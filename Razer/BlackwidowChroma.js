@@ -1,3 +1,14 @@
+export function Name() { return "Razer Blackwidow Chroma"; }
+export function VendorId() { return 0x1532; }
+export function ProductId() { return 0x0203; }
+export function Publisher() { return "WhirlwindFX"; }
+export function Size() { return [22, 6]; }
+export function Type() { return "Hid"; }
+var vLedNames = ["Keyboard"];
+
+var vLedPositions = [[0,1]];
+
+
 function GetReport(cmd_class, cmd_id, size)
 {
     var report = new Array(91).fill(0);
@@ -48,16 +59,6 @@ function CalculateCrc(report)
 }
 
 
-export function Name() { return "Razer Blackwidow 2019"; }
-export function VendorId() { return 0x1532; }
-export function ProductId() { return 0x0241; }
-export function Publisher() { return "WhirlwindFX"; }
-export function Size() { return [22, 6]; }
-export function Type() { return "Hid"; }
-var vLedNames = ["Keyboard"];
-
-var vLedPositions = [[0,1]];
-
 export function LedNames()
 {
   return vLedNames;
@@ -71,6 +72,7 @@ export function LedPositions()
 function EnableSoftwareControl()
 {    
     var report = GetReport(0x0F, 0x03, 0x47);
+   // 0x03, 0x0B, 0x46
 
     report[2] = 0x3F; // transaction id.
 
@@ -92,54 +94,57 @@ function ReturnToHardwareControl()
 
 
 export function Initialize()
-{
+{      
     
 }
 
+
 function SendPacket(idx)
 {
-    var packet = [];
+    var packet = new Array(91).fill(0);
     packet[0] = 0x00;
     packet[1] = 0x00;
-    packet[2] = 0x3F;
+    packet[2] = 0xFF;
     packet[3] = 0x00;
     packet[4] = 0x00;
     packet[5] = 0x00;
-    packet[6] = 0x47;
-    packet[7] = 0x0F;
-    packet[8] = 0x03;
-    packet[11] = idx;
-    packet[13] = 0x15;
+    packet[6] = 0x46;
+    packet[7] = 0x03;
+    packet[8] = 0x0B;
+    packet[9] = 0xFF;
+    packet[10] = idx;
+    packet[12] = 0x15;
 
     
     for(var iIdx = 0; iIdx < 22; iIdx++){
         var col = device.color(iIdx,idx);
         var iLedIdx = (iIdx*3) + 14;
-        packet[iLedIdx] = col[0];
-        packet[iLedIdx+1] = col[1];
-        packet[iLedIdx+2] = col[2];
+        packet[iLedIdx] = col[0]; //0; //0xF7;
+        packet[iLedIdx+1] = col[1]; //0;
+        packet[iLedIdx+2] = col[2]; //255;
     }
 
     packet[89] = CalculateCrc(packet);
-
-    device.send_report(packet, 91);
+    device.send_report(packet, 91);    
+    device.pause(1); // We need a pause here (between packets), otherwise the ornata can't keep up.
 }
 
 
 function Apply()
 {
-    var packet = []; //new Array(91).fill(0);
+    var packet = new Array(91).fill(0);
     packet[0] = 0x00;
     packet[1] = 0x00;
-    packet[2] = 0x3F;
+    packet[2] = 0xFF;
     packet[3] = 0x00;
     packet[4] = 0x00;
     packet[5] = 0x00;
-    packet[6] = 0x0C;
-    packet[7] = 0x0F;
-    packet[8] = 0x02;
-    packet[11] = 0x08;
-    
+    packet[6] = 0x02;
+    packet[7] = 0x03;
+    packet[8] = 0x0A;
+    packet[9] = 0x05;
+    packet[10] = 0x01;
+        
     packet[89] = CalculateCrc(packet);
 
     device.send_report(packet, 91);
@@ -147,14 +152,14 @@ function Apply()
 
 
 export function Render()
-{    
-    SendPacket(0);
-    SendPacket(1);
+{                
+    SendPacket(0);   
+    SendPacket(1);  
     SendPacket(2);
-    SendPacket(3);
-    SendPacket(4);
-    SendPacket(5);    
-    Apply();
+    SendPacket(3);    
+    SendPacket(4);   
+    SendPacket(5);          
+    Apply();        
 }
 
 
@@ -163,10 +168,12 @@ export function Shutdown()
     
 }
 
+
 export function Validate(endpoint)
 {
     return endpoint.interface === 2;
 }
+
 
 export function Image()
 {

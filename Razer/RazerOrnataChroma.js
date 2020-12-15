@@ -48,9 +48,9 @@ function CalculateCrc(report)
 }
 
 
-export function Name() { return "Razer Blackwidow 2019"; }
+export function Name() { return "Razer Ornata Chroma"; }
 export function VendorId() { return 0x1532; }
-export function ProductId() { return 0x0241; }
+export function ProductId() { return 0x021e; }
 export function Publisher() { return "WhirlwindFX"; }
 export function Size() { return [22, 6]; }
 export function Type() { return "Hid"; }
@@ -71,6 +71,7 @@ export function LedPositions()
 function EnableSoftwareControl()
 {    
     var report = GetReport(0x0F, 0x03, 0x47);
+   // 0x03, 0x0B, 0x46
 
     report[2] = 0x3F; // transaction id.
 
@@ -90,15 +91,80 @@ function ReturnToHardwareControl()
 
 }
 
+function Unknown1()
+{
+    var packet = [];
+    packet[0] = 0x00;
+    packet[1] = 0x00;
+    packet[2] = 0xFF;
+    packet[3] = 0x00;
+    packet[4] = 0x00;
+    packet[5] = 0x00;
+    packet[6] = 0x16;
+    packet[7] = 0x00;
+    packet[8] = 0x82;
+    
+    packet[89] = CalculateCrc(packet);
+
+    device.send_report(packet, 91);
+}
+function Unknown2()
+{
+    var packet = [];
+    packet[0] = 0x00;
+    packet[1] = 0x00;
+    packet[2] = 0xFF;
+    packet[3] = 0x00;
+    packet[4] = 0x00;
+    packet[5] = 0x00;
+    packet[6] = 0x02;
+    packet[7] = 0x00;
+    packet[8] = 0x81;
+    
+    packet[89] = CalculateCrc(packet);
+
+    device.send_report(packet, 91);
+}
+
+function UnknownInit()
+{
+    var packet = [];
+    packet[0] = 0x00;
+    packet[1] = 0x00;
+    packet[2] = 0x3F;
+    packet[3] = 0x00;
+    packet[4] = 0x00;
+    packet[5] = 0x00;
+    packet[6] = 0x02;
+    packet[7] = 0x00;
+    packet[8] = 0x04;
+    
+    packet[89] = CalculateCrc(packet);
+
+    device.send_report(packet, 91);
+}
+
 
 export function Initialize()
-{
-    
+{      
+    /* 
+    UnknownInit();
+    Unknown1();
+    Unknown2();
+
+    SendPacket(0);   
+    SendPacket(1);  
+    SendPacket(2);
+    SendPacket(3);    
+    SendPacket(4);   
+    SendPacket(5);          
+    Apply();
+    */
 }
 
 function SendPacket(idx)
 {
-    var packet = [];
+    var packet = new Array(91).fill(0);
     packet[0] = 0x00;
     packet[1] = 0x00;
     packet[2] = 0x3F;
@@ -115,20 +181,19 @@ function SendPacket(idx)
     for(var iIdx = 0; iIdx < 22; iIdx++){
         var col = device.color(iIdx,idx);
         var iLedIdx = (iIdx*3) + 14;
-        packet[iLedIdx] = col[0];
-        packet[iLedIdx+1] = col[1];
-        packet[iLedIdx+2] = col[2];
+        packet[iLedIdx] = col[0]; //0; //0xF7;
+        packet[iLedIdx+1] = col[1]; //0;
+        packet[iLedIdx+2] = col[2]; //255;
     }
 
     packet[89] = CalculateCrc(packet);
-
-    device.send_report(packet, 91);
+    device.send_report(packet, 91);    
+    device.pause(1); // We need a pause here (between packets), otherwise the ornata can't keep up.
 }
-
 
 function Apply()
 {
-    var packet = []; //new Array(91).fill(0);
+    var packet = new Array(91).fill(0);
     packet[0] = 0x00;
     packet[1] = 0x00;
     packet[2] = 0x3F;
@@ -138,6 +203,8 @@ function Apply()
     packet[6] = 0x0C;
     packet[7] = 0x0F;
     packet[8] = 0x02;
+    packet[9] = 0x00;
+    packet[10] = 0x00;
     packet[11] = 0x08;
     
     packet[89] = CalculateCrc(packet);
@@ -147,14 +214,16 @@ function Apply()
 
 
 export function Render()
-{    
-    SendPacket(0);
-    SendPacket(1);
+{                
+    SendPacket(0);   
+    SendPacket(1);  
     SendPacket(2);
-    SendPacket(3);
-    SendPacket(4);
-    SendPacket(5);    
+    SendPacket(3);    
+    SendPacket(4);   
+    SendPacket(5);          
     Apply();
+        
+    
 }
 
 
