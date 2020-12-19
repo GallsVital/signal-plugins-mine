@@ -52,14 +52,14 @@ export function Name() { return "Razer Base Station Chroma White"; }
 export function VendorId() { return 0x1532; }
 export function ProductId() { return 0x0f08; }
 export function Publisher() { return "WhirlwindFX"; }
-export function Size() { return [10,10]; }
+export function Size() { return [6,6]; }
 export function Type() { return "Hid"; }
 
 
 var vLedNames = ["Base Station"];
 var vLedPositions = [
 
-    [0,5],[0,4],[0,2],[1,1],[3,1],[5,1],[7,1],[9,1],[9,4],[9,6],[9,8],[9,9],[7,9],[5,9],[4,9],[3,9],[1,9],[1,8],[1,6],[1,6]
+    [0,0],[0,1],[0,2],[0,3],[0,4],[0,5],[1,5],[2,5],[3,5],[5,5],[5,4],[5,3],[5,2],[5,1],[5,0],[5,0]
 
 ];
 
@@ -161,7 +161,6 @@ export function Render()
 {    
     SendPacket();
 
-    
 }
 
 

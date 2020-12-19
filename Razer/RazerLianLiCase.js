@@ -52,17 +52,15 @@ export function Name() { return "Razer Lian Li Case"; }
 export function VendorId() { return 0x1532; }
 export function ProductId() { return 0x0f13; }
 export function Publisher() { return "WhirlwindFX"; }
-export function Size() { return [20,20]; }
+export function Size() { return [20,1]; }
 export function Type() { return "Hid"; }
 
 
-var vLedNames = ["Front Panel 1","Front Panel 2","Front Panel 3","Front Panel 4","Front Panel 5","Front Panel 6",
-"Right Under 1","Right Under 2","Right Under 3","Right Under 4","Right Under 5","Right Under 6",
-"Left Under 1","Left Under 2","Left Under 3","Left Under 4","Left Under 5","Left Under 6"
+var vLedNames = ["Case",
 ];
 var vLedPositions = [
 
-    [18,18],[18,16],[18,12],[18,8],[18,6],[18,2],[18,0], [12,10], [12,12], [12,14], [12,16], [8,16], [8,14], [8,12], [8,10], [8,8], [8,6]
+    [1,0],[2,0],[3,0],[4,0],[5,0],[6,0],[7,0],[8,0],[8,0],[8,0],[9,0],[10,0],[11,0],[12,0],[13,0],[14,0],[15,0],[16,0],[16,0],[16,0]
 
 ];
 
@@ -138,6 +136,8 @@ function SendPacket(idx)
     packet[89] = CalculateCrc(packet);
 
     device.send_report(packet, 91);
+    device.pause(1); // We need a pause here (between packets), otherwise the ornata can't keep up.
+
 
 }
 
@@ -168,6 +168,8 @@ export function Render()
     SendPacket(1);
     SendPacket(2);
     SendPacket(3);
+    SendPacket(4);
+    SendPacket(5);
     
 }
 

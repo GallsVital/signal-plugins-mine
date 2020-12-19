@@ -7,11 +7,10 @@ export function Type() { return "Hid"; }
 var vLedNames = ["Left", "Right"];
 
 var vLedPositions = [
+    [5,5],[4,5],[3,5],[2,5],[1,5],[0,5],
+    [0,5],[0,4],[0,3],[0,2],[0,1],[0,0],
     [0,0],[1,0],[2,0],[3,0],[4,0],[5,0],
-    [0,1],[1,1],[2,1],[3,1],[4,1],[5,1],
-    [0,2],[1,2],[2,2],[3,2],[4,2],[5,2],
-    [0,3],[1,3],[2,3],[3,3],[4,3],[5,3],
-    
+    [5,1],[5,2],[5,3],[5,4],[5,5],[5,5],[5,5],[5,5]
     
 
 ];
@@ -53,14 +52,14 @@ function SendPacket(value,speaker)
     
 
 
-    for(var iIdx = 0; iIdx < 24; iIdx++){
+    for(var iIdx = 0; iIdx < vLedPositions.length; iIdx++){
 
         
         var iPxX = vLedPositions[iIdx][0];
         var iPxY = vLedPositions[iIdx][1];
 
-        if(speaker == 1){
-            var col = device.color(24-iPxX, iPxY);
+        if(speaker == 0){
+            var col = device.color(14+iPxX, iPxY);
         }else{
             var col = device.color(iPxX, iPxY);
         }
@@ -80,16 +79,15 @@ function SendPacket(value,speaker)
     packet[89] = value;
     packet[90] = 0x00;
 
-    device.send_report(packet, 91);    
+    device.send_report(packet, 91);
+    device.pause(1); // We need a pause here (between packets), otherwise the ornata can't keep up.
+    
 }
 
 export function Render()
 {                
 
-    SendPacket(56,0);
     SendPacket(57,0);
-
-    SendPacket(56,1);
     SendPacket(57,1);
          
 }

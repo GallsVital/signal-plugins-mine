@@ -48,9 +48,9 @@ function CalculateCrc(report)
 }
 
 
-export function Name() { return "Razer FireFly V2"; }
+export function Name() { return "Razer FireFly Hard Edition"; }
 export function VendorId() { return 0x1532; }
-export function ProductId() { return 0x0c04; }
+export function ProductId() { return 0x0c00; }
 export function Publisher() { return "WhirlwindFX"; }
 export function Size() { return [10,10]; }
 export function Type() { return "Hid"; }
@@ -59,7 +59,7 @@ export function Type() { return "Hid"; }
 var vLedNames = ["MousePad"];
 var vLedPositions = [
 
-    [5,0],[4,0],[2,0],[1,1],[1,3],[1,3],[1,7],[1,9],[4,9],[6,9],[8,9],[9,9],[9,7],[9,5],[9,4],[9,3],[9,1],[8,1],[6,1],[5,1]
+    [9,0],[9,2],[9,4],[9,6],[9,7],[7,7],[7,5],[7,3],[7,1],[6,1],[5,1],[4,1],[3,0],[2,0],[1,0]
 
 ];
 
@@ -107,14 +107,16 @@ function SendPacket()
     packet[0] = 0x00;
     packet[1] = 0x00;
     packet[2] = 0x1F;
-    packet[3] = 0x00;
+    packet[3] = 0x00;  
     packet[4] = 0x00;
     packet[5] = 0x00;
-    packet[6] = 0x3E;
-    packet[7] = 0x0F;
-    packet[8] = 0x03;
-    packet[11] = 0;
-    packet[13] = 0x12;
+    packet[6] = 0x2F;
+    packet[7] = 0x03;
+    packet[8] = 0x0C;
+    packet[9] = 0x00;
+    packet[10] = 0x0E;
+    
+    
 
     
     for(var iIdx = 0; iIdx < vLedPositions.length; iIdx++){
@@ -123,7 +125,7 @@ function SendPacket()
         var iPxY = vLedPositions[iIdx][1];
         var col = device.color(iPxX, iPxY);
 
-        var iLedIdx = (iIdx*3) + 14;
+        var iLedIdx = (iIdx*3) + 11;
         packet[iLedIdx] = col[0];
         packet[iLedIdx+1] = col[1];
         packet[iLedIdx+2] = col[2];
@@ -142,14 +144,14 @@ function Apply()
     var packet = []; //new Array(91).fill(0);
     packet[0] = 0x00;
     packet[1] = 0x00;
-    packet[2] = 0x3F;
+    packet[2] = 0x1F;
     packet[3] = 0x00;
-    packet[4] = 0x00;
+    packet[4] = 0x00;  
     packet[5] = 0x00;
-    packet[6] = 0x0C;
-    packet[7] = 0x0F;
-    packet[8] = 0x02;
-    packet[11] = 0x08;
+    packet[6] = 0x02;
+    packet[7] = 0x03;
+    packet[8] = 0x0A;
+    packet[9] = 0x05;
     
     packet[89] = CalculateCrc(packet);
 
@@ -160,6 +162,7 @@ function Apply()
 export function Render()
 {    
     SendPacket();
+    Apply();
 
     
 }
