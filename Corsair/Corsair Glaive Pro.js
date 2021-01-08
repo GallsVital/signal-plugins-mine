@@ -10,15 +10,15 @@ var CORSAIR_PROPERTY_SPECIAL_FUNCTION = 0x04;
 var CORSAIR_PROPERTY_SUBMIT_MOUSE_COLOR         = 0x22;
 
 
-export function Name() { return "Corsair Dark Core RGB Pro"; }
+export function Name() { return "Corsair Glaive Pro RGB Mouse"; }
 export function VendorId() { return 0x1b1c; }
-export function ProductId() { return  0x0000;} //0x1B7F; } //Disabled for testing
+export function ProductId() { return 0x1b74; }
 export function Publisher() { return "WhirlwindFX"; }
 export function Size() { return [3, 3]; }
 
 var vLedNames = ["Mouse"];
 
-var vLedPositions = [[1,1],[1,1],[1,1],[1,1],[1,1],[1,1],[1,1],[1,1]];
+var vLedPositions = [[1,1]];
 
 export function LedNames()
 {
@@ -70,48 +70,24 @@ export function Render()
 {
     var packet = []
     packet[0x00]   = 0x00;
-    packet[0x01]   = 0x09;     
-    packet[0x02]   = 0x06;
-    packet[0x03]   = 0x00;
-    packet[0x04]   = 0x24;
-    packet[0x05]   = 0x00;
-    packet[0x06]   = 0x00;
-    packet[0x07]   = 0x00;
-
-
-
-
+    packet[0x01]   = CORSAIR_COMMAND_WRITE;
+    packet[0x02]   = CORSAIR_PROPERTY_SUBMIT_MOUSE_COLOR;
+    packet[0x03]   = 1;
+    packet[0x04]   = 0x00;
 
     // Fetch color at 1,1
     var iX = vLedPositions[0][0];
     var iY = vLedPositions[0][1];
     var col = device.color(iX,iY);
-    var red = [];
-    var green = [];
-    var blue = [];
 
-    for(var iIdx = 0; iIdx < vLedPositions.length; iIdx++)
+    // Single zone - apply to mouse.
+    for(var zone_idx = 0; zone_idx < 1; zone_idx++)
     {
-        var iPxX = vLedPositions[iIdx][0];
-        var iPxY = vLedPositions[iIdx][1];
-        var mxPxColor = device.color(iPxX, iPxY);
-        red[iIdx] = mxPxColor[0];
-        green[iIdx] = mxPxColor[1];
-        blue[iIdx] = mxPxColor[2];
-
-     }
-     packet = packet.concat(red);
-     packet.push(0x00);
-     packet.push(0x00);
-     packet.push(0x00);
-     packet.push(0x00);
-     packet = packet.concat(green);
-     packet.push(0xBF);
-     packet.push(0x00);
-     packet.push(0x00);
-     packet.push(0x00);
-     packet = packet.concat(blue);
-     packet.push(0xFF);
+        packet[(zone_idx * 4) + 5] = zone_idx;
+        packet[(zone_idx * 4) + 6] = col[0];
+        packet[(zone_idx * 4) + 7] = col[1];
+        packet[(zone_idx * 4) + 8] = col[2];
+    }
 
     device.write(packet, 65);
 }
