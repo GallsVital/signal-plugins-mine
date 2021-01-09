@@ -1,8 +1,8 @@
-export function Name() { return "Corsair K70 RGB mkII Low Profile"; }
+export function Name() { return "Corsair K95 Plat XT"; }
 export function VendorId() { return 0x1b1c; }
-export function ProductId() { return 0x1b55; }
+export function ProductId() { return 0x1B89; }
 export function Publisher() { return "WhirlwindFX"; }
-export function Size() { return [21, 7]; }
+export function Size() { return [24, 8]; }
 
 
 var CORSAIR_COMMAND_WRITE       = 0x07;
@@ -43,9 +43,9 @@ export function Initialize()
 
 export function Shutdown()
 {
-    var red = [144];
-    var green = [144];
-    var blue = [144];
+    var red = [168];
+    var green = [168];
+    var blue = [168];
 
 
     for(var iIdx = 0; iIdx < vKeys.length; iIdx++)
@@ -53,8 +53,8 @@ export function Shutdown()
         var iPxX = vKeyPositions[iIdx][0];
         var iPxY = vKeyPositions[iIdx][1];
         var mxPxColor = device.color(iPxX, iPxY);
-        red[vKeys[iIdx]] = 255;
-        green[vKeys[iIdx]] = 0;
+        red[vKeys[iIdx]] = 0;
+        green[vKeys[iIdx]] = 255;
         blue[vKeys[iIdx]] = 0;
     }
     
@@ -65,7 +65,7 @@ export function Shutdown()
    \*-----------------------------------------------------*/
    StreamPacket(1, 60, red.splice(0,60));
    StreamPacket(2, 60, red.splice(0,60));
-   StreamPacket(3, 24, red.splice(0,24));
+   StreamPacket(3, 48, red.splice(0,48));
    SubmitKbColors(1, 3, 1);
 
    /*-----------------------------------------------------*\
@@ -73,7 +73,7 @@ export function Shutdown()
    \*-----------------------------------------------------*/
    StreamPacket(1, 60, green.splice(0,60));
    StreamPacket(2, 60, green.splice(0,60));
-   StreamPacket(3, 24, green.splice(0,24));
+   StreamPacket(3, 48, green.splice(0,48));
    SubmitKbColors(2, 3, 1);
 
    /*-----------------------------------------------------*\
@@ -81,7 +81,7 @@ export function Shutdown()
    \*-----------------------------------------------------*/
    StreamPacket(1, 60, blue.splice(0,60));
    StreamPacket(2, 60, blue.splice(0,60));
-   StreamPacket(3, 24, blue.splice(0,24));
+   StreamPacket(3, 48, blue.splice(0,48));
    SubmitKbColors(3, 3, 2);
 }
 
@@ -134,14 +134,34 @@ function SubmitKbColors(color_channel, packet_count, finish_val)
 
 
 // This is an array of key indexes for setting colors in our render array, indexed left to right, row top to bottom.
-var vKeys = [
-                   125, 137, 8,                       59,                               20,    // Special key row.
-    0,     12, 24, 36, 48,     60, 72, 84, 96,     108, 120, 132, 6,     18, 30, 42,    32, 44, 56,  68,  //20
-    1,   13, 25, 37, 49, 61, 73, 85, 97, 109, 121, 133, 7,       31,     54, 66, 78,    80, 92, 104, 116, //21
-    2,   14, 26, 38, 50, 62, 74, 86, 98, 110, 122, 134,   90,   102,     43, 55, 67,    9,  21, 33,  128, //21   
-    3,   15, 27, 39, 51, 63, 75, 87, 99, 111, 123, 135,         126,                    57, 69, 81,       //16
-    4,   28, 40, 52, 64, 76, 88, 100,112, 124, 136,          79,         103,       93, 105, 117, 140,
-    5,   17, 29,            53,                    89, 101, 113, 91,     115,127,139,   129, 141
+ var vKeys = [
+            125, 137, 8,                       59,                               20,    // Special key row.
+ 10, 0,     12, 24, 36, 48,     60, 72, 84, 96,     108, 120, 132, 6,     18, 30, 42,    32, 44, 56,  68,  //20
+ 22, 1,   13, 25, 37, 49, 61, 73, 85, 97, 109, 121, 133, 7,       31,     54, 66, 78,    80, 92, 104, 116, //21
+ 34, 2,   14, 26, 38, 50, 62, 74, 86, 98, 110, 122, 134,   90,   102,     43, 55, 67,    9,  21, 33,  128, //21   
+ 46, 3,   15, 27, 39, 51, 63, 75, 87, 99, 111, 123, 135,         126,                    57, 69, 81,       //16
+ 58, 4,   28, 40, 52, 64, 76, 88, 100,112, 124, 136,          79,         103,       93, 105, 117, 140,
+ 70, 5,   17, 29,            53,                    89, 101, 113, 91,     115,127,139,   129, 141,
+
+//Top Light Strip
+ 144,145,146,158,160,147,148,149,150,151,152,153,154,155, 159,162,161,156,157,
+ 
+ 
+ ];
+// This array must be the same length as vKeys[], and represents the pixel color position in our pixel matrix that we reference.  For example,
+// item at index 3 [9,0] represents the corsair logo, and the render routine will grab its color from [9,0].
+var vKeyPositions = [
+                  [3,1], [4,1], [5,1],                                                                                                 [18,1],  [18,1],           // Logo & specialkey row.
+[0,1], [1,1], [2,1], [3,1], [4,1], [5,1], [6,1], [7,1], [8,1], [9,1], [10,1], [11,1], [12,1],         [14,1],   [15,1], [16,1], [17,1],   [18,1], [19,1],[20,1], [21,1], //20
+[0,2], [1,2], [2,2], [3,2], [4,2], [5,2], [6,2], [7,2], [8,2], [9,2], [10,2], [11,2], [12,2], [13,2], [14,2],   [15,2], [16,2], [17,2],   [18,2], [19,2],[20,2], [21,2], //21
+[0,3], [1,3], [2,3], [3,3], [4,3], [5,3], [6,3], [7,3], [8,3], [9,3], [10,3], [11,3], [12,3], [13,3], [14,3],   [15,3], [16,3], [17,3],   [18,3], [19,3],[20,3], [21,3], //21
+[0,4], [1,4], [2,4], [3,4], [4,4], [5,4], [6,4], [7,4], [8,4], [9,4], [10,4], [11,4], [12,4],         [14,4],                             [18,4], [19,4],[20,4], // 16
+[0,5], [1,5], [2,5], [3,5], [4,5], [5,5], [6,5], [7,5], [8,5], [9,5], [10,5], [11,5], [13,5],                           [16,5],           [18,5], [19,5],[20,5],[21,5], // 17
+[0,6], [1,6], [2,6], [3,6],                      [7,6],                       [11,6], [12,6], [13,6], [14,6],   [15,6], [16,6], [17,6],   [18,6],        [20,6], // 14
+
+//Top Light Strip
+[0,0],[1,0],[2,0],[3,0],[5,0],[6,0],[7,0],[8,0],[9,0],[11,0],[12,0],[13,0],[14,0],[16,0],[17,0],[18,0],[19,0],[20,0],[21,0],
+    
 ];
 
 var vKeyNames = [
@@ -154,17 +174,7 @@ var vKeyNames = [
 "Left Ctrl", "Left Win", "Left Alt", "Space", "Right Alt", "Right Win", "Menu", "Right Ctrl",  "Left Arrow", "Down Arrow", "Right Arrow", "Num 0", "Num ."                       //13
 ];
 
-// This array must be the same length as vKeys[], and represents the pixel color position in our pixel matrix that we reference.  For example,
-// item at index 3 [9,0] represents the corsair logo, and the render routine will grab its color from [9,0].
-var vKeyPositions = [
-                         [3,0], [4,0], [5,0],                      [9,0],                                                             [17,0],   // Logo & specialkey row.
-    [0,1], [1,1], [2,1], [3,1], [4,1], [5,1], [6,1], [7,1], [8,1], [9,1], [10,1], [11,1],         [13,1],   [14,1], [15,1], [16,1],   [17,1], [18,1],[19,1], [20,1], //20
-    [0,2], [1,2], [2,2], [3,2], [4,2], [5,2], [6,2], [7,2], [8,2], [9,2], [10,2], [11,2], [12,2], [13,2],   [14,2], [15,2], [16,2],   [17,2], [18,2],[19,2], [20,2], //21
-    [0,3], [1,3], [2,3], [3,3], [4,3], [5,3], [6,3], [7,3], [8,3], [9,3], [10,3], [11,3], [12,3], [13,3],   [14,3], [15,3], [16,3],   [17,3], [18,3],[19,3], [20,3], //21
-    [0,4], [1,4], [2,4], [3,4], [4,4], [5,4], [6,4], [7,4], [8,4], [9,4], [10,4], [11,4],         [13,4],                             [17,4], [18,4],[19,4], // 16
-    [0,5], [1,5], [2,5], [3,5], [4,5], [5,5], [6,5], [7,5], [8,5], [9,5], [10,5], [11,5],         [13,5],           [15,5],           [17,5], [18,5],[19,5], // 17
-    [0,6], [1,6], [2,6],                      [6,6],                      [10,6], [11,6], [12,6], [13,6],   [14,6], [15,6], [16,6],   [17,6],        [19,6] // 14
-];
+
 
 // These arrays are unused and for development reference.
 var vMedia = [
@@ -191,9 +201,9 @@ export function LedPositions()
 
 export function Render()
 {
-    var red = [144];
-    var green = [144];
-    var blue = [144];
+    var red = [168];
+    var green = [168];
+    var blue = [168];
 
 
     for(var iIdx = 0; iIdx < vKeys.length; iIdx++)
@@ -213,7 +223,7 @@ export function Render()
    \*-----------------------------------------------------*/
    StreamPacket(1, 60, red.splice(0,60));
    StreamPacket(2, 60, red.splice(0,60));
-   StreamPacket(3, 24, red.splice(0,24));
+   StreamPacket(3, 48, red.splice(0,48));
    SubmitKbColors(1, 3, 1);
 
    /*-----------------------------------------------------*\
@@ -221,7 +231,7 @@ export function Render()
    \*-----------------------------------------------------*/
    StreamPacket(1, 60, green.splice(0,60));
    StreamPacket(2, 60, green.splice(0,60));
-   StreamPacket(3, 24, green.splice(0,24));
+   StreamPacket(3, 48, green.splice(0,48));
    SubmitKbColors(2, 3, 1);
 
    /*-----------------------------------------------------*\
@@ -229,14 +239,14 @@ export function Render()
    \*-----------------------------------------------------*/
    StreamPacket(1, 60, blue.splice(0,60));
    StreamPacket(2, 60, blue.splice(0,60));
-   StreamPacket(3, 24, blue.splice(0,24));
+   StreamPacket(3, 48, blue.splice(0,48));
    SubmitKbColors(3, 3, 2);
 }
 
 
 export function Validate(endpoint)
 {
-    return endpoint.interface === 1;
+    return endpoint.interface === 3;
 }
 
 

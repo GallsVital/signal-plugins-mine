@@ -10,15 +10,15 @@ var CORSAIR_PROPERTY_SPECIAL_FUNCTION = 0x04;
 var CORSAIR_PROPERTY_SUBMIT_MOUSE_COLOR         = 0x22;
 
 
-export function Name() { return "Corsair Nightsword"; }
+export function Name() { return "Corsair Sabre RGB"; }
 export function VendorId() { return 0x1b1c; }
-export function ProductId() { return 0x1B5C; }
+export function ProductId() { return 0x1B2F; }
 export function Publisher() { return "WhirlwindFX"; }
-export function Size() { return [3, 4]; }
+export function Size() { return [3, 3]; }
 
-var vLedNames = ["Logo Zone","Rear Zone","Front Zone", "Scroll Zone"];
+var vLedNames = ["Scroll Zone","Front Zone","N/A","Logo Zone"];
 
-var vLedPositions = [[2,2],[2,3],[1,0],[0,0]
+var vLedPositions = [[1,1],[1,0],[1,1],[1,2]
 ];
 
 export function LedNames()
@@ -75,7 +75,7 @@ export function Render()
     packet[0x02]   = CORSAIR_PROPERTY_SUBMIT_MOUSE_COLOR;
     packet[0x03]   = 0x04;
     packet[0x04]   = 0x01;
-    var zoneId = [2,6,1,4]
+    var zoneId = [4,3,1,2]
 
     // Single zone - apply to mouse.
     for(var zone_idx = 0; zone_idx < vLedPositions.length; zone_idx++)
@@ -99,13 +99,14 @@ export function Validate(endpoint)
 
 export function Shutdown()
 {
+
     var packet = []
     packet[0x00]   = 0x00;
     packet[0x01]   = CORSAIR_COMMAND_WRITE;
     packet[0x02]   = CORSAIR_PROPERTY_SUBMIT_MOUSE_COLOR;
     packet[0x03]   = 0x04;
     packet[0x04]   = 0x01;
-    var zoneId = [2,6,1,4]
+    var zoneId = [4,3,1,2]
 
     // Single zone - apply to mouse.
     for(var zone_idx = 0; zone_idx < vLedPositions.length; zone_idx++)
@@ -120,7 +121,6 @@ export function Shutdown()
     }
 
     device.write(packet, 65);
-
     ReturnToHardwareControl();
 }
 

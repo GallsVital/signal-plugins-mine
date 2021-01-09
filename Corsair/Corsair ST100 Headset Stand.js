@@ -43,8 +43,27 @@ export function Initialize()
 
 export function Shutdown()
 {
-    // Return to some BS here?  Solid color?
-}
+    var packet = []
+    packet[0x00]   = 0x00;
+    packet[0x01]   = 0x07;    
+    packet[0x02]   = 0x22;
+    packet[0x03]   = 0x14;
+    packet[0x04]   = 0x00;
+
+
+    //vKeys.length
+    for(var iIdx = 0; iIdx < vKeyPositions.length; iIdx++)
+    {
+        var iPxX = vKeyPositions[iIdx][0];
+        var iPxY = vKeyPositions[iIdx][1];
+        var mxPxColor = device.color(iPxX, iPxY);
+        packet[0x05+iIdx*3] = 255;
+        packet[0x06+iIdx*3 ] = 0;
+        packet[0x07+iIdx*3 ] = 0
+
+     }
+    
+    device.write(packet,65);}
 
 
 var vKeyNames = [

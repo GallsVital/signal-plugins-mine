@@ -43,7 +43,47 @@ export function Initialize()
 
 export function Shutdown()
 {
-    // Return to some BS here?  Solid color?
+      
+     var red = [144];
+    var green = [144];
+    var blue = [144];
+
+
+    for(var iIdx = 0; iIdx < vKeys.length; iIdx++)
+    {
+        var iPxX = vKeyPositions[iIdx][0];
+        var iPxY = vKeyPositions[iIdx][1];
+        var mxPxColor = device.color(iPxX, iPxY);
+        red[vKeys[iIdx]] = 255;
+        green[vKeys[iIdx]] = 0;
+        blue[vKeys[iIdx]] = 0;
+    }
+    
+    
+    
+    /*-----------------------------------------------------*\
+   | Send red bytes                                        |
+   \*-----------------------------------------------------*/
+   StreamPacket(1, 60, red.splice(0,60));
+   StreamPacket(2, 60, red.splice(0,60));
+   StreamPacket(3, 24, red.splice(0,24));
+   SubmitKbColors(1, 3, 1);
+
+   /*-----------------------------------------------------*\
+   | Send green bytes                                      |
+   \*-----------------------------------------------------*/
+   StreamPacket(1, 60, green.splice(0,60));
+   StreamPacket(2, 60, green.splice(0,60));
+   StreamPacket(3, 24, green.splice(0,24));
+   SubmitKbColors(2, 3, 1);
+
+   /*-----------------------------------------------------*\
+   | Send blue bytes                                       |
+   \*-----------------------------------------------------*/
+   StreamPacket(1, 60, blue.splice(0,60));
+   StreamPacket(2, 60, blue.splice(0,60));
+   StreamPacket(3, 24, blue.splice(0,24));
+   SubmitKbColors(3, 3, 2);
 }
 
 

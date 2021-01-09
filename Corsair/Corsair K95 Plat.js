@@ -43,7 +43,46 @@ export function Initialize()
 
 export function Shutdown()
 {
-    // Return to some BS here?  Solid color?
+    var red = [168];
+    var green = [168];
+    var blue = [168];
+
+
+    for(var iIdx = 0; iIdx < vKeys.length; iIdx++)
+    {
+        var iPxX = vKeyPositions[iIdx][0];
+        var iPxY = vKeyPositions[iIdx][1];
+        var mxPxColor = device.color(iPxX, iPxY);
+        red[vKeys[iIdx]] = 255;
+        green[vKeys[iIdx]] = 0;
+        blue[vKeys[iIdx]] = 0;
+    }
+    
+    
+    
+    /*-----------------------------------------------------*\
+   | Send red bytes                                        |
+   \*-----------------------------------------------------*/
+   StreamPacket(1, 60, red.splice(0,60));
+   StreamPacket(2, 60, red.splice(0,60));
+   StreamPacket(3, 48, red.splice(0,48));
+   SubmitKbColors(1, 3, 1);
+
+   /*-----------------------------------------------------*\
+   | Send green bytes                                      |
+   \*-----------------------------------------------------*/
+   StreamPacket(1, 60, green.splice(0,60));
+   StreamPacket(2, 60, green.splice(0,60));
+   StreamPacket(3, 48, green.splice(0,48));
+   SubmitKbColors(2, 3, 1);
+
+   /*-----------------------------------------------------*\
+   | Send blue bytes                                       |
+   \*-----------------------------------------------------*/
+   StreamPacket(1, 60, blue.splice(0,60));
+   StreamPacket(2, 60, blue.splice(0,60));
+   StreamPacket(3, 48, blue.splice(0,48));
+   SubmitKbColors(3, 3, 2);
 }
 
 
@@ -126,145 +165,13 @@ var vKeyPositions = [
 ];
 
 var vKeyNames = [
-    "Escape",          //0
-    "`",               //1
-    "Tab",             //2
-    "Caps Lock",       //3
-    "Left Shift",      //4
-    "Left Control",    //5
-    "F12",             //6
-    "=",               //7
-    "Lock",            //8
-    "Number Pad 7",    //9
-    "F1",              //12
-    "1",               //13
-    "Q",               //14
-    "A",               //15
-    "Left Windows",    //17
-    "Print Screen",    //18
-    "Media Mute",      //20
-    "Number Pad 8",    //21
-    "F2",              //24
-    "2",               //25
-    "W",               //26
-    "S",               //27
-    "Z",               //28
-    "Left Alt",        //29
-    "Scroll Lock",     //30
-    "Backspace",       //31
-    "Media Stop",      //32
-    "Number Pad 9",    //33
-    "F3",              //36
-    "3",               //37
-    "E",               //38
-    "D",               //39
-    "X",               //40
-    "Pause/Break",     //42
-    "Delete",          //43
-    "Media Previous",  //44
-    "F4",              //48
-    "4",               //49
-    "R",               //50
-    "F",               //51
-    "C",               //52
-    "Space",           //53
-    "Insert",          //54
-    "End",             //55
-    "Media Play/Pause",//56
-    "Number Pad 4",    //57
-    "F5",              //60
-    "5",               //61
-    "T",               //62
-    "G",               //63
-    "V",               //64
-    "Home",            //66
-    "Page Down",       //67
-    "Media Next",      //68
-    "Number Pad 5",    //69
-    "F6",              //72
-    "6",               //73
-    "Y",               //74
-    "H",               //75
-    "B",               //76
-    "Page Up",         //78
-    "Right Shift",     //79
-    "Num Lock",        //80
-    "Number Pad 6",    //81
-    "F7",              //84
-    "7",               //85
-    "U",               //86
-    "J",               //87
-    "N",               //88
-    "Right Alt",       //89
-    "]",               //90
-    "Right Control",   //91
-    "Number Pad /",    //92
-    "Number Pad 1",    //93
-    "F8",              //96
-    "8",               //97
-    "I",               //98
-    "K",               //99
-    "M",               //100
-    "Right Windows",   //101
-    "\\ (ANSI)",       //102
-    "Up Arrow",        //103
-    "Number Pad *",    //104
-    "Number Pad 2",    //105
-    "F9",              //108
-    "9",               //109
-    "O",               //110
-    "L",               //111
-    ",",               //112
-    "Menu",            //113
-    "Left Arrow",      //115
-    "Number Pad -",    //116
-    "Number Pad 3",    //117
-    "F10",             //120
-    "0",               //121
-    "P",               //122
-    ";",               //123
-    ".",               //124
-    "Enter",           //126
-    "Down Arrow",      //127
-    "Number Pad +",    //128
-    "Number Pad 0",    //129
-    "F11",             //132
-    "-",               //133
-    "[",               //134
-    "'",               //135
-    "/",               //136
-    "Brightness",      //137
-    "Right Arrow",     //139
-    "Number Pad Enter",//140
-    "Number Pad .",    //141
-    "/ (ISO)",
-    "\\ (ISO)",
-    "Macro G1",
-    "Macro G2",
-    "Macro G3",
-    "Macro G4",
-    "Macro G5",
-    "Macro G6",
-    "Light Bar 1",
-    "Light Bar 2",
-    "Light Bar 3",
-    "Light Bar 4",
-    "Light Bar 5",
-    "Light Bar 6",
-    "Light Bar 7",
-    "Light Bar 8",
-    "Light Bar 9",
-    "Light Bar 10",
-    "Light Bar 11",
-    "Light Bar 12",
-    "Light Bar 13",
-    "Light Bar 14",
-    "Light Bar 15",
-    "Light Bar 16",
-    "Light Bar 17",
-    "Light Bar 18",
-    "Light Bar 19"
-
+    "Profile","Brightness", "Lock",                  "Logo",                   "Mute",
+"Esc", "F1", "F2", "F3", "F4", "F5", "F6", "F7", "F8", "F9", "F10", "F11", "F12",         "Print Screen", "Scroll Lock", "Pause Break",   "Stop", "Prev", "Play/Pause", "Next",  //20
+"`", "1", "2", "3", "4", "5", "6", "7", "8", "9", "0", "-_", "=+", "Backspace",                        "Insert", "Home", "Page Up",       "NumLock", "Num /", "Num *", "Num -",  //21
+"Tab", "Q", "W", "E", "R", "T", "Y", "U", "I", "O", "P", "[", "]", "\\",                               "Del", "End", "Page Down",         "Num 7", "Num 8", "Num 9", "Num +",    //21
+"Caps Lock", "A", "S", "D", "F", "G", "H", "J", "K", "L", ";", "'", "Enter",                                                              "Num 4", "Num 5", "Num 6",             //16
+"Left Shift", "Z", "X", "C", "V", "B", "N", "M", ",", ".", "/", "Right Shift",                                  "Up Arrow",               "Num 1", "Num 2", "Num 3", "Num Enter",//17
+"Left Ctrl", "Left Win", "Left Alt", "Space", "Right Alt", "Right Win", "Menu", "Right Ctrl",  "Left Arrow", "Down Arrow", "Right Arrow", "Num 0", "Num ."                       //13
 ];
 
 

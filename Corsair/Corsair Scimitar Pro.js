@@ -10,15 +10,15 @@ var CORSAIR_PROPERTY_SPECIAL_FUNCTION = 0x04;
 var CORSAIR_PROPERTY_SUBMIT_MOUSE_COLOR         = 0x22;
 
 
-export function Name() { return "Corsair Glaive RGB"; }
+export function Name() { return "Corsair Scimitar Pro"; }
 export function VendorId() { return 0x1b1c; }
-export function ProductId() { return 0x1B34; }
+export function ProductId() { return 0x1B3E; }
 export function Publisher() { return "WhirlwindFX"; }
-export function Size() { return [3, 3]; }
+export function Size() { return [3, 4]; }
 
-var vLedNames = ["Logo Zone","Front Zone","Light Zone"];
+var vLedNames = ["Scroll Zone","Front Zone","Side Zone", "N/A","Logo Zone"];
 
-var vLedPositions = [[1,2],[1,0],[1,1]
+var vLedPositions = [[1,1],[1,0],[0,2],[0,0],[1,3]
 ];
 
 export function LedNames()
@@ -73,9 +73,12 @@ export function Render()
     packet[0x00]   = 0x00;
     packet[0x01]   = CORSAIR_COMMAND_WRITE;
     packet[0x02]   = CORSAIR_PROPERTY_SUBMIT_MOUSE_COLOR;
-    packet[0x03]   = 0x03;
+    packet[0x03]   = 0x05;
     packet[0x04]   = 0x01;
-    var zoneId = [2,6,1]
+    var zoneId = [4,1,5,3,2]
+
+
+
 
     // Single zone - apply to mouse.
     for(var zone_idx = 0; zone_idx < vLedPositions.length; zone_idx++)
@@ -99,6 +102,30 @@ export function Validate(endpoint)
 
 export function Shutdown()
 {
+    var packet = []
+    packet[0x00]   = 0x00;
+    packet[0x01]   = CORSAIR_COMMAND_WRITE;
+    packet[0x02]   = CORSAIR_PROPERTY_SUBMIT_MOUSE_COLOR;
+    packet[0x03]   = 0x05;
+    packet[0x04]   = 0x01;
+    var zoneId = [4,1,5,3,2]
+
+
+
+
+    // Single zone - apply to mouse.
+    for(var zone_idx = 0; zone_idx < vLedPositions.length; zone_idx++)
+    {
+        var iX = vLedPositions[zone_idx][0];
+        var iY = vLedPositions[zone_idx][1];
+        var col = device.color(iX,iY);
+        packet[(zone_idx * 4) + 5] = zoneId[zone_idx];
+        packet[(zone_idx * 4) + 6] = 255;
+        packet[(zone_idx * 4) + 7] = 0;
+        packet[(zone_idx * 4) + 8] = 0;
+    }
+
+    device.write(packet, 65);
     ReturnToHardwareControl();
 }
 

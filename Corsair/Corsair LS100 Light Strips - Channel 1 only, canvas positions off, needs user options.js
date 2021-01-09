@@ -1,8 +1,8 @@
-export function Name() { return "Corsair LT100 Lighting Tower"; }
+export function Name() { return "Corsair LS100 Light Strips"; }
 export function VendorId() { return 0x1b1c; }
-export function ProductId() { return 0x0C23; }
+export function ProductId() { return 0x0C1E; }
 export function Publisher() { return "WhirlwindFX"; }
-export function Size() { return [8, 8]; }
+export function Size() { return [64, 27]; }
 
 
 var CORSAIR_COMMAND_WRITE       = 0x07;
@@ -24,8 +24,8 @@ export function Initialize()
     | Set up Lighting Control packet                        |
     \*-----------------------------------------------------*/
     packet[0x00]           = 0x00;
-    packet[0x01]           = CORSAIR_COMMAND_WRITE;
-    packet[0x02]           = CORSAIR_PROPERTY_LIGHTING_CONTROL;    
+    packet[0x01]           = 0x38;
+    packet[0x02]           = 0x00;    //Channel 0/1
     packet[0x03]           = CORSAIR_LIGHTING_CONTROL_SOFTWARE;
 
     /*-----------------------------------------------------*\
@@ -38,26 +38,68 @@ export function Initialize()
     | Send packet                                           |
     \*-----------------------------------------------------*/    
     device.write(packet, 6);
+    var packet2 = [];
+
+    /*-----------------------------------------------------*\
+    | Set up Lighting Control packet                        |
+    \*-----------------------------------------------------*/
+    packet2[0x00]           = 0x00;
+    packet2[0x01]           = 0x38;
+    packet2[0x02]           = 0x01;    //Channel 0/1
+    packet2[0x03]           = CORSAIR_LIGHTING_CONTROL_SOFTWARE;
+
+    /*-----------------------------------------------------*\
+    | Lighting control byte needs to be 3 for keyboards and |
+    | headset stand, 1 for mice and mousepads               |
+    \*-----------------------------------------------------*/
+    packet2[0x05]   = 0x03;
+
+    /*-----------------------------------------------------*\
+    | Send packet                                           |
+    \*-----------------------------------------------------*/    
+    device.write(packet2, 6);
 }
 
 
 export function Shutdown()
 {
-    // Return to some BS here?  Solid color?
+    //channel 0
+    var packet = [];
+
+    packet[0x00] = 0x00;
+    packet[0x01] = 0x38;
+    packet[0x02] = 0x00;
+    packet[0x03] = 0x01;
+
+    device.write(packet, 65);
+    //channel 1
+    var packet2 = [];
+
+    packet2[0x00] = 0x00;
+    packet2[0x01] = 0x38;
+    packet2[0x02] = 0x01;
+    packet2[0x03] = 0x01;
+
+    device.write(packet2, 65);
+
+
 }
 
-function StreamPacket(packet_id, data_sz, data)
+function StreamLightingPacketChanneled(start, count, colorChannel, data, channel)
 {
+    //channel selection == 32 0/1 Start Count Channel LEDS
+    //(Start, Count, Color, Data)
     var packet = [];
 
     /*-----------------------------------------------------*\
     | Set up Stream packet                                  |
     \*-----------------------------------------------------*/
     packet[0x00]   = 0x00;
-    packet[0x01]   = CORSAIR_COMMAND_STREAM;
-    packet[0x02]   = packet_id;
-    packet[0x03]   = data_sz;
-    packet[0x04]   = 0;
+    packet[0x01]   = 0x32;
+    packet[0x02]   = channel;
+    packet[0x03]   = start;
+    packet[0x04]   = count;
+    packet[0x05]   = colorChannel;
 
     /*-----------------------------------------------------*\
     | Copy in data bytes                                    |
@@ -69,21 +111,31 @@ function StreamPacket(packet_id, data_sz, data)
     \*-----------------------------------------------------*/
     device.write(packet, 65);
 }
+function channelStart(channel){
+    var packet = [];
+    //start packet == 34 00 channel (len 64)
 
+    packet[0x00]   = 0x00;
+    packet[0x01]   = 0x34;
+    packet[0x02]   = channel;
 
-function SubmitKbColors(color_channel, packet_count, finish_val)
+    /*-----------------------------------------------------*\
+    | Send packet                                           |
+    \*-----------------------------------------------------*/
+    device.write(packet, 65);
+}
+
+function SubmitLightingColors()
 {
     var packet = [];
-
+    //commit packet == 32 FF (len 64)
     /*-----------------------------------------------------*\
     | Set up Submit Keyboard 24-Bit Colors packet           |
     \*-----------------------------------------------------*/
     packet[0x00]   = 0x00;
-    packet[0x01]   = CORSAIR_COMMAND_WRITE;
-    packet[0x02]   = CORSAIR_PROPERTY_SUBMIT_KEYBOARD_COLOR_24;
-    packet[0x03]   = color_channel;
-    packet[0x04]   = packet_count;
-    packet[0x05]   = finish_val;
+    packet[0x01]   = 0x33;
+    packet[0x02]   = 0xFF;
+
 
     /*-----------------------------------------------------*\
     | Send packet                                           |
@@ -91,13 +143,27 @@ function SubmitKbColors(color_channel, packet_count, finish_val)
     device.write(packet, 65);
 }
 var vKeyNames = [
-    "Stand"
+    "Tower 1, Led 1","Tower 1, Led 2","Tower 1, Led 3","Tower 1, Led 4","Tower 1, Led 5","Tower 1, Led 6","Tower 1, Led 7","Tower 1, Led 8","Tower 1, Led 9","Tower 1, Led 10","Tower 1, Led 11","Tower 1, Led 12","Tower 1, Led 13",
+    "Tower 1, Led 14","Tower 1, Led 15","Tower 1, Led 16","Tower 1, Led 17","Tower 1, Led 18","Tower 1, Led 19","Tower 1, Led 21","Tower 1, Led 22","Tower 1, Led 22","Tower 1, Led 23","Tower 1, Led 24","Tower 1, Led 25","Tower 1, Led 26",
+    "Tower 2, Led 1","Tower 2, Led 2","Tower 2, Led 3","Tower 2, Led 4","Tower 2, Led 5","Tower 2, Led 6","Tower 2, Led 7","Tower 2, Led 8","Tower 2, Led 9","Tower 2, Led 10","Tower 2, Led 11","Tower 2, Led 12","Tower 2, Led 13",
+    "Tower 2, Led 14","Tower 2, Led 15","Tower 2, Led 16","Tower 2, Led 17","Tower 2, Led 18","Tower 2, Led 19","Tower 2, Led 21","Tower 2, Led 22","Tower 2, Led 22","Tower 2, Led 23","Tower 2, Led 24","Tower 2, Led 25","Tower 2, Led 26",
+    "Tower 3, Led 1","Tower 3, Led 2","Tower 3, Led 3","Tower 3, Led 4","Tower 3, Led 5","Tower 3, Led 6","Tower 3, Led 7","Tower 3, Led 8","Tower 3, Led 9","Tower 3, Led 10","Tower 3, Led 11","Tower 3, Led 12","Tower 3, Led 13",
+    "Tower 3, Led 14","Tower 3, Led 15","Tower 3, Led 16","Tower 3, Led 17","Tower 3, Led 18","Tower 3, Led 19","Tower 3, Led 21","Tower 3, Led 22","Tower 3, Led 22","Tower 3, Led 23","Tower 3, Led 24","Tower 3, Led 25","Tower 3, Led 26",
+    "Tower 4, Led 1","Tower 4, Led 2","Tower 4, Led 3","Tower 4, Led 4","Tower 4, Led 5","Tower 4, Led 6","Tower 4, Led 7","Tower 4, Led 8","Tower 4, Led 9","Tower 4, Led 10","Tower 4, Led 11","Tower 4, Led 12","Tower 4, Led 13",
+    "Tower 4, Led 14","Tower 4, Led 15","Tower 4, Led 16","Tower 4, Led 17","Tower 4, Led 18","Tower 4, Led 19","Tower 4, Led 21","Tower 4, Led 22","Tower 4, Led 22","Tower 4, Led 23","Tower 4, Led 24","Tower 4, Led 25","Tower 4, Led 26",
 ];
-
+//32 X 20
  var vKeyPositions = [
-    //TL   TR   Right   BR   Logo
-    [0,0],[7,0],[7,5],[7,7],[5,5],[5,7],[3,7],[7,4],[0,4]
-
+     //specific to Alex's set up for now
+    //Tower 1
+    [4,26],[4,25],[4,24],[4,23],[4,22],[4,21],[4,20],[4,19],[4,18],[4,17],[4,16],[4,15],[4,14],[4,13],[4,12],[4,11],[4,10],[4,9],[4,8],[4,7],[4,6],[4,5],[4,4],[4,3],[4,2],[4,1],[4,0],
+    //Tower 2
+    [16,26],[16,25],[16,24],[16,23],[16,22],[16,21],[16,20],[16,19],[16,18],[16,17],[16,16],[16,15],[16,14],[16,13],[16,12],[16,11],[16,10],[16,9],[16,8],[16,7],[16,6],[16,5],[16,4],[16,3],[16,2],[16,1],[16,0],
+    //Tower 4
+    [60,26],[60,25],[60,24],[60,23],[60,22],[60,21],[60,20],[60,19],[60,18],[60,17],[60,16],[60,15],[60,14],[60,13],[60,12],[60,11],[60,10],[60,9],[60,8],[60,7],[60,6],[60,5],[60,4],[60,3],[60,2],[60,1],[60,0],
+    //Tower 3
+    [48,26],[48,25],[48,24],[48,23],[48,22],[48,21],[48,20],[48,19],[48,18],[48,17],[48,16],[48,15],[48,14],[48,13],[48,12],[48,11],[48,10],[48,9],[48,8],[48,7],[48,6],[48,5],[48,4],[48,3],[48,2],[48,1],[48,0],
+    [48,26],[48,25],[48,24],[48,23],[48,22],[48,21],[48,20],[48,19],[48,18],[48,17],[48,16],[48,15],[48,14],[48,13],[48,12],[48,11],[48,10],[48,9],[48,8],[48,7],[48,6],[48,5],[48,4],[48,3],[48,2],[48,1],[48,0],
  ];
 
 
@@ -113,46 +179,58 @@ export function LedPositions()
 
 export function Render()
 {
-    var red = [144];
-    var green = [144];
-    var blue = [144];
+    var red = [132];
+    var green = [132];
+    var blue = [132];
 
 
-    for(var iIdx = 0; iIdx < vKeys.length; iIdx++)
+    for(var iIdx = 0; iIdx < vKeyPositions.length; iIdx++)
     {
         var iPxX = vKeyPositions[iIdx][0];
         var iPxY = vKeyPositions[iIdx][1];
         var mxPxColor = device.color(iPxX, iPxY);
-        red[vKeys[iIdx]] = mxPxColor[0];
-        green[vKeys[iIdx]] = mxPxColor[1];
-        blue[vKeys[iIdx]] = mxPxColor[2];
+        red[iIdx] = mxPxColor[0];
+        green[iIdx] = mxPxColor[1];
+        blue[iIdx] = mxPxColor[2];
     }
-    
-    
-    
-    /*-----------------------------------------------------*\
-   | Send red bytes                                        |
-   \*-----------------------------------------------------*/
-   StreamPacket(1, 60, red.splice(0,60));
-   StreamPacket(2, 60, red.splice(0,60));
-   StreamPacket(3, 24, red.splice(0,24));
-   SubmitKbColors(1, 3, 1);
+    var red2 = red;
+    //Channel 0
 
-   /*-----------------------------------------------------*\
-   | Send green bytes                                      |
-   \*-----------------------------------------------------*/
-   StreamPacket(1, 60, green.splice(0,60));
-   StreamPacket(2, 60, green.splice(0,60));
-   StreamPacket(3, 24, green.splice(0,24));
-   SubmitKbColors(2, 3, 1);
+    //channelStart(0);
 
-   /*-----------------------------------------------------*\
-   | Send blue bytes                                       |
-   \*-----------------------------------------------------*/
-   StreamPacket(1, 60, blue.splice(0,60));
-   StreamPacket(2, 60, blue.splice(0,60));
-   StreamPacket(3, 24, blue.splice(0,24));
-   SubmitKbColors(3, 3, 2);
+   //StreamLightingPacketChanneled(0x00,0x32,0,red.splice(0,32),0)
+   //StreamLightingPacketChanneled(0x32,32,0,red.splice(0,32),0)
+   //StreamLightingPacketChanneled(0x64,32,0,red.splice(0,32),0)
+   //SubmitLightingColors();
+
+   //StreamLightingPacketChanneled(0x00,0x32,1,green.splice(0,32),0)
+   //StreamLightingPacketChanneled(0x32,32,1,green.splice(0,32),0)
+   //StreamLightingPacketChanneled(0x64,32,1,green.splice(0,32),0)
+
+   //SubmitLightingColors();
+
+   //StreamLightingPacketChanneled(0x00,0x32,2,blue.splice(0,32),0)
+   //StreamLightingPacketChanneled(0x32,32,2,blue.splice(0,32),0)
+   //StreamLightingPacketChanneled(0x64,32,2,blue.splice(0,32),0)
+    
+
+   //Channel 1
+   channelStart(1);
+    //red
+   StreamLightingPacketChanneled(0,50,0,red.splice(0,50),1)
+   StreamLightingPacketChanneled(50,50,0,red.splice(0,50),1)
+   StreamLightingPacketChanneled(100,27,0,red.splice(0,27),1)
+   //green
+   StreamLightingPacketChanneled(0,50,1,green.splice(0,50),1)
+   StreamLightingPacketChanneled(50,50,1,green.splice(0,50),1)
+   StreamLightingPacketChanneled(100,27,1,green.splice(0,27),1)
+   //blue
+   StreamLightingPacketChanneled(0,50,2,blue.splice(0,50),1)
+   StreamLightingPacketChanneled(50,50,2,blue.splice(0,50),1)
+   StreamLightingPacketChanneled(100,27,2,blue.splice(0,27),1)
+   //commit packet
+   SubmitLightingColors();
+
 }
 
  

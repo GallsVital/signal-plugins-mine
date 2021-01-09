@@ -1,8 +1,8 @@
-export function Name() { return "Corsair K70 RGB mkII Low Profile"; }
+export function Name() { return "Corsair LT100 Lighting Tower"; }
 export function VendorId() { return 0x1b1c; }
-export function ProductId() { return 0x1b55; }
+export function ProductId() { return 0x0C23; }
 export function Publisher() { return "WhirlwindFX"; }
-export function Size() { return [21, 7]; }
+export function Size() { return [64, 27]; }
 
 
 var CORSAIR_COMMAND_WRITE       = 0x07;
@@ -24,8 +24,8 @@ export function Initialize()
     | Set up Lighting Control packet                        |
     \*-----------------------------------------------------*/
     packet[0x00]           = 0x00;
-    packet[0x01]           = CORSAIR_COMMAND_WRITE;
-    packet[0x02]           = CORSAIR_PROPERTY_LIGHTING_CONTROL;
+    packet[0x01]           = 0x38;
+    packet[0x02]           = 0x00;    //Channel 0/1
     packet[0x03]           = CORSAIR_LIGHTING_CONTROL_SOFTWARE;
 
     /*-----------------------------------------------------*\
@@ -43,61 +43,34 @@ export function Initialize()
 
 export function Shutdown()
 {
-    var red = [144];
-    var green = [144];
-    var blue = [144];
+    // Return to some BS here?  Solid color?
+    var packet = [];
+
+    packet[0x00] = 0x00;
+    packet[0x01] = 0x38;
+    packet[0x02] = 0x00;
+    packet[0x03] = 0x01;
+
+    device.write(packet, 65);
 
 
-    for(var iIdx = 0; iIdx < vKeys.length; iIdx++)
-    {
-        var iPxX = vKeyPositions[iIdx][0];
-        var iPxY = vKeyPositions[iIdx][1];
-        var mxPxColor = device.color(iPxX, iPxY);
-        red[vKeys[iIdx]] = 255;
-        green[vKeys[iIdx]] = 0;
-        blue[vKeys[iIdx]] = 0;
-    }
-    
-    
-    
-    /*-----------------------------------------------------*\
-   | Send red bytes                                        |
-   \*-----------------------------------------------------*/
-   StreamPacket(1, 60, red.splice(0,60));
-   StreamPacket(2, 60, red.splice(0,60));
-   StreamPacket(3, 24, red.splice(0,24));
-   SubmitKbColors(1, 3, 1);
-
-   /*-----------------------------------------------------*\
-   | Send green bytes                                      |
-   \*-----------------------------------------------------*/
-   StreamPacket(1, 60, green.splice(0,60));
-   StreamPacket(2, 60, green.splice(0,60));
-   StreamPacket(3, 24, green.splice(0,24));
-   SubmitKbColors(2, 3, 1);
-
-   /*-----------------------------------------------------*\
-   | Send blue bytes                                       |
-   \*-----------------------------------------------------*/
-   StreamPacket(1, 60, blue.splice(0,60));
-   StreamPacket(2, 60, blue.splice(0,60));
-   StreamPacket(3, 24, blue.splice(0,24));
-   SubmitKbColors(3, 3, 2);
 }
 
-
-function StreamPacket(packet_id, data_sz, data)
+function StreamLightingPacket(start, count, colorChannel, data)
 {
+    //channel selection == 32 0/1 Start Count Channel LEDS
+    //(Start, Count, Color, Data)
     var packet = [];
 
     /*-----------------------------------------------------*\
     | Set up Stream packet                                  |
     \*-----------------------------------------------------*/
     packet[0x00]   = 0x00;
-    packet[0x01]   = CORSAIR_COMMAND_STREAM;
-    packet[0x02]   = packet_id;
-    packet[0x03]   = data_sz;
-    packet[0x04]   = 0;
+    packet[0x01]   = 0x32;
+    packet[0x02]   = 0x00;
+    packet[0x03]   = start;
+    packet[0x04]   = count;
+    packet[0x05]   = colorChannel;
 
     /*-----------------------------------------------------*\
     | Copy in data bytes                                    |
@@ -111,73 +84,47 @@ function StreamPacket(packet_id, data_sz, data)
 }
 
 
-function SubmitKbColors(color_channel, packet_count, finish_val)
+function SubmitLightingColors()
 {
     var packet = [];
-
+    //commit packet == 32 FF (len 64)
     /*-----------------------------------------------------*\
     | Set up Submit Keyboard 24-Bit Colors packet           |
     \*-----------------------------------------------------*/
     packet[0x00]   = 0x00;
-    packet[0x01]   = CORSAIR_COMMAND_WRITE;
-    packet[0x02]   = CORSAIR_PROPERTY_SUBMIT_KEYBOARD_COLOR_24;
-    packet[0x03]   = color_channel;
-    packet[0x04]   = packet_count;
-    packet[0x05]   = finish_val;
+    packet[0x01]   = 0x33;
+    packet[0x02]   = 0xFF;
+
 
     /*-----------------------------------------------------*\
     | Send packet                                           |
     \*-----------------------------------------------------*/
     device.write(packet, 65);
 }
-
-
-
-// This is an array of key indexes for setting colors in our render array, indexed left to right, row top to bottom.
-var vKeys = [
-                   125, 137, 8,                       59,                               20,    // Special key row.
-    0,     12, 24, 36, 48,     60, 72, 84, 96,     108, 120, 132, 6,     18, 30, 42,    32, 44, 56,  68,  //20
-    1,   13, 25, 37, 49, 61, 73, 85, 97, 109, 121, 133, 7,       31,     54, 66, 78,    80, 92, 104, 116, //21
-    2,   14, 26, 38, 50, 62, 74, 86, 98, 110, 122, 134,   90,   102,     43, 55, 67,    9,  21, 33,  128, //21   
-    3,   15, 27, 39, 51, 63, 75, 87, 99, 111, 123, 135,         126,                    57, 69, 81,       //16
-    4,   28, 40, 52, 64, 76, 88, 100,112, 124, 136,          79,         103,       93, 105, 117, 140,
-    5,   17, 29,            53,                    89, 101, 113, 91,     115,127,139,   129, 141
-];
-
 var vKeyNames = [
-    "Profile","Brightness", "Lock",                  "Logo",                   "Mute",
-"Esc", "F1", "F2", "F3", "F4", "F5", "F6", "F7", "F8", "F9", "F10", "F11", "F12",         "Print Screen", "Scroll Lock", "Pause Break",   "Stop", "Prev", "Play/Pause", "Next",  //20
-"`", "1", "2", "3", "4", "5", "6", "7", "8", "9", "0", "-_", "=+", "Backspace",                        "Insert", "Home", "Page Up",       "NumLock", "Num /", "Num *", "Num -",  //21
-"Tab", "Q", "W", "E", "R", "T", "Y", "U", "I", "O", "P", "[", "]", "\\",                               "Del", "End", "Page Down",         "Num 7", "Num 8", "Num 9", "Num +",    //21
-"Caps Lock", "A", "S", "D", "F", "G", "H", "J", "K", "L", ";", "'", "Enter",                                                              "Num 4", "Num 5", "Num 6",             //16
-"Left Shift", "Z", "X", "C", "V", "B", "N", "M", ",", ".", "/", "Right Shift",                                  "Up Arrow",               "Num 1", "Num 2", "Num 3", "Num Enter",//17
-"Left Ctrl", "Left Win", "Left Alt", "Space", "Right Alt", "Right Win", "Menu", "Right Ctrl",  "Left Arrow", "Down Arrow", "Right Arrow", "Num 0", "Num ."                       //13
+    "Tower 1, Led 1","Tower 1, Led 2","Tower 1, Led 3","Tower 1, Led 4","Tower 1, Led 5","Tower 1, Led 6","Tower 1, Led 7","Tower 1, Led 8","Tower 1, Led 9","Tower 1, Led 10","Tower 1, Led 11","Tower 1, Led 12","Tower 1, Led 13",
+    "Tower 1, Led 14","Tower 1, Led 15","Tower 1, Led 16","Tower 1, Led 17","Tower 1, Led 18","Tower 1, Led 19","Tower 1, Led 21","Tower 1, Led 22","Tower 1, Led 22","Tower 1, Led 23","Tower 1, Led 24","Tower 1, Led 25","Tower 1, Led 26",
+    "Tower 2, Led 1","Tower 2, Led 2","Tower 2, Led 3","Tower 2, Led 4","Tower 2, Led 5","Tower 2, Led 6","Tower 2, Led 7","Tower 2, Led 8","Tower 2, Led 9","Tower 2, Led 10","Tower 2, Led 11","Tower 2, Led 12","Tower 2, Led 13",
+    "Tower 2, Led 14","Tower 2, Led 15","Tower 2, Led 16","Tower 2, Led 17","Tower 2, Led 18","Tower 2, Led 19","Tower 2, Led 21","Tower 2, Led 22","Tower 2, Led 22","Tower 2, Led 23","Tower 2, Led 24","Tower 2, Led 25","Tower 2, Led 26",
+    "Tower 3, Led 1","Tower 3, Led 2","Tower 3, Led 3","Tower 3, Led 4","Tower 3, Led 5","Tower 3, Led 6","Tower 3, Led 7","Tower 3, Led 8","Tower 3, Led 9","Tower 3, Led 10","Tower 3, Led 11","Tower 3, Led 12","Tower 3, Led 13",
+    "Tower 3, Led 14","Tower 3, Led 15","Tower 3, Led 16","Tower 3, Led 17","Tower 3, Led 18","Tower 3, Led 19","Tower 3, Led 21","Tower 3, Led 22","Tower 3, Led 22","Tower 3, Led 23","Tower 3, Led 24","Tower 3, Led 25","Tower 3, Led 26",
+    "Tower 4, Led 1","Tower 4, Led 2","Tower 4, Led 3","Tower 4, Led 4","Tower 4, Led 5","Tower 4, Led 6","Tower 4, Led 7","Tower 4, Led 8","Tower 4, Led 9","Tower 4, Led 10","Tower 4, Led 11","Tower 4, Led 12","Tower 4, Led 13",
+    "Tower 4, Led 14","Tower 4, Led 15","Tower 4, Led 16","Tower 4, Led 17","Tower 4, Led 18","Tower 4, Led 19","Tower 4, Led 21","Tower 4, Led 22","Tower 4, Led 22","Tower 4, Led 23","Tower 4, Led 24","Tower 4, Led 25","Tower 4, Led 26",
 ];
+//32 X 20
+ var vKeyPositions = [
+     //specific to Alex's set up for now
+    //Tower 1
+    [4,26],[4,25],[4,24],[4,23],[4,22],[4,21],[4,20],[4,19],[4,18],[4,17],[4,16],[4,15],[4,14],[4,13],[4,12],[4,11],[4,10],[4,9],[4,8],[4,7],[4,6],[4,5],[4,4],[4,3],[4,2],[4,1],[4,0],
+    //Tower 2
+    [16,26],[16,25],[16,24],[16,23],[16,22],[16,21],[16,20],[16,19],[16,18],[16,17],[16,16],[16,15],[16,14],[16,13],[16,12],[16,11],[16,10],[16,9],[16,8],[16,7],[16,6],[16,5],[16,4],[16,3],[16,2],[16,1],[16,0],
+    //Tower 4
+    [60,26],[60,25],[60,24],[60,23],[60,22],[60,21],[60,20],[60,19],[60,18],[60,17],[60,16],[60,15],[60,14],[60,13],[60,12],[60,11],[60,10],[60,9],[60,8],[60,7],[60,6],[60,5],[60,4],[60,3],[60,2],[60,1],[60,0],
+    //Tower 3
+    [48,26],[48,25],[48,24],[48,23],[48,22],[48,21],[48,20],[48,19],[48,18],[48,17],[48,16],[48,15],[48,14],[48,13],[48,12],[48,11],[48,10],[48,9],[48,8],[48,7],[48,6],[48,5],[48,4],[48,3],[48,2],[48,1],[48,0],
 
-// This array must be the same length as vKeys[], and represents the pixel color position in our pixel matrix that we reference.  For example,
-// item at index 3 [9,0] represents the corsair logo, and the render routine will grab its color from [9,0].
-var vKeyPositions = [
-                         [3,0], [4,0], [5,0],                      [9,0],                                                             [17,0],   // Logo & specialkey row.
-    [0,1], [1,1], [2,1], [3,1], [4,1], [5,1], [6,1], [7,1], [8,1], [9,1], [10,1], [11,1],         [13,1],   [14,1], [15,1], [16,1],   [17,1], [18,1],[19,1], [20,1], //20
-    [0,2], [1,2], [2,2], [3,2], [4,2], [5,2], [6,2], [7,2], [8,2], [9,2], [10,2], [11,2], [12,2], [13,2],   [14,2], [15,2], [16,2],   [17,2], [18,2],[19,2], [20,2], //21
-    [0,3], [1,3], [2,3], [3,3], [4,3], [5,3], [6,3], [7,3], [8,3], [9,3], [10,3], [11,3], [12,3], [13,3],   [14,3], [15,3], [16,3],   [17,3], [18,3],[19,3], [20,3], //21
-    [0,4], [1,4], [2,4], [3,4], [4,4], [5,4], [6,4], [7,4], [8,4], [9,4], [10,4], [11,4],         [13,4],                             [17,4], [18,4],[19,4], // 16
-    [0,5], [1,5], [2,5], [3,5], [4,5], [5,5], [6,5], [7,5], [8,5], [9,5], [10,5], [11,5],         [13,5],           [15,5],           [17,5], [18,5],[19,5], // 17
-    [0,6], [1,6], [2,6],                      [6,6],                      [10,6], [11,6], [12,6], [13,6],   [14,6], [15,6], [16,6],   [17,6],        [19,6] // 14
-];
+ ];
 
-// These arrays are unused and for development reference.
-var vMedia = [
-    32, 44, 56, 68
-];
-
-var vSpecial = [
-    125, 137, 8, 59, 20
-]
-
-var vSpecialPositions = [
-    [0,3], [0,4], [0,5], [0,9], [0,17]
-]
 
 export function LedNames()
 {
@@ -196,47 +143,43 @@ export function Render()
     var blue = [144];
 
 
-    for(var iIdx = 0; iIdx < vKeys.length; iIdx++)
+    for(var iIdx = 0; iIdx < vKeyPositions.length; iIdx++)
     {
         var iPxX = vKeyPositions[iIdx][0];
         var iPxY = vKeyPositions[iIdx][1];
         var mxPxColor = device.color(iPxX, iPxY);
-        red[vKeys[iIdx]] = mxPxColor[0];
-        green[vKeys[iIdx]] = mxPxColor[1];
-        blue[vKeys[iIdx]] = mxPxColor[2];
+        red[iIdx] = mxPxColor[0];
+        green[iIdx] = mxPxColor[1];
+        blue[iIdx] = mxPxColor[2];
     }
+    
     
     
     
     /*-----------------------------------------------------*\
    | Send red bytes                                        |
    \*-----------------------------------------------------*/
-   StreamPacket(1, 60, red.splice(0,60));
-   StreamPacket(2, 60, red.splice(0,60));
-   StreamPacket(3, 24, red.splice(0,24));
-   SubmitKbColors(1, 3, 1);
+   StreamLightingPacket(0x00,0x32,0,red.splice(0,50))
+   StreamLightingPacket(0x32,0x64,0,red.splice(0,50))
+   StreamLightingPacket(0x64,0x08,0,red.splice(0,12))
+   //SubmitLightingColors();
 
-   /*-----------------------------------------------------*\
-   | Send green bytes                                      |
-   \*-----------------------------------------------------*/
-   StreamPacket(1, 60, green.splice(0,60));
-   StreamPacket(2, 60, green.splice(0,60));
-   StreamPacket(3, 24, green.splice(0,24));
-   SubmitKbColors(2, 3, 1);
+   StreamLightingPacket(0x00,0x32,1,green.splice(0,50))
+   StreamLightingPacket(0x32,0x64,1,green.splice(0,50))
+   StreamLightingPacket(0x64,0x8,1,green.splice(0,12))
+   //SubmitLightingColors();
 
-   /*-----------------------------------------------------*\
-   | Send blue bytes                                       |
-   \*-----------------------------------------------------*/
-   StreamPacket(1, 60, blue.splice(0,60));
-   StreamPacket(2, 60, blue.splice(0,60));
-   StreamPacket(3, 24, blue.splice(0,24));
-   SubmitKbColors(3, 3, 2);
+   StreamLightingPacket(0x00,0x32,2,blue.splice(0,50))
+   StreamLightingPacket(0x32,0x64,2,blue.splice(0,50))
+   StreamLightingPacket(0x64,0x8,2,blue.splice(0,12))
+   SubmitLightingColors();
+
 }
 
-
+ 
 export function Validate(endpoint)
 {
-    return endpoint.interface === 1;
+    return endpoint.interface === -1;
 }
 
 
