@@ -138,6 +138,7 @@ export function LedPositions()
 
 export function Render()
 {
+    Initialize()
     var red = [144];
     var green = [144];
     var blue = [144];
@@ -153,9 +154,7 @@ export function Render()
         blue[iIdx] = mxPxColor[2];
     }
     
-    
-    
-    
+
     /*-----------------------------------------------------*\
    | Send red bytes                                        |
    \*-----------------------------------------------------*/
@@ -176,7 +175,6 @@ export function Render()
 
 }
 
- 
 export function Validate(endpoint)
 {
     return endpoint.interface === -1;

@@ -37,7 +37,7 @@ export function Initialize()
     /*-----------------------------------------------------*\
     | Send packet                                           |
     \*-----------------------------------------------------*/    
-    device.write(packet, 6);
+    device.write(packet, 65);
 }
 
 

@@ -1,8 +1,8 @@
-export function Name() { return "Corsair K100 RGB"; }
+export function Name() { return "Corsair Spec Omega Case"; }
 export function VendorId() { return 0x1b1c; }
-export function ProductId() { return 0x1B7C; }
+export function ProductId() { return 0x1D04; }
 export function Publisher() { return "WhirlwindFX"; }
-export function Size() { return [22, 8]; }
+export function Size() { return [128, 16]; }
 
 
 var CORSAIR_COMMAND_WRITE       = 0x07;
@@ -24,89 +24,153 @@ export function Initialize()
     | Set up Lighting Control packet                        |
     \*-----------------------------------------------------*/
     packet[0x00]           = 0x00;
-    packet[0x01]           = CORSAIR_COMMAND_WRITE;
-    packet[0x02]           = CORSAIR_PROPERTY_LIGHTING_CONTROL;    
+    packet[0x01]           = 0x38;
+    packet[0x02]           = 0x00;    //Channel 0/1
     packet[0x03]           = CORSAIR_LIGHTING_CONTROL_SOFTWARE;
-
-    /*-----------------------------------------------------*\
-    | Lighting control byte needs to be 3 for keyboards and |
-    | headset stand, 1 for mice and mousepads               |
-    \*-----------------------------------------------------*/
-    packet[0x05]   = 0x03;
 
     /*-----------------------------------------------------*\
     | Send packet                                           |
     \*-----------------------------------------------------*/    
-    device.write(packet, 6);
+    device.write(packet, 65);
+    
+    /*-----------------------------------------------------*\
+    | Set up Lighting Control packet                        |
+    \*-----------------------------------------------------*/
+    var packet2 = [];
 
+    packet2[0x00]           = 0x00;
+    packet2[0x01]           = 0x38;
+    packet2[0x02]           = 0x01;    //Channel 0/1
+    packet2[0x03]           = CORSAIR_LIGHTING_CONTROL_SOFTWARE;
+
+
+    /*-----------------------------------------------------*\
+    | Send packet                                           |
+    \*-----------------------------------------------------*/    
+    device.write(packet2, 65);
 }
-
 
 
 export function Shutdown()
 {
-    
-    var packet = []
-    packet[0x00]   = 0x00;
-    packet[0x01]   = 0x08;    
-    packet[0x02]   = 0x06;
-    packet[0x03]   = 0x00;
-    packet[0x04]   = 0x45;
-    packet[0x05]   = 0x02;
-    packet[0x06]   = 0x00;
-    packet[0x07]   = 0x00;
-    packet[0x08]   = 0x12;
-    
+    //channel 0
+    var packet = [];
+
+    packet[0x00] = 0x00;
+    packet[0x01] = 0x38;
+    packet[0x02] = 0x00;
+    packet[0x03] = 0x01;
+
+    device.write(packet, 65);
+    //channel 1
+    var packet2 = [];
+
+    packet2[0x00] = 0x00;
+    packet2[0x01] = 0x38;
+    packet2[0x02] = 0x01;
+    packet2[0x03] = 0x01;
+
+    device.write(packet2, 65);
 
 
-    //vKeys.length
-    for(var iIdx = 0; iIdx < vKeyPositions.length; iIdx++)
-    {
-        var iPxX = vKeyPositions[iIdx][0];
-        var iPxY = vKeyPositions[iIdx][1];
-        var mxPxColor = device.color(iPxX, iPxY);
-        packet[22+iIdx*3] = 255;
-        packet[22+iIdx*3 +1 ] = 0;
-        packet[22+iIdx*3 +2 ] = 0;
-
-    }
-    
-    device.write(packet, 1028);
 }
 
+function StreamLightingPacketChanneled(start, count, colorChannel, data, channel)
+{
+    //channel selection == 32 0/1 Start Count Channel LEDS
+    //(Start, Count, Color, Data)
+    var packet = [];
 
-// k100 Specific Ordering
+    /*-----------------------------------------------------*\
+    | Set up Stream packet                                  |
+    \*-----------------------------------------------------*/
+    packet[0x00]   = 0x00;
+    packet[0x01]   = 0x32;
+    packet[0x02]   = channel;
+    packet[0x03]   = start;
+    packet[0x04]   = count;
+    packet[0x05]   = colorChannel;
 
+    /*-----------------------------------------------------*\
+    | Copy in data bytes                                    |
+    \*-----------------------------------------------------*/
+    packet = packet.concat(data);
+
+    /*-----------------------------------------------------*\
+    | Send packet                                           |
+    \*-----------------------------------------------------*/
+    device.write(packet, 65);
+}
+function channelStart(channel){
+    var packet = [];
+    //start packet == 34 00 channel (len 64)
+
+    packet[0x00]   = 0x00;
+    packet[0x01]   = 0x34;
+    packet[0x02]   = channel;
+
+    /*-----------------------------------------------------*\
+    | Send packet                                           |
+    \*-----------------------------------------------------*/
+    device.write(packet, 65);
+}
+
+function SubmitLightingColors()
+{
+    var packet = [];
+    //commit packet == 32 FF (len 64)
+    /*-----------------------------------------------------*\
+    | Set up Submit Keyboard 24-Bit Colors packet           |
+    \*-----------------------------------------------------*/
+    packet[0x00]   = 0x00;
+    packet[0x01]   = 0x33;
+    packet[0x02]   = 0xFF;
+
+
+    /*-----------------------------------------------------*\
+    | Send packet                                           |
+    \*-----------------------------------------------------*/
+    device.write(packet, 65);
+}
 var vKeyNames = [
-    "a"   ,  "b"  , "c",   "d"  ,"e"   ,"f" ,  "g" ,  "h" ,  "i"  , "j"  , "k"   ,"l"  ,"m"  , "n" , "o"  , "p" ,  "q"  , "r"  , "t" ,  "u" ,  "v"  , "w" ,  "x"  , "y" ,  "z" ,
-    "1", "2", "3" ,"4" ,"5" ,"6" ,"7" ,"8", "9" ,"0" ,"Enter", "esc" ,"backspace" ,"Tab" ,"Space" ,"-" ,"=" ,"[", "]", "\\", "Blank", "?", ";" ,"\'" ,"\`", "\,", ".", "/", "Caps" ,"f1" ,"f2","f3" ,"f4", "f5", "f6", "f7", "f8", "f9", "f10" ,"f11", "f12" ,"f12" ,"Scrolllock" ,"printscn", "pause",
-    "ins", "home", "pgup", "del", "end", "pgdn", "right", "left", "down", "up", "numlock", "/", "*" ,"-", "+", "numEnter", "num1", "num2", "num3" ,"num4", "num5" ,"num6", "num7", "num8" ,"num9"
+    "LED 0","LED 1","LED 2","LED 3","LED 4","LED 5","LED 6","LED 7","LED 8","LED 9","LED 10",
+    "LED 11","LED 12","LED 13","LED 14","LED 15","LED 16","LED 17","LED 18","LED 19","LED 20",
+    "LED 21","LED 22","LED 23","LED 24","LED 25","LED 26","LED 27","LED 28","LED 29","LED 30",
+    "LED 31","LED 32","LED 33","LED 34","LED 35","LED 36","LED 37","LED 38","LED 39","LED 40",
+    "LED 41","LED 42","LED 43","LED 44","LED 45","LED 46","LED 47","LED 48","LED 49","LED 50",
+    "LED 51","LED 52","LED 53","LED 54","LED 55","LED 56","LED 57","LED 58","LED 59","LED 60",
+    "LED 61","LED 62","LED 63","LED 64","LED 65","LED 66","LED 67","LED 68","LED 69","LED 70",
+    "LED 71","LED 72","LED 73","LED 74","LED 75","LED 76","LED 77","LED 78","LED 79","LED 80",
+    "LED 81","LED 82","LED 83","LED 84","LED 85","LED 86","LED 87","LED 88","LED 89","LED 90",
+    "LED 91","LED 92","LED 93","LED 94","LED 95","LED 96","LED 97","LED 98","LED 99","LED 100",
+    "LED 101","LED 102","LED 103","LED 104","LED 105","LED 106","LED 107","LED 108","LED 109","LED 110",
+    "LED 111","LED 112","LED 113","LED 114","LED 115","LED 116","LED 117","LED 118","LED 119","LED 120",
+    "LED 121","LED 122","LED 123","LED 124","LED 125","LED 126","LED 127"
 ];
 
+
  var vKeyPositions = [
-    //a     b   c    d  e   f   g   h   i   j    k   l   m   n   o   p   q   r   s  t   u   v   w   x   y   z  
-    [2,4],[6,5],[4,5],[4,4],[4,3],[5,4],[6,4],[7,4],[9,3],[8,4],[9,4],[10,4],[9,5],[8,5],[11,4],[12,4],[2,3],[5,3],[3,4],[6,3],[8,3],[5,5],[3,3],[3,5],[7,3],[2,5],
-    // 1 2 3 4 5 6 7 8 9 0  Enter esc backspace Tab Space - = [ ]
-    [1,1],[2,1],[3,1],[4,1],[5,1],[6,1],[7,1],[8,1],[10,1],[11,1],[14,3],[1,1],[14,1],[1,3],[7,6],[12,1],[13,1],[12,2],[13,2],
-    //  \ Blank? ; ' ` , . / Caps 
-    [14,2],[12,2],[12,3], [12,3], [1,2], [10,4],  [11,4],[12,4], [1,4],
+    [0,0],[1,0],[2,0],[3,0],[4,0],[5,0],[6,0],[7,0],[8,0],[9,0],[10,0],
+    [11,0],[12,0],[13,0],[14,0],[15,0],[16,0],[17,0],[18,0],[19,0],[20,0],
+    [21,0],[22,0],[23,0],[24,0],[25,0],[26,0],[27,0],[28,0],[29,0],[30,0],
+    [31,0],[32,0],[33,0],[34,0],[35,0],[36,0],[37,0],[38,0],[39,0],[40,0],
+    [41,0],[42,0],[43,0],[44,0],[45,0],[46,0],[47,0],[48,0],[49,0],[50,0],
+    [51,0],[52,0],[53,0],[54,0],[55,0],[56,0],[57,0],[58,0],[59,0],[60,0],
+    [61,0],[62,0],[63,0],[64,0],[65,0],[66,0],[67,0],[68,0],[69,0],[70,0],
+    [71,0],[72,0],[73,0],[74,0],[75,0],[76,0],[77,0],[78,0],[79,0],[80,0],
+    [81,0],[82,0],[83,0],[84,0],[85,0],[86,0],[87,0],[88,0],[89,0],[90,0],
+    [91,0],[92,0],[93,0],[94,0],[95,0],[96,0],[97,0],[98,0],[99,0],[100,0],
+    [101,0],[102,0],[103,0],[104,0],[105,0],[106,0],[107,0],[108,0],[109,0],[110,0],
+    [111,0],[112,0],[113,0],[114,0],[115,0],[116,0],[117,0],[118,0],[119,0],[120,0],
+    [121,0],[122,0],[123,0],[124,0],[125,0],[126,0],[127,0],
+    //204 max leds ,204-128 = 76 extra
+    [1,0],[2,0],[3,0],[4,0],[5,0],[6,0],[7,0],[8,0],[9,0],[10,0],
+    [11,0],[12,0],[13,0],[14,0],[15,0],[16,0],[17,0],[18,0],[19,0],[20,0],
+    [21,0],[22,0],[23,0],[24,0],[25,0],[26,0],[27,0],[28,0],[29,0],[30,0],
+    [31,0],[32,0],[33,0],[34,0],[35,0],[36,0],[37,0],[38,0],[39,0],[40,0],
+    [41,0],[42,0]
     
-    //f1 f2 f3 f4 f5 f6 f7 f8 f9 f10 f11 f12 f12 Scrolllock printscn pause
-    [2,1],[3,1],[4,1],[5,1],[7,1],[8,1],[9,1],[10,1],[11,1],[12,1],[13,1],[14,1],[15,1],[16,1],[17,1],
-    // ins home pgup del end pgdn right left down up numlock / * - + numEnter 1 2 3 4 5 6 7 8 9
-    [15,1],[16,1],[17,1], [15,3],[16,3],[17,3], [17,6],[15,6],[16,6],[16,5], [18,2],[19,2],[20,2],[21,2], [21,3],[21,5],[18,5],[19,5],[20,5],[18,4],[19,4],[20,4],[18,3],[19,3],[20,3],
-    // Num0 num. blank  rightWin Mute Blank Blank LControl LShift LAlt LWin Rcontrol RShift RAlt
-    [19,6],[20,6],[1,1], [13,6], [18,1] , [18,1] , [18,1], [1,6], [1,5], [3,6], [2,6], [14,6], [13,5], [11,6], 
-    // Blank Blank Lock    Blank Blank Blank Blank Blank Blank blank Fnkey stop playPause FF RR Blank Profile Blank Blank g1 g2 g3 g4 g5 g6
-    [13,4], [13,4], [3,1], [3,0], [3,0], [3,0], [3,0], [3,0], [3,0], [3,0], [12,6], [18,2], [20,2], [21,2], [19,2], [4,1], [0,0], [0,0], [0,1], [0,2], [0,3], [0,4], [0,5], [0,6], [0,7]
-    // logoCenter Blank REARLIGHTBAR START
-    , [2,2], [0,7], [0,0],[1,0],[2,0],[3,0],[4,0],[5,0],[6,0],[7,0],[8,0],[9,0],[10,0],[11,0],[12,0],[13,0],[14,0],[15,0],[16,0],[17,0],[18,0],[19,0],[20,0],[21,0],
-    //Left Side Bar
-    [0,1],[0,2],[0,3],[0,4],[0,5],[0,5],[0,6],[0,6],[0,7],[0,7],
-    //Right Side Bar
-    [21,1],[21,2],[21,3],[21,4],[21,5],[21,5],[21,6],[21,6],[21,7],[21,7],
-    //Blank logo Ring Top-Right-Bottom-Left
-    [21,7],[2,1],[3,1],[3,2],[3,3],[2,3],[1,3],[1,2]
+
  ];
 
 
@@ -119,45 +183,96 @@ export function LedPositions()
 {
     return vKeyPositions;
 }
-
-export function Render()
+function Send30(channel)
 {
-    
-
-    var packet = []
-    packet[0x00]   = 0x00;
-    packet[0x01]   = 0x08;    
-    packet[0x02]   = 0x06;
-    packet[0x03]   = 0x00;
-    packet[0x04]   = 0x45;
-    packet[0x05]   = 0x02;
-    packet[0x06]   = 0x00;
-    packet[0x07]   = 0x00;
-    packet[0x08]   = 0x12;
-    
+    var red = [210];
+    var green = [210];
+    var blue = [210];
 
 
-    //vKeys.length
+    for(var iIdx = 0; iIdx < 30; iIdx++)
+    {
+        var iPxX = vKeyPositions[iIdx][0];
+        var iPxY = vKeyPositions[iIdx][1];
+        var mxPxColor = device.color(iPxX, iPxY);
+        red[iIdx] = mxPxColor[0];
+        green[iIdx] = mxPxColor[1];
+        blue[iIdx] = mxPxColor[2];
+    }
+    //Initialize();
+
+
+   //channelStart(channel);
+    //red
+   StreamLightingPacketChanneled(0,30,0,red.splice(0,30),channel)
+
+
+   //green
+   StreamLightingPacketChanneled(0,30,1,green.splice(0,30),channel)
+
+
+   //blue
+   StreamLightingPacketChanneled(0,30,2,blue.splice(0,30),channel)
+
+   //commit packet
+   SubmitLightingColors();
+}
+function SendChannel(channel)
+{
+    var red = [210];
+    var green = [210];
+    var blue = [210];
+
+
     for(var iIdx = 0; iIdx < vKeyPositions.length; iIdx++)
     {
         var iPxX = vKeyPositions[iIdx][0];
         var iPxY = vKeyPositions[iIdx][1];
         var mxPxColor = device.color(iPxX, iPxY);
-        packet[22+iIdx*3] = mxPxColor[0];
-        packet[22+iIdx*3 +1 ] = mxPxColor[1];
-        packet[22+iIdx*3 +2 ] = mxPxColor[2];
-
+        red[iIdx] = mxPxColor[0];
+        green[iIdx] = mxPxColor[1];
+        blue[iIdx] = mxPxColor[2];
     }
-    
-    device.write(packet, 1028);
-    
+    //Initialize();
 
+
+   //channelStart(channel);
+    //red
+   StreamLightingPacketChanneled(0,50,0,red.splice(0,50),channel)
+   StreamLightingPacketChanneled(50,50,0,red.splice(0,50),channel)
+   StreamLightingPacketChanneled(100,50,0,red.splice(0,50),channel)
+   StreamLightingPacketChanneled(150,50,0,red.splice(0,50),channel)
+   StreamLightingPacketChanneled(200,4,0,red.splice(0,4),channel)
+
+   //green
+   StreamLightingPacketChanneled(0,50,1,green.splice(0,50),channel)
+   StreamLightingPacketChanneled(50,50,1,green.splice(0,50),channel)
+   StreamLightingPacketChanneled(100,50,1,green.splice(0,50),channel)
+   StreamLightingPacketChanneled(150,50,1,green.splice(0,50),channel)
+   StreamLightingPacketChanneled(200,4,0,green.splice(0,4),channel)
+
+   //blue
+   StreamLightingPacketChanneled(0,50,2,blue.splice(0,50),channel)
+   StreamLightingPacketChanneled(50,50,2,blue.splice(0,50),channel)
+   StreamLightingPacketChanneled(100,50,2,blue.splice(0,50),channel)
+   StreamLightingPacketChanneled(150,50,2,blue.splice(0,50),channel)
+   StreamLightingPacketChanneled(200,4,0,blue.splice(0,4),channel)
+
+   //commit packet
+   SubmitLightingColors();
 }
 
+export function Render()
+{
+    // Both are mirrored
+    Initialize();
+    Send30(0);
+    SendChannel(1);
+}
 
 export function Validate(endpoint)
 {
-    return endpoint.interface === 1;
+    return endpoint.interface === -1;
 }
 
 
