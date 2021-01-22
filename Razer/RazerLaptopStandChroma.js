@@ -54,7 +54,8 @@ export function ProductId() { return 0x0f0D; }
 export function Publisher() { return "WhirlwindFX"; }
 export function Size() { return [15,1]; }
 export function Type() { return "Hid"; }
-
+export function DefaultPosition(){return [120,80]}
+export function DefaultScale(){return 4.0}
 
 var vLedNames = ["laptop Stand"];
 var vLedPositions = [

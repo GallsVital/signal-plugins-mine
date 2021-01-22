@@ -3,7 +3,8 @@ export function VendorId() { return 0x1038; }
 export function ProductId() { return 0x172B; }
 export function Publisher() { return "WhirlwindFX"; }
 export function Size() { return [7,7]; }
-
+export function DefaultPosition(){return [240,120]}
+export function DefaultScale(){return 8.0}
 var vLedNames = [
     "Scroll", "Logo",
      "Left1", "Right1",

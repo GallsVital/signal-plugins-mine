@@ -3,7 +3,8 @@ export function VendorId() { return 0x1b1c; }
 export function ProductId() { return 0x1b55; }
 export function Publisher() { return "WhirlwindFX"; }
 export function Size() { return [21, 7]; }
-
+export function DefaultPosition(){return [50,100]}
+export function DefaultScale(){return 8.0}
 
 var CORSAIR_COMMAND_WRITE       = 0x07;
 var CORSAIR_COMMAND_READ        = 0x0E;

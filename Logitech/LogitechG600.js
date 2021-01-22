@@ -14,6 +14,8 @@ export function VendorId() { return 0x046D; }
 export function ProductId() { return 0xC24A; } 
 export function Publisher() { return "WhirlwindFX"; }
 export function Size() { return [3,3]; } 
+export function DefaultPosition(){return [240,120]}
+export function DefaultScale(){return 8.0}
 
 var vLedNames = ["MouseWide"];
 

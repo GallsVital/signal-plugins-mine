@@ -3,7 +3,8 @@ export function VendorId() { return 0x1b1c; }
 export function ProductId() { return 0x0C1E; }
 export function Publisher() { return "WhirlwindFX"; }
 export function Size() { return [128, 3]; }
-
+export function DefaultPosition(){return [0,0]}
+export function DefaultScale(){return 1.0}
 
 var CORSAIR_LIGHTING_CONTROL_SOFTWARE           = 0x02;
 

@@ -4,6 +4,8 @@ export function ProductId() { return 0x0517; }
 export function Publisher() { return "WhirlwindFX"; }
 export function Size() { return [24, 6]; }
 export function Type() { return "Hid"; }
+export function DefaultPosition(){return [0,0]}
+export function DefaultScale(){return 8.0}
 var vLedNames = ["Left", "Right"];
 
 var vLedPositions = [

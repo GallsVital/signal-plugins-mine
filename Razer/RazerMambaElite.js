@@ -54,7 +54,8 @@ export function ProductId() { return 0x006c; }
 export function Publisher() { return "WhirlwindFX"; }
 export function Size() { return [10,10]; }
 export function Type() { return "Hid"; }
-
+export function DefaultPosition(){return [240,120]}
+export function DefaultScale(){return 8.0}
   
 var vLedNames = ["ScrollWheel", "Logo", "SideBarLeft1","SideBarLeft2","SideBarLeft3","SideBarLeft4","SideBarLeft5","SideBarLeft6","SideBarLeft7","SideBarLeft8","SideBarLeft9",
 , "SideBarRight1","SideBarRight2","SideBarRight3","SideBarRight4","SideBarRight5","SideBarRight6","SideBarRight7","SideBarRight8","SideBarRight9"];

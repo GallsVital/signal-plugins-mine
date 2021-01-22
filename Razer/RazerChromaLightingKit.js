@@ -54,7 +54,8 @@ export function ProductId() { return 0x0f0e; }
 export function Publisher() { return "WhirlwindFX"; }
 export function Size() { return [20,1]; }
 export function Type() { return "Hid"; }
-
+export function DefaultPosition(){return [0,0]}
+export function DefaultScale(){return 8.0}
 
 var vLedNames = ["Position 1","Position 2","Position 3","Position 4","Position 5","Position 6","Position 7","Position 8","Position 9","Position 10","Position 11","Position 12","Position 13","Position 14","Position 15","Position 16"];
 var vLedPositions = [

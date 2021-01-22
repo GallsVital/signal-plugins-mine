@@ -3,7 +3,8 @@ export function VendorId() { return 0x046d; }
 export function ProductId() { return 0xc092; }
 export function Publisher() { return "WhirlwindFX"; }
 export function Size() { return [3, 3]; }
-
+export function DefaultPosition(){return [240,120]}
+export function DefaultScale(){return 8.0}
 var vLedNames = ["Left Zone", "Logo Zone", "Right Zone"];
 var vLedPositions = [
     [1,0],[1,1],[1,2]
