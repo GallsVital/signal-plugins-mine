@@ -1,24 +1,19 @@
-export function Name() { return "Corsair Commander Pro"; }
+export function Name() { return "Corsair LS100 Light Strips"; }
 export function VendorId() { return 0x1b1c; }
-export function ProductId() { return 0x0C10; }
+export function ProductId() { return 0x0C1E; }
 export function Publisher() { return "WhirlwindFX"; }
-export function Size() { return [128, 16]; }
+export function Size() { return [128, 3]; }
 
 
-var CORSAIR_COMMAND_WRITE       = 0x07;
-var CORSAIR_COMMAND_READ        = 0x0E;
-var CORSAIR_COMMAND_STREAM      = 0x7F;
-var CORSAIR_PROPERTY_LIGHTING_CONTROL           = 0x05;
-var CORSAIR_LIGHTING_CONTROL_HARDWARE           = 0x01;
 var CORSAIR_LIGHTING_CONTROL_SOFTWARE           = 0x02;
-var CORSAIR_PROPERTY_SUBMIT_KEYBOARD_COLOR_24   = 0x28;
-var CORSAIR_PROPERTY_SPECIAL_FUNCTION = 0x04;
-var CORSAIR_PROPERTY_SUBMIT_MOUSE_COLOR         = 0x22;
 
+
+var brightness = .5;
 
 export function Initialize()
 {
     var packet = [];
+
 
     /*-----------------------------------------------------*\
     | Set up Lighting Control packet                        |
@@ -32,7 +27,7 @@ export function Initialize()
     | Send packet                                           |
     \*-----------------------------------------------------*/    
     device.write(packet, 65);
-    
+
     /*-----------------------------------------------------*\
     | Set up Lighting Control packet                        |
     \*-----------------------------------------------------*/
@@ -162,16 +157,7 @@ var vKeyNames = [
     [91,0],[92,0],[93,0],[94,0],[95,0],[96,0],[97,0],[98,0],[99,0],[100,0],
     [101,0],[102,0],[103,0],[104,0],[105,0],[106,0],[107,0],[108,0],[109,0],[110,0],
     [111,0],[112,0],[113,0],[114,0],[115,0],[116,0],[117,0],[118,0],[119,0],[120,0],
-    [121,0],[122,0],[123,0],[124,0],[125,0],[126,0],[127,0],
-    //204 max leds ,204-128 = 76 extra
-    [1,0],[2,0],[3,0],[4,0],[5,0],[6,0],[7,0],[8,0],[9,0],[10,0],
-    [11,0],[12,0],[13,0],[14,0],[15,0],[16,0],[17,0],[18,0],[19,0],[20,0],
-    [21,0],[22,0],[23,0],[24,0],[25,0],[26,0],[27,0],[28,0],[29,0],[30,0],
-    [31,0],[32,0],[33,0],[34,0],[35,0],[36,0],[37,0],[38,0],[39,0],[40,0],
-    [41,0],[42,0],[43,0],[44,0],[45,0],[46,0],[47,0],[48,0],[49,0],[50,0],
-    [51,0],[52,0],[53,0],[54,0],[55,0],[56,0],[57,0],[58,0],[59,0],[60,0],
-    [61,0],[62,0],[63,0],[64,0],[65,0],[66,0],[67,0],[68,0],[69,0],[70,0],
-    [71,0],[72,0],[73,0],[74,0],[75,0],[76,0]
+    [121,0],[122,0],[123,0],[124,0],[125,0],[126,0],[127,0]
 
  ];
 
@@ -187,9 +173,9 @@ export function LedPositions()
 }
 function SendChannel(channel)
 {
-    var red = [210];
-    var green = [210];
-    var blue = [210];
+    var red = [132];
+    var green = [132];
+    var blue = [132];
 
 
     for(var iIdx = 0; iIdx < vKeyPositions.length; iIdx++)
@@ -197,35 +183,25 @@ function SendChannel(channel)
         var iPxX = vKeyPositions[iIdx][0];
         var iPxY = vKeyPositions[iIdx][1];
         var mxPxColor = device.color(iPxX, iPxY);
-        red[iIdx] = mxPxColor[0];
-        green[iIdx] = mxPxColor[1];
-        blue[iIdx] = mxPxColor[2];
+        red[iIdx] = mxPxColor[0]*brightness;
+        green[iIdx] = mxPxColor[1]*brightness;
+        blue[iIdx] = mxPxColor[2]*brightness;
     }
-    //Initialize();
+    
+   channelStart(channel);
 
-
-   //channelStart(channel);
     //red
    StreamLightingPacketChanneled(0,50,0,red.splice(0,50),channel)
    StreamLightingPacketChanneled(50,50,0,red.splice(0,50),channel)
-   StreamLightingPacketChanneled(100,50,0,red.splice(0,50),channel)
-   StreamLightingPacketChanneled(150,50,0,red.splice(0,50),channel)
-   StreamLightingPacketChanneled(200,4,0,red.splice(0,4),channel)
-
+   StreamLightingPacketChanneled(100,27,0,red.splice(0,27),channel)
    //green
    StreamLightingPacketChanneled(0,50,1,green.splice(0,50),channel)
    StreamLightingPacketChanneled(50,50,1,green.splice(0,50),channel)
-   StreamLightingPacketChanneled(100,50,1,green.splice(0,50),channel)
-   StreamLightingPacketChanneled(150,50,1,green.splice(0,50),channel)
-   StreamLightingPacketChanneled(200,4,0,green.splice(0,4),channel)
-
+   StreamLightingPacketChanneled(100,27,1,green.splice(0,27),channel)
    //blue
    StreamLightingPacketChanneled(0,50,2,blue.splice(0,50),channel)
    StreamLightingPacketChanneled(50,50,2,blue.splice(0,50),channel)
-   StreamLightingPacketChanneled(100,50,2,blue.splice(0,50),channel)
-   StreamLightingPacketChanneled(150,50,2,blue.splice(0,50),channel)
-   StreamLightingPacketChanneled(200,4,0,blue.splice(0,4),channel)
-
+   StreamLightingPacketChanneled(100,27,2,blue.splice(0,27),channel)
    //commit packet
    SubmitLightingColors();
 }
@@ -236,8 +212,11 @@ export function Render()
     Initialize()
     SendChannel(0);
     SendChannel(1);
+
+
 }
 
+ 
 export function Validate(endpoint)
 {
     return endpoint.interface === -1;

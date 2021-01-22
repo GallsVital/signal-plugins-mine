@@ -18,26 +18,31 @@ var CORSAIR_PROPERTY_SUBMIT_MOUSE_COLOR         = 0x22;
 
 export function Initialize()
 {
+    
     var packet = [];
-
-    /*-----------------------------------------------------*\
-    | Set up Lighting Control packet                        |
-    \*-----------------------------------------------------*/
     packet[0x00]           = 0x00;
     packet[0x01]           = CORSAIR_COMMAND_WRITE;
-    packet[0x02]           = CORSAIR_PROPERTY_LIGHTING_CONTROL;    
+    packet[0x02]           = 4;    
     packet[0x03]           = CORSAIR_LIGHTING_CONTROL_SOFTWARE;
+    packet[0x05]   = 0x00;
+    device.write(packet, 65);
 
-    /*-----------------------------------------------------*\
-    | Lighting control byte needs to be 3 for keyboards and |
-    | headset stand, 1 for mice and mousepads               |
-    \*-----------------------------------------------------*/
-    packet[0x05]   = 0x03;
+    var packet1 = []
+    packet1[0x00]   = 0x00;
+    packet1[0x01]   = 0x07;
+    packet1[0x02]   = 0x22;
+    packet1[0x03]   = 0x14;
+    device.write(packet1, 65);
 
-    /*-----------------------------------------------------*\
-    | Send packet                                           |
-    \*-----------------------------------------------------*/    
-    device.write(packet, 6);
+    var packet2 = [];
+    packet2[0x00]           = 0x00;
+    packet2[0x01]           = CORSAIR_COMMAND_WRITE;
+    packet2[0x02]           = CORSAIR_PROPERTY_LIGHTING_CONTROL;    
+    packet2[0x03]           = CORSAIR_LIGHTING_CONTROL_SOFTWARE;
+
+    packet2[0x05]   = 0x01;
+ 
+    device.write(packet2, 65);
 }
 
 
@@ -56,7 +61,6 @@ export function Shutdown()
     {
         var iPxX = vKeyPositions[iIdx][0];
         var iPxY = vKeyPositions[iIdx][1];
-        var mxPxColor = device.color(iPxX, iPxY);
         packet[0x05+iIdx*3] = 255;
         packet[0x06+iIdx*3 ] = 0;
         packet[0x07+iIdx*3 ] = 0;

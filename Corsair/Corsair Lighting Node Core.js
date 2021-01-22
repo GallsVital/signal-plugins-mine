@@ -189,26 +189,26 @@ function SendChannel(channel)
 
 
    channelStart(channel);
-    //red
+   
    StreamLightingPacketChanneled(0,50,0,red.splice(0,50),channel)
-   StreamLightingPacketChanneled(50,50,0,red.splice(0,50),channel)
-   StreamLightingPacketChanneled(100,50,0,red.splice(0,50),channel)
-   StreamLightingPacketChanneled(150,50,0,red.splice(0,50),channel)
-   StreamLightingPacketChanneled(200,4,0,red.splice(0,4),channel)
-
-   //green
    StreamLightingPacketChanneled(0,50,1,green.splice(0,50),channel)
-   StreamLightingPacketChanneled(50,50,1,green.splice(0,50),channel)
-   StreamLightingPacketChanneled(100,50,1,green.splice(0,50),channel)
-   StreamLightingPacketChanneled(150,50,1,green.splice(0,50),channel)
-   StreamLightingPacketChanneled(200,4,0,green.splice(0,4),channel)
-
-   //blue
    StreamLightingPacketChanneled(0,50,2,blue.splice(0,50),channel)
+
+   StreamLightingPacketChanneled(50,50,0,red.splice(0,50),channel)
+   StreamLightingPacketChanneled(50,50,1,green.splice(0,50),channel)
    StreamLightingPacketChanneled(50,50,2,blue.splice(0,50),channel)
+
+   StreamLightingPacketChanneled(100,50,0,red.splice(0,50),channel)
+   StreamLightingPacketChanneled(100,50,1,green.splice(0,50),channel)
    StreamLightingPacketChanneled(100,50,2,blue.splice(0,50),channel)
+
+   StreamLightingPacketChanneled(150,50,0,red.splice(0,50),channel)
+   StreamLightingPacketChanneled(150,50,1,green.splice(0,50),channel)
    StreamLightingPacketChanneled(150,50,2,blue.splice(0,50),channel)
-   StreamLightingPacketChanneled(200,4,0,blue.splice(0,4),channel)
+
+   StreamLightingPacketChanneled(200,4,0,red.splice(0,4),channel)
+   StreamLightingPacketChanneled(200,4,1,green.splice(0,4),channel)
+   StreamLightingPacketChanneled(200,4,2,blue.splice(0,4),channel)
 
    //commit packet
    SubmitLightingColors();

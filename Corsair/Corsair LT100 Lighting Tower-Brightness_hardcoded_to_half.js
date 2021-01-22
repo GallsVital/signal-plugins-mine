@@ -15,29 +15,19 @@ var CORSAIR_PROPERTY_SUBMIT_KEYBOARD_COLOR_24   = 0x28;
 var CORSAIR_PROPERTY_SPECIAL_FUNCTION = 0x04;
 var CORSAIR_PROPERTY_SUBMIT_MOUSE_COLOR         = 0x22;
 
+var brightness = .5;
 
 export function Initialize()
 {
+    
     var packet = [];
 
-    /*-----------------------------------------------------*\
-    | Set up Lighting Control packet                        |
-    \*-----------------------------------------------------*/
     packet[0x00]           = 0x00;
     packet[0x01]           = 0x38;
     packet[0x02]           = 0x00;    //Channel 0/1
     packet[0x03]           = CORSAIR_LIGHTING_CONTROL_SOFTWARE;
-
-    /*-----------------------------------------------------*\
-    | Lighting control byte needs to be 3 for keyboards and |
-    | headset stand, 1 for mice and mousepads               |
-    \*-----------------------------------------------------*/
-    packet[0x05]   = 0x03;
-
-    /*-----------------------------------------------------*\
-    | Send packet                                           |
-    \*-----------------------------------------------------*/    
-    device.write(packet, 6);
+ 
+    device.write(packet, 65);
 }
 
 
@@ -45,15 +35,12 @@ export function Shutdown()
 {
     // Return to some BS here?  Solid color?
     var packet = [];
-
     packet[0x00] = 0x00;
     packet[0x01] = 0x38;
     packet[0x02] = 0x00;
     packet[0x03] = 0x01;
-
     device.write(packet, 65);
-
-
+    
 }
 
 function StreamLightingPacket(start, count, colorChannel, data)
@@ -61,44 +48,32 @@ function StreamLightingPacket(start, count, colorChannel, data)
     //channel selection == 32 0/1 Start Count Channel LEDS
     //(Start, Count, Color, Data)
     var packet = [];
-
-    /*-----------------------------------------------------*\
-    | Set up Stream packet                                  |
-    \*-----------------------------------------------------*/
     packet[0x00]   = 0x00;
     packet[0x01]   = 0x32;
     packet[0x02]   = 0x00;
     packet[0x03]   = start;
     packet[0x04]   = count;
     packet[0x05]   = colorChannel;
-
-    /*-----------------------------------------------------*\
-    | Copy in data bytes                                    |
-    \*-----------------------------------------------------*/
     packet = packet.concat(data);
-
-    /*-----------------------------------------------------*\
-    | Send packet                                           |
-    \*-----------------------------------------------------*/
     device.write(packet, 65);
 }
 
+function channelStart(channel){
+    var packet = [];
+    //start packet == 34 00 channel (len 64)
+    packet[0x00]   = 0x00;
+    packet[0x01]   = 0x34;
+    packet[0x02]   = channel;
+    device.write(packet, 65);
+}
 
 function SubmitLightingColors()
 {
     var packet = [];
     //commit packet == 32 FF (len 64)
-    /*-----------------------------------------------------*\
-    | Set up Submit Keyboard 24-Bit Colors packet           |
-    \*-----------------------------------------------------*/
     packet[0x00]   = 0x00;
     packet[0x01]   = 0x33;
     packet[0x02]   = 0xFF;
-
-
-    /*-----------------------------------------------------*\
-    | Send packet                                           |
-    \*-----------------------------------------------------*/
     device.write(packet, 65);
 }
 var vKeyNames = [
@@ -138,7 +113,7 @@ export function LedPositions()
 
 export function Render()
 {
-    Initialize()
+    
     var red = [144];
     var green = [144];
     var blue = [144];
@@ -149,28 +124,28 @@ export function Render()
         var iPxX = vKeyPositions[iIdx][0];
         var iPxY = vKeyPositions[iIdx][1];
         var mxPxColor = device.color(iPxX, iPxY);
-        red[iIdx] = mxPxColor[0];
-        green[iIdx] = mxPxColor[1];
-        blue[iIdx] = mxPxColor[2];
+        red[iIdx] = mxPxColor[0]*brightness;
+        green[iIdx] = mxPxColor[1]*brightness;
+        blue[iIdx] = mxPxColor[2]*brightness;
     }
     
 
-    /*-----------------------------------------------------*\
-   | Send red bytes                                        |
-   \*-----------------------------------------------------*/
+  
+
+   channelStart(0);//only one channel for these
+
    StreamLightingPacket(0x00,0x32,0,red.splice(0,50))
-   StreamLightingPacket(0x32,0x64,0,red.splice(0,50))
-   StreamLightingPacket(0x64,0x08,0,red.splice(0,12))
-   //SubmitLightingColors();
-
    StreamLightingPacket(0x00,0x32,1,green.splice(0,50))
-   StreamLightingPacket(0x32,0x64,1,green.splice(0,50))
-   StreamLightingPacket(0x64,0x8,1,green.splice(0,12))
-   //SubmitLightingColors();
-
    StreamLightingPacket(0x00,0x32,2,blue.splice(0,50))
-   StreamLightingPacket(0x32,0x64,2,blue.splice(0,50))
-   StreamLightingPacket(0x64,0x8,2,blue.splice(0,12))
+
+   StreamLightingPacket(0x32,0x32,0,red.splice(0,50))
+   StreamLightingPacket(0x32,0x32,1,green.splice(0,50))
+   StreamLightingPacket(0x32,0x32,2,blue.splice(0,50))
+
+   StreamLightingPacket(0x64,0x08,0,red.splice(0,8))
+   StreamLightingPacket(0x64,0x08,1,green.splice(0,8))
+   StreamLightingPacket(0x64,0x08,2,blue.splice(0,8))
+
    SubmitLightingColors();
 
 }

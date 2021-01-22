@@ -1,6 +1,6 @@
-export function Name() { return "Corsair Lighting Node Pro"; }
+export function Name() { return "Corsair Commander Pro"; }
 export function VendorId() { return 0x1b1c; }
-export function ProductId() { return 0x0C0B; }
+export function ProductId() { return 0x0C10; }
 export function Publisher() { return "WhirlwindFX"; }
 export function Size() { return [128, 16]; }
 
@@ -20,7 +20,6 @@ export function Initialize()
 {
     var packet = [];
 
-
     /*-----------------------------------------------------*\
     | Set up Lighting Control packet                        |
     \*-----------------------------------------------------*/
@@ -33,7 +32,7 @@ export function Initialize()
     | Send packet                                           |
     \*-----------------------------------------------------*/    
     device.write(packet, 65);
-
+    
     /*-----------------------------------------------------*\
     | Set up Lighting Control packet                        |
     \*-----------------------------------------------------*/
@@ -151,7 +150,6 @@ var vKeyNames = [
 
 
  var vKeyPositions = [
-     //204 Max Leds
     [0,0],[1,0],[2,0],[3,0],[4,0],[5,0],[6,0],[7,0],[8,0],[9,0],[10,0],
     [11,0],[12,0],[13,0],[14,0],[15,0],[16,0],[17,0],[18,0],[19,0],[20,0],
     [21,0],[22,0],[23,0],[24,0],[25,0],[26,0],[27,0],[28,0],[29,0],[30,0],
@@ -165,7 +163,7 @@ var vKeyNames = [
     [101,0],[102,0],[103,0],[104,0],[105,0],[106,0],[107,0],[108,0],[109,0],[110,0],
     [111,0],[112,0],[113,0],[114,0],[115,0],[116,0],[117,0],[118,0],[119,0],[120,0],
     [121,0],[122,0],[123,0],[124,0],[125,0],[126,0],[127,0],
-    
+    //204 max leds ,204-128 = 76 extra
     [1,0],[2,0],[3,0],[4,0],[5,0],[6,0],[7,0],[8,0],[9,0],[10,0],
     [11,0],[12,0],[13,0],[14,0],[15,0],[16,0],[17,0],[18,0],[19,0],[20,0],
     [21,0],[22,0],[23,0],[24,0],[25,0],[26,0],[27,0],[28,0],[29,0],[30,0],
@@ -173,7 +171,7 @@ var vKeyNames = [
     [41,0],[42,0],[43,0],[44,0],[45,0],[46,0],[47,0],[48,0],[49,0],[50,0],
     [51,0],[52,0],[53,0],[54,0],[55,0],[56,0],[57,0],[58,0],[59,0],[60,0],
     [61,0],[62,0],[63,0],[64,0],[65,0],[66,0],[67,0],[68,0],[69,0],[70,0],
-    [71,0],[72,0],[73,0],[74,0],[75,0],[74,0],[75,0],[74,0],[75,0],[75,0],[74,0],[75,0],[74,0],[75,0]
+    [71,0],[72,0],[73,0],[74,0],[75,0],[76,0],[77,0],[78,0]
 
  ];
 
@@ -189,9 +187,9 @@ export function LedPositions()
 }
 function SendChannel(channel)
 {
-    var red = [220];
-    var green = [220];
-    var blue = [220];
+    var red = [210];
+    var green = [210];
+    var blue = [210];
 
 
     for(var iIdx = 0; iIdx < vKeyPositions.length; iIdx++)
@@ -206,26 +204,26 @@ function SendChannel(channel)
     //Initialize();
 
 
-   channelStart(channel);
+   //channelStart(channel);
     //red
    StreamLightingPacketChanneled(0,50,0,red.splice(0,50),channel)
-   StreamLightingPacketChanneled(50,50,0,red.splice(0,50),channel)
-   StreamLightingPacketChanneled(100,50,0,red.splice(0,50),channel)
-   StreamLightingPacketChanneled(150,50,0,red.splice(0,50),channel)
-   StreamLightingPacketChanneled(200,4,0,red.splice(0,4),channel)
-
-   //green
    StreamLightingPacketChanneled(0,50,1,green.splice(0,50),channel)
-   StreamLightingPacketChanneled(50,50,1,green.splice(0,50),channel)
-   StreamLightingPacketChanneled(100,50,1,green.splice(0,50),channel)
-   StreamLightingPacketChanneled(150,50,1,green.splice(0,50),channel)
-   StreamLightingPacketChanneled(200,4,1,green.splice(0,4),channel)
-
-   //blue
    StreamLightingPacketChanneled(0,50,2,blue.splice(0,50),channel)
+
+   StreamLightingPacketChanneled(50,50,0,red.splice(0,50),channel)
+   StreamLightingPacketChanneled(50,50,1,green.splice(0,50),channel)
    StreamLightingPacketChanneled(50,50,2,blue.splice(0,50),channel)
+
+   StreamLightingPacketChanneled(100,50,0,red.splice(0,50),channel)
+   StreamLightingPacketChanneled(100,50,1,green.splice(0,50),channel)
    StreamLightingPacketChanneled(100,50,2,blue.splice(0,50),channel)
+
+   StreamLightingPacketChanneled(150,50,0,red.splice(0,50),channel)
+   StreamLightingPacketChanneled(150,50,1,green.splice(0,50),channel)
    StreamLightingPacketChanneled(150,50,2,blue.splice(0,50),channel)
+
+   StreamLightingPacketChanneled(200,4,0,red.splice(0,4),channel)
+   StreamLightingPacketChanneled(200,4,1,green.splice(0,4),channel)
    StreamLightingPacketChanneled(200,4,2,blue.splice(0,4),channel)
 
    //commit packet
@@ -234,13 +232,12 @@ function SendChannel(channel)
 
 export function Render()
 {
-    //Both are mirrored
+    // Both are mirrored
     Initialize()
     SendChannel(0);
     SendChannel(1);
 }
 
- 
 export function Validate(endpoint)
 {
     return endpoint.interface === -1;
