@@ -1,26 +1,15 @@
 
-var CORSAIR_COMMAND_WRITE       = 0x07;
-var CORSAIR_COMMAND_READ        = 0x0E;
-var CORSAIR_COMMAND_STREAM      = 0x7F;
-
-var CORSAIR_LIGHTING_CONTROL_HARDWARE           = 0x01;
-var CORSAIR_LIGHTING_CONTROL_SOFTWARE           = 0x02;
-
-var CORSAIR_PROPERTY_SPECIAL_FUNCTION = 0x04;
-var CORSAIR_PROPERTY_SUBMIT_MOUSE_COLOR         = 0x22;
-
-
 export function Name() { return "Corsair M55 Mouse"; }
-export function VendorId() { return 0x1b1c; }
+export function VendorId() { return 0x1B1C; }
 export function ProductId() { return 0x1B70; }
 export function Publisher() { return "WhirlwindFX"; }
 export function Size() { return [3, 3]; }
 export function DefaultPosition(){return [240,120]}
 export function DefaultScale(){return 8.0}
 
-var vLedNames = ["Mouse"];
+var vLedNames = ["DPI Zone", "Logo Zone"];
 
-var vLedPositions = [[1,1]];
+var vLedPositions = [[1,0],[1,1]];
 
 export function LedNames()
 {
@@ -34,38 +23,62 @@ export function LedPositions()
 
 function EnableSoftwareControl()  {
 
-
-//     //08 01 20 00 20 03       
     var packet = [];
+
+    // Lighting ctrl packet.
     packet[0x00]           = 0x00;
-    packet[0x01]           = 0x08;
-    packet[0x02]           = 0x01;
-    packet[0x03]           = 0x20;
-    packet[0x04]           = 0x00;
-    packet[0x03]           = 0x20;
-    packet[0x04]           = 0x03;
+    packet[0x01]           = 08;
+    packet[0x02]           = 01;
+    packet[0x03]           = 03;
+    packet[0x04]           = 00;
+    packet[0x05]           = 02;
+    // Send packet.
     device.write(packet, 65);
-// //08 05 01 01  
-//     var packet2 = [];
 
-//     packet2[0x00]           = 0x00;
-//     packet2[0x01]           = 0x08;
-//     packet2[0x02]           = 0x0D;
-//     packet2[0x03]           = 0x00;
-//     packet2[0x04]           = 0x01;
+    // var packet = [];
 
-//     device.write(packet2, 65);
-    //08 05 01 01          
+    // // Lighting ctrl packet.
+    // packet[0x00]           = 0x00;
+    // packet[0x01]           = 08;
+    // packet[0x02]           = 02;
+    // packet[0x03]           = 0x52;
 
-    // var packet3 = [];
+    // // Send packet.
+    // device.write(packet, 65);
+    // var packet = [];
 
-    // packet3[0x00]           = 0x00;
-    // packet3[0x01]           = 0x08;
-    // packet3[0x02]           = 0x05;
-    // packet3[0x03]           = 0x01;
-    // packet3[0x04]           = 0x01;
+    // // Lighting ctrl packet.
+    // packet[0x00]           = 0x00;
+    // packet[0x01]           = 08;
+    // packet[0x02]           = 06;
+    // packet[0x04]           = 08;
+    // packet[0x08]           = 01;
+    // packet[0x09]           = 01;
+    // packet[10]           = 01;
+    // packet[13]           = 01;
+    // packet[14]           = 01;
+    // // Send packet.
+    // device.write(packet, 65);
 
-    // device.write(packet3, 65);
+    //  var packet3 = [];
+
+    //  packet3[0x00]           = 0x00;
+    //  packet3[0x01]           = 0x08;
+    //  packet3[0x02]           = 0x05;
+    //  packet3[0x03]           = 0x01;
+
+
+    //  device.write(packet3, 65);
+
+    //  var packet2 = [];
+
+    //  packet2[0x00]           = 0x00;
+    //  packet2[0x01]           = 0x08;
+    //  packet2[0x02]           = 0x0D;
+    //  packet2[0x03]           = 0x00;
+    //  packet2[0x04]           = 0x01;
+    //  device.write(packet2, 65);
+
 }
 
 
@@ -106,18 +119,27 @@ export function Render()
     packet[0x05]   = 0x00;
     packet[0x06]   = 0x00;
     packet[0x07]   = 0x00;
-    packet[0x08]   = 0xFF;
-    // Fetch color at 1,1
+    
+    
+
+    //Dpi Zone
     var iX = vLedPositions[0][0];
     var iY = vLedPositions[0][1];
     var col = device.color(iX,iY);
 
-        packet[0x09] = col[0];
-        packet[10]   = 0x00;
-        packet[11] = col[1];
-        packet[12]   = 0x00;
-        packet[13] = col[2];
+    //Logo Zone
+    var iX = vLedPositions[1][0];
+    var iY = vLedPositions[1][1];
+    var col2 = device.color(iX,iY);
+
+    packet[0x08]   = col[0];
+    packet[0x09] = col2[0];
+    packet[10]   = col[1];
+    packet[11] = col2[1];
+    packet[12]   = col[2];
+    packet[13] = col2[2];
     device.write(packet, 65);
+    device.pause(30);
 }
 
 export function Validate(endpoint)

@@ -1,12 +1,14 @@
-export function Name() { return "Logitech G502 LightSpeed"; }
+export function Name() { return "Logitech G502 Hero Se"; }
 export function VendorId() { return 0x046d; }
-export function ProductId() { return 0xc539; }
+export function ProductId() { return 0xC08B; }
 export function Publisher() { return "WhirlwindFX"; }
 export function Size() { return [3, 3]; }
+export function DefaultPosition(){return [240,120]}
+export function DefaultScale(){return 8.0}
 
-var vLedNames = ["Primary Zone", "Logo Zone"];
+var vLedNames = ["Dpi Zone", "Logo Zone", ];
 var vLedPositions = [
-    [0,1],[0,2]
+    [0,1],[1,2]
 ];
 
 export function LedNames()
@@ -28,23 +30,24 @@ export function Initialize()
 
 function Apply()
 {
-    // var packet = [];
+    var packet = [];
 
-    // packet[0x00] = 0x11;
-    // packet[0x01] = 0xFF;
-    // packet[0x02] = 0x12;
-    // packet[0x03] = 0x7E;
+    packet[0x00] = 0x11;
+    packet[0x01] = 0xFF;
+    packet[0x02] = 0x02;
+    packet[0x03] = 0x3E;
 
-    // device.write(packet, 20);  
-    // device.pause(30);  
+    device.write(packet, 20);  
+    //device.pause(30);  
     //device.read(packet,20);
 }
+
 function sendZone(zone){
     var packet = [];
     packet[0x00] = 0x11;
-    packet[0x01] = 0x01;
-    packet[0x02] = 0x07;
-    packet[0x03] = 0x3A;
+    packet[0x01] = 0xFF;
+    packet[0x02] = 0x02;
+    packet[0x03] = 0x3E;
     packet[0x04] = zone;
     packet[0x05] = 0x01;
 
@@ -68,9 +71,11 @@ function sendZone(zone){
 export function Render()
 {
     sendZone(0);
+    //Apply(); //Makes Dpi zone flicker
     sendZone(1);
-    Apply();
+    //Apply(); //Makes Dpi zone flicker
 }
+
 
 
 export function Shutdown()

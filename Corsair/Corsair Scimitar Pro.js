@@ -17,9 +17,10 @@ export function Publisher() { return "WhirlwindFX"; }
 export function Size() { return [3, 4]; }
 export function DefaultPosition(){return [240,120]}
 export function DefaultScale(){return 8.0}
-var vLedNames = ["Scroll Zone","Front Zone","Side Zone", "N/A","Logo Zone"];
 
-var vLedPositions = [[1,1],[1,0],[0,2],[0,0],[1,3]
+var vLedNames = ["Logo Zone","Side Bar","Side Keys", "Front Zone","Scroll Zone"];
+
+var vLedPositions = [[2,2],[0,0],[0,1],[2,0],[1,0]
 ];
 
 export function LedNames()
@@ -44,6 +45,28 @@ function EnableSoftwareControl()
 
     // Send.
     device.write(packet, 65);
+
+    var packet = [];
+
+    packet[0x00]           = 0x00;
+    packet[0x01]           = CORSAIR_COMMAND_WRITE;
+    packet[0x02]           = 0x22;
+    packet[0x03]           = 0;
+    packet[0x03]           = 1;
+
+    device.write(packet, 65);
+
+    //00000000  07 05 04 00 03 
+    var packet = [];
+
+    packet[0x00]           = 0x00;
+    packet[0x01]           = CORSAIR_COMMAND_WRITE;
+    packet[0x02]           = 0x05;
+    packet[0x03]           = 4;
+    packet[0x04]           = 3;
+
+    device.write(packet, 65);
+
 }
 
 
@@ -76,8 +99,8 @@ export function Render()
     packet[0x02]   = CORSAIR_PROPERTY_SUBMIT_MOUSE_COLOR;
     packet[0x03]   = 0x05;
     packet[0x04]   = 0x01;
-    var zoneId = [4,1,5,3,2]
-
+    //var zoneId = [4,1,5,3,2]
+    var zoneId = [2,3,5,1,4]
 
 
 
