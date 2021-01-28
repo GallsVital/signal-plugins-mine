@@ -3,6 +3,8 @@ export function VendorId() { return 0x1b1c; }
 export function ProductId() { return 0x1B89; }
 export function Publisher() { return "WhirlwindFX"; }
 export function Size() { return [24, 8]; }
+export function DefaultPosition() {return [50,100]; }
+export function DefaultScale() {return 8.0; }
 
 
 var CORSAIR_COMMAND_WRITE       = 0x07;
@@ -15,81 +17,159 @@ var CORSAIR_PROPERTY_SUBMIT_KEYBOARD_COLOR_24   = 0x28;
 var CORSAIR_PROPERTY_SPECIAL_FUNCTION = 0x04;
 var CORSAIR_PROPERTY_SUBMIT_MOUSE_COLOR         = 0x22;
 
+var interval;
+//Modern Corsair
+// 08 01 4A 00 KEY      //Disable Key
+// 08 01 45             //Confirm?
+
+// 08 0D 00 02 // Macro Key
+// 08 06 00 04 //Macro Key
+// 00 07 00 01 01 01.. //macro key
+var Modern_Corsair_COMMAND_WRITE = 0x08;
+var Modern_CORSAIR_PROPERTY_LIGHTING_CONTROL           = 0x01;
+
+
+function sendPacketString(string, size){
+    var packet= [];
+    var data = string.split(' ');
+    
+    for(let i = 0; i < data.length; i++){
+        packet[parseInt(i,16)] =parseInt(data[i],16)//.toString(16)
+    }
+
+    device.write(packet, size);
+}
 
 export function Initialize()
 {
-    var packet = [];
+    //sendPacketString("00 08 02 03 ",65);
+    sendPacketString("00 08 01 03 00 02",65);  //Critical Software control packet
+    //sendPacketString("00 08 02 03",65);
+    //sendPacketString("00 08 02 5F",65);
+    //sendPacketString("00 08 02 01",65);
+    // sendPacketString("00 08 02 03",65);
+    // sendPacketString("00 08 02 13",65);
+    // sendPacketString("00 08 02 14",65);
+    // sendPacketString("00 08 02 41",65);
+    // sendPacketString("00 08 02 96",65);
+    // sendPacketString("00 08 0D 00 27",65);
+    // sendPacketString("00 08 01 03 00 02",65);
 
-    packet[0x00]   = 0x00;
-    packet[0x01]   = 8;
-    packet[0x02]   = 1;
-    packet[0x03]   = 3;
-    packet[0x04]   = 0;
-    packet[0x05]   = 2;
-    device.write(packet, 65);
+    //sendPacketString("00 08 02 4A 00 00",65);
+    //sendPacketString("00 08 02 45",65);
+    
+    
+    //sendPacketString("00 08 01 02 00 E8 03",65);
+    //sendPacketString("00 08 01 09 00 01",65);
+    //sendPacketString("00 08 01 39 00 01",65);
+    //sendPacketString("00 08 01 0A 00 05",65);
+
+    //sendPacketString("00 08 0D 00 0F",65);
+    //sendPacketString("00 08 01 38 00 05",65);
+    //sendPacketString("00 08 09",65);
+
+    // sendPacketString("00 08 01 4A 00 00",65);
+    // sendPacketString("00 08 08",65);
+    // sendPacketString("00 08 01 45",65);
+    // sendPacketString("00 08 05 01",65);
+
+    
+    sendPacketString("00 08 02 6E",65);             //critical- no idea
+    //sendPacketString("00 08 0D 00 60 6D",65);
+    //sendPacketString("00 08 09",65);
+    //sendPacketString("00 08 08 ",65);
+    sendPacketString("00 08 0D 01 01",65);          //critical - no idea
+    //sendPacketString("00 08 05 01",65);
+    //sendPacketString("08 08 0D 00 62 6D",65);
+
+    //var red =  new Array(228).fill(0);
+    //var green =  new Array(228).fill(0);
+    //var blue =  new Array(228).fill(0);
+    
+    //sendInitalPacket(red.splice(0,53)); //start of red 53
+    //sendPacketString("00 08 09",65);
+   // StreamPacket(red.splice(0,62)); //all red 62
+    //StreamDoublePacket(red.splice(0,38),green.splice(0,19),0,4); // 38 red, space 4, 19 green
+    //sendPacketString("00 08 08",65);
+    //StreamPacket(green.splice(0,61)); //green 61
+    //sendPacketString("00 08 05 01",65);
+    //StreamPacket(green.splice(0,61)); //green 61
+    //sendPacketString("00 08 0D 00 61 6D",65);
+    //StreamDoublePacket(green.splice(0,11),blue.splice(0,46),0,4);  //11 green, space 4, blue 46
+    //sendPacketString("00 08 09",65);
+    //StreamPacket(blue.splice(0,61)); //61 BLUE
+    //StreamPacket(blue.splice(0,61)); //61 BLUE
+
+
+    //sendPacketString("00 08 02 6E",65);
+    //sendPacketString("00 08 0D 02 02",65);
+
 }
 
 
 export function Shutdown()
 {
-    
-    var packet = [];
+     var packet = [];
 
-    packet[0x00]   = 0x00;
-    packet[0x01]   = 8;
-    packet[0x02]   = 1;
-    packet[0x03]   = 3;
-    packet[0x04]   = 0;
-    packet[0x05]   = 1;
-    device.write(packet, 65);
+     packet[0x00]   = 0x00;
+     packet[0x01]   = 8;
+     packet[0x02]   = 1;
+     packet[0x03]   = 3;
+     packet[0x04]   = 0;
+     packet[0x05]   = 1;
+     device.write(packet, 65);
 
 }
 
 
 // This is an array of key indexes for setting colors in our render array, indexed left to right, row top to bottom.
  var vKeys = [  
-  //46,96,//99,100,//111,//112,113//,114,115,116,//117,118,119,124,126,127// is nothing on RED
 
-  
- //NEEDS ENTER KEY
+    
+ 
+   //Top Light Strip 
+     134,135,136,137,138,139,140,141,142,143,144,145,146,147,148,149,150,151,152,153,154,
 
-
-   //Top Light Strip
-    //134,135,136,137,138,139,140,141,142,143,144,145,146,147,148,149,150,151,152,153,154,
-
-    //Main KeyBoard
-    //       125, 109, 110,                                                       98,    
-    //128, 37,   54, 55, 56, 57,     58, 59, 60, 61,     62, 63, 64, 65,     66, 67, 68,    120, 123, 121, 122,  
-    //129, 49,   26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 41, 42,     38,     69, 70, 71,    79, 80, 81, 82, 
-    //130, 39,   16, 22, 4, 17, 19, 24, 20, 8, 14, 15, 43,   44,   45,       72, 73, 74,    91, 92, 93, 83,   
-    //131, 53,   0, 18, 3, 5, 6, 7, 9, 10, 11, 47, 48,         125,                        88, 89, 90,       
-   // 132, 102,  25, 23, 2, 21, 1, 13, 12, 50, 51, 52,          106,              78,        85, 86, 87, 84,
-    //133, 101,  104, 103,           40,              107, 108, 97, 105,      76,77,75,     94,    95,
+     //Main KeyBoard
+          125, 109, 110,                                                       98,    
+     128, 37,   54, 55, 56, 57,     58, 59, 60, 61,     62, 63, 64, 65,     66, 67, 68,    120, 123, 121, 122,  
+     129, 49,   26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 41, 42,     38,     69, 70, 71,    79, 80, 81, 82, 
+     130, 39,   16, 22, 4, 17, 19, 24, 20, 8, 14, 15, 43,   44,   45,       72, 73, 74,    91, 92, 93, 83,   
+     131, 53,   0, 18, 3, 5, 6, 7, 9, 10, 11, 47, 48,         36,                        88, 89, 90,       
+     132, 102,  25, 23, 2, 21, 1, 13, 12, 50, 51, 52,          106,              78,        85, 86, 87, 84,
+     133, 101,  104, 103,           40,              107, 108, 97, 105,      76,77,75,     94,    95,
    
  ];
+
+
+
 // This array must be the same length as vKeys[], and represents the pixel color position in our pixel matrix that we reference.  For example,
 // item at index 3 [9,0] represents the corsair logo, and the render routine will grab its color from [9,0].
 var vKeyPositions = [
 
-    [0,0],[1,0],[2,0],[3,0],[5,0],[6,0],[7,0],[8,0],[9,0],[11,0],[12,0],[13,0],[14,0],[16,0],[17,0],[18,0],[19,0],[20,0],[21,0],[23,0],[24,0],
+    [0,0],[2,0],[3,0],[4,0],[5,0],[6,0],[7,0],[8,0],[9,0],[11,0],[12,0],[13,0],[14,0],[16,0],[17,0],[18,0],[19,0],[20,0],[21,0],[23,0],[24,0],
 
-                   [2,0], [3,0], [4,0],                                                                                                               [19,0],   
-    [0,1],  [1,1],      [3,1],[4,1], [5,1], [6,1],     [7,1],[8,1], [9,1], [10,1],   [12,1],[13,1], [14,1], [15,1],  [15,1], [16,1], [17,1],   [18,1], [19,1],[20,1], [21,1], 
+                            [4,0], [5,0], [6,0],                                                                                               [18,0],   
+    [0,1],  [1,1],    [3,1],[4,1], [5,1], [6,1],     [7,1],[8,1], [9,1], [10,1],   [12,1],[13,1], [14,1], [15,1],  [15,1], [16,1], [17,1],        [18,1], [19,1],[20,1], [21,1], 
     [0,2],  [1,2], [2,2], [3,2], [4,2], [5,2], [6,2], [7,2], [8,2], [9,2], [10,2], [11,2], [12,2], [13,2], [14,2],   [15,2], [16,2], [17,2],   [18,2], [19,2],[20,2], [21,2], 
     [0,3],  [1,3], [2,3], [3,3], [4,3], [5,3], [6,3], [7,3], [8,3], [9,3], [10,3], [11,3], [12,3], [13,3], [14,3],   [15,3], [16,3], [17,3],   [18,3], [19,3],[20,3], [21,3], 
     [0,4],  [1,4], [2,4], [3,4], [4,4], [5,4], [6,4], [7,4], [8,4], [9,4], [10,4], [11,4], [12,4],         [14,4],                             [18,4], [19,4],[20,4], 
-    [0,5],  [1,5], [2,5], [3,5], [4,5], [5,5], [6,5], [7,5], [8,5], [9,5], [10,5], [11,5], [12,5],         [14,5],           [16,5],           [18,5], [19,5],[20,5], [21,5],
+    [0,5],  [1,5],     [3,5], [4,5], [5,5], [6,5], [7,5], [8,5], [9,5], [10,5], [11,5], [12,5],            [14,5],           [16,5],           [18,5], [19,5],[20,5], [21,5],
     [0,6],  [1,6], [2,6], [3,6],                      [7,6],                       [11,6], [12,6], [13,6], [14,6],   [15,6], [16,6], [17,6],   [18,6],        [20,6] 
+
     
 ];
 var vKeyNames = [
+    "lightBar1","lightBar2","lightBar3","lightBar4","lightBar5","lightBar6","lightBar7","lightBar8","lightBar9","lightBar10","lightBar11","lightBar12","lightBar13","lightBar14",
+    "lightBar15","lightBar16","lightBar17","lightBar18","lightBar19","lightBar20","lightBar21",
+
     "Profile","Brightness", "Lock",                  "Logo",                   "Mute",
-"Esc", "F1", "F2", "F3", "F4", "F5", "F6", "F7", "F8", "F9", "F10", "F11", "F12",         "Print Screen", "Scroll Lock", "Pause Break",   "Stop", "Prev", "Play/Pause", "Next",  //20
-"`", "1", "2", "3", "4", "5", "6", "7", "8", "9", "0", "-_", "=+", "Backspace",                        "Insert", "Home", "Page Up",       "NumLock", "Num /", "Num *", "Num -",  //21
-"Tab", "Q", "W", "E", "R", "T", "Y", "U", "I", "O", "P", "[", "]", "\\",                               "Del", "End", "Page Down",         "Num 7", "Num 8", "Num 9", "Num +",    //21
-"Caps Lock", "A", "S", "D", "F", "G", "H", "J", "K", "L", ";", "'", "Enter",                                                              "Num 4", "Num 5", "Num 6",             //16
-"Left Shift", "Z", "X", "C", "V", "B", "N", "M", ",", ".", "/", "Right Shift",                                  "Up Arrow",               "Num 1", "Num 2", "Num 3", "Num Enter",//17
-"Left Ctrl", "Left Win", "Left Alt", "Space", "Right Alt", "Right Win", "Menu", "Right Ctrl",  "Left Arrow", "Down Arrow", "Right Arrow", "Num 0", "Num ."                       //13
+"G1","Esc", "F1", "F2", "F3", "F4", "F5", "F6", "F7", "F8", "F9", "F10", "F11", "F12",         "Print Screen", "Scroll Lock", "Pause Break",   "Stop", "Prev", "Play/Pause", "Next",  //20
+"G2","`", "1", "2", "3", "4", "5", "6", "7", "8", "9", "0", "-_", "=+", "Backspace",                        "Insert", "Home", "Page Up",       "NumLock", "Num /", "Num *", "Num -",  //21
+"G3","Tab", "Q", "W", "E", "R", "T", "Y", "U", "I", "O", "P", "[", "]", "\\",                               "Del", "End", "Page Down",         "Num 7", "Num 8", "Num 9", "Num +",    //21
+"G4","Caps Lock", "A", "S", "D", "F", "G", "H", "J", "K", "L", ";", "'", "Enter",                                                              "Num 4", "Num 5", "Num 6",             //16
+"G5","Left Shift", "Z", "X", "C", "V", "B", "N", "M", ",", ".", "/", "Right Shift",                                  "Up Arrow",               "Num 1", "Num 2", "Num 3", "Num Enter",//17
+"G6","Left Ctrl", "Left Win", "Left Alt", "Space", "Right Alt", "Right Win", "Menu", "Right Ctrl",  "Left Arrow", "Down Arrow", "Right Arrow", "Num 0", "Num ."                       //13
 ];
 
 export function LedNames()
@@ -121,7 +201,7 @@ function sendInitalPacket(data){
 
     device.write(packet, 65);
 }
-function StreamDoublePacket(data1, data2){
+function StreamDoublePacket(data1, data2,space1,space2){
     var packet = [];
 
     packet[0x00]   = 0x00;
@@ -129,8 +209,9 @@ function StreamDoublePacket(data1, data2){
     packet[0x02]   = 7;
     packet[0x03]   = 1;
 
+    packet = packet.concat(new Array(space1).fill(0))
     packet = packet.concat(data1);
-
+    packet = packet.concat(new Array(space2).fill(0))
     packet = packet.concat(data2);
 
     device.write(packet, 65);
@@ -161,35 +242,30 @@ export function Render()
         var iPxY = vKeyPositions[iIdx][1];
         var mxPxColor = device.color(iPxX, iPxY);
         red[vKeys[iIdx]] = mxPxColor[0];
-        green[vKeys[iIdx]] = mxPxColor[1];
-        blue[vKeys[iIdx]] = mxPxColor[2];
+
+
+        //Why these shift over around key count 115, i have no idea...
+        if(vKeys[iIdx] < 115) {
+            green[vKeys[iIdx]] =  mxPxColor[1];
+            blue[vKeys[iIdx]] = mxPxColor[2];
+        } else {
+            green[vKeys[iIdx]-1] = mxPxColor[1];
+            blue[vKeys[iIdx]-1] = mxPxColor[2];
+        }
+        
     }
     
-    sendInitalPacket(red.splice(0,53)); //start of red
-    StreamPacket(red.splice(0,62)); //all red
-    StreamDoublePacket(red.splice(0,42),emptyPacket.splice(0,19)); //42 red, 19 Green
-    StreamPacket(emptyPacket.splice(0,62)); //all green
-    StreamPacket(emptyPacket.splice(0,62)); //all green
-    StreamDoublePacket(green.splice(0,11),emptyPacket.splice(0,50)); // 11 green, 50 Blue
-    StreamPacket(emptyPacket.splice(0,62)); 
-    StreamPacket(emptyPacket.splice(0,62)); 
-
-    // var emptyPacket = new Array(900).fill(0);
-    // var redTest = new Array(228).fill(255);
-    // var greenTest = new Array(228).fill(255);
-    // var blueTest = new Array(228).fill(255);
-
-
-    // sendInitalPacket(redTest.splice(0,53)); //start of red
-    // StreamPacket(redTest.splice(0,62)); //all red
-    // StreamDoublePacket(redTest.splice(0,38),greenTest.splice(0,23)); //38 red, 23 Green
-    // StreamPacket(greenTest.splice(0,62)); //all green
-    // StreamPacket(greenTest.splice(0,62)); //all green
-    // StreamDoublePacket(greenTest.splice(0,15),emptyPacket.splice(0,47)); // 11 green, 50 Blue
-    // StreamPacket(emptyPacket.splice(0,62)); 
-    // StreamPacket(emptyPacket.splice(0,62)); 
+    sendInitalPacket(red.splice(0,53)); //start of red 53
+    StreamPacket(red.splice(0,62)); //all red 62
+    StreamDoublePacket(red.splice(0,38),green.splice(0,19),0,4); // 38 red, space 4, 19 green
+    StreamPacket(green.splice(0,61)); //green 61
+    StreamPacket(green.splice(0,61)); //green 61
+    StreamDoublePacket(green.splice(0,11),blue.splice(0,46),0,4);  //11 green, space 4, blue 46
+    StreamPacket(blue.splice(0,61)); //61 BLUE
+    StreamPacket(blue.splice(0,61)); //61 BLUE
 
 }
+
 export function Validate(endpoint)
 {
     return endpoint.interface === 1;

@@ -4,13 +4,14 @@ export function ProductId() { return 0x172B; }
 export function Publisher() { return "WhirlwindFX"; }
 export function Size() { return [7,7]; }
 export function DefaultPosition(){return [240,120]}
-export function DefaultScale(){return 8.0}
+export function DefaultScale(){return 1.5}
 var vLedNames = [
     "Scroll", "Logo",
      "Left1", "Right1",
       "Left2", "Right2",
        "Left3", "Right3"
 ];
+
 //Zones go 0 through 7
 var vLedPositions = [
     [3,0], [3,6],
@@ -18,6 +19,7 @@ var vLedPositions = [
     [1,3], [5,3],
     [0,4], [6,4],
 ];
+
 
 export function Initialize() {
     // var packet = [];
