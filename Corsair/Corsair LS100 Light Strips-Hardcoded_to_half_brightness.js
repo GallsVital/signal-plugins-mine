@@ -213,8 +213,6 @@ export function Render()
     Initialize()
     SendChannel(0);
     SendChannel(1);
-
-
 }
 
  
