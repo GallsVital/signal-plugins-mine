@@ -4,7 +4,7 @@ export function ProductId() { return 0x1705; }
 export function Publisher() { return "WhirlwindFX"; }
 export function Size() { return [8,8]; }
 export function DefaultPosition(){return [230,100]}
-export function DefaultScale(){return 5.0}
+export function DefaultScale(){return 3.0}
 
 
 var vLedNames = [
