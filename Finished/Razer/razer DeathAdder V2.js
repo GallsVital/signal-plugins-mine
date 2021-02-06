@@ -50,7 +50,7 @@ function CalculateCrc(report)
 
 export function Name() { return "Razer Deathadder V2"; }
 export function VendorId() { return 0x1532; }
-export function ProductId() { return 0x084c; }
+export function ProductId() { return 0x0084; }
 export function Publisher() { return "WhirlwindFX"; }
 export function Size() { return [10,10]; }
 export function Type() { return "Hid"; }
