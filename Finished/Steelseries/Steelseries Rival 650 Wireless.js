@@ -120,6 +120,7 @@ function SendColorPacket(Position, shutdown = false) {
     packet[50] = 0x56;
 
     device.write(packet, 65);
+    device.pause(1)
 }
 
 function sendSecondPacket(){
@@ -173,6 +174,7 @@ export function Render() {
         savedDpi2 = dpi2;
         setDpi(2,dpi2)
     }
+    device.pause(1)
 }
 
 function setDpi(channel, dpi){
