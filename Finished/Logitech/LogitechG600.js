@@ -16,6 +16,13 @@ export function Publisher() { return "WhirlwindFX"; }
 export function Size() { return [3,3]; } 
 export function DefaultPosition(){return [240,120]}
 export function DefaultScale(){return 8.0}
+export function ControllableParameters(){
+    return [
+        {"property":"shutdownColor", "label":"Shutdown Color","type":"color","default":"009bde"},
+        {"property":"dpi1", "label":"DPI", "type":"number","min":"200", "max":"12400","default":"800"},
+    ];
+}
+var savedDpi1;
 
 var vLedNames = ["MouseWide"];
 
@@ -33,13 +40,12 @@ export function LedPositions()
 
 export function Initialize()
 {
-    
+    setDpi(dpi1);
     return "Logitech G600 Initialized";
 }
 
+function sendColors(shutdown = false){
 
-export function Render()
-{
     var packet = []
     //packet[0x00] = 0x00;
     packet[0x00]   = G600_RGB_WRITE;
@@ -47,7 +53,14 @@ export function Render()
     // Fetch color at 1,1
     var iX = vLedPositions[0][0];
     var iY = vLedPositions[0][1];
-    var col = device.color(iX,iY);
+
+    var col;
+    if(shutdown){
+        col = hexToRgb(shutdownColor)
+    }else{
+        col = device.color(iX, iY);
+    }
+
     //assign to packets 2-4
     packet[0x01] = col[0];
     packet[0x02] = col[1];
@@ -61,8 +74,38 @@ export function Render()
     packet[0x07] = 0x00;
 
     device.send_report(packet, 8);
-    
+
 }
+export function Render()
+{
+    sendColors()
+    if(savedDpi1 != dpi1){
+       setDpi(dpi1)
+    }
+
+}
+function setDpi(dpi){
+
+savedDpi1 = dpi;
+var packet = [];
+packet[0] = 0xF2;
+packet[1] = 0x02;
+packet[2] = 0x00;
+packet[3] = Math.round(dpi/50);
+packet[4] = 0x00;
+device.send_report(packet, 8);
+
+
+}
+function hexToRgb(hex) {
+var result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+var colors = [];
+colors[0] = parseInt(result[1], 16);
+colors[1] = parseInt(result[2], 16);
+colors[2] = parseInt(result[3], 16);
+return colors;
+}
+
 export function Validate(endpoint)
 {
     return  endpoint.interface === 1 && endpoint.usage === 0x0080;
@@ -70,7 +113,7 @@ export function Validate(endpoint)
 
 export function Shutdown()
 {
-    
+    sendColors(true);
     return "Logitech G600 Disconnected";
 }
 

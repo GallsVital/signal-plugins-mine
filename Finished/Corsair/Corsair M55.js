@@ -9,9 +9,14 @@ export function Publisher() { return "WhirlwindFX"; }
 export function Size() { return [3, 3]; }
 export function DefaultPosition(){return [240,120]; }
 export function DefaultScale(){return 8.0; }
-
+export function ControllableParameters(){
+    return [
+        {"property":"shutdownColor", "label":"Shutdown Color","type":"color","default":"009bde"},
+        {"property":"dpi1", "label":"DPI", "type":"number","min":"200", "max":"12400","default":"800"},
+    ];
+}
+var savedDpi1;
 var vLedNames = ["DPI Zone", "Logo Zone"];
-
 var vLedPositions = [[1,0],[1,1]];
 
 export function LedNames()
@@ -42,7 +47,7 @@ function EnableSoftwareControl()
     packet[0x03]           = 0x00;
     packet[0x04]           = 0x01;
     device.write(packet, 65);
-
+    setDpi(dpi1);
 }
 
 
@@ -64,9 +69,7 @@ export function Initialize()
     EnableSoftwareControl();
 }
 
-
-export function Render()
-{
+function sendColors(shutdown = false){
     var packet = []
     packet[0x00]   = 0x00;
     packet[0x01]   = 0x08;
@@ -78,17 +81,23 @@ export function Render()
     packet[0x07]   = 0x00;
     
     
+    var col;
+    var col2;
 
-    //Dpi Zone
-    var iX = vLedPositions[0][0];
-    var iY = vLedPositions[0][1];
-    var col = device.color(iX,iY);
+        //Dpi Zone
+        var iX = vLedPositions[0][0];
+        var iY = vLedPositions[0][1];
+        //Logo Zone
+        var iX2 = vLedPositions[1][0];
+        var iY2 = vLedPositions[1][1];
 
-    //Logo Zone
-    var iX = vLedPositions[1][0];
-    var iY = vLedPositions[1][1];
-    var col2 = device.color(iX,iY);
-
+        if(shutdown){
+            col = hexToRgb(shutdownColor)
+            col2 = hexToRgb(shutdownColor)
+        }else{
+            col = device.color(iX, iY);
+            col2 = device.color(iX2,iY2);
+        }
     packet[0x08]   = col[0];
     packet[0x09] = col2[0];
     packet[10]   = col[1];
@@ -98,7 +107,37 @@ export function Render()
     device.write(packet, 65);
     device.pause(1);
 }
+export function Render()
+{
+    sendColors()
 
+    if(savedDpi1 != dpi1){
+        setDpi(dpi1)
+    }
+
+}
+function setDpi(dpi){
+
+    savedDpi1 = dpi;
+    var packet = [];
+    packet[0] = 0x00;
+    packet[1] = 0x08;
+    packet[2] = 0x01;
+    packet[3] = 0x20;
+    packet[4] = 0x00;
+    packet[5] = dpi%256;
+    packet[6] = Math.floor(dpi/256);
+    device.write(packet, 65);
+}
+function hexToRgb(hex) {
+    var result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+    var colors = [];
+    colors[0] = parseInt(result[1], 16);
+    colors[1] = parseInt(result[2], 16);
+    colors[2] = parseInt(result[3], 16);
+
+    return colors;
+}
 export function Validate(endpoint)
 {
     return endpoint.interface === 1;
@@ -106,7 +145,9 @@ export function Validate(endpoint)
 
 export function Shutdown()
 {
+    sendColors(true);
     ReturnToHardwareControl();
+    
 }
 
 export function Image() 
