@@ -17,9 +17,16 @@ export function Publisher() { return "WhirlwindFX"; }
 export function Size() { return [3, 3]; }
 export function DefaultPosition(){return [240,120]}
 export function DefaultScale(){return 8.0}
+export function ControllableParameters(){
+    return [
+        {"property":"shutdownColor", "label":"Shutdown Color","type":"color","default":"009bde"},
+        {"property":"dpi1", "label":"DPI", "type":"number","min":"100", "max":"12000","default":"800"},
+    ];
+}
 var vLedNames = ["Scroll Zone", "Dpi Zone", "Logo Zone"];
 
 var vLedPositions = [[1,0],[1,1],[1,2]];
+var savedDpi1;
 
 export function LedNames()
 {
@@ -64,11 +71,11 @@ function ReturnToHardwareControl()
 export function Initialize()
 {
     EnableSoftwareControl();
+    savedDpi1 = dpi1;
+    setDpi(dpi1);
+
 }
-
-
-export function Render()
-{
+function sendColors(shutdown = false){
     var packet = []
     packet[0x00]   = 0x00;
     packet[0x01]   = CORSAIR_COMMAND_WRITE;
@@ -82,14 +89,56 @@ export function Render()
         packet[(zone_idx * 4) + 5] = 4-zone_idx;
         var iX = vLedPositions[zone_idx][0];
         var iY = vLedPositions[zone_idx][1];
-        var col = device.color(iX,iY);
-        packet[(zone_idx * 4) + 6] = col[0];
-        packet[(zone_idx * 4) + 7] = col[1];
-        packet[(zone_idx * 4) + 8] = col[2];
+
+        var color
+        if(shutdown){
+            color = hexToRgb(shutdownColor)
+        }else{
+            color = device.color(iX, iY);
+        }
+
+        packet[(zone_idx * 4) + 6] = color[0];
+        packet[(zone_idx * 4) + 7] = color[1];
+        packet[(zone_idx * 4) + 8] = color[2];
     }
 
     device.write(packet, 65);
 }
+
+export function Render()
+{
+    sendColors();
+
+    if(savedDpi1 != dpi1){
+        savedDpi1 = dpi1;
+        setDpi(dpi1)
+    }
+}
+
+
+function setDpi(dpi){
+    var packet = [];
+    packet[0] = 0x00;
+    packet[1] = 0x07;
+    packet[2] = 0x13;
+    packet[3] = 0xD1;
+    packet[4] = 0x00;
+    packet[5] = 0x00;
+    packet[6] = dpi%256;
+    packet[7] = Math.floor(dpi/256);
+    packet[8] = dpi%256;
+    packet[9] = Math.floor(dpi/256);
+    device.write(packet, 65);
+}
+function hexToRgb(hex) {
+    var result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+    var colors = [];
+    colors[0] = parseInt(result[1], 16);
+    colors[1] = parseInt(result[2], 16);
+    colors[2] = parseInt(result[3], 16);
+
+    return colors;
+  }
 
 export function Validate(endpoint)
 {

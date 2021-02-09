@@ -3,6 +3,14 @@ export function VendorId() { return 0x046d; }
 export function ProductId() { return 0xC08D; }
 export function Publisher() { return "WhirlwindFX"; }
 export function Size() { return [3, 3]; }
+export function ControllableParameters(){
+    return [
+        {"property":"shutdownColor", "label":"Shutdown Color","type":"color","default":"009bde"},
+        {"property":"dpi1", "label":"DPI", "type":"number","min":"100", "max":"26500","default":"800"},
+        
+    ];
+}
+var savedDpi1;
 
 var vLedNames = ["Primary Zone", "Logo Zone"];
 var vLedPositions = [
@@ -22,15 +30,34 @@ export function LedPositions()
 
 export function Initialize()
 {
+    device.set_endpoint(2, 0x0001, 0xff00); // System IF    
+    savedDpi1 = dpi1;
+    setDpi(dpi1);
 
 }
 
+function setDpi(dpi){
 
+    device.set_endpoint(2, 0x0001, 0xff00); // System IF    
+
+    var packet = [];
+    packet[0] = 0x10;
+    packet[1] = 0x01;
+    packet[2] = 0x0C;
+    packet[3] = 0x3A;
+    packet[4] = 0x00;
+    packet[5] = Math.floor(dpi/256);
+    packet[6] = dpi%256;
+    device.write(packet, 7);
+
+
+
+}
 function Apply()
 {
 
 }
-function sendZone(zone){
+function sendZone(zone, shutDown = false){
     var packet = [];
     packet[0x00] = 0x11;
     packet[0x01] = 0x01;
@@ -43,8 +70,12 @@ function sendZone(zone){
 
         var iX = vLedPositions[zone][0];
         var iY = vLedPositions[zone][1];
-        var color = device.color(iX,iY);
-        
+        var color
+        if(shutDown){
+            color = hexToRgb(shutdownColor)
+        }else{
+            color = device.color(iX, iY);
+        }
         packet[0x06] = color[0];
         packet[0x07] = color[1];
         packet[0x08] = color[2];
@@ -58,22 +89,41 @@ function sendZone(zone){
 
 export function Render()
 {
+    device.set_endpoint(2, 0x0002, 0xff00); // Lighting IF    
     sendZone(0);
     sendZone(1);
-    Apply();
+    
+
+    if(savedDpi1 != dpi1){
+        savedDpi1 = dpi1;
+      setDpi(dpi1)
+    }
 }
 
 
 export function Shutdown()
 {
-
+    device.set_endpoint(2, 0x0002, 0xff00); // Lighting IF    
+    sendZone(0,true);
+    sendZone(1,true);
+    
 }
 
 
 export function Validate(endpoint)
 {
-    return endpoint.interface === 2 && endpoint.usage === 0x0002;
+    return endpoint.interface === 2 && endpoint.usage === 0x0002 && endpoint.usage_page === 0xff00
+     || endpoint.interface === 2 && endpoint.usage === 0x0001 && endpoint.usage_page === 0xff00;
 }
+function hexToRgb(hex) {
+    var result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+    var colors = [];
+    colors[0] = parseInt(result[1], 16);
+    colors[1] = parseInt(result[2], 16);
+    colors[2] = parseInt(result[3], 16);
+
+    return colors;
+  }
 
 export function Image()
 {

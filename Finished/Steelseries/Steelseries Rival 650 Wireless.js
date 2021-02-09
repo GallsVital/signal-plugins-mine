@@ -5,6 +5,14 @@ export function Publisher() { return "WhirlwindFX"; }
 export function Size() { return [7,7]; }
 export function DefaultPosition(){return [240,120]}
 export function DefaultScale(){return 1.5}
+export function ControllableParameters(){
+    return [
+        {"property":"shutdownColor", "label":"Shutdown Color","type":"color","default":"009bde"},
+        {"property":"dpi1", "label":"DPI 1", "type":"number","min":"100", "max":"12000","default":"800"},
+        {"property":"dpi2", "label":"DPI 2", "type":"number","min":"100", "max":"12000","default":"800"},
+    ];
+}
+
 var vLedNames = [
     "Scroll", "Logo",
      "Left1", "Right1",
@@ -20,6 +28,8 @@ var vLedPositions = [
     [0,4], [6,4],
 ];
 
+var savedDpi1;
+var savedDpi2;
 
 export function Initialize() {
     // var packet = [];
@@ -48,6 +58,10 @@ export function Initialize() {
     // buf[0x05] = 0x00;
     // buf[0x06] = 0x85;
     // device.send_report(packet, 513);
+    savedDpi1 = dpi1;
+    savedDpi2 = dpi2;
+    setDpi(1,dpi1);
+    setDpi(2,dpi2);
 }
 
 export function LedNames()
@@ -62,18 +76,29 @@ export function LedPositions()
 
 export function Shutdown()
 {
-
+    for(let i = 0 ;i < vLedPositions.length;i++){
+        SendColorPacket(vLedPositions[i], true);
+        sendSecondPacket();// Not needed?
+        sendZoneIdPacket(i);
+        //sendForthPacket(zones[i],); //Not needed?
+        }
 }
 
 export function Validate(endpoint)
 {
     return endpoint.interface === 0;
 }
-function SendColorPacket(Position) {
+function SendColorPacket(Position, shutdown = false) {
     var packet = [];
     var iPxX = Position[0];
     var iPxY = Position[1];
-    var color = device.color(iPxX, iPxY);
+    var color
+    if(shutdown){
+        color = hexToRgb(shutdownColor)
+    }else{
+        color = device.color(iPxX, iPxY);
+    }
+
     packet[0x00] = 0x00;
     packet[0x01] = 0x03;
     packet[0x05] = 0x30;
@@ -95,8 +120,8 @@ function SendColorPacket(Position) {
     packet[50] = 0x56;
 
     device.write(packet, 65);
-
 }
+
 function sendSecondPacket(){
     var packet = new Array(65).fill(0);
 
@@ -130,19 +155,43 @@ function sendForthPacket(zoneId,zonesInfo){
     packet[0x06] = zonesInfo[3];
     packet[0x07] = zonesInfo[4];
     device.write(packet, 65);
-
 }
 
 export function Render() {
     
     for(let i = 0 ;i < vLedPositions.length;i++){
-
     SendColorPacket(vLedPositions[i]);
-    //sendSecondPacket(); Not needed?
+    sendSecondPacket();// Not needed?
     sendZoneIdPacket(i);
     //sendForthPacket(zones[i],); //Not needed?
     }
+    if(savedDpi1 != dpi1){
+        savedDpi1 = dpi1;
+        setDpi(1,dpi1)
+    }
+    if(savedDpi2 != dpi2){
+        savedDpi2 = dpi2;
+        setDpi(2,dpi2)
+    }
 }
+
+function setDpi(channel, dpi){
+    var packet = [];
+    packet[0] = 0x00;
+    packet[1] = 0x15;
+    packet[2] = channel;
+    packet[3] = (dpi/100) -1;
+    device.write(packet, 65);
+}
+function hexToRgb(hex) {
+    var result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+    var colors = [];
+    colors[0] = parseInt(result[1], 16);
+    colors[1] = parseInt(result[2], 16);
+    colors[2] = parseInt(result[3], 16);
+
+    return colors;
+  }
 
 
 export function Image() 
