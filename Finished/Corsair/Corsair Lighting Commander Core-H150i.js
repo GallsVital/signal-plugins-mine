@@ -2,18 +2,26 @@ export function Name() { return "Corsair Lighting Commander Core"; }
 export function VendorId() { return 0x1b1c; }
 export function ProductId() { return 0x0C1C; }
 export function Publisher() { return "WhirlwindFX"; }
-export function Size() { return [128, 16]; }
+export function Size() { return [128, 12]; }
 export function DefaultPosition(){return [0,0]}
 export function DefaultScale(){return 1.0}
-
+export function ControllableParameters(){
+    return [
+    {"property":"stripMode", "label":"Strip Mode", "type":"boolean", "default":"false"},
+    {"property":"fan1", "label":"Fan 1 Type", "type":"combobox", "values":["None","LL", "QL","ML","SpPro"], "default":"None"},
+    {"property":"fan2", "label":"Fan 2 Type", "type":"combobox", "values":["None","LL", "QL","ML","SpPro"], "default":"None"},
+    {"property":"fan3", "label":"Fan 3 Type", "type":"combobox", "values":["None","LL", "QL","ML","SpPro"], "default":"None"},
+    {"property":"fan4", "label":"Fan 4 Type", "type":"combobox", "values":["None","LL", "QL","ML","SpPro"], "default":"None"},
+    {"property":"fan5", "label":"Fan 5 Type", "type":"combobox", "values":["None","LL", "QL","ML","SpPro"], "default":"None"},
+    {"property":"fan6", "label":"Fan 6 Type", "type":"combobox", "values":["None","LL", "QL","ML","SpPro"], "default":"None"},
+    ];
+}
 
 export function Initialize()
 {
    
     sendPacketString("00 08 01 03 00 02",1025) // Lighting Control packet
     sendPacketString("00 08 0D 00 22",1025) // Critical
-
-
 }
 
 
@@ -34,48 +42,140 @@ function sendPacketString(string, size){
 }
 
 var vKeyNames = [
-    "LED 0","LED 1","LED 2","LED 3","LED 4","LED 5","LED 6","LED 7","LED 8","LED 9","LED 10",
-    "LED 11","LED 12","LED 13","LED 14","LED 15","LED 16","LED 17","LED 18","LED 19","LED 20",
-    "LED 21","LED 22","LED 23","LED 24","LED 25","LED 26","LED 27","LED 28","LED 29","LED 30",
-    "LED 31","LED 32","LED 33","LED 34","LED 35","LED 36","LED 37","LED 38","LED 39","LED 40",
-    "LED 41","LED 42","LED 43","LED 44","LED 45","LED 46","LED 47","LED 48","LED 49","LED 50",
-    "LED 51","LED 52","LED 53","LED 54","LED 55","LED 56","LED 57","LED 58","LED 59","LED 60",
-    "LED 61","LED 62","LED 63","LED 64","LED 65","LED 66","LED 67","LED 68","LED 69","LED 70",
-    "LED 71","LED 72","LED 73","LED 74","LED 75","LED 76","LED 77","LED 78","LED 79","LED 80",
-    "LED 81","LED 82","LED 83","LED 84","LED 85","LED 86","LED 87","LED 88","LED 89","LED 90",
-    "LED 91","LED 92","LED 93","LED 94","LED 95","LED 96","LED 97","LED 98","LED 99","LED 100",
-    "LED 101","LED 102","LED 103","LED 104","LED 105","LED 106","LED 107","LED 108","LED 109","LED 110",
-    "LED 111","LED 112","LED 113","LED 114","LED 115","LED 116","LED 117","LED 118","LED 119","LED 120",
-    "LED 121","LED 122","LED 123","LED 124","LED 125","LED 126","LED 127"
+    "LED 0",
 ];
 
 
  var vKeyPositions = [
     [0,0],[1,0],[2,0],[3,0],[4,0],[5,0],[6,0],[7,0],[8,0],[9,0],[10,0],
     [11,0],[12,0],[13,0],[14,0],[15,0],[16,0],[17,0],[18,0],[19,0],[20,0],
-    [21,0],[22,0],[23,0],[24,0],[25,0],[26,0],[27,0],[28,0],[29,0],[30,0],
-    [31,0],[32,0],[33,0],[34,0],[35,0],[36,0],[37,0],[38,0],[39,0],[40,0],
-    [41,0],[42,0],[43,0],[44,0],[45,0],[46,0],[47,0],[48,0],[49,0],[50,0],
-    [51,0],[52,0],[53,0],[54,0],[55,0],[56,0],[57,0],[58,0],[59,0],[60,0],
-    [61,0],[62,0],[63,0],[64,0],[65,0],[66,0],[67,0],[68,0],[69,0],[70,0],
-    [71,0],[72,0],[73,0],[74,0],[75,0],[76,0],[77,0],[78,0],[79,0],[80,0],
-    [81,0],[82,0],[83,0],[84,0],[85,0],[86,0],[87,0],[88,0],[89,0],[90,0],
-    [91,0],[92,0],[93,0],[94,0],[95,0],[96,0],[97,0],[98,0],[99,0],[100,0],
-    [101,0],[102,0],[103,0],[104,0],[105,0],[106,0],[107,0],[108,0],[109,0],[110,0],
-    [111,0],[112,0],[113,0],[114,0],[115,0],[116,0],[117,0],[118,0],[119,0],[120,0],
-    [121,0],[122,0],[123,0],[124,0],[125,0],[126,0],[127,0],
-    
-    [1,0],[2,0],[3,0],[4,0],[5,0],[6,0],[7,0],[8,0],[9,0],[10,0],
-    [11,0],[12,0],[13,0],[14,0],[15,0],[16,0],[17,0],[18,0],[19,0],[20,0],
-    [21,0],[22,0],[23,0],[24,0],[25,0],[26,0],[27,0],[28,0],[29,0],[30,0],
-    [31,0],[32,0],[33,0],[34,0],[35,0],[36,0],[37,0],[38,0],[39,0],[40,0],
-    [41,0],[42,0],[43,0],[44,0],[45,0],[46,0],[47,0],[48,0],[49,0],[50,0],
-    [51,0],[52,0],[53,0],[54,0],[55,0],[56,0],[57,0],[58,0],[59,0],[60,0],
-    [61,0],[62,0],[63,0],[64,0],[65,0],[66,0],[67,0],[68,0],[69,0],[70,0],
-    [71,0],[72,0],[73,0],[74,0],[75,0]
-
+    [21,0],[22,0],[23,0],[24,0],[25,0],[26,0],[27,0],[28,0]
  ];
+const H150iCooler = new Object();
+H150iCooler.positioning = [
+    [0,0],      [2,0],      [4,0],       [6,0],
+         [1,1],       [3,1],       [5,1],
+    [0,2],      [2,2],[3,2],[4,2],       [6,2], 
+         [1,3], [2,3],[3,3],[4,3], [5,3],
+    [0,4],      [2,4],[3,4],[4,4],       [6,4],
+         [1,5],       [3,5],       [5,5],
+    [0,6],      [2,6],      [4,6],       [6,6],            
+];
+H150iCooler.mapping = [
+    28,     27,     26,    25,
+         16,   15,    14,
+    17,        0, 7, 3,    24,
+        9,  4, 8, 6,  13,
+    18,        1, 5, 2,    23,
+        10,    11,     12,
+    19,    20,     21,     22,
 
+];
+H150iCooler.offset = 8;
+H150iCooler.ledCount = 33;
+
+ const LLFan = new Object();
+ LLFan.mapping = [
+     4,      15,   14,    13, 
+     5,          0,        12,
+             1,    3,      11,
+     6,          2,        10,
+         7,     8,     9,    
+     ];
+     LLFan.positioning = [
+     [0,0], [1,0],  [2,0], [3,0],
+     [0,1],      [2,1],         [4,1],     
+              [1,2],   [3,2],   [4,2],                                      
+     [0,3],       [2,3],        [4,3], 
+         [1,4],  [2,4],    [3,4],  
+ ]
+LLFan.ledCount = 16;
+LLFan.offset = 5;
+
+
+const QLFan = new Object();
+QLFan.mapping = [
+ //Front
+ 10, 11, 12,
+ 21, 0, 13,
+ 20, 3, 1, 14,
+ 19, 2, 15,
+ 18, 17, 16,
+ //back
+ 22, 23, 24,
+ 33, 9, 4, 25,
+ 32, 8, 5, 26,
+ 31, 7, 6, 27,
+ 30, 29, 28,
+];
+QLFan.positioning = [
+         //Front
+         [1, 0], [2, 0], [3, 0],
+         [0, 1], [2, 1], [4, 1],
+         [0, 2], [1, 2], [3, 2], [4, 2],
+         [0, 3], [2, 3], [4, 3],
+       [1, 4], [2, 4], [3, 4],
+         //back
+         [1, 0], [2, 0], [3, 0],
+         [0, 1], [2, 1], [2, 1], [4, 1],
+         [0, 2], [1, 2], [3, 2], [4, 2],
+         [0, 3], [2, 3], [2, 3], [4, 3],
+         [1, 4], [2, 4], [3, 4],
+     ];
+QLFan.ledCount = 34;
+QLFan.offset = 5;
+
+
+const MLFan = new Object();
+MLFan.mapping = [
+ 0,
+3,  1,
+ 2, 
+];
+MLFan.positioning = [
+ [1,0], 
+[0,1],      [2,1], 
+ [1,2],
+];
+MLFan.ledCount = 4;
+MLFan.offset = 2;
+
+const SpProFan = new Object();
+SpProFan.mapping = [
+ 6,7,
+5,     0,
+4,     1,
+3, 2,
+];
+SpProFan.positioning = [
+ [1,0],[2,0],
+[0,1],     [3,1],
+[0,2],     [3,2],
+  [1,3],[2,3],
+];
+SpProFan.ledCount = 8;
+SpProFan.offset = 4;
+
+var Channel1Fans = [];
+var FanDict = {
+ "None": null,
+ "LL" : LLFan,
+ "QL" : QLFan,
+ "ML" : MLFan,
+ "SpPro" : SpProFan,
+}
+
+function SetFans(fanArray){
+ //set channel 1 fans
+ fanArray[0] = H150iCooler;
+ fanArray[1] = FanDict[fan1];
+ fanArray[2] = FanDict[fan2];
+ fanArray[3] = FanDict[fan3];
+ fanArray[4] = FanDict[fan4];
+ fanArray[5] = FanDict[fan5];
+ fanArray[6] = FanDict[fan6];
+
+}
 
 export function LedNames()
 {
@@ -86,10 +186,34 @@ export function LedPositions()
 {
     return vKeyPositions;
 }
-function SendColorData()
+function SendColorData(FanArray)
 {
+    var RGBdata = [];
+    var TotalOffset = 0;
+    var TotalLedCount = 0;
 
+     for (var fan = 0; fan < FanArray.length; fan++ ) {
 
+         if(FanArray[fan] != null) {
+                 for(var iIdx = 0; iIdx < FanArray[fan].mapping.length; iIdx++)
+                 {
+                     var iPxX = FanArray[fan].positioning[iIdx][0] + TotalOffset;
+                     var iPxY = FanArray[fan].positioning[iIdx][1];
+                     var mxPxColor = device.color(iPxX, iPxY);
+                    if(stripMode){
+                        RGBdata[iIdx*3+TotalLedCount*3] = mxPxColor[0];
+                        RGBdata[iIdx*3+1+TotalLedCount*3] = mxPxColor[1];
+                        RGBdata[iIdx*3+2+TotalLedCount*3] = mxPxColor[2];
+                    }else{
+                     RGBdata[FanArray[fan].mapping[iIdx]*3+TotalLedCount*3] = mxPxColor[0];
+                     RGBdata[FanArray[fan].mapping[iIdx]*3+1+TotalLedCount*3] = mxPxColor[1];
+                     RGBdata[FanArray[fan].mapping[iIdx]*3+2+TotalLedCount*3] = mxPxColor[2];
+                    }
+                 }
+             TotalLedCount += FanArray[fan].ledCount;
+             TotalOffset += FanArray[fan].offset;
+         }
+     }
     var packet = []
     packet[0x00]   = 0x00;
     packet[0x01]   = 0x08;
@@ -106,34 +230,27 @@ function SendColorData()
     packet[0x08]   = 0x12;
     packet[0x09]   = 0x00;
 
-    for(var iIdx = 0; iIdx < vKeyPositions.length; iIdx++)
-    {
-        var iPxX = vKeyPositions[iIdx][0];
-        var iPxY = vKeyPositions[iIdx][1];
-        var mxPxColor = device.color(iPxX, iPxY);
-        packet[iIdx*3+10] = mxPxColor[0];
-        packet[iIdx*3+11] = mxPxColor[1];
-        packet[iIdx*3+12] = mxPxColor[2];
-
-     }
-
+    // for(var iIdx = 0; iIdx < vKeyPositions.length; iIdx++)
+    // {
+    //     var iPxX = vKeyPositions[iIdx][0];
+    //     var iPxY = vKeyPositions[iIdx][1];
+    //     var mxPxColor = device.color(iPxX, iPxY);
+    //     packet[iIdx*3+10] = mxPxColor[0];
+    //     packet[iIdx*3+11] = mxPxColor[1];
+    //     packet[iIdx*3+12] = mxPxColor[2];
+    //  }
+    packet         = packet.concat(RGBdata);
 
     device.write(packet,1025);
     //device.pause(2)
-
-
-
 }
 
 export function Render()
 {
     //Initialize()
-    SendColorData();
-
-
+    SetFans(Channel1Fans);
+    SendColorData(Channel1Fans);
 }
-
- 
 export function Validate(endpoint)
 {
     return endpoint.interface === 0;

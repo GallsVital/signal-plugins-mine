@@ -5,16 +5,25 @@ export function Publisher() { return "WhirlwindFX"; }
 export function Size() { return [128, 16]; }
 export function DefaultPosition(){return [0,0]}
 export function DefaultScale(){return 1.0}
+export function ControllableParameters(){
+    return [
+    {"property":"stripMode", "label":"Strip Mode", "type":"boolean", "default":"false"},
+    {"property":"fan1", "label":"Fan 1 Type", "type":"combobox", "values":["None","LL", "QL","ML","SpPro"], "default":"None"},
+    {"property":"fan2", "label":"Fan 2 Type", "type":"combobox", "values":["None","LL", "QL","ML","SpPro"], "default":"None"},
+    {"property":"fan3", "label":"Fan 3 Type", "type":"combobox", "values":["None","LL", "QL","ML","SpPro"], "default":"None"},
+    {"property":"fan4", "label":"Fan 4 Type", "type":"combobox", "values":["None","LL", "QL","ML","SpPro"], "default":"None"},
+    {"property":"fan5", "label":"Fan 5 Type", "type":"combobox", "values":["None","LL", "QL","ML","SpPro"], "default":"None"},
+    {"property":"fan6", "label":"Fan 6 Type", "type":"combobox", "values":["None","LL", "QL","ML","SpPro"], "default":"None"},
+    {"property":"fan7", "label":"Fan 7 Type", "type":"combobox", "values":["None","LL", "QL","ML","SpPro"], "default":"None"},
+    {"property":"fan8", "label":"Fan 8 Type", "type":"combobox", "values":["None","LL", "QL","ML","SpPro"], "default":"None"},
+    {"property":"fan9", "label":"Fan 9 Type", "type":"combobox", "values":["None","LL", "QL","ML","SpPro"], "default":"None"},
+    {"property":"fan10", "label":"Fan 10 Type", "type":"combobox", "values":["None","LL", "QL","ML","SpPro"], "default":"None"},
+    {"property":"fan11", "label":"Fan 11 Type", "type":"combobox", "values":["None","LL", "QL","ML","SpPro"], "default":"None"},
+    {"property":"fan12", "label":"Fan 12 Type", "type":"combobox", "values":["None","LL", "QL","ML","SpPro"], "default":"None"},
+    ];
+}
 
-var CORSAIR_COMMAND_WRITE       = 0x07;
-var CORSAIR_COMMAND_READ        = 0x0E;
-var CORSAIR_COMMAND_STREAM      = 0x7F;
-var CORSAIR_PROPERTY_LIGHTING_CONTROL           = 0x05;
-var CORSAIR_LIGHTING_CONTROL_HARDWARE           = 0x01;
 var CORSAIR_LIGHTING_CONTROL_SOFTWARE           = 0x02;
-var CORSAIR_PROPERTY_SUBMIT_KEYBOARD_COLOR_24   = 0x28;
-var CORSAIR_PROPERTY_SPECIAL_FUNCTION = 0x04;
-var CORSAIR_PROPERTY_SUBMIT_MOUSE_COLOR         = 0x22;
 
 
 export function Initialize()
@@ -102,6 +111,120 @@ function StreamLightingPacketChanneled(start, count, colorChannel, data, channel
     \*-----------------------------------------------------*/
     device.write(packet, 65);
 }
+
+
+const LLFan = new Object();
+    LLFan.mapping = [
+        4,      15,   14,    13, 
+        5,          0,        12,
+                1,    3,      11,
+        6,          2,        10,
+            7,     8,     9,    
+        ];
+        LLFan.positioning = [
+        [0,0], [1,0],  [2,0], [3,0],
+        [0,1],      [2,1],         [4,1],     
+                 [1,2],   [3,2],   [4,2],                                      
+        [0,3],       [2,3],        [4,3], 
+            [1,4],  [2,4],    [3,4],  
+    ]
+LLFan.ledCount = 16;
+LLFan.offset = 5;
+
+
+const QLFan = new Object();
+   QLFan.mapping = [
+    //Front
+    10,   11,  12,
+    21,       0,      13,
+    20,     3,   1,   14,
+    19,       2,      15,
+       18,   17,   16,
+    //back
+    22,    23,    24,
+    33,     9, 4,    25,
+    32,    8,   5,   26,
+    31,     7, 6,    27,
+    30,    29,     28,
+           
+        ];
+QLFan.positioning = [
+            //Front
+            [1, 0], [2, 0], [3, 0],
+            [0, 1], [2, 1], [4, 1],
+            [0, 2], [1, 2], [3, 2], [4, 2],
+            [0, 3], [2, 3], [4, 3],
+          [1, 4], [2, 4], [3, 4],
+            //back
+            [1, 0], [2, 0], [3, 0],
+            [0, 1], [2, 1], [2, 1], [4, 1],
+            [0, 2], [1, 2], [3, 2], [4, 2],
+            [0, 3], [2, 3], [2, 3], [4, 3],
+            [1, 4], [2, 4], [3, 4],
+        ];
+QLFan.ledCount = 34;
+QLFan.offset = 5;
+
+
+const MLFan = new Object();
+MLFan.mapping = [
+    0,
+ 3,  1,
+    2, 
+];
+MLFan.positioning = [
+    [1,0], 
+[0,1],      [2,1], 
+    [1,2],
+];
+MLFan.ledCount = 4;
+MLFan.offset = 2;
+
+const SpProFan = new Object();
+SpProFan.mapping = [
+    6,7,
+ 5,     0,
+ 4,     1,
+   3, 2,
+];
+SpProFan.positioning = [
+    [1,0],[2,0],
+  [0,1],     [3,1],
+  [0,2],     [3,2],
+     [1,3],[2,3],
+];
+SpProFan.ledCount = 8;
+SpProFan.offset = 4;
+
+var Channel1Fans = [];
+var Channel2Fans = [];
+var FanDict = {
+    "None": null,
+    "LL" : LLFan,
+    "QL" : QLFan,
+    "ML" : MLFan,
+    "SpPro" : SpProFan,
+}
+
+function SetFans(fanArray1,fanArray2){
+    //set channel 1 fans
+    fanArray1[0] = FanDict[fan1];
+    fanArray1[1] = FanDict[fan2];
+    fanArray1[2] = FanDict[fan3];
+    fanArray1[3] = FanDict[fan4];
+    fanArray1[4] = FanDict[fan5];
+    fanArray1[5] = FanDict[fan6];
+    //set channel 2 fans
+    fanArray2[0] = FanDict[fan7];
+    fanArray2[1] = FanDict[fan8];
+    fanArray2[2] = FanDict[fan9];
+    fanArray2[3] = FanDict[fan10];
+    fanArray2[4] = FanDict[fan11];
+    fanArray2[5] = FanDict[fan12];
+}
+
+
+
 function channelStart(channel){
     var packet = [];
     //start packet == 34 00 channel (len 64)
@@ -134,47 +257,9 @@ function SubmitLightingColors()
     device.write(packet, 65);
 }
 var vKeyNames = [
-    "LED 0","LED 1","LED 2","LED 3","LED 4","LED 5","LED 6","LED 7","LED 8","LED 9","LED 10",
-    "LED 11","LED 12","LED 13","LED 14","LED 15","LED 16","LED 17","LED 18","LED 19","LED 20",
-    "LED 21","LED 22","LED 23","LED 24","LED 25","LED 26","LED 27","LED 28","LED 29","LED 30",
-    "LED 31","LED 32","LED 33","LED 34","LED 35","LED 36","LED 37","LED 38","LED 39","LED 40",
-    "LED 41","LED 42","LED 43","LED 44","LED 45","LED 46","LED 47","LED 48","LED 49","LED 50",
-    "LED 51","LED 52","LED 53","LED 54","LED 55","LED 56","LED 57","LED 58","LED 59","LED 60",
-    "LED 61","LED 62","LED 63","LED 64","LED 65","LED 66","LED 67","LED 68","LED 69","LED 70",
-    "LED 71","LED 72","LED 73","LED 74","LED 75","LED 76","LED 77","LED 78","LED 79","LED 80",
-    "LED 81","LED 82","LED 83","LED 84","LED 85","LED 86","LED 87","LED 88","LED 89","LED 90",
-    "LED 91","LED 92","LED 93","LED 94","LED 95","LED 96","LED 97","LED 98","LED 99","LED 100",
-    "LED 101","LED 102","LED 103","LED 104","LED 105","LED 106","LED 107","LED 108","LED 109","LED 110",
-    "LED 111","LED 112","LED 113","LED 114","LED 115","LED 116","LED 117","LED 118","LED 119","LED 120",
-    "LED 121","LED 122","LED 123","LED 124","LED 125","LED 126","LED 127"
+    "LED 0",
 ];
 
-
- var vKeyPositions = [
-    [0,0],[1,0],[2,0],[3,0],[4,0],[5,0],[6,0],[7,0],[8,0],[9,0],[10,0],
-    [11,0],[12,0],[13,0],[14,0],[15,0],[16,0],[17,0],[18,0],[19,0],[20,0],
-    [21,0],[22,0],[23,0],[24,0],[25,0],[26,0],[27,0],[28,0],[29,0],[30,0],
-    [31,0],[32,0],[33,0],[34,0],[35,0],[36,0],[37,0],[38,0],[39,0],[40,0],
-    [41,0],[42,0],[43,0],[44,0],[45,0],[46,0],[47,0],[48,0],[49,0],[50,0],
-    [51,0],[52,0],[53,0],[54,0],[55,0],[56,0],[57,0],[58,0],[59,0],[60,0],
-    [61,0],[62,0],[63,0],[64,0],[65,0],[66,0],[67,0],[68,0],[69,0],[70,0],
-    [71,0],[72,0],[73,0],[74,0],[75,0],[76,0],[77,0],[78,0],[79,0],[80,0],
-    [81,0],[82,0],[83,0],[84,0],[85,0],[86,0],[87,0],[88,0],[89,0],[90,0],
-    [91,0],[92,0],[93,0],[94,0],[95,0],[96,0],[97,0],[98,0],[99,0],[100,0],
-    [101,0],[102,0],[103,0],[104,0],[105,0],[106,0],[107,0],[108,0],[109,0],[110,0],
-    [111,0],[112,0],[113,0],[114,0],[115,0],[116,0],[117,0],[118,0],[119,0],[120,0],
-    [121,0],[122,0],[123,0],[124,0],[125,0],[126,0],[127,0],
-    //204 max leds ,204-128 = 76 extra
-    [1,0],[2,0],[3,0],[4,0],[5,0],[6,0],[7,0],[8,0],[9,0],[10,0],
-    [11,0],[12,0],[13,0],[14,0],[15,0],[16,0],[17,0],[18,0],[19,0],[20,0],
-    [21,0],[22,0],[23,0],[24,0],[25,0],[26,0],[27,0],[28,0],[29,0],[30,0],
-    [31,0],[32,0],[33,0],[34,0],[35,0],[36,0],[37,0],[38,0],[39,0],[40,0],
-    [41,0],[42,0],[43,0],[44,0],[45,0],[46,0],[47,0],[48,0],[49,0],[50,0],
-    [51,0],[52,0],[53,0],[54,0],[55,0],[56,0],[57,0],[58,0],[59,0],[60,0],
-    [61,0],[62,0],[63,0],[64,0],[65,0],[66,0],[67,0],[68,0],[69,0],[70,0],
-    [71,0],[72,0],[73,0],[74,0],[75,0],[76,0],[77,0],[78,0]
-
- ];
 
 
 export function LedNames()
@@ -186,24 +271,39 @@ export function LedPositions()
 {
     return vKeyPositions;
 }
-function SendChannel(channel)
+function SendChannel(channel, FanArray)
 {
-    var red = [210];
-    var green = [210];
-    var blue = [210];
+    var red = [220];
+    var green = [220];
+    var blue = [220];
+    var TotalLedCount = 0;
+    var TotalOffset = 0;
+    
+    for (var fan = 0; fan < FanArray.length; fan++ ) {
 
+        if(FanArray[fan] != null) {
 
-    for(var iIdx = 0; iIdx < vKeyPositions.length; iIdx++)
-    {
-        var iPxX = vKeyPositions[iIdx][0];
-        var iPxY = vKeyPositions[iIdx][1];
-        var mxPxColor = device.color(iPxX, iPxY);
-        red[iIdx] = mxPxColor[0];
-        green[iIdx] = mxPxColor[1];
-        blue[iIdx] = mxPxColor[2];
+            for(var iIdx = 0; iIdx < FanArray[fan].mapping.length; iIdx++)
+            {
+
+                var iPxX = FanArray[fan].positioning[iIdx][0] + TotalOffset;
+                var iPxY = FanArray[fan].positioning[iIdx][1];
+
+                var mxPxColor = device.color(iPxX, iPxY);
+                if(stripMode) {
+                    red[iIdx+TotalLedCount] = mxPxColor[0];
+                    green[iIdx+TotalLedCount] = mxPxColor[1];
+                    blue[iIdx+TotalLedCount] = mxPxColor[2];
+                }else{
+                    red[FanArray[fan].mapping[iIdx]+TotalLedCount] = mxPxColor[0];
+                    green[FanArray[fan].mapping[iIdx]+TotalLedCount] = mxPxColor[1];
+                    blue[FanArray[fan].mapping[iIdx]+TotalLedCount] = mxPxColor[2];
+                }
+            }
+            TotalLedCount += FanArray[fan].mapping.length;
+            TotalOffset += FanArray[fan].offset;
+        }
     }
-    //Initialize();
-
 
    //channelStart(channel);
     //red
@@ -235,8 +335,11 @@ export function Render()
 {
     // Both are mirrored
     Initialize()
-    SendChannel(0);
-    SendChannel(1);
+
+    SetFans(Channel1Fans,Channel2Fans);
+
+    SendChannel(0,Channel1Fans);
+    SendChannel(1,Channel2Fans);
 }
 
 export function Validate(endpoint)

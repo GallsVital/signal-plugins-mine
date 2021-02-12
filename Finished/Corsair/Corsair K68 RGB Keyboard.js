@@ -20,24 +20,27 @@ var CORSAIR_PROPERTY_SUBMIT_MOUSE_COLOR         = 0x22;
 export function Initialize()
 {
     var packet = [];
+    packet[0x00]           = 0x00;
+    packet[0x01]           = CORSAIR_COMMAND_WRITE;
+    packet[0x02]           = CORSAIR_PROPERTY_SPECIAL_FUNCTION;
+    packet[0x03]           = CORSAIR_LIGHTING_CONTROL_SOFTWARE;
 
-    /*-----------------------------------------------------*\
-    | Set up Lighting Control packet                        |
-    \*-----------------------------------------------------*/
+    device.write(packet, 65);
+
+    var packet = [];
     packet[0x00]           = 0x00;
     packet[0x01]           = CORSAIR_COMMAND_WRITE;
     packet[0x02]           = CORSAIR_PROPERTY_LIGHTING_CONTROL;
     packet[0x03]           = CORSAIR_LIGHTING_CONTROL_SOFTWARE;
-
-    /*-----------------------------------------------------*\
-    | Lighting control byte needs to be 3 for keyboards and |
-    | headset stand, 1 for mice and mousepads               |
-    \*-----------------------------------------------------*/
     packet[0x05]   = 0x03;
+    device.write(packet, 65);
 
-    /*-----------------------------------------------------*\
-    | Send packet                                           |
-    \*-----------------------------------------------------*/    
+    var packet = [];
+    packet[0x00]           = 0x00;
+    packet[0x01]           = CORSAIR_COMMAND_WRITE;
+    packet[0x02]           = CORSAIR_PROPERTY_LIGHTING_CONTROL;
+    packet[0x03]           = 8;
+    packet[0x05]   = 0x01;
     device.write(packet, 65);
 }
 
