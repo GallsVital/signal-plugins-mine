@@ -38,7 +38,7 @@ export function Initialize()
     /*-----------------------------------------------------*\
     | Send packet                                           |
     \*-----------------------------------------------------*/    
-    device.write(packet, 6);
+    device.write(packet, 65);
 }
 
 
@@ -237,7 +237,8 @@ export function Render()
 
 export function Validate(endpoint)
 {
-    return endpoint.interface === 1;
+    //i think this has two possible endpoints, newer batchs use 1?
+    return endpoint.interface === 2;
 }
 
 

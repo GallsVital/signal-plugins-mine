@@ -5,32 +5,20 @@ export function Publisher() { return "WhirlwindFX"; }
 export function Size() { return [64, 27]; }
 export function DefaultPosition(){return [0,0]}
 export function DefaultScale(){return 1.0}
-
-var CORSAIR_COMMAND_WRITE       = 0x07;
-var CORSAIR_COMMAND_READ        = 0x0E;
-var CORSAIR_COMMAND_STREAM      = 0x7F;
-var CORSAIR_PROPERTY_LIGHTING_CONTROL           = 0x05;
-var CORSAIR_LIGHTING_CONTROL_HARDWARE           = 0x01;
 var CORSAIR_LIGHTING_CONTROL_SOFTWARE           = 0x02;
-var CORSAIR_PROPERTY_SUBMIT_KEYBOARD_COLOR_24   = 0x28;
-var CORSAIR_PROPERTY_SPECIAL_FUNCTION = 0x04;
-var CORSAIR_PROPERTY_SUBMIT_MOUSE_COLOR         = 0x22;
+
 
 var brightness = .5;
 
 export function Initialize()
 {
-    
     var packet = [];
-
     packet[0x00]           = 0x00;
     packet[0x01]           = 0x38;
     packet[0x02]           = 0x00;    //Channel 0/1
     packet[0x03]           = CORSAIR_LIGHTING_CONTROL_SOFTWARE;
- 
     device.write(packet, 65);
 }
-
 
 export function Shutdown()
 {
@@ -41,7 +29,6 @@ export function Shutdown()
     packet[0x02] = 0x00;
     packet[0x03] = 0x01;
     device.write(packet, 65);
-    
 }
 
 function StreamLightingPacket(start, count, colorChannel, data)
@@ -130,9 +117,6 @@ export function Render()
         blue[iIdx] = mxPxColor[2]*brightness;
     }
     
-
-  
-
    channelStart(0);//only one channel for these
 
    StreamLightingPacket(0x00,0x32,0,red.splice(0,50))
