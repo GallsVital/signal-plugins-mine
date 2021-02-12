@@ -18,9 +18,9 @@ export function ControllableParameters(){
     {"property":"fan7", "label":"Fan 7 Type", "type":"combobox", "values":["None","LL", "QL","ML","SpPro","XD5Reservior","GPUBlock","XD5CPU"], "default":"None"},
     {"property":"fan8", "label":"Fan 8 Type", "type":"combobox", "values":["None","LL", "QL","ML","SpPro","XD5Reservior","GPUBlock","XD5CPU"], "default":"None"},
     {"property":"fan9", "label":"Fan 9 Type", "type":"combobox", "values":["None","LL", "QL","ML","SpPro","XD5Reservior","GPUBlock","XD5CPU"], "default":"None"},
-    {"property":"fan10", "label":"Fan 10 Type", "type":"combobox", "values":["None","LL", "QL","ML","SpPro","XD5Reservior","GPUBlock","XD5CPU"], "default":"None"},
-    {"property":"fan11", "label":"Fan 11 Type", "type":"combobox", "values":["None","LL", "QL","ML","SpPro","XD5Reservior","GPUBlock","XD5CPU"], "default":"None"},
-    {"property":"fan12", "label":"Fan 12 Type", "type":"combobox", "values":["None","LL", "QL","ML","SpPro","XD5Reservior","GPUBlock","XD5CPU"], "default":"None"},
+    {"property":"fan10", "label":"Fan 10 Type", "type":"combobox","values":["None","LL", "QL","ML","SpPro","XD5Reservior","GPUBlock","XD5CPU"], "default":"None"},
+    {"property":"fan11", "label":"Fan 11 Type", "type":"combobox","values":["None","LL", "QL","ML","SpPro","XD5Reservior","GPUBlock","XD5CPU"], "default":"None"},
+    {"property":"fan12", "label":"Fan 12 Type", "type":"combobox","values":["None","LL", "QL","ML","SpPro","XD5Reservior","GPUBlock","XD5CPU"], "default":"None"},
     ];
 }
 
