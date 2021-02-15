@@ -10,9 +10,9 @@ var CORSAIR_PROPERTY_SPECIAL_FUNCTION = 0x04;
 var CORSAIR_PROPERTY_SUBMIT_MOUSE_COLOR         = 0x22;
 
 
-export function Name() { return "Corsair Harpoon Wireless - WIRED"; }
+export function Name() { return "Corsair Harpoon Wireless - Wireless"; }
 export function VendorId() { return 0x1b1c; }
-export function ProductId() { return 0x1B5E; }
+export function ProductId() { return 0x1B65; }
 export function Publisher() { return "WhirlwindFX"; }
 export function Size() { return [3, 3]; }
 export function DefaultPosition(){return [240,120]}
@@ -40,7 +40,6 @@ export function LedPositions()
   return vLedPositions;
 }
 
-
 function sendPacketString(string, size){
     var packet= [];
     var data = string.split(' ');
@@ -52,19 +51,22 @@ function sendPacketString(string, size){
     device.write(packet, size);
 }
 
+
 export function Initialize()
 {
-    sendPacketString("00 08 01 03 00 02",65)//software control packet
-    sendPacketString("00 08 02 00 E8 03",65) // Critical
-    sendPacketString("00 08 0D 00 01",65) // Critical
 
-    setDpi(dpi1);
+    sendPacketString("00 09 01 03 00 02",65)//software control packet
+    sendPacketString("00 09 0D 00 01",65) // Critical
+    sendPacketString("00 09 0D 00 02",65) // Critical
+
+
+    //setDpi(dpi1);
 }
 function sendColors(shutdown = false){
 
     var packet = []
     packet[0x00]   = 0x00;
-    packet[0x01]   = 0x08;
+    packet[0x01]   = 0x09;
     packet[0x02]   = 0x06;
     packet[0x03]   = 0x00;
     packet[0x04]   = 0x06;
@@ -93,7 +95,7 @@ export function Render()
     sendColors()
 
     if(savedDpi1 != dpi1){
-        setDpi(dpi1)
+        //setDpi(dpi1)
     }
     device.pause(1)
 }
@@ -127,8 +129,8 @@ export function Validate(endpoint)
 
 export function Shutdown()
 {
-    sendColors(true);
-    sendPacketString("00 08 01 03 00 01",65) //hardware control packet
+    //sendColors(true);
+    sendPacketString("00 09 01 03 00 01",65) //hardware control packet
 }
 
 export function Image() 
