@@ -8,18 +8,18 @@ export function DefaultScale(){return 1.0}
 export function ControllableParameters(){
     return [
     {"property":"stripMode", "label":"Strip Mode", "type":"boolean", "default":"false"},
-    {"property":"fan1", "label":"Fan 1 Type", "type":"combobox", "values":["None","LL", "QL","ML","SpPro","XD5Reservior","GPUBlock","XD5CPU"], "default":"None"},
-    {"property":"fan2", "label":"Fan 2 Type", "type":"combobox", "values":["None","LL", "QL","ML","SpPro","XD5Reservior","GPUBlock","XD5CPU"], "default":"None"},
-    {"property":"fan3", "label":"Fan 3 Type", "type":"combobox", "values":["None","LL", "QL","ML","SpPro","XD5Reservior","GPUBlock","XD5CPU"], "default":"None"},
-    {"property":"fan4", "label":"Fan 4 Type", "type":"combobox", "values":["None","LL", "QL","ML","SpPro","XD5Reservior","GPUBlock","XD5CPU"], "default":"None"},
-    {"property":"fan5", "label":"Fan 5 Type", "type":"combobox", "values":["None","LL", "QL","ML","SpPro","XD5Reservior","GPUBlock","XD5CPU"], "default":"None"},
-    {"property":"fan6", "label":"Fan 6 Type", "type":"combobox", "values":["None","LL", "QL","ML","SpPro","XD5Reservior","GPUBlock","XD5CPU"], "default":"None"},
-    {"property":"fan7", "label":"Fan 7 Type", "type":"combobox", "values":["None","LL", "QL","ML","SpPro","XD5Reservior","GPUBlock","XD5CPU"], "default":"None"},
-    {"property":"fan8", "label":"Fan 8 Type", "type":"combobox", "values":["None","LL", "QL","ML","SpPro","XD5Reservior","GPUBlock","XD5CPU"], "default":"None"},
-    {"property":"fan9", "label":"Fan 9 Type", "type":"combobox", "values":["None","LL", "QL","ML","SpPro","XD5Reservior","GPUBlock","XD5CPU"], "default":"None"},
-    {"property":"fan10", "label":"Fan 10 Type", "type":"combobox", "values":["None","LL", "QL","ML","SpPro","XD5Reservior","GPUBlock","XD5CPU"], "default":"None"},
-    {"property":"fan11", "label":"Fan 11 Type", "type":"combobox", "values":["None","LL", "QL","ML","SpPro","XD5Reservior","GPUBlock","XD5CPU"], "default":"None"},
-    {"property":"fan12", "label":"Fan 12 Type", "type":"combobox", "values":["None","LL", "QL","ML","SpPro","XD5Reservior","GPUBlock","XD5CPU"], "default":"None"},
+    {"property":"fan1", "label":"Fan 1 Type", "type":"combobox", "values":["None","LL", "QL","ML","SpPro","XD5Reservior","GPUBlock","XD5CPU"], "default":"LL"},
+    {"property":"fan2", "label":"Fan 2 Type", "type":"combobox", "values":["None","LL", "QL","ML","SpPro","XD5Reservior","GPUBlock","XD5CPU"], "default":"LL"},
+    {"property":"fan3", "label":"Fan 3 Type", "type":"combobox", "values":["None","LL", "QL","ML","SpPro","XD5Reservior","GPUBlock","XD5CPU"], "default":"LL"},
+    {"property":"fan4", "label":"Fan 4 Type", "type":"combobox", "values":["None","LL", "QL","ML","SpPro","XD5Reservior","GPUBlock","XD5CPU"], "default":"LL"},
+    {"property":"fan5", "label":"Fan 5 Type", "type":"combobox", "values":["None","LL", "QL","ML","SpPro","XD5Reservior","GPUBlock","XD5CPU"], "default":"LL"},
+    {"property":"fan6", "label":"Fan 6 Type", "type":"combobox", "values":["None","LL", "QL","ML","SpPro","XD5Reservior","GPUBlock","XD5CPU"], "default":"LL"},
+    {"property":"fan7", "label":"Fan 7 Type", "type":"combobox", "values":["None","LL", "QL","ML","SpPro","XD5Reservior","GPUBlock","XD5CPU"], "default":"LL"},
+    {"property":"fan8", "label":"Fan 8 Type", "type":"combobox", "values":["None","LL", "QL","ML","SpPro","XD5Reservior","GPUBlock","XD5CPU"], "default":"LL"},
+    {"property":"fan9", "label":"Fan 9 Type", "type":"combobox", "values":["None","LL", "QL","ML","SpPro","XD5Reservior","GPUBlock","XD5CPU"], "default":"LL"},
+    {"property":"fan10", "label":"Fan 10 Type", "type":"combobox", "values":["None","LL", "QL","ML","SpPro","XD5Reservior","GPUBlock","XD5CPU"], "default":"LL"},
+    {"property":"fan11", "label":"Fan 11 Type", "type":"combobox", "values":["None","LL", "QL","ML","SpPro","XD5Reservior","GPUBlock","XD5CPU"], "default":"LL"},
+    {"property":"fan12", "label":"Fan 12 Type", "type":"combobox", "values":["None","LL", "QL","ML","SpPro","XD5Reservior","GPUBlock","XD5CPU"], "default":"LL"},
     ];
 }
 
@@ -142,7 +142,9 @@ function SubmitLightingColors()
 var vKeyNames = [
     "Fans",
 ];
-
+var vKeyPositions = [
+    [0,0]
+];
 const LLFan = new Object();
     LLFan.mapping = [
         4,      15,   14,    13, 

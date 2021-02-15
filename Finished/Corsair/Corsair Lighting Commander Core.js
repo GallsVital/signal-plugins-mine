@@ -9,13 +9,13 @@ export function ControllableParameters(){
     return [
     {"property":"stripMode", "label":"Strip Mode", "type":"boolean", "default":"false"},
     {"property":"selection", "label":"Mode Controller", "type":"number", "min":"0", "max":"2", "default":"1"},
-    {"property":"pump", "label":"Pump Type", "type":"combobox", "values":["None","H150I"], "default":"None"},
-    {"property":"fan1", "label":"Fan 1 Type", "type":"combobox", "values":["None","LL", "QL","ML","SpPro","XD5Reservior","GPUBlock","XD5CPU"], "default":"None"},
-    {"property":"fan2", "label":"Fan 2 Type", "type":"combobox", "values":["None","LL", "QL","ML","SpPro","XD5Reservior","GPUBlock","XD5CPU"], "default":"None"},
-    {"property":"fan3", "label":"Fan 3 Type", "type":"combobox", "values":["None","LL", "QL","ML","SpPro","XD5Reservior","GPUBlock","XD5CPU"], "default":"None"},
-    {"property":"fan4", "label":"Fan 4 Type", "type":"combobox", "values":["None","LL", "QL","ML","SpPro","XD5Reservior","GPUBlock","XD5CPU"], "default":"None"},
-    {"property":"fan5", "label":"Fan 5 Type", "type":"combobox", "values":["None","LL", "QL","ML","SpPro","XD5Reservior","GPUBlock","XD5CPU"], "default":"None"},
-    {"property":"fan6", "label":"Fan 6 Type", "type":"combobox", "values":["None","LL", "QL","ML","SpPro","XD5Reservior","GPUBlock","XD5CPU"], "default":"None"},
+    {"property":"pump", "label":"Pump Type", "type":"combobox", "values":["None","H150I"], "default":"H150I"},
+    {"property":"fan1", "label":"Fan 1 Type", "type":"combobox", "values":["None","LL", "QL","ML","SpPro","XD5Reservior","GPUBlock","XD5CPU"], "default":"LL"},
+    {"property":"fan2", "label":"Fan 2 Type", "type":"combobox", "values":["None","LL", "QL","ML","SpPro","XD5Reservior","GPUBlock","XD5CPU"], "default":"LL"},
+    {"property":"fan3", "label":"Fan 3 Type", "type":"combobox", "values":["None","LL", "QL","ML","SpPro","XD5Reservior","GPUBlock","XD5CPU"], "default":"LL"},
+    {"property":"fan4", "label":"Fan 4 Type", "type":"combobox", "values":["None","LL", "QL","ML","SpPro","XD5Reservior","GPUBlock","XD5CPU"], "default":"LL"},
+    {"property":"fan5", "label":"Fan 5 Type", "type":"combobox", "values":["None","LL", "QL","ML","SpPro","XD5Reservior","GPUBlock","XD5CPU"], "default":"LL"},
+    {"property":"fan6", "label":"Fan 6 Type", "type":"combobox", "values":["None","LL", "QL","ML","SpPro","XD5Reservior","GPUBlock","XD5CPU"], "default":"LL"},
     ];
 }
 
@@ -41,10 +41,10 @@ function sendPacketString(string, size){
 
     device.write(packet, size);
 }
-
 var vKeyNames = [
     "LED 0",
 ];
+
 
  var vKeyPositions = [
     [0,0],[1,0],[2,0],[3,0],[4,0],[5,0],[6,0],[7,0],[8,0],[9,0],[10,0],

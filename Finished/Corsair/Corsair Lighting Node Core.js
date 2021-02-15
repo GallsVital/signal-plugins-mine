@@ -8,12 +8,12 @@ export function DefaultScale(){return 1.0}
 export function ControllableParameters(){
     return [
         {"property":"stripMode", "label":"Strip Mode", "type":"boolean", "default":"false"},
-    {"property":"fan1", "label":"Fan 1 Type", "type":"combobox", "values":["None","LL", "QL","ML","SpPro","XD5Reservior","GPUBlock","XD5CPU"], "default":"None"},
-    {"property":"fan2", "label":"Fan 2 Type", "type":"combobox", "values":["None","LL", "QL","ML","SpPro","XD5Reservior","GPUBlock","XD5CPU"], "default":"None"},
-    {"property":"fan3", "label":"Fan 3 Type", "type":"combobox", "values":["None","LL", "QL","ML","SpPro","XD5Reservior","GPUBlock","XD5CPU"], "default":"None"},
-    {"property":"fan4", "label":"Fan 4 Type", "type":"combobox", "values":["None","LL", "QL","ML","SpPro","XD5Reservior","GPUBlock","XD5CPU"], "default":"None"},
-    {"property":"fan5", "label":"Fan 5 Type", "type":"combobox", "values":["None","LL", "QL","ML","SpPro","XD5Reservior","GPUBlock","XD5CPU"], "default":"None"},
-    {"property":"fan6", "label":"Fan 6 Type", "type":"combobox", "values":["None","LL", "QL","ML","SpPro","XD5Reservior","GPUBlock","XD5CPU"], "default":"None"},
+    {"property":"fan1", "label":"Fan 1 Type", "type":"combobox", "values":["None","LL", "QL","ML","SpPro","XD5Reservior","GPUBlock","XD5CPU"], "default":"LL"},
+    {"property":"fan2", "label":"Fan 2 Type", "type":"combobox", "values":["None","LL", "QL","ML","SpPro","XD5Reservior","GPUBlock","XD5CPU"], "default":"LL"},
+    {"property":"fan3", "label":"Fan 3 Type", "type":"combobox", "values":["None","LL", "QL","ML","SpPro","XD5Reservior","GPUBlock","XD5CPU"], "default":"LL"},
+    {"property":"fan4", "label":"Fan 4 Type", "type":"combobox", "values":["None","LL", "QL","ML","SpPro","XD5Reservior","GPUBlock","XD5CPU"], "default":"LL"},
+    {"property":"fan5", "label":"Fan 5 Type", "type":"combobox", "values":["None","LL", "QL","ML","SpPro","XD5Reservior","GPUBlock","XD5CPU"], "default":"LL"},
+    {"property":"fan6", "label":"Fan 6 Type", "type":"combobox", "values":["None","LL", "QL","ML","SpPro","XD5Reservior","GPUBlock","XD5CPU"], "default":"LL"},
     ];
 }
 
@@ -124,7 +124,9 @@ var vKeyNames = [
     "LED 0",
 ];
 
-
+var vKeyPositions = [
+    [0,0]
+];
  const LLFan = new Object();
  LLFan.mapping = [
      4,      15,   14,    13, 
@@ -145,34 +147,35 @@ LLFan.offset = 5;
 
 
 const QLFan = new Object();
-QLFan.mapping = [
- //Front
- 10, 11, 12,
- 21, 0, 13,
- 20, 3, 1, 14,
- 19, 2, 15,
- 18, 17, 16,
- //back
- 22, 23, 24,
- 33, 9, 4, 25,
- 32, 8, 5, 26,
- 31, 7, 6, 27,
- 30, 29, 28,
-];
+   QLFan.mapping = [
+    //Front
+    10,   11,  12,
+    21,       0,      13,
+    20,     3,   1,   14,
+    19,       2,      15,
+       18,   17,   16,
+    //back
+    22,    23,    24,
+    33,     9, 4,    25,
+    32,    8,   5,   26,
+    31,     7, 6,    27,
+    30,    29,     28,
+           
+        ];
 QLFan.positioning = [
-         //Front
-         [1, 0], [2, 0], [3, 0],
-         [0, 1], [2, 1], [4, 1],
-         [0, 2], [1, 2], [3, 2], [4, 2],
-         [0, 3], [2, 3], [4, 3],
-       [1, 4], [2, 4], [3, 4],
-         //back
-         [1, 0], [2, 0], [3, 0],
-         [0, 1], [2, 1], [2, 1], [4, 1],
-         [0, 2], [1, 2], [3, 2], [4, 2],
-         [0, 3], [2, 3], [2, 3], [4, 3],
-         [1, 4], [2, 4], [3, 4],
-     ];
+            //Front
+            [1, 0], [2, 0], [3, 0],
+            [0, 1], [2, 1], [4, 1],
+            [0, 2], [1, 2], [3, 2], [4, 2],
+            [0, 3], [2, 3], [4, 3],
+          [1, 4], [2, 4], [3, 4],
+            //back
+            [1, 0], [2, 0], [3, 0],
+            [0, 1], [2, 1], [2, 1], [4, 1],
+            [0, 2], [1, 2], [3, 2], [4, 2],
+            [0, 3], [2, 3], [2, 3], [4, 3],
+            [1, 4], [2, 4], [3, 4],
+        ];
 QLFan.ledCount = 34;
 QLFan.offset = 5;
 
@@ -249,7 +252,6 @@ XD5CPU.positioning = [
        [0,3],            [3,3],
        [0,4],            [3,4],
        [0,5],[1,5],[2,5],[3,5],
-
 ];
 XD5CPU.ledCount = 16;
 XD5CPU.offset = 5;
