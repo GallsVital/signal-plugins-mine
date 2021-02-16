@@ -11,9 +11,9 @@ var magic3 = [0x00, 0x3F, 0xEB, 0x28, 0x29, 0x2A, 0x2B, 0x2C, 0x2D, 0x2E, 0x2F, 
 
 var bFlags = [0b100,0b101,0b110];
 
-export function Name() { return "Corsair h100i Pro XT"; }
+export function Name() { return "Corsair h115i Pro XT"; }
 export function VendorId() { return 0x1b1c; }
-export function ProductId() { return 0x0C20; }
+export function ProductId() { return 0x0C21; }
 export function Publisher() { return "WhirlwindFX"; }
 export function Size() { return [30, 8]; }
 export function ControllableParameters(){
