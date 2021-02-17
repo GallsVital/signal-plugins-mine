@@ -20,11 +20,12 @@ export function DefaultScale(){return 8.0}
 export function ControllableParameters(){
     return [
         {"property":"shutdownColor", "label":"Shutdown Color","type":"color","default":"009bde"},
+        {"property":"DpiControl", "label":"Enable Dpi Control","type":"boolean","default":"false"},
         {"property":"dpi1", "label":"DPI", "type":"number","min":"200", "max":"10000","default":"800"},
     ];
 }
 
-var savedDpi1;
+var savedDpi1 = 0;
 var vLedNames = ["Dpi Zone","Logo Zone",];
 
 var vLedPositions = [[1,0],[1,2]
@@ -60,7 +61,9 @@ export function Initialize()
     sendPacketString("00 09 0D 00 02",65) // Critical
 
 
-    //setDpi(dpi1);
+    if(DpiControl) {
+        setDpi(dpi1);
+    }
 }
 function sendColors(shutdown = false){
 
@@ -94,24 +97,36 @@ export function Render()
 {
     sendColors()
 
-    if(savedDpi1 != dpi1){
-        //setDpi(dpi1)
+    if(savedDpi1 != dpi1 && DpiControl){
+        setDpi(dpi1)
     }
     device.pause(1)
 }
 
 function setDpi(dpi){
-
+    
     savedDpi1 = dpi;
+    var RoundedDpi = Math.round(dpi/100)*100
     var packet = [];
     packet[0] = 0x00;
-    packet[1] = 0x08;
+    packet[1] = 0x98;
     packet[2] = 0x01;
     packet[3] = 0x20;
     packet[4] = 0x00;
-    packet[5] = dpi%256;
-    packet[6] = Math.floor(dpi/256);
+    packet[5] = RoundedDpi%256;
+    packet[6] = Math.floor(RoundedDpi/256);
     device.write(packet, 65);
+    device.pause(10)
+    var packet = [];
+    packet[0] = 0x00;
+    packet[1] = 0x09;
+    packet[2] = 0x01;
+    packet[3] = 0x18;
+    packet[4] = 0x00;
+    packet[5] = RoundedDpi%256;
+    packet[6] = Math.floor(RoundedDpi/256);
+    device.write(packet, 65);
+
 }
 function hexToRgb(hex) {
     var result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);

@@ -17,73 +17,32 @@ var CORSAIR_PROPERTY_SPECIAL_FUNCTION = 0x04;
 var CORSAIR_PROPERTY_SUBMIT_MOUSE_COLOR         = 0x22;
 
 
+function sendPacketString(string, size){
+    var packet= [];
+    var data = string.split(' ');
+    
+    for(let i = 0; i < data.length; i++){
+        packet[parseInt(i,16)] =parseInt(data[i],16)//.toString(16)
+    }
+
+    device.write(packet, size);
+}
+
 export function Initialize()
 {
-    var packet = [];
-
-    /*-----------------------------------------------------*\
-    | Set up Lighting Control packet                        |
-    \*-----------------------------------------------------*/
-    packet[0x00]           = 0x00;
-    packet[0x01]           = CORSAIR_COMMAND_WRITE;
-    packet[0x02]           = CORSAIR_PROPERTY_LIGHTING_CONTROL;
-    packet[0x03]           = CORSAIR_LIGHTING_CONTROL_SOFTWARE;
-
-    /*-----------------------------------------------------*\
-    | Lighting control byte needs to be 3 for keyboards and |
-    | headset stand, 1 for mice and mousepads               |
-    \*-----------------------------------------------------*/
-    packet[0x05]   = 0x03;
-
-    /*-----------------------------------------------------*\
-    | Send packet                                           |
-    \*-----------------------------------------------------*/    
-    device.write(packet, 6);
+    sendPacketString("00 0E 01",65);
+    sendPacketString("00 0E 17 01",65);
+    sendPacketString("00 07 04 02",65);
+    sendPacketString("00 0E 48",65);
+    sendPacketString("00 07 05 02 00 03",65);
+    sendPacketString("00 07 05 08 00 01",65);
 }
 
 
 export function Shutdown()
 {
-    var red = [144];
-    var green = [144];
-    var blue = [144];
 
 
-    for(var iIdx = 0; iIdx < vKeys.length; iIdx++)
-    {
-        var iPxX = vKeyPositions[iIdx][0];
-        var iPxY = vKeyPositions[iIdx][1];
-        var mxPxColor = device.color(iPxX, iPxY);
-        red[vKeys[iIdx]] = 255;
-        green[vKeys[iIdx]] = 0;
-        blue[vKeys[iIdx]] = 0;
-    }
-    
-    
-    
-    /*-----------------------------------------------------*\
-   | Send red bytes                                        |
-   \*-----------------------------------------------------*/
-   StreamPacket(1, 60, red.splice(0,60));
-   StreamPacket(2, 60, red.splice(0,60));
-   StreamPacket(3, 24, red.splice(0,24));
-   SubmitKbColors(1, 3, 1);
-
-   /*-----------------------------------------------------*\
-   | Send green bytes                                      |
-   \*-----------------------------------------------------*/
-   StreamPacket(1, 60, green.splice(0,60));
-   StreamPacket(2, 60, green.splice(0,60));
-   StreamPacket(3, 24, green.splice(0,24));
-   SubmitKbColors(2, 3, 1);
-
-   /*-----------------------------------------------------*\
-   | Send blue bytes                                       |
-   \*-----------------------------------------------------*/
-   StreamPacket(1, 60, blue.splice(0,60));
-   StreamPacket(2, 60, blue.splice(0,60));
-   StreamPacket(3, 24, blue.splice(0,24));
-   SubmitKbColors(3, 3, 2);
 }
 
 
@@ -192,9 +151,9 @@ export function LedPositions()
 
 export function Render()
 {
-    var red = [144];
-    var green = [144];
-    var blue = [144];
+    var red = [170];
+    var green = [170];
+    var blue = [170];
 
 
     for(var iIdx = 0; iIdx < vKeys.length; iIdx++)
@@ -214,7 +173,7 @@ export function Render()
    \*-----------------------------------------------------*/
    StreamPacket(1, 60, red.splice(0,60));
    StreamPacket(2, 60, red.splice(0,60));
-   StreamPacket(3, 24, red.splice(0,24));
+   StreamPacket(3, 48, red.splice(0,48));
    SubmitKbColors(1, 3, 1);
 
    /*-----------------------------------------------------*\
@@ -222,7 +181,7 @@ export function Render()
    \*-----------------------------------------------------*/
    StreamPacket(1, 60, green.splice(0,60));
    StreamPacket(2, 60, green.splice(0,60));
-   StreamPacket(3, 24, green.splice(0,24));
+   StreamPacket(3, 48, green.splice(0,48));
    SubmitKbColors(2, 3, 1);
 
    /*-----------------------------------------------------*\
@@ -230,7 +189,7 @@ export function Render()
    \*-----------------------------------------------------*/
    StreamPacket(1, 60, blue.splice(0,60));
    StreamPacket(2, 60, blue.splice(0,60));
-   StreamPacket(3, 24, blue.splice(0,24));
+   StreamPacket(3, 48, blue.splice(0,48));
    SubmitKbColors(3, 3, 2);
 }
 

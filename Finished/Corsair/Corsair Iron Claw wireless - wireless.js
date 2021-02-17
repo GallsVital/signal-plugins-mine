@@ -20,6 +20,7 @@ export function DefaultScale(){return 8.0}
 export function ControllableParameters(){
     return [
         {"property":"shutdownColor", "label":"Shutdown Color","type":"color","default":"009bde"},
+        {"property":"DpiControl", "label":"Enable Dpi Control","type":"boolean","default":"false"},
         {"property":"dpi1", "label":"DPI", "type":"number","min":"100", "max":"18000","default":"800"},
     ];
 }
@@ -61,7 +62,9 @@ export function Initialize()
     //sendPacketString("00 09 0D 00 02",65) // open endpoint
 
 
-    //setDpi(dpi1);
+    if(DpiControl) {
+        setDpi(dpi1);
+    }
 }
 
 function sendColors(shutdown = false){
@@ -102,10 +105,11 @@ var blue = [];
 }
 export function Render()
 {
-    sendColors()
+    
 
-    if(savedDpi1 != dpi1){
-        //setDpi(dpi1)
+    sendColors()
+    if(savedDpi1 != dpi1 && DpiControl){
+        setDpi(dpi1)
     }
     device.pause(1)
 }
@@ -115,9 +119,19 @@ function setDpi(dpi){
     savedDpi1 = dpi;
     var packet = [];
     packet[0] = 0x00;
-    packet[1] = 0x08;
+    packet[1] = 0x09;
     packet[2] = 0x01;
     packet[3] = 0x21;
+    packet[4] = 0x00;
+    packet[5] = dpi%256;
+    packet[6] = Math.floor(dpi/256);
+    device.write(packet, 65);
+    device.pause(2)
+    var packet = [];
+    packet[0] = 0x00;
+    packet[1] = 0x09;
+    packet[2] = 0x01;
+    packet[3] = 0x22;
     packet[4] = 0x00;
     packet[5] = dpi%256;
     packet[6] = Math.floor(dpi/256);
@@ -139,6 +153,7 @@ export function Validate(endpoint)
 
 export function Shutdown()
 {
+    
     //sendColors(true);
     sendPacketString("00 09 01 03 00 01",65) //hardware control packet
 }

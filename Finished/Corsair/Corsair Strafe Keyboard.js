@@ -38,7 +38,7 @@ export function Initialize()
     /*-----------------------------------------------------*\
     | Send packet                                           |
     \*-----------------------------------------------------*/    
-    device.write(packet, 6);
+    device.write(packet, 65);
 }
 
 
@@ -168,18 +168,6 @@ var vKeyPositions = [
     [0,6], [1,6], [2,6],                      [6,6],                      [10,6], [11,6], [12,6], [13,6],   [14,6], [15,6], [16,6],   [17,6],        [19,6] // 14
 ];
 
-// These arrays are unused and for development reference.
-var vMedia = [
-    32, 44, 56, 68
-];
-
-var vSpecial = [
-    125, 137, 8, 59, 20
-]
-
-var vSpecialPositions = [
-    [0,3], [0,4], [0,5], [0,9], [0,17]
-]
 
 export function LedNames()
 {
