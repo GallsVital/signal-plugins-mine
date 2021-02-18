@@ -3,9 +3,14 @@ export function VendorId() { return 0x1b1c; }
 export function ProductId() { return 0x1B7C; }
 export function Publisher() { return "WhirlwindFX"; }
 export function Size() { return [22, 8]; }
-export function DefaultPosition(){return [50,100]}
+export function DefaultPosition() {return [75,70]; }
 export function DefaultScale(){return 8.0}
+export function ControllableParameters(){
+    return [
+        {"property":"ControlMode", "label":"Control Mode","type":"combobox", "values":["0","1"],"default":"0"},
 
+    ];
+}
 var CORSAIR_COMMAND_WRITE       = 0x07;
 var CORSAIR_COMMAND_READ        = 0x0E;
 var CORSAIR_COMMAND_STREAM      = 0x7F;
@@ -26,8 +31,9 @@ export function Initialize()
 
 
 }
-
+ 
 function sendPacketString(string, size){
+
     var packet= [];
     var data = string.split(' ');
     
@@ -92,21 +98,18 @@ export function LedPositions()
 
 export function Render()
 {
-    
 
     var packet = []
     packet[0x00]   = 0x00;
     packet[0x01]   = 0x08;    
     packet[0x02]   = 0x06;
-    packet[0x03]   = 0x00; // seen 0 and 1
+    packet[0x03]   = parseInt(ControlMode); // seen 0 and 1
     packet[0x04]   = 0x45;
     packet[0x05]   = 0x02;
     packet[0x06]   = 0x00;
     packet[0x07]   = 0x00;
     packet[0x08]   = 0x12;
     
-
-
     //vKeys.length
     for(var iIdx = 0; iIdx < vKeyPositions.length; iIdx++)
     {

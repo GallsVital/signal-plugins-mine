@@ -5,6 +5,22 @@ export function Publisher() { return "WhirlwindFX"; }
 export function Size() { return [128, 3]; }
 export function DefaultPosition(){return [0,0];}
 export function DefaultScale(){return 1.0;}
+export function ControllableParameters(){
+    return [
+    {"property":"fan1", "label":"Strip 1 Type", "type":"combobox",  "values":["None","Strip_Internal","Strip_250mm","Strip_350mm","Strip_450mm","Strip_140CM"], "default":"Strip_250mm"},
+    {"property":"fan2", "label":"Strip 2 Type", "type":"combobox",  "values":["None","Strip_Internal","Strip_250mm","Strip_350mm","Strip_450mm","Strip_140CM"], "default":"Strip_250mm"},
+    {"property":"fan3", "label":"Strip 3 Type", "type":"combobox",  "values":["None","Strip_Internal","Strip_250mm","Strip_350mm","Strip_450mm","Strip_140CM"], "default":"Strip_250mm"},
+    {"property":"fan4", "label":"Strip 4 Type", "type":"combobox",  "values":["None","Strip_Internal","Strip_250mm","Strip_350mm","Strip_450mm","Strip_140CM"], "default":"Strip_250mm"},
+    {"property":"fan5", "label":"Strip 5 Type", "type":"combobox",  "values":["None","Strip_Internal","Strip_250mm","Strip_350mm","Strip_450mm","Strip_140CM"], "default":"Strip_250mm"},
+    {"property":"fan6", "label":"Strip 6 Type", "type":"combobox",  "values":["None","Strip_Internal","Strip_250mm","Strip_350mm","Strip_450mm","Strip_140CM"], "default":"Strip_250mm"},
+    {"property":"fan7", "label":"Strip 7 Type", "type":"combobox",  "values":["None","Strip_Internal","Strip_250mm","Strip_350mm","Strip_450mm","Strip_140CM"], "default":"Strip_250mm"},
+    {"property":"fan8", "label":"Strip 8 Type", "type":"combobox",  "values":["None","Strip_Internal","Strip_250mm","Strip_350mm","Strip_450mm","Strip_140CM"], "default":"Strip_250mm"},
+    {"property":"fan9", "label":"Strip 9 Type", "type":"combobox",  "values":["None","Strip_Internal","Strip_250mm","Strip_350mm","Strip_450mm","Strip_140CM"], "default":"Strip_250mm"},
+    {"property":"fan10", "label":"Strip 10 Type", "type":"combobox","values":["None","Strip_Internal","Strip_250mm","Strip_350mm","Strip_450mm","Strip_140CM"], "default":"Strip_250mm"},
+    {"property":"fan11", "label":"Strip 11 Type", "type":"combobox","values":["None","Strip_Internal","Strip_250mm","Strip_350mm","Strip_450mm","Strip_140CM"], "default":"Strip_250mm"},
+    {"property":"fan12", "label":"Strip 12 Type", "type":"combobox","values":["None","Strip_Internal","Strip_250mm","Strip_350mm","Strip_450mm","Strip_140CM"], "default":"Strip_250mm"},
+    ];
+}
 
 var CORSAIR_LIGHTING_CONTROL_SOFTWARE           = 0x02;
 
@@ -129,37 +145,12 @@ function SubmitLightingColors()
     device.write(packet, 65);
 }
 var vKeyNames = [
-    "LED 0","LED 1","LED 2","LED 3","LED 4","LED 5","LED 6","LED 7","LED 8","LED 9","LED 10",
-    "LED 11","LED 12","LED 13","LED 14","LED 15","LED 16","LED 17","LED 18","LED 19","LED 20",
-    "LED 21","LED 22","LED 23","LED 24","LED 25","LED 26","LED 27","LED 28","LED 29","LED 30",
-    "LED 31","LED 32","LED 33","LED 34","LED 35","LED 36","LED 37","LED 38","LED 39","LED 40",
-    "LED 41","LED 42","LED 43","LED 44","LED 45","LED 46","LED 47","LED 48","LED 49","LED 50",
-    "LED 51","LED 52","LED 53","LED 54","LED 55","LED 56","LED 57","LED 58","LED 59","LED 60",
-    "LED 61","LED 62","LED 63","LED 64","LED 65","LED 66","LED 67","LED 68","LED 69","LED 70",
-    "LED 71","LED 72","LED 73","LED 74","LED 75","LED 76","LED 77","LED 78","LED 79","LED 80",
-    "LED 81","LED 82","LED 83","LED 84","LED 85","LED 86","LED 87","LED 88","LED 89","LED 90",
-    "LED 91","LED 92","LED 93","LED 94","LED 95","LED 96","LED 97","LED 98","LED 99","LED 100",
-    "LED 101","LED 102","LED 103","LED 104","LED 105","LED 106","LED 107","LED 108","LED 109","LED 110",
-    "LED 111","LED 112","LED 113","LED 114","LED 115","LED 116","LED 117","LED 118","LED 119","LED 120",
-    "LED 121","LED 122","LED 123","LED 124","LED 125","LED 126","LED 127"
+    "LED 0",
 ];
 
 
  var vKeyPositions = [
-    [0,0],[1,0],[2,0],[3,0],[4,0],[5,0],[6,0],[7,0],[8,0],[9,0],[10,0],
-    [11,0],[12,0],[13,0],[14,0],[15,0],[16,0],[17,0],[18,0],[19,0],[20,0],
-    [21,0],[22,0],[23,0],[24,0],[25,0],[26,0],[27,0],[28,0],[29,0],[30,0],
-    [31,0],[32,0],[33,0],[34,0],[35,0],[36,0],[37,0],[38,0],[39,0],[40,0],
-    [41,0],[42,0],[43,0],[44,0],[45,0],[46,0],[47,0],[48,0],[49,0],[50,0],
-    [51,0],[52,0],[53,0],[54,0],[55,0],[56,0],[57,0],[58,0],[59,0],[60,0],
-    [61,0],[62,0],[63,0],[64,0],[65,0],[66,0],[67,0],[68,0],[69,0],[70,0],
-    [71,0],[72,0],[73,0],[74,0],[75,0],[76,0],[77,0],[78,0],[79,0],[80,0],
-    [81,0],[82,0],[83,0],[84,0],[85,0],[86,0],[87,0],[88,0],[89,0],[90,0],
-    [91,0],[92,0],[93,0],[94,0],[95,0],[96,0],[97,0],[98,0],[99,0],[100,0],
-    [101,0],[102,0],[103,0],[104,0],[105,0],[106,0],[107,0],[108,0],[109,0],[110,0],
-    [111,0],[112,0],[113,0],[114,0],[115,0],[116,0],[117,0],[118,0],[119,0],[120,0],
-    [121,0],[122,0],[123,0],[124,0],[125,0],[126,0],[127,0]
-
+    [0,0]
  ];
 
 
@@ -172,22 +163,116 @@ export function LedPositions()
 {
     return vKeyPositions;
 }
-function SendChannel(channel)
+
+const Strip_Internal = {
+    mapping : [
+        0,1,2,3,4,5,6,7,8,9
+       ],
+       positioning : [
+        [0,0],[1,0],[2,0],[3,0],[4,0],[5,0],[6,0],[7,0],[8,0],[9,0]
+    ],
+    ledCount : 10,
+    offset : 10
+}
+const Strip_250mm = {
+    mapping : [
+        0,1,2,3,4,5,6,7,8,9,10,11,12,13,14
+       ],
+       positioning : [
+        [0,0],[1,0],[2,0],[3,0],[4,0],[5,0],[6,0],[7,0],[8,0],[9,0],[10,0],[11,0],[12,0],[13,0],[14,0]
+    ],
+    ledCount : 15,
+    offset : 15
+}
+const Strip_350mm = {
+    mapping : [
+        0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20
+       ],
+       positioning : [
+        [0,0],[1,0],[2,0],[3,0],[4,0],[5,0],[6,0],[7,0],[8,0],[9,0],[10,0],[11,0],[12,0],[13,0],[14,0],[15,0],[16,0],[17,0],[18,0],[19,0],[20,0]
+    ],
+    ledCount : 21,
+    offset : 21
+}
+const Strip_450mm = {
+    mapping : [
+        0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26
+       ],
+       positioning : [
+        [0,0],[1,0],[2,0],[3,0],[4,0],[5,0],[6,0],[7,0],[8,0],[9,0],[10,0],[11,0],[12,0],[13,0],[14,0],[15,0],[16,0],[17,0],[18,0],[19,0],[20,0],[21,0],[22,0],[23,0],[24,0],[25,0],[26,0]
+    ],
+    ledCount : 27,
+    offset : 27
+}
+const Strip_140CM = {
+    mapping : [
+        0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36,37,38,39,40,41,42,43,44,45,46,47,48,49,50,51,52,53,54,55,56,57,58,59,60,61,62,63,64,65,66,67,68,69,70,71,72,73,74,75,76,77,78,79,81,82,83,84,85,86
+       ],
+       positioning : [
+        [0,0],[1,0],[2,0],[3,0],[4,0],[5,0],[6,0],[7,0],[8,0],[9,0],[10,0],[11,0],[12,0],[13,0],[14,0],[15,0],[16,0],[17,0],[18,0],[19,0],[20,0],[21,0],[22,0],[23,0],[24,0],[25,0],[26,0],[27,0],[28,0],[29,0],[30,0],[31,0],[32,0],[33,0],[34,0],[35,0],[36,0],[37,0],[38,0],[39,0],[40,0],[41,0],[42,0],[43,0],[44,0],[45,0],[46,0],[47,0],[48,0],[49,0],[50,0],[51,0],[52,0],[53,0],[54,0],[55,0],[56,0],[57,0],[58,0],[59,0],[60,0],[61,0],[62,0],[63,0],[64,0],[65,0],[66,0],[67,0],[68,0],[69,0],[70,0],[71,0],[72,0],[73,0],[74,0],[75,0],[76,0],[77,0],[78,0],[79,0],[81,0],[82,0],[83,0],[84,0],[85,0],[86,0]
+    ],
+    ledCount : 87,
+    offset : 87
+}
+var Channel1 = [];
+var Channel2 = [];
+
+var ComponentDict = {
+    "None": null,
+    "Strip_Internal" : Strip_Internal,
+    "Strip_250mm" : Strip_250mm,
+    "Strip_350mm" : Strip_350mm,
+    "Strip_450mm" : Strip_450mm,
+    "Strip_140CM" : Strip_140CM,
+}
+
+function SetFans(fanArray1,fanArray2){
+    //set channel 1 fans
+    fanArray1[0] = ComponentDict[fan1];
+    fanArray1[1] = ComponentDict[fan2];
+    fanArray1[2] = ComponentDict[fan3];
+    fanArray1[3] = ComponentDict[fan4];
+    fanArray1[4] = ComponentDict[fan5];
+    fanArray1[5] = ComponentDict[fan6];
+    //set channel 2 fans
+    fanArray2[0] = ComponentDict[fan7];
+    fanArray2[1] = ComponentDict[fan8];
+    fanArray2[2] = ComponentDict[fan9];
+    fanArray2[3] = ComponentDict[fan10];
+    fanArray2[4] = ComponentDict[fan11];
+    fanArray2[5] = ComponentDict[fan12];
+}
+function SendChannel(channel,channelArray)
 {
-    var red = [132];
-    var green = [132];
-    var blue = [132];
 
+    var red = [135];
+    var green = [135];
+    var blue = [135];
+    var TotalLedCount = 0;
+    var TotalOffset = 0;
+    
+    for (var fan = 0; fan < channelArray.length; fan++ ) {
 
-    for(var iIdx = 0; iIdx < vKeyPositions.length; iIdx++)
-    {
-        var iPxX = vKeyPositions[iIdx][0];
-        var iPxY = vKeyPositions[iIdx][1];
-        var mxPxColor = device.color(iPxX, iPxY);
-        red[iIdx] = mxPxColor[0]*brightness;
-        green[iIdx] = mxPxColor[1]*brightness;
-        blue[iIdx] = mxPxColor[2]*brightness;
+        if(channelArray[fan] != null) {
+
+            for(var iIdx = 0; iIdx < channelArray[fan].mapping.length; iIdx++)
+            {
+
+                var iPxX = channelArray[fan].positioning[iIdx][0] + TotalOffset;
+                var iPxY = channelArray[fan].positioning[iIdx][1];
+
+                var mxPxColor = device.color(iPxX, iPxY);
+                
+                    red[channelArray[fan].mapping[iIdx]+TotalLedCount] = mxPxColor[0]*brightness;
+                    green[channelArray[fan].mapping[iIdx]+TotalLedCount] = mxPxColor[1]*brightness;
+                    blue[channelArray[fan].mapping[iIdx]+TotalLedCount] = mxPxColor[2]*brightness;
+            
+            }
+            TotalLedCount += channelArray[fan].mapping.length;
+            TotalOffset += channelArray[fan].offset;
+        }
     }
+
     
    channelStart(channel);
 
@@ -210,9 +295,11 @@ function SendChannel(channel)
 export function Render()
 {
     // Both are mirrored
-    Initialize()
-    SendChannel(0);
-    SendChannel(1);
+    //Initialize()
+
+    SetFans(Channel1,Channel2);
+    SendChannel(0,Channel1);
+    SendChannel(1,Channel2);
 }
 
  

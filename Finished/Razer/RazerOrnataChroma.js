@@ -54,7 +54,7 @@ export function ProductId() { return 0x021e; }
 export function Publisher() { return "WhirlwindFX"; }
 export function Size() { return [22, 6]; }
 export function Type() { return "Hid"; }
-export function DefaultPosition(){return [50,100]}
+export function DefaultPosition() {return [75,70]; }
 export function DefaultScale(){return 8.0}
 var vLedNames = ["Keyboard"];
 
