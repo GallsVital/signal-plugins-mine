@@ -10,7 +10,9 @@ export function ControllableParameters(){
         {"property":"shutdownColor", "label":"Shutdown Color","type":"color","default":"009bde"},
     ];
 }
-
+export function ConflictingProcesses() {
+    return ["NGenuity2.exe"];
+}
 var vLedNames = [
     "Esc", "F1", "F2", "F3", "F4", "F5", "F6", "F7", "F8", "F9", "F10", "F11", "F12",         "Print Screen", "Scroll Lock", "Pause Break",   
     "`", "1", "2", "3", "4", "5", "6", "7", "8", "9", "0", "-_", "=+", "Backspace",                        "Insert", "Home", "Page Up",       "NumLock", "Num /", "Num *", "Num -",  //21

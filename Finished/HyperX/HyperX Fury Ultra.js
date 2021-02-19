@@ -5,7 +5,9 @@ export function Publisher() { return "WhirlwindFX"; }
 export function Size() { return [8,8]; }
 export function DefaultPosition(){return [230,100]}
 export function DefaultScale(){return 3.0}
-
+export function ConflictingProcesses() {
+    return ["NGenuity2.exe"];
+}
 
 var vLedNames = [
     "Esc", "F1", "F2", "F3", "F4", "F5", "F6", "F7", "F8", "F9", "F10", "F11", "F12",         "Print Screen", "Scroll Lock", "Pause Break",   
@@ -54,6 +56,7 @@ export function LedPositions()
 {
     return vLedPositions;
 }
+
 function sendPacketString(string, size){
     var packet= [];
     var data = string.split(' ');

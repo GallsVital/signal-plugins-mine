@@ -13,6 +13,9 @@ export function ControllableParameters(){
         {"property":"dpi1", "label":"DPI", "type":"number","min":"200", "max":"12000","default":"800"},
     ];
 }
+export function ConflictingProcesses() {
+    return ["NGenuity2.exe"];
+}
 var savedDpi1;
 
 var vLedNames = [
