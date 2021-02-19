@@ -3,9 +3,14 @@ export function VendorId() { return 0x1b1c; }
 export function ProductId() { return 0x1B7C; }
 export function Publisher() { return "WhirlwindFX"; }
 export function Size() { return [22, 8]; }
-export function DefaultPosition(){return [50,100]}
+export function DefaultPosition() {return [75,70]; }
 export function DefaultScale(){return 8.0}
+export function ControllableParameters(){
+    return [
+        
 
+    ];
+}
 var CORSAIR_COMMAND_WRITE       = 0x07;
 var CORSAIR_COMMAND_READ        = 0x0E;
 var CORSAIR_COMMAND_STREAM      = 0x7F;
@@ -20,14 +25,17 @@ var CORSAIR_PROPERTY_SUBMIT_MOUSE_COLOR         = 0x22;
 export function Initialize()
 {
     sendPacketString("00 08 01 03 00 02",1025);  //Critical Software control packet
-    sendPacketString("00 08 01 6D 00 E8 03",1025);             //critical- no idea
-    sendPacketString("00 08 02 6E",1025);             //critical- no idea
-    sendPacketString("00 08 0D 01 22",1025);          //critical - no idea
+    sendPacketString("00 08 01 6D 00 F8 02",1025);             //critical-
+    sendPacketString("00 08 02 6D 00 F8 02",1025);             //critical- has to do with  Control wheel modes?
+    sendPacketString("00 08 01 6D 00 E8 03",1025);             //critical-
+    sendPacketString("00 08 02 6E",1025);             //critical- 
+    sendPacketString("00 08 0D 01 22",1025);          //Open lighting endpoint
 
 
 }
-
+ 
 function sendPacketString(string, size){
+
     var packet= [];
     var data = string.split(' ');
     
@@ -92,21 +100,18 @@ export function LedPositions()
 
 export function Render()
 {
-    
 
     var packet = []
     packet[0x00]   = 0x00;
     packet[0x01]   = 0x08;    
     packet[0x02]   = 0x06;
-    packet[0x03]   = 0x00; // seen 0 and 1
+    packet[0x03]   = 0x01 // seen 0 and 1
     packet[0x04]   = 0x45;
     packet[0x05]   = 0x02;
     packet[0x06]   = 0x00;
     packet[0x07]   = 0x00;
     packet[0x08]   = 0x12;
     
-
-
     //vKeys.length
     for(var iIdx = 0; iIdx < vKeyPositions.length; iIdx++)
     {
@@ -116,11 +121,8 @@ export function Render()
         packet[22+iIdx*3] = mxPxColor[0];
         packet[22+iIdx*3 +1 ] = mxPxColor[1];
         packet[22+iIdx*3 +2 ] = mxPxColor[2];
-
     }
-    
     device.write(packet, 1025);
-    
 
 }
 

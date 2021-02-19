@@ -3,7 +3,7 @@ export function VendorId() { return 0x1b1c; }
 export function ProductId() { return 0x1B2D; }
 export function Publisher() { return "WhirlwindFX"; }
 export function Size() { return [24, 8]; }
-export function DefaultPosition(){return [50,100]}
+export function DefaultPosition() {return [75,70]; }
 export function DefaultScale(){return 8.0}
 
 var CORSAIR_COMMAND_WRITE       = 0x07;
@@ -38,7 +38,7 @@ export function Initialize()
     /*-----------------------------------------------------*\
     | Send packet                                           |
     \*-----------------------------------------------------*/    
-    device.write(packet, 6);
+    device.write(packet, 65);
 }
 
 

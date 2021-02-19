@@ -3,7 +3,7 @@ export function VendorId() { return 0x046d; }
 export function ProductId() { return 0xc33c; }
 export function Publisher() { return "WhirlwindFX"; }
 export function Size() { return [21, 6]; }
-export function DefaultPosition(){return [50,100]}
+export function DefaultPosition() {return [75,70]; }
 export function DefaultScale(){return 8.0}
 var vLedNames = [
 "Esc", "F1", "F2", "F3", "F4", "F5", "F6", "F7", "F8", "F9", "F10", "F11", "F12",         "Print Screen", "Scroll Lock", "Pause Break",   

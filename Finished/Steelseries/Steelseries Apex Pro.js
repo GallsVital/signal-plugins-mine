@@ -3,7 +3,7 @@ export function VendorId() { return 0x1038; }
 export function ProductId() { return 0x1610; }
 export function Publisher() { return "WhirlwindFX"; }
 export function Size() { return [21,6]; }
-export function DefaultPosition(){return [50,100]}
+export function DefaultPosition() {return [75,70]; }
 export function DefaultScale(){return 8.0}
 
 var SignalRGB_OLED = [

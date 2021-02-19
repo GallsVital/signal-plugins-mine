@@ -1,25 +1,174 @@
+const Strip_Internal = {
+    mapping : [
+        0,1,2,3,4,5,6,7,8,9
+       ],
+       positioning : [
+        [0,0],[1,0],[2,0],[3,0],[4,0],[5,0],[6,0],[7,0],[8,0],[9,0]
+    ],
+    ledCount : 10,
+    offset : 10
+}
+
+
+const LLFan ={
+    mapping : [
+        4,      15,   14,    13, 
+        5,          0,        12,
+                1,    3,      11,
+        6,          2,        10,
+            7,     8,     9,    
+        ],
+        positioning : [
+        [0,0], [1,0],  [2,0], [3,0],
+        [0,1],      [2,1],         [4,1],     
+                 [1,2],   [3,2],   [4,2],                                      
+        [0,3],       [2,3],        [4,3], 
+            [1,4],  [2,4],    [3,4],  
+    ],
+    ledCount : 16,
+    offset : 5,
+}
+
+
+const QLFan = 
+{   mapping : [
+    //Front
+    10,   11,  12,
+    21,       0,      13,
+    20,     3,   1,   14,
+    19,       2,      15,
+       18,   17,   16,
+    //back
+    22,    23,    24,
+    33,     9, 4,    25,
+    32,    8,   5,   26,
+    31,     7, 6,    27,
+    30,    29,     28,
+           
+        ],
+positioning : [
+            //Front
+            [1, 0], [2, 0], [3, 0],
+            [0, 1], [2, 1], [4, 1],
+            [0, 2], [1, 2], [3, 2], [4, 2],
+            [0, 3], [2, 3], [4, 3],
+          [1, 4], [2, 4], [3, 4],
+            //back
+            [1, 0], [2, 0], [3, 0],
+            [0, 1], [2, 1], [2, 1], [4, 1],
+            [0, 2], [1, 2], [3, 2], [4, 2],
+            [0, 3], [2, 3], [2, 3], [4, 3],
+            [1, 4], [2, 4], [3, 4],
+        ],
+ledCount : 34,
+offset : 5,}
+
+
+const MLFan = {
+mapping : [
+    0,
+ 3,  1,
+    2, 
+],
+positioning : [
+    [1,0], 
+[0,1],      [2,1], 
+    [1,2],
+],
+ledCount : 4,
+offset : 2,
+}
+const SpProFan = {
+mapping : [
+    6,7,
+ 5,     0,
+ 4,     1,
+   3, 2,
+],
+positioning : [
+    [1,0],[2,0],
+  [0,1],     [3,1],
+  [0,2],     [3,2],
+     [1,3],[2,3],
+],
+ledCount : 8,
+offset : 4,
+}
+const XD5Reservior = {
+mapping : [
+         0,1,2,
+        9,    3,
+        8,    4, 
+         7,6,5   
+],
+positioning : [
+    [0,0],[1,0],[3,0],
+    [0,1],       [3,1],
+    [0,2],       [3,2],
+    [0,3],[1,3],[3,3],
+],
+ledCount : 10,
+offset : 4,
+}
+const GPUBlock = {
+mapping : [
+ 0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15
+],
+
+positioning : [
+    [0,0],[1,0],[2,0],[3,0],[4,0],[5,0],[6,0],[7,0],[8,0],[9,0],[10,0],[11,0],[12,0],[13,0],[14,0],[15,0]
+
+],
+ledCount : 16,
+offset : 16,
+}
+const XD5CPU = {
+mapping : [
+           9,8,  7,6,
+        10,          5,
+        11,          4,
+        12,          3,
+        13,          2,                        
+         14,15, 0,1,
+],
+positioning : [
+       [0,0],[1,0],[2,0],[3,0],
+       [0,1],            [3,1],
+       [0,2],            [3,2],
+       [0,3],            [3,3],
+       [0,4],            [3,4],
+       [0,5],[1,5],[2,5],[3,5],
+
+],
+ledCount : 16,
+offset : 5,
+}
+
+
+
+
 export function Name() { return "Corsair Lighting Node Pro"; }
 export function VendorId() { return 0x1b1c; }
 export function ProductId() { return 0x0C0B; }
 export function Publisher() { return "WhirlwindFX"; }
-export function Size() { return [128, 16]; }
+export function Size() { return [90, 8]; }
 export function DefaultPosition(){return [0,0]}
 export function DefaultScale(){return 1.0}
 export function ControllableParameters(){
     return [
     {"property":"stripMode", "label":"Strip Mode", "type":"boolean", "default":"false"},
-    {"property":"fan1", "label":"Fan 1 Type", "type":"combobox", "values":["None","LL", "QL","ML","SpPro","XD5Reservior","GPUBlock","XD5CPU"], "default":"LL"},
-    {"property":"fan2", "label":"Fan 2 Type", "type":"combobox", "values":["None","LL", "QL","ML","SpPro","XD5Reservior","GPUBlock","XD5CPU"], "default":"LL"},
-    {"property":"fan3", "label":"Fan 3 Type", "type":"combobox", "values":["None","LL", "QL","ML","SpPro","XD5Reservior","GPUBlock","XD5CPU"], "default":"LL"},
-    {"property":"fan4", "label":"Fan 4 Type", "type":"combobox", "values":["None","LL", "QL","ML","SpPro","XD5Reservior","GPUBlock","XD5CPU"], "default":"LL"},
-    {"property":"fan5", "label":"Fan 5 Type", "type":"combobox", "values":["None","LL", "QL","ML","SpPro","XD5Reservior","GPUBlock","XD5CPU"], "default":"LL"},
-    {"property":"fan6", "label":"Fan 6 Type", "type":"combobox", "values":["None","LL", "QL","ML","SpPro","XD5Reservior","GPUBlock","XD5CPU"], "default":"LL"},
-    {"property":"fan7", "label":"Fan 7 Type", "type":"combobox", "values":["None","LL", "QL","ML","SpPro","XD5Reservior","GPUBlock","XD5CPU"], "default":"LL"},
-    {"property":"fan8", "label":"Fan 8 Type", "type":"combobox", "values":["None","LL", "QL","ML","SpPro","XD5Reservior","GPUBlock","XD5CPU"], "default":"LL"},
-    {"property":"fan9", "label":"Fan 9 Type", "type":"combobox", "values":["None","LL", "QL","ML","SpPro","XD5Reservior","GPUBlock","XD5CPU"], "default":"LL"},
-    {"property":"fan10", "label":"Fan 10 Type", "type":"combobox", "values":["None","LL", "QL","ML","SpPro","XD5Reservior","GPUBlock","XD5CPU"], "default":"LL"},
-    {"property":"fan11", "label":"Fan 11 Type", "type":"combobox", "values":["None","LL", "QL","ML","SpPro","XD5Reservior","GPUBlock","XD5CPU"], "default":"LL"},
-    {"property":"fan12", "label":"Fan 12 Type", "type":"combobox", "values":["None","LL", "QL","ML","SpPro","XD5Reservior","GPUBlock","XD5CPU"], "default":"LL"},
+    {"property":"fan1", "label":"Fan 1 Type", "type":"combobox",   "values":["None","Strip_Internal","LL", "QL","ML","SpPro","XD5Reservior","GPUBlock","XD5CPU"], "default":"LL"},
+    {"property":"fan2", "label":"Fan 2 Type", "type":"combobox",   "values":["None","Strip_Internal","LL", "QL","ML","SpPro","XD5Reservior","GPUBlock","XD5CPU"], "default":"LL"},
+    {"property":"fan3", "label":"Fan 3 Type", "type":"combobox",   "values":["None","Strip_Internal","LL", "QL","ML","SpPro","XD5Reservior","GPUBlock","XD5CPU"], "default":"LL"},
+    {"property":"fan4", "label":"Fan 4 Type", "type":"combobox",   "values":["None","Strip_Internal","LL", "QL","ML","SpPro","XD5Reservior","GPUBlock","XD5CPU"], "default":"LL"},
+    {"property":"fan5", "label":"Fan 5 Type", "type":"combobox",   "values":["None","Strip_Internal","LL", "QL","ML","SpPro","XD5Reservior","GPUBlock","XD5CPU"], "default":"LL"},
+    {"property":"fan6", "label":"Fan 6 Type", "type":"combobox",   "values":["None","Strip_Internal","LL", "QL","ML","SpPro","XD5Reservior","GPUBlock","XD5CPU"], "default":"LL"},
+    {"property":"fan7", "label":"Fan 7 Type", "type":"combobox",   "values":["None","Strip_Internal","LL", "QL","ML","SpPro","XD5Reservior","GPUBlock","XD5CPU"], "default":"LL"},
+    {"property":"fan8", "label":"Fan 8 Type", "type":"combobox",   "values":["None","Strip_Internal","LL", "QL","ML","SpPro","XD5Reservior","GPUBlock","XD5CPU"], "default":"LL"},
+    {"property":"fan9", "label":"Fan 9 Type", "type":"combobox",   "values":["None","Strip_Internal","LL", "QL","ML","SpPro","XD5Reservior","GPUBlock","XD5CPU"], "default":"LL"},
+    {"property":"fan10", "label":"Fan 10 Type", "type":"combobox", "values":["None","Strip_Internal","LL", "QL","ML","SpPro","XD5Reservior","GPUBlock","XD5CPU"], "default":"LL"},
+    {"property":"fan11", "label":"Fan 11 Type", "type":"combobox", "values":["None","Strip_Internal","LL", "QL","ML","SpPro","XD5Reservior","GPUBlock","XD5CPU"], "default":"LL"},
+    {"property":"fan12", "label":"Fan 12 Type", "type":"combobox", "values":["None","Strip_Internal","LL", "QL","ML","SpPro","XD5Reservior","GPUBlock","XD5CPU"], "default":"LL"},
     ];
 }
 
@@ -29,34 +178,20 @@ export function Initialize()
 {
     var packet = [];
 
-
-    /*-----------------------------------------------------*\
-    | Set up Lighting Control packet                        |
-    \*-----------------------------------------------------*/
     packet[0x00]           = 0x00;
     packet[0x01]           = 0x38;
     packet[0x02]           = 0x00;    //Channel 0/1
     packet[0x03]           = CORSAIR_LIGHTING_CONTROL_SOFTWARE;
-
-    /*-----------------------------------------------------*\
-    | Send packet                                           |
-    \*-----------------------------------------------------*/    
+  
     device.write(packet, 65);
 
-    /*-----------------------------------------------------*\
-    | Set up Lighting Control packet                        |
-    \*-----------------------------------------------------*/
     var packet2 = [];
 
     packet2[0x00]           = 0x00;
     packet2[0x01]           = 0x38;
     packet2[0x02]           = 0x01;    //Channel 0/1
     packet2[0x03]           = CORSAIR_LIGHTING_CONTROL_SOFTWARE;
-
-
-    /*-----------------------------------------------------*\
-    | Send packet                                           |
-    \*-----------------------------------------------------*/    
+ 
     device.write(packet2, 65);
 }
 
@@ -88,9 +223,6 @@ function StreamLightingPacketChanneled(start, count, colorChannel, data, channel
     //(Start, Count, Color, Data)
     var packet = [];
 
-    /*-----------------------------------------------------*\
-    | Set up Stream packet                                  |
-    \*-----------------------------------------------------*/
     packet[0x00]   = 0x00;
     packet[0x01]   = 0x32;
     packet[0x02]   = channel;
@@ -98,14 +230,8 @@ function StreamLightingPacketChanneled(start, count, colorChannel, data, channel
     packet[0x04]   = count;
     packet[0x05]   = colorChannel;
 
-    /*-----------------------------------------------------*\
-    | Copy in data bytes                                    |
-    \*-----------------------------------------------------*/
     packet = packet.concat(data);
 
-    /*-----------------------------------------------------*\
-    | Send packet                                           |
-    \*-----------------------------------------------------*/
     device.write(packet, 65);
 }
 function channelStart(channel){
@@ -116,9 +242,6 @@ function channelStart(channel){
     packet[0x01]   = 0x34;
     packet[0x02]   = channel;
 
-    /*-----------------------------------------------------*\
-    | Send packet                                           |
-    \*-----------------------------------------------------*/
     device.write(packet, 65);
 }
 
@@ -126,17 +249,11 @@ function SubmitLightingColors()
 {
     var packet = [];
     //commit packet == 32 FF (len 64)
-    /*-----------------------------------------------------*\
-    | Set up Submit Keyboard 24-Bit Colors packet           |
-    \*-----------------------------------------------------*/
+
     packet[0x00]   = 0x00;
     packet[0x01]   = 0x33;
     packet[0x02]   = 0xFF;
 
-
-    /*-----------------------------------------------------*\
-    | Send packet                                           |
-    \*-----------------------------------------------------*/
     device.write(packet, 65);
 }
 var vKeyNames = [
@@ -145,142 +262,13 @@ var vKeyNames = [
 var vKeyPositions = [
     [0,0]
 ];
-const LLFan = new Object();
-    LLFan.mapping = [
-        4,      15,   14,    13, 
-        5,          0,        12,
-                1,    3,      11,
-        6,          2,        10,
-            7,     8,     9,    
-        ];
-        LLFan.positioning = [
-        [0,0], [1,0],  [2,0], [3,0],
-        [0,1],      [2,1],         [4,1],     
-                 [1,2],   [3,2],   [4,2],                                      
-        [0,3],       [2,3],        [4,3], 
-            [1,4],  [2,4],    [3,4],  
-    ]
-LLFan.ledCount = 16;
-LLFan.offset = 5;
-
-
-const QLFan = new Object();
-   QLFan.mapping = [
-    //Front
-    10,   11,  12,
-    21,       0,      13,
-    20,     3,   1,   14,
-    19,       2,      15,
-       18,   17,   16,
-    //back
-    22,    23,    24,
-    33,     9, 4,    25,
-    32,    8,   5,   26,
-    31,     7, 6,    27,
-    30,    29,     28,
-           
-        ];
-QLFan.positioning = [
-            //Front
-            [1, 0], [2, 0], [3, 0],
-            [0, 1], [2, 1], [4, 1],
-            [0, 2], [1, 2], [3, 2], [4, 2],
-            [0, 3], [2, 3], [4, 3],
-          [1, 4], [2, 4], [3, 4],
-            //back
-            [1, 0], [2, 0], [3, 0],
-            [0, 1], [2, 1], [2, 1], [4, 1],
-            [0, 2], [1, 2], [3, 2], [4, 2],
-            [0, 3], [2, 3], [2, 3], [4, 3],
-            [1, 4], [2, 4], [3, 4],
-        ];
-QLFan.ledCount = 34;
-QLFan.offset = 5;
-
-
-const MLFan = new Object();
-MLFan.mapping = [
-    0,
- 3,  1,
-    2, 
-];
-MLFan.positioning = [
-    [1,0], 
-[0,1],      [2,1], 
-    [1,2],
-];
-MLFan.ledCount = 4;
-MLFan.offset = 2;
-
-const SpProFan = new Object();
-SpProFan.mapping = [
-    6,7,
- 5,     0,
- 4,     1,
-   3, 2,
-];
-SpProFan.positioning = [
-    [1,0],[2,0],
-  [0,1],     [3,1],
-  [0,2],     [3,2],
-     [1,3],[2,3],
-];
-SpProFan.ledCount = 8;
-SpProFan.offset = 4;
-
-const XD5Reservior = new Object();
-XD5Reservior.mapping = [
-         0,1,2,
-        9,    3,
-        8,    4, 
-         7,6,5   
-];
-XD5Reservior.positioning = [
-    [0,0],[1,0],[3,0],
-    [0,1],       [3,1],
-    [0,2],       [3,2],
-    [0,3],[1,3],[3,3],
-];
-XD5Reservior.ledCount = 10;
-XD5Reservior.offset = 4;
-
-const GPUBlock = new Object();
-GPUBlock.mapping = [
- 0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15
-];
-
-GPUBlock.positioning = [
-    [0,0],[1,0],[2,0],[3,0],[4,0],[5,0],[6,0],[7,0],[8,0],[9,0],[10,0],[11,0],[12,0],[13,0],[14,0],[15,0]
-
-];
-GPUBlock.ledCount = 16;
-GPUBlock.offset = 16;
-const XD5CPU = new Object();
-XD5CPU.mapping = [
-           9,8,  7,6,
-        10,          5,
-        11,          4,
-        12,          3,
-        13,          2,                        
-         14,15, 0,1,
-];
-XD5CPU.positioning = [
-       [0,0],[1,0],[2,0],[3,0],
-       [0,1],            [3,1],
-       [0,2],            [3,2],
-       [0,3],            [3,3],
-       [0,4],            [3,4],
-       [0,5],[1,5],[2,5],[3,5],
-
-];
-XD5CPU.ledCount = 16;
-XD5CPU.offset = 5;
 
 
 var Channel1Fans = [];
 var Channel2Fans = [];
 var FanDict = {
     "None": null,
+    "Strip_Internal" : Strip_Internal,
     "LL" : LLFan,
     "QL" : QLFan,
     "ML" : MLFan,
@@ -332,8 +320,10 @@ function SendChannel(channel, FanArray)
         if(FanArray[fan] != null) {
             for(var iIdx = 0; iIdx < FanArray[fan].mapping.length; iIdx++)
             {
-                var iPxX = FanArray[fan].positioning[iIdx][0] + TotalOffset;
-                var iPxY = FanArray[fan].positioning[iIdx][1];
+               
+                    var iPxX = FanArray[fan].positioning[iIdx][0] + TotalOffset;
+                    var iPxY = FanArray[fan].positioning[iIdx][1];
+                
                 var mxPxColor = device.color(iPxX, iPxY);
                 if(stripMode) {
                     red[iIdx+TotalLedCount] = mxPxColor[0];

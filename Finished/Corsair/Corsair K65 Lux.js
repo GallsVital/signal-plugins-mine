@@ -3,7 +3,7 @@ export function VendorId() { return 0x1b1c; }
 export function ProductId() { return 0x1B37; }
 export function Publisher() { return "WhirlwindFX"; }
 export function Size() { return [21, 7]; }
-export function DefaultPosition(){return [50,100]}
+export function DefaultPosition() {return [75,70]; }
 export function DefaultScale(){return 8.0}
 
 var CORSAIR_COMMAND_WRITE       = 0x07;
@@ -230,7 +230,7 @@ export function Render()
 export function Validate(endpoint)
 {
     //i think this has two possible endpoints, newer batchs use 1? older use 2
-    return endpoint.interface === 1;
+    return endpoint.interface === 2// || endpoint.interface === 2;
 }
 
 
