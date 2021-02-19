@@ -30,9 +30,9 @@ export function LedPositions()
 
 function EnableSoftwareControl()
 {
-    sendPacketString("00 09 01 03 00 02",65)//software control packet
+    //sendPacketString("00 09 01 03 00 02",65)//software control packet
     //sendPacketString("00 09 02 6E",65) // Critical
-    sendPacketString("00 09 0D 00 01",65) // open lighting channel
+    //sendPacketString("00 09 0D 00 01",65) // open lighting channel
     //sendPacketString("00 09 0D 00 02",65) // open endpoint
     
 }
