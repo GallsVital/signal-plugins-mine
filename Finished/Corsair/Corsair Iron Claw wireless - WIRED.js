@@ -113,24 +113,27 @@ export function Render()
 function setDpi(dpi){
 
     savedDpi1 = dpi;
-    var packet = [];
-    packet[0] = 0x00;
-    packet[1] = 0x08;
-    packet[2] = 0x01;
-    packet[3] = 0x21;
-    packet[4] = 0x00;
-    packet[5] = dpi%256;
-    packet[6] = Math.floor(dpi/256);
-    device.write(packet, 65);
-    var packet = [];
-    packet[0] = 0x00;
-    packet[1] = 0x08;
-    packet[2] = 0x01;
-    packet[3] = 0x22;
-    packet[4] = 0x00;
-    packet[5] = dpi%256;
-    packet[6] = Math.floor(dpi/256);
-    device.write(packet, 65);
+for (let i = 0; i < 2; i++) {
+        var packet = [];
+        packet[0] = 0x00;
+        packet[1] = 0x08;
+        packet[2] = 0x01;
+        packet[3] = 0x21;
+        packet[4] = 0x00;
+        packet[5] = dpi%256;
+        packet[6] = Math.floor(dpi/256);
+        device.write(packet, 65);
+        var packet = [];
+        packet[0] = 0x00;
+        packet[1] = 0x08;
+        packet[2] = 0x01;
+        packet[3] = 0x22;
+        packet[4] = 0x00;
+        packet[5] = dpi%256;
+        packet[6] = Math.floor(dpi/256);
+        device.write(packet, 65);
+        device.pause(20);
+}
 }
 function hexToRgb(hex) {
     var result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
