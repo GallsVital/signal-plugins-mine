@@ -30,12 +30,12 @@ function sendPacketString(string, size){
 
 export function Initialize()
 {
-    sendPacketString("00 0E 01",65);
-    sendPacketString("00 0E 17 01",65);
-    sendPacketString("00 07 04 02",65);
-    sendPacketString("00 0E 48",65);
+    //sendPacketString("00 0E 01",65);
+    //sendPacketString("00 0E 17 01",65);
+    //sendPacketString("00 07 04 02",65);
+    //sendPacketString("00 0E 48",65);
     sendPacketString("00 07 05 02 00 03",65);
-    sendPacketString("00 07 05 08 00 01",65);
+    //endPacketString("00 07 05 08 00 01",65);
 }
 
 
