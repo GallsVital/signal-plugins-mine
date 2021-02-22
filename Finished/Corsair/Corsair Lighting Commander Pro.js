@@ -299,9 +299,6 @@ function channelStart(channel){
     packet[0x01]   = 0x34;
     packet[0x02]   = channel;
 
-    /*-----------------------------------------------------*\
-    | Send packet                                           |
-    \*-----------------------------------------------------*/
     device.write(packet, 65);
 }
 
@@ -309,17 +306,11 @@ function SubmitLightingColors()
 {
     var packet = [];
     //commit packet == 32 FF (len 64)
-    /*-----------------------------------------------------*\
-    | Set up Submit Keyboard 24-Bit Colors packet           |
-    \*-----------------------------------------------------*/
+
     packet[0x00]   = 0x00;
     packet[0x01]   = 0x33;
     packet[0x02]   = 0xFF;
 
-
-    /*-----------------------------------------------------*\
-    | Send packet                                           |
-    \*-----------------------------------------------------*/
     device.write(packet, 65);
 }
 var vKeyNames = [

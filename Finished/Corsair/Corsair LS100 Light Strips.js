@@ -32,22 +32,14 @@ export function Initialize()
     var packet = [];
 
 
-    /*-----------------------------------------------------*\
-    | Set up Lighting Control packet                        |
-    \*-----------------------------------------------------*/
     packet[0x00]           = 0x00;
     packet[0x01]           = 0x38;
     packet[0x02]           = 0x00;    //Channel 0/1
     packet[0x03]           = CORSAIR_LIGHTING_CONTROL_SOFTWARE;
 
-    /*-----------------------------------------------------*\
-    | Send packet                                           |
-    \*-----------------------------------------------------*/    
+  
     device.write(packet, 65);
 
-    /*-----------------------------------------------------*\
-    | Set up Lighting Control packet                        |
-    \*-----------------------------------------------------*/
     var packet2 = [];
 
     packet2[0x00]           = 0x00;
@@ -56,9 +48,6 @@ export function Initialize()
     packet2[0x03]           = CORSAIR_LIGHTING_CONTROL_SOFTWARE;
 
 
-    /*-----------------------------------------------------*\
-    | Send packet                                           |
-    \*-----------------------------------------------------*/    
     device.write(packet2, 65);
 }
 
@@ -93,9 +82,6 @@ function StreamLightingPacketChanneled(start, count, colorChannel, data, channel
     //(Start, Count, Color, Data)
     var packet = [];
 
-    /*-----------------------------------------------------*\
-    | Set up Stream packet                                  |
-    \*-----------------------------------------------------*/
     packet[0x00]   = 0x00;
     packet[0x01]   = 0x32;
     packet[0x02]   = channel;
@@ -103,14 +89,9 @@ function StreamLightingPacketChanneled(start, count, colorChannel, data, channel
     packet[0x04]   = count;
     packet[0x05]   = colorChannel;
 
-    /*-----------------------------------------------------*\
-    | Copy in data bytes                                    |
-    \*-----------------------------------------------------*/
+
     packet = packet.concat(data);
 
-    /*-----------------------------------------------------*\
-    | Send packet                                           |
-    \*-----------------------------------------------------*/
     device.write(packet, 65);
 }
 function channelStart(channel){
@@ -121,9 +102,7 @@ function channelStart(channel){
     packet[0x01]   = 0x34;
     packet[0x02]   = channel;
 
-    /*-----------------------------------------------------*\
-    | Send packet                                           |
-    \*-----------------------------------------------------*/
+
     device.write(packet, 65);
 }
 
@@ -131,17 +110,11 @@ function SubmitLightingColors()
 {
     var packet = [];
     //commit packet == 32 FF (len 64)
-    /*-----------------------------------------------------*\
-    | Set up Submit Keyboard 24-Bit Colors packet           |
-    \*-----------------------------------------------------*/
+
     packet[0x00]   = 0x00;
     packet[0x01]   = 0x33;
     packet[0x02]   = 0xFF;
 
-
-    /*-----------------------------------------------------*\
-    | Send packet                                           |
-    \*-----------------------------------------------------*/
     device.write(packet, 65);
 }
 var vKeyNames = [

@@ -43,23 +43,14 @@ function StreamPacket(packet_id, data_sz, data)
 {
     var packet = [];
 
-    /*-----------------------------------------------------*\
-    | Set up Stream packet                                  |
-    \*-----------------------------------------------------*/
     packet[0x00]   = 0x00;
     packet[0x01]   = CORSAIR_COMMAND_STREAM;
     packet[0x02]   = packet_id;
     packet[0x03]   = data_sz;
     packet[0x04]   = 0;
 
-    /*-----------------------------------------------------*\
-    | Copy in data bytes                                    |
-    \*-----------------------------------------------------*/
     packet = packet.concat(data);
 
-    /*-----------------------------------------------------*\
-    | Send packet                                           |
-    \*-----------------------------------------------------*/
     device.write(packet, 65);
 }
 
@@ -68,9 +59,6 @@ function SubmitKbColors(color_channel, packet_count, finish_val)
 {
     var packet = [];
 
-    /*-----------------------------------------------------*\
-    | Set up Submit Keyboard 24-Bit Colors packet           |
-    \*-----------------------------------------------------*/
     packet[0x00]   = 0x00;
     packet[0x01]   = CORSAIR_COMMAND_WRITE;
     packet[0x02]   = CORSAIR_PROPERTY_SUBMIT_KEYBOARD_COLOR_24;
@@ -78,9 +66,6 @@ function SubmitKbColors(color_channel, packet_count, finish_val)
     packet[0x04]   = packet_count;
     packet[0x05]   = finish_val;
 
-    /*-----------------------------------------------------*\
-    | Send packet                                           |
-    \*-----------------------------------------------------*/
     device.write(packet, 65);
 }
 

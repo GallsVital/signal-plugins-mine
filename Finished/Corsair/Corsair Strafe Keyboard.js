@@ -21,23 +21,15 @@ export function Initialize()
 {
     var packet = [];
 
-    /*-----------------------------------------------------*\
-    | Set up Lighting Control packet                        |
-    \*-----------------------------------------------------*/
+
     packet[0x00]           = 0x00;
     packet[0x01]           = CORSAIR_COMMAND_WRITE;
     packet[0x02]           = CORSAIR_PROPERTY_LIGHTING_CONTROL;
     packet[0x03]           = CORSAIR_LIGHTING_CONTROL_SOFTWARE;
 
-    /*-----------------------------------------------------*\
-    | Lighting control byte needs to be 3 for keyboards and |
-    | headset stand, 1 for mice and mousepads               |
-    \*-----------------------------------------------------*/
     packet[0x05]   = 0x03;
 
-    /*-----------------------------------------------------*\
-    | Send packet                                           |
-    \*-----------------------------------------------------*/    
+  
     device.write(packet, 65);
 }
 
@@ -60,27 +52,19 @@ export function Shutdown()
         blue[vKeys[iIdx]] = 0;
     }
     
-    
-    
-    /*-----------------------------------------------------*\
-   | Send red bytes                                        |
-   \*-----------------------------------------------------*/
+
    StreamPacket(1, 60, red.splice(0,60));
    StreamPacket(2, 60, red.splice(0,60));
    StreamPacket(3, 24, red.splice(0,24));
    SubmitKbColors(1, 3, 1);
 
-   /*-----------------------------------------------------*\
-   | Send green bytes                                      |
-   \*-----------------------------------------------------*/
+
    StreamPacket(1, 60, green.splice(0,60));
    StreamPacket(2, 60, green.splice(0,60));
    StreamPacket(3, 24, green.splice(0,24));
    SubmitKbColors(2, 3, 1);
 
-   /*-----------------------------------------------------*\
-   | Send blue bytes                                       |
-   \*-----------------------------------------------------*/
+
    StreamPacket(1, 60, blue.splice(0,60));
    StreamPacket(2, 60, blue.splice(0,60));
    StreamPacket(3, 24, blue.splice(0,24));
@@ -92,23 +76,17 @@ function StreamPacket(packet_id, data_sz, data)
 {
     var packet = [];
 
-    /*-----------------------------------------------------*\
-    | Set up Stream packet                                  |
-    \*-----------------------------------------------------*/
+
     packet[0x00]   = 0x00;
     packet[0x01]   = CORSAIR_COMMAND_STREAM;
     packet[0x02]   = packet_id;
     packet[0x03]   = data_sz;
     packet[0x04]   = 0;
 
-    /*-----------------------------------------------------*\
-    | Copy in data bytes                                    |
-    \*-----------------------------------------------------*/
+
     packet = packet.concat(data);
 
-    /*-----------------------------------------------------*\
-    | Send packet                                           |
-    \*-----------------------------------------------------*/
+  
     device.write(packet, 65);
 }
 
@@ -117,9 +95,7 @@ function SubmitKbColors(color_channel, packet_count, finish_val)
 {
     var packet = [];
 
-    /*-----------------------------------------------------*\
-    | Set up Submit Keyboard 24-Bit Colors packet           |
-    \*-----------------------------------------------------*/
+
     packet[0x00]   = 0x00;
     packet[0x01]   = CORSAIR_COMMAND_WRITE;
     packet[0x02]   = CORSAIR_PROPERTY_SUBMIT_KEYBOARD_COLOR_24;
@@ -127,9 +103,7 @@ function SubmitKbColors(color_channel, packet_count, finish_val)
     packet[0x04]   = packet_count;
     packet[0x05]   = finish_val;
 
-    /*-----------------------------------------------------*\
-    | Send packet                                           |
-    \*-----------------------------------------------------*/
+
     device.write(packet, 65);
 }
 
@@ -198,25 +172,17 @@ export function Render()
     
     
     
-    /*-----------------------------------------------------*\
-   | Send red bytes                                        |
-   \*-----------------------------------------------------*/
+
    StreamPacket(1, 60, red.splice(0,60));
    StreamPacket(2, 60, red.splice(0,60));
    StreamPacket(3, 24, red.splice(0,24));
    SubmitKbColors(1, 3, 1);
 
-   /*-----------------------------------------------------*\
-   | Send green bytes                                      |
-   \*-----------------------------------------------------*/
    StreamPacket(1, 60, green.splice(0,60));
    StreamPacket(2, 60, green.splice(0,60));
    StreamPacket(3, 24, green.splice(0,24));
    SubmitKbColors(2, 3, 1);
 
-   /*-----------------------------------------------------*\
-   | Send blue bytes                                       |
-   \*-----------------------------------------------------*/
    StreamPacket(1, 60, blue.splice(0,60));
    StreamPacket(2, 60, blue.splice(0,60));
    StreamPacket(3, 24, blue.splice(0,24));

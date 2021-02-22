@@ -30,12 +30,9 @@ function sendPacketString(string, size){
 
 export function Initialize()
 {
-    //sendPacketString("00 0E 01",65);
-    //sendPacketString("00 0E 17 01",65);
-    //sendPacketString("00 07 04 02",65);
-    //sendPacketString("00 0E 48",65);
+
     sendPacketString("00 07 05 02 00 03",65);
-    //endPacketString("00 07 05 08 00 01",65);
+
 }
 
 
@@ -50,23 +47,17 @@ function StreamPacket(packet_id, data_sz, data)
 {
     var packet = [];
 
-    /*-----------------------------------------------------*\
-    | Set up Stream packet                                  |
-    \*-----------------------------------------------------*/
+  
     packet[0x00]   = 0x00;
     packet[0x01]   = CORSAIR_COMMAND_STREAM;
     packet[0x02]   = packet_id;
     packet[0x03]   = data_sz;
     packet[0x04]   = 0;
 
-    /*-----------------------------------------------------*\
-    | Copy in data bytes                                    |
-    \*-----------------------------------------------------*/
+  
     packet = packet.concat(data);
 
-    /*-----------------------------------------------------*\
-    | Send packet                                           |
-    \*-----------------------------------------------------*/
+ 
     device.write(packet, 65);
 }
 
@@ -75,9 +66,7 @@ function SubmitKbColors(color_channel, packet_count, finish_val)
 {
     var packet = [];
 
-    /*-----------------------------------------------------*\
-    | Set up Submit Keyboard 24-Bit Colors packet           |
-    \*-----------------------------------------------------*/
+   
     packet[0x00]   = 0x00;
     packet[0x01]   = CORSAIR_COMMAND_WRITE;
     packet[0x02]   = CORSAIR_PROPERTY_SUBMIT_KEYBOARD_COLOR_24;
@@ -85,9 +74,7 @@ function SubmitKbColors(color_channel, packet_count, finish_val)
     packet[0x04]   = packet_count;
     packet[0x05]   = finish_val;
 
-    /*-----------------------------------------------------*\
-    | Send packet                                           |
-    \*-----------------------------------------------------*/
+ 
     device.write(packet, 65);
 }
 
@@ -167,26 +154,18 @@ export function Render()
     }
     
     
-    
-    /*-----------------------------------------------------*\
-   | Send red bytes                                        |
-   \*-----------------------------------------------------*/
+
    StreamPacket(1, 60, red.splice(0,60));
    StreamPacket(2, 60, red.splice(0,60));
    StreamPacket(3, 48, red.splice(0,48));
    SubmitKbColors(1, 3, 1);
 
-   /*-----------------------------------------------------*\
-   | Send green bytes                                      |
-   \*-----------------------------------------------------*/
    StreamPacket(1, 60, green.splice(0,60));
    StreamPacket(2, 60, green.splice(0,60));
    StreamPacket(3, 48, green.splice(0,48));
    SubmitKbColors(2, 3, 1);
 
-   /*-----------------------------------------------------*\
-   | Send blue bytes                                       |
-   \*-----------------------------------------------------*/
+
    StreamPacket(1, 60, blue.splice(0,60));
    StreamPacket(2, 60, blue.splice(0,60));
    StreamPacket(3, 48, blue.splice(0,48));

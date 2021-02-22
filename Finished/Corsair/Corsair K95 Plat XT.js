@@ -42,67 +42,12 @@ function sendPacketString(string, size){
 
 export function Initialize()
 {
-    //sendPacketString("00 08 02 03 ",65);
+  
     sendPacketString("00 08 01 03 00 02",65);  //Critical Software control packet
-    //sendPacketString("00 08 02 03",65);
-    //sendPacketString("00 08 02 5F",65);
-    //sendPacketString("00 08 02 01",65);
-    // sendPacketString("00 08 02 03",65);
-    // sendPacketString("00 08 02 13",65);
-    // sendPacketString("00 08 02 14",65);
-    // sendPacketString("00 08 02 41",65);
-    // sendPacketString("00 08 02 96",65);
-    // sendPacketString("00 08 0D 00 27",65);
-    // sendPacketString("00 08 01 03 00 02",65);
 
-    //sendPacketString("00 08 02 4A 00 00",65);
-    //sendPacketString("00 08 02 45",65);
-    
-    
-    //sendPacketString("00 08 01 02 00 E8 03",65);
-    //sendPacketString("00 08 01 09 00 01",65);
-    //sendPacketString("00 08 01 39 00 01",65);
-    //sendPacketString("00 08 01 0A 00 05",65);
-
-    //sendPacketString("00 08 0D 00 0F",65);
-    //sendPacketString("00 08 01 38 00 05",65);
-    //sendPacketString("00 08 09",65);
-
-    // sendPacketString("00 08 01 4A 00 00",65);
-    // sendPacketString("00 08 08",65);
-    // sendPacketString("00 08 01 45",65);
-    // sendPacketString("00 08 05 01",65);
-
-    
     sendPacketString("00 08 02 6E",65);             //critical- no idea
-    //sendPacketString("00 08 0D 00 60 6D",65);
-    //sendPacketString("00 08 09",65);
-    //sendPacketString("00 08 08 ",65);
+
     sendPacketString("00 08 0D 01 01",65);          //critical - no idea
-    //sendPacketString("00 08 05 01",65);
-    //sendPacketString("08 08 0D 00 62 6D",65);
-
-    //var red =  new Array(228).fill(0);
-    //var green =  new Array(228).fill(0);
-    //var blue =  new Array(228).fill(0);
-    
-    //sendInitalPacket(red.splice(0,53)); //start of red 53
-    //sendPacketString("00 08 09",65);
-   // StreamPacket(red.splice(0,62)); //all red 62
-    //StreamDoublePacket(red.splice(0,38),green.splice(0,19),0,4); // 38 red, space 4, 19 green
-    //sendPacketString("00 08 08",65);
-    //StreamPacket(green.splice(0,61)); //green 61
-    //sendPacketString("00 08 05 01",65);
-    //StreamPacket(green.splice(0,61)); //green 61
-    //sendPacketString("00 08 0D 00 61 6D",65);
-    //StreamDoublePacket(green.splice(0,11),blue.splice(0,46),0,4);  //11 green, space 4, blue 46
-    //sendPacketString("00 08 09",65);
-    //StreamPacket(blue.splice(0,61)); //61 BLUE
-    //StreamPacket(blue.splice(0,61)); //61 BLUE
-
-
-    //sendPacketString("00 08 02 6E",65);
-    //sendPacketString("00 08 0D 02 02",65);
 
 }
 
