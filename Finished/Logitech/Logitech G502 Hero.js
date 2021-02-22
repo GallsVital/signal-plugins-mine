@@ -1,12 +1,20 @@
-export function Name() { return "Logitech G502 Hero Se"; }
+export function Name() { return "Logitech G502 Hero"; }
 export function VendorId() { return 0x046d; }
 export function ProductId() { return 0xC08B; }
 export function Publisher() { return "WhirlwindFX"; }
 export function Size() { return [3, 3]; }
 export function DefaultPosition(){return [240,120]}
 export function DefaultScale(){return 8.0}
+export function ControllableParameters(){
+    return [
+        {"property":"shutdownColor", "label":"Shutdown Color","type":"color","default":"009bde"},
+        {"property":"DpiControl", "label":"Enable Dpi Control","type":"boolean","default":"false"},
+        {"property":"dpi1", "label":"DPI", "type":"number","min":"200", "max":"12000","default":"800"},
+    ];
+}
+var savedDpi1;
 
-var vLedNames = ["Dpi Zone", "Logo Zone", ];
+var vLedNames = ["Dpi Zone", "Logo Zone"];
 var vLedPositions = [
     [0,1],[1,2]
 ];
@@ -24,9 +32,27 @@ export function LedPositions()
 
 export function Initialize()
 {
-
+    if(DpiControl) {
+        setDpi(dpi1);
+    
+}
 }
 
+function setDpi(dpi){
+
+    device.set_endpoint(1, 0x0001, 0xff00); // System IF    
+    savedDpi1 = dpi1;
+
+    var packet = [];
+    packet[0] = 0x10;
+    packet[1] = 0xFF;
+    packet[2] = 0x0A;
+    packet[3] = 0x3C;
+    packet[4] = 0x00;
+    packet[5] = Math.floor(dpi/256);
+    packet[6] = dpi%256;
+    device.write(packet, 7);
+}
 
 function Apply()
 {
@@ -70,10 +96,15 @@ function sendZone(zone){
 
 export function Render()
 {
+    device.set_endpoint(1, 0x0002, 0xff00); // Lighting IF    
     sendZone(0);
     //Apply(); //Makes Dpi zone flicker
     sendZone(1);
-    //Apply(); //Makes Dpi zone flicker
+    //Apply(); //Makes Dpi zone flicker''
+
+    if(savedDpi1 != dpi1 && DpiControl){
+        setDpi(dpi1)
+      }
 }
 
 
@@ -86,7 +117,7 @@ export function Shutdown()
 
 export function Validate(endpoint)
 {
-    return endpoint.interface === 1 && endpoint.usage === 0x0002;
+    return endpoint.interface === 1// && endpoint.usage === 0x0002;
 }
 
 export function Image()

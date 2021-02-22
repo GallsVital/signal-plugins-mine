@@ -1,22 +1,20 @@
 export function Name() { return "SteelSeries Apex 3"; }
 export function VendorId() { return 0x1038; }
-export function ProductId() { return 0x161a; }
+export function ProductId() { return 0x161A; }
 export function Publisher() { return "WhirlwindFX"; }
-export function Size() { return [8,5]; }
+export function Size() { return [10,3]; }
 export function DefaultPosition(){return [50,100]}
 export function DefaultScale(){return 8.0}
 
 
-
 var vLedNames = [
-    "Zone 1", "Zone 2", "Zone 3", "Zone 4", "Zone 5", "Zone 6", "Zone 7", "Zone 8"
+    "Zone 1", "Zone 2", "Zone 3", "Zone 4", "Zone 5", "Zone 6", "Zone 7", "Zone 8", "Zone 9", "Zone 10"
 ];
 
 var vLedPositions = [
-    [0,0], [1,0], [2,0], [3,0], [4,0], [5,0], [6,0], [7,0]
+    [0,0], [1,0], [2,0], [3,0], [4,0], [5,0], [6,0], [7,0], [8,0], [9,0]
 ];
 
- 
 export function Initialize() {
 
 }
@@ -30,6 +28,7 @@ export function LedPositions()
 {
     return vLedPositions;
 }
+
 function sendPacketString(string, size){
     var packet= [];
     var data = string.split(' ');
@@ -59,31 +58,32 @@ export function Shutdown()
 
 export function Validate(endpoint)
 {
-    //endpoint = 1 1 ffc0
-    //Takes both a size 64 'system' WRITE, and size 643 RGB data REPORT
-    return endpoint.interface === 1 && endpoint.usage === 1;
+
+    return endpoint.interface === 3
 }
 
 
-function sendColors(shutdown = false){
-    var packet = []
+ function sendColors(shutdown = false){
+     var packet = []
+     packet[0x00]   = 0x00;
+     packet[0x01]   = 0x0B;
+     packet[0x02]   = 0x00;
+    
 
-    packet[0x00]   = 00;
-    packet[0x01]   = 0x0B;
-    packet[0x02]   = 0x00;
-    for (var idx = 0; idx <= vLedPositions.length; idx++)
-    {        
-        var iPxX = vLedPositions[idx][0];
-        var iPxY = vLedPositions[idx][1];
-        var col = device.color(iPxX, iPxY);
-        packet[idx * 3 + 3] = col[0];
-        packet[idx * 3 + 4] = col[1];
-        packet[idx * 3 + 5] = col[2];        
-    }
-
-
-    device.write(packet,33)
+     for (var idx = 0; idx < vLedPositions.length; idx++)
+     {        
+         var iPxX = vLedPositions[idx][0];
+         var iPxY = vLedPositions[idx][1];
+         
+         var col = device.color(iPxX, iPxY);
+        
+         packet[idx * 3 + 3] = col[0];
+         packet[idx * 3 + 4] = col[1];
+         packet[idx * 3 + 5] = col[2];        
+     }
+     device.write(packet,33)
 }
+
 export function Render() {
 
 sendColors();

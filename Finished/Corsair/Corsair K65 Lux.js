@@ -5,7 +5,13 @@ export function Publisher() { return "WhirlwindFX"; }
 export function Size() { return [21, 7]; }
 export function DefaultPosition() {return [75,70]; }
 export function DefaultScale(){return 8.0}
+export function ControllableParameters(){
+    return [
 
+    {"property":"endpointUsed", "label":"Endpoint Selection", "type":"combobox", "values":["Endpoint 1","Endpoint 2",], "default":"Endpoint 1"},
+
+    ];
+}
 var CORSAIR_COMMAND_WRITE       = 0x07;
 var CORSAIR_COMMAND_READ        = 0x0E;
 var CORSAIR_COMMAND_STREAM      = 0x7F;
@@ -192,6 +198,9 @@ export function LedPositions()
 
 export function Render()
 {
+
+    selectEndpoint()
+
     var red = [144];
     var green = [144];
     var blue = [144];
@@ -225,12 +234,20 @@ export function Render()
    StreamPacket(3, 24, blue.splice(0,24));
    SubmitKbColors(3, 3, 2);
 }
-
+var selectedEndpoint;
+function selectEndpoint(){
+    selectedEndpoint = endpointUsed;
+    if(selectedEndpoint == "Endpoint 1"){
+        device.set_endpoint(1, 0x0004, 0xffc2);   
+    }else{
+    //device.set_endpoint(1, 0x0602, 0xff43);    
+    }
+}
 
 export function Validate(endpoint)
 {
     //i think this has two possible endpoints, newer batchs use 1? older use 2
-    return endpoint.interface === 2// || endpoint.interface === 2;
+    return endpoint.interface === 2 || endpoint.interface === 1;
 }
 
 
