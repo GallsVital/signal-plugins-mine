@@ -48,9 +48,9 @@ function CalculateCrc(report)
 }
 
 
-export function Name() { return "Razer Cynosa V2"; }
+export function Name() { return "Razer Blackwidow V3"; }
 export function VendorId() { return 0x1532; }
-export function ProductId() { return 0x025E; }
+export function ProductId() { return 0x024E; }
 export function Publisher() { return "WhirlwindFX"; }
 export function Size() { return [22,10]; }
 export function Type() { return "Hid"; }
@@ -115,14 +115,7 @@ function SendPacket(idx)
 
     
     for(var iIdx = 0; iIdx < 22; iIdx++){
-
-        if(idx === 4 &&  (iIdx === 15 || iIdx === 17) ) {
-            var col = device.color(21,0);
-            
-        }else {
-            var col = device.color(iIdx,idx);
-
-        }
+        var col = device.color(iIdx,idx);
         var iLedIdx = (iIdx*3) + 14;
         packet[iLedIdx] = col[0];
         packet[iLedIdx+1] = col[1];
@@ -152,8 +145,6 @@ function Apply()
     packet[89] = CalculateCrc(packet);
 
     device.send_report(packet, 91);
-    device.pause(1); // We need a pause here (between packets), otherwise the ornata can't keep up.
-
 }
 
 
@@ -165,7 +156,9 @@ export function Render()
     SendPacket(3);
     SendPacket(4);
     SendPacket(5);  
- 
+    SendPacket(6);
+    SendPacket(7);
+    SendPacket(8); 
     
 }
 
@@ -177,7 +170,7 @@ export function Shutdown()
 
 export function Validate(endpoint)
 {
-    return endpoint.interface === 2;
+    return endpoint.interface === 3;
 }
 
 export function Image()

@@ -20,8 +20,8 @@ export function DefaultScale(){return 8.0}
 export function ControllableParameters(){
     return [
         {"property":"shutdownColor", "label":"Shutdown Color","type":"color","default":"009bde"},
-        {"property":"DpiControl", "label":"Enable Dpi Control","type":"boolean","default":"false"},
-        {"property":"dpi1", "label":"DPI", "type":"number","min":"200", "max":"10000","default":"800"},
+        //{"property":"DpiControl", "label":"Enable Dpi Control","type":"boolean","default":"false"},
+        //{"property":"dpi1", "label":"DPI", "type":"number","min":"200", "max":"10000","default":"800"},
     ];
 }
 
@@ -107,28 +107,25 @@ function setDpi(dpi){
     
     savedDpi1 = dpi;
     var RoundedDpi = Math.round(dpi/100)*100
-for (let i = 0; i < 2; i = i + 1) {
-        var packet = [];
-        packet[0] = 0x00;
-        packet[1] = 0x98;
-        packet[2] = 0x01;
-        packet[3] = 0x20;
-        packet[4] = 0x00;
-        packet[5] = RoundedDpi%256;
-        packet[6] = Math.floor(RoundedDpi/256);
-        device.write(packet, 65);
-        device.pause(10)
-        var packet = [];
-        packet[0] = 0x00;
-        packet[1] = 0x09;
-        packet[2] = 0x01;
-        packet[3] = 0x18;
-        packet[4] = 0x00;
-        packet[5] = RoundedDpi%256;
-        packet[6] = Math.floor(RoundedDpi/256);
-        device.write(packet, 65);
-        device.pause(10)
-}
+    var packet = [];
+    packet[0] = 0x00;
+    packet[1] = 0x98;
+    packet[2] = 0x01;
+    packet[3] = 0x20;
+    packet[4] = 0x00;
+    packet[5] = RoundedDpi%256;
+    packet[6] = Math.floor(RoundedDpi/256);
+    device.write(packet, 65);
+    device.pause(10)
+    var packet = [];
+    packet[0] = 0x00;
+    packet[1] = 0x09;
+    packet[2] = 0x01;
+    packet[3] = 0x18;
+    packet[4] = 0x00;
+    packet[5] = RoundedDpi%256;
+    packet[6] = Math.floor(RoundedDpi/256);
+    device.write(packet, 65);
 
 }
 function hexToRgb(hex) {
