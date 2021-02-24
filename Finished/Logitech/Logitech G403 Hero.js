@@ -1,6 +1,6 @@
-export function Name() { return "Logitech G703 LightSpeed Wired Mode"; }
+export function Name() { return "Logitech G403 Hero"; }
 export function VendorId() { return 0x046d; }
-export function ProductId() { return 0xC090; }
+export function ProductId() { return 0xC08F; }
 export function Publisher() { return "WhirlwindFX"; }
 export function Size() { return [3, 3]; }
 export function DefaultPosition(){return [240,120]}
@@ -17,7 +17,7 @@ var savedDpi1;
 
 var vLedNames = ["Primary Zone", "Logo Zone"];
 var vLedPositions = [
-    [0,1],[0,2]
+    [1,0],[1,2]
 ];
 
 export function LedNames()
@@ -33,7 +33,7 @@ export function LedPositions()
 
 export function Initialize()
 {
-    device.set_endpoint(2, 0x0001, 0xff00); // System IF    
+    device.set_endpoint(1, 0x0001, 0xff00); // System IF    
 if(DpiControl) {
         setDpi(dpi1);
     
@@ -42,14 +42,14 @@ if(DpiControl) {
 
 function setDpi(dpi){
 
-    device.set_endpoint(2, 0x0001, 0xff00); // System IF    
+    device.set_endpoint(1, 0x0001, 0xff00); // System IF    
     savedDpi1 = dpi1;
 
     var packet = [];
     packet[0] = 0x10;
     packet[1] = 0xFF;
-    packet[2] = 0x0B;
-    packet[3] = 0x3E;
+    packet[2] = 0x0A;
+    packet[3] = 0x3A;
     packet[4] = 0x00;
     packet[5] = Math.floor(dpi/256);
     packet[6] = dpi%256;
@@ -66,8 +66,8 @@ function sendZone(zone, shutDown = false){
     var packet = [];
     packet[0x00] = 0x11;
     packet[0x01] = 0xFF;
-    packet[0x02] = 0x07;
-    packet[0x03] = 0x1F;
+    packet[0x02] = 0x0E;
+    packet[0x03] = 0x3A;
     packet[0x04] = zone;
     packet[0x05] = 0x01;
 
@@ -95,7 +95,7 @@ function sendZone(zone, shutDown = false){
 
 export function Render()
 {
-    device.set_endpoint(2, 0x0002, 0xff00); // Lighting IF    
+    device.set_endpoint(1, 0x0002, 0xff00); // Lighting IF    
     sendZone(0);
     sendZone(1);
     
@@ -108,7 +108,7 @@ export function Render()
 
 export function Shutdown()
 {
-    device.set_endpoint(2, 0x0002, 0xff00); // Lighting IF    
+    device.set_endpoint(1, 0x0002, 0xff00); // Lighting IF    
     sendZone(0,true);
     sendZone(1,true);
     
@@ -117,8 +117,8 @@ export function Shutdown()
 
 export function Validate(endpoint)
 {
-    return endpoint.interface === 2 && endpoint.usage === 0x0002 && endpoint.usage_page === 0xff00
-     || endpoint.interface === 2 && endpoint.usage === 0x0001 && endpoint.usage_page === 0xff00;
+    return endpoint.interface === 1 && endpoint.usage === 0x0002 && endpoint.usage_page === 0xff00
+     || endpoint.interface === 1 && endpoint.usage === 0x0001 && endpoint.usage_page === 0xff00;
 }
 function hexToRgb(hex) {
     var result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
