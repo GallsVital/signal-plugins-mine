@@ -19,7 +19,7 @@ var CORSAIR_PROPERTY_SUBMIT_MOUSE_COLOR         = 0x22;
 
 export function Initialize()
 {
-sendPacketString("00 07 04 02",65);
+//sendPacketString("00 07 04 02",65);
 sendPacketString("00 07 05 02 00 03",65);
 }
 
