@@ -54,8 +54,8 @@ export function ProductId() { return 0x0c02; }
 export function Publisher() { return "WhirlwindFX"; }
 export function Size() { return [10,10]; }
 export function Type() { return "Hid"; }
-export function DefaultPosition(){return [0,0]}
-export function DefaultScale(){return 1.0}
+export function DefaultPosition(){return [120,80]}
+export function DefaultScale(){return 8.0}
 
 var vLedNames = ["MousePad"];
 var vLedPositions = [

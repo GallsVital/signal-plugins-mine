@@ -7,8 +7,6 @@ var G600_FIXED_MODE = 0x00;
 var G600_BRETHING_MODE = 0x01;
 var G600_CYCLE_MODE = 0x02;
 
-
-
 export function Name() { return "Logitech G600 Mouse"; }
 export function VendorId() { return 0x046D; } 
 export function ProductId() { return 0xC24A; } 
@@ -19,11 +17,14 @@ export function DefaultScale(){return 8.0}
 export function ControllableParameters(){
     return [
         {"property":"shutdownColor", "label":"Shutdown Color","type":"color","default":"009bde"},
+        {"property":"LightingMode", "label":"Lighting Mode", "type":"combobox", "values":["Grid","Forced"], "default":"Grid"},
+        {"property":"forcedColor", "label":"Forced Color","type":"color","default":"009bde"},
+        {"property":"DpiControl", "label":"Enable Dpi Control","type":"boolean","default":"false"},
         {"property":"dpi1", "label":"DPI", "type":"number","min":"200", "max":"12400","default":"800"},
     ];
 }
-var savedDpi1;
 
+var savedDpi1;
 var vLedNames = ["MouseWide"];
 
 var vLedPositions = [[1,1]];
@@ -40,8 +41,10 @@ export function LedPositions()
 
 export function Initialize()
 {
-    setDpi(dpi1);
-    return "Logitech G600 Initialized";
+    if(DpiControl) {
+        setDpi(dpi1);
+    }
+    
 }
 
 function sendColors(shutdown = false){
@@ -57,6 +60,8 @@ function sendColors(shutdown = false){
     var col;
     if(shutdown){
         col = hexToRgb(shutdownColor)
+    }else if (LightingMode == "Forced") {
+        col = hexToRgb(forcedColor)
     }else{
         col = device.color(iX, iY);
     }
@@ -79,7 +84,8 @@ function sendColors(shutdown = false){
 export function Render()
 {
     sendColors()
-    if(savedDpi1 != dpi1){
+
+    if(savedDpi1 != dpi1 && DpiControl){
        setDpi(dpi1)
     }
 
@@ -114,7 +120,6 @@ export function Validate(endpoint)
 export function Shutdown()
 {
     sendColors(true);
-    return "Logitech G600 Disconnected";
 }
 
 export function Image() 

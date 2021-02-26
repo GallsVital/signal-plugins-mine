@@ -53,8 +53,8 @@ var vLed = [
 export function Initialize() {
 if(DpiControl) {
         setDpi(dpi1);
-    
-}}
+    }
+}
 
 export function LedNames()
 {
