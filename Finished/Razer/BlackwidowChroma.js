@@ -120,7 +120,7 @@ function SendPacket(idx)
     
     for(var iIdx = 0; iIdx < 22; iIdx++){
         var col = device.color(iIdx,idx);
-        var iLedIdx = (iIdx*3) + 14;
+        var iLedIdx = (iIdx*3) + 13;
         packet[iLedIdx] = col[0]; //0; //0xF7;
         packet[iLedIdx+1] = col[1]; //0;
         packet[iLedIdx+2] = col[2]; //255;

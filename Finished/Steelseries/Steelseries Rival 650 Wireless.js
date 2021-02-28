@@ -8,8 +8,10 @@ export function DefaultScale(){return 1.5}
 export function ControllableParameters(){
     return [
         {"property":"shutdownColor", "label":"Shutdown Color","type":"color","default":"009bde"},
-        {"property":"dpi1", "label":"DPI 1", "type":"number","min":"100", "max":"12000","default":"800"},
-        {"property":"dpi2", "label":"DPI 2", "type":"number","min":"100", "max":"12000","default":"800"},
+        {"property":"LightingMode", "label":"Lighting Mode", "type":"combobox", "values":["Canvas","Forced"], "default":"Canvas"},
+        {"property":"forcedColor", "label":"Forced Color","type":"color","default":"009bde"},
+        {"property":"DpiControl", "label":"Enable Dpi Control","type":"boolean","default":"false"},
+        {"property":"dpi1", "label":"DPI", "type":"number","min":"200", "max":"12400","default":"800"},
     ];
 }
 
@@ -29,7 +31,6 @@ var vLedPositions = [
 ];
 
 var savedDpi1;
-var savedDpi2;
 
 export function Initialize() {
     // var packet = [];
@@ -59,9 +60,7 @@ export function Initialize() {
     // buf[0x06] = 0x85;
     // device.send_report(packet, 513);
     savedDpi1 = dpi1;
-    savedDpi2 = dpi2;
     setDpi(1,dpi1);
-    setDpi(2,dpi2);
 }
 
 export function LedNames()
@@ -93,8 +92,11 @@ function SendColorPacket(Position, shutdown = false) {
     var iPxX = Position[0];
     var iPxY = Position[1];
     var color
+    var color;
     if(shutdown){
         color = hexToRgb(shutdownColor)
+    }else if (LightingMode == "Forced") {
+        color = hexToRgb(forcedColor)
     }else{
         color = device.color(iPxX, iPxY);
     }
@@ -170,10 +172,7 @@ export function Render() {
         savedDpi1 = dpi1;
         setDpi(1,dpi1)
     }
-    if(savedDpi2 != dpi2){
-        savedDpi2 = dpi2;
-        setDpi(2,dpi2)
-    }
+
     device.pause(1)
 }
 

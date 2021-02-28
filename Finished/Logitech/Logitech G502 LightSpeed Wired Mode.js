@@ -8,8 +8,10 @@ export function DefaultScale(){return 8.0}
 export function ControllableParameters(){
     return [
         {"property":"shutdownColor", "label":"Shutdown Color","type":"color","default":"009bde"},
-        {"property":"dpi1", "label":"DPI", "type":"number","min":"100", "max":"26500","default":"800"},
-        
+        {"property":"LightingMode", "label":"Lighting Mode", "type":"combobox", "values":["Canvas","Forced"], "default":"Canvas"},
+        {"property":"forcedColor", "label":"Forced Color","type":"color","default":"009bde"},
+        {"property":"DpiControl", "label":"Enable Dpi Control","type":"boolean","default":"false"},
+        {"property":"dpi1", "label":"DPI", "type":"number","min":"200", "max":"12400","default":"800"},
     ];
 }
 var savedDpi1;
@@ -18,7 +20,15 @@ var vLedNames = ["Primary Zone", "Logo Zone"];
 var vLedPositions = [
     [0,1],[0,2]
 ];
+function hexToRgb(hex) {
+    var result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+    var colors = [];
+    colors[0] = parseInt(result[1], 16);
+    colors[1] = parseInt(result[2], 16);
+    colors[2] = parseInt(result[3], 16);
 
+    return colors;
+  }
 export function LedNames()
 {
     return vLedNames;
@@ -59,7 +69,7 @@ function Apply()
 {
 
 }
-function sendZone(zone, shutDown = false){
+function sendZone(zone, shutdown = false){
     var packet = [];
     packet[0x00] = 0x11;
     packet[0x01] = 0x01;
@@ -72,9 +82,11 @@ function sendZone(zone, shutDown = false){
 
         var iX = vLedPositions[zone][0];
         var iY = vLedPositions[zone][1];
-        var color
-        if(shutDown){
+        var color;
+        if(shutdown){
             color = hexToRgb(shutdownColor)
+        }else if (LightingMode == "Forced") {
+            color = hexToRgb(forcedColor)
         }else{
             color = device.color(iX, iY);
         }
@@ -117,15 +129,7 @@ export function Validate(endpoint)
     return endpoint.interface === 2 && endpoint.usage === 0x0002 && endpoint.usage_page === 0xff00
      || endpoint.interface === 2 && endpoint.usage === 0x0001 && endpoint.usage_page === 0xff00;
 }
-function hexToRgb(hex) {
-    var result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
-    var colors = [];
-    colors[0] = parseInt(result[1], 16);
-    colors[1] = parseInt(result[2], 16);
-    colors[2] = parseInt(result[3], 16);
 
-    return colors;
-  }
 
 export function Image()
 {

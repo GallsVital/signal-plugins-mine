@@ -8,7 +8,10 @@ export function DefaultScale(){return 8.0}
 export function ControllableParameters(){
     return [
         {"property":"shutdownColor", "label":"Shutdown Color","type":"color","default":"009bde"},
-        {"property":"dpi1", "label":"DPI 1", "type":"number","min":"100", "max":"12000","default":"800"},
+        {"property":"LightingMode", "label":"Lighting Mode", "type":"combobox", "values":["Canvas","Forced"], "default":"Canvas"},
+        {"property":"forcedColor", "label":"Forced Color","type":"color","default":"009bde"},
+        {"property":"DpiControl", "label":"Enable Dpi Control","type":"boolean","default":"false"},
+        {"property":"dpi1", "label":"DPI", "type":"number","min":"200", "max":"12400","default":"800"},
     ];
 }
 
@@ -31,9 +34,21 @@ var savedDpi1;
 
 export function Initialize() {
 
+    packet[0x00] = 0x00;
+    packet[0x01] = 0x33;
+    packet[0x02] = 0x00;
+    packet[0x03] = 31
+    packet[0x04] = 0;
+    packet[0x05] = 0x00;
+    packet[0x06] = 0
+    packet[0x07] = 0x00;
+    packet[0x08] = 0x32
+    device.write(packet, 33);
 
-    savedDpi1 = dpi1;
-    //setDpi(1,dpi1);
+    
+    if(DpiControl) {
+        setDpi(dpi1);
+    }
 }
 
 export function LedNames()
@@ -63,9 +78,12 @@ function SendColorPacket(zoneid,zoneToken,secondToken, shutdown = false) {
     var packet = [];
     var iPxX = vLedPositions[zoneid][0];
     var iPxY = vLedPositions[zoneid][1];
-    var color
+
+    var color;
     if(shutdown){
         color = hexToRgb(shutdownColor)
+    }else if (LightingMode == "Forced") {
+        color = hexToRgb(forcedColor)
     }else{
         color = device.color(iPxX, iPxY);
     }
@@ -107,8 +125,7 @@ export function Render() {
         SendColorPacket(i,zoneIds[i],secondaryZoneId[i]);
     }
 
-    if(savedDpi1 != dpi1){
-        savedDpi1 = dpi1;
+    if(savedDpi1 != dpi1 && DpiControl){
         setDpi(1,dpi1)
     }
     
@@ -116,6 +133,7 @@ export function Render() {
 }
 
 function setDpi(channel, dpi){
+    savedDpi1 = dpi1;
     var packet = [];
     packet[0] = 0x00;
     packet[1] = 0x03;

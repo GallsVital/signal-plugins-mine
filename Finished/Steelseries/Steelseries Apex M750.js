@@ -5,6 +5,14 @@ export function Publisher() { return "WhirlwindFX"; }
 export function Size() { return [21,6]; }
 export function DefaultPosition() {return [75,70]; }
 export function DefaultScale(){return 8.0}
+export function ControllableParameters(){
+    return [
+        {"property":"shutdownColor", "label":"Shutdown Color","type":"color","default":"009bde"},
+        {"property":"LightingMode", "label":"Lighting Mode", "type":"combobox", "values":["Canvas","Forced"], "default":"Canvas"},
+        {"property":"forcedColor", "label":"Forced Color","type":"color","default":"009bde"},
+
+    ];
+}
 var vLedNames = [
     "Esc", "F1", "F2", "F3", "F4", "F5", "F6", "F7", "F8", "F9", "F10", "F11", "F12",         "Print Screen", "Scroll Lock", "Pause Break",   
     "`", "1", "2", "3", "4", "5", "6", "7", "8", "9", "0", "-_", "=+", "Backspace",                        "Insert", "Home", "Page Up",       "NumLock", "Num /", "Num *", "Num -",  //21
@@ -77,7 +85,7 @@ export function Shutdown()
     // by 64 byte commit packets.  Here, we sent the bytes we'll use and the engine will
     // pad the rest with zeroes.  Important to note that we add 1 to the send and write functions
     // because hid firstbyte is (almost) always zero.  Use usblyzer to verify the packets sent.    
-    var packet = [];
+    sendColor(true);
 
     
 }
@@ -88,8 +96,7 @@ export function Validate(endpoint)
     // zero.
     return endpoint.interface === 2;
 }
-
-export function Render() {
+function sendColor(shutdown = false){
     var packet = [];
 
     packet[0x00] = 0x00;
@@ -107,15 +114,33 @@ export function Render() {
         var idx = vKeymap[i];
         var iPxX = vLedPositions[i][0];
         var iPxY = vLedPositions[i][1];
-        var col = device.color(iPxX, iPxY);
-        packet[(idx * 3) + 9] = col[0];
-        packet[(idx * 3) + 10] = col[1];
-        packet[(idx * 3) + 11] = col[2];        
+        var color;
+        if(shutdown){
+            color = hexToRgb(shutdownColor)
+        }else if (LightingMode == "Forced") {
+            color = hexToRgb(forcedColor)
+        }else{
+            color = device.color(iPxX, iPxY);
+        }        
+        packet[(idx * 3) + 9] = color[0];
+        packet[(idx * 3) + 10] = color[1];
+        packet[(idx * 3) + 11] = color[2];        
     }
     
     device.send_report(packet, 513);
 }
+export function Render() {
+sendColor();
+}
+function hexToRgb(hex) {
+    var result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+    var colors = [];
+    colors[0] = parseInt(result[1], 16);
+    colors[1] = parseInt(result[2], 16);
+    colors[2] = parseInt(result[3], 16);
 
+    return colors;
+  }
 
 export function Image() 
 {

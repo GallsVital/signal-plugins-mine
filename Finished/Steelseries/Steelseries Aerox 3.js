@@ -8,8 +8,10 @@ export function DefaultScale(){return 8.0}
 export function ControllableParameters(){
     return [
         {"property":"shutdownColor", "label":"Shutdown Color","type":"color","default":"009bde"},
+        {"property":"LightingMode", "label":"Lighting Mode", "type":"combobox", "values":["Canvas","Forced"], "default":"Canvas"},
+        {"property":"forcedColor", "label":"Forced Color","type":"color","default":"009bde"},
         {"property":"DpiControl", "label":"Enable Dpi Control","type":"boolean","default":"false"},
-        {"property":"dpi1", "label":"DPI 1", "type":"number","min":"200", "max":"8000","default":"800"},
+        {"property":"dpi1", "label":"DPI", "type":"number","min":"200", "max":"12400","default":"800"},
     ];
 }
 
@@ -63,6 +65,8 @@ function SendColorPacket(shutdown = false) {
         var color;
         if(shutdown){
             color = hexToRgb(shutdownColor)
+        }else if (LightingMode == "Forced") {
+            color = hexToRgb(forcedColor)
         }else{
             color = device.color(iPxX, iPxY);
         }

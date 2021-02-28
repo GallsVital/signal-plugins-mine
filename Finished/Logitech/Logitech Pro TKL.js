@@ -8,6 +8,9 @@ export function DefaultScale(){return 8.0;}
 export function ControllableParameters(){
     return [
         {"property":"shutdownColor", "label":"Shutdown Color","type":"color","default":"009bde"},
+        {"property":"LightingMode", "label":"Lighting Mode", "type":"combobox", "values":["Canvas","Forced"], "default":"Canvas"},
+        {"property":"forcedColor", "label":"Forced Color","type":"color","default":"009bde"},
+
     ];
 }
 
@@ -99,6 +102,8 @@ function SendLogoZones(shutdown = false){
         var iKeyPosY = vLogoPositions[iIdx][1];
         if(shutdown){
             var col = hexToRgb(shutdownColor)
+        }else if (LightingMode == "Forced") {
+            var col = hexToRgb(forcedColor)
         }else{
         var col = device.color(iKeyPosX,iKeyPosY);
         }
@@ -141,6 +146,8 @@ function SendMediaPacket(startIdx, count, shutdown = false)
         var iKeyPosY = vMediaPositions[iIdx][1];
         if(shutdown){
             var col = hexToRgb(shutdownColor)
+        }else if (LightingMode == "Forced") {
+            var col = hexToRgb(forcedColor)
         }else{
         var col = device.color(iKeyPosX,iKeyPosY);
         }
@@ -174,6 +181,8 @@ function SendPacket(startIdx, count, shutdown = false)
         var iKeyPosY = vLedPositions[iKeyIdx][1];
         if(shutdown){
             var col = hexToRgb(shutdownColor)
+        }else if (LightingMode == "Forced") {
+            var col = hexToRgb(forcedColor)
         }else{
         var col = device.color(iKeyPosX,iKeyPosY);
         }

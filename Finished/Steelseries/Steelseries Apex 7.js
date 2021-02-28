@@ -5,7 +5,13 @@ export function Publisher() { return "WhirlwindFX"; }
 export function Size() { return [21,6]; }
 export function DefaultPosition(){return [50,100]}
 export function DefaultScale(){return 8.0}
-
+export function ControllableParameters(){
+    return [
+        {"property":"shutdownColor", "label":"Shutdown Color","type":"color","default":"009bde"},
+        {"property":"LightingMode", "label":"Lighting Mode", "type":"combobox", "values":["Canvas","Forced"], "default":"Canvas"},
+        {"property":"forcedColor", "label":"Forced Color","type":"color","default":"009bde"},
+    ];
+}
 var SignalRGB_OLED = [
     0x00 ,0x65 ,0x00 ,0x00 ,0x00 ,0x00 ,0x00 ,0x00 ,0x00 ,0x00 ,0x00 ,0x00 ,0x00 ,0x00 ,0x00 ,0x00 ,0x00 ,0x00 ,0x00,
     0x00 ,0x00 ,0x00 ,0x00 ,0x00 ,0x00 ,0x00 ,0x00 ,0x00 ,0x00 ,0x00 ,0x00 ,0x00 ,0x00 ,0x00 ,0x00 ,0x00 ,0x00 ,0x00,
@@ -96,36 +102,8 @@ function sendReportString(string, size){
 
 export function Shutdown()
 {
-    var packet = []
-    var red = [];
-    var green = [];
-    var blue = [];
-    packet[0x00]   = 0;
-    packet[0x01]   = 0x3A;
-    packet[0x02]   = vKeymap.length;
+    sendColors(true);
 
-    for (var idx = 0; idx <= vKeymap.length; idx++)
-    {        
-        var iPxX = vLedPositions[idx][0];
-        var iPxY = vLedPositions[idx][1];
-        var col = device.color(iPxX, iPxY);
-        red[vKeymap[idx]] = 120;
-        green[vKeymap[idx]] = 120;
-        blue[vKeymap[idx]] = 120;        
-    }
-    
-    for(var idx = 0; idx < vKeymap.length; idx++){
-    packet[(idx * 4) + 3] = vKeymap[idx];
-    packet[(idx * 4) + 4] = red[vKeymap[idx]]
-    packet[(idx * 4) + 5] = green[vKeymap[idx]]
-    packet[(idx * 4) + 6] = blue[vKeymap[idx]]
-    }
-
-    device.send_report(packet,643)   
-    //sendReportString("00 69",65)
-    //sendReportString("00 3B",65)
-    //sendReportString("00 69",65)
-    //sendReportString("00 6C",65)
     
 }
 
@@ -136,10 +114,23 @@ export function Validate(endpoint)
     return endpoint.interface === 1 && endpoint.usage === 1;
 }
 
+function hexToRgb(hex) {
+    var result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+    var colors = [];
+    colors[0] = parseInt(result[1], 16);
+    colors[1] = parseInt(result[2], 16);
+    colors[2] = parseInt(result[3], 16);
 
+    return colors;
+  }
 
 export function Render() {
 
+sendColors();
+
+}
+
+function sendColors(shutdown = false){
     var packet = []
     var red = [];
     var green = [];
@@ -152,10 +143,16 @@ export function Render() {
     {        
         var iPxX = vLedPositions[idx][0];
         var iPxY = vLedPositions[idx][1];
-        var col = device.color(iPxX, iPxY);
-        red[vKeymap[idx]] = col[0];
-        green[vKeymap[idx]] = col[1];
-        blue[vKeymap[idx]] = col[2];        
+        var color;
+        if(shutdown){
+            color = hexToRgb(shutdownColor)
+        }else if (LightingMode == "Forced") {
+            color = hexToRgb(forcedColor)
+        }else{
+            color = device.color(iPxX, iPxY);
+        }        red[vKeymap[idx]] = color[0];
+        green[vKeymap[idx]] = color[1];
+        blue[vKeymap[idx]] = color[2];        
     }
     
     for(var idx = 0; idx < vKeymap.length; idx++){
@@ -168,7 +165,6 @@ export function Render() {
     device.send_report(packet,643)
 
 }
-
 
 export function Image() 
 {

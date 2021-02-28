@@ -5,7 +5,14 @@ export function Publisher() { return "WhirlwindFX"; }
 export function Size() { return [24, 9]; }
 export function DefaultPosition() {return [75,70]; }
 export function DefaultScale(){return 8.0;}
+export function ControllableParameters(){
+    return [
+        {"property":"shutdownColor", "label":"Shutdown Color","type":"color","default":"009bde"},
+        {"property":"LightingMode", "label":"Lighting Mode", "type":"combobox", "values":["Canvas","Forced"], "default":"Canvas"},
+        {"property":"forcedColor", "label":"Forced Color","type":"color","default":"009bde"},
 
+    ];
+}
 
 var vLedNames = [
 "Esc", "F1", "F2", "F3", "F4", "F5", "F6", "F7", "F8", "F9", "F10", "F11", "F12",         "Print Screen", "Scroll Lock", "Pause Break",   
@@ -79,7 +86,7 @@ function Apply()
     device.set_endpoint(1, 0x0602, 0xff43); // System IF    
     device.write(packet, 20);  
 }
-function SendGkeys()
+function SendGkeys(shutdown = false)
 {
     var packet = [];
     packet[0] = 0x12;
@@ -95,11 +102,18 @@ function SendGkeys()
         var iLedIdx = (iIdx * 4) + 8;
         var iKeyPosX = vGkeyPositions[iIdx][0];
         var iKeyPosY = vGkeyPositions[iIdx][1];
-        var col = device.color(iKeyPosX,iKeyPosY);
+        var color;
+        if(shutdown){
+            color = hexToRgb(shutdownColor)
+        }else if (LightingMode == "Forced") {
+            color = hexToRgb(forcedColor)
+        }else{
+            color = device.color(iKeyPosX, iKeyPosY);
+        }
         packet[iLedIdx] = iIdx
-        packet[iLedIdx+1] = col[0];
-        packet[iLedIdx+2] = col[1];
-        packet[iLedIdx+3] = col[2];        
+        packet[iLedIdx+1] = color[0];
+        packet[iLedIdx+2] = color[1];
+        packet[iLedIdx+3] = color[2];        
     }
                                               
 
@@ -108,7 +122,7 @@ function SendGkeys()
     device.pause(1);
 }
 
-function SendLogoZones(){
+function SendLogoZones(shutdown = false){
     var packet = [];
     packet[0] = 0x11;
     packet[1] = 0xFF;
@@ -123,11 +137,18 @@ function SendLogoZones(){
         var iLedIdx = (iIdx * 4) + 8;
         var iKeyPosX = vLogoPositions[iIdx][0];
         var iKeyPosY = vLogoPositions[iIdx][1];
-        var col = device.color(iKeyPosX,iKeyPosY);
+        var color;
+        if(shutdown){
+            color = hexToRgb(shutdownColor)
+        }else if (LightingMode == "Forced") {
+            color = hexToRgb(forcedColor)
+        }else{
+            color = device.color(iKeyPosX, iKeyPosY);
+        }
         packet[iLedIdx] = iIdx+1;
-        packet[iLedIdx+1] = col[0];
-        packet[iLedIdx+2] = col[1];
-        packet[iLedIdx+3] = col[2];        
+        packet[iLedIdx+1] = color[0];
+        packet[iLedIdx+2] = color[1];
+        packet[iLedIdx+3] = color[2];        
     }
 
     //device.set_endpoint(1, 0x0604, 0xff43); // Lighting IF
@@ -138,7 +159,7 @@ function SendLogoZones(){
 }
 
 
-function SendZonePacket(startIdx, count, zone)
+function SendZonePacket(startIdx, count, zone,shutdown = false)
 {
     var packet = [];
     packet[0] = 0x12;
@@ -155,11 +176,18 @@ function SendZonePacket(startIdx, count, zone)
         var iKeyIdx = startIdx + iIdx;
         var iKeyPosX = vLedPositions[iKeyIdx][0];
         var iKeyPosY = vLedPositions[iKeyIdx][1];
-        var col = device.color(iKeyPosX,iKeyPosY);
+        var color;
+        if(shutdown){
+            color = hexToRgb(shutdownColor)
+        }else if (LightingMode == "Forced") {
+            color = hexToRgb(forcedColor)
+        }else{
+            color = device.color(iKeyPosY, iKeyPosX);
+        }
         packet[iLedIdx] = vKeymap[iKeyIdx];
-        packet[iLedIdx+1] = col[0];
-        packet[iLedIdx+2] = col[1];
-        packet[iLedIdx+3] = col[2];        
+        packet[iLedIdx+1] = color[0];
+        packet[iLedIdx+2] = color[1];
+        packet[iLedIdx+3] = color[2];        
     }
 
     device.set_endpoint(1, 0x0604, 0xff43); // Lighting IF
@@ -167,7 +195,7 @@ function SendZonePacket(startIdx, count, zone)
     device.pause(1);
 }
 
-function SendPacket(startIdx, count)
+function SendPacket(startIdx, count,shutdown = false)
 {
     var packet = [];
     packet[0] = 0x12;
@@ -184,11 +212,18 @@ function SendPacket(startIdx, count)
         var iKeyIdx = startIdx + iIdx;
         var iKeyPosX = vLedPositions[iKeyIdx][0];
         var iKeyPosY = vLedPositions[iKeyIdx][1];
-        var col = device.color(iKeyPosX,iKeyPosY);
+        var color;
+        if(shutdown){
+            color = hexToRgb(shutdownColor)
+        }else if (LightingMode == "Forced") {
+            color = hexToRgb(forcedColor)
+        }else{
+            color = device.color(iKeyPosX, iKeyPosY);
+        }        
         packet[iLedIdx] = vKeymap[iKeyIdx];
-        packet[iLedIdx+1] = col[0];
-        packet[iLedIdx+2] = col[1];
-        packet[iLedIdx+3] = col[2];        
+        packet[iLedIdx+1] = color[0];
+        packet[iLedIdx+2] = color[1];
+        packet[iLedIdx+3] = color[2];        
     }
 
     device.set_endpoint(1, 0x0604, 0xff43); // Lighting IF
@@ -254,7 +289,17 @@ export function Render()
 
 export function Shutdown()
 {
-
+    SendPacket(0, 14,true);
+    SendPacket(14, 14,true);
+    SendPacket(28, 14,true);
+    SendPacket(42, 14,true);
+    SendPacket(56, 14,true);
+    SendPacket(70, 14,true);
+    SendPacket(84, 14,true);
+    SendPacket(98, 9,true); 
+    SendGkeys(true);
+    SendLogoZones(true);
+    Apply();
 }
 
 

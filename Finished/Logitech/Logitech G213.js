@@ -5,6 +5,13 @@ export function Publisher() { return "WhirlwindFX"; }
 export function Size() { return [5, 1]; }
 export function DefaultPosition() {return [75,70]; }
 export function DefaultScale(){return 8.0}
+export function ControllableParameters(){
+    return [
+        {"property":"shutdownColor", "label":"Shutdown Color","type":"color","default":"009bde"},
+        {"property":"LightingMode", "label":"Lighting Mode", "type":"combobox", "values":["Canvas","Forced"], "default":"Canvas"},
+        {"property":"forcedColor", "label":"Forced Color","type":"color","default":"009bde"},
+    ];
+}
 var vLedNames = [
 "zone 1", "Zone 2", "Zone 3", "zone 4", "Zone 5",
 ];
@@ -30,6 +37,15 @@ export function Initialize()
 
 }
 
+function hexToRgb(hex) {
+    var result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+    var colors = [];
+    colors[0] = parseInt(result[1], 16);
+    colors[1] = parseInt(result[2], 16);
+    colors[2] = parseInt(result[3], 16);
+
+    return colors;
+  }
 
 function Apply()
 {
@@ -44,7 +60,7 @@ function Apply()
 }
 
 
-function SendPacket(zone)
+function SendPacket(zone,shutdown = false)
 {
     var packet = [];
     packet[0] = 0x11;
@@ -55,10 +71,16 @@ function SendPacket(zone)
     packet[5] = 0x01;
         var iKeyPosX = vLedPositions[zone-1][0];
         var iKeyPosY = vLedPositions[zone-1][1];
-        var col = device.color(iKeyPosX,iKeyPosY);
-        packet[6] = col[0];
-        packet[7] = col[1];
-        packet[8] = col[2];        
+    var color;
+    if(shutdown){
+        color = hexToRgb(shutdownColor)
+    }else if (LightingMode == "Forced") {
+        color = hexToRgb(forcedColor)
+    }else{
+        color = device.color(iKeyPosX, iKeyPosY);
+    }        packet[6] = color[0];
+        packet[7] = color[1];
+        packet[8] = color[2];        
     
     packet[9] = 0x02
 

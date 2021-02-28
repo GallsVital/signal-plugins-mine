@@ -8,9 +8,10 @@ export function DefaultScale(){return 8.0}
 export function ControllableParameters(){
     return [
         {"property":"shutdownColor", "label":"Shutdown Color","type":"color","default":"009bde"},
+        {"property":"LightingMode", "label":"Lighting Mode", "type":"combobox", "values":["Canvas","Forced"], "default":"Canvas"},
+        {"property":"forcedColor", "label":"Forced Color","type":"color","default":"009bde"},
         {"property":"DpiControl", "label":"Enable Dpi Control","type":"boolean","default":"false"},
-        {"property":"dpi1", "label":"DPI", "type":"number","min":"100", "max":"26500","default":"800"},
-        
+        {"property":"dpi1", "label":"DPI", "type":"number","min":"200", "max":"12400","default":"800"},
     ];
 }
 var savedDpi1;
@@ -70,10 +71,7 @@ function Apply()
     device.pause(30);  
     //device.read(packet,20);
 }
-
-
-export function Render()
-{
+function sendColor(shutdown = false){
     device.set_endpoint(1, 0x0002, 0xff00); // Lighting IF    
 
     var packet = [];
@@ -89,7 +87,14 @@ export function Render()
         var iLedIdx = offset + (iIdx * 4);
         var iX = vLedPositions[iIdx][0];
         var iY = vLedPositions[iIdx][1];
-        var color = device.color(iX,iY);
+        var color;
+        if(shutdown){
+            color = hexToRgb(shutdownColor)
+        }else if (LightingMode == "Forced") {
+            color = hexToRgb(forcedColor)
+        }else{
+            color = device.color(iX, iY);
+        }        
         packet[iLedIdx] = iIdx + 1;
         packet[iLedIdx+1] = color[0];
         packet[iLedIdx+2] = color[1];
@@ -102,6 +107,19 @@ export function Render()
     device.pause(30);
     
     Apply();
+}
+function hexToRgb(hex) {
+    var result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+    var colors = [];
+    colors[0] = parseInt(result[1], 16);
+    colors[1] = parseInt(result[2], 16);
+    colors[2] = parseInt(result[3], 16);
+
+    return colors;
+  }
+export function Render()
+{
+    sendColor()
 
     if(savedDpi1 != dpi1 && DpiControl){
         setDpi(dpi1)
@@ -112,6 +130,7 @@ export function Render()
 
 export function Shutdown()
 {
+    sendColor(true)
 
 }
 

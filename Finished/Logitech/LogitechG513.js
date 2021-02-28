@@ -5,6 +5,24 @@ export function Publisher() { return "WhirlwindFX"; }
 export function Size() { return [21, 6]; }
 export function DefaultPosition() {return [75,70]; }
 export function DefaultScale(){return 8.0}
+export function ControllableParameters(){
+    return [
+        {"property":"shutdownColor", "label":"Shutdown Color","type":"color","default":"009bde"},
+        {"property":"LightingMode", "label":"Lighting Mode", "type":"combobox", "values":["Canvas","Forced"], "default":"Canvas"},
+        {"property":"forcedColor", "label":"Forced Color","type":"color","default":"009bde"},
+
+    ];
+}
+
+function hexToRgb(hex) {
+    var result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+    var colors = [];
+    colors[0] = parseInt(result[1], 16);
+    colors[1] = parseInt(result[2], 16);
+    colors[2] = parseInt(result[3], 16);
+
+    return colors;
+  }
 var vLedNames = [
 "Esc", "F1", "F2", "F3", "F4", "F5", "F6", "F7", "F8", "F9", "F10", "F11", "F12",         "Print Screen", "Scroll Lock", "Pause Break",   
 "`", "1", "2", "3", "4", "5", "6", "7", "8", "9", "0", "-_", "=+", "Backspace",                        "Insert", "Home", "Page Up",       "NumLock", "Num /", "Num *", "Num -",  //21
@@ -63,7 +81,7 @@ function Apply()
 }
 
 
-function SendPacket(startIdx, count)
+function SendPacket(startIdx, count,shutdown = false)
 {
     var packet = [];
     packet[0] = 0x12;
@@ -80,11 +98,19 @@ function SendPacket(startIdx, count)
         var iKeyIdx = startIdx + iIdx;
         var iKeyPosX = vLedPositions[iKeyIdx][0];
         var iKeyPosY = vLedPositions[iKeyIdx][1];
-        var col = device.color(iKeyPosX,iKeyPosY);
+
+        var color;
+        if(shutdown){
+            color = hexToRgb(shutdownColor)
+        }else if (LightingMode == "Forced") {
+            color = hexToRgb(forcedColor)
+        }else{
+            color = device.color(iKeyPosX, iKeyPosY);
+        }        
         packet[iLedIdx] = vKeymap[iKeyIdx];
-        packet[iLedIdx+1] = col[0];
-        packet[iLedIdx+2] = col[1];
-        packet[iLedIdx+3] = col[2];        
+        packet[iLedIdx+1] = color[0];
+        packet[iLedIdx+2] = color[1];
+        packet[iLedIdx+3] = color[2];        
     }
 
     device.set_endpoint(1, 0x0604, 0xff43); // Lighting IF
@@ -110,7 +136,16 @@ export function Render()
 
 export function Shutdown()
 {
+    SendPacket(0, 14,true);
+    SendPacket(14, 14,true);
+    SendPacket(28, 14,true);
+    SendPacket(42, 14,true);
+    SendPacket(56, 14,true);
+    SendPacket(70, 14,true);
+    SendPacket(84, 14,true);
+    SendPacket(98, 6,true);
 
+    Apply();
 }
 
 
