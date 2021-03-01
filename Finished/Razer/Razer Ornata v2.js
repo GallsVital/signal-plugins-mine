@@ -56,6 +56,22 @@ export function Size() { return [22, 6]; }
 export function Type() { return "Hid"; }
 export function DefaultPosition() {return [75,70]; }
 export function DefaultScale(){return 8.0}
+export function ControllableParameters(){
+    return [
+        {"property":"shutdownColor", "label":"Shutdown Color","type":"color","default":"009bde"},
+        {"property":"LightingMode", "label":"Lighting Mode", "type":"combobox", "values":["Canvas","Forced"], "default":"Canvas"},
+        {"property":"forcedColor", "label":"Forced Color","type":"color","default":"009bde"},
+    ];
+}
+function hexToRgb(hex) {
+    var result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+    var colors = [];
+    colors[0] = parseInt(result[1], 16);
+    colors[1] = parseInt(result[2], 16);
+    colors[2] = parseInt(result[3], 16);
+
+    return colors;
+  }
 var vLedNames = ["Keyboard"];
 
 var vLedPositions = [[0,1]];
@@ -164,7 +180,7 @@ export function Initialize()
     */
 }
 
-function SendPacket(idx)
+function SendPacket(idx,shutdown = false)
 {
     var packet = new Array(91).fill(0);
     packet[0] = 0x00;
@@ -181,8 +197,14 @@ function SendPacket(idx)
 
     
     for(var iIdx = 0; iIdx < 22; iIdx++){
-        var col = device.color(iIdx,idx);
-        var iLedIdx = (iIdx*3) + 14;
+        var col;
+        if(shutdown){
+            col = hexToRgb(shutdownColor)
+        }else if (LightingMode == "Forced") {
+            col = hexToRgb(forcedColor)
+        }else{
+            col = device.color(iIdx, idx);
+        }           var iLedIdx = (iIdx*3) + 14;
         packet[iLedIdx] = col[0]; //0; //0xF7;
         packet[iLedIdx+1] = col[1]; //0;
         packet[iLedIdx+2] = col[2]; //255;
@@ -231,7 +253,13 @@ export function Render()
 
 export function Shutdown()
 {
-    
+    SendPacket(0,true);   
+    SendPacket(1,true);  
+    SendPacket(2,true);
+    SendPacket(3,true);    
+    SendPacket(4,true);   
+    SendPacket(5,true);          
+    Apply();
 }
 
 export function Validate(endpoint)

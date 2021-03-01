@@ -56,6 +56,22 @@ export function Size() { return [6,6]; }
 export function DefaultPosition(){return [50,100]}
 export function DefaultScale(){return 8.0}
 export function Type() { return "Hid"; }
+export function ControllableParameters(){
+    return [
+        {"property":"shutdownColor", "label":"Shutdown Color","type":"color","default":"009bde"},
+        {"property":"LightingMode", "label":"Lighting Mode", "type":"combobox", "values":["Canvas","Forced"], "default":"Canvas"},
+        {"property":"forcedColor", "label":"Forced Color","type":"color","default":"009bde"},
+    ];
+}
+function hexToRgb(hex) {
+    var result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+    var colors = [];
+    colors[0] = parseInt(result[1], 16);
+    colors[1] = parseInt(result[2], 16);
+    colors[2] = parseInt(result[3], 16);
+
+    return colors;
+  }
 
 
 var vLedNames = ["Dock"];
@@ -99,7 +115,7 @@ export function Initialize()
     
 }
 
-function SendPacket(){
+function SendPacket(shutdown = false){
 
 
     var packet = [];  
@@ -122,8 +138,14 @@ function SendPacket(){
 
         var iPxX = vLedPositions[iIdx][0];
         var iPxY = vLedPositions[iIdx][1];
-        var col = device.color(iPxX, iPxY);
-        
+        var col;
+        if(shutdown){
+            col = hexToRgb(shutdownColor)
+        }else if (LightingMode == "Forced") {
+            col = hexToRgb(forcedColor)
+        }else{
+            col = device.color(iPxX, iPxY);
+        }            
         var iLedIdx = (iIdx*3) + 14;
         packet[iLedIdx] = col[0];
         packet[iLedIdx+1] = col[1];
@@ -171,7 +193,12 @@ export function Render()
 
 export function Shutdown()
 {
-    
+    SendPacket(0,true);
+    SendPacket(1,true);
+    SendPacket(2,true);
+    SendPacket(3,true);
+    SendPacket(4,true);
+    SendPacket(5,true);
 }
 
 export function Validate(endpoint)

@@ -56,6 +56,22 @@ export function Size() { return [5,5]; }
 export function DefaultPosition(){return [50,100]}
 export function DefaultScale(){return 8.0}
 export function Type() { return "Hid"; }
+export function ControllableParameters(){
+    return [
+        {"property":"shutdownColor", "label":"Shutdown Color","type":"color","default":"009bde"},
+        {"property":"LightingMode", "label":"Lighting Mode", "type":"combobox", "values":["Canvas","Forced"], "default":"Canvas"},
+        {"property":"forcedColor", "label":"Forced Color","type":"color","default":"009bde"},
+    ];
+}
+function hexToRgb(hex) {
+    var result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+    var colors = [];
+    colors[0] = parseInt(result[1], 16);
+    colors[1] = parseInt(result[2], 16);
+    colors[2] = parseInt(result[3], 16);
+
+    return colors;
+  }
 
 
 var vLedNames = ["Base Station"];
@@ -165,7 +181,7 @@ export function Initialize()
 
 }
 
-function SendPacket()
+function SendPacket(shutdown = false)
 {
     var packet = [];     
     packet[0] = 0x00;  
@@ -185,8 +201,14 @@ function SendPacket()
 
         var iPxX = vLedPositions[iIdx][0];
         var iPxY = vLedPositions[iIdx][1];
-        var col = device.color(iPxX, iPxY);
-
+        var col;
+        if(shutdown){
+            col = hexToRgb(shutdownColor)
+        }else if (LightingMode == "Forced") {
+            col = hexToRgb(forcedColor)
+        }else{
+            col = device.color(iPxX, iPxY);
+        }    
         packet[vLedMapping[iIdx]*3+14] = col[0];
         packet[vLedMapping[iIdx]*3+15] = col[1];
         packet[vLedMapping[iIdx]*3+16] = col[2];
@@ -229,6 +251,9 @@ export function Render()
 
 export function Shutdown()
 {
+    SendPacket(true);
+
+
     var packet = [];
     packet[0] = 0x00;
     packet[1] = 0x00;
