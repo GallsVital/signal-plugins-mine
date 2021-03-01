@@ -34,9 +34,10 @@ export function LedPositions()
 export function Initialize()
 {
     device.set_endpoint(2, 0x0001, 0xff00); // System IF    
-    savedDpi1 = dpi1;
-    setDpi(dpi1);
-
+if(DpiControl) {
+        setDpi(dpi1);
+    
+}
 }
 
 
@@ -82,8 +83,7 @@ export function Render()
     sendZone(1);
     
 
-    if(savedDpi1 != dpi1){
-        savedDpi1 = dpi1;
+    if(savedDpi1 != dpi1 && DpiControl){
       setDpi(dpi1)
     }
 
@@ -101,6 +101,7 @@ export function Shutdown()
 function setDpi(dpi){
 
     device.set_endpoint(2, 0x0001, 0xff00); // System IF    
+    savedDpi1 = dpi1;
 
     var packet = [];
     packet[0] = 0x10;

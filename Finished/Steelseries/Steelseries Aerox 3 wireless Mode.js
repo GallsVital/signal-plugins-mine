@@ -1,6 +1,6 @@
 export function Name() { return "SteelSeries Aerox 3 Wireless Mode"; }
 export function VendorId() { return 0x1038; }
-export function ProductId() { return 0x1838; }
+export function ProductId() { return 0x0000;} //0x1838; }
 export function Publisher() { return "WhirlwindFX"; }
 export function Size() { return [3,3]; }
 export function DefaultPosition(){return [240,120]}
@@ -61,6 +61,7 @@ function SendColorPacket(shutdown = false) {
         packet[0x03] = zones[iIdx];
         var iPxX = vLedPositions[iIdx][0];
         var iPxY = vLedPositions[iIdx][1];
+
         var color;
         if(shutdown){
             color = hexToRgb(shutdownColor)
@@ -73,8 +74,10 @@ function SendColorPacket(shutdown = false) {
         packet[6] = color[2];
 
         device.write(packet, 65);
+        device.pause(2)
+
     }
-    device.pause(1)
+    device.pause(10)
 }
 
 export function Render() {

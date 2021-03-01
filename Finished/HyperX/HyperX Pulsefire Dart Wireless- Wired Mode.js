@@ -8,9 +8,10 @@ export function DefaultScale(){return 8.0}
 export function ControllableParameters(){
     return [
         {"property":"shutdownColor", "label":"Shutdown Color","type":"color","default":"009bde"},
+        {"property":"LightingMode", "label":"Lighting Mode", "type":"combobox", "values":["Canvas","Forced"], "default":"Canvas"},
+        {"property":"forcedColor", "label":"Forced Color","type":"color","default":"009bde"},
         {"property":"DpiControl", "label":"Enable Dpi Control","type":"boolean","default":"false"},
-
-        {"property":"dpi1", "label":"DPI", "type":"number","min":"200", "max":"16000","default":"800"},
+        {"property":"dpi1", "label":"DPI", "type":"number","min":"200", "max":"12400","default":"800"},
     ];
 }
 export function ConflictingProcesses() {
@@ -97,19 +98,21 @@ function sendColors(zoneId,shutdown = false){
     for(var iIdx = 0; iIdx < vLedPositions.length; iIdx++)
     {
 
-        var col;
         
         var iX = vLedPositions[zoneId/16][0];
         var iY = vLedPositions[zoneId/16][1];
     
-            if(shutdown){
-                col = hexToRgb(shutdownColor)
-            }else{
-                col = device.color(iX, iY);
-            }
-        packet[0x05+iIdx*3] = col[0];
-        packet[0x06+iIdx*3] = col[1];
-        packet[0x07+iIdx*3] = col[2];
+        var color;
+        if(shutdown){
+            color = hexToRgb(shutdownColor)
+        }else if (LightingMode == "Forced") {
+            color = hexToRgb(forcedColor)
+        }else{
+            color = device.color(iX, iY);
+        }
+        packet[0x05+iIdx*3] = color[0];
+        packet[0x06+iIdx*3] = color[1];
+        packet[0x07+iIdx*3] = color[2];
      }
      packet[11] = 0x64;
 

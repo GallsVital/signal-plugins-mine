@@ -8,6 +8,14 @@ export function DefaultScale(){return 8.0}
 export function ConflictingProcesses() {
     return ["NGenuity2.exe"];
 }
+export function ControllableParameters(){
+    return [
+        {"property":"shutdownColor", "label":"Shutdown Color","type":"color","default":"009bde"},
+        {"property":"LightingMode", "label":"Lighting Mode", "type":"combobox", "values":["Canvas","Forced"], "default":"Canvas"},
+        {"property":"forcedColor", "label":"Forced Color","type":"color","default":"009bde"},
+
+    ];
+}
 
 var vLedNames = [
     "Esc", "F1", "F2", "F3", "F4", "F5", "F6", "F7", "F8", "F9", "F10", "F11", "F12",         "Print Screen", "Scroll Lock", "Pause Break",   
@@ -84,7 +92,7 @@ function sendReportString(string, size){
 
 export function Shutdown()
 {
-
+    sendcolor(true);
 }
 
 export function Validate(endpoint)
@@ -97,48 +105,68 @@ function StartPacket(){
     sendReportString("00 04 F2",65)
 }
 
-export function Render() {
+function hexToRgb(hex) {
+    var result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+    var colors = [];
+    colors[0] = parseInt(result[1], 16);
+    colors[1] = parseInt(result[2], 16);
+    colors[2] = parseInt(result[3], 16);
+
+    return colors;
+  }
+  function sendcolor(shutdown = false){
     StartPacket();
 
 
-//get color data
-     var red = [168];
-     var green = [168];
-     var blue = [168];
- 
- 
-     for(var iIdx = 0; iIdx < vKeymap.length; iIdx++)
-     {
-         var iPxX = vLedPositions[iIdx][0];
-         var iPxY = vLedPositions[iIdx][1];
-         var mxPxColor = device.color(iPxX, iPxY);
-         red[vKeymap[iIdx]] = mxPxColor[0];
-         green[vKeymap[iIdx]] = mxPxColor[1];
-         blue[vKeymap[iIdx]] = mxPxColor[2];
-     }
-
-     var packet = []
-     packet[0x00]   = 0x00;
-
-    var TotalkeyCount = 145
-    var sentKeys = 0
-   while(TotalkeyCount > 0){
-
-       var keys = TotalkeyCount >= 16 ? 16 : TotalkeyCount
-
-     for(var idx = 0; idx < keys; idx++)
-    {
-        packet[(idx * 4) + 1] = 0x81;
-        packet[(idx * 4) + 2] = red[sentKeys]
-        packet[(idx * 4) + 3] = green[sentKeys]
-        packet[(idx * 4) + 4] = blue[sentKeys]
-        TotalkeyCount--;
-        sentKeys++;
-
-    }
-    device.send_report(packet,65)
-   }
-
+    //get color data
+         var red = [168];
+         var green = [168];
+         var blue = [168];
+     
+     
+         for(var iIdx = 0; iIdx < vKeymap.length; iIdx++)
+         {
+             var iPxX = vLedPositions[iIdx][0];
+             var iPxY = vLedPositions[iIdx][1];
+             var color;
+             if(shutdown){
+                 color = hexToRgb(shutdownColor)
+             }else if (LightingMode == "Forced") {
+                 color = hexToRgb(forcedColor)
+             }else{
+                 color = device.color(iPxX, iPxY);
+             }         
+             red[vKeymap[iIdx]] = color[0];
+             green[vKeymap[iIdx]] = color[1];
+             blue[vKeymap[iIdx]] = color[2];
+         }
+    
+         var packet = []
+         packet[0x00]   = 0x00;
+    
+        var TotalkeyCount = 145
+        var sentKeys = 0
+       while(TotalkeyCount > 0){
+    
+           var keys = TotalkeyCount >= 16 ? 16 : TotalkeyCount
+    
+         for(var idx = 0; idx < keys; idx++)
+        {
+            packet[(idx * 4) + 1] = 0x81;
+            packet[(idx * 4) + 2] = red[sentKeys]
+            packet[(idx * 4) + 3] = green[sentKeys]
+            packet[(idx * 4) + 4] = blue[sentKeys]
+            TotalkeyCount--;
+            sentKeys++;
+    
+        }
+        device.send_report(packet,65)
+       }
+    
+    
+  }
+export function Render() {
+ sendcolor();
 
 }
 

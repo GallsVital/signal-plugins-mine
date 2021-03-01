@@ -8,11 +8,13 @@ export function DefaultScale(){return 8.0}
 export function ControllableParameters(){
     return [
         {"property":"shutdownColor", "label":"Shutdown Color","type":"color","default":"009bde"},
+        {"property":"LightingMode", "label":"Lighting Mode", "type":"combobox", "values":["Canvas","Forced"], "default":"Canvas"},
+        {"property":"forcedColor", "label":"Forced Color","type":"color","default":"009bde"},
         {"property":"DpiControl", "label":"Enable Dpi Control","type":"boolean","default":"false"},
-
         {"property":"dpi1", "label":"DPI", "type":"number","min":"200", "max":"12400","default":"800"},
     ];
 }
+
 export function ConflictingProcesses() {
     return ["NGenuity2.exe"];
 }
@@ -80,20 +82,22 @@ function sendColors(shutdown = false){
     packet[0x00]   = 0x07;
     packet[0x01]   = 0x0A;
     
-    var col;
     var iX = vLedPositions[0][0];
     var iY = vLedPositions[0][1];
 
 
-        if(shutdown){
-            col = hexToRgb(shutdownColor)
-        }else{
-            col = device.color(iX, iY);
-        }
+    var color;
+    if(shutdown){
+        color = hexToRgb(shutdownColor)
+    }else if (LightingMode == "Forced") {
+        color = hexToRgb(forcedColor)
+    }else{
+        color = device.color(iX, iY);
+    }
 
-    packet[0x02]   = col[0];
-    packet[0x03] = col[1];
-    packet[0x04]   = col[2];
+    packet[0x02]   = color[0];
+    packet[0x03] = color[1];
+    packet[0x04]   = color[2];
     packet[0x08] = 0xFF;
     device.send_report(packet, 264);
     device.pause(1);

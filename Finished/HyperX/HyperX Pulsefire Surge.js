@@ -8,6 +8,8 @@ export function DefaultScale(){return 5.0}
 export function ControllableParameters(){
     return [
         {"property":"shutdownColor", "label":"Shutdown Color","type":"color","default":"009bde"},
+        {"property":"LightingMode", "label":"Lighting Mode", "type":"combobox", "values":["Canvas","Forced"], "default":"Canvas"},
+        {"property":"forcedColor", "label":"Forced Color","type":"color","default":"009bde"},
         {"property":"DpiControl", "label":"Enable Dpi Control","type":"boolean","default":"false"},
         {"property":"dpi1", "label":"DPI", "type":"number","min":"200", "max":"12400","default":"800"},
     ];
@@ -128,15 +130,19 @@ function sendColors(shutdown = false){
         {
             var iPxX = vLedPositions[iIdx][0];
             var iPxY = vLedPositions[iIdx][1];
+            var color;
             if(shutdown){
-                var mxPxColor = hexToRgb(shutdownColor)
+                color = hexToRgb(shutdownColor)
+            }else if (LightingMode == "Forced") {
+                color = hexToRgb(forcedColor)
             }else{
-               var  mxPxColor = device.color(iPxX, iPxY);
+                color = device.color(iPxX, iPxY);
             }
+        
 
-            red[vLed[iIdx]] = mxPxColor[0];
-            green[vLed[iIdx]] =  mxPxColor[1];
-            blue[vLed[iIdx]] =  mxPxColor[2];
+            red[vLed[iIdx]] = color[0];
+            green[vLed[iIdx]] =  color[1];
+            blue[vLed[iIdx]] =  color[2];
         }
 
 

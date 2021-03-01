@@ -59,9 +59,10 @@ export function Initialize() {
     // buf[0x05] = 0x00;
     // buf[0x06] = 0x85;
     // device.send_report(packet, 513);
-    savedDpi1 = dpi1;
-    setDpi(1,dpi1);
-}
+if(DpiControl) {
+        setDpi(1,dpi1);
+    
+}}
 
 export function LedNames()
 {
@@ -168,8 +169,7 @@ export function Render() {
     sendZoneIdPacket(i);
     //sendForthPacket(zones[i],); //Not needed?
     }
-    if(savedDpi1 != dpi1){
-        savedDpi1 = dpi1;
+    if(savedDpi1 != dpi1 && DpiControl){
         setDpi(1,dpi1)
     }
 
@@ -178,6 +178,8 @@ export function Render() {
 
 function setDpi(channel, dpi){
     var packet = [];
+    savedDpi1 = dpi1;
+
     packet[0] = 0x00;
     packet[1] = 0x15;
     packet[2] = channel;

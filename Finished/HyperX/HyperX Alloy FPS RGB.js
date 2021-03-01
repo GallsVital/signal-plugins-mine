@@ -8,6 +8,9 @@ export function DefaultScale(){return 8.0}
 export function ControllableParameters(){
     return [
         {"property":"shutdownColor", "label":"Shutdown Color","type":"color","default":"009bde"},
+        {"property":"LightingMode", "label":"Lighting Mode", "type":"combobox", "values":["Canvas","Forced"], "default":"Canvas"},
+        {"property":"forcedColor", "label":"Forced Color","type":"color","default":"009bde"},
+
     ];
 }
 export function ConflictingProcesses() {
@@ -117,15 +120,18 @@ for(var iIdx = 0; iIdx < vKeymap.length; iIdx++)
 {
     var iPxX = vLedPositions[iIdx][0];
     var iPxY = vLedPositions[iIdx][1];
+    var color;
     if(shutdown){
-       var mxPxColor = hexToRgb(shutdownColor)
-   }else{
-       var mxPxColor = device.color(iPxX, iPxY);
-   }
+        color = hexToRgb(shutdownColor)
+    }else if (LightingMode == "Forced") {
+        color = hexToRgb(forcedColor)
+    }else{
+        color = device.color(iPxX, iPxY);
+    }
 
-    red[vKeymap[iIdx]] = mxPxColor[0];
-    green[vKeymap[iIdx]] = mxPxColor[1];
-    blue[vKeymap[iIdx]] = mxPxColor[2];
+    red[vKeymap[iIdx]] = color[0];
+    green[vKeymap[iIdx]] = color[1];
+    blue[vKeymap[iIdx]] = color[2];
 }
 
 
