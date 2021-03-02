@@ -65,7 +65,17 @@ export function ControllableParameters(){
         {"property":"dpi1", "label":"DPI", "type":"number","min":"200", "max":"12400","default":"800"},
     ];
 }
+var savedDpi1;
 
+function hexToRgb(hex) {
+    var result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+    var colors = [];
+    colors[0] = parseInt(result[1], 16);
+    colors[1] = parseInt(result[2], 16);
+    colors[2] = parseInt(result[3], 16);
+
+    return colors;
+  }
 var vLedNames = ["Mouse"];
 var vLedPositions = [[5,5] ];
 
@@ -100,11 +110,33 @@ function ReturnToHardwareControl()
 {
 
 }
+function setDPIRazer(dpi){
+    savedDpi1 = dpi;
+    var packet = [];
+    packet[0] = 0x00;
+    packet[1] = 0x00;
+    packet[2] = 0x1F;
+    packet[3] = 0x00;
+    packet[4] = 0x00;
+    packet[5] = 0x00; 
+    packet[6] = 0x07;
+    packet[7] = 0x04;
+    packet[8] = 0x05;
+    packet[9] = 0x00;
+    packet[10] = Math.floor(dpi/256);
+    packet[11] = dpi%256;
+    packet[12] = Math.floor(dpi/256);
+    packet[13] = dpi%256;
+    packet[89] = CalculateCrc(packet);
 
+    device.send_report(packet, 91);
+}
 
 export function Initialize()
 {
-    
+    if(DpiControl) {
+        setDPIRazer(dpi1);
+    }
 }
 
 function SendPacket(shutdown = false){
@@ -123,7 +155,6 @@ function SendPacket(shutdown = false){
 
 
 
-    
        for(var iIdx = 0; iIdx < vLedPositions.length; iIdx++){
 
         var iPxX = vLedPositions[iIdx][0];
@@ -173,6 +204,10 @@ function Apply()
 export function Render()
 {    
     SendPacket();
+    if(DpiControl) {
+        setDPIRazer(dpi1);
+    
+}
 }
 
 
