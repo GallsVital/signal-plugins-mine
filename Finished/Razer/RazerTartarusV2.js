@@ -149,6 +149,7 @@ function SendPacket(idx,shutdown = false)
     packet[89] = CalculateCrc(packet);
 
     device.send_report(packet, 91);
+    device.pause(1)
 }
 
 

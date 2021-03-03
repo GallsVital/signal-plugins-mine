@@ -52,7 +52,7 @@ export function Name() { return "Razer Cynosa Chroma"; }
 export function VendorId() { return 0x1532; }
 export function ProductId() { return 0x022a; }
 export function Publisher() { return "WhirlwindFX"; }
-export function Size() { return [22, 6]; }
+export function Size() { return [22, 7]; }
 export function DefaultPosition() {return [75,70]; }
 export function DefaultScale(){return 8.0}
 export function Type() { return "Hid"; }
@@ -130,15 +130,20 @@ function SendPacket(idx,shutdown = false)
     packet[13] = 0x15;
 
     
-    for(var iIdx = 0; iIdx < 22; iIdx++){
+    for(var iIdx = 0; iIdx < 24; iIdx++){
         var col;
         if(shutdown){
             col = hexToRgb(shutdownColor)
         }else if (LightingMode == "Forced") {
             col = hexToRgb(forcedColor)
         }else{
+            if(iIdx == 20 && idx == 0){
+                col = device.color(12, 6);
+            }else{
             col = device.color(iIdx, idx);
-        }            var iLedIdx = (iIdx*3) + 14;
+            }
+        }            
+        var iLedIdx = (iIdx*3) + 14;
         packet[iLedIdx] = col[0];
         packet[iLedIdx+1] = col[1];
         packet[iLedIdx+2] = col[2];

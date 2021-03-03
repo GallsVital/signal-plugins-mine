@@ -48,7 +48,7 @@ function CalculateCrc(report)
 }
 
 
-export function Name() { return "Razer Base Station Chroma White"; }
+export function Name() { return "Razer Base Station Chroma"; }
 export function VendorId() { return 0x1532; }
 export function ProductId() { return 0x0f08; }
 export function Publisher() { return "WhirlwindFX"; }
@@ -116,7 +116,23 @@ function ReturnToHardwareControl()
 
 export function Initialize()
 {
-    
+    var packet = [];
+    packet[0] = 0x00;
+    packet[1] = 0x00;
+    packet[2] = 0x1F;
+    packet[3] = 0x00;
+    packet[4] = 0x00; 
+    packet[5] = 0x00;
+    packet[6] = 0x06;
+    packet[7] = 0x0F;
+    packet[8] = 0x02;
+    packet[9] = 0x00;
+    packet[10] = 0x00;
+    packet[11] = 0x08;
+    packet[12] = 0x00;
+    packet[13] = 0x00;
+    packet[89] = CalculateCrc(packet);
+    device.send_report(packet, 91);
 }
 
 function SendPacket(shutdown = false)

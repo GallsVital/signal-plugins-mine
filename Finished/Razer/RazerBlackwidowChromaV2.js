@@ -111,7 +111,23 @@ function ReturnToHardwareControl()
 
 export function Initialize()
 {
-    
+    var packet = [];
+    packet[0] = 0x00;
+    packet[1] = 0x00;
+    packet[2] = 0x1F;
+    packet[3] = 0x00;
+    packet[4] = 0x00; 
+    packet[5] = 0x00;
+    packet[6] = 0x06;
+    packet[7] = 0x0F;
+    packet[8] = 0x02;
+    packet[9] = 0x00;
+    packet[10] = 0x00;
+    packet[11] = 0x08;
+    packet[12] = 0x00;
+    packet[13] = 0x00;
+    packet[89] = CalculateCrc(packet);
+    device.send_report(packet, 91);
 }
 
 function SendPacket(idx,shutdown = false)
@@ -142,8 +158,12 @@ function SendPacket(idx,shutdown = false)
         }else if (LightingMode == "Forced") {
             col = hexToRgb(forcedColor)
         }else{
+            if(iIdx == 20 && idx == 0){
+                col = device.color(12, 6);
+            }else{
             col = device.color(iIdx, idx);
-        }            var iLedIdx = (iIdx*3) + 13;
+            }        }            
+        var iLedIdx = (iIdx*3) + 13;
         packet[iLedIdx] = col[0];
         packet[iLedIdx+1] = col[1];
         packet[iLedIdx+2] = col[2];

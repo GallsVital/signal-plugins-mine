@@ -52,7 +52,7 @@ export function Name() { return "Razer Huntsman Elite"; }
 export function VendorId() { return 0x1532; }
 export function ProductId() { return 0x0226; }
 export function Publisher() { return "WhirlwindFX"; }
-export function Size() { return [22, 6]; }
+export function Size() { return [23, 9]; }
 export function Type() { return "Hid"; }
 export function DefaultPosition() {return [75,70]; }
 export function DefaultScale(){return 8.0}
@@ -86,6 +86,8 @@ export function LedPositions()
   return vLedPositions;
 }
 
+
+
 function EnableSoftwareControl()
 {    
     var report = GetReport(0x0F, 0x03, 0x47);
@@ -114,6 +116,70 @@ export function Initialize()
     
 }
 
+let LightbarMap = [
+    //top
+ [0,0],[1,0],[2,0],[3,0],[4,0],[6,0],[7,0],[8,0],[10,0],[11,0],[13,0],[14,0],[15,0],[17,0],[18,0],[21,0], 
+ //right side
+ [22,2],[22,3],[22,4],
+//left
+[0,2],[0,3],[0,4],
+//bottom
+[0,6],[1,6],[2,6],[3,6],[4,6],[6,6],[7,6],[8,6],[10,6],[11,6],[13,6],[14,6],[15,6],[17,6],[18,6],[21,6], 
+
+//bottom left
+[0,6],[0,7],
+//bottom
+[0,8],[1,8],[2,8],[3,8],[4,8],[5,8],[6,8],[7,8],[8,8],[9,8],[10,8],[11,8],[12,8],[14,8],[15,8],[17,8], 
+
+[18,8],[20,8], [21,8],[22,8], 
+
+];
+
+function sendLightbar(idx,shutdown = false){
+    var packet = [];
+    packet[0] = 0x00;
+    packet[1] = 0x00;
+    packet[2] = 0x3F;
+    packet[3] = 0x00;
+    packet[4] = 0x00;
+    packet[5] = 0x00;
+    packet[6] = 0x4A;
+    packet[7] = 0x0F;
+    packet[8] = 0x03;
+    packet[11] = idx+6;
+    packet[13] = 0x16;
+    let count;
+    if(idx === 2){
+         count = 20;
+    }else{
+         count = 19;
+    }
+
+    for(var iIdx = 0; iIdx < count; iIdx++){
+        var col;
+        if(shutdown){
+            col = hexToRgb(shutdownColor)
+        }else if (LightingMode == "Forced") {
+            col = hexToRgb(forcedColor)
+        }else{
+            let position = LightbarMap[iIdx + idx*20];
+            col = device.color(position[0], position[1]);
+        }    
+           
+        var iLedIdx = (iIdx*3) + 14;
+        packet[iLedIdx] = col[0];
+        packet[iLedIdx+1] = col[1];
+        packet[iLedIdx+2] = col[2];
+
+    }
+
+    packet[89] = CalculateCrc(packet);
+
+    device.send_report(packet, 91);
+    device.pause(1); // We need a pause here (between packets), otherwise the ornata can't keep up.
+
+}
+
 function SendPacket(idx,shutdown = false)
 {
     var packet = [];
@@ -131,12 +197,14 @@ function SendPacket(idx,shutdown = false)
 
     
     for(var iIdx = 0; iIdx < 24; iIdx++){
+
         var col;
         if(shutdown){
             col = hexToRgb(shutdownColor)
         }else if (LightingMode == "Forced") {
             col = hexToRgb(forcedColor)
         }else{
+            
             col = device.color(iIdx, idx);
         }    
            
@@ -182,9 +250,11 @@ export function Render()
     SendPacket(3);
     SendPacket(4);
     SendPacket(5);
-    SendPacket(6); 
-    SendPacket(7); 
-    SendPacket(8);     
+
+    sendLightbar(0);
+    sendLightbar(1);
+    sendLightbar(2);
+ 
     Apply();
 
 }

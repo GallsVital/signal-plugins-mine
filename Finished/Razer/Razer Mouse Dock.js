@@ -112,7 +112,82 @@ function ReturnToHardwareControl()
 
 export function Initialize()
 {
-    
+    var packet = [];
+    packet[0] = 0x00;
+    packet[1] = 0x00;
+    packet[2] = 0x1F;
+    packet[3] = 0x00;
+    packet[4] = 0x00; 
+    packet[5] = 0x00;
+    packet[6] = 0x02;
+    packet[7] = 0x00;
+    packet[8] = 0x84;
+    packet[9] = 0x00;
+    packet[10] = 0x00;
+    packet[89] = CalculateCrc(packet);
+    //device.send_report(packet, 91);
+
+    var packet = [];
+    packet[0] = 0x00;
+    packet[1] = 0x00;
+    packet[2] = 0x1F;
+    packet[3] = 0x00;
+    packet[4] = 0x00; 
+    packet[5] = 0x00;
+    packet[6] = 0x02;
+    packet[7] = 0x00;
+    packet[8] = 0x04;
+    packet[9] = 0x03;
+    packet[10] = 0x00;
+    packet[89] = CalculateCrc(packet);
+    ////device.send_report(packet, 91);
+
+
+    packet[0] = 0x00;
+    packet[1] = 0x00;
+    packet[2] = 0x08;
+    packet[3] = 0x00;
+    packet[4] = 0x00; 
+    packet[5] = 0x00;
+    packet[6] = 0x02;
+    packet[7] = 0x00;
+    packet[8] = 0x86;
+    packet[9] = 0x00;
+    packet[10] = 0x00;
+    packet[89] = CalculateCrc(packet);
+    //device.send_report(packet, 91);
+
+
+    var packet = [];
+    packet[0] = 0x00;
+    packet[1] = 0x00;
+    packet[2] = 0x1F;
+    packet[3] = 0x00;
+    packet[4] = 0x00; 
+    packet[5] = 0x00;
+    packet[6] = 0x06;
+    packet[7] = 0x0f;
+    packet[8] = 0x02;
+    packet[9] = 0x00;
+    packet[10] = 0x00;
+    packet[11] = 0x08;
+    packet[89] = CalculateCrc(packet);
+    ////device.send_report(packet, 91);
+
+    var packet = [];
+    packet[0] = 0x00;
+    packet[1] = 0x00;
+    packet[2] = 0x1F;
+    packet[3] = 0x00;
+    packet[4] = 0x00; 
+    packet[5] = 0x00;
+    packet[6] = 0x08;
+    packet[7] = 0x0f;
+    packet[8] = 0x03;
+    packet[9] = 0x00;
+    packet[10] = 0x00;
+    packet[89] = CalculateCrc(packet);
+    //device.send_report(packet, 91);
 }
 
 function SendPacket(shutdown = false){
@@ -121,16 +196,16 @@ function SendPacket(shutdown = false){
     var packet = [];  
     packet[0] = 0x00;
     packet[1] = 0x00;
-    packet[2] = 0x3F;
+    packet[2] = 0x1F;
     packet[3] = 0x00;
     packet[4] = 0x00;
     packet[5] = 0x00;
-    packet[6] = 0x4A;
+    packet[6] = 0x08;
     packet[7] = 0x0F;
     packet[8] = 0x03;
     packet[9] = 0x00;
     packet[10] = 0x00;
-    packet[11] = 0x15;
+    //packet[11] = 0x15;
  
 
     
@@ -182,23 +257,15 @@ function Apply()
 
 export function Render()
 {    
-    SendPacket(0);
-    SendPacket(1);
-    SendPacket(2);
-    SendPacket(3);
-    SendPacket(4);
-    SendPacket(5);
+    SendPacket();
+ 
 }
 
 
 export function Shutdown()
 {
-    SendPacket(0,true);
-    SendPacket(1,true);
-    SendPacket(2,true);
-    SendPacket(3,true);
-    SendPacket(4,true);
-    SendPacket(5,true);
+    SendPacket(true);
+
 }
 
 export function Validate(endpoint)

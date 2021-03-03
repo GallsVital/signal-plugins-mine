@@ -52,9 +52,9 @@ export function Name() { return "Razer Basilisk Ultimate"; }
 export function VendorId() { return 0x1532; }
 export function ProductId() { return 0x0088; }
 export function Publisher() { return "WhirlwindFX"; }
-export function Size() { return [10,22]; }
+export function Size() { return [7,13]; }
 export function Type() { return "Hid"; }
-export function DefaultPosition(){return [240,120]}
+export function DefaultPosition(){return [220,80]}
 export function DefaultScale(){return 8.0}
 export function ControllableParameters(){
     return [
@@ -74,7 +74,8 @@ function hexToRgb(hex) {
   }
 
 var vLedNames = ["ScrollWheel", "Logo", "SideBar1","SideBar2","SideBar3","SideBar4","SideBar5","SideBar6","SideBar7","SideBar8","SideBar9","SideBar10","SideBar11","SideBar12"];
-var vLedPositions = [[0,5], [7,5],[2,2],[3,2],[4,2],[5,2],[6,2],[7,2],[8,2],[9,2],[9,2],[9,2],[9,2]];
+var vLedPositions = [[3,0], [3,11],
+[0,1],[0,2],[0,3],[0,4],[0,5],[0,6],[0,7],[0,8],[0,9],[0,10],[0,11]];
 
 export function LedNames()
 {
