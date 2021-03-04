@@ -123,6 +123,7 @@ function sendColors(shutdown = false){
         }else{
             col = device.color(iPxX, iPxY);
         }
+        
         red[iIdx] = col[0];
         green[iIdx] = col[1];
         blue[iIdx] = col[2];

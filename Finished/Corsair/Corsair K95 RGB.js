@@ -156,7 +156,8 @@ function sendColors(shutdown = false){
             mxPxColor = hexToRgb(forcedColor)
         }else{
             mxPxColor = device.color(iPxX, iPxY);
-        }          red[vKeys[iIdx]] = mxPxColor[0];
+        }          
+        red[vKeys[iIdx]] = mxPxColor[0];
         green[vKeys[iIdx]] = mxPxColor[1];
         blue[vKeys[iIdx]] = mxPxColor[2];
     }
