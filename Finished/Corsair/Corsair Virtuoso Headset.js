@@ -17,7 +17,12 @@ export function Publisher() { return "WhirlwindFX"; }
 export function Size() { return [3, 3]; }
 export function DefaultPosition(){return [240,120]}
 export function DefaultScale(){return 8.0}
-
+export function ControllableParameters(){
+    return [
+        {"property":"micLedControl", "label":"Enable Mic Led","type":"boolean","default":"false"},
+        {"property":"frameRate", "label":"Frame Rate", "type":"number","min":"1", "max":"10","default":"5"},
+    ];
+}
 var vLedNames = ["Left Cans","Right Can","Mic"];
 
 var vLedPositions = [
@@ -84,7 +89,13 @@ var blue = new Array(3).fill(0)
     {
         var iX = vLedPositions[zone_idx][0];
         var iY = vLedPositions[zone_idx][1];
-        var col = device.color(iX,iY);
+var col;
+if(zone_idx = 2 && !micLedControl) {
+     col = [0,80,0];
+}else{
+     col = device.color(iX,iY);
+
+}
         red[zone_idx] = col[0];
         green[zone_idx] = col[1];
         blue[zone_idx] = col[2];
@@ -94,7 +105,7 @@ var blue = new Array(3).fill(0)
     packet = packet.concat(blue);
 
     device.write(packet, 64);
-    device.pause(200);
+    device.pause(1000/frameRate);
 }
 
 export function Validate(endpoint)

@@ -48,11 +48,11 @@ function CalculateCrc(report)
 }
 
 
-export function Name() { return "Razer Blackwidow V3 Pro"; }
+export function Name() { return "Razer Blackwidow V3 TKL"; }
 export function VendorId() { return 0x1532; }
-export function ProductId() { return 0x025A; }
+export function ProductId() { return 0x0A24; }
 export function Publisher() { return "WhirlwindFX"; }
-export function Size() { return [22,10]; }
+export function Size() { return [19,6]; }
 export function Type() { return "Hid"; }
 export function DefaultPosition() {return [75,70]; }
 export function DefaultScale(){return 8.0}
@@ -139,14 +139,14 @@ function SendPacket(idx,shutdown = false)
     packet[3] = 0x00;
     packet[4] = 0x00;
     packet[5] = 0x00;
-    packet[6] = 0x47;
+    packet[6] = 0x3B;
     packet[7] = 0x0F;
     packet[8] = 0x03;
     packet[11] = idx;
-    packet[13] = 0x15;
+    packet[13] = 0x11;
 
     
-    for(var iIdx = 0; iIdx < 22; iIdx++){
+    for(var iIdx = 0; iIdx < 18; iIdx++){
         var col;
         if(shutdown){
             col = hexToRgb(shutdownColor)

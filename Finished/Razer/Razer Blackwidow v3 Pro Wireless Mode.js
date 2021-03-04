@@ -48,9 +48,9 @@ function CalculateCrc(report)
 }
 
 
-export function Name() { return "Razer Blackwidow V3 Pro"; }
+export function Name() { return "Razer Blackwidow V3 Pro Wireless Mode"; }
 export function VendorId() { return 0x1532; }
-export function ProductId() { return 0x025A; }
+export function ProductId() { return 0x025C; }
 export function Publisher() { return "WhirlwindFX"; }
 export function Size() { return [22,10]; }
 export function Type() { return "Hid"; }
@@ -114,7 +114,7 @@ export function Initialize()
     var packet = [];
     packet[0] = 0x00;
     packet[1] = 0x00;
-    packet[2] = 0x1F;
+    packet[2] = 0x9F;
     packet[3] = 0x00;
     packet[4] = 0x00; 
     packet[5] = 0x00;
@@ -124,8 +124,8 @@ export function Initialize()
     packet[9] = 0x00;
     packet[10] = 0x00;
     packet[11] = 0x08;
-    packet[12] = 0x01;
-    packet[13] = 0x01;
+    packet[12] = 0x00;
+    packet[13] = 0x00;
     packet[89] = CalculateCrc(packet);
     device.send_report(packet, 91);
 }
@@ -135,7 +135,7 @@ function SendPacket(idx,shutdown = false)
     var packet = [];
     packet[0] = 0x00;
     packet[1] = 0x00;
-    packet[2] = 0x1F;
+    packet[2] = 0x9F;
     packet[3] = 0x00;
     packet[4] = 0x00;
     packet[5] = 0x00;
@@ -145,7 +145,7 @@ function SendPacket(idx,shutdown = false)
     packet[11] = idx;
     packet[13] = 0x15;
 
-    
+     
     for(var iIdx = 0; iIdx < 22; iIdx++){
         var col;
         if(shutdown){
