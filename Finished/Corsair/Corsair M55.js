@@ -9,12 +9,24 @@ export function Publisher() { return "WhirlwindFX"; }
 export function Size() { return [3, 3]; }
 export function DefaultPosition(){return [240,120]; }
 export function DefaultScale(){return 8.0; }
-export function ControllableParameters(){
+export function ControllableParameters(){
     return [
         {"property":"shutdownColor", "label":"Shutdown Color","type":"color","default":"009bde"},
+        {"property":"LightingMode", "label":"Lighting Mode", "type":"combobox", "values":["Canvas","Forced"], "default":"Canvas"},
+        {"property":"forcedColor", "label":"Forced Color","type":"color","default":"009bde"},
+        {"property":"DpiControl", "label":"Enable Dpi Control","type":"boolean","default":"false"},
         {"property":"dpi1", "label":"DPI", "type":"number","min":"200", "max":"12400","default":"800"},
     ];
 }
+function hexToRgb(hex) {
+    var result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+    var colors = [];
+    colors[0] = parseInt(result[1], 16);
+    colors[1] = parseInt(result[2], 16);
+    colors[2] = parseInt(result[3], 16);
+
+    return colors;
+  }
 var savedDpi1;
 var vLedNames = ["DPI Zone", "Logo Zone"];
 var vLedPositions = [[1,0],[1,1]];
@@ -81,8 +93,7 @@ function sendColors(shutdown = false){
     packet[0x07]   = 0x00;
     
     
-    var col;
-    var col2;
+
 
         //Dpi Zone
         var iX = vLedPositions[0][0];
@@ -91,13 +102,21 @@ function sendColors(shutdown = false){
         var iX2 = vLedPositions[1][0];
         var iY2 = vLedPositions[1][1];
 
+        var col;
+        var col2;
         if(shutdown){
             col = hexToRgb(shutdownColor)
             col2 = hexToRgb(shutdownColor)
+
+        }else if (LightingMode == "Forced") {
+            col = hexToRgb(forcedColor)
+            col2 = hexToRgb(forcedColor)
+
         }else{
-            col = device.color(iX, iY);
-            col2 = device.color(iX2,iY2);
-        }
+            col = device.color(iPxX, iPxY);
+            col2 = device.color(iPxX, iPxY);
+
+        }  
     packet[0x08]   = col[0];
     packet[0x09] = col2[0];
     packet[10]   = col[1];

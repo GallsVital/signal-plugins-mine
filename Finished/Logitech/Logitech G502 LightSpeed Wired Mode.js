@@ -67,10 +67,7 @@ function setDpi(dpi){
 
 
 }
-function Apply()
-{
 
-}
 function sendZone(zone, shutdown = false){
     var packet = [];
     packet[0x00] = 0x11;

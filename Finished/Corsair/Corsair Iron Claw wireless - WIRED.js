@@ -17,14 +17,24 @@ export function Publisher() { return "WhirlwindFX"; }
 export function Size() { return [5, 3]; }
 export function DefaultPosition(){return [240,120]}
 export function DefaultScale(){return 8.0}
-export function ControllableParameters(){
+export function ControllableParameters(){
     return [
         {"property":"shutdownColor", "label":"Shutdown Color","type":"color","default":"009bde"},
+        {"property":"LightingMode", "label":"Lighting Mode", "type":"combobox", "values":["Canvas","Forced"], "default":"Canvas"},
+        {"property":"forcedColor", "label":"Forced Color","type":"color","default":"009bde"},
         {"property":"DpiControl", "label":"Enable Dpi Control","type":"boolean","default":"false"},
-
-        {"property":"dpi1", "label":"DPI", "type":"number","min":"100", "max":"18000","default":"800"},
+        {"property":"dpi1", "label":"DPI", "type":"number","min":"200", "max":"12400","default":"800"},
     ];
 }
+function hexToRgb(hex) {
+    var result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+    var colors = [];
+    colors[0] = parseInt(result[1], 16);
+    colors[1] = parseInt(result[2], 16);
+    colors[2] = parseInt(result[3], 16);
+
+    return colors;
+  }
 var savedDpi1;
 var vLedNames = ["Logo","Scroll Zone","Front Zone","Dpi Zone Low","Dpi Zone Mid","Dpi Zone High"];
 
@@ -85,11 +95,13 @@ var blue = [];
         var iX = vLedPositions[zone_idx][0];
         var iY = vLedPositions[zone_idx][1];
         var col;
-        if(shutdown){
-            col = hexToRgb(shutdownColor)
-        }else{
-            col = device.color(iX, iY);
-        }
+    if(shutdown){
+        col = hexToRgb(shutdownColor)
+    }else if (LightingMode == "Forced") {
+        col = hexToRgb(forcedColor)
+    }else{
+        col = device.color(iX, iY);
+    }   
         red[zone_idx] = col[0];
         green[zone_idx] = col[1];
         blue[zone_idx] = col[2];

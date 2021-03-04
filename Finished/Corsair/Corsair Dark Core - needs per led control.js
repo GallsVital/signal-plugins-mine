@@ -17,6 +17,25 @@ export function Publisher() { return "WhirlwindFX"; }
 export function Size() { return [3, 3]; }
 export function DefaultPosition(){return [240,120]}
 export function DefaultScale(){return 8.0}
+export function ControllableParameters(){
+    return [
+        {"property":"shutdownColor", "label":"Shutdown Color","type":"color","default":"009bde"},
+        {"property":"LightingMode", "label":"Lighting Mode", "type":"combobox", "values":["Canvas","Forced"], "default":"Canvas"},
+        {"property":"forcedColor", "label":"Forced Color","type":"color","default":"009bde"},
+        {"property":"DpiControl", "label":"Enable Dpi Control","type":"boolean","default":"false"},
+        {"property":"dpi1", "label":"DPI", "type":"number","min":"200", "max":"12400","default":"800"},
+    ];
+}
+function hexToRgb(hex) {
+    var result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+    var colors = [];
+    colors[0] = parseInt(result[1], 16);
+    colors[1] = parseInt(result[2], 16);
+    colors[2] = parseInt(result[3], 16);
+
+    return colors;
+  }
+
 var vLedNames = ["Front Zone","Logo Zone"];
 
 var vLedPositions = [[1,0],[1,2]
@@ -69,7 +88,11 @@ export function Initialize()
 
 
 export function Render()
-{
+{ 
+    sendColors();
+}
+function sendColors(shutdown = false){
+
         var zones = [0,1,2,3,7];
     
         var packet = []
@@ -89,7 +112,16 @@ export function Render()
         {
             var iX = vLedPositions[zone_idx][0];
             var iY = vLedPositions[zone_idx][1];
-            var col = device.color(iX,iY);
+            var col;
+            if(shutdown){
+                col = hexToRgb(shutdownColor)
+            }else if (LightingMode == "Forced") {
+                col = hexToRgb(forcedColor)
+            }else{
+                col = device.color(iX, iY);
+            }
+            
+                         
             if(zone_idx == 0){
                 packet[0x09]   = 0x64;
             }

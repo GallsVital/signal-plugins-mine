@@ -84,7 +84,7 @@ export function Shutdown()
 
 export function Validate(endpoint)
 {
-    return endpoint.interface === 2//  && endpoint.usage === 0x0006// && endpoint.usage_page == 0xff00;
+    return endpoint.interface === 2
 }
 function sendColors(zoneId,shutdown = false){
     

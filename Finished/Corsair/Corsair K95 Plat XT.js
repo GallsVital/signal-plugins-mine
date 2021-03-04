@@ -5,7 +5,23 @@ export function Publisher() { return "WhirlwindFX"; }
 export function Size() { return [24, 8]; }
 export function DefaultPosition() {return [75,70]; }
 export function DefaultScale() {return 8.0; }
+export function ControllableParameters(){
+    return [
+        {"property":"shutdownColor", "label":"Shutdown Color","type":"color","default":"009bde"},
+        {"property":"LightingMode", "label":"Lighting Mode", "type":"combobox", "values":["Canvas","Forced"], "default":"Canvas"},
+        {"property":"forcedColor", "label":"Forced Color","type":"color","default":"009bde"},
 
+    ];
+}
+function hexToRgb(hex) {
+    var result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+    var colors = [];
+    colors[0] = parseInt(result[1], 16);
+    colors[1] = parseInt(result[2], 16);
+    colors[2] = parseInt(result[3], 16);
+
+    return colors;
+  }
 
 var CORSAIR_COMMAND_WRITE       = 0x07;
 var CORSAIR_COMMAND_READ        = 0x0E;
@@ -174,7 +190,11 @@ function StreamPacket(data){
     device.write(packet, 65);
 }
 export function Render()
-{
+{       
+    sendColors();
+}
+function sendColors(shutdown = false){
+
     var red =  new Array(228).fill(0);
     var green =  new Array(228).fill(0);
     var blue =  new Array(228).fill(0);
@@ -185,17 +205,22 @@ export function Render()
     {
         var iPxX = vKeyPositions[iIdx][0];
         var iPxY = vKeyPositions[iIdx][1];
-        var mxPxColor = device.color(iPxX, iPxY);
-        red[vKeys[iIdx]] = mxPxColor[0];
+        var col;
+        if(shutdown){
+            col = hexToRgb(shutdownColor)
+        }else if (LightingMode == "Forced") {
+            col = hexToRgb(forcedColor)
+        }else{
+            col = device.color(iPxX, iPxY);
+        }           
+        red[vKeys[iIdx]] = col[0];
 
-
-        //Why these shift over around key count 115, i have no idea...
         if(vKeys[iIdx] < 115) {
-            green[vKeys[iIdx]] =  mxPxColor[1];
-            blue[vKeys[iIdx]] = mxPxColor[2];
+            green[vKeys[iIdx]] =  col[1];
+            blue[vKeys[iIdx]] = col[2];
         } else {
-            green[vKeys[iIdx]-1] = mxPxColor[1];
-            blue[vKeys[iIdx]-1] = mxPxColor[2];
+            green[vKeys[iIdx]-1] = col[1];
+            blue[vKeys[iIdx]-1] = col[2];
         }
         
     }

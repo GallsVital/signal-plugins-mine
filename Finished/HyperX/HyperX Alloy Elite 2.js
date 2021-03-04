@@ -68,16 +68,7 @@ export function LedPositions()
 {
     return vLedPositions;
 }
-function sendPacketString(string, size){
-    var packet= [];
-    var data = string.split(' ');
-    
-    for(let i = 0; i < data.length; i++){
-        packet[parseInt(i,16)] = parseInt(data[i],16)//.toString(16)
-    }
 
-    device.write(packet, size);
-}
 
 function sendReportString(string, size){
     var packet= [];

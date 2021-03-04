@@ -3,7 +3,23 @@ export function VendorId() { return 0x1b1c; }
 export function ProductId() { return 0x1D04; }
 export function Publisher() { return "WhirlwindFX"; }
 export function Size() { return [128, 16]; }
+export function ControllableParameters(){
+    return [
+        {"property":"shutdownColor", "label":"Shutdown Color","type":"color","default":"009bde"},
+        {"property":"LightingMode", "label":"Lighting Mode", "type":"combobox", "values":["Canvas","Forced"], "default":"Canvas"},
+        {"property":"forcedColor", "label":"Forced Color","type":"color","default":"009bde"},
 
+    ];
+}
+function hexToRgb(hex) {
+    var result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+    var colors = [];
+    colors[0] = parseInt(result[1], 16);
+    colors[1] = parseInt(result[2], 16);
+    colors[2] = parseInt(result[3], 16);
+
+    return colors;
+  }
 
 var CORSAIR_COMMAND_WRITE       = 0x07;
 var CORSAIR_COMMAND_READ        = 0x0E;

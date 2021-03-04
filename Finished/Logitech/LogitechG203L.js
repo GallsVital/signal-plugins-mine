@@ -69,7 +69,6 @@ function Apply()
 
     device.write(packet, 20);  
     device.pause(30);  
-    //device.read(packet,20);
 }
 function sendColor(shutdown = false){
     device.set_endpoint(1, 0x0002, 0xff00); // Lighting IF    

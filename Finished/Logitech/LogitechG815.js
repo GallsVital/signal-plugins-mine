@@ -67,7 +67,6 @@ export function LedPositions()
 
 export function Initialize()
 {
-    // Media and G-Keys - set to white.   
     NewPacket(104,4);    
     NewPacket(108,4);    
     NewPacket(112,2);

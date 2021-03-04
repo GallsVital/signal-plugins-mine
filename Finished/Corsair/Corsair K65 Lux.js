@@ -5,13 +5,26 @@ export function Publisher() { return "WhirlwindFX"; }
 export function Size() { return [21, 7]; }
 export function DefaultPosition() {return [75,70]; }
 export function DefaultScale(){return 8.0}
-export function ControllableParameters(){
+
+export function ControllableParameters(){
     return [
-
-    {"property":"endpointUsed", "label":"Endpoint Selection", "type":"combobox", "values":["Endpoint 1","Endpoint 2",], "default":"Endpoint 1"},
-
+        {"property":"endpointUsed", "label":"Endpoint Selection", "type":"combobox", "values":["Endpoint 1","Endpoint 2",], "default":"Endpoint 1"},
+        {"property":"shutdownColor", "label":"Shutdown Color","type":"color","default":"009bde"},
+        {"property":"LightingMode", "label":"Lighting Mode", "type":"combobox", "values":["Canvas","Forced"], "default":"Canvas"},
+        {"property":"forcedColor", "label":"Forced Color","type":"color","default":"009bde"},
+        {"property":"DpiControl", "label":"Enable Dpi Control","type":"boolean","default":"false"},
+        {"property":"dpi1", "label":"DPI", "type":"number","min":"200", "max":"12400","default":"800"},
     ];
 }
+function hexToRgb(hex) {
+    var result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+    var colors = [];
+    colors[0] = parseInt(result[1], 16);
+    colors[1] = parseInt(result[2], 16);
+    colors[2] = parseInt(result[3], 16);
+
+    return colors;
+  }
 var CORSAIR_COMMAND_WRITE       = 0x07;
 var CORSAIR_COMMAND_READ        = 0x0E;
 var CORSAIR_COMMAND_STREAM      = 0x7F;
@@ -155,6 +168,10 @@ export function LedPositions()
 
 export function Render()
 {
+       
+    sendColors();
+}
+function sendColors(shutdown = false){
 
     selectEndpoint()
 
@@ -167,10 +184,17 @@ export function Render()
     {
         var iPxX = vKeyPositions[iIdx][0];
         var iPxY = vKeyPositions[iIdx][1];
-        var mxPxColor = device.color(iPxX, iPxY);
-        red[vKeys[iIdx]] = mxPxColor[0];
-        green[vKeys[iIdx]] = mxPxColor[1];
-        blue[vKeys[iIdx]] = mxPxColor[2];
+        var col;
+        if(shutdown){
+            col = hexToRgb(shutdownColor)
+        }else if (LightingMode == "Forced") {
+            col = hexToRgb(forcedColor)
+        }else{
+            col = device.color(iPxX, iPxY);
+        }           
+        red[vKeys[iIdx]] = col[0];
+        green[vKeys[iIdx]] = col[1];
+        blue[vKeys[iIdx]] = col[2];
     }
     
     

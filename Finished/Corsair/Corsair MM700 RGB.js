@@ -5,7 +5,23 @@ export function Publisher() { return "WhirlwindFX"; }
 export function Size() { return [5, 3]; }
 export function DefaultPosition(){return [240,120]}
 export function DefaultScale(){return 8.0}
+export function ControllableParameters(){
+    return [
+        {"property":"shutdownColor", "label":"Shutdown Color","type":"color","default":"009bde"},
+        {"property":"LightingMode", "label":"Lighting Mode", "type":"combobox", "values":["Canvas","Forced"], "default":"Canvas"},
+        {"property":"forcedColor", "label":"Forced Color","type":"color","default":"009bde"},
 
+    ];
+}
+function hexToRgb(hex) {
+    var result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+    var colors = [];
+    colors[0] = parseInt(result[1], 16);
+    colors[1] = parseInt(result[2], 16);
+    colors[2] = parseInt(result[3], 16);
+
+    return colors;
+  }
 
 
 export function Initialize()
@@ -56,7 +72,11 @@ export function LedPositions()
 
 export function Render()
 {
-    
+           
+    sendColors();
+}
+function sendColors(shutdown = false){
+
     var red =  new Array(3).fill(255)
     var green = new Array(3).fill(255)
     var blue = new Array(3).fill(255)
@@ -77,7 +97,14 @@ export function Render()
     {
         var iPxX = vKeyPositions[iIdx][0];
         var iPxY = vKeyPositions[iIdx][1];
-        var mxPxColor = device.color(iPxX, iPxY);
+        var mxPxColor;
+        if(shutdown){
+            mxPxColor = hexToRgb(shutdownColor)
+        }else if (LightingMode == "Forced") {
+            mxPxColor = hexToRgb(forcedColor)
+        }else{
+            mxPxColor = device.color(iPxX, iPxY);
+        }           
         packet[iIdx+8] = mxPxColor[0];
         packet[iIdx+11] = mxPxColor[1];
         packet[iIdx+14] = mxPxColor[2];

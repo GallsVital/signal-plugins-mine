@@ -98,9 +98,8 @@ export function Shutdown()
 export function Validate(endpoint)
 {
 
-    return endpoint.interface === 3// && endpoint.usage === 2 //&& endpoint.usage_page == 0x000c;
+    return endpoint.interface === 3;
 }
-
 function StartPacket(){
     sendReportString("00 04 F2",65)
 }

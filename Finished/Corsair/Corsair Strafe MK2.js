@@ -5,7 +5,22 @@ export function Publisher() { return "WhirlwindFX"; }
 export function Size() { return [21, 7]; }
 export function DefaultPosition() {return [75,70]; }
 export function DefaultScale(){return 8.0}
+export function ControllableParameters(){
+    return [
+        {"property":"shutdownColor", "label":"Shutdown Color","type":"color","default":"009bde"},
+        {"property":"LightingMode", "label":"Lighting Mode", "type":"combobox", "values":["Canvas","Forced"], "default":"Canvas"},
+        {"property":"forcedColor", "label":"Forced Color","type":"color","default":"009bde"},
+    ];
+}
+function hexToRgb(hex) {
+    var result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+    var colors = [];
+    colors[0] = parseInt(result[1], 16);
+    colors[1] = parseInt(result[2], 16);
+    colors[2] = parseInt(result[3], 16);
 
+    return colors;
+  }
 var CORSAIR_COMMAND_WRITE       = 0x07;
 var CORSAIR_COMMAND_READ        = 0x0E;
 var CORSAIR_COMMAND_STREAM      = 0x7F;
@@ -50,28 +65,17 @@ export function Shutdown()
         green[vKeys[iIdx]] = 0;
         blue[vKeys[iIdx]] = 0;
     }
-    
-    
-    
-    /*-----------------------------------------------------*\
-   | Send red bytes                                        |
-   \*-----------------------------------------------------*/
+
    StreamPacket(1, 60, red.splice(0,60));
    StreamPacket(2, 60, red.splice(0,60));
    StreamPacket(3, 24, red.splice(0,24));
    SubmitKbColors(1, 3, 1);
 
-   /*-----------------------------------------------------*\
-   | Send green bytes                                      |
-   \*-----------------------------------------------------*/
    StreamPacket(1, 60, green.splice(0,60));
    StreamPacket(2, 60, green.splice(0,60));
    StreamPacket(3, 24, green.splice(0,24));
    SubmitKbColors(2, 3, 1);
 
-   /*-----------------------------------------------------*\
-   | Send blue bytes                                       |
-   \*-----------------------------------------------------*/
    StreamPacket(1, 60, blue.splice(0,60));
    StreamPacket(2, 60, blue.splice(0,60));
    StreamPacket(3, 24, blue.splice(0,24));
@@ -83,23 +87,13 @@ function StreamPacket(packet_id, data_sz, data)
 {
     var packet = [];
 
-    /*-----------------------------------------------------*\
-    | Set up Stream packet                                  |
-    \*-----------------------------------------------------*/
     packet[0x00]   = 0x00;
     packet[0x01]   = CORSAIR_COMMAND_STREAM;
     packet[0x02]   = packet_id;
     packet[0x03]   = data_sz;
     packet[0x04]   = 0;
 
-    /*-----------------------------------------------------*\
-    | Copy in data bytes                                    |
-    \*-----------------------------------------------------*/
     packet = packet.concat(data);
-
-    /*-----------------------------------------------------*\
-    | Send packet                                           |
-    \*-----------------------------------------------------*/
     device.write(packet, 65);
 }
 
@@ -108,9 +102,6 @@ function SubmitKbColors(color_channel, packet_count, finish_val)
 {
     var packet = [];
 
-    /*-----------------------------------------------------*\
-    | Set up Submit Keyboard 24-Bit Colors packet           |
-    \*-----------------------------------------------------*/
     packet[0x00]   = 0x00;
     packet[0x01]   = CORSAIR_COMMAND_WRITE;
     packet[0x02]   = CORSAIR_PROPERTY_SUBMIT_KEYBOARD_COLOR_24;
@@ -118,15 +109,11 @@ function SubmitKbColors(color_channel, packet_count, finish_val)
     packet[0x04]   = packet_count;
     packet[0x05]   = finish_val;
 
-    /*-----------------------------------------------------*\
-    | Send packet                                           |
-    \*-----------------------------------------------------*/
     device.write(packet, 65);
 }
 
 
 
-// This is an array of key indexes for setting colors in our render array, indexed left to right, row top to bottom.
 var vKeys = [
                    125, 137, 8,                       59,                               20,    // Special key row.
     0,     12, 24, 36, 48,     60, 72, 84, 96,     108, 120, 132, 6,     18, 30, 42,    32, 44, 56,  68,  //20
@@ -159,18 +146,6 @@ var vKeyPositions = [
     [0,6], [1,6], [2,6],                      [6,6],                      [10,6], [11,6], [12,6], [13,6],   [14,6], [15,6], [16,6],   [17,6],        [19,6] // 14
 ];
 
-// These arrays are unused and for development reference.
-var vMedia = [
-    32, 44, 56, 68
-];
-
-var vSpecial = [
-    125, 137, 8, 59, 20
-]
-
-var vSpecialPositions = [
-    [0,3], [0,4], [0,5], [0,9], [0,17]
-]
 
 export function LedNames()
 {
@@ -183,7 +158,11 @@ export function LedPositions()
 }
 
 export function Render()
-{
+{       
+    sendColors();
+}
+function sendColors(shutdown = false){
+
     var red = [144];
     var green = [144];
     var blue = [144];
@@ -193,33 +172,29 @@ export function Render()
     {
         var iPxX = vKeyPositions[iIdx][0];
         var iPxY = vKeyPositions[iIdx][1];
-        var mxPxColor = device.color(iPxX, iPxY);
+        var mxPxColor;
+        if(shutdown){
+            mxPxColor = hexToRgb(shutdownColor)
+        }else if (LightingMode == "Forced") {
+            mxPxColor = hexToRgb(forcedColor)
+        }else{
+            mxPxColor = device.color(iPxX, iPxY);
+        }               
         red[vKeys[iIdx]] = mxPxColor[0];
         green[vKeys[iIdx]] = mxPxColor[1];
         blue[vKeys[iIdx]] = mxPxColor[2];
     }
-    
-    
-    
-    /*-----------------------------------------------------*\
-   | Send red bytes                                        |
-   \*-----------------------------------------------------*/
+
    StreamPacket(1, 60, red.splice(0,60));
    StreamPacket(2, 60, red.splice(0,60));
    StreamPacket(3, 24, red.splice(0,24));
    SubmitKbColors(1, 3, 1);
 
-   /*-----------------------------------------------------*\
-   | Send green bytes                                      |
-   \*-----------------------------------------------------*/
    StreamPacket(1, 60, green.splice(0,60));
    StreamPacket(2, 60, green.splice(0,60));
    StreamPacket(3, 24, green.splice(0,24));
    SubmitKbColors(2, 3, 1);
 
-   /*-----------------------------------------------------*\
-   | Send blue bytes                                       |
-   \*-----------------------------------------------------*/
    StreamPacket(1, 60, blue.splice(0,60));
    StreamPacket(2, 60, blue.splice(0,60));
    StreamPacket(3, 24, blue.splice(0,24));

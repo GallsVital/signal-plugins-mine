@@ -5,7 +5,24 @@ export function Publisher() { return "WhirlwindFX"; }
 export function Size() { return [7, 7]; }
 export function DefaultPosition(){return [240,120]}
 export function DefaultScale(){return 3.0}
+export function ControllableParameters(){
+    return [
+        {"property":"shutdownColor", "label":"Shutdown Color","type":"color","default":"009bde"},
+        {"property":"LightingMode", "label":"Lighting Mode", "type":"combobox", "values":["Canvas","Forced"], "default":"Canvas"},
+        {"property":"forcedColor", "label":"Forced Color","type":"color","default":"009bde"},
+        {"property":"DpiControl", "label":"Enable Dpi Control","type":"boolean","default":"false"},
+        {"property":"dpi1", "label":"DPI", "type":"number","min":"200", "max":"12400","default":"800"},
+    ];
+}
+function hexToRgb(hex) {
+    var result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+    var colors = [];
+    colors[0] = parseInt(result[1], 16);
+    colors[1] = parseInt(result[2], 16);
+    colors[2] = parseInt(result[3], 16);
 
+    return colors;
+  }
 var vLedNames = ["Scroll Wheel",
 "Side Led 1","Side Led 2","Side Led 3","Side Led 4", "Side Led 5","logo", "Right Side Led",
 "Dpi 1","dpi 2","Dpi 3",
@@ -62,7 +79,10 @@ export function Initialize()
 
 
 export function Render()
-{
+{    sendColors();
+}
+function sendColors(shutdown = false){
+
     var packet = []
     packet[0x00]   = 0x00;
     packet[0x01]   = 0x08;     
@@ -95,10 +115,17 @@ export function Render()
     {
         var iPxX = vLedPositions[iIdx][0];
         var iPxY = vLedPositions[iIdx][1];
-        var mxPxColor = device.color(iPxX, iPxY);
-        red[iIdx] = mxPxColor[0];
-        green[iIdx] = mxPxColor[1];
-        blue[iIdx] = mxPxColor[2];
+        var col;
+        if(shutdown){
+            col = hexToRgb(shutdownColor)
+        }else if (LightingMode == "Forced") {
+            col = hexToRgb(forcedColor)
+        }else{
+            col = device.color(iPxX, iPxY);
+        }
+        red[iIdx] = col[0];
+        green[iIdx] = col[1];
+        blue[iIdx] = col[2];
 
      }
      packet = packet.concat(red.splice(0,12));
