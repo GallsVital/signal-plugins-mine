@@ -51,49 +51,27 @@ export function Initialize()
     packet[0x05]   = 0x03;
     device.write(packet, 65);
 
-    var packet = [];
-    packet[0x00]           = 0x00;
-    packet[0x01]           = CORSAIR_COMMAND_WRITE;
-    packet[0x02]           = CORSAIR_PROPERTY_LIGHTING_CONTROL;
-    packet[0x03]           = 8;
-    packet[0x05]   = 0x01;
-    device.write(packet, 65);
+
 }
 
 
 export function Shutdown()
 {
-    var red = [144];
-    var green = [144];
-    var blue = [144];
+    var packet = [];
+    packet[0x00]           = 0x00;
+    packet[0x01]           = CORSAIR_COMMAND_WRITE;
+    packet[0x02]           = CORSAIR_PROPERTY_SPECIAL_FUNCTION;
+    packet[0x03]           = CORSAIR_LIGHTING_CONTROL_HARDWARE;
 
-    //vKeys.length
-    for(var iIdx = 0; iIdx < vKeys.length; iIdx++)
-    {
-        var iPxX = vKeyPositions[iIdx][0];
-        var iPxY = vKeyPositions[iIdx][1];
-        var mxPxColor = device.color(iPxX, iPxY);
-        red[vKeys[iIdx]] = 255;
-        green[vKeys[iIdx]] = 0;
-        blue[vKeys[iIdx]] = 0;
-    }
-    
+    device.write(packet, 65);
 
-   StreamPacket(1, 60, red.splice(0,60));
-   StreamPacket(2, 60, red.splice(0,60));
-   StreamPacket(3, 24, red.splice(0,24));
-   SubmitKbColors(1, 3, 1);
-
-   StreamPacket(1, 60, green.splice(0,60));
-   StreamPacket(2, 60, green.splice(0,60));
-   StreamPacket(3, 24, green.splice(0,24));
-   SubmitKbColors(2, 3, 1);
-
-   StreamPacket(1, 60, blue.splice(0,60));
-   StreamPacket(2, 60, blue.splice(0,60));
-   StreamPacket(3, 24, blue.splice(0,24));
-   SubmitKbColors(3, 3, 2);
-   
+    var packet = [];
+    packet[0x00]           = 0x00;
+    packet[0x01]           = CORSAIR_COMMAND_WRITE;
+    packet[0x02]           = CORSAIR_PROPERTY_LIGHTING_CONTROL;
+    packet[0x03]           = CORSAIR_LIGHTING_CONTROL_HARDWARE;
+    packet[0x05]   = 0x03;
+    device.write(packet, 65);
 }
 
 
@@ -160,19 +138,6 @@ var vKeyPositions = [
 [0,6], [1,6], [2,6],                      [6,6],                      [10,6], [11,6], [12,6], [13,6],   [14,6], [15,6], [16,6],   [17,6],        [19,6] // 14
 ];
 
-// These arrays are unused and for development reference.
-var vMedia = [
-    32, 44, 56, 68
-];
-
-var vSpecial = [
-    125, 137, 8, 59, 20
-]
-
-var vSpecialPositions = [
-    [0,3], [0,4], [0,5], [0,9], [0,17]
-]
-
 export function LedNames()
 {
     return vKeyNames;
@@ -212,7 +177,6 @@ function sendColors(shutdown = false){
     }
     
     
-
    StreamPacket(1, 60, red.splice(0,60));
    StreamPacket(2, 60, red.splice(0,60));
    StreamPacket(3, 24, red.splice(0,24));

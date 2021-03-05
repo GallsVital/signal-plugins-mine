@@ -117,7 +117,8 @@ var blue = new Array(3).fill(0)
             }else{
                 col = device.color(iX, iY);
             }
-        }        red[zone_idx] = col[0];
+        }        
+        red[zone_idx] = col[0];
         green[zone_idx] = col[1];
         blue[zone_idx] = col[2];
     }

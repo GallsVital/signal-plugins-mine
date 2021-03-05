@@ -221,7 +221,7 @@ function selectEndpoint(){
     if(selectedEndpoint == "Endpoint 1"){
         device.set_endpoint(1, 0x0004, 0xffc2);   
     }else{
-    //device.set_endpoint(1, 0x0602, 0xff43);    
+device.set_endpoint(2, 0x00004, 0xffc2);    
     }
 }
 

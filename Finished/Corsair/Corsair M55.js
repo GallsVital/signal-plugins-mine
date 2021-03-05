@@ -79,6 +79,9 @@ function ReturnToHardwareControl()
 export function Initialize()
 {
     EnableSoftwareControl();
+    if(savedDpi1 != dpi1 && DpiControl){
+        setDpi(dpi1)
+    }
 }
 
 function sendColors(shutdown = false){
@@ -130,7 +133,7 @@ export function Render()
 {
     sendColors()
 
-    if(savedDpi1 != dpi1){
+    if(savedDpi1 != dpi1 && DpiControl){
         setDpi(dpi1)
     }
 

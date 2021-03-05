@@ -106,23 +106,22 @@ var blue = new Array(3).fill(0)
     {
         var iX = vLedPositions[zone_idx][0];
         var iY = vLedPositions[zone_idx][1];
-var col;
-if(zone_idx = 2 && !micLedControl) {
-     col = [0,80,0];
-}else{
-    if(shutdown){
-        col = hexToRgb(shutdownColor)
-    }else if (LightingMode == "Forced") {
-        col = hexToRgb(forcedColor)
-    }else{
-        col = device.color(iX, iY);
-    }
-}
+        var col;
+        if(zone_idx = 2 && !micLedControl) {
+            col = [0,255,255];
+        }else{
+            if(shutdown){
+                col = hexToRgb(shutdownColor)
+            }else if (LightingMode == "Forced") {
+                col = hexToRgb(forcedColor)
+            }else{
+                col = device.color(iX, iY);
+            }
+        }
 
-
-        red[zone_idx] = col[0];
-        green[zone_idx] = col[1];
-        blue[zone_idx] = col[2];
+        red[zone_idx +1 ] = col[0];
+        green[zone_idx+2] = col[1];
+        blue[zone_idx+3] = col[2];
     }
     packet = packet.concat(red);
     packet = packet.concat(green);

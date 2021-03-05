@@ -23,9 +23,11 @@ export function ControllableParameters(){
         {"property":"LightingMode", "label":"Lighting Mode", "type":"combobox", "values":["Canvas","Forced"], "default":"Canvas"},
         {"property":"forcedColor", "label":"Forced Color","type":"color","default":"009bde"},
         {"property":"DpiControl", "label":"Enable Dpi Control","type":"boolean","default":"false"},
-        {"property":"dpi1", "label":"DPI", "type":"number","min":"200", "max":"12400","default":"800"},
+        {"property":"dpi1", "label":"DPI", "type":"number","min":"200", "max":"6000","default":"800"},
     ];
 }
+var savedDpi1;
+
 function hexToRgb(hex) {
     var result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
     var colors = [];
@@ -64,7 +66,33 @@ function EnableSoftwareControl()
     device.write(packet, 65);
 }
 
+function setDpi(dpi){
 
+    savedDpi1 = dpi;
+    var packet = [];
+    packet[0] = 0x00;
+    packet[1] = 0x07;
+    packet[2] = 0x13;
+    packet[3] = 0xD1;
+    packet[4] = 0x00;
+    packet[5] = 0x00;
+    packet[6] = dpi%256;
+    packet[7] = Math.floor(dpi/256);
+    packet[8] = dpi%256;
+    packet[9] = Math.floor(dpi/256);
+    packet[10] = 0xFF;
+    device.write(packet, 65);
+
+    var packet = [];
+    packet[0] = 0x00;
+    packet[1] = 0x07;
+    packet[2] = 0x13;
+    packet[3] = 0x02;
+    packet[4] = 0x00;
+    packet[5] = 0x01;
+    device.write(packet, 65);
+
+}
 function ReturnToHardwareControl()
 {
     var packet = [];
@@ -83,12 +111,20 @@ function ReturnToHardwareControl()
 export function Initialize()
 {
     EnableSoftwareControl();
+
+    if(savedDpi1 != dpi1 && DpiControl){
+        setDpi(dpi1)
+    }
 }
 
 
 export function Render()
 {       
     sendColors();
+
+    if(savedDpi1 != dpi1 && DpiControl){
+        setDpi(dpi1)
+    };
 }
 function sendColors(shutdown = false){
 
