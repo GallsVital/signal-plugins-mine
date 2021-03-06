@@ -29,36 +29,7 @@ var CORSAIR_LIGHTING_CONTROL_SOFTWARE           = 0x02;
 
 export function Initialize()
 {
-    var packet = [];
 
-    /*-----------------------------------------------------*\
-    | Set up Lighting Control packet                        |
-    \*-----------------------------------------------------*/
-    packet[0x00]           = 0x00;
-    packet[0x01]           = 0x38;
-    packet[0x02]           = 0x00;    //Channel 0/1
-    packet[0x03]           = CORSAIR_LIGHTING_CONTROL_SOFTWARE;
-
-    /*-----------------------------------------------------*\
-    | Send packet                                           |
-    \*-----------------------------------------------------*/    
-    device.write(packet, 65);
-    
-    /*-----------------------------------------------------*\
-    | Set up Lighting Control packet                        |
-    \*-----------------------------------------------------*/
-    var packet2 = [];
-
-    packet2[0x00]           = 0x00;
-    packet2[0x01]           = 0x38;
-    packet2[0x02]           = 0x01;    //Channel 0/1
-    packet2[0x03]           = CORSAIR_LIGHTING_CONTROL_SOFTWARE;
-
-
-    /*-----------------------------------------------------*\
-    | Send packet                                           |
-    \*-----------------------------------------------------*/    
-    device.write(packet2, 65);
 }
 
 
@@ -92,9 +63,6 @@ function StreamLightingPacketChanneled(start, count, colorChannel, data, channel
     //(Start, Count, Color, Data)
     var packet = [];
 
-    /*-----------------------------------------------------*\
-    | Set up Stream packet                                  |
-    \*-----------------------------------------------------*/
     packet[0x00]   = 0x00;
     packet[0x01]   = 0x32;
     packet[0x02]   = channel;
@@ -102,14 +70,8 @@ function StreamLightingPacketChanneled(start, count, colorChannel, data, channel
     packet[0x04]   = count;
     packet[0x05]   = colorChannel;
 
-    /*-----------------------------------------------------*\
-    | Copy in data bytes                                    |
-    \*-----------------------------------------------------*/
     packet = packet.concat(data);
 
-    /*-----------------------------------------------------*\
-    | Send packet                                           |
-    \*-----------------------------------------------------*/
     device.write(packet, 65);
 }
 const Strip_Internal = {
@@ -289,7 +251,15 @@ function SetFans(fanArray1,fanArray2){
     fanArray2[5] = FanDict[fan12];
 }
 
-
+function InitChannel(channel){
+    var packet = [];
+    packet[0x00]           = 0x00;
+    packet[0x01]           = 0x38;
+    packet[0x02]           = channel;   
+    packet[0x03]           = CORSAIR_LIGHTING_CONTROL_SOFTWARE; 
+    device.write(packet, 65);
+    //device.read(packet, 17);
+}
 
 function channelStart(channel){
     var packet = [];
@@ -369,7 +339,8 @@ function SendChannel(channel, FanArray)
     }
 
    //channelStart(channel);
-    //red
+   InitChannel(channel);
+    
    StreamLightingPacketChanneled(0,50,0,red.splice(0,50),channel)
    StreamLightingPacketChanneled(0,50,1,green.splice(0,50),channel)
    StreamLightingPacketChanneled(0,50,2,blue.splice(0,50),channel)
@@ -390,22 +361,22 @@ function SendChannel(channel, FanArray)
    StreamLightingPacketChanneled(200,4,1,green.splice(0,4),channel)
    StreamLightingPacketChanneled(200,4,2,blue.splice(0,4),channel)
 
-   //commit packet
-   SubmitLightingColors();
-
-
-   //set canvas size to fans width
 
 }
 
 export function Render()
 {
-    // Both are mirrored
-    Initialize()
 
     SetFans(Channel1Fans,Channel2Fans);
+
     SendChannel(0,Channel1Fans);
+    device.pause(1);
+
     SendChannel(1,Channel2Fans);
+    device.pause(1);
+
+    SubmitLightingColors();
+    device.pause(1);
 
 }
 

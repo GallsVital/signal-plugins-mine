@@ -156,6 +156,9 @@ export function DefaultPosition(){return [0,0]}
 export function DefaultScale(){return 1.0}
 export function ControllableParameters(){
     return [
+    {"property":"shutdownColor", "label":"Shutdown Color","type":"color","default":"009bde"},
+    {"property":"LightingMode", "label":"Lighting Mode", "type":"combobox", "values":["Canvas","Forced"], "default":"Canvas"},
+    {"property":"forcedColor", "label":"Forced Color","type":"color","default":"009bde"},
     {"property":"stripMode", "label":"Strip Mode", "type":"boolean", "default":"false"},
     {"property":"fan1", "label":"Fan 1 Type", "type":"combobox",   "values":["None","Strip_Internal","LL", "QL","ML","SpPro","XD5Reservior","GPUBlock","XD5CPU"], "default":"LL"},
     {"property":"fan2", "label":"Fan 2 Type", "type":"combobox",   "values":["None","Strip_Internal","LL", "QL","ML","SpPro","XD5Reservior","GPUBlock","XD5CPU"], "default":"LL"},
@@ -169,34 +172,35 @@ export function ControllableParameters(){
     {"property":"fan10", "label":"Fan 10 Type", "type":"combobox", "values":["None","Strip_Internal","LL", "QL","ML","SpPro","XD5Reservior","GPUBlock","XD5CPU"], "default":"LL"},
     {"property":"fan11", "label":"Fan 11 Type", "type":"combobox", "values":["None","Strip_Internal","LL", "QL","ML","SpPro","XD5Reservior","GPUBlock","XD5CPU"], "default":"LL"},
     {"property":"fan12", "label":"Fan 12 Type", "type":"combobox", "values":["None","Strip_Internal","LL", "QL","ML","SpPro","XD5Reservior","GPUBlock","XD5CPU"], "default":"LL"},
+
     ];
 }
 
 var CORSAIR_LIGHTING_CONTROL_SOFTWARE           = 0x02;
-
-export function Initialize()
-{
+function InitChannel(channel){
     var packet = [];
-
     packet[0x00]           = 0x00;
     packet[0x01]           = 0x38;
-    packet[0x02]           = 0x00;    //Channel 0/1
-    packet[0x03]           = CORSAIR_LIGHTING_CONTROL_SOFTWARE;
-  
+    packet[0x02]           = channel;   
+    packet[0x03]           = CORSAIR_LIGHTING_CONTROL_SOFTWARE; 
     device.write(packet, 65);
+    //device.read(packet, 17);
+}
+export function Initialize()
+{
 
-    var packet2 = [];
 
-    packet2[0x00]           = 0x00;
-    packet2[0x01]           = 0x38;
-    packet2[0x02]           = 0x01;    //Channel 0/1
-    packet2[0x03]           = CORSAIR_LIGHTING_CONTROL_SOFTWARE;
- 
-    device.write(packet2, 65);
+    //InitChannel(0);
+    //InitChannel(1);
+
 }
 
 export function Shutdown()
 {
+    SendChannel(0,Channel1Fans,true);
+    SendChannel(1,Channel2Fans,true);
+
+
     //channel 0
     var packet = [];
 
@@ -233,6 +237,8 @@ function StreamLightingPacketChanneled(start, count, colorChannel, data, channel
     packet = packet.concat(data);
 
     device.write(packet, 65);
+    device.read(packet, 17);
+
 }
 function channelStart(channel){
     var packet = [];
@@ -243,18 +249,27 @@ function channelStart(channel){
     packet[0x02]   = channel;
 
     device.write(packet, 65);
+    device.read(packet, 17);
 }
+function channelReset(channel){
+    var packet = [];
 
+    packet[0x00]   = 0x00;
+    packet[0x01]   = 0x37;
+    packet[0x02]   = channel;
+
+    device.write(packet, 65);
+    device.read(packet, 17);
+}
 function SubmitLightingColors()
 {
     var packet = [];
-    //commit packet == 32 FF (len 64)
-
     packet[0x00]   = 0x00;
     packet[0x01]   = 0x33;
     packet[0x02]   = 0xFF;
-
     device.write(packet, 65);
+    device.read(packet, 17);
+
 }
 var vKeyNames = [
     "Fans",
@@ -306,8 +321,16 @@ export function LedPositions()
 {
     return vKeyPositions;
 }
+function hexToRgb(hex) {
+    var result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+    var colors = [];
+    colors[0] = parseInt(result[1], 16);
+    colors[1] = parseInt(result[2], 16);
+    colors[2] = parseInt(result[3], 16);
 
-function SendChannel(channel, FanArray)
+    return colors;
+  }
+function SendChannel(channel, FanArray,shutdown = false)
 {
 
     var red = [220];
@@ -321,10 +344,18 @@ function SendChannel(channel, FanArray)
             for(var iIdx = 0; iIdx < FanArray[fan].mapping.length; iIdx++)
             {
                
-                    var iPxX = FanArray[fan].positioning[iIdx][0] + TotalOffset;
-                    var iPxY = FanArray[fan].positioning[iIdx][1];
-                
-                var mxPxColor = device.color(iPxX, iPxY);
+                var iPxX = FanArray[fan].positioning[iIdx][0] + TotalOffset;
+                var iPxY = FanArray[fan].positioning[iIdx][1];
+                var mxPxColor;
+                //find colors
+                if(shutdown){
+                    mxPxColor = hexToRgb(shutdownColor)
+                }else if (LightingMode == "Forced") {
+                    mxPxColor = hexToRgb(forcedColor)
+                }else{
+                    mxPxColor = device.color(iPxX, iPxY);
+                } 
+                //set colors
                 if(stripMode) {
                     red[iIdx+TotalLedCount] = mxPxColor[0];
                     green[iIdx+TotalLedCount] = mxPxColor[1];
@@ -339,42 +370,54 @@ function SendChannel(channel, FanArray)
             TotalOffset += FanArray[fan].offset;
         }
     }
+    //channelReset(channel)
+    //channelStart(channel);
+    InitChannel(channel);
+    device.pause(1);
 
-   channelStart(channel);
-    
+
     StreamLightingPacketChanneled(0,50,0,red.splice(0,50),channel)
     StreamLightingPacketChanneled(0,50,1,green.splice(0,50),channel)
     StreamLightingPacketChanneled(0,50,2,blue.splice(0,50),channel)
- 
+    device.pause(1);
+
     StreamLightingPacketChanneled(50,50,0,red.splice(0,50),channel)
     StreamLightingPacketChanneled(50,50,1,green.splice(0,50),channel)
     StreamLightingPacketChanneled(50,50,2,blue.splice(0,50),channel)
- 
+    device.pause(1);
+
     StreamLightingPacketChanneled(100,50,0,red.splice(0,50),channel)
     StreamLightingPacketChanneled(100,50,1,green.splice(0,50),channel)
     StreamLightingPacketChanneled(100,50,2,blue.splice(0,50),channel)
- 
+    device.pause(1);
+
     StreamLightingPacketChanneled(150,50,0,red.splice(0,50),channel)
     StreamLightingPacketChanneled(150,50,1,green.splice(0,50),channel)
     StreamLightingPacketChanneled(150,50,2,blue.splice(0,50),channel)
- 
+    device.pause(1);
+
     StreamLightingPacketChanneled(200,4,0,red.splice(0,4),channel)
     StreamLightingPacketChanneled(200,4,1,green.splice(0,4),channel)
     StreamLightingPacketChanneled(200,4,2,blue.splice(0,4),channel)
+    device.pause(1);
 
-   //commit packet
-   SubmitLightingColors();
 }
+
 
 export function Render()
 {
-    //Both are mirrored
-    Initialize()
 
-    SetFans(Channel1Fans,Channel2Fans);
+        SetFans(Channel1Fans,Channel2Fans);
 
-    SendChannel(0, Channel1Fans);
-    SendChannel(1,Channel2Fans);
+        SendChannel(0,Channel1Fans);
+        device.pause(1);
+
+        SendChannel(1,Channel2Fans);
+        device.pause(1);
+
+        SubmitLightingColors();
+        device.pause(1);
+
 }
 
  

@@ -372,8 +372,9 @@ function SendChannel(channel, FanArray,shutdown = false)
         }
     }
 
-   channelStart(channel);
-    
+    //channelStart(channel);
+    InitChannel(channel);
+
     StreamLightingPacketChanneled(0,50,0,red.splice(0,50),channel)
     StreamLightingPacketChanneled(0,50,1,green.splice(0,50),channel)
     StreamLightingPacketChanneled(0,50,2,blue.splice(0,50),channel)
@@ -395,11 +396,9 @@ function SendChannel(channel, FanArray,shutdown = false)
     StreamLightingPacketChanneled(200,4,2,blue.splice(0,4),channel)
 
    //commit packet
-   //SubmitLightingColors();
+   SubmitLightingColors();
+   device.pause(2);
 }
-var test;
-var timer = new Date();
-var prevseconds = 0;
 
 export function Render()
 {
@@ -410,45 +409,9 @@ export function Render()
         device.pause(1);
         SendChannel(1,Channel2Fans);
         device.pause(1);
-        SubmitLightingColors();
+        //SubmitLightingColors();
         device.pause(1);
-        test = false;
-
-    }else if(ControlMode == "off"){
-                //channel 0
-   
-        var packet = [];
-    
-        packet[0x00] = 0x00;
-        packet[0x01] = 0x38;
-        packet[0x02] = 0x00;
-        packet[0x03] = 0x01;
-    
-        device.write(packet, 65);
-        //channel 1
-        var packet2 = [];
-    
-        packet2[0x00] = 0x00;
-        packet2[0x01] = 0x38;
-        packet2[0x02] = 0x01;
-        packet2[0x03] = 0x01;
-    
-        device.write(packet2, 65);
-   } else{
-
-        if(test == false) {
-            test = true;
-            channelReset(0);
-            device.pause(5);
-            channelReset(1);
-            device.pause(5);
-            InitChannel(0);
-            device.pause(5);
-            InitChannel(1);
-            device.pause(5);
-        }
     }
-}
 
  
 export function Validate(endpoint)
