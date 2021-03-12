@@ -1,6 +1,6 @@
 export function Name() { return "Logitech G502 LightSpeed wireless Mode"; }
 export function VendorId() { return 0x046d; }
-export function ProductId() { return 0xc539; }
+export function ProductId() { return 0x0000;}//0xc539; }
 export function Publisher() { return "WhirlwindFX"; }
 export function Size() { return [3, 3]; }
 export function DefaultPosition(){return [240,120]}
@@ -34,7 +34,7 @@ export function LedPositions()
 export function Initialize()
 {
     device.set_endpoint(2, 0x0001, 0xff00); // System IF    
-if(DpiControl) {
+if(savedDpi1 != dpi1 && DpiControl) {
         setDpi(dpi1);
     
 }

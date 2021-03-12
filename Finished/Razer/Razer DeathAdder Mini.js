@@ -135,7 +135,7 @@ export function Initialize()
 
 
 
-    if(DpiControl) {
+    if(savedDpi1 != dpi1 && DpiControl) {
         setDPIRazer(dpi1);
     }
 }
@@ -205,7 +205,7 @@ function Apply()
 }
 function setDPIRazer(dpi){
     savedDpi1 = dpi;
-//00000000  00 1F 00 00 00 26 04 06 01 01 01 00 06 A4 06 A4 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00  
+    var usableDpi = Math.floor(dpi/100) * 100;
 var packet = [];
 packet[0] = 0x00;
 packet[1] = 0x00;
@@ -220,50 +220,49 @@ packet[9] = 0x01;
 packet[10] = 0x01;
 packet[11] = 0x01;
 packet[12] = 0x00;
-packet[13] = Math.floor(dpi/256);
-packet[14] = dpi%256;
-packet[15] = Math.floor(dpi/256);
-packet[16] = dpi%256;
+packet[13] = Math.floor(usableDpi/256);
+packet[14] = usableDpi%256;
+packet[15] = Math.floor(dpusableDpii/256);
+packet[16] = usableDpi%256;
 packet[89] = CalculateCrc(packet);
 device.send_report(packet, 91);
 
+var packet = [];
+packet[0] = 0x00;
+packet[1] = 0x00;
+packet[2] = 0x1F;
+packet[3] = 0x00;
+packet[4] = 0x00;
+packet[5] = 0x00; 
+packet[6] = 0x07;
+packet[7] = 0x04;
+packet[8] = 0x05;
+packet[9] = 0x00;
+packet[10] = Math.floor(usableDpi/256);
+packet[11] = usableDpi%256;
+packet[12] = Math.floor(usableDpi/256);
+packet[13] = usableDpi%256;
+packet[89] = CalculateCrc(packet);
+device.send_report(packet, 91);
 
-    var packet = [];
-    packet[0] = 0x00;
-    packet[1] = 0x00;
-    packet[2] = 0x1F;
-    packet[3] = 0x00;
-    packet[4] = 0x00;
-    packet[5] = 0x00; 
-    packet[6] = 0x07;
-    packet[7] = 0x04;
-    packet[8] = 0x05;
-    packet[9] = 0x00;
-    packet[10] = Math.floor(dpi/256);
-    packet[11] = dpi%256;
-    packet[12] = Math.floor(dpi/256);
-    packet[13] = dpi%256;
-    packet[89] = CalculateCrc(packet);
+var packet = [];
+packet[0] = 0x00;
+packet[1] = 0x00;
+packet[2] = 0x1F;
+packet[3] = 0x00;
+packet[4] = 0x00;
+packet[5] = 0x00; 
+packet[6] = 0x07;
+packet[7] = 0x04;
+packet[8] = 0x05;
+packet[9] = 0x00;
+packet[10] = Math.floor(usableDpi/256);
+packet[11] = usableDpi%256;
+packet[12] = Math.floor(usableDpi/256);
+packet[13] = usableDpi%256;
+packet[89] = CalculateCrc(packet);
+device.send_report(packet, 91);
 
-    device.send_report(packet, 91);
-    var packet = [];
-    packet[0] = 0x00;
-    packet[1] = 0x00;
-    packet[2] = 0x1F;
-    packet[3] = 0x00;
-    packet[4] = 0x00;
-    packet[5] = 0x00; 
-    packet[6] = 0x07;
-    packet[7] = 0x04;
-    packet[8] = 0x05;
-    packet[9] = 0x00;
-    packet[10] = Math.floor(dpi/256);
-    packet[11] = dpi%256;
-    packet[12] = Math.floor(dpi/256);
-    packet[13] = dpi%256;
-    packet[89] = CalculateCrc(packet);
-
-    device.send_report(packet, 91);
     var packet = [];
     packet[0] = 0x00;
     packet[1] = 0x00;
@@ -275,19 +274,20 @@ device.send_report(packet, 91);
     packet[7] = 0x04;
     packet[8] = 0x05;
     packet[9] = 0x01;
-    packet[10] = Math.floor(dpi/256);
-    packet[11] = dpi%256;
-    packet[12] = Math.floor(dpi/256);
-    packet[13] = dpi%256;
+    packet[10] = Math.floor(usableDpi/256);
+    packet[11] = usableDpi%256;
+    packet[12] = Math.floor(usableDpi/256);
+    packet[13] = usableDpi%256;
     packet[89] = CalculateCrc(packet);
-
     device.send_report(packet, 91);
+
+
 }
 
 export function Render()
 {    
     SendPacket();
-    if(DpiControl) {
+    if(savedDpi1 != dpi1 && DpiControl) {
         setDPIRazer(dpi1);
     }
 }

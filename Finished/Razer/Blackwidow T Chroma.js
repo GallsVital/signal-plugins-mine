@@ -2,7 +2,7 @@ export function Name() { return "Razer Blackwidow T Chroma"; }
 export function VendorId() { return 0x1532; }
 export function ProductId() { return 0x0209; }
 export function Publisher() { return "WhirlwindFX"; }
-export function Size() { return [22, 6]; }
+export function Size() { return [22, 7]; }
 export function Type() { return "Hid"; }
 export function DefaultPosition() {return [75,70]; }
 export function DefaultScale(){return 8.0}
@@ -136,16 +136,20 @@ function SendPacket(idx,shutdown = false)
     for(var iIdx = 0; iIdx < 22; iIdx++){
         var col;
         if(shutdown){
-            col = hexToRgb(shutdownColor);
+            col = hexToRgb(shutdownColor)
         }else if (LightingMode == "Forced") {
-            col = hexToRgb(forcedColor);
+            col = hexToRgb(forcedColor)
         }else{
+            if(iIdx == 20 && idx == 0){
+                col = device.color(9, 6);
+            }else{
             col = device.color(iIdx, idx);
+            }        
         }        
         var iLedIdx = (iIdx*3) + 13;
-        packet[iLedIdx] = col[0]; 
-        packet[iLedIdx+1] = col[1]; 
-        packet[iLedIdx+2] = col[2]; 
+        packet[iLedIdx] = col[0]; //0; //0xF7;
+        packet[iLedIdx+1] = col[1]; //0;
+        packet[iLedIdx+2] = col[2]; //255;
     }
 
     packet[89] = CalculateCrc(packet);

@@ -1,6 +1,6 @@
 export function Name() { return "SteelSeries Aerox 3 Wireless Mode"; }
 export function VendorId() { return 0x1038; }
-export function ProductId() { return 0x0000;} //0x1838; }
+export function ProductId() { return 0x1838; }
 export function Publisher() { return "WhirlwindFX"; }
 export function Size() { return [3,3]; }
 export function DefaultPosition(){return [240,120]}

@@ -35,7 +35,7 @@ export function LedPositions()
 export function Initialize()
 {
     device.set_endpoint(2, 0x0001, 0xff00); // System IF    
-if(DpiControl) {
+if(savedDpi1 != dpi1 && DpiControl) {
         setDpi(dpi1);
     
 }

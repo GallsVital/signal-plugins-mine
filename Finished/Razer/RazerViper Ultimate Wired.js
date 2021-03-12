@@ -35,7 +35,15 @@ function GetReport(cmd_class, cmd_id, size)
     return report;
 }
 
+function hexToRgb(hex) {
+    var result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+    var colors = [];
+    colors[0] = parseInt(result[1], 16);
+    colors[1] = parseInt(result[2], 16);
+    colors[2] = parseInt(result[3], 16);
 
+    return colors;
+  }
 function CalculateCrc(report)
 {
     var iCrc = 0;
@@ -172,15 +180,7 @@ function SendPacket(shutdown = false){
     device.send_report(packet, 91);
 }
 
-function hexToRgb(hex) {
-    var result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
-    var colors = [];
-    colors[0] = parseInt(result[1], 16);
-    colors[1] = parseInt(result[2], 16);
-    colors[2] = parseInt(result[3], 16);
 
-    return colors;
-  }
 function Apply()
 {
     var packet = []; //new Array(91).fill(0);

@@ -143,9 +143,9 @@ function SendPacket(idx,shutdown = false)
             col = device.color(iIdx, idx);
         }        
         var iLedIdx = (iIdx*3) + 13;
-        packet[iLedIdx] = col[0]; 
-        packet[iLedIdx+1] = col[1];
-        packet[iLedIdx+2] = col[2]; 
+        packet[iLedIdx] = col[0]; //0; //0xF7;
+        packet[iLedIdx+1] = col[1]; //0;
+        packet[iLedIdx+2] = col[2]; //255;
     }
 
     packet[89] = CalculateCrc(packet);

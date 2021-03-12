@@ -34,7 +34,7 @@ export function LedPositions()
 
 export function Initialize()
 {
-    if(DpiControl) {
+    if(savedDpi1 != dpi1 && DpiControl) {
         setDpi(dpi1);
     
 }
@@ -56,7 +56,19 @@ function setDpi(dpi){
     device.write(packet, 7);
 }
 
+function Apply()
+{
+    var packet = [];
 
+    packet[0x00] = 0x11;
+    packet[0x01] = 0xFF;
+    packet[0x02] = 0x02;
+    packet[0x03] = 0x3E;
+
+    device.write(packet, 20);  
+    //device.pause(30);  
+    //device.read(packet,20);
+}
 
 function sendZone(zone,shutdown = false){
     var packet = [];
@@ -94,7 +106,9 @@ export function Render()
 {
     device.set_endpoint(1, 0x0002, 0xff00); // Lighting IF    
     sendZone(0);
+    //Apply(); //Makes Dpi zone flicker
     sendZone(1);
+    //Apply(); //Makes Dpi zone flicker''
 
     if(savedDpi1 != dpi1 && DpiControl){
         setDpi(dpi1)
@@ -115,8 +129,9 @@ export function Shutdown()
 {
     device.set_endpoint(1, 0x0002, 0xff00); // Lighting IF    
     sendZone(0,true);
+    //Apply(); //Makes Dpi zone flicker
     sendZone(1,true);
-    //Apply(); //Mkes Dpi zone flicker''
+    //Apply(); //Makes Dpi zone flicker''
 }
 
 

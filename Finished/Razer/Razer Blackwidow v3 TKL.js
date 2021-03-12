@@ -52,7 +52,7 @@ export function Name() { return "Razer Blackwidow V3 TKL"; }
 export function VendorId() { return 0x1532; }
 export function ProductId() { return 0x0A24; }
 export function Publisher() { return "WhirlwindFX"; }
-export function Size() { return [19,6]; }
+export function Size() { return [22,7]; }
 export function Type() { return "Hid"; }
 export function DefaultPosition() {return [75,70]; }
 export function DefaultScale(){return 8.0}
@@ -146,14 +146,16 @@ function SendPacket(idx,shutdown = false)
     packet[13] = 0x11;
 
     
-    for(var iIdx = 0; iIdx < 18; iIdx++){
+    for(var iIdx = 0; iIdx < 22; iIdx++){
         var col;
         if(shutdown){
             col = hexToRgb(shutdownColor)
         }else if (LightingMode == "Forced") {
             col = hexToRgb(forcedColor)
         }else{
+            
             col = device.color(iIdx, idx);
+                    
         }    
         var iLedIdx = (iIdx*3) + 14;
         packet[iLedIdx] = col[0];

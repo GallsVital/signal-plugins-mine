@@ -153,7 +153,11 @@ function SendPacket(idx,shutdown = false)
         }else if (LightingMode == "Forced") {
             col = hexToRgb(forcedColor)
         }else{
+            if(iIdx == 14 && idx == 3){
+                col = device.color(11, 6);
+            }else{
             col = device.color(iIdx, idx);
+            }         
         }    
         var iLedIdx = (iIdx*3) + 14;
         packet[iLedIdx] = col[0];

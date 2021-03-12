@@ -1,6 +1,6 @@
-export function Name() { return "Logitech G703 LightSpeed Wireless Mode"; }
+export function Name() { return "Logitech G Pro Wireless Mouse"; }
 export function VendorId() { return 0x046d; }
-export function ProductId() { return 0xC539; }
+export function ProductId() { return 0xC088; }
 export function Publisher() { return "WhirlwindFX"; }
 export function Size() { return [3, 3]; }
 export function DefaultPosition(){return [240,120]}
@@ -35,7 +35,7 @@ export function LedPositions()
 export function Initialize()
 {
     device.set_endpoint(2, 0x0001, 0xff00); // System IF    
-if(DpiControl) {
+if(savedDpi1 != dpi1 && DpiControl) {
         setDpi(dpi1);
     
 }
@@ -48,24 +48,26 @@ function setDpi(dpi){
 
     var packet = [];
     packet[0] = 0x10;
-    packet[1] = 0x01;
-    packet[2] = 0x0B;
-    packet[3] = 0x3F;
+    packet[1] = 0xFF;
+    packet[2] = 0x0C;
+    packet[3] = 0x3D;
     packet[4] = 0x00;
     packet[5] = Math.floor(dpi/256);
     packet[6] = dpi%256;
     device.write(packet, 7);
 
-
+}
+function Apply()
+{
 
 }
 
 function sendZone(zone, shutdown = false){
     var packet = [];
     packet[0x00] = 0x11;
-    packet[0x01] = 0x01;
+    packet[0x01] = 0xFF;
     packet[0x02] = 0x07;
-    packet[0x03] = 0x1B;
+    packet[0x03] = 0x3E;
     packet[0x04] = zone;
     packet[0x05] = 0x01;
 
@@ -88,7 +90,6 @@ function sendZone(zone, shutdown = false){
     
     
     packet[0x09] = 0x02;
-    packet[16] = 0x01;
 
     device.write(packet, 20);
     device.pause(1);
