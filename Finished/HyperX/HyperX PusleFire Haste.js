@@ -11,7 +11,7 @@ export function ControllableParameters(){
         {"property":"LightingMode", "label":"Lighting Mode", "type":"combobox", "values":["Canvas","Forced"], "default":"Canvas"},
         {"property":"forcedColor", "label":"Forced Color","type":"color","default":"009bde"},
         {"property":"DpiControl", "label":"Enable Dpi Control","type":"boolean","default":"false"},
-        {"property":"dpi1", "label":"DPI", "type":"number","min":"200", "max":"12400","default":"800"},
+        {"property":"dpi1", "label":"DPI","step":"50", "type":"number","min":"200", "max":"12400","default":"800"},
     ];
 }
 export function ConflictingProcesses() {

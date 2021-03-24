@@ -1,50 +1,10 @@
-Corsair Devices now have access to a Forced Lighting Mode
-Logitech mice Wireless mode is all aggregated in a single dongle, you need to select the mouse you have now. 
-Keyboard press effects should be working on all Supported keyboards now, This is done per device so check how its working on your device and give feedback, especially if you have a razer keyboard.
+Apex Pro, Pro TKL, 7, 7 TKL should all be working with keypress effects now.
+Apex Pro Image should be displaying properly now.
+Huntsman Elite Keypress Matrix Shifted one to the right. 
+Cynsoa V2 keypress matrix shifted one to the right.
+Deathadder v2 orientation changed to face upwards.
+All 59 mice that have dpi support will have the dpi slider increment by 50 now
 
-
-Razer Mouse Dock initilization tweaked
-Razer Base Station v1 Initilization tweaked
-Razer Laptop Stand Initilization tweaked
-Razer Black widow V2 Initilization
-Razer Blackwidow v3 pro Initilization Tweaked
-Razer Blackwidow v3 Pro Wireless mode added
-Corsair Virtuoso [SE] Headset now has mic LED toggle and FrameRate Selection
-
-
-Razer Viper Mini Dpi control added
-Razer Abyssus Essential Dpi control added
-Razer Lancehead wireless Dpi control added
-Razer Mamba Elite dpi control added
-Razer Naga Trinity Dpi control added
-Corsair Sabre Dpi Control added
-Corsair Harpoon RGB Dpi Control added
-Corsair Dark core Dpi Control added
-Corsair NightSword Dpi Control added
-Corsair Ironclaw Dpi control added
-Corsair Glaive Dpi Control added
-
-Razer Basilisk Ult Led positions tweaked
-Razer Black widow V2 logo position tweaked
-Razer Cynosa V1 Logo Position tweaked
-Razer Huntsman Elite Light Bar Functionality added
-
-Razer Tartarus V2 "screen tearing" fixed
-Razer Viper Ultimate Forced Lighting Mode fixed
-Razer Viper  Forced Lighting Mode fixed
 
 New Devices:
-Razer Blackwidow v3 TKL
-Razer Deathadder mini (placeholder image)
-Razer Deathadder v2 Pro (with wireless mode)(with Dpi)(placeholder image)
-Razer Huntsman Tweaked
-Razer Mamba Wireless (with wireless mode)(with Dpi)(placeholder image)
-Razer Naga Pro (with wireless mode)(with Dpi)(placeholder image)
-Razer Basilisk V2 (with wireless mode)(with Dpi)(placeholder image)
-Blackwidow TE chroma(placeholder image)
-Logitech G pro wireless mouser (placeholder image)(with Dpi)
-Logitech G915 TKL wireless ( placeholder image)
-Steelseries Rival 3 Wireless added (with Dpi) (placeholder image)
-Steelseries Rival 3 Wired added by #rafee
-SteelSeries QCK 3XL added
-
+Original K70 added
