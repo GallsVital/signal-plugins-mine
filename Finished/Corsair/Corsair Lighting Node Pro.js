@@ -373,33 +373,33 @@ function SendChannel(channel, FanArray,shutdown = false)
     //channelReset(channel)
     //channelStart(channel);
     InitChannel(channel);
-    device.pause(1);
+    //device.pause(1);
 
 
     StreamLightingPacketChanneled(0,50,0,red.splice(0,50),channel)
     StreamLightingPacketChanneled(0,50,1,green.splice(0,50),channel)
     StreamLightingPacketChanneled(0,50,2,blue.splice(0,50),channel)
-    device.pause(1);
+    //device.pause(1);
 
     StreamLightingPacketChanneled(50,50,0,red.splice(0,50),channel)
     StreamLightingPacketChanneled(50,50,1,green.splice(0,50),channel)
     StreamLightingPacketChanneled(50,50,2,blue.splice(0,50),channel)
-    device.pause(1);
+    //device.pause(1);
 
     StreamLightingPacketChanneled(100,50,0,red.splice(0,50),channel)
     StreamLightingPacketChanneled(100,50,1,green.splice(0,50),channel)
     StreamLightingPacketChanneled(100,50,2,blue.splice(0,50),channel)
-    device.pause(1);
+    //device.pause(1);
 
     StreamLightingPacketChanneled(150,50,0,red.splice(0,50),channel)
     StreamLightingPacketChanneled(150,50,1,green.splice(0,50),channel)
     StreamLightingPacketChanneled(150,50,2,blue.splice(0,50),channel)
-    device.pause(1);
+    //device.pause(1);
 
     StreamLightingPacketChanneled(200,4,0,red.splice(0,4),channel)
     StreamLightingPacketChanneled(200,4,1,green.splice(0,4),channel)
     StreamLightingPacketChanneled(200,4,2,blue.splice(0,4),channel)
-    device.pause(1);
+    //device.pause(1);
 
 }
 
