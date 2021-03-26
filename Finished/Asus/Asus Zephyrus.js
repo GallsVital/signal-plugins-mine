@@ -2,7 +2,7 @@ export function Name() { return "Asus Zephyrus M15"; }
 export function VendorId() { return 0x0b05; }
 export function ProductId() { return 0x1866; }
 export function Publisher() { return "WhirlwindFX"; }
-export function Size() { return [[2,2],[2,2]]; }
+export function Size() { return [2,2]; }
 export function DefaultPosition(){return [240,120];}
 export function DefaultScale(){return 8.0;}
 
