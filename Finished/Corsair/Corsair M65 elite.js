@@ -111,9 +111,9 @@ function sendColors(shutdown = false){
             col = device.color(iX, iY);
         }
 
-        packet[(zone_idx * 4) + 6] = color[0];
-        packet[(zone_idx * 4) + 7] = color[1];
-        packet[(zone_idx * 4) + 8] = color[2];
+        packet[(zone_idx * 4) + 6] = col[0];
+        packet[(zone_idx * 4) + 7] = col[1];
+        packet[(zone_idx * 4) + 8] = col[2];
     }
 
     device.write(packet, 65);

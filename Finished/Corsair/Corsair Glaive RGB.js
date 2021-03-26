@@ -122,7 +122,7 @@ export function Initialize()
 
 export function Render()
 {       
-    //sendColors();
+    sendColors();
 
     if(savedDpi1 != dpi1 && DpiControl){
         setDpi(dpi1)
