@@ -35,10 +35,22 @@ var CORSAIR_PROPERTY_SUBMIT_MOUSE_COLOR         = 0x22;
 export function Initialize()
 {
     sendPacketString("00 08 01 03 00 02",1025);  //Critical Software control packet
-    sendPacketString("00 08 01 6D 00 F8 02",1025);             //critical-
-    sendPacketString("00 08 02 6D 00 F8 02",1025);             //critical- has to do with  Control wheel modes?
-    sendPacketString("00 08 01 6D 00 E8 03",1025);             //critical-
+
+        //new
+        sendPacketString("00 08 01 6D 00 E8 03",1025);             //critical-
+        sendPacketString("00 08 01 02 00 E8 03",1025);             //critical-
+
+
+//Alexes
+    //sendPacketString("00 08 01 6D 00 F8 02",1025);             //critical-
+    //sendPacketString("00 08 02 6D 00 F8 02",1025);             //critical- has to do with  Control wheel modes?
+    //sendPacketString("00 08 01 6D 00 E8 03",1025);             //critical-
+
+
     sendPacketString("00 08 02 6E",1025);             //critical- 
+    //new
+    sendPacketString("00 08 0D 00 0F",1025);          //Open lighting endpoint
+
     sendPacketString("00 08 0D 01 22",1025);          //Open lighting endpoint
 
 
