@@ -338,21 +338,15 @@ function SendColorData(shutdown = false)
                         mxPxColor = device.subdeviceColor(deviceArray[deviceNumber],iPxX, iPxY);
                     } 
                      //set colors
-                        red[DeviceDict[propertyArray[deviceNumber]].mapping[iIdx]+TotalLedCount] = mxPxColor[0];
-                        green[DeviceDict[propertyArray[deviceNumber]].mapping[iIdx]+TotalLedCount] = mxPxColor[1];
-                        blue[DeviceDict[propertyArray[deviceNumber]].mapping[iIdx]+TotalLedCount] = mxPxColor[2];
+                        RGBdata[DeviceDict[propertyArray[deviceNumber]].mapping[iIdx]*3+TotalLedCount*3] = mxPxColor[0];
+                        RGBdata[DeviceDict[propertyArray[deviceNumber]].mapping[iIdx]*3+TotalLedCount*3+1] = mxPxColor[1];
+                        RGBdata[DeviceDict[propertyArray[deviceNumber]].mapping[iIdx]*3+TotalLedCount*3+2] = mxPxColor[2];
                     }
                     TotalLedCount += DeviceDict[propertyArray[deviceNumber]].ledCount;
 
                 }
             
     }
-
-                     RGBdata[FanArray[fan].mapping[iIdx]*3+TotalLedCount*3] = mxPxColor[0];
-                     RGBdata[FanArray[fan].mapping[iIdx]*3+1+TotalLedCount*3] = mxPxColor[1];
-                     RGBdata[FanArray[fan].mapping[iIdx]*3+2+TotalLedCount*3] = mxPxColor[2];
-
-
     var packet = []
     packet[0x00]   = 0x00;
     packet[0x01]   = 0x08;
