@@ -382,6 +382,7 @@ function hexToRgb(hex) {
 
     return colors;
   }
+  
 function SendChannel(channel,shutdown = false)
 {
 

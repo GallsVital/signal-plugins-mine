@@ -178,6 +178,9 @@ export function DefaultPosition(){return [0,0]}
 export function DefaultScale(){return 1.0}
 export function ControllableParameters(){
     return [
+    {"property":"shutdownColor", "label":"Shutdown Color","min":"0","max":"360","type":"color","default":"009bde"},
+    {"property":"LightingMode", "label":"Lighting Mode", "type":"combobox", "values":["Canvas","Forced"], "default":"Canvas"},
+    {"property":"forcedColor", "label":"Forced Color","min":"0","max":"360","type":"color","default":"009bde"},
     {"property":"device1", "label":"Ch1 | Port 1",  "type":"combobox", "values":["None","Strip_Internal","LL", "QL","ML","SpPro","XD5Reservior","GPUBlock","XD5CPU"], "default":"None"},
     {"property":"device2", "label":"Ch1 | Port 2",  "type":"combobox", "values":["None","Strip_Internal","LL", "QL","ML","SpPro","XD5Reservior","GPUBlock","XD5CPU"], "default":"None"},
     {"property":"device3", "label":"Ch1 | Port 3",  "type":"combobox", "values":["None","Strip_Internal","LL", "QL","ML","SpPro","XD5Reservior","GPUBlock","XD5CPU"], "default":"None"},
@@ -217,7 +220,6 @@ export function Shutdown()
     packet2[0x03] = 0x01;
 
     device.write(packet2, 65);
-
 }
 
 function StreamLightingPacketChanneled(start, count, colorChannel, data, channel)
@@ -295,7 +297,6 @@ var deviceArray = [
     "Ch1-Port-4",
     "Ch1-Port-5",
     "Ch1-Port-6",
-
 ];
 
 
@@ -338,7 +339,7 @@ export function LedPositions()
 {
     return vKeyPositions;
 }
-function SendChannel(channel)
+function SendChannel(channel,shutdown = false)
 {
     var red = [220];
     var green = [220];

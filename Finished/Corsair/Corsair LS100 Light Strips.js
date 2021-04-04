@@ -7,6 +7,9 @@ export function DefaultPosition(){return [0,0];}
 export function DefaultScale(){return 1.0;}
 export function ControllableParameters(){
     return [
+        {"property":"shutdownColor", "label":"Shutdown Color","min":"0","max":"360","type":"color","default":"009bde"},
+        {"property":"LightingMode", "label":"Lighting Mode", "type":"combobox", "values":["Canvas","Forced"], "default":"Canvas"},
+        {"property":"forcedColor", "label":"Forced Color","min":"0","max":"360","type":"color","default":"009bde"},
     {"property":"device1",  "label":"Ch1 | Port 1", "type":"combobox",  "values":["None","Strip_Internal","Strip_250mm","Strip_350mm","Strip_450mm","Strip_140CM"], "default":"None"},
     {"property":"device2",  "label":"Ch1 | Port 2", "type":"combobox",  "values":["None","Strip_Internal","Strip_250mm","Strip_350mm","Strip_450mm","Strip_140CM"], "default":"None"},
     {"property":"device3",  "label":"Ch1 | Port 3", "type":"combobox",  "values":["None","Strip_Internal","Strip_250mm","Strip_350mm","Strip_450mm","Strip_140CM"], "default":"None"},

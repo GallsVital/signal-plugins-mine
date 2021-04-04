@@ -7,17 +7,16 @@ export function DefaultPosition(){return [0,0]}
 export function DefaultScale(){return 1.0}
 export function ControllableParameters(){
     return [
-    {"property":"selection", "label":"Mode Controller", "type":"number", "min":"0", "max":"2", "default":"1"},
-    {"property":"pump", "label":"Pump Type", "type":"combobox", "values":["None","H150I"], "default":"None"},
-    {"property":"device1", "label":"Ch1 | Port 1",  "type":"combobox", "values":["None","LL", "QL","ML","SpPro","XD5Reservior","GPUBlock","XD5CPU"], "default":"None"},
-    {"property":"device2", "label":"Ch1 | Port 2",  "type":"combobox", "values":["None","LL", "QL","ML","SpPro","XD5Reservior","GPUBlock","XD5CPU"], "default":"None"},
-    {"property":"device3", "label":"Ch1 | Port 3",  "type":"combobox", "values":["None","LL", "QL","ML","SpPro","XD5Reservior","GPUBlock","XD5CPU"], "default":"None"},
-    {"property":"device4", "label":"Ch1 | Port 4",  "type":"combobox", "values":["None","LL", "QL","ML","SpPro","XD5Reservior","GPUBlock","XD5CPU"], "default":"None"},
-    {"property":"device5", "label":"Ch1 | Port 5",  "type":"combobox", "values":["None","LL", "QL","ML","SpPro","XD5Reservior","GPUBlock","XD5CPU"], "default":"None"},
-    {"property":"device6", "label":"Ch1 | Port 6", "type":"combobox", "values":["None","LL", "QL","ML","SpPro","XD5Reservior","GPUBlock","XD5CPU"], "default":"None"},
+    {"property":"shutdownColor", "label":"Shutdown Color","min":"0","max":"360","type":"color","default":"009bde"},
+    {"property":"LightingMode", "label":"Lighting Mode", "type":"combobox", "values":["Canvas","Forced"], "default":"Canvas"},
+    {"property":"forcedColor", "label":"Forced Color","min":"0","max":"360","type":"color","default":"009bde"},
+    {"property":"device1", "label":"Ch1 | Port 1",  "type":"combobox", "values":["None","Light Tower"], "default":"None"},
+    {"property":"device2", "label":"Ch1 | Port 2",  "type":"combobox", "values":["None","Light Tower"], "default":"None"},
+    {"property":"device3", "label":"Ch1 | Port 3",  "type":"combobox", "values":["None","Light Tower"], "default":"None"},
+    {"property":"device4", "label":"Ch1 | Port 4",  "type":"combobox", "values":["None","Light Tower"], "default":"None"},
     ];
 }
-var ParentDeviceName = "Corsair Lighting Commander Core";
+var ParentDeviceName = "Corsair LT100";
 
 var CORSAIR_LIGHTING_CONTROL_SOFTWARE           = 0x02;
 
@@ -110,7 +109,7 @@ export function LedPositions()
 }
 var DeviceDict = {
     "None": null,
-    "Light_Tower" : Light_Tower,
+    "Light Tower" : Light_Tower,
 
 }
 

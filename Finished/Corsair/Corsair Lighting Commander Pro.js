@@ -177,6 +177,9 @@ export function DefaultPosition(){return [0,0]}
 export function DefaultScale(){return 2.0}
 export function ControllableParameters(){
     return [
+    {"property":"shutdownColor", "label":"Shutdown Color","min":"0","max":"360","type":"color","default":"009bde"},
+    {"property":"LightingMode", "label":"Lighting Mode", "type":"combobox", "values":["Canvas","Forced"], "default":"Canvas"},
+    {"property":"forcedColor", "label":"Forced Color","min":"0","max":"360","type":"color","default":"009bde"},
     {"property":"device1",  "label":"Ch1 | Port 1", "type":"combobox",  "values":["None","Strip_Internal","LL", "QL","ML","SpPro","XD5Reservior","GPUBlock","XD5CPU"], "default":"None"},
     {"property":"device2",  "label":"Ch1 | Port 2", "type":"combobox",  "values":["None","Strip_Internal","LL", "QL","ML","SpPro","XD5Reservior","GPUBlock","XD5CPU"], "default":"None"},
     {"property":"device3",  "label":"Ch1 | Port 3", "type":"combobox",  "values":["None","Strip_Internal","LL", "QL","ML","SpPro","XD5Reservior","GPUBlock","XD5CPU"], "default":"None"},
@@ -388,7 +391,6 @@ function SendChannel(channel,shutdown = false)
                         blue[DeviceDict[propertyArray[deviceNumber]].mapping[iIdx]+TotalLedCount] = mxPxColor[2];
                     }
                     TotalLedCount += DeviceDict[propertyArray[deviceNumber]].ledCount;
-
                 }
             
     }
