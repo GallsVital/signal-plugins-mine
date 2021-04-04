@@ -27,12 +27,7 @@ function hexToRgb(hex) {
     return colors;
   }
 var vLedNames = [
-    "Esc", "F1", "F2", "F3", "F4", "F5", "F6", "F7", "F8", "F9", "F10", "F11", "F12",         "Print Screen", "Scroll Lock", "Pause Break",   
-    "`", "1", "2", "3", "4", "5", "6", "7", "8", "9", "0", "-_", "=+", "Backspace",                        "Insert", "Home", "Page Up",       "NumLock", "Num /", "Num *", "Num -",  //21
-    "Tab", "Q", "W", "E", "R", "T", "Y", "U", "I", "O", "P", "[", "]", "\\",                               "Del", "End", "Page Down",         "Num 7", "Num 8", "Num 9", "Num +",    //21
-    "Caps Lock", "A", "S", "D", "F", "G", "H", "J", "K", "L", ";", "'", "Enter",                                                              "Num 4", "Num 5", "Num 6",             //16
-    "Left Shift", "Z", "X", "C", "V", "B", "N", "M", ",", ".", "/", "Right Shift",                                  "Up Arrow",               "Num 1", "Num 2", "Num 3", "Num Enter",//17
-    "Left Ctrl", "Left Win", "Left Alt", "Space", "Right Alt", "Fn", "Menu", "Right Ctrl",  "Left Arrow", "Down Arrow", "Right Arrow", "Num 0", "Num ."                       //13
+    "Led 1","Led 2","Led 3","Led 4","Led 5","Led 6","Led 7","Led 8","Led 9","Led 10","Led 11","Led 12","Led 13","Led 14","Led 15","Led 16","Led 17","Led 18","Led 19","Led 20"
 ];
 
 var vLedPositions = [
@@ -55,13 +50,9 @@ var vKeymap = [
       11,         3,   
       10,         4,
        9,8,7, 6,5,
-        
-            
-             
 ];
  
 export function Initialize() {
-
 }
 
 export function LedNames()
@@ -99,7 +90,6 @@ function sendReportString(string, size){
 export function Shutdown()
 {
     sendColor(true);
-
 }
 
 export function Validate(endpoint)
@@ -163,7 +153,6 @@ function sendColor(shutdown = false){
 }
 export function Render() {
     sendColor();
-
 }
 
 

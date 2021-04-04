@@ -38,20 +38,10 @@ export function Initialize()
     var packet = [];
     packet[0x00]           = 0x00;
     packet[0x01]           = CORSAIR_COMMAND_WRITE;
-    packet[0x02]           = CORSAIR_PROPERTY_SPECIAL_FUNCTION;
-    packet[0x03]           = CORSAIR_LIGHTING_CONTROL_SOFTWARE;
-
-    device.write(packet, 65);
-
-    var packet = [];
-    packet[0x00]           = 0x00;
-    packet[0x01]           = CORSAIR_COMMAND_WRITE;
     packet[0x02]           = CORSAIR_PROPERTY_LIGHTING_CONTROL;
     packet[0x03]           = CORSAIR_LIGHTING_CONTROL_SOFTWARE;
     packet[0x05]   = 0x03;
     device.write(packet, 65);
-
-
 }
 
 

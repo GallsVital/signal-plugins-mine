@@ -1,40 +1,19 @@
-export function Name() { return "SteelSeries Rival 3 Wireless"; }
+export function Name() { return "Steelseries QcK Prism"; }
 export function VendorId() { return 0x1038; }
-export function ProductId() { return 0x1830; }
+export function ProductId() { return 0x150a; }
 export function Publisher() { return "WhirlwindFX"; }
-export function Size() { return [3,3]; }
+export function Size() { return [2,2]; }
 export function DefaultPosition(){return [240,120]}
 export function DefaultScale(){return 8.0}
-export function ControllableParameters(){
-    return [
-        {"property":"shutdownColor", "label":"Shutdown Color","type":"color","default":"009bde"},
-        {"property":"LightingMode", "label":"Lighting Mode", "type":"combobox", "values":["Canvas","Forced"], "default":"Canvas"},
-        {"property":"forcedColor", "label":"Forced Color","type":"color","default":"009bde"},
-        {"property":"DpiControl", "label":"Enable Dpi Control","type":"boolean","default":"false"},
-        {"property":"dpi1", "label":"DPI", "step":"50","type":"number","min":"200", "max":"12400","default":"800"},
-    ];
-}
-
 var vLedNames = [
-    "Scroll Zone",
+    "Mousemat Top","Mousemap Bottom"
 ];
 
-var vLedPositions = [
-    [1,0],[1,0]
-];
-
-var savedDpi1;
+var vLedPositions = [[0,0], [1,1]];
 
 export function Initialize() {
-    var packet = [];
-	packet[0x00] = 0x00;
-	packet[0x01] = 0x09;
-	device.write(packet, 69)
-
-
-if(savedDpi1 != dpi1 && DpiControl) {
-        setDpi(dpi1);
-    }
+    // Qck doesn't require a setup packet.    
+    return "Hello, there!";
 }
 
 export function LedNames()
@@ -49,128 +28,141 @@ export function LedPositions()
 
 export function Shutdown()
 {
-        SendColorPacket(true);
+    // Most of this is grabbed using usblyzer.  Usblyzer sent 524 byte packets followed
+    // by 64 byte commit packets.  Here, we sent the bytes we'll use and the engine will
+    // pad the rest with zeroes.  Important to note that we add 1 to the send and write functions
+    // because hid firstbyte is (almost) always zero.  Use usblyzer to verify the packets sent.    
+    var packet = [];
+
+    // first byte is zero.
+    packet[0] = 0;
+
+    // packet start.
+    packet[1] = 14; 
+    packet[2] = 0;
+    packet[3] = 2;
+    packet[4] = 0;
+
+    // Color, bottom.    
+    packet[5] = 100; //r
+    packet[6] = 100; //g
+    packet[7] = 100; //b
+
+    packet[8] = 255; //?
+    packet[9] = 50; 
+    packet[10] = 200; 
+
+    packet[11] = 0; //?
+    packet[12] = 0; 
+    packet[13] = 0;
+
+    packet[14] = 1; //?
+    packet[15] = 0; 
+    packet[16] = 0; 
+
+    // Color, top.    
+    packet[17] = 100; 
+    packet[18] = 100; 
+    packet[19] = 100;
+
+    packet[20] = 255; //?
+    packet[21] = 50 
+    packet[22] = 200;
+
+    packet[23] = 0; //?
+    packet[24] = 0 
+    packet[25] = 1; 
+
+    packet[26] = 1; //?
+    packet[27] = 0; 
+    packet[28] = 1;
+
+
+    device.send_report(packet, 525);   
+    
+    // We have to send 'write' vs 'send_report' here with only 0x0D as byte 1. (first byte
+    // is always zero)
+    var apply = [];
+    apply[0] = 0;
+    apply[1] = 0x0D;
+    device.write(apply, 65)    
 }
 
 export function Validate(endpoint)
 {
-    return endpoint.interface === 3;
-}
-
-function SendColorPacket(shutdown = false) {
-
-    var packet = [];
-    packet[0x00] = 0x00;
-    packet[0x01] = 0xE8;
-    device.write(packet, 65);
-
-
-        var packet = [];
-        packet[0x00] = 0x00;
-        packet[0x01] = 0x03;
-        packet[0x05] = 0x30;
-		packet[0x07] = 0x10;
-        packet[0x08] = 0x27;
-
-        packet[23] = 0x01;
-
-        packet[31] = 0x01;
-
-        for(var iIdx = 0; iIdx < 2; iIdx++){
-        var iPxX = vLedPositions[iIdx][0];
-        var iPxY = vLedPositions[iIdx][1];
-        var color;
-        if(shutdown){
-            color = hexToRgb(shutdownColor)
-        }else if (LightingMode == "Forced") {
-            color = hexToRgb(forcedColor)
-        }else{
-            color = device.color(iPxX, iPxY);
-        }
-
-        var iLedIdx = 32 + iIdx * 3
-        packet[iLedIdx] = color[0];
-        packet[iLedIdx+1] = color[1];
-        packet[iLedIdx+2] = color[2];
-
-    }
-    device.write(packet, 65);
-   
-
-
-    
-    var packet = [];
-    packet[0x00] = 0x00;
-    packet[0x01] = 0x03;
-    packet[0x02] = 0x00;
-    packet[0x03] = 0x30;
-	packet[0x04] = 0x00;
-    packet[0x05] = 0x2C;
-    device.write(packet, 65);
-
-    var packet = [];
-    packet[0x00] = 0x00;
-    packet[0x01] = 0x05;
-    packet[0x02] = 0x00;
-    packet[0x03] = 0x10;
-	packet[0x04] = 0xFF;
-    packet[0x09] = 0x5C;
-    device.write(packet, 65);
-
-    var packet = [];
-    packet[0x00] = 0x00;
-    packet[0x01] = 0x1c;
-    packet[0x02] = 0x00;
-    packet[0x03] = 0x55;
-	packet[0x04] = 0x00;
-    packet[0x05] = 0x0E;
-    packet[0x06] = 0x01;
-    packet[0x07] = 0x01;
-    device.write(packet, 65);
-
-    device.pause(100);
+    // Qck has two interfaces - return 'true' if the endpoint is at interface
+    // zero.
+    return endpoint.interface === 0;
 }
 
 export function Render() {
     
-    SendColorPacket();
+    // Most of this is grabbed using usblyzer.  Usblyzer sent 524 byte packets followed
+    // by 64 byte commit packets.  Here, we sent the bytes we'll use and the engine will
+    // pad the rest with zeroes.  Important to note that we add 1 to the send and write functions
+    // because hid firstbyte is (almost) always zero.  Use usblyzer to verify the packets sent.    
+    var packet = [];
 
-    if(savedDpi1 != dpi1 && DpiControl){
-        setDpi(dpi1)
-    }
-    device.pause(1)
+    // first byte is zero.
+    packet[0] = 0;
+
+    // packet start.
+    packet[1] = 14; 
+    packet[2] = 0;
+    packet[3] = 2;
+    packet[4] = 0;
+
+    // Color, bottom.
+    var iBX = vLedPositions[1][0];
+    var iBY = vLedPositions[1][1];
+    var bottom = device.color(iBX,iBY);
+    packet[5] = bottom[0]; //r
+    packet[6] = bottom[1]; //g
+    packet[7] = bottom[2]; //b
+
+    packet[8] = 255; //?
+    packet[9] = 50; 
+    packet[10] = 200; 
+
+    packet[11] = 0; //?
+    packet[12] = 0; 
+    packet[13] = 0;
+
+    packet[14] = 1; //?
+    packet[15] = 0; 
+    packet[16] = 0; 
+
+    // Color, top.
+    var iTX = vLedPositions[0][0];
+    var iTY = vLedPositions[0][1];
+    var top = device.color(iTX,iTY);
+    packet[17] = top[0]; 
+    packet[18] = top[1]; 
+    packet[19] = top[2];
+
+    packet[20] = 255; //?
+    packet[21] = 50 
+    packet[22] = 200;
+
+    packet[23] = 0; //?
+    packet[24] = 0; 
+    packet[25] = 1; 
+
+    packet[26] = 1; //?
+    packet[27] = 0; 
+    packet[28] = 1;
+
+
+    device.send_report(packet, 525);   
+    
+    // We have to send 'write' vs 'send_report' here with only 0x0D as byte 1. (first byte
+    // is always zero)
+    var apply = [];
+    apply[0] = 0;
+    apply[1] = 0x0D;
+    device.write(apply, 65)    
 }
 
-function setDpi(dpi){
-    savedDpi1 = dpi1;
-    var packet = [];
-    packet[0x00] = 0x00;
-    packet[0x01] = 0x20;
-    packet[0x02] = 0x01;
-    packet[0x03] = 0x01;
-    packet[0x04] = Math.floor(dpi/100);
-    device.write(packet, 65);
-
-    var packet = [];
-    packet[0x00] = 0x00;
-    packet[0x01] = 0xA0;
-    device.write(packet, 65);
-
-    packet[0x00] = 0x00;
-    packet[0x01] = 0xE8;
-    device.write(packet, 65);
-
-
-}
-function hexToRgb(hex) {
-    var result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
-    var colors = [];
-    colors[0] = parseInt(result[1], 16);
-    colors[1] = parseInt(result[2], 16);
-    colors[2] = parseInt(result[3], 16);
-
-    return colors;
-  }
 
 export function Image() 
 {

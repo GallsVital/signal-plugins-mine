@@ -116,8 +116,8 @@ function sendColors(shutdown = false){
             col2 = hexToRgb(forcedColor)
 
         }else{
-            col = device.color(iPxX, iPxY);
-            col2 = device.color(iPxX, iPxY);
+            col = device.color(iX, iY);
+            col2 = device.color(iX2, iY2);
 
         }  
     packet[0x08]   = col[0];
