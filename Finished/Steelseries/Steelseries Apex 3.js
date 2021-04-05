@@ -10,7 +10,6 @@ export function ControllableParameters(){
         {"property":"shutdownColor", "label":"Shutdown Color","type":"color","default":"009bde"},
         {"property":"LightingMode", "label":"Lighting Mode", "type":"combobox", "values":["Canvas","Forced"], "default":"Canvas"},
         {"property":"forcedColor", "label":"Forced Color","type":"color","default":"009bde"},
-
     ];
 }
 
@@ -101,7 +100,8 @@ export function Validate(endpoint)
      {        
          var iPxX = vLedPositions[idx][0];
          var iPxY = vLedPositions[idx][1];
-         
+
+         var col;
          if(shutdown){
             col = hexToRgb(shutdownColor)
          }else if (LightingMode == "Forced") {

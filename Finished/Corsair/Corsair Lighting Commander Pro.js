@@ -180,18 +180,19 @@ export function ControllableParameters(){
     {"property":"shutdownColor", "label":"Shutdown Color","min":"0","max":"360","type":"color","default":"009bde"},
     {"property":"LightingMode", "label":"Lighting Mode", "type":"combobox", "values":["Canvas","Forced"], "default":"Canvas"},
     {"property":"forcedColor", "label":"Forced Color","min":"0","max":"360","type":"color","default":"009bde"},
-    {"property":"device1",  "label":"Ch1 | Port 1", "type":"combobox",  "values":["None","Strip_Internal","LL", "QL","ML","SpPro","XD5Reservior","GPUBlock","XD5CPU"], "default":"None"},
-    {"property":"device2",  "label":"Ch1 | Port 2", "type":"combobox",  "values":["None","Strip_Internal","LL", "QL","ML","SpPro","XD5Reservior","GPUBlock","XD5CPU"], "default":"None"},
-    {"property":"device3",  "label":"Ch1 | Port 3", "type":"combobox",  "values":["None","Strip_Internal","LL", "QL","ML","SpPro","XD5Reservior","GPUBlock","XD5CPU"], "default":"None"},
-    {"property":"device4",  "label":"Ch1 | Port 4", "type":"combobox",  "values":["None","Strip_Internal","LL", "QL","ML","SpPro","XD5Reservior","GPUBlock","XD5CPU"], "default":"None"},
-    {"property":"device5",  "label":"Ch1 | Port 5", "type":"combobox",  "values":["None","Strip_Internal","LL", "QL","ML","SpPro","XD5Reservior","GPUBlock","XD5CPU"], "default":"None"},
-    {"property":"device6",  "label":"Ch1 | Port 6", "type":"combobox",  "values":["None","Strip_Internal","LL", "QL","ML","SpPro","XD5Reservior","GPUBlock","XD5CPU"], "default":"None"},
-    {"property":"device7",  "label":"Ch2 | Port 1", "type":"combobox",  "values":["None","Strip_Internal","LL", "QL","ML","SpPro","XD5Reservior","GPUBlock","XD5CPU"], "default":"None"},
-    {"property":"device8",  "label":"Ch2 | Port 2", "type":"combobox",  "values":["None","Strip_Internal","LL", "QL","ML","SpPro","XD5Reservior","GPUBlock","XD5CPU"], "default":"None"},
-    {"property":"device9",  "label":"Ch2 | Port 3", "type":"combobox",  "values":["None","Strip_Internal","LL", "QL","ML","SpPro","XD5Reservior","GPUBlock","XD5CPU"], "default":"None"},
-    {"property":"device10", "label":"Ch2 | Port 4", "type":"combobox","values":["None","Strip_Internal","LL", "QL","ML","SpPro","XD5Reservior","GPUBlock","XD5CPU"], "default":"None"},
-    {"property":"device11", "label":"Ch2 | Port 5", "type":"combobox","values":["None","Strip_Internal","LL", "QL","ML","SpPro","XD5Reservior","GPUBlock","XD5CPU"], "default":"None"},
-    {"property":"device12", "label":"Ch2 | Port 6", "type":"combobox","values":["None","Strip_Internal","LL", "QL","ML","SpPro","XD5Reservior","GPUBlock","XD5CPU"], "default":"None"},
+    {"property":"CustomSize", "label":"Custom Strip Size","type":"number","min":"0", "max":"80","default":"10"},
+    {"property":"device1",  "label":"Ch1 | Port 1", "type":"combobox",  "values":["None","Strip_Internal","LL", "QL","ML","SpPro","XD5Reservior","GPUBlock","XD5CPU","Custom"], "default":"None"},
+    {"property":"device2",  "label":"Ch1 | Port 2", "type":"combobox",  "values":["None","Strip_Internal","LL", "QL","ML","SpPro","XD5Reservior","GPUBlock","XD5CPU","Custom"], "default":"None"},
+    {"property":"device3",  "label":"Ch1 | Port 3", "type":"combobox",  "values":["None","Strip_Internal","LL", "QL","ML","SpPro","XD5Reservior","GPUBlock","XD5CPU","Custom"], "default":"None"},
+    {"property":"device4",  "label":"Ch1 | Port 4", "type":"combobox",  "values":["None","Strip_Internal","LL", "QL","ML","SpPro","XD5Reservior","GPUBlock","XD5CPU","Custom"], "default":"None"},
+    {"property":"device5",  "label":"Ch1 | Port 5", "type":"combobox",  "values":["None","Strip_Internal","LL", "QL","ML","SpPro","XD5Reservior","GPUBlock","XD5CPU","Custom"], "default":"None"},
+    {"property":"device6",  "label":"Ch1 | Port 6", "type":"combobox",  "values":["None","Strip_Internal","LL", "QL","ML","SpPro","XD5Reservior","GPUBlock","XD5CPU","Custom"], "default":"None"},
+    {"property":"device7",  "label":"Ch2 | Port 1", "type":"combobox",  "values":["None","Strip_Internal","LL", "QL","ML","SpPro","XD5Reservior","GPUBlock","XD5CPU","Custom"], "default":"None"},
+    {"property":"device8",  "label":"Ch2 | Port 2", "type":"combobox",  "values":["None","Strip_Internal","LL", "QL","ML","SpPro","XD5Reservior","GPUBlock","XD5CPU","Custom"], "default":"None"},
+    {"property":"device9",  "label":"Ch2 | Port 3", "type":"combobox",  "values":["None","Strip_Internal","LL", "QL","ML","SpPro","XD5Reservior","GPUBlock","XD5CPU","Custom"], "default":"None"},
+    {"property":"device10", "label":"Ch2 | Port 4", "type":"combobox","values":["None","Strip_Internal","LL", "QL","ML","SpPro","XD5Reservior","GPUBlock","XD5CPU","Custom"], "default":"None"},
+    {"property":"device11", "label":"Ch2 | Port 5", "type":"combobox","values":["None","Strip_Internal","LL", "QL","ML","SpPro","XD5Reservior","GPUBlock","XD5CPU","Custom"], "default":"None"},
+    {"property":"device12", "label":"Ch2 | Port 6", "type":"combobox","values":["None","Strip_Internal","LL", "QL","ML","SpPro","XD5Reservior","GPUBlock","XD5CPU","Custom"], "default":"None"},
     ];
 }
 var ParentDeviceName = "Corsair Lighting Commander Pro";
@@ -255,7 +256,8 @@ var DeviceDict = {
     "SpPro" : SpProFan,
     "XD5Reservior" : XD5Reservior,
     "GPUBlock" : GPUBlock,
-    "XD5CPU" : XD5CPU
+    "XD5CPU" : XD5CPU,
+    "Custom" : Custom,
 }
 
 var deviceValues = [
@@ -286,7 +288,35 @@ var deviceArray = [
     "Ch2-Port-5",
     "Ch2-Port-6",
 ];
+const Custom = {
+    mapping : [],
+    positioning : [],
+    displayName: "Custom Strip",
+    ledCount : 10,
+    width: 10,
+    height: 1,
+    image: Placeholder()
+}
+function InitCustomStrip(){
+    var mapping = [];
+    var positioning = [];
+    for(let i = 0; i < CustomSize;i++){
+        mapping[i] = i;
+        positioning[i] = [i,0];    
+    }
+    Custom.mapping = mapping;
+    Custom.positioning = positioning;
+    Custom.width = CustomSize;
+    Custom.ledCount = CustomSize;
 
+    var propertyArray = [device1, device2,device3,device4,device5,device6,device7,device8,device9,device10,device11,device12];
+
+    for (var deviceNumber = 0; deviceNumber < 12; deviceNumber++ ) {
+             if(deviceValues[deviceNumber] == "Custom"){
+                device.setSubdeviceSize(deviceArray[deviceNumber],DeviceDict[propertyArray[deviceNumber]].width,DeviceDict[propertyArray[deviceNumber]].height);
+             }       
+    }
+}
 
 function SetFans(){
     var propertyArray = [device1, device2,device3,device4,device5,device6,device7,device8,device9,device10,device11,device12];
@@ -405,33 +435,38 @@ function SendChannel(channel,shutdown = false)
 
    //channelStart(channel);
    InitChannel(channel);
-    
-   StreamLightingPacketChanneled(0,50,0,red.splice(0,50),channel)
-   StreamLightingPacketChanneled(0,50,1,green.splice(0,50),channel)
-   StreamLightingPacketChanneled(0,50,2,blue.splice(0,50),channel)
+   var ledsSent = 0;
+   var TotalLedCount = TotalLedCount >= 204 ? 204 : TotalLedCount;
 
-   StreamLightingPacketChanneled(50,50,0,red.splice(0,50),channel)
-   StreamLightingPacketChanneled(50,50,1,green.splice(0,50),channel)
-   StreamLightingPacketChanneled(50,50,2,blue.splice(0,50),channel)
+    while(TotalLedCount > 0){
+        var ledsToSend = TotalLedCount >= 50 ? 50 : TotalLedCount;
 
-   StreamLightingPacketChanneled(100,50,0,red.splice(0,50),channel)
-   StreamLightingPacketChanneled(100,50,1,green.splice(0,50),channel)
-   StreamLightingPacketChanneled(100,50,2,blue.splice(0,50),channel)
-
-   StreamLightingPacketChanneled(150,50,0,red.splice(0,50),channel)
-   StreamLightingPacketChanneled(150,50,1,green.splice(0,50),channel)
-   StreamLightingPacketChanneled(150,50,2,blue.splice(0,50),channel)
-
-   StreamLightingPacketChanneled(200,4,0,red.splice(0,4),channel)
-   StreamLightingPacketChanneled(200,4,1,green.splice(0,4),channel)
-   StreamLightingPacketChanneled(200,4,2,blue.splice(0,4),channel)
+        StreamLightingPacketChanneled(ledsSent,ledsToSend,0,red.splice(0,ledsToSend),channel);
+        StreamLightingPacketChanneled(ledsSent,ledsToSend,1,green.splice(0,ledsToSend),channel);
+        StreamLightingPacketChanneled(ledsSent,ledsToSend,2,blue.splice(0,ledsToSend),channel);
+        ledsSent += ledsToSend;
+        TotalLedCount -= ledsToSend;
+    }
 
 
 }
+var savedEndpointValue;
+function setEndpoint(){
+    if(savedEndpointValue != EndpointMode){
+        savedEndpointValue = EndpointMode;
+        if(savedEndpointValue == "Corsair"){
+            device.set_endpoint(-1, 0x0001, 0xffc0); // lighting IF
+        }else if(savedEndpointValue == "Arduino"){
+            device.set_endpoint(2, 0x0c00, 0xffc0); // lighting IF
 
+        }
+    }
+
+}
 export function Render()
 {
-
+    setEndpoint();
+    InitCustomStrip()
     SetFans();
 
     SendChannel(0);
@@ -444,7 +479,7 @@ export function Render()
 
 export function Validate(endpoint)
 {
-    return endpoint.interface === -1;
+    return endpoint.interface === -1 | 2;
 }
 
 
