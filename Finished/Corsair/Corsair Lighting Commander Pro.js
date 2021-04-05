@@ -358,7 +358,15 @@ export function LedPositions()
 {
     return vKeyPositions;
 }
+function hexToRgb(hex) {
+    var result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+    var colors = [];
+    colors[0] = parseInt(result[1], 16);
+    colors[1] = parseInt(result[2], 16);
+    colors[2] = parseInt(result[3], 16);
 
+    return colors;
+  }
 
 function SendChannel(channel,shutdown = false)
 {
