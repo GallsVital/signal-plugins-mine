@@ -262,7 +262,7 @@ function hexToRgb(hex) {
 
     return colors;
   }
-function SendChannel(channel)
+function SendChannel(channel,shutdown = false)
 {
 
     var red = [135];
@@ -314,7 +314,6 @@ function SendChannel(channel)
    StreamLightingPacketChanneled(0,50,2,blue.splice(0,50),channel)
    StreamLightingPacketChanneled(50,50,2,blue.splice(0,50),channel)
    StreamLightingPacketChanneled(100,27,2,blue.splice(0,27),channel)
-
 }
 
 export function Render()
@@ -322,14 +321,13 @@ export function Render()
     SetFans();
 
     SendChannel(0);
-    device.pause(1);
 
     SendChannel(1);
 
     SubmitLightingColors();
 }
 
- 
+
 export function Validate(endpoint)
 {
     return endpoint.interface === -1;

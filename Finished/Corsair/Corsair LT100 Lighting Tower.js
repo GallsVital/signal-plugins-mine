@@ -1,13 +1,12 @@
-export function Name() { return "Corsair LT100 Lighting Tower"; }
-export function VendorId() { return 0x1b1c; }
-export function ProductId() { return 0x0C23; }
+export function Name() { return "Corsair LT100 Lighting Tower Controller"; }
+export function VendorId() { return 0x1b1c; }//0x046D; }
+export function ProductId() { return 0x0C23; }// 0xC24A;}
 export function Publisher() { return "WhirlwindFX"; }
 export function Size() { return [64, 27]; }
 export function DefaultPosition(){return [0,0]}
 export function DefaultScale(){return 1.0}
 export function ControllableParameters(){
     return [
-    {"property":"shutdownColor", "label":"Shutdown Color","min":"0","max":"360","type":"color","default":"009bde"},
     {"property":"LightingMode", "label":"Lighting Mode", "type":"combobox", "values":["Canvas","Forced"], "default":"Canvas"},
     {"property":"forcedColor", "label":"Forced Color","min":"0","max":"360","type":"color","default":"009bde"},
     {"property":"device1", "label":"Ch1 | Port 1",  "type":"combobox", "values":["None","Light Tower"], "default":"None"},
@@ -85,7 +84,7 @@ var vKeyNames = [
     
 
  ];
- const Strip_Internal = {
+ const Light_Tower = {
     mapping : [
         0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,29,20,21,22,23,24,25,26
        ],
@@ -96,7 +95,7 @@ var vKeyNames = [
     ledCount : 27,
     width: 4,
     height: 27,
-    image: Place
+    image: Placeholder()
  };
 export function LedNames()
 {
@@ -110,7 +109,6 @@ export function LedPositions()
 var DeviceDict = {
     "None": null,
     "Light Tower" : Light_Tower,
-
 }
 
 var deviceValues = [
@@ -159,7 +157,9 @@ function hexToRgb(hex) {
   }
 export function Render()
 {
-    
+    SetFans();
+
+
     var red = [144];
     var green = [144];
     var blue = [144];
@@ -176,9 +176,7 @@ export function Render()
                     var iPxY = DeviceDict[propertyArray[deviceNumber]].positioning[iIdx][1];
                     var mxPxColor;
                     //find colors
-                    if(shutdown){
-                        mxPxColor = hexToRgb(shutdownColor)
-                    }else if (LightingMode == "Forced") {
+                    if (LightingMode == "Forced") {
                         mxPxColor = hexToRgb(forcedColor)
                     }else{
                         mxPxColor = device.subdeviceColor(deviceArray[deviceNumber],iPxX, iPxY);
