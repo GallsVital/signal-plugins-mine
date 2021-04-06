@@ -1,8 +1,82 @@
+const Strip_Internal = {
+    mapping : [
+        0,1,2,3,4,5,6,7,8,9
+       ],
+       positioning : [
+        [0,0],[1,0],[2,0],[3,0],[4,0],[5,0],[6,0],[7,0],[8,0],[9,0]
+    ],
+    displayName: "Internal Strip",
+    ledCount : 10,
+    width: 10,
+    height: 1,
+    image: Placeholder()
+}
+const Strip_250mm = {
+    mapping : [
+        0,1,2,3,4,5,6,7,8,9,10,11,12,13,14
+       ],
+       positioning : [
+        [0,0],[1,0],[2,0],[3,0],[4,0],[5,0],[6,0],[7,0],[8,0],[9,0],[10,0],[11,0],[12,0],[13,0],[14,0]
+    ],
+    ledCount : 15,
+    displayName: "Strip 250mm",
+    width: 15,
+    height: 1,
+    image: Placeholder()
+}
+const Strip_350mm = {
+    mapping : [
+        0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20
+       ],
+       positioning : [
+        [0,0],[1,0],[2,0],[3,0],[4,0],[5,0],[6,0],[7,0],[8,0],[9,0],[10,0],[11,0],[12,0],[13,0],[14,0],[15,0],[16,0],[17,0],[18,0],[19,0],[20,0]
+    ],
+    ledCount : 21,
+    displayName: "Strip 350mm",
+    width: 21,
+    height: 1,
+    image: Placeholder()
+}
+const Strip_450mm = {
+    mapping : [
+        0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26
+       ],
+       positioning : [
+        [0,0],[1,0],[2,0],[3,0],[4,0],[5,0],[6,0],[7,0],[8,0],[9,0],[10,0],[11,0],[12,0],[13,0],[14,0],[15,0],[16,0],[17,0],[18,0],[19,0],[20,0],[21,0],[22,0],[23,0],[24,0],[25,0],[26,0]
+    ],
+    ledCount : 27,
+    displayName: "Strip 450mm",
+    width: 27,
+    height: 1,
+    image: Placeholder()
+}
+const Strip_140CM = {
+    mapping : [
+        0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36,37,38,39,40,41,42,43,44,45,46,47,48,49,50,51,52,53,54,55,56,57,58,59,60,61,62,63,64,65,66,67,68,69,70,71,72,73,74,75,76,77,78,79,81,82,83,84,85,86
+       ],
+       positioning : [
+        [0,0],[1,0],[2,0],[3,0],[4,0],[5,0],[6,0],[7,0],[8,0],[9,0],[10,0],[11,0],[12,0],[13,0],[14,0],[15,0],[16,0],[17,0],[18,0],[19,0],[20,0],[21,0],[22,0],[23,0],[24,0],[25,0],[26,0],[27,0],[28,0],[29,0],[30,0],[31,0],[32,0],[33,0],[34,0],[35,0],[36,0],[37,0],[38,0],[39,0],[40,0],[41,0],[42,0],[43,0],[44,0],[45,0],[46,0],[47,0],[48,0],[49,0],[50,0],[51,0],[52,0],[53,0],[54,0],[55,0],[56,0],[57,0],[58,0],[59,0],[60,0],[61,0],[62,0],[63,0],[64,0],[65,0],[66,0],[67,0],[68,0],[69,0],[70,0],[71,0],[72,0],[73,0],[74,0],[75,0],[76,0],[77,0],[78,0],[79,0],[81,0],[82,0],[83,0],[84,0],[85,0],[86,0]
+    ],
+    ledCount : 87,
+    displayName: "Strip 140cm",
+    width: 87,
+    height: 1,
+    image: Placeholder()
+}
+const Custom = {
+    mapping : [],
+    positioning : [],
+    displayName: "Custom Strip",
+    ledCount : 10,
+    width: 10,
+    height: 1,
+    image: Placeholder()
+}
 export function Name() { return "Corsair LS100 Light Strips"; }
-export function VendorId() { return 0x1b1c; }
-export function ProductId() { return 0x0C1E; }
+export function VendorId() { return   0x1b1c; }
+export function ProductId() { return   0x0C1E; }
 export function Publisher() { return "WhirlwindFX"; }
-export function Size() { return [128, 3]; }
+export function Size() { return [1,1]; }
 export function DefaultPosition(){return [0,0];}
 export function DefaultScale(){return 1.0;}
 export function ControllableParameters(){
@@ -10,6 +84,8 @@ export function ControllableParameters(){
         {"property":"shutdownColor", "label":"Shutdown Color","min":"0","max":"360","type":"color","default":"009bde"},
         {"property":"LightingMode", "label":"Lighting Mode", "type":"combobox", "values":["Canvas","Forced"], "default":"Canvas"},
         {"property":"forcedColor", "label":"Forced Color","min":"0","max":"360","type":"color","default":"009bde"},
+        {"property":"EndpointMode", "label":"Endpoint Mode", "type":"combobox", "values":["Corsair","Arduino"], "default":"Corsair"},
+
         {"property":"CustomSize", "label":"Custom Strip Size","type":"number","min":"0", "max":"80","default":"10"},
     {"property":"device1",  "label":"Ch1 | Port 1", "type":"combobox",  "values":["None","Strip_Internal","Strip_250mm","Strip_350mm","Strip_450mm","Strip_140CM","Custom"], "default":"None"},
     {"property":"device2",  "label":"Ch1 | Port 2", "type":"combobox",  "values":["None","Strip_Internal","Strip_250mm","Strip_350mm","Strip_450mm","Strip_140CM","Custom"], "default":"None"},
@@ -130,71 +206,6 @@ export function LedPositions()
     return vKeyPositions;
 }
 
-const Strip_Internal = {
-    mapping : [
-        0,1,2,3,4,5,6,7,8,9
-       ],
-       positioning : [
-        [0,0],[1,0],[2,0],[3,0],[4,0],[5,0],[6,0],[7,0],[8,0],[9,0]
-    ],
-    displayName: "Internal Strip",
-    ledCount : 10,
-    width: 10,
-    height: 1,
-    image: Placeholder()
-}
-const Strip_250mm = {
-    mapping : [
-        0,1,2,3,4,5,6,7,8,9,10,11,12,13,14
-       ],
-       positioning : [
-        [0,0],[1,0],[2,0],[3,0],[4,0],[5,0],[6,0],[7,0],[8,0],[9,0],[10,0],[11,0],[12,0],[13,0],[14,0]
-    ],
-    ledCount : 15,
-    displayName: "Strip 250mm",
-    width: 15,
-    height: 1,
-    image: Placeholder()
-}
-const Strip_350mm = {
-    mapping : [
-        0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20
-       ],
-       positioning : [
-        [0,0],[1,0],[2,0],[3,0],[4,0],[5,0],[6,0],[7,0],[8,0],[9,0],[10,0],[11,0],[12,0],[13,0],[14,0],[15,0],[16,0],[17,0],[18,0],[19,0],[20,0]
-    ],
-    ledCount : 21,
-    displayName: "Strip 350mm",
-    width: 21,
-    height: 1,
-    image: Placeholder()
-}
-const Strip_450mm = {
-    mapping : [
-        0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26
-       ],
-       positioning : [
-        [0,0],[1,0],[2,0],[3,0],[4,0],[5,0],[6,0],[7,0],[8,0],[9,0],[10,0],[11,0],[12,0],[13,0],[14,0],[15,0],[16,0],[17,0],[18,0],[19,0],[20,0],[21,0],[22,0],[23,0],[24,0],[25,0],[26,0]
-    ],
-    ledCount : 27,
-    displayName: "Strip 450mm",
-    width: 27,
-    height: 1,
-    image: Placeholder()
-}
-const Strip_140CM = {
-    mapping : [
-        0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36,37,38,39,40,41,42,43,44,45,46,47,48,49,50,51,52,53,54,55,56,57,58,59,60,61,62,63,64,65,66,67,68,69,70,71,72,73,74,75,76,77,78,79,81,82,83,84,85,86
-       ],
-       positioning : [
-        [0,0],[1,0],[2,0],[3,0],[4,0],[5,0],[6,0],[7,0],[8,0],[9,0],[10,0],[11,0],[12,0],[13,0],[14,0],[15,0],[16,0],[17,0],[18,0],[19,0],[20,0],[21,0],[22,0],[23,0],[24,0],[25,0],[26,0],[27,0],[28,0],[29,0],[30,0],[31,0],[32,0],[33,0],[34,0],[35,0],[36,0],[37,0],[38,0],[39,0],[40,0],[41,0],[42,0],[43,0],[44,0],[45,0],[46,0],[47,0],[48,0],[49,0],[50,0],[51,0],[52,0],[53,0],[54,0],[55,0],[56,0],[57,0],[58,0],[59,0],[60,0],[61,0],[62,0],[63,0],[64,0],[65,0],[66,0],[67,0],[68,0],[69,0],[70,0],[71,0],[72,0],[73,0],[74,0],[75,0],[76,0],[77,0],[78,0],[79,0],[81,0],[82,0],[83,0],[84,0],[85,0],[86,0]
-    ],
-    ledCount : 87,
-    displayName: "Strip 140cm",
-    width: 87,
-    height: 1,
-    image: Placeholder()
-}
 
 var DeviceDict = {
     "None": null,
@@ -234,15 +245,7 @@ var deviceArray = [
     "Ch2-Port-5",
     "Ch2-Port-6",
 ];
-const Custom = {
-    mapping : [],
-    positioning : [],
-    displayName: "Custom Strip",
-    ledCount : 10,
-    width: 10,
-    height: 1,
-    image: Placeholder()
-}
+
 function InitCustomStrip(){
     var mapping = [];
     var positioning = [];
@@ -358,7 +361,6 @@ function setEndpoint(){
 
         }
     }
-
 }
 export function Render()
 {
