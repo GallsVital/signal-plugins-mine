@@ -1,8 +1,8 @@
-export function Name() { return "SteelSeries Arctis PRo"; }
+export function Name() { return "SteelSeries Arctis Pro"; }
 export function VendorId() { return 0x1038; }
 export function ProductId() { return 0x1252; }
 export function Publisher() { return "WhirlwindFX"; }
-export function Size() { return [21,6]; }
+export function Size() { return [3,2]; }
 export function DefaultPosition(){return [50,100]}
 export function DefaultScale(){return 8.0}
 export function ControllableParameters(){
@@ -10,21 +10,22 @@ export function ControllableParameters(){
         {"property":"shutdownColor", "label":"Shutdown Color","type":"color","default":"009bde"},
         {"property":"LightingMode", "label":"Lighting Mode", "type":"combobox", "values":["Canvas","Forced"], "default":"Canvas"},
         {"property":"forcedColor", "label":"Forced Color","type":"color","default":"009bde"},
+        {"property":"NoiseCancelling", "label":"Noise Canceling", "type":"combobox", "values":["None","Low","Medium","High"], "default":"None"},
     ];
 }
 
 
 
 var vLedNames = [
-    "Esc"
+    "Left Can", "Right Can", "Mic Led", "Muted Mic Led"
 ];
 
 var vLedPositions = [
-    [0,0], 
+    [0,0], [2,0], [2,0],[1,1]
 ];
 
 var vKeymap = [
-    0
+    0, 2,3,1
 ];
  
 export function Initialize() {
@@ -66,14 +67,13 @@ export function Shutdown()
 {
     sendColors(true);
 
-    
 }
 
 export function Validate(endpoint)
 {
     //endpoint = 1 1 ffc0
     //Takes both a size 64 'system' WRITE, and size 643 RGB data REPORT
-    return endpoint.interface === 1 && endpoint.usage === 1;
+    return endpoint.interface === 5
 }
 
 function hexToRgb(hex) {
@@ -86,51 +86,79 @@ function hexToRgb(hex) {
     return colors;
   }
 
+var NoiseCancellingDict = {
+    "None": "FF 7F",
+    "Low" : "FF 4F",
+    "Medium":"00 20",
+    "High": "00 00"
+}
+var SavedNoiseCancellingLevel;
+function setNoiseCancelling(){
+    if(SavedNoiseCancellingLevel != NoiseCancelling){
+        SavedNoiseCancellingLevel = NoiseCancelling
+    sendPacketString(`04 40 06 10 F6 60 09 2C 01` +  NoiseCancellingDict[NoiseCancelling], 39);
+    sendPacketString("04 40 01 11 54 9B", 39);
+    sendPacketString("06 8A 42 00 20 05", 37);
+    sendPacketString("06 81 43 01 23", 37);
+    }
+}
+
 export function Render() {
 
+setNoiseCancelling()
 sendColors();
 
 }
-function sendFirstCommit(){
 
-}
+// 0 is left, 1 is right. 
 function sendColors(shutdown = false){
-    var packet = []
+    for (let index = 0;index < vKeymap.length; index++) {
+        var packet = []
+        sendPacketString("06 81 43 01 22", 37);
+        //sendPacketString("06 8A 42 00 20 40",37)
+        sendPacketString("06 81 43 01 23", 37);
+    
+        //packet[0x00]   = 0x00;
+        packet[0x00]   = 0x06;
+        packet[0x01]   = 0x8A;
+        packet[0x02]   = 0x42;
+        packet[0x03]   = 0x00;
+        packet[0x04]   = 0x20;
+        packet[0x05]   = 0x41;
+        packet[0x06]   = 0x00;
+    
+          
+            var iPxX = vLedPositions[index][0];
+            var iPxY = vLedPositions[index][1];
+            var color;
+            if(shutdown){
+                color = hexToRgb(shutdownColor)
+            }else if (LightingMode == "Forced") {
+                color = hexToRgb(forcedColor)
+            }else{
+                color = device.color(iPxX, iPxY);
+            }
+            packet[7] = color[0];
+            packet[8] = color[1];
+            packet[9] = color[2];        
+        
+        packet[10] = 0xFF;
+        packet[11] = 0x32;
+        packet[12] = 0xC8;
+        packet[13] = 0xC8;
+    
+        device.write(packet,37);
+        //sendPacketString("06 81 43 01 23", 37);
+        sendPacketString(`06 8A 42 00 20 41 08 ${index} 01`, 37);
+        //sendPacketString("06 81 43 01 23", 37);
+        sendPacketString(`06 8A 42 00 20 60 ${index}`, 37);
+        //sendPacketString("06 81 43 01 23", 37);
+        //sendPacketString("06 8A 42 00 20 40",37)
 
-    packet[0x00]   = 0;
-    packet[0x01]   = 0x06;
-    packet[0x02]   = 0x6A;
-    packet[0x03]   = 0x42;
-    packet[0x04]   = 0x00;
-    packet[0x05]   = 0x20;
-    packet[0x06]   = 0x41;
-    packet[0x07]   = 0x00;
+        sendPacketString("06 8A 42 20 05", 37);
 
-    for (var idx = 0; idx <= vKeymap.length; idx++)
-    {        
-        var iPxX = vLedPositions[idx][0];
-        var iPxY = vLedPositions[idx][1];
-        var color;
-        if(shutdown){
-            color = hexToRgb(shutdownColor)
-        }else if (LightingMode == "Forced") {
-            color = hexToRgb(forcedColor)
-        }else{
-            color = device.color(iPxX, iPxY);
-        }
-        packet[(idx * 3) + 8] = color[0];
-        packet[(idx * 3) + 9] = color[1];
-        packet[(idx * 3) + 10] = color[2];        
+        device.pause(80);
     }
-    packet[11] = 0xFF;
-    packet[12] = 0x32;
-    packet[13] = 0xC8;
-    packet[14] = 0xC8;
-
-    device.send_report(packet,38);
-    sendPacketString("06 81 43 01 23", 38);
-    sendPacketString(`06 8A 42 00 20 41 08 ${0} 01`, 38);
-
 }
 
 export function Image() 
