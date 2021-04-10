@@ -45,7 +45,7 @@ export function Initialize()
 
     packet[0x05]   = 0x03;
   
-    device.write(packet, 6);
+    device.write(packet, 65);
 }
 
 

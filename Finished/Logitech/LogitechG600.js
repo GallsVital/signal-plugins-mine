@@ -8,8 +8,8 @@ var G600_BRETHING_MODE = 0x01;
 var G600_CYCLE_MODE = 0x02;
 
 export function Name() { return "Logitech G600 Mouse"; }
-export function VendorId() { return 0x046D; } 
-export function ProductId() { return 0xC24A; } 
+export function VendorId() { return  0x046D; } //
+export function ProductId() { return 0xC24A; } //
 export function Publisher() { return "WhirlwindFX"; }
 export function Size() { return [3,3]; } 
 export function DefaultPosition(){return [240,120]}

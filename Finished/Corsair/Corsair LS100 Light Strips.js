@@ -295,7 +295,7 @@ function hexToRgb(hex) {
 
     return colors;
   }
-function SendChannel(channel)
+function SendChannel(channel, shutdown = false)
 {
 
     var red = [135];

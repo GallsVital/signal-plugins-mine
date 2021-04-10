@@ -436,6 +436,7 @@ function SendChannel(channel,shutdown = false)
 
    //commit packet
 }
+
 var savedEndpointValue;
 function setEndpoint(){
     if(savedEndpointValue != EndpointMode){

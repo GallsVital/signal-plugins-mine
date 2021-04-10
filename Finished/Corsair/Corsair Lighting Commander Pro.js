@@ -178,8 +178,8 @@ const Custom = {
 }
 
 export function Name() { return "Corsair Commander Pro"; }
-export function VendorId() { return   0x1b1c; }
-export function ProductId() { return   0x0C10; }
+export function VendorId() { return  0x1b1c; }
+export function ProductId() { return  0x0C10; }
 export function Publisher() { return "WhirlwindFX"; }
 export function Size() { return [1, 1]; }
 export function DefaultPosition(){return [0,0]}
