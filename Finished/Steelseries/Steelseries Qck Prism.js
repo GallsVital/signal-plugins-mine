@@ -146,7 +146,7 @@ function sendColors(shutdown = false) {
     }
 
     device.send_report(packet,525);
-    device.sendPacketString("00 0D",65);
+    sendPacketString("00 0D",65);
 }
 export function Image() 
 {

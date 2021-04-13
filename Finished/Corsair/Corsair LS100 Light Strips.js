@@ -331,7 +331,6 @@ function SendChannel(channel, shutdown = false)
                 }
             
     }
-
     
    //channelStart(channel);
    InitChannel(channel)
