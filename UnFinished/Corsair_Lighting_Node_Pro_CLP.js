@@ -156,7 +156,7 @@ export function DefaultPosition(){return [0,0]}
 export function DefaultScale(){return 1.0}
 export function ControllableParameters(){
     return [
-    {"property":"shutdownColor", "label":"Shutdown Color","type":"color","default":"009bde"},
+    {"property":"shutdownColor", "label":"Shutdown Color","min":"0","max":"360","type":"color","default":"009bde"},
     {"property":"LightingMode", "label":"Lighting Mode", "type":"combobox", "values":["Canvas","Forced"], "default":"Canvas"},
     {"property":"EndpointMode", "label":"Endpoint Mode", "type":"combobox", "values":["Corsair","Arduino"], "default":"Corsair"},
     {"property":"forcedColor", "label":"Forced Color","type":"color","default":"009bde"},

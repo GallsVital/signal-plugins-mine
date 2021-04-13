@@ -7,7 +7,7 @@ export function DefaultPosition(){return [240,120]}
 export function DefaultScale(){return 8.0}
 export function ControllableParameters(){
     return [
-        {"property":"shutdownColor", "label":"Shutdown Color","type":"color","default":"009bde"},
+        {"property":"shutdownColor", "label":"Shutdown Color","min":"0","max":"360","type":"color","default":"009bde"},
         {"property":"DpiControl", "label":"Enable Dpi Control","type":"boolean","default":"false"},
         {"property":"dpi1", "label":"DPI 1","step":"50", "type":"number","min":"200", "max":"8000","default":"800"},
     ];

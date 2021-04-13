@@ -176,9 +176,9 @@ export function Publisher() { return "WhirlwindFX"; }
 export function Size() { return [40, 3]; }
 export function ControllableParameters(){
     return [
-        {"property":"shutdownColor", "label":"Shutdown Color","type":"color","default":"009bde"},
+        {"property":"shutdownColor", "label":"Shutdown Color","min":"0","max":"360","type":"color","default":"009bde"},
         {"property":"LightingMode", "label":"Lighting Mode", "type":"combobox", "values":["Canvas","Forced"], "default":"Canvas"},
-        {"property":"forcedColor", "label":"Forced Color","type":"color","default":"009bde"},
+        {"property":"forcedColor", "label":"Forced Color","min":"0","max":"360","type":"color","default":"009bde"},
         {"property":"device1", "label":"Ch1 | Port 1",  "type":"combobox", "values":["None","Strip_Internal","LL", "QL","ML","SpPro","XD5Reservior","GPUBlock","XD5CPU"], "default":"None"},
         {"property":"device2", "label":"Ch1 | Port 2",  "type":"combobox", "values":["None","Strip_Internal","LL", "QL","ML","SpPro","XD5Reservior","GPUBlock","XD5CPU"], "default":"None"},
         {"property":"device3", "label":"Ch1 | Port 3",  "type":"combobox", "values":["None","Strip_Internal","LL", "QL","ML","SpPro","XD5Reservior","GPUBlock","XD5CPU"], "default":"None"},
