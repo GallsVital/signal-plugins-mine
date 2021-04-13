@@ -1,5 +1,5 @@
 export function Name() { return "Steelseries QcK Prism"; }
-export function VendorId() { return 0x1038; }
+export function VendorId() { return  0x1038; }
 export function ProductId() { return 0x1507; }
 export function Publisher() { return "WhirlwindFX"; }
 export function Size() { return [5,5]; }
@@ -7,29 +7,31 @@ export function DefaultPosition(){return [240,120]}
 export function DefaultScale(){return 8.0}
 export function ControllableParameters(){
     return [
-        {"property":"shutdownColor", "label":"Shutdown Color","type":"color","default":"009bde"},
+        {"property":"shutdownColor", "label":"Shutdown Color","min":"0","max":"360","type":"color","default":"009bde"},
         {"property":"LightingMode", "label":"Lighting Mode", "type":"combobox", "values":["Canvas","Forced"], "default":"Canvas"},
-        {"property":"forcedColor", "label":"Forced Color","type":"color","default":"009bde"},
-
+        {"property":"forcedColor", "label":"Forced Color","min":"0","max":"360","type":"color","default":"009bde"},
     ];
 }
+
 var vLedNames = [
     "Led 1", "Led 2", "Led 3", "Led 4", "Led 5", "Led 6", "Led 7", "Led 8", "Led 9", "Led 10", "Led 11", "Led 12",
 ];
 
 var vLedPositions = [
-    [0,0], [1,0], [2,0], [3,0],
-    [0,1],               [3,1],
-    [0,2],               [3,2],
-    [0,3],               [3,3],
-    [0,4], [1,4], [2,4], [3,4]
+    //left mid/bot
+    [0,2], [0,3], 
+
+    //bottom
+    [1,4], [2,4], [3,4],
+    //right
+    [4,3], [4,2], [4,1],
+
+    //top
+    [3,1], [2,1], [1,1],
+    //left top
+    [0,1],
     ];
-var vKeyMap = [
-    0,1,2,3,
-    4,     5,
-    6,     7,
-    8,9,10,11
-];
+
 export function Initialize() {
     return "Hello, there!";
 }
@@ -46,7 +48,7 @@ export function LedPositions()
 
 export function Shutdown()
 {
-    
+    sendColors(true);
 }
 
 export function Validate(endpoint)
@@ -117,7 +119,7 @@ function sendColors(shutdown = false) {
         color = device.color(iPxX, iPxY);
     }
 
-    for(let iIdx = 0; iIdx < vKeyMap.length; iIdx++) {
+    for(let iIdx = 0; iIdx < vLedPositions.length; iIdx++) {
         var iPxX = vLedPositions[iIdx][0];
         var iPxY = vLedPositions[iIdx][1];
 
