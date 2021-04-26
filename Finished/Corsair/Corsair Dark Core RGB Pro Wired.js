@@ -1,6 +1,6 @@
-export function Name() { return "Corsair Dark Core RGB Pro SE Wireless Mode"; }
+export function Name() { return "Corsair Dark Core RGB Pro Wired Mode"; }
 export function VendorId() { return 0x1b1c; }
-export function ProductId() { return  0x1B7F; }
+export function ProductId() { return  0x1B81; }
 export function Publisher() { return "WhirlwindFX"; }
 export function Size() { return [7, 7]; }
 export function DefaultPosition(){return [240,120]}
@@ -47,11 +47,12 @@ export function LedPositions()
 
 function EnableSoftwareControl()
 {
-    //sendPacketString("00 09 01 03 00 02",65)//software control packet
-    //sendPacketString("00 09 02 6E",65) // Critical
-    //sendPacketString("00 09 0D 00 01",65) // open lighting channel
-    //sendPacketString("00 09 0D 00 02",65) // open endpoint
-    
+    sendPacketString("00 08 01 03 00 02",65)//software control packet
+
+    sendPacketString("00 08 02 6E",65) // Critical
+    sendPacketString("00 08 0D 00 01",65) // Critical
+
+
 }
 
 function sendPacketString(string, size){
@@ -67,7 +68,7 @@ function sendPacketString(string, size){
 
 function ReturnToHardwareControl()
 {
- sendPacketString("00 09 01 03 00 01",65) //hardware control packet
+ sendPacketString("00 08 01 03 00 01",65) //hardware control packet
 }
 
 
@@ -84,7 +85,7 @@ function sendColors(shutdown = false){
 
     var packet = []
     packet[0x00]   = 0x00;
-    packet[0x01]   = 0x09;     
+    packet[0x01]   = 0x08;     
     packet[0x02]   = 0x06;
     packet[0x03]   = 0x00;
     packet[0x04]   = 0x24;
@@ -99,6 +100,8 @@ function sendColors(shutdown = false){
     //00 00 00 00 00 00 00 00 00 00 00 00
     //00 00 00 00 00 00 00 00 00 00 00 80                                                         
     
+
+
     // Fetch color at 1,1
     var iX = vLedPositions[0][0];
     var iY = vLedPositions[0][1];
@@ -119,7 +122,8 @@ function sendColors(shutdown = false){
             col = hexToRgb(forcedColor)
         }else{
             col = device.color(iPxX, iPxY);
-        }        
+        }
+        
         red[iIdx] = col[0];
         green[iIdx] = col[1];
         blue[iIdx] = col[2];

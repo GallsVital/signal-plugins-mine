@@ -1,53 +1,26 @@
-export function Name() { return "NZXT Kraken x63"; }
-export function VendorId() { return 0x1e71; }
-export function ProductId() { return 0x2007; }
+export function Name() { return "Logitech Wireless Mouse Powerplay dongle"; }
+export function VendorId() { return 0x046d; }
+export function ProductId() { return 0xC53A; }
 export function Publisher() { return "WhirlwindFX"; }
-export function Size() { return [4,4]; }
-export function DefaultPosition() {return [30,30]; }
+export function Size() { return [3, 3]; }
+export function DefaultPosition(){return [240,120]}
 export function DefaultScale(){return 8.0}
-export function ControllableParameters(){
+export function ControllableParameters(){
     return [
-        {"property":"shutdownColor", "label":"Shutdown Color","min":"0", "max":"360","type":"color","default":"009bde"},
+        {"property":"shutdownColor", "label":"Shutdown Color","min":"0","max":"360","type":"color","default":"009bde"},
+        {"property":"MouseType", "label":"Connected Mouse", "type":"combobox", "values":["G502L","G703L","G903L","GPro"], "default":"G502L"},
         {"property":"LightingMode", "label":"Lighting Mode", "type":"combobox", "values":["Canvas","Forced"], "default":"Canvas"},
-        {"property":"forcedColor", "label":"Forced Color","min":"0", "max":"360","type":"color","default":"009bde"},
-        
+        {"property":"forcedColor", "label":"Forced Color","min":"0","max":"360","type":"color","default":"009bde"},
+        {"property":"DpiControl", "label":"Enable Dpi Control","type":"boolean","default":"false"},
+        {"property":"dpi1", "label":"DPI","step":"50", "type":"number","min":"200", "max":"12400","default":"800"},
     ];
 }
-var vLedNames = [
-    "Led 1","Led 2","Led 3","Led 4","Led 5","Led 6","Led 7","Led 8", "Logo"
-];
+var savedDpi1;
 
+var vLedNames = ["Primary Zone", "Logo Zone"];
 var vLedPositions = [
-
-        [1,0], [2,0], 
-    [0,1],          [3,1],
-    [0,2],          [3,2], 
-        [1,3], [2,3],      
-
-        [1,2]
+    [0,1],[0,2]
 ];
-var vLedMap = [
-            7,0,
-        6,        1,
-        5,        2,
-            4,3 
-];
-
-export function Initialize() {
-
-}
-
-export function Shutdown()
-{
-    sendColors(true);
-    sendLogo(true);
-    sendPacketString("22 11 02",64);
-
-    sendPacketString(`22 A0 02 00 01 00 00 08 00 00 80 00 32 00 00 01 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 
-    00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 
-    22 A0 02 00 01 00 00 08 00 00 80 00 32 00 00 01 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 
-    00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00`,64);
-}
 
 export function LedNames()
 {
@@ -58,101 +31,146 @@ export function LedPositions()
 {
     return vLedPositions;
 }
+
+
+export function Initialize()
+{
+    device.set_endpoint(2, 0x0001, 0xff00); // System IF    
+if(savedDpi1 != dpi1 && DpiControl) {
+        setDpi(dpi1);
+    
+}
+}
+const dpidict2= {
+    "G502L" : 0x0C,
+    "G703L" : 0x0B,
+    "G903L" : 0x0B,
+    "GPro" : 0x0C,
+};
+const dpidict= {
+    "G502L" : 0x3A,
+    "G703L" : 0x3F,
+    "G903L" : 0x3F,
+    "GPro" : 0x3E,
+};
+
+function setDpi(dpi){
+
+    device.set_endpoint(2, 0x0001, 0xff00); // System IF    
+    savedDpi1 = dpi1;
+
+    var packet = [];
+    packet[0] = 0x10;
+    packet[1] = 0x01;
+    packet[2] = dpidict2[MouseType];
+    packet[3] = dpidict[MouseType];
+    packet[4] = 0x00;
+    packet[5] = Math.floor(dpi/256);
+    packet[6] = dpi%256;
+    device.write(packet, 7);
+
+
+
+}
+function Apply()
+{
+
+    device.set_endpoint(2, 0x0001, 0xff00); // System IF    
+    var packet = [];
+    packet[0] = 0x10;
+    packet[1] = 0x01;
+    packet[2] = 0x0B;
+    packet[3] = 0x2F;
+    packet[4] = 0x01;
+    device.write(packet, 7);
+}
+
+const mouseZonedict = {
+    "G502L" : 0x3E,
+    "G703L" : 0x1B,
+    "G903L" : 0x1B,
+    "GPro" : 0x3F,
+}
+function sendZone(zone, shutdown = false){
+
+    if(MouseType == "GPro"){
+        Apply();
+    }
+    device.set_endpoint(2, 0x0002, 0xff00); // Lighting IF    
+
+    var packet = [];
+    packet[0x00] = 0x11;
+    packet[0x01] = 0x01;
+    packet[0x02] = 0x07;
+    packet[0x03] = mouseZonedict[MouseType];
+    packet[0x04] = zone;
+    packet[0x05] = 0x01;
+
+
+
+        var iX = vLedPositions[zone][0];
+        var iY = vLedPositions[zone][1];
+        var color
+        var color;
+        if(shutdown){
+            color = hexToRgb(shutdownColor)
+        }else if (LightingMode == "Forced") {
+            color = hexToRgb(forcedColor)
+        }else{
+            color = device.color(iX, iY);
+        }
+        packet[0x06] = color[0];
+        packet[0x07] = color[1];
+        packet[0x08] = color[2];
+    
+    
+    packet[0x09] = 0x02;
+if(MouseType == "G903L" || MouseType == "G703L") {
+        packet[16] = 0x01;
+    
+}
+
+    device.write(packet, 20);
+    device.pause(1);
+
+}
+
+export function Render()
+{
+    sendZone(0);
+    sendZone(1);
+    
+    
+
+    if(savedDpi1 != dpi1 && DpiControl){
+      setDpi(dpi1)
+    }
+}
+
+
+export function Shutdown()
+{
+    device.set_endpoint(2, 0x0002, 0xff00); // Lighting IF    
+    sendZone(0,true);
+    sendZone(1,true);
+    
+}
+
+
+export function Validate(endpoint)
+{
+    return endpoint.interface === 2 && endpoint.usage === 0x0002 && endpoint.usage_page === 0xff00
+     || endpoint.interface === 2 && endpoint.usage === 0x0001 && endpoint.usage_page === 0xff00;
+}
 function hexToRgb(hex) {
     var result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
     var colors = [];
     colors[0] = parseInt(result[1], 16);
     colors[1] = parseInt(result[2], 16);
     colors[2] = parseInt(result[3], 16);
+
     return colors;
-    }
-    function sendPacketString(string, size){
-        var packet= [];
-        var data = string.split(' ');
-        
-        for(let i = 0; i < data.length; i++){
-            packet[parseInt(i,16)] =parseInt(data[i],16)//.toString(16)
-        }
-    
-        device.write(packet, size);
-    }
-export function Render()
-{       
-    sendColors();
-    sendLogo();
-    sendPacketString("22 11 02",64);
-
-    sendPacketString(`22 A0 02 00 01 00 00 08 00 00 80 00 32 00 00 01 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 
-    00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 
-    22 A0 02 00 01 00 00 08 00 00 80 00 32 00 00 01 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 
-    00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00`,64);
-}
-
-
-
-function sendColors(shutdown = false){
-
-    var packet = []
-    packet[0x00]   = 0x22;
-    packet[0x01]   = 0x10;
-    packet[0x02]   = 0x02;
-    packet[0x03]   = 0x00;
-    packet[0x04]   = 0x00;
-
-    for(var iIdx = 0; iIdx < vLedMap.length; iIdx++)
-    {
-        var iPxX = vLedPositions[iIdx][0];
-        var iPxY = vLedPositions[iIdx][1];
-        var col;
-        if(shutdown){
-            col = hexToRgb(shutdownColor)
-        }else if (LightingMode == "Forced") {
-            col = hexToRgb(forcedColor)
-        }else{
-            col = device.color(iPxX, iPxY);
-        }           
-    packet[vLedMap[iIdx]*3 + 4] = col[1];
-    packet[vLedMap[iIdx]*3 + 5] = col[0];
-    packet[vLedMap[iIdx]*3 + 6] = col[2];
-    }
-
-    device.write(packet, 64);
-    
-}
-function sendLogo(shutdown = false){
-     
-    var packet = []
-    packet[0x00]   = 0x2A;
-    packet[0x01]   = 0x04;
-    packet[0x02]   = 0x04;
-    packet[0x03]   = 0x04;
-    packet[0x04]   = 0x00;
-    packet[0x05]   = 0x32;
-    packet[0x06]   = 0x00;
-    var iPxX = vLedPositions[8][0];
-    var iPxY = vLedPositions[8][1];
-
-        var col;
-        if(shutdown){
-            col = hexToRgb(shutdownColor)
-        }else if (LightingMode == "Forced") {
-            col = hexToRgb(forcedColor)
-        }else{
-            col = device.color(iPxX, iPxY);
-        }           
-    packet[7] = col[1];
-    packet[8] = col[0];
-    packet[9] = col[2];
-    
-
-    packet[56]   = 0x01;
-    packet[57]   = 0x00;
-    packet[58]   = 0x01;
-    packet[59]   = 0x03;
-
-    device.write(packet, 64);
-    
-}
+  }
 
 export function Image()
 {

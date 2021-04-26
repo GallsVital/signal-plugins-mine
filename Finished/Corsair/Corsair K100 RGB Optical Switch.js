@@ -1,4 +1,4 @@
-export function Name() { return "Corsair K100 RGB"; }
+export function Name() { return "Corsair K100 RGB Optical"; }
 export function VendorId() { return 0x1b1c; }
 export function ProductId() { return 0x1B7C; }
 export function Publisher() { return "WhirlwindFX"; }

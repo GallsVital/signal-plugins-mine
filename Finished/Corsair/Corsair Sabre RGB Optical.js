@@ -10,9 +10,9 @@ var CORSAIR_PROPERTY_SPECIAL_FUNCTION = 0x04;
 var CORSAIR_PROPERTY_SUBMIT_MOUSE_COLOR         = 0x22;
 
 
-export function Name() { return "Corsair Sabre RGB"; }
+export function Name() { return "Corsair Sabre RGB Optical"; }
 export function VendorId() { return 0x1b1c; }
-export function ProductId() { return 0x1B14; }
+export function ProductId() { return 0x1B2F; }
 export function Publisher() { return "WhirlwindFX"; }
 export function Size() { return [3, 3]; }
 export function DefaultPosition(){return [240,120]}

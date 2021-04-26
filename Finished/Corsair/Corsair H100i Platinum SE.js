@@ -206,7 +206,7 @@ export function Initialize()
  function GetPacketSequence()
  {
      seq++;
-     if (seq > 32) seq = 1;
+     if (seq > 31) seq = 1;
   
      var shift = seq << 3;
      return shift//+ 4;
