@@ -7,9 +7,9 @@ export function DefaultPosition(){return [240,120]}
 export function DefaultScale(){return 8.0}
 export function ControllableParameters(){
     return [
-        {"property":"shutdownColor", "label":"Shutdown Color","type":"color","default":"009bde"},
+        {"property":"shutdownColor", "label":"Shutdown Color","min":"0","max":"360","type":"color","default":"009bde"},
         {"property":"LightingMode", "label":"Lighting Mode", "type":"combobox", "values":["Grid","Forced"], "default":"Grid"},
-        {"property":"forcedColor", "label":"Forced Color","type":"color","default":"009bde"},
+        {"property":"forcedColor", "label":"Forced Color","min":"0","max":"360","type":"color","default":"009bde"},
         {"property":"SettingControl", "label":"Enable Setting Control","type":"boolean","default":"false"},
         {"property":"dpi1", "label":"DPI 1", "step":"100","type":"number","min":"400", "max":"12000","default":"1500"},
         {"property":"dpi2", "label":"DPI 2", "step":"100","type":"number","min":"400", "max":"12000","default":"1500"},
