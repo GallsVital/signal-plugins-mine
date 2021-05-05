@@ -1,6 +1,6 @@
 export function Name() { return "Corsair K55 RGB Keyboard"; }
 export function VendorId() { return 0x1b1c; }
-export function ProductId() { return 0x1b3d; }
+export function ProductId() { return 0x0000;}// 0x1b3d; }
 export function Publisher() { return "WhirlwindFX"; }
 export function Size() { return [5, 2]; }
 
