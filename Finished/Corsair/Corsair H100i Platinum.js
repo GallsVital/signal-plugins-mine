@@ -137,9 +137,9 @@ var StartFlags = [0b001,0b010,0b011];
 var CoolingFlags = [0b000,0b011];
 var CoolingCommand = 0x14;
 var CurrentFanSpeed; 
-export function Name() { return "Corsair h100i Platinum SE"; }
+export function Name() { return "Corsair h100i Platinum"; }
 export function VendorId() { return  0x1b1c; }
-export function ProductId() { return 0x0C19; }
+export function ProductId() { return 0x0C18; }
 export function Publisher() { return "WhirlwindFX"; }
 export function Size() { return [5, 5]; }
 export function ControllableParameters(){

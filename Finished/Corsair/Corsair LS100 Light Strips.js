@@ -232,18 +232,18 @@ var deviceValues = [
     "",
 ];
 var deviceArray = [
-    "Ch1-Port-1",
-    "Ch1-Port-2",
-    "Ch1-Port-3",
-    "Ch1-Port-4",
-    "Ch1-Port-5",
-    "Ch1-Port-6",
     "Ch2-Port-1",
     "Ch2-Port-2",
     "Ch2-Port-3",
     "Ch2-Port-4",
     "Ch2-Port-5",
     "Ch2-Port-6",
+    "Ch1-Port-1",
+    "Ch1-Port-2",
+    "Ch1-Port-3",
+    "Ch1-Port-4",
+    "Ch1-Port-5",
+    "Ch1-Port-6",
 ];
 
 function InitCustomStrip(){
@@ -258,7 +258,7 @@ function InitCustomStrip(){
     Custom.width = CustomSize;
     Custom.ledCount = CustomSize;
 
-    var propertyArray = [device1, device2,device3,device4,device5,device6,device7,device8,device9,device10,device11,device12];
+    var propertyArray = [device7,device8,device9,device10,device11,device12, device1, device2,device3,device4,device5,device6];
 
     for (var deviceNumber = 0; deviceNumber < 12; deviceNumber++ ) {
              if(deviceValues[deviceNumber] == "Custom"){
@@ -267,7 +267,7 @@ function InitCustomStrip(){
     }
 }
 function SetFans(){
-    var propertyArray = [device1, device2,device3,device4,device5,device6,device7,device8,device9,device10,device11,device12];
+    var propertyArray = [device6,device7,device8,device9,device10,device11,device12,device1, device2,device3,device4,device5];
 
         for (var deviceNumber = 0; deviceNumber < 12; deviceNumber++ ) {
               if(deviceValues[deviceNumber] != propertyArray[deviceNumber]){
@@ -302,7 +302,7 @@ function SendChannel(channel, shutdown = false)
     var green = [135];
     var blue = [135];
     var TotalLedCount = 0;
-    var propertyArray = [device1, device2,device3,device4,device5,device6,device7,device8,device9,device10,device11,device12];
+    var propertyArray = [device7,device8,device9,device10,device11,device12, device1, device2,device3,device4,device5,device6];
 
 
     for (var deviceNumber = 0+6*channel; deviceNumber < 6+6*channel; deviceNumber++ ) {

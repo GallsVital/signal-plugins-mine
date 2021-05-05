@@ -1,4 +1,4 @@
-export function Name() { return "NZXT Kraken M22"; }
+export function Name() { return "NZXT Kraken M2"; }
 export function VendorId() { return 0x1e71; }
 export function ProductId() { return 0x1715; }
 export function Publisher() { return "WhirlwindFX"; }
@@ -60,7 +60,7 @@ export function Render()
     packet[0] = 0x02;
     packet[1] = 0x4C;
     packet[2] = 0x02; //channel
-    packet[3] = 0x00;
+    packet[3] = 0x00; //direct mode
 
     // Speed?
     packet[4] = 0x04;

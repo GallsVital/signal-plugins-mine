@@ -92,9 +92,9 @@ const Custom = {
     image: Placeholder()
 }
 
-export function Name() { return "NZXT Smart Device 2"; }
+export function Name() { return "NZXT RGB and Fan Controler"; }
 export function VendorId() { return   0x1E71; }
-export function ProductId() { return   0x2006; }
+export function ProductId() { return   0x2009; }
 export function Publisher() { return "WhirlwindFX"; }
 export function Size() { return [1,1]; }
 export function DefaultPosition(){return [0,0]}
@@ -120,7 +120,7 @@ export function ControllableParameters(){
     {"property":"device12", "label":"Ch2 | Port 6", "type":"combobox",  "values":["None","AER 2 Fan","Strip_10Led","Strip_8Led","Strip_Underglow_200mm","Cable_Comb","Custom"], "default":"None"},
     ];
 }
-var ParentDeviceName = "NZXT Smart Device 2";
+var ParentDeviceName = "NZXT RGB and Fan Controler";
 
 export function Initialize()
 {

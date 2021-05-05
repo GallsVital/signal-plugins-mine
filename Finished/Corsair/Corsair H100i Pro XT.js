@@ -119,8 +119,24 @@ var magic3 = [
      //0x55
 ];
 
+var CoolingBalanced = [0x14,0x00,0xFF,0x05,0xFF,0xFF,0xFF,0xFF,0xFF,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x01,0xFF,0xFF,0x00,0x00,0xFF,0x07,0x1D,0x33,0x1E,0x40,0x1F,0x4D,0x20,0x73,0x21,0xAD,0x22,0xD9,0x23,0xFF,0x1D,0x33,0x1E, 0x40,0x1F,0x4D,0x20,0x73,0x21,0xAD,0x22,0xD9,0x23,0xFF,0xFF,0xFF,0xFF,0xFF,0xFF,0x5F];
+
+var CoolingExtreme = [0x14,0x00,0xFF,0x05,0xFF,0xFF,0xFF,0xFF,0xFF,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x02,0xFF,0xFF,0x00,0x00,0xFF,0x07,0x1C,0x4D,0x1D,0x59,0x1E,0x80,0x1F,0xB3,0x20,0xCC,0x21,0xE6,0x22,0xFF,0x1C,0x4D,0x1D, 0x59,0x1E,0x80,0x1F,0xB3,0x20,0xCC,0x21,0xE6,0x22,0xFF,0xFF,0xFF,0xFF,0xFF,0xFF];
+
+var CoolingQuiet = [0x14,0x00,0xFF,0x05,0xFF,0xFF,0xFF,0xFF,0xFF,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0xFF,0xFF,0x00,0x00,0xFF,0x07,0x1E,0x33,0x20,0x40,0x23,0x73,0x25,0xA1,0x27,0xB8,0x29,0xCF,0x2A,0xFF,0x1E,0x33,0x20,0x40,0x23,0x73,0x25,0xA1,0x27,0xB8,0x29,0xCF,0x2A,0xFF,0xFF,0xFF,0xFF,0xFF,0xFF,0x3];
+
+var CoolingDict = {
+    "Quiet": CoolingQuiet,
+    "Balanced":CoolingBalanced,
+    "Extreme":CoolingExtreme
+}
+
+
 var ColorFlags = [0b100,0b101,0b110];
 var StartFlags = [0b001,0b010,0b011];
+var CoolingFlags = [0b000,0b011];
+var CoolingCommand = 0x14;
+var CurrentFanSpeed; 
 export function Name() { return "Corsair h100i Pro XT"; }
 export function VendorId() { return  0x1b1c; }
 export function ProductId() { return 0x0C20; }
@@ -132,6 +148,7 @@ export function ControllableParameters(){
     {"property":"LightingMode", "label":"Lighting Mode", "type":"combobox", "values":["Canvas","Forced"], "default":"Canvas"},
     {"property":"forcedColor", "label":"Forced Color","min":"0","max":"360","type":"color","default":"009bde"},
     //{"property":"stripMode", "label":"Strip Mode", "type":"boolean", "default":"false"},
+    {"property":"FanSpeed", "label":"Fan Speed", "type":"combobox", "values":["Quiet","Balanced", "Extreme"], "default":"Balanced"},
     {"property":"device1", "label":"Fan 1 Type", "type":"combobox", "values":["None","LL", "QL","ML","SpPro"], "default":"None"},
     {"property":"device2", "label":"Fan 2 Type", "type":"combobox", "values":["None","LL", "QL","ML","SpPro"], "default":"None"},
     ];
@@ -139,7 +156,6 @@ export function ControllableParameters(){
 var vLedNames = [
     "Logo 1","Logo 2", "Logo 3", "Logo 4","Ring 1", "Ring 2", "Ring 3", "Ring 4",
   "Ring 5","Ring 6", "Ring 7", "Ring 8", "Ring 9", "Ring 10", "Ring 11", "Ring 12",
-  
 ];
 var vLedPos = [        
       [1,0],[2,0],[3, 0],
@@ -149,11 +165,11 @@ var vLedPos = [
      [1,4], [2,4], [3,4]
     ];
 var vLedMapping = [
-     10, 11, 12,
-    9,    1,    13,
-    8,  0,  2,  14,
-    7,    3,    15,
-        6, 5, 4
+    11,  12,  13,
+    10,      1,     14,
+    9,    0,   2,   15,
+     8,      3,      4,
+        7,  6,  5,
 ];
 
 
@@ -206,7 +222,7 @@ export function Initialize()
  function GetPacketSequence()
  {
      seq++;
-     if (seq > 32) seq = 1;
+     if (seq > 31) seq = 1;
   
      var shift = seq << 3;
      return shift//+ 4;
@@ -304,6 +320,31 @@ function sendColorPacket(command, data){
     //10 works well for soft locks
     device.pause(10);
 }
+function sendCoolingPacket(data){
+    var packet = [];
+    packet[0] = 0x00;
+    packet[1] = 0x3F;
+    packet[2] = GetPacketSequence();
+    // packet[3] = 0x14;
+    packet = packet.concat(data);
+
+    // packet[4] = 0x00;
+    // packet[5] = 0xFF;
+    // packet[6] = 0x05;
+    // packet[7] = 0xFF;
+    // packet[8] = 0xFF;
+    // packet[9] = 0xFF;
+    // packet[10] = 0xFF;
+    // packet[11] = 0xFF;
+
+
+    // packet[63] = 0x00; 
+    packet[64] = ComputePec(packet.slice(2,64));
+    device.write(packet, 65);
+    device.read(packet,65);
+    // //10 works well for soft locks
+    device.pause(3);
+}
 
 function hexToRgb(hex) {
     var result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
@@ -320,7 +361,7 @@ function sendColor(shutdown = false){
     var TotalLedCount = 0;
     var propertyArray = [device1, device2];
     //Pump
-
+    
             for(var iIdx = 0; iIdx < vLedMapping.length; iIdx++)
             {
                 var iPxX = vLedPos[iIdx][0];
@@ -379,6 +420,12 @@ function sendColor(shutdown = false){
 export function Render()
 {
     SetFans();
+
+    if(CurrentFanSpeed != FanSpeed) {
+        CurrentFanSpeed = FanSpeed;
+        sendCoolingPacket(CoolingDict[CurrentFanSpeed]);
+    }   
+
     sendColor();
 }
 
