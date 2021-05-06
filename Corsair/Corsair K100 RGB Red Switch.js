@@ -2,7 +2,7 @@ export function Name() { return "Corsair K100 RGB Red"; }
 export function VendorId() { return 0x1b1c; }
 export function ProductId() { return 0x1B7D; }
 export function Publisher() { return "WhirlwindFX"; }
-export function Size() { return [22, 8]; }
+export function Size() { return [28, 12]; }
 export function DefaultPosition() {return [75,70]; }
 export function DefaultScale(){return 8.0}
 export function ControllableParameters(){
@@ -21,24 +21,15 @@ function hexToRgb(hex) {
 
     return colors;
   }
-var CORSAIR_COMMAND_WRITE       = 0x07;
-var CORSAIR_COMMAND_READ        = 0x0E;
-var CORSAIR_COMMAND_STREAM      = 0x7F;
-var CORSAIR_PROPERTY_LIGHTING_CONTROL           = 0x05;
-var CORSAIR_LIGHTING_CONTROL_HARDWARE           = 0x01;
-var CORSAIR_LIGHTING_CONTROL_SOFTWARE           = 0x02;
-var CORSAIR_PROPERTY_SUBMIT_KEYBOARD_COLOR_24   = 0x28;
-var CORSAIR_PROPERTY_SPECIAL_FUNCTION = 0x04;
-var CORSAIR_PROPERTY_SUBMIT_MOUSE_COLOR         = 0x22;
-
 
 export function Initialize()
 {
     sendPacketString("00 08 01 03 00 02",1025);  //Critical Software control packet
-    sendPacketString("00 08 01 6D 00 F8 02",1025);             //critical-
-    sendPacketString("00 08 02 6D 00 F8 02",1025);             //critical- has to do with  Control wheel modes?
-    sendPacketString("00 08 01 6D 00 E8 03",1025);             //critical-
-    sendPacketString("00 08 02 6E",1025);             //critical-     sendPacketString("00 08 0D 01 22",1025);          //Open lighting endpoint
+    //sendPacketString("00 08 01 6D 00 F8 02",1025);             //critical-
+    //sendPacketString("00 08 02 6D 00 F8 02",1025);             //critical- has to do with  Control wheel modes?
+    //sendPacketString("00 08 01 6D 00 E8 03",1025);             //critical-
+    //sendPacketString("00 08 02 6E",1025);             //critical-     sendPacketString("00 08 0D 01 22",1025);          //Open lighting endpoint
+
     sendPacketString("00 08 0D 01 22",1025);          //Open lighting endpoint
 
 //         //new
@@ -80,38 +71,54 @@ export function Shutdown()
 }
 
 
-// k100 Specific Ordering
+
+// This is an array of key indexes for setting colors in our render array, indexed left to right, row top to bottom.
+var vKeys = [  
+     134,135,136,137,138,139,140,141,142,143,144,145,146,147,148,149,150,151,152,153,154,155,
+     156,                      185,178,179,                                                                                167,
+     157,                  124,184,133,180,110,              186,187,188, 98,                                              168,  
+     158,                      183,182,181,                                                                                169,  
+     159, 127,        37,   54, 55, 56, 57,     58, 59, 60, 61,     62, 63, 64, 65,  66, 67, 68,      119, 122, 120, 121,  170, 
+     160, 128,     49,   26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 41, 42,     38,     69, 70, 71,      79, 80, 81, 82,      171, 
+     161,                                                                                                                  172, 
+     162, 129,     39,   16, 22, 4, 17, 19, 24, 20, 8, 14, 15, 43,   44,   45,       72, 73, 74,      91, 92, 93, 83,      173,
+     163, 130,     53,   0, 18, 3, 5, 6, 7, 9, 10, 11, 47, 48,         36,                            88, 89, 90,          174, 
+     164, 131,     102,  25, 23, 2, 21, 1, 13, 12, 50, 51, 52,          106,             78,          85, 86, 87, 84,      175, 
+     165, 132,     101,  104, 103,           40,              107, 118, 97, 105,      76,77,75,        94,    95,          176,
+     166,                                                                                                                  177,
+  ];
+ 
 
 var vKeyNames = [
-    "A"   ,  "B"  , "C",   "D"  ,"E"   ,"F" ,  "G" ,  "H" ,  "I"  , "J"  , "K"   ,"L"  ,"M"  , "N" , "O"  , "P" ,  "Q"  , "R"  , "T" ,  "U" ,  "V"  , "W" ,  "X"  , "Y" ,  "Z" ,
-    "1", "2", "3" ,"4" ,"5" ,"6" ,"7" ,"8", "9" ,"0" ,"Enter", "Esc" ,"Backspace" ,"Tab" ,"Space" ,"-_" ,"=+" ,"[", "]", "\\", "/", ";" ,"'" ,"`", ",", ".", "CapsLock" ,"F1" ,"F2","F3" ,"F4", "F5", "F6", "F7", "F8", "F9", "F10" ,"F11", "F12" ,"F12" ,"Scroll Lock" ,"Print Screen", "Pause Break",
-    "Insert", "Home", "Page Up", "Del", "End", "Page Down", "Right Arrow", "Left Arrow", "Down Arrow", "Up Arrow", "Num Lock", "/", "*" ,"-+", "=+", "Num Enter", "Num 1", "Num 2", "Num 3" ,"Num 4", "Num 5" ,"Num 6", "Num 7", "Num 8" ,"Num 9"
+    "lightBar1","lightBar2","lightBar3","lightBar4","lightBar5","lightBar6","lightBar7","lightBar8","lightBar9","lightBar10","lightBar11","lightBar12","lightBar13","lightBar14", "lightBar15","lightBar16","lightBar17","lightBar18","lightBar19","lightBar20","lightBar21","lightBar22",
+"LeftBar1",             "Control Wheel 1","Control Wheel 2", "Control Wheel 3",                                                                                 "RightBar 1",
+"LeftBar2",   "Profile","Control Wheel 8","Control Wheel Center","Control Wheel 4", "Lock",    "Logo 1","Logo 2","Logo 3",    "VOLUME_MUTE",                    "RightBar 2",
+"LeftBar3",             "Control Wheel 7","Control Wheel 6","Control Wheel 5",                                                                                  "RightBar 3",
+"LeftBar4","G1","Esc", "F1", "F2", "F3", "F4", "F5", "F6", "F7", "F8", "F9", "F10", "F11", "F12",         "Print Screen", "Scroll Lock", "Pause Break","MediaStop","MediaRewind","MediaPlayPause","MediaFastForward","RightBar 4",
+"LeftBar5","G2", "`", "1", "2", "3", "4", "5", "6", "7", "8", "9", "0", "-_", "=+", "Backspace",      "Insert", "Home", "Page Up",    "NumLock", "Num /", "Num *", "Num -","RightBar 5", 
+"LeftBar6",                                                                                                                                                         "RightBar 6",
+"LeftBar7","G3", "Tab", "Q", "W", "E", "R", "T", "Y", "U", "I", "O", "P", "[", "]", "\\",             "Del", "End", "Page Down",      "Num 7", "Num 8", "Num 9", "Num +",   "RightBar 7", 
+"LeftBar8","G4","CapsLock", "A", "S", "D", "F", "G", "H", "J", "K", "L", ";", "'", "Enter",                                                   "Num 4", "Num 5", "Num 6",  "RightBar 8",            
+"LeftBar9","G5","Left Shift", "Z", "X", "C", "V", "B", "N", "M", ",", ".", "/", "Right Shift",                          "Up Arrow",           "Num 1", "Num 2", "Num 3", "Num Enter", "RightBar 9",
+"LeftBar10","G6","Left Ctrl", "Left Win", "Left Alt", "Space", "Right Alt", "Fn", "Menu", "Right Ctrl",  "Left Arrow", "Down Arrow", "Right Arrow", "Num 0", "Num .","RightBar 10",   
+"LeftBar11","RightBar11"                 
 ];
 
  var vKeyPositions = [
-    //a     b   c    d  e   f   g   h   i   j    k   l   m   n   o   p   q   r   s  t   u   v   w   x   y   z  
-    [2,4],[6,5],[4,5],[4,4],[4,3],[5,4],[6,4],[7,4],[9,3],[8,4],[9,4],[10,4],[9,5],[8,5],[11,4],[12,4],[2,3],[5,3],[3,4],[6,3],[8,3],[5,5],[3,3],[3,5],[7,3],[2,5],
-    // 1 2 3 4 5 6 7 8 9 0  Enter esc backspace Tab Space - = [ ]
-    [1,1],[2,1],[3,1],[4,1],[5,1],[6,1],[7,1],[8,1],[10,1],[11,1],[14,3],[1,1],[14,1],[1,3],[7,6],[12,1],[13,1],[12,2],[13,2],
-    //  \ Blank? ; ' ` , . / Caps 
-    [14,2],[12,2],[12,3], [12,3], [1,2], [10,4],  [11,4],[12,4], [1,4],
-    
-    //f1 f2 f3 f4 f5 f6 f7 f8 f9 f10 f11 f12 f12 Scrolllock printscn pause
-    [2,1],[3,1],[4,1],[5,1],[7,1],[8,1],[9,1],[10,1],[11,1],[12,1],[13,1],[14,1],[15,1],[16,1],[17,1],
-    // ins home pgup del end pgdn right left down up numlock / * - + numEnter 1 2 3 4 5 6 7 8 9
-    [15,1],[16,1],[17,1], [15,3],[16,3],[17,3], [17,6],[15,6],[16,6],[16,5], [18,2],[19,2],[20,2],[21,2], [21,3],[21,5],[18,5],[19,5],[20,5],[18,4],[19,4],[20,4],[18,3],[19,3],[20,3],
-    // Num0 num. blank  rightWin Mute Blank Blank LControl LShift LAlt LWin Rcontrol RShift RAlt
-    [19,6],[20,6],[1,1], [13,6], [18,1] , [18,1] , [18,1], [1,6], [1,5], [3,6], [2,6], [14,6], [13,5], [11,6], 
-    // Blank Blank Lock    Blank Blank Blank Blank Blank Blank blank Fnkey stop playPause FF RR Blank Profile Blank Blank g1 g2 g3 g4 g5 g6
-    [13,4], [13,4], [3,1], [3,0], [3,0], [3,0], [3,0], [3,0], [3,0], [3,0], [12,6], [18,2], [20,2], [21,2], [19,2], [4,1], [0,0], [0,0], [0,1], [0,2], [0,3], [0,4], [0,5], [0,6], [0,7]
-    // logoCenter Blank REARLIGHTBAR START
-    , [2,2], [0,7], [0,0],[1,0],[2,0],[3,0],[4,0],[5,0],[6,0],[7,0],[8,0],[9,0],[10,0],[11,0],[12,0],[13,0],[14,0],[15,0],[16,0],[17,0],[18,0],[19,0],[20,0],[21,0],
-    //Left Side Bar
-    [0,1],[0,2],[0,3],[0,4],[0,5],[0,5],[0,6],[0,6],[0,7],[0,7],
-    //Right Side Bar
-    [21,1],[21,2],[21,3],[21,4],[21,5],[21,5],[21,6],[21,6],[21,7],[21,7],
-    //Blank logo Ring Top-Right-Bottom-Left
-    [21,7],[2,1],[3,1],[3,2],[3,3],[2,3],[1,3],[1,2]
+  
+[0,0],[2,0],[3,0],[4,0],[5,0],[6,0],[7,0],[8,0],[9,0],[11,0],[12,0],[13,0],[14,0],[16,0],[17,0],[18,0],[19,0],[20,0],[21,0],[23,0],[24,0],[25,0],
+ [0,1],         [3,1],[4,1],[5,1],                                                                                                                                                    [25,1], 
+[0,2],   [2,2],[3,2],[4,2],[5,2],[6,2],                               [11,2],[12,2],[13,2],                                       [21,2],                                             [25,2],
+ [0,3],         [3,3],[4,3],[5,3],                                                                                                                                                    [25,3],
+ [0,4],   [2,4],[3,4],    [5,4],[6,4], [7,4], [8,4],     [9,4],[10,4], [11,4], [12,4],   [14,4],[15,4], [16,4], [17,4],  [18,4], [19,4], [20,4],    [21,4], [22,4],[23,4], [24,4],    [25,4],         
+ [0,5],   [2,5],[3,5],[4,5],[5,5], [6,5], [7,5], [8,5], [9,5], [10,5], [11,5], [12,5], [13,5], [14,5], [15,5], [17,5],   [18,5], [19,5], [20,5],    [21,5], [22,5],[23,5], [24,5],    [25,5],         
+ [0,6],                                                                                                                                                                               [25,6],         
+ [0,7],   [2,7],  [3,7], [4,7], [5,7], [6,7], [7,7], [8,7], [9,7], [10,7], [11,7], [12,7], [13,7], [14,7], [16,7], [17,7], [18,7], [19,7], [20,7],   [21,7], [22,7],[23,7], [24,7],   [25,7],         
+ [0,8],    [2,8],  [3,8], [4,8], [5,8], [6,8], [7,8], [8,8], [9,8], [10,8], [11,8], [12,8], [13,8], [14,8],         [16,8],                           [21,8], [22,8],[23,8],          [25,8],         
+ [0,9],   [2,9],  [3,9],     [4,9], [5,9], [6,9], [7,9], [8,9], [9,9], [10,9], [11,9], [12,9], [13,9],            [16,9],           [19,9],           [21,9], [22,9],[23,9], [24,9],  [25,9],         
+ [0,10],  [2,10],  [3,10], [4,10], [5,10],                      [9,10],                       [12,10], [13,10], [15,10], [17,10],   [19,10], [20,10], [21,10],      [22,10], [23,10], [25,10],
+ [0,11],                                                                                                                                                                              [25,11],
+
  ];
 
 
@@ -144,7 +151,7 @@ function sendColors(shutdown = false){
     packet[0x08]   = 0x12;
     
     //vKeys.length
-    for(var iIdx = 0; iIdx < vKeyPositions.length; iIdx++)
+    for(var iIdx = 0; iIdx < vKeys.length; iIdx++)
     {
         var iPxX = vKeyPositions[iIdx][0];
         var iPxY = vKeyPositions[iIdx][1];
@@ -156,9 +163,9 @@ function sendColors(shutdown = false){
         }else{
             mxPxColor = device.color(iPxX, iPxY);
         }
-        packet[22+iIdx*3] = mxPxColor[0];
-        packet[22+iIdx*3 +1 ] = mxPxColor[1];
-        packet[22+iIdx*3 +2 ] = mxPxColor[2];
+        packet[22+vKeys[iIdx]*3] = mxPxColor[0];
+        packet[22+vKeys[iIdx]*3 +1 ] = mxPxColor[1];
+        packet[22+vKeys[iIdx]*3 +2 ] = mxPxColor[2];
     }
     device.write(packet, 1025);
 
