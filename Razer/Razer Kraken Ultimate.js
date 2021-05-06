@@ -28,6 +28,16 @@ export function ControllableParameters(){
 
     ];
 }
+function sendPacketString(string, size){
+    var packet= [];
+    var data = string.split(' ');
+    
+    for(let i = 0; i < data.length; i++){
+        packet[parseInt(i,16)] = parseInt(data[i],16)//.toString(16)
+    }
+
+    device.write(packet, size);
+}
 function hexToRgb(hex) {
     var result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
     var colors = [];
@@ -38,7 +48,7 @@ function hexToRgb(hex) {
     return colors;
   }
   var vLedNames = [
-    "Both Cans",     
+    "Both Cans"    
 ];
 
 var vLedPositions = [
@@ -57,7 +67,8 @@ export function LedPositions()
 
 export function Initialize()
 {
-    
+    sendPacketString("40 01 00 00 08",9)//software control packet
+
 }
 
 function SendPacket(shutdown = false)
@@ -67,10 +78,9 @@ function SendPacket(shutdown = false)
     packet[1] = 0x03;
     packet[2] = 0x00;
 
-    for(var iIdx = 0; iIdx < 1; iIdx++){
         var color;
-        var iPxX = vLedPositions[iIdx][0];
-        var iPxY = vLedPositions[iIdx][1];
+        var iPxX = vLedPositions[0][0];
+        var iPxY = vLedPositions[0][1];
         if(shutdown){
             color = hexToRgb(shutdownColor)
         }else if (LightingMode == "Forced") {
@@ -78,11 +88,11 @@ function SendPacket(shutdown = false)
         }else{
             color = device.color(iPxX, iPxY);
         }
-        var iLedIdx = (iIdx*3) + 3;
-        packet[iLedIdx] = color[0];
-        packet[iLedIdx+1] = color[1];
-        packet[iLedIdx+2] = color[2];
-    }
+        
+        packet[3] = color[0];
+        packet[4] = color[1];
+        packet[5] = color[2];
+    
     device.write(packet, 9);
     device.pause(1); // We need a pause here (between packets), otherwise the ornata can't keep up.
 
