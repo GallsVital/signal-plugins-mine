@@ -1,6 +1,6 @@
-export function Name() { return "Corsair K70 TKL"; }
+export function Name() { return "Corsair K65 Mini"; }
 export function VendorId() { return 0x1b1c; }
-export function ProductId() { return 0x1B73; }
+export function ProductId() { return 0x1BAF; }
 export function Publisher() { return "WhirlwindFX"; }
 export function Size() { return [22, 8]; }
 export function DefaultPosition() {return [75,70]; }
@@ -25,10 +25,6 @@ function hexToRgb(hex) {
 export function Initialize()
 {
     sendPacketString("00 08 01 03 00 02",1025);  //Critical Software control packet
-    //sendPacketString("00 08 01 6D 00 F8 02",1025);             //critical-
-    //sendPacketString("00 08 02 6D 00 F8 02",1025);             //critical- has to do with  Control wheel modes?
-    //sendPacketString("00 08 01 6D 00 E8 03",1025);             //critical-
-    //sendPacketString("00 08 02 6E",1025);             //critical-     sendPacketString("00 08 0D 01 22",1025);          //Open lighting endpoint
     sendPacketString("00 08 0D 01 22",1025);          //Open lighting endpoint
 
 
@@ -53,37 +49,27 @@ export function Shutdown()
 }
 
 var vKeys = [
-    
-     119,122,120,121,            -1,-3,                  124,109,110,98,
-     37,   54, 55, 56, 57,     58, 59, 60, 61,     62, 63, 64, 65,     66, 67, 68,   
-     49,   26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 41, 42,     38,     69, 70, 71,   
-     39,   16, 22, 4, 17, 19, 24, 20, 8, 14, 15, 43,   44,   45,       72, 73, 74, 
-     53,   0, 18, 3, 5, 6, 7, 9, 10, 11, 47, 48,         36,                       
-     102,  25, 23, 2, 21, 1, 13, 12, 50, 51, 52,          106,              78,    
-     101,  104, 103,           40,              107, 118, 97, 105,      76,77,75,  
-  
+     37,   26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 41, 42,     38,    
+     39,   16, 22, 4, 17, 19, 24, 20, 8, 14, 15, 43,   44,   45,     
+     53,   0, 18, 3, 5, 6, 7, 9, 10, 11, 47, 48,         36,         
+     102,  25, 23, 2, 21, 1, 13, 12, 50, 51, 52,          106,       
+     101,  104, 103,       -4,    40,  -3,           107, 118, 97, 105,   
 ]
 
 var vKeyNames = [
-    "MediaStop","MediaPreviousTrack", "MediaPlayPause", "MediaNextTrack",  "Logo 1", "Logo 2","Profile", "Brightness","Lock", "VOLUME_MUTE",
-    "Esc", "F1", "F2", "F3", "F4", "F5", "F6", "F7", "F8", "F9", "F10", "F11", "F12",         "Print Screen", "Scroll Lock", "Pause Break",   
-    "`", "1", "2", "3", "4", "5", "6", "7", "8", "9", "0", "-_", "=+", "Backspace",                        "Insert", "Home", "Page Up",       
-    "Tab", "Q", "W", "E", "R", "T", "Y", "U", "I", "O", "P", "[", "]", "\\",                               "Del", "End", "Page Down",         
-    "CapsLock", "A", "S", "D", "F", "G", "H", "J", "K", "L", ";", "'", "Enter",                                                              
-    "Left Shift", "Z", "X", "C", "V", "B", "N", "M", ",", ".", "/", "Right Shift",                                  "Up Arrow",               
-    "Left Ctrl", "Left Win", "Left Alt", "Space", "Right Alt", "Fn", "Menu", "Right Ctrl",  "Left Arrow", "Down Arrow", "Right Arrow" 
+    "Esc", "1", "2", "3", "4", "5", "6", "7", "8", "9", "0", "-_", "=+", "Backspace",         
+    "Tab", "Q", "W", "E", "R", "T", "Y", "U", "I", "O", "P", "[", "]", "\\",                
+    "CapsLock", "A", "S", "D", "F", "G", "H", "J", "K", "L", ";", "'", "Enter",             
+    "Left Shift", "Z", "X", "C", "V", "B", "N", "M", ",", ".", "/", "Right Shift",          
+    "Left Ctrl", "Left Win", "Left Alt","Space Left", "Space","Space Right", "Right Alt", "Fn", "Menu", "Right Ctrl",  
 ];
 
- var vKeyPositions = [
-    [0,0],[1,0], [2,0],  [3,0],         [7,0],[8,0],                               [11,0], [12,0], [13,0],   [14,0],
-    [0,1],        [2,1], [3,1], [4,1], [5,1], [6,1], [7,1], [8,1], [9,1],  [10,1], [11,1], [12,1], [13,1],   [14,1], [15,1], [16,1],  
-    [0,2], [1,2], [2,2], [3,2], [4,2], [5,2], [6,2], [7,2], [8,2], [9,2],  [10,2], [11,2], [12,2], [13,2],   [14,2], [15,2], [16,2], 
-    [0,3], [1,3], [2,3], [3,3], [4,3], [5,3], [6,3], [7,3], [8,3], [9,3],  [10,3], [11,3], [12,3], [13,3],   [14,3], [15,3], [16,3],
-    [0,4], [1,4], [2,4], [3,4], [4,4], [5,4], [6,4], [7,4], [8,4], [9,4],  [10,4], [11,4],         [13,4],                          
-    [0,5],        [2,5], [3,5], [4,5], [5,5], [6,5], [7,5], [8,5], [9,5],  [10,5], [11,5],         [13,5],           [15,5],        
-    [0,6], [1,6], [2,6],                      [6,6],                       [10,6], [11,6], [12,6], [13,6],   [14,6], [15,6], [16,6],
-
-    
+ var vKeyPositions = [      
+    [0,2], [1,2], [2,2], [3,2], [4,2], [5,2], [6,2], [7,2], [8,2], [9,2],  [10,2], [11,2], [12,2], [13,2],   
+    [0,3], [1,3], [2,3], [3,3], [4,3], [5,3], [6,3], [7,3], [8,3], [9,3],  [10,3], [11,3], [12,3], [13,3],   
+    [0,4], [1,4], [2,4], [3,4], [4,4], [5,4], [6,4], [7,4], [8,4], [9,4],  [10,4], [11,4],         [13,4],   
+    [0,5],        [2,5], [3,5], [4,5], [5,5], [6,5], [7,5], [8,5], [9,5],  [10,5], [11,5],         [13,5],   
+    [0,6], [1,6], [2,6],        [4,6],       [6,6],         [8,6],              [10,6], [11,6], [12,6], [13,6],   
  ];
 
 
@@ -109,7 +95,7 @@ function sendColors(shutdown = false){
     packet[0x01]   = 0x08;    
     packet[0x02]   = 0x06;
     packet[0x03]   = 0x01; // seen 0 and 1
-    packet[0x04]   = 0x85;
+    packet[0x04]   = 0x73;
     packet[0x05]   = 0x01;
     packet[0x06]   = 0x00;
     packet[0x07]   = 0x00;
