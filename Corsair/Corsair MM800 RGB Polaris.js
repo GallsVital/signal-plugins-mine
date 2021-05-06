@@ -34,22 +34,6 @@ var CORSAIR_PROPERTY_SUBMIT_MOUSE_COLOR         = 0x22;
 
 export function Initialize()
 {
-    
-    var packet = [];
-    packet[0x00]           = 0x00;
-    packet[0x01]           = CORSAIR_COMMAND_WRITE;
-    packet[0x02]           = 4;    
-    packet[0x03]           = CORSAIR_LIGHTING_CONTROL_SOFTWARE;
-    packet[0x05]   = 0x00;
-    device.write(packet, 65);
-
-    var packet1 = []
-    packet1[0x00]   = 0x00;
-    packet1[0x01]   = 0x07;
-    packet1[0x02]   = 0x22;
-    packet1[0x03]   = 0x14;
-    device.write(packet1, 65);
-
     var packet2 = [];
     packet2[0x00]           = 0x00;
     packet2[0x01]           = CORSAIR_COMMAND_WRITE;
@@ -59,6 +43,23 @@ export function Initialize()
     packet2[0x05]   = 0x01;
  
     device.write(packet2, 65);
+    
+    var packet = [];
+    packet[0x00]           = 0x00;
+    packet[0x01]           = CORSAIR_COMMAND_WRITE;
+    packet[0x02]           = CORSAIR_PROPERTY_SPECIAL_FUNCTION;    
+    packet[0x03]           = CORSAIR_LIGHTING_CONTROL_SOFTWARE;
+    packet[0x05]   = 0x00;
+    device.write(packet, 65);
+
+    var packet1 = []
+    packet1[0x00]   = 0x00;
+    packet1[0x01]   = 0x07;
+    packet1[0x02]   = 0x22;
+    packet1[0x03]   = 0x14;
+    //device.write(packet1, 65);
+
+
 }
 
 
