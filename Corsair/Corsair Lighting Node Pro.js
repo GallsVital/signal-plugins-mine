@@ -28,6 +28,13 @@ const LLFan ={
         [0,3],       [2,3],        [4,3], 
             [1,4],  [2,4],    [3,4],  
     ],
+    LedNames : [
+        "Ring Led 1", "Ring Led 2", "Ring Led 3", "Ring Led 4",
+        "Ring Led 5",      "Center Led 1", "Ring Led 6",
+        "Center Led 2","Center Led 3", "Ring Led 7",
+        "Ring Led 8",    "Center Led 4", "Ring Led 9",
+        "Ring Led 10", "Ring Led 11", "Ring Led 12"
+    ],
     displayName: "LL Fan",
     ledCount : 16,
     width: 5,
@@ -390,6 +397,7 @@ function SetFans(){
                     device.setSubdeviceName(deviceArray[deviceNumber],`${ParentDeviceName} - ${DeviceDict[propertyArray[deviceNumber]].displayName} - ${deviceArray[deviceNumber]}`);
                     device.setSubdeviceImage(deviceArray[deviceNumber], DeviceDict[propertyArray[deviceNumber]].image);
                     device.setSubdeviceSize(deviceArray[deviceNumber],DeviceDict[propertyArray[deviceNumber]].width,DeviceDict[propertyArray[deviceNumber]].height);
+                    
                  }
             }
         }

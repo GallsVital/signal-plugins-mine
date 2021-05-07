@@ -74,7 +74,12 @@ function hexToRgb(hex) {
   }
 
 
-var vLedNames = ["Base Station"];
+var vLedNames = [
+    "Ring Led 1", "Ring Led 2", "Ring Led 3",
+    "Ring Led 10",               "Ring Led 4",
+    "Ring Led 9",                "Ring Led 5",
+    "Ring Led 8","Ring Led 7","Ring Led 6"
+];
 var vLedPositions = [
         [1,0],[2,1],[3,1],
     [0,1],              [4,1],
@@ -86,7 +91,6 @@ var vLedMapping = [
     1,        7,
     2,        6,
        3,  4, 5, 
-
 ];
 
 export function LedNames()

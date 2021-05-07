@@ -74,11 +74,11 @@ var deviceArray = [
     "Ch2-Port-3",
 ];
 
-export function Name() { return "ASUS Aura LED Controller X"; }
-export function VendorId() { return  0x0B05; }            //0x046D ;}
-export function ProductId() { return 0x0000;} //0x18F3;}//0x1939  //0xC24A ;} Experimental
+export function Name() { return "GIGABYTE Motherboard Controller"; }
+export function VendorId() { return  0x048D; }  
+export function ProductId() { return 0x000;}//0x5702;} Experimental
 export function Publisher() { return "WhirlwindFX"; }
-export function Size() { return [9,1]; }
+export function Size() { return [3,3]; }
 export function Type() { return "Hid"; }
 export function DefaultPosition(){return [0,0]}
 export function DefaultScale(){return 8.0}
@@ -97,9 +97,10 @@ export function ControllableParameters(){
         {"property":"device6", "label":"Ch2 | Device 3", "type":"combobox",   "values":["None","Strip_10Led","Strip_8Led","Strip_6Led","Custom"], "default":"None"},
         ];
 }
-var ParentDeviceName = "ASUS AURA LED Controller";
+var ParentDeviceName = "GigaByte MotherBoard";
 var channelCount = 2;
 var MainBoardLedCount = 8;
+
 function hexToRgb(hex) {
     var result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
     var colors = [];
@@ -109,10 +110,24 @@ function hexToRgb(hex) {
 
     return colors;
   }
-
+var TotalZones = [
+    0x20,
+    0x21,
+    0x22,
+    0x23,
+    0x24,
+    0x25,
+    0x26,
+    0x27,
+]
+var vZones = [
+    0x20,0x22,0x23
+]
 var vLedNames = ["Led 1","Led 2","Led 3","Led 4","Led 5","Led 6","RGB Header 1", "RGB Header 2"];
 var vLedPositions = [
-    [0,0],[1,0],[2,0],[3,0],[4,0],[5,0],[6,0],[7,0]
+    [0,0],
+    [1,1],
+    [0,2],
 ];
 function InitMainBoardLeds(){
     var names = [];
@@ -165,12 +180,12 @@ export function Initialize()
     //this needs to read the response packets and set the number of chanels and mainboard leds.
     RequestConfig();
     //this is updated after loading so it won't display in the editor
-    InitMainBoardLeds();
+    //InitMainBoardLeds();
 
     //set all channels to direct mode
-    for(let channel = 0; channel < channelCount+1; channel++){
-        sendChannelStart(channel,255);
-    }
+    //for(let channel = 0; channel < channelCount+1; channel++){
+    //    sendChannelStart(channel,255);
+    //}
 }
 
 function Sendchannel(channel,shutdown = false)
@@ -227,7 +242,7 @@ function Sendchannel(channel,shutdown = false)
               var ledsToSend = TotalLedCount >= 20 ? 20 : TotalLedCount;
               TotalLedCount -= ledsToSend;
               TotalLedCount == 0 ? apply = true: apply = false;
-              sendDirectPacket(channel-1, ledsSent, ledsToSend, RGBdata.splice(0,ledsToSend*3),apply)
+              //sendDirectPacket(channel-1, ledsSent, ledsToSend, RGBdata.splice(0,ledsToSend*3),apply)
               ledsSent += ledsToSend;
           }
 
@@ -240,7 +255,7 @@ function SendMainboard(shutdown = false)
     var TotalLedCount = 0;
     var RGBdata = [];
 
-        for(var iIdx = 0; iIdx < vLedPositions.length; iIdx++)
+        for(var iIdx = 0; iIdx < vZones.length; iIdx++)
         {
             var iPxX = vLedPositions[iIdx][0];
             var iPxY = vLedPositions[iIdx][1];
@@ -252,27 +267,25 @@ function SendMainboard(shutdown = false)
             }else{
                 col = device.color(iPxX, iPxY);
             }           
-        
-            RGBdata[iIdx*3] = col[0];
-            RGBdata[iIdx*3+1] = col[1];
-            RGBdata[iIdx*3+2] = col[2];
-            TotalLedCount += 1;
+            //Data for my B550 Aorus Elite V1 is BGR?
+            //sendColorPacket(vZones[iIdx],[col[2],col[1],col[0]]);
+            //sendCommit();
         }
-        //we want to try and use direct mode
-         var ledsSent = 0;
-         var TotalLedCount = TotalLedCount >= 120 ? 120 : TotalLedCount;
+        // //we want to try and use direct mode
+        //  var ledsSent = 0;
+        //  var TotalLedCount = TotalLedCount >= 120 ? 120 : TotalLedCount;
 
-         //main board is channel 0 normally, but channel 4 in direct mode
-        //var xChannel = channel == 0 ? 4 : channel-1;
-        var xChannel = 4
-        var apply = false
-          while(TotalLedCount > 0){
-              var ledsToSend = TotalLedCount >= 20 ? 20 : TotalLedCount;
-              TotalLedCount -= ledsToSend;
-              TotalLedCount == 0 ? apply = true: apply = false;
-              sendDirectPacket(xChannel, ledsSent, ledsToSend, RGBdata.splice(0,ledsToSend*3),apply)
-              ledsSent += ledsToSend;
-          }
+        //  //main board is channel 0 normally, but channel 4 in direct mode
+        // //var xChannel = channel == 0 ? 4 : channel-1;
+        // var xChannel = 4
+        // var apply = false
+        //   while(TotalLedCount > 0){
+        //       var ledsToSend = TotalLedCount >= 20 ? 20 : TotalLedCount;
+        //       TotalLedCount -= ledsToSend;
+        //       TotalLedCount == 0 ? apply = true: apply = false;
+        //       //sendDirectPacket(xChannel, ledsSent, ledsToSend, RGBdata.splice(0,ledsToSend*3),apply)
+        //       ledsSent += ledsToSend;
+        //   }
 }
 function SetFans(){
     var propertyArray = [device1, device2,device3,device4,device5,device6];
@@ -302,68 +315,64 @@ export function Render()
     SetFans();
     SendMainboard();
 
-    for(let channel = 1; channel < channelCount+1; channel++){
-        Sendchannel(channel);
-    }
+    //for(let channel = 1; channel < channelCount+1; channel++){
+    //    Sendchannel(channel);
+    //}
 }
 
 function sendDirectPacket(channel, start, count, data,apply){
 
     var packet = [];         
-    packet[0] = 0xEC;
-    packet[1] = 0x40;
-    packet[2] = apply ? 0x80 | channel : channel;
-    packet[3] = start;
-    packet[4] = count;
+
+
     packet = packet.concat(data);
 
     device.write(packet, 65);
 }
-function sendColorPacket(start, count, data){
+function sendColorPacket(zone, data){
+    let Mode = 1; //Static mode
 
-    //these mask's are awful to find out
-    let mask = (((1 << count) -1)<< start);
-
-    var packet = [];         
-    packet[0] = 0xEC;
-    packet[1] = 0x36;
-    packet[2] = mask >> 8;
-    packet[3] = mask & 0xFF;
-    packet[4] = 0x00;
-
+    //Mainboard Leds seem to need standard effect packets
+    var packet = []; 
+            
+    packet[0x00] = 0xCC;
+    packet[0x01] = zone;
+    packet[0x02] = 2 ** Math.abs((0x20 - zone));
+    packet[0x03] = 0;
+    packet[0x04] = 0;
+    packet[0x0B] = Mode;
+    packet[0x0C] = 0x5A //We Always hardcode brightness to Max in plugins, its handled in the backend
+    packet[0x0D] = 0x00 //Min Brightness for effect - Not needed for us
     packet = packet.concat(data);
-    device.write(packet, 65);
+
+    //We ignore everything else involing timers and color shift effect info.
+    //device.log(packet);
+    device.send_report(packet, 64);
 }
 
 function sendCommit(){
-    sendPacketString("EC 3F 55",65);
+    sendReportString("CC 28 FF",64);
 }
 function sendChannelStart(channel, mode){
-    sendPacketString(`EC 35 ${(channel).toString(16)} 00 00 ${(mode).toString(16)}`,65);
+    //sendPacketString(`EC 35 ${(channel).toString(16)} 00 00 ${(mode).toString(16)}`,65);
 }
-var config = []
+var config = [0xCC]
 function RequestConfig(){
-    sendPacketString(`EC B0`,65);
-    
-    //config = device.read(config, 65)
+    sendReportString(`CC 60 00`,64);
+    config = device.get_report(config, 64)
+    device.log(config);
 
-    //first is channels, second is mainboard led count
-//1E 9F [01] 01 00 00
-//78 3C 00 00 00 00
-//00 00 00 00 00 00
-//00 00 00 00 00 00
-//00 00 00 [08] 09 02
-//00 00 00 00 00 00
-//00 00 00 00 00 00
-//00 00 00 00 00 00
-//00 00 00 00 00 00
-//00 00 00 00 00 00
+    let product = config[1];
+    let device_number = config[2];
+    let ledCount = config[3];
+ 
+
 }
 export function Shutdown()
 {
 
 }
-function sendPacketString(string, size){
+function sendReportString(string, size){
     var packet= [];
     var data = string.split(' ');
     
@@ -371,11 +380,11 @@ function sendPacketString(string, size){
         packet[parseInt(i,16)] =parseInt(data[i],16)//.toString(16)
     }
 
-    device.write(packet, size);
+    device.send_report(packet, size);
 }
 export function Validate(endpoint)
 {
-    return endpoint.interface === 2;
+    return endpoint.interface === -1 && endpoint.usage === 0x00CC;
 
 }
 

@@ -70,7 +70,7 @@ var deviceArray = [
 
 export function Name() { return "ASUS Aura LED Controller B"; }
 export function VendorId() { return  0x0B05; }                            //0x046D ;}
-export function ProductId() { return 0x0000;} //0x1939;}//0x1939;0x18F3 }  //0xC24A ;}
+export function ProductId() { return 0x0000;} //0x1939;}//0x1939;0x18F3 }  //0xC24A ;} Outdated Experimental
 export function Publisher() { return "WhirlwindFX"; }
 export function Size() { return [9,1]; }
 export function Type() { return "Hid"; }
