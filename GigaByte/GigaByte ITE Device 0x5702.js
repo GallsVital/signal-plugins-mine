@@ -76,7 +76,7 @@ var deviceArray = [
 
 export function Name() { return "GIGABYTE Motherboard Controller"; }
 export function VendorId() { return  0x048D; }  
-export function ProductId() { return 0x000;}//0x5702;} Experimental
+export function ProductId() { return 0x0000;}//0x5702;} //Experimental
 export function Publisher() { return "WhirlwindFX"; }
 export function Size() { return [3,3]; }
 export function Type() { return "Hid"; }
@@ -121,12 +121,19 @@ var TotalZones = [
     0x27,
 ]
 var vZones = [
-    0x20,0x22,0x23
+    0x20,
+    0x21, //RGB Header Bottom "LED_C1"
+    0x22,
+    0x23, 
+    0x24, // RGB Header Top "LED_C2"
 ]
 var vLedNames = ["Led 1","Led 2","Led 3","Led 4","Led 5","Led 6","RGB Header 1", "RGB Header 2"];
 var vLedPositions = [
     [0,0],
     [1,1],
+    [0,2],
+    [0,2],
+    [0,2],
     [0,2],
 ];
 function InitMainBoardLeds(){
@@ -268,8 +275,8 @@ function SendMainboard(shutdown = false)
                 col = device.color(iPxX, iPxY);
             }           
             //Data for my B550 Aorus Elite V1 is BGR?
-            //sendColorPacket(vZones[iIdx],[col[2],col[1],col[0]]);
-            //sendCommit();
+            sendColorPacket(vZones[iIdx],[col[2],col[1],col[0]]);
+            sendCommit();
         }
         // //we want to try and use direct mode
         //  var ledsSent = 0;
