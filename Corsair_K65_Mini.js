@@ -14,7 +14,7 @@ export function ControllableParameters(){
     ];
 }
 var endpointVal;
-var savedStartUpValue;
+var savedStartUpValue = true;
 
 function hexToRgb(hex) {
     var result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
@@ -29,7 +29,7 @@ function hexToRgb(hex) {
 export function Initialize()
 {
     sendPacketString("00 08 01 03 00 02",1025);  //Critical Software control packet
-    if(startupMode){
+    if(savedStartUpValue){
         //sendPacketString("00 08 01 6D 00 E8 03",1025);             //critical-
         //sendPacketString("00 08 01 02 00 E8 03",1025);             //critical-
         sendPacketString("00 08 02 6E",1025);                     //Tim's pc requires this
@@ -37,9 +37,9 @@ export function Initialize()
         endpointVal = 1;
     }else{
         sendPacketString("00 08 02 6E",1025);                     //Tim's pc requires this
-        sendPacketString(`00 08 0D 00 0F`,1025);          //Open 
-        sendPacketString(`00 08 0D 01 22`,1025);          //Open 
-        endpointVal = 1;
+        //sendPacketString(`00 08 0D 00 0F`,1025);          //Open 
+        sendPacketString(`00 08 0D 00 22`,1025);          //Open 
+        endpointVal = 0;
     }
     savedStartUpValue = startupMode;
     return "Startup Ran" + savedStartUpValue;
@@ -60,7 +60,6 @@ function sendPacketString(string, size){
 export function Shutdown()
 {
     sendPacketString("00 08 01 03 00 01",1025);  // hardware control packet
-
 }
 
 var vKeys = [
@@ -136,6 +135,22 @@ function sendColors(shutdown = false){
         packet[22+vKeys[iIdx]*3 +2 ] = mxPxColor[2];
     }
     device.write(packet, 1025);
+
+            //Check for Error
+
+            packet[3] = 0x00
+            packet = device.read(packet,1025)
+            if(packet[3] == 3){
+                //device.log(packet[3]);
+                //device.pause(10)
+                //device.log(packet);
+    
+                sendPacketString(`00 08 05 ${savedStartUpValue}`,1025);
+                savedStartUpValue = savedStartUpValue == 1 ? 0 : 1;
+                device.log("Selected Lighting Handle: " + savedStartUpValue);
+                Initialize();
+                
+            }
 
 }
 

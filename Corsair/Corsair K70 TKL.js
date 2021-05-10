@@ -1,6 +1,6 @@
 export function Name() { return "Corsair K70 TKL"; }
 export function VendorId() { return 0x1b1c; }
-export function ProductId() { return 0x1B73; }
+export function ProductId() { return 0; }
 export function Publisher() { return "WhirlwindFX"; }
 export function Size() { return [22, 8]; }
 export function DefaultPosition() {return [75,70]; }

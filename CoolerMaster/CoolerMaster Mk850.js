@@ -121,7 +121,6 @@ function SendColors(shutdown = false){
              StreamPacket(packetCount,
                  RGBData.splice(0,60)
                  );
-                 device.pause(2)
      }
 
 
@@ -151,13 +150,13 @@ function StreamPacket(packetId,RGBData){
     packet = packet.concat(RGBData);
     device.write(packet,65)
 
-    device.read(packet,65);
+    //device.read(packet,65);
 
 }
 function SendCommits(){
     sendPacketString("00 41 80",65);
     sendPacketString("00 51 28 00 00 04",65);
-
+    device.pause(1)
 
 }
 function SendMagicColorPacketStart(){

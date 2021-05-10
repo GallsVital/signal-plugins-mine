@@ -71,51 +71,19 @@ export function LedPositions()
 {
     return vLedPositions;
 }
-function sendPacketString(string, size){
-    var packet= [];
-    var data = string.split(' ');
-    
-    for(let i = 0; i < data.length; i++){
-        packet[parseInt(i,16)] = parseInt(data[i],16)//.toString(16)
-    }
-
-    device.write(packet, size);
-}
-
-function sendReportString(string, size){
-    var packet= [];
-    var data = string.split(' ');
-    
-    for(let i = 0; i < data.length; i++){
-        packet[parseInt(i,16)] =parseInt(data[i],16)//.toString(16)
-    }
-
-    device.send_report(packet, size);
-}
 
 export function Shutdown()
 {
     sendColors(true);
 
-    
 }
 
 export function Validate(endpoint)
 {
-    //endpoint = 1 1 ffc0
-    //Takes both a size 64 'system' WRITE, and size 643 RGB data REPORT
+    //Endpoint = 1 1 ffc0
+    //Takes both a size 64 'system' WRITE, and size '643 RGB data' REPORT
     return endpoint.interface === 1 && endpoint.usage === 1;
 }
-
-function hexToRgb(hex) {
-    var result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
-    var colors = [];
-    colors[0] = parseInt(result[1], 16);
-    colors[1] = parseInt(result[2], 16);
-    colors[2] = parseInt(result[3], 16);
-
-    return colors;
-  }
 
 export function Render() {
 
@@ -156,8 +124,17 @@ function sendColors(shutdown = false){
     }
 
     device.send_report(packet,643)
-
 }
+
+function hexToRgb(hex) {
+    var result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+    var colors = [];
+    colors[0] = parseInt(result[1], 16);
+    colors[1] = parseInt(result[2], 16);
+    colors[2] = parseInt(result[3], 16);
+
+    return colors;
+  }
 
 export function Image() 
 {

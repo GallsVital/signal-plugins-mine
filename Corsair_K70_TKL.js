@@ -7,15 +7,14 @@ export function DefaultPosition() {return [75,70]; }
 export function DefaultScale(){return 8.0}
 export function ControllableParameters(){
     return [
-        {"property":"startupMode", "label":"Start Up Mode","type":"boolean","default":"true"},
         {"property":"shutdownColor", "label":"Shutdown Color","min":"0","max":"360","type":"color","default":"009bde"},
         {"property":"LightingMode", "label":"Lighting Mode", "type":"combobox", "values":["Canvas","Forced"], "default":"Canvas"},
         {"property":"forcedColor", "label":"Forced Color","min":"0","max":"360","type":"color","default":"009bde"},
     ];
 }
 var endpointVal;
-var savedStartUpValue;
-
+var savedStartUpValue = true;
+var errors = 0;
 function hexToRgb(hex) {
     var result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
     var colors = [];
@@ -28,36 +27,52 @@ function hexToRgb(hex) {
 var readpacket = []
 export function Initialize()
 {
-
-    sendPacketString("00 08 02 03",1025);  
-    sendPacketString("00 08 01 03 00 02",1025);  
-    sendPacketString("00 08 02 03",1025);  
-    sendPacketString("00 08 02 5F",1025);  
-    sendPacketString("00 08 02 01",1025);  
-    sendPacketString("00 08 02 03",1025);  
-    sendPacketString("00 08 02 13",1025);  
-    sendPacketString("00 08 02 14",1025);  
-    sendPacketString("00 08 02 41",1025);  
-    sendPacketString("00 08 02 96",1025);  
-    sendPacketString("00 08 0D 00 27",1025);
-    sendPacketString("00 08 01 03 00 02",1025);  
-    sendPacketString("00 08 02 4A",1025);  
-    sendPacketString("00 08 02 45",1025);  
-    sendPacketString("00 08 01 02 00 E8 03",1025);  
-    sendPacketString("00 08 01 09 00 01",1025);  
-    sendPacketString("00 08 01 39 00 01",1025);  
-    sendPacketString("00 08 02 63",1025);  
-    sendPacketString("00 08 02 78",1025);  
-    sendPacketString("00 08 01 4a 00 01",1025);  
-    sendPacketString("00 08 02 6E",1025);  
-    sendPacketString("00 08 0d 00 22",1025);  
-    sendPacketString("00 08 0d 01 02",1025);  
-    sendPacketString("00 08 0d 01 0F",1025);  
-    sendPacketString("00 08 0d 00 22",1025);  
+ 
+    sendPacketString("00 08 01 03 00 02",1025);  //Critical Software control packet
+    if(savedStartUpValue){
+        sendPacketString("00 08 01 6D 00 E8 03",1025);             //critical-
+        sendPacketString("00 08 01 02 00 E8 03",1025);             //critical-
+        sendPacketString("00 08 02 6E",1025);                     //Tim's pc requires this
+        sendPacketString(`00 08 0D 00 22`,1025);          //Open 
+        endpointVal = 0;
+    }else{
+        sendPacketString("00 08 01 6D 00 E8 03",1025);             //critical-
+        sendPacketString("00 08 01 02 00 E8 03",1025);             //critical-
+        sendPacketString("00 08 02 6E",1025);                     //Tim's pc requires this
+        sendPacketString(`00 08 0D 00 0F`,1025);          //Open 
+        sendPacketString(`00 08 0D 01 22`,1025);          //Open 
+        endpointVal = 1;
+    }
 
 
-     endpointVal = 0;
-     savedStartUpValue = startupMode;
+
+
+    // sendPacketString("00 08 02 03",1025);  
+    // sendPacketString("00 08 01 03 00 02",1025);  
+    // sendPacketString("00 08 02 03",1025);  
+    // sendPacketString("00 08 02 5F",1025);  
+    // sendPacketString("00 08 02 01",1025);  
+    // sendPacketString("00 08 02 03",1025);  
+    // sendPacketString("00 08 02 13",1025);  
+    // sendPacketString("00 08 02 14",1025);  
+    // sendPacketString("00 08 02 41",1025);  
+    // sendPacketString("00 08 02 96",1025);  
+    // sendPacketString("00 08 0D 00 27",1025);
+    // sendPacketString("00 08 01 03 00 02",1025);  
+    // sendPacketString("00 08 02 4A",1025);  
+    // sendPacketString("00 08 02 45",1025);  
+    // sendPacketString("00 08 01 02 00 E8 03",1025);  
+    // sendPacketString("00 08 01 09 00 01",1025);  
+    // sendPacketString("00 08 01 39 00 01",1025);  
+    // sendPacketString("00 08 02 63",1025);  
+    // sendPacketString("00 08 02 78",1025);  
+    // sendPacketString("00 08 01 4a 00 01",1025);  
+    // sendPacketString("00 08 02 6E",1025);  
+    // sendPacketString("00 08 0d 00 22",1025);  
+    // sendPacketString("00 08 0d 01 02",1025);  
+    // sendPacketString("00 08 0d 01 0F",1025);  
+    // sendPacketString("00 08 0d 00 22",1025);  
+
 
 
 }
@@ -128,9 +143,7 @@ export function LedPositions()
 
 export function Render()
 {
-    if(savedStartUpValue != startupMode){
-        //Initialize();
-    }
+
     sendColors();
 }
 function sendColors(shutdown = false){
@@ -164,14 +177,29 @@ function sendColors(shutdown = false){
         packet[22+vKeys[iIdx]*3 +2 ] = mxPxColor[2];
     }
     device.write(packet, 1025);
-    device.read(readpacket,1025);
+        //Check for Error
+        packet[3] = 0x00
+        packet = device.read(packet,1025)
+        if(packet[3] == 3){
+            errors += 1;
+            if(errors > 1){
+                //device.log(packet[3]);
+                //device.log(errors)
+                errors = 0;
+                
+                sendPacketString(`00 08 05 ${savedStartUpValue}`,1025);
+                savedStartUpValue = savedStartUpValue == 1 ? 0 : 1;
+                device.log("Selected Lighting Handle: " + savedStartUpValue);
+                Initialize();
+            }
 
+        }
 }
 
 
 export function Validate(endpoint)
 {
-    return true//endpoint.interface === 1;
+    return endpoint.interface === 1;
 }
 
 

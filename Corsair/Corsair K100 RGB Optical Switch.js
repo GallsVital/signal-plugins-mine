@@ -1,6 +1,17 @@
+const Bragi_Id = 0x08;
+const Bragi_Set = 0x01;
+const Bragi_Get = 0x02;
+const Bragi_Close = 0x05;
+const Bragi_Write = 0x06;
+const Bragi_Open = 0x0D;
+
+const Bragi_Software = 0x02;
+const Bragi_Hardware = 0x01;
+
+
 export function Name() { return "Corsair K100 RGB Optical"; }
 export function VendorId() { return 0x1b1c; }
-export function ProductId() { return 0x1B7C; }
+export function ProductId() { return 0; }
 export function Publisher() { return "WhirlwindFX"; }
 export function Size() { return [28, 12]; }
 export function DefaultPosition() {return [75,70]; }
@@ -24,31 +35,23 @@ function hexToRgb(hex) {
 
 export function Initialize()
 {
-    sendPacketString("00 08 01 03 00 02",1025);  //Critical Software control packet
-    //sendPacketString("00 08 01 6D 00 F8 02",1025);             //critical-
-    //sendPacketString("00 08 02 6D 00 F8 02",1025);             //critical- has to do with  Control wheel modes?
-    //sendPacketString("00 08 01 6D 00 E8 03",1025);             //critical-
-    //sendPacketString("00 08 02 6E",1025);             //critical-     sendPacketString("00 08 0D 01 22",1025);          //Open lighting endpoint
+     var modePacket = []
+     modePacket[0] = 0x00
+     modePacket[1] = 0x08
+    // modePacket[2] = 0x02
+    // modePacket[3] = 0x03
 
-    sendPacketString("00 08 0D 01 22",1025);          //Open lighting endpoint
-
-//         //new
-//         sendPacketString("00 08 01 6D 00 E8 03",1025);             //critical-
-//         sendPacketString("00 08 01 02 00 E8 03",1025);             //critical-
-
-
-// //Alexes
-//     //sendPacketString("00 08 01 6D 00 F8 02",1025);             //critical-
-//     //sendPacketString("00 08 02 6D 00 F8 02",1025);             //critical- has to do with  Control wheel modes?
-//     //sendPacketString("00 08 01 6D 00 E8 03",1025);             //critical-
-
-
-//     sendPacketString("00 08 02 6E",1025);             //critical- 
-//     //new
-//     sendPacketString("00 08 0D 00 0F",1025);          //Open lighting endpoint
-
-//     sendPacketString("00 08 0D 01 22",1025);          //Open lighting endpoint
-
+    sendPacketString("00 08 01 03 00 01",1025);  //Software control packet [Bragi_Id, Bragi_Set, Mode, 00, Bragi_Software]
+    device.read(modePacket,1025)
+    device.pause(50)
+    sendPacketString("00 08 02 41",1025);
+    device.read(modePacket,1025)
+    sendPacketString("00 08 01 03 00 02",1025);  //Software control packet [Bragi_Id, Bragi_Set, Mode, 00, Bragi_Software]
+    device.read(modePacket,1025)
+    sendPacketString("00 08 0D 00 22",1025);          //Open lighting endpoint [Bragi_Id,Bragi_Open, Endpoint? ,LightingEndpoint (K100 uses 22?)]
+    modePacket = device.read(modePacket,1025)
+    device.log(modePacket[3]);
+    sendColors();
 
 }
  
@@ -135,7 +138,7 @@ export function LedPositions()
 export function Render()
 {
        
-    sendColors();
+    //reportsendColors();
 }
 function sendColors(shutdown = false){
 
@@ -143,7 +146,7 @@ function sendColors(shutdown = false){
     packet[0x00]   = 0x00;
     packet[0x01]   = 0x08;    
     packet[0x02]   = 0x06;
-    packet[0x03]   = 0x01 // seen 0 and 1
+    packet[0x03]   = 0x01 // seen 0 and 1 Seems to be Lighting Endpoint
     packet[0x04]   = 0x45;
     packet[0x05]   = 0x02;
     packet[0x06]   = 0x00;
@@ -168,6 +171,11 @@ function sendColors(shutdown = false){
         packet[22+vKeys[iIdx]*3 +2 ] = mxPxColor[2];
     }
     device.write(packet, 1025);
+    //Check for Error
+    packet[3] = 0x00
+    packet = device.read(packet,1025)
+    device.log(packet[3]);
+
 
 }
 
