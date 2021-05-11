@@ -1,4 +1,4 @@
-export function Name() { return "Corsair K100 RGB Red"; }
+export function Name() { return "Corsair K100 RGB Optical"; }
 export function VendorId() { return 0x1b1c; }
 export function ProductId() { return 0x1B7D; }
 export function Publisher() { return "WhirlwindFX"; }
@@ -7,6 +7,7 @@ export function DefaultPosition() {return [75,70]; }
 export function DefaultScale(){return 8.0}
 export function ControllableParameters(){
     return [
+        {"property":"startupMode", "label":"Start Up Mode","type":"boolean","default":"true"},
         {"property":"shutdownColor", "label":"Shutdown Color","min":"0","max":"360","type":"color","default":"009bde"},
         {"property":"LightingMode", "label":"Lighting Mode", "type":"combobox", "values":["Canvas","Forced"], "default":"Canvas"},
         {"property":"forcedColor", "label":"Forced Color","min":"0","max":"360","type":"color","default":"009bde"},
@@ -21,37 +22,29 @@ function hexToRgb(hex) {
 
     return colors;
   }
-
+var readPacket = []
+var endpointVal;
+var savedStartUpValue = true;
+var errors = 0;
 export function Initialize()
 {
+
     sendPacketString("00 08 01 03 00 02",1025);  //Critical Software control packet
-    //sendPacketString("00 08 01 6D 00 F8 02",1025);             //critical-
-    //sendPacketString("00 08 02 6D 00 F8 02",1025);             //critical- has to do with  Control wheel modes?
-    //sendPacketString("00 08 01 6D 00 E8 03",1025);             //critical-
-    //sendPacketString("00 08 02 6E",1025);             //critical-     sendPacketString("00 08 0D 01 22",1025);          //Open lighting endpoint
-
-    sendPacketString("00 08 0D 01 22",1025);          //Open lighting endpoint
-
-//         //new
-//         sendPacketString("00 08 01 6D 00 E8 03",1025);             //critical-
-//         sendPacketString("00 08 01 02 00 E8 03",1025);             //critical-
-
-
-// //Alexes
-//     //sendPacketString("00 08 01 6D 00 F8 02",1025);             //critical-
-//     //sendPacketString("00 08 02 6D 00 F8 02",1025);             //critical- has to do with  Control wheel modes?
-//     //sendPacketString("00 08 01 6D 00 E8 03",1025);             //critical-
-
-
-//     sendPacketString("00 08 02 6E",1025);             //critical- 
-//     //new
-//     sendPacketString("00 08 0D 00 0F",1025);          //Open lighting endpoint
-
-//     sendPacketString("00 08 0D 01 22",1025);          //Open lighting endpoint
-
+    if(savedStartUpValue){
+        //sendPacketString("00 08 01 6D 00 E8 03",1025);             //critical-
+        //sendPacketString("00 08 01 02 00 E8 03",1025);             //critical-
+        //sendPacketString("00 08 02 6E",1025);                     //Tim's pc requires this
+        sendPacketString(`00 08 0D 00 22`,1025);          //Open 
+        endpointVal = 0;
+    }else{
+        //sendPacketString("00 08 02 6E",1025);                     //Tim's pc requires this
+        //sendPacketString(`0 08 0D 00 0F`,1025);          //Open 
+        sendPacketString(`00 08 0D 01 22`,1025);          //Open 
+        endpointVal = 1;
+    }
 
 }
- 
+
 function sendPacketString(string, size){
 
     var packet= [];
@@ -134,7 +127,9 @@ export function LedPositions()
 
 export function Render()
 {
-       
+    // //if(savedStartUpValue != startupMode){
+    //         Initialize();
+    // }
     sendColors();
 }
 function sendColors(shutdown = false){
@@ -143,7 +138,7 @@ function sendColors(shutdown = false){
     packet[0x00]   = 0x00;
     packet[0x01]   = 0x08;    
     packet[0x02]   = 0x06;
-    packet[0x03]   = 0x01 // seen 0 and 1
+    packet[0x03]   = endpointVal // seen 0 and 1
     packet[0x04]   = 0x45;
     packet[0x05]   = 0x02;
     packet[0x06]   = 0x00;
@@ -168,6 +163,25 @@ function sendColors(shutdown = false){
         packet[22+vKeys[iIdx]*3 +2 ] = mxPxColor[2];
     }
     device.write(packet, 1025);
+
+        //Check for Error
+        packet[3] = 0x00
+        packet = device.read(packet,1025)
+        if(packet[3] == 3){
+            errors += 1;
+            if(errors > 1){
+                //device.log(packet[3]);
+                //device.log(errors)
+                erros = 0;
+
+                sendPacketString(`00 08 05 ${savedStartUpValue}`,1025);
+                savedStartUpValue = !savedStartUpValue
+                savedStartUpValue = savedStartUpValue == 1 ? 0 : 1;
+                device.log("Selected Lighting Handle: " + savedStartUpValue);
+                Initialize();
+            }
+
+        }
 
 }
 
