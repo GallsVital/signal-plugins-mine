@@ -98,7 +98,7 @@ export function ControllableParameters(){
         ];
 }
 var ParentDeviceName = "ASUS AURA LED Controller";
-var channelCount = 2;
+var channelCount = 1;
 var MainBoardLedCount = 8;
 function hexToRgb(hex) {
     var result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
@@ -168,7 +168,7 @@ export function Initialize()
     InitMainBoardLeds();
 
     //set all channels to direct mode
-    for(let channel = 0; channel < channelCount+1; channel++){
+    for(let channel = 0; channel < 2; channel++){
         sendChannelStart(channel,255);
     }
 }
@@ -302,7 +302,7 @@ export function Render()
     SetFans();
     SendMainboard();
 
-    for(let channel = 1; channel < channelCount+1; channel++){
+    for(let channel = 0; channel < channelCount; channel++){
         Sendchannel(channel);
     }
 }
@@ -341,12 +341,16 @@ function sendCommit(){
 function sendChannelStart(channel, mode){
     sendPacketString(`EC 35 ${(channel).toString(16)} 00 00 ${(mode).toString(16)}`,65);
 }
-var config = []
+var config = [0xEC, 0xB0]
 function RequestConfig(){
     sendPacketString(`EC B0`,65);
     
-    //config = device.read(config, 65)
-
+    config = device.read(config, 65)
+    device.log(config);
+    channelCount = config[6]
+    device.log(` ARGB channel Count ${channelCount} `);
+MainBoardLedCount = config[31]
+device.log(`MainBoard Led Count ${MainBoardLedCount} `);
     //first is channels, second is mainboard led count
 //1E 9F [01] 01 00 00
 //78 3C 00 00 00 00
@@ -368,7 +372,7 @@ function sendPacketString(string, size){
     var data = string.split(' ');
     
     for(let i = 0; i < data.length; i++){
-        packet[parseInt(i,16)] =parseInt(data[i],16)//.toString(16)
+        packet[parseInt(i,16)] = parseInt(data[i],16)//.toString(16)
     }
 
     device.write(packet, size);

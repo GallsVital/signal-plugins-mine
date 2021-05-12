@@ -1,4 +1,4 @@
-export function Name() { return "Corsair K100 RGB Optical"; }
+export function Name() { return "Corsair K100 RGB Red Switch"; }
 export function VendorId() { return 0x1b1c; }
 export function ProductId() { return 0x1B7D; }
 export function Publisher() { return "WhirlwindFX"; }
@@ -172,7 +172,7 @@ function sendColors(shutdown = false){
             if(errors > 1){
                 //device.log(packet[3]);
                 //device.log(errors)
-                erros = 0;
+                errors = 0;
 
                 sendPacketString(`00 08 05 ${savedStartUpValue}`,1025);
                 savedStartUpValue = !savedStartUpValue

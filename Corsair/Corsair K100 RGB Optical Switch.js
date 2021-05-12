@@ -172,7 +172,7 @@ function sendColors(shutdown = false){
             if(errors > 1){
                 //device.log(packet[3]);
                 //device.log(errors)
-                erros = 0;
+                errors = 0;
 
                 sendPacketString(`00 08 05 ${savedStartUpValue}`,1025);
                 savedStartUpValue = !savedStartUpValue
