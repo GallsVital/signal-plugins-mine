@@ -36,18 +36,60 @@ var CORSAIR_PROPERTY_SUBMIT_MOUSE_COLOR         = 0x22;
 export function Initialize()
 {
     var packet = [];
+    packet[0x00]           = 0x00;
+    packet[0x01]           = CORSAIR_COMMAND_WRITE;
+    packet[0x02]           = CORSAIR_PROPERTY_SPECIAL_FUNCTION;
+    packet[0x03]           = CORSAIR_LIGHTING_CONTROL_SOFTWARE;
+    packet[0x05]   = 0x03;
+    device.write(packet, 65);
 
+
+    var packet = [];
     packet[0x00]           = 0x00;
     packet[0x01]           = CORSAIR_COMMAND_WRITE;
     packet[0x02]           = CORSAIR_PROPERTY_LIGHTING_CONTROL;
     packet[0x03]           = CORSAIR_LIGHTING_CONTROL_SOFTWARE;
-
     packet[0x05]   = 0x03;
-   
     device.write(packet, 65);
+
+    InitScanCodes();
+
 }
+var SkippedKeys = [
+    0x31, 0x41,0x42,0x48,0x49,0x51,0x55,0x6F,0x7E,0x7F,0x80,0x81
+]
+function InitScanCodes(){
+    sendPacketString("00 07 05 08 00 01",65);
+    var ScanCodes = []
+    for(var ScanCode = 0; ScanCode < 120+SkippedKeys.length;ScanCode++){
+        if(SkippedKeys.includes(ScanCode)){
+            continue;
+        }
+        ScanCodes.push(ScanCode);
+        ScanCodes.push(0xC0);
+    }
+    for(var packetCount = 0; packetCount < 4; packetCount++) {
+        var packet = []
+        packet[0] = 0x00;
+        packet[1] = 0x07;
+        packet[2] = 0x40;
+        packet[3] = 0x1E;
+        packet[4] = 0x00;
+        packet = packet.concat(ScanCodes.splice(0,60))
+        device.write(packet,65);
+    }
+}
+function sendPacketString(string, size){
 
+    var packet= [];
+    var data = string.split(' ');
+    
+    for(let i = 0; i < data.length; i++){
+        packet[i] =parseInt(data[i],16)//.toString(16)
+    }
 
+    device.write(packet, size);
+}
 export function Shutdown()
 {
     var red = [168];
@@ -81,6 +123,17 @@ export function Shutdown()
    StreamPacket(2, 60, blue.splice(0,60));
    StreamPacket(3, 48, blue.splice(0,48));
    SubmitKbColors(3, 3, 2);
+
+   var packet = [];
+
+   packet[0x00]           = 0x00;
+   packet[0x01]           = CORSAIR_COMMAND_WRITE;
+   packet[0x02]           = CORSAIR_PROPERTY_LIGHTING_CONTROL;
+   packet[0x03]           = CORSAIR_LIGHTING_CONTROL_HARDWARE;
+
+   packet[0x05]   = 0x03;
+  
+   device.write(packet, 65);
 }
 
 
@@ -149,12 +202,15 @@ var vKeyPositions = [
 
 var vKeyNames = [
     "Profile","Brightness", "Lock",                  "Logo",                   "Mute",
-    "G1","Esc", "F1", "F2", "F3", "F4", "F5", "F6", "F7", "F8", "F9", "F10", "F11", "F12",         "Print Screen", "Scroll Lock", "Pause Break",   
+    "G1","Esc", "F1", "F2", "F3", "F4", "F5", "F6", "F7", "F8", "F9", "F10", "F11", "F12",         "Print Screen", "Scroll Lock", "Pause Break",   "MediaStop", "MediaRewind","MediaPlayPause","MediaFastForward",
     "G2","`", "1", "2", "3", "4", "5", "6", "7", "8", "9", "0", "-_", "=+", "Backspace",                        "Insert", "Home", "Page Up",       "NumLock", "Num /", "Num *", "Num -",  //21
     "G3","Tab", "Q", "W", "E", "R", "T", "Y", "U", "I", "O", "P", "[", "]", "\\",                               "Del", "End", "Page Down",         "Num 7", "Num 8", "Num 9", "Num +",    //21
     "G4","CapsLock", "A", "S", "D", "F", "G", "H", "J", "K", "L", ";", "'", "Enter",                                                              "Num 4", "Num 5", "Num 6",             //16
     "G5","Left Shift", "Z", "X", "C", "V", "B", "N", "M", ",", ".", "/", "Right Shift",                                  "Up Arrow",               "Num 1", "Num 2", "Num 3", "Num Enter",//17
-    "G6","Left Ctrl", "Left Win", "Left Alt", "Space", "Right Alt", "Fn", "Menu", "Right Ctrl",  "Left Arrow", "Down Arrow", "Right Arrow", "Num 0", "Num ."                       //13
+    "G6","Left Ctrl", "Left Win", "Left Alt", "Space", "Right Alt", "Fn", "Menu", "Right Ctrl",  "Left Arrow", "Down Arrow", "Right Arrow", "Num 0", "Num .",                       //13
+
+    "Lightbar Lightbar Led 1", "Lightbar Led 2", "Lightbar Led 3", "Lightbar Led 4", "Lightbar Led 5", "Lightbar Led 6", "Lightbar Led 7", "Lightbar Led 8", "Lightbar Led 9", "Lightbar Led 10", "Lightbar Led 11", "Lightbar Led 12",
+    "Lightbar Led 13", "Lightbar Led 14", "Lightbar Led 15", "Lightbar Led 16", "Lightbar Led 17", "Lightbar Led 18", "Lightbar Led 19"
 ];
 
 
