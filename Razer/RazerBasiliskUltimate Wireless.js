@@ -73,7 +73,7 @@ function hexToRgb(hex) {
     return colors;
   }
 
-var vLedNames = ["ScrollWheel", "Logo", "SideBar1","SideBar2","SideBar3","SideBar4","SideBar5","SideBar6","SideBar7","SideBar8","SideBar9","SideBar10","SideBar11","SideBar12"];
+var vLedNames = ["ScrollWheel", "Logo", "SideBar1","SideBar2","SideBar3","SideBar4","SideBar5","SideBar6","SideBar7","SideBar8","SideBar9","SideBar10","SideBar11"];
 var vLedPositions = [[3,0], [3,11],
 [0,1],[0,2],[0,3],[0,4],[0,5],[0,6],[0,7],[0,8],[0,9],[0,10],[0,11]];
 

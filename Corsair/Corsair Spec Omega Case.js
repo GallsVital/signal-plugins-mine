@@ -312,8 +312,10 @@ function SubmitLightingColors()
     device.write(packet, 65);
 }
 var vKeyNames = [
-    "Device Wide",
-];
+    "Led 0" , "Led 1" , "Led 2" , "Led 3" , "Led 4" , "Led 5" , "Led 6" , "Led 7" , "Led 8" , "Led 9" , "Led 10",
+    "Led 11" , "Led 12" , "Led 13" , "Led 14" , "Led 15" , "Led 16" , "Led 17" , "Led 18" , "Led 19" , "Led 20",
+    "Led 21" , "Led 22" , "Led 23" , "Led 24" , "Led 25" , "Led 26" , "Led 27" , "Led 28" , "Led 29" , "Led 30",
+    "Led 31" , "Led 32"]
 
 
  var vKeyPositions = [

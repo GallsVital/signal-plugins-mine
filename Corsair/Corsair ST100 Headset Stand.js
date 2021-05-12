@@ -87,7 +87,7 @@ export function Shutdown()
 
 
 var vKeyNames = [
-    "Stand"
+    "Base Led 1", "Base Led 2", "Base Led 3", "Base Led 4","Logo","Base Led 5","Base Led 6","Base Led 7","Base Led 8",
 ];
 
  var vKeyPositions = [

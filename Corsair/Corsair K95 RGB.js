@@ -114,8 +114,8 @@ var vKeyPositions = [
 ];
 
 var vKeyNames = [
-    "Profile","Brightness", "Lock",                  "Logo",                   "Mute",
-  "G1","G2","G3", "Esc", "F1", "F2", "F3", "F4", "F5", "F6", "F7", "F8", "F9", "F10", "F11", "F12",         "Print Screen", "Scroll Lock", "Pause Break",   
+                                                                                                                                                             "Lock", "Mute",
+  "G1","G2","G3", "Esc", "F1", "F2", "F3", "F4", "F5", "F6", "F7", "F8", "F9", "F10", "F11", "F12",         "Print Screen", "Scroll Lock", "Pause Break",   "MediaStop", "MediaRewind","MediaPlayPause","MediaFastForward",
   "G4","G5","G6", "`", "1", "2", "3", "4", "5", "6", "7", "8", "9", "0", "-_", "=+", "Backspace",                        "Insert", "Home", "Page Up",       "NumLock", "Num /", "Num *", "Num -",  //21
   "G7","G8","G9", "Tab", "Q", "W", "E", "R", "T", "Y", "U", "I", "O", "P", "[", "]", "\\",                               "Del", "End", "Page Down",         "Num 7", "Num 8", "Num 9", "Num +",    //21
   "G10","G11","G12", "CapsLock", "A", "S", "D", "F", "G", "H", "J", "K", "L", ";", "'", "Enter",                                                              "Num 4", "Num 5", "Num 6",             //16

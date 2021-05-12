@@ -73,7 +73,10 @@ function hexToRgb(hex) {
     return colors;
   }
 
-var vLedNames = ["laptop Stand"];
+var vLedNames = [
+    "Led 1", "Led 2", "Led 3", "Led 4", "Led 5", "Led 6", "Led 7", "Led 8", "Led 9", "Led 10", "Led 11", "Led 12",
+    "Led 13", "Led 14", "Led 15", "Led 16"
+];
 var vLedPositions = [
 
     [1,0],[2,0],[3,0],[4,0],[5,0],[6,0],[7,0],[8,0],[9,0],[10,0],[11,0],[12,0],[13,0],[14,0],[15,0],[15,0]

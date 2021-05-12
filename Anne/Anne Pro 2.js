@@ -64,7 +64,7 @@ function sendPacketString(string, size){
     var data = string.split(' ');
     
     for(let i = 0; i < data.length; i++){
-        packet[parseInt(i,16)] =parseInt(data[i],16)//.toString(16)
+        packet[i] =parseInt(data[i],16)//.toString(16)
     }
 
     device.write(packet, size);

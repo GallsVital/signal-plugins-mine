@@ -73,7 +73,10 @@ function hexToRgb(hex) {
     return colors;
   }
 
-var vLedNames = ["MousePad"];
+var vLedNames = [
+    "Led 1", "Led 2", "Led 3", "Led 4", "Led 5", "Led 6", "Led 7", "Led 8", "Led 9", "Led 10", "Led 11", "Led 12",
+    "Led 13", "Led 14", "Led 15"
+];
 var vLedPositions = [
 
     [9,0],[9,2],[9,4],[9,6],[9,7],[7,7],[7,5],[7,3],[7,1],[6,1],[5,1],[4,1],[3,0],[2,0],[1,0]

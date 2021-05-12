@@ -48,7 +48,7 @@ function CalculateCrc(report)
 }
 
 
-export function Name() { return "Razer Naga Pro test"; }
+export function Name() { return "Razer Naga Pro"; }
 export function VendorId() { return 0x1532; }
 export function ProductId() { return 0x008F; }
 export function Publisher() { return "WhirlwindFX"; }
@@ -77,7 +77,7 @@ function hexToRgb(hex) {
   }
 
 var vLedNames = ["ScrollWheel", "Logo","Side Panel"];
-var vLedPositions = [[1,0]//, [1,2], [0,1]
+var vLedPositions = [[1,0], [1,2], [0,1]
 ];
 
 export function LedNames()

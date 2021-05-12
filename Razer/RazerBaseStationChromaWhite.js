@@ -74,7 +74,10 @@ function hexToRgb(hex) {
   }
 
 
-var vLedNames = ["Base Station"];
+var vLedNames = [
+    "Led 1", "Led 2", "Led 3", "Led 4", "Led 5", "Led 6", "Led 7", "Led 8", "Led 9", "Led 10", "Led 11", "Led 12",
+    "Led 13", "Led 14", "Led 15", "Led 16"
+];
 var vLedPositions = [
 
     [0,0],[0,1],[0,2],[0,3],[0,4],[0,5],[1,5],[2,5],[3,5],[5,5],[5,4],[5,3],[5,2],[5,1],[5,0],[5,0]

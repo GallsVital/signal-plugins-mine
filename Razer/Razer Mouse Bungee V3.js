@@ -75,7 +75,9 @@ function hexToRgb(hex) {
 export function Type() { return "Hid"; }
 
 
-var vLedNames = ["Base Station"];
+var vLedNames = [
+    "Led 1", "Led 2", "Led 3", "Led 4", "Led 5", "Led 6", "Led 7", "Led 8"
+];
 var vLedPositions = [
         [1,0],[2,1],
     [0,1],          [3,1],

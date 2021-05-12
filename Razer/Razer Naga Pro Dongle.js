@@ -77,7 +77,7 @@ function hexToRgb(hex) {
   }
 
 var vLedNames = ["ScrollWheel", "Logo","Side Panel"];
-var vLedPositions = [[1,0], [1,2], [0,1], [0,1]];
+var vLedPositions = [[1,0], [1,2], [0,1]];
 
 export function LedNames()
 {

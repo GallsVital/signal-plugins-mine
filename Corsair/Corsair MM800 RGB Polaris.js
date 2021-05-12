@@ -89,7 +89,7 @@ export function Shutdown()
 
 
 var vKeyNames = [
-    "Stand"
+    "Led 1", "Led 2", "Led 3", "Led 4", "Led 5","Led 6","Led 7","Led 8","Led 9","Led 10","Led 11","Led 12","Led 13","Led 14","Led 15"
 ];
 
  var vKeyPositions = [

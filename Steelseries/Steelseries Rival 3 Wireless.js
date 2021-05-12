@@ -16,7 +16,7 @@ export function ControllableParameters(){
 }
 
 var vLedNames = [
-    "Scroll Zone",
+    "Scroll Zone 1","Scroll Zone 2",
 ];
 
 var vLedPositions = [

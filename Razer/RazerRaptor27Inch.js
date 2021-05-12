@@ -74,7 +74,9 @@ function hexToRgb(hex) {
 export function Type() { return "Hid"; }
 
 
-var vLedNames = ["Monitor Stand"];
+var vLedNames = [
+    "Led 1", "Led 2", "Led 3", "Led 4", "Led 5", "Led 6", "Led 7", "Led 8", "Led 9", "Led 10", "Led 11", "Led 12"
+];
 var vLedPositions = [
 
     [0,1], [0,3], [0,7], [0,9], [5,9], [7,9], [11,9], [14,9], [14,7], [14,5], [14,3] , [14,1]

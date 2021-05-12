@@ -20,7 +20,7 @@ export function ConflictingProcesses() {
 var savedDpi1;
 
 var vLedNames = [
-    "Logo",
+    "Scroll", "Logo"
 ];
 
 var vLedPositions = [
