@@ -5,6 +5,9 @@ const Strip_Internal = {
        positioning : [
         [0,0],[1,0],[2,0],[3,0],[4,0],[5,0],[6,0],[7,0],[8,0],[9,0]
     ],
+    LedNames : [
+        "Led 1","Led 2","Led 3","Led 4","Led 5","Led 6","Led 7","Led 8","Led 9","Led 10"
+    ],
     displayName: "Internal Strip",
     ledCount : 10,
     width: 10,
@@ -27,6 +30,13 @@ const LLFan ={
                  [1,2],   [3,2],   [4,2],                                      
         [0,3],       [2,3],        [4,3], 
             [1,4],  [2,4],    [3,4],  
+    ],
+    LedNames : [
+        "Ring Led 1", "Ring Led 2", "Ring Led 3", "Ring Led 4",
+        "Ring Led 5",      "Center Led 1", "Ring Led 6",
+        "Center Led 2","Center Led 3", "Ring Led 7",
+        "Ring Led 8",    "Center Led 4", "Ring Led 9",
+        "Ring Led 10", "Ring Led 11", "Ring Led 12"
     ],
     displayName: "LL Fan",
     ledCount : 16,
@@ -66,6 +76,19 @@ positioning : [
             [0, 3], [2, 3], [2, 3], [4, 3],
             [1, 4], [2, 4], [3, 4],
         ],
+        LedNames : [
+            "Front Ring Led 1","Front Ring Led 2","Front Ring Led 3",
+            "Front Ring Led 12",         "Front Center Led 1",             "Front Ring Led 4",
+            "Front Ring Led 11",  "Front Ring Led 4","Front Ring Led 2",  "Front Ring Led 5", 
+            "Front Ring Led 10",     "Front Ring Led 3",         "Front Ring Led 6",
+            "Front Ring Led 9","Front Ring Led 8","Front Ring Led 7",
+
+            "Back Ring Led 1","Back Ring Led 2","Back Ring Led 3",
+            "Back Ring Led 12",      "Back Ring Led 1","Back Ring Led 2",    "Back Ring Led 4",
+            "Back Ring Led 11",      "Back Ring Led 6","Back Ring Led 3",    "Back Ring Led 5",
+            "Back Ring Led 10",      "Back Ring Led 5","Back Ring Led 4",    "Back Ring Led 6",
+            "Back Ring Led 9","Back Ring Led 8","Back Ring Led 7",
+        ],
 displayName: "QL Fan",
 ledCount : 34,
 width: 5,
@@ -84,6 +107,9 @@ positioning : [
     [1,0], 
 [0,1],      [2,1], 
     [1,2],
+],
+LedNames : [
+    "Led 1", "Led 2", "Led 3", "Led 4"
 ],
 displayName: "ML Fan",
 ledCount : 4,
@@ -104,6 +130,9 @@ positioning : [
   [0,2],     [3,2],
      [1,3],[2,3],
 ],
+LedNames : [
+    "Led 1","Led 2","Led 3","Led 4","Led 5","Led 6","Led 7","Led 8"
+],
 displayName: "SpPro Fan",
 ledCount : 8,
 width: 4,
@@ -123,6 +152,9 @@ positioning : [
     [0,2],       [3,2],
     [0,3],[1,3],[3,3],
 ],
+LedNames : [
+    "Led 1","Led 2","Led 3","Led 4","Led 5","Led 6","Led 7","Led 8","Led 9","Led 10"
+],
 displayName: "XD5 Reservior",
 ledCount : 10,
 width: 4,
@@ -137,6 +169,9 @@ mapping : [
 positioning : [
     [0,0],[1,0],[2,0],[3,0],[4,0],[5,0],[6,0],[7,0],[8,0],[9,0],[10,0],[11,0],[12,0],[13,0],[14,0],[15,0]
 
+],
+LedNames : [
+    "Led 1","Led 2","Led 3","Led 4","Led 5","Led 6","Led 7","Led 8","Led 9","Led 10","Led 11","Led 12","Led 13","Led 14","Led 15","Led 16"
 ],
 displayName: "Gpu WaterBlock",
 ledCount : 16,
@@ -161,11 +196,24 @@ positioning : [
        [0,4],            [3,4],
        [0,5],[1,5],[2,5],[3,5],
 ],
+LedNames : [
+    "Led 1","Led 2","Led 3","Led 4","Led 5","Led 6","Led 7","Led 8","Led 9","Led 10","Led 11","Led 12","Led 13","Led 14","Led 15","Led 16"
+],
 displayName: "XD5 CPU",
 ledCount : 16,
 width: 6,
 height: 6,
 image: XD5_Cpu_Image()
+}
+const Custom = {
+    mapping : [],
+    positioning : [],
+    LedNames : [],
+    displayName: "Custom Strip",
+    ledCount : 10,
+    width: 10,
+    height: 1,
+    image: Placeholder()
 }
 
 const H150iCooler = {
@@ -187,6 +235,10 @@ const H150iCooler = {
              10,    11,     12,
          19,    20,     21,     22
      ],
+     LedNames : [
+        "Led 1","Led 2","Led 3","Led 4","Led 5","Led 6","Led 7","Led 8","Led 9","Led 10","Led 11","Led 12","Led 13","Led 14","Led 15","Led 16",
+        "Led 17","Led 18","Led 19","Led 20","Led 21","Led 22","Led 23","Led 24","Led 25","Led 26","Led 27","Led 28","Led 29"
+    ],
      displayName: "H150i Cooler",
      ledCount : 29,
      width: 7,
@@ -207,12 +259,12 @@ export function ControllableParameters(){
     {"property":"forcedColor", "label":"Forced Color","min":"0","max":"360","type":"color","default":"009bde"},
     {"property":"selection", "label":"Mode Controller", "type":"number", "min":"0", "max":"2", "default":"1"},
     {"property":"pump", "label":"Pump Type", "type":"combobox", "values":["None","H150I"], "default":"None"},
-    {"property":"device1",  "label":"Ch1 | Port 1", "type":"combobox",  "values":["None","Strip_Internal","LL", "QL","ML","SpPro","XD5Reservior","GPUBlock","XD5CPU"], "default":"None"},
-    {"property":"device2",  "label":"Ch1 | Port 2", "type":"combobox",  "values":["None","Strip_Internal","LL", "QL","ML","SpPro","XD5Reservior","GPUBlock","XD5CPU"], "default":"None"},
-    {"property":"device3",  "label":"Ch1 | Port 3", "type":"combobox",  "values":["None","Strip_Internal","LL", "QL","ML","SpPro","XD5Reservior","GPUBlock","XD5CPU"], "default":"None"},
-    {"property":"device4",  "label":"Ch1 | Port 4", "type":"combobox",  "values":["None","Strip_Internal","LL", "QL","ML","SpPro","XD5Reservior","GPUBlock","XD5CPU"], "default":"None"},
-    {"property":"device5",  "label":"Ch1 | Port 5", "type":"combobox",  "values":["None","Strip_Internal","LL", "QL","ML","SpPro","XD5Reservior","GPUBlock","XD5CPU"], "default":"None"},
-    {"property":"device6",  "label":"Ch1 | Port 6", "type":"combobox",  "values":["None","Strip_Internal","LL", "QL","ML","SpPro","XD5Reservior","GPUBlock","XD5CPU"], "default":"None"},
+    {"property":"device1",  "label":"Ch1 | Port 1", "type":"combobox",  "values":["None","Strip_Internal","LL", "QL","ML","SpPro","XD5Reservior","GPUBlock","XD5CPU","Custom"], "default":"None"},
+    {"property":"device2",  "label":"Ch1 | Port 2", "type":"combobox",  "values":["None","Strip_Internal","LL", "QL","ML","SpPro","XD5Reservior","GPUBlock","XD5CPU","Custom"], "default":"None"},
+    {"property":"device3",  "label":"Ch1 | Port 3", "type":"combobox",  "values":["None","Strip_Internal","LL", "QL","ML","SpPro","XD5Reservior","GPUBlock","XD5CPU","Custom"], "default":"None"},
+    {"property":"device4",  "label":"Ch1 | Port 4", "type":"combobox",  "values":["None","Strip_Internal","LL", "QL","ML","SpPro","XD5Reservior","GPUBlock","XD5CPU","Custom"], "default":"None"},
+    {"property":"device5",  "label":"Ch1 | Port 5", "type":"combobox",  "values":["None","Strip_Internal","LL", "QL","ML","SpPro","XD5Reservior","GPUBlock","XD5CPU","Custom"], "default":"None"},
+    {"property":"device6",  "label":"Ch1 | Port 6", "type":"combobox",  "values":["None","Strip_Internal","LL", "QL","ML","SpPro","XD5Reservior","GPUBlock","XD5CPU","Custom"], "default":"None"},
     ];
 }
 var ParentDeviceName = "Corsair Lighting Commander Core";
@@ -275,7 +327,29 @@ var deviceArray = [
     "Ch1-Port-6",
 
 ];
+function InitCustomStrip(){
+    var mapping = [];
+    var positioning = [];
+    var names = [];
+    for(let i = 0; i < CustomSize;i++){
+        mapping[i] = i;
+        positioning[i] = [i,0];
+        names[i] = `Led ${i}`;   
+    }
+    Custom.mapping = mapping;
+    Custom.positioning = positioning;
+    Custom.LedNames = names;
+    Custom.width = CustomSize;
+    Custom.ledCount = CustomSize;
 
+    var propertyArray = [device1, device2,device3,device4,device5,device6,device7,device8,device9,device10,device11,device12];
+
+    for (var deviceNumber = 0; deviceNumber < 12; deviceNumber++ ) {
+             if(deviceValues[deviceNumber] == "Custom"){
+                device.setSubdeviceSize(deviceArray[deviceNumber],DeviceDict[propertyArray[deviceNumber]].width,DeviceDict[propertyArray[deviceNumber]].height);
+             }       
+    }
+}
 
 function SetFans(){
     var propertyArray = [pump,device1, device2,device3,device4,device5,device6];
@@ -383,6 +457,7 @@ function SendColorData(shutdown = false)
 
 export function Render()
 {
+    InitCustomStrip(); 
 
     SetFans();
 

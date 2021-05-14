@@ -11,6 +11,9 @@ const AER_2 = {
         [0,2],       [3,2],
           [1,3],  [2,3]
     ],
+    LedNames : [
+        "Led 1","Led 2","Led 3","Led 4","Led 5","Led 6","Led 7","Led 8"
+    ],
     displayName: "AER 2 Fan",
     ledCount : 8,
     width: 4,
@@ -23,6 +26,9 @@ const Strip_10Led = {
        ],
        positioning : [
         [0,0],[1,0],[2,0],[3,0],[4,0],[5,0],[6,0],[7,0],[8,0],[9,0]
+    ],
+    LedNames : [
+        "Led 1","Led 2","Led 3","Led 4","Led 5","Led 6","Led 7","Led 8","Led 9","Led 10"
     ],
     displayName: "10 Led Strip",
     ledCount : 10,
@@ -37,6 +43,9 @@ const Strip_8Led = {
        positioning : [
         [0,0],[1,0],[2,0],[3,0],[4,0],[5,0],[6,0],[7,0]
     ],
+    LedNames : [
+        "Led 1","Led 2","Led 3","Led 4","Led 5","Led 6","Led 7","Led 8"
+    ],
     displayName: "8 Led Strip",
     ledCount : 8,
     width: 8,
@@ -49,6 +58,9 @@ const Strip_6Led = {
        ],
        positioning : [
         [0,0],[1,0],[2,0],[3,0],[4,0],[5,0]
+    ],
+    LedNames : [
+        "Led 1","Led 2","Led 3","Led 4","Led 5","Led 6"
     ],
     displayName: "6 Led Strip",
     ledCount : 6,
@@ -63,6 +75,9 @@ const Strip_Underglow_200mm = {
        positioning : [
         [0,0],[1,0],[2,0],[3,0],[4,0],[5,0],[6,0],[7,0],[8,0],[9,0]
     ],
+    LedNames : [
+        "Led 1","Led 2","Led 3","Led 4","Led 5","Led 6","Led 7","Led 8","Led 9","Led 10"
+    ],
     displayName: "Underglow Strip",
     ledCount : 10,
     width: 10,
@@ -76,6 +91,9 @@ const Cable_Comb = {
        positioning : [
         [0,0],[1,0],[2,0],[3,0],[4,0],[5,0],[6,0],[7,0],[8,0],[9,0],[10,0],[11,0],[12,0],[13,0]
     ],
+    LedNames : [
+        "Led 1","Led 2","Led 3","Led 4","Led 5","Led 6","Led 7","Led 8","Led 9","Led 10","Led 11","Led 12","Led 13","Led 14"
+    ],
     displayName: "Cable Comb",
     ledCount : 14,
     width: 14,
@@ -85,6 +103,7 @@ const Cable_Comb = {
 const Custom = {
     mapping : [],
     positioning : [],
+    LedNames : [],
     displayName: "Custom Strip",
     ledCount : 10,
     width: 10,
@@ -178,12 +197,15 @@ var vKeyPositions = [
 function InitCustomStrip(){
     var mapping = [];
     var positioning = [];
+    var names = [];
     for(let i = 0; i < CustomSize;i++){
         mapping[i] = i;
-        positioning[i] = [i,0];    
+        positioning[i] = [i,0];
+        names[i] = `Led ${i}`;   
     }
     Custom.mapping = mapping;
     Custom.positioning = positioning;
+    Custom.LedNames = names;
     Custom.width = CustomSize;
     Custom.ledCount = CustomSize;
 

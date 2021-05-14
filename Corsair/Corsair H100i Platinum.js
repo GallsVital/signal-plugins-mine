@@ -1,4 +1,3 @@
-
 const LLFan ={
     mapping : [
         4,      15,   14,    13, 
@@ -13,6 +12,13 @@ const LLFan ={
                  [1,2],   [3,2],   [4,2],                                      
         [0,3],       [2,3],        [4,3], 
             [1,4],  [2,4],    [3,4],  
+    ],
+    LedNames : [
+        "Ring Led 1", "Ring Led 2", "Ring Led 3", "Ring Led 4",
+        "Ring Led 5",      "Center Led 1", "Ring Led 6",
+        "Center Led 2","Center Led 3", "Ring Led 7",
+        "Ring Led 8",    "Center Led 4", "Ring Led 9",
+        "Ring Led 10", "Ring Led 11", "Ring Led 12"
     ],
     displayName: "LL Fan",
     ledCount : 16,
@@ -52,6 +58,19 @@ positioning : [
             [0, 3], [2, 3], [2, 3], [4, 3],
             [1, 4], [2, 4], [3, 4],
         ],
+        LedNames : [
+            "Front Ring Led 1","Front Ring Led 2","Front Ring Led 3",
+            "Front Ring Led 12",         "Front Center Led 1",             "Front Ring Led 4",
+            "Front Ring Led 11",  "Front Ring Led 4","Front Ring Led 2",  "Front Ring Led 5", 
+            "Front Ring Led 10",     "Front Ring Led 3",         "Front Ring Led 6",
+            "Front Ring Led 9","Front Ring Led 8","Front Ring Led 7",
+
+            "Back Ring Led 1","Back Ring Led 2","Back Ring Led 3",
+            "Back Ring Led 12",      "Back Ring Led 1","Back Ring Led 2",    "Back Ring Led 4",
+            "Back Ring Led 11",      "Back Ring Led 6","Back Ring Led 3",    "Back Ring Led 5",
+            "Back Ring Led 10",      "Back Ring Led 5","Back Ring Led 4",    "Back Ring Led 6",
+            "Back Ring Led 9","Back Ring Led 8","Back Ring Led 7",
+        ],
 displayName: "QL Fan",
 ledCount : 34,
 width: 5,
@@ -71,6 +90,9 @@ positioning : [
 [0,1],      [2,1], 
     [1,2],
 ],
+LedNames : [
+    "Led 1", "Led 2", "Led 3", "Led 4"
+],
 displayName: "ML Fan",
 ledCount : 4,
 width: 3,
@@ -89,6 +111,9 @@ positioning : [
   [0,1],     [3,1],
   [0,2],     [3,2],
      [1,3],[2,3],
+],
+LedNames : [
+    "Led 1","Led 2","Led 3","Led 4","Led 5","Led 6","Led 7","Led 8"
 ],
 displayName: "SpPro Fan",
 ledCount : 8,

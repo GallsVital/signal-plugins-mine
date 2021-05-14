@@ -5,6 +5,9 @@ const Strip_Internal = {
        positioning : [
         [0,0],[1,0],[2,0],[3,0],[4,0],[5,0],[6,0],[7,0],[8,0],[9,0]
     ],
+    LedNames : [
+        "Led 1","Led 2","Led 3","Led 4","Led 5","Led 6","Led 7","Led 8","Led 9","Led 10"
+    ],
     displayName: "Internal Strip",
     ledCount : 10,
     width: 10,
@@ -27,6 +30,13 @@ const LLFan ={
                  [1,2],   [3,2],   [4,2],                                      
         [0,3],       [2,3],        [4,3], 
             [1,4],  [2,4],    [3,4],  
+    ],
+    LedNames : [
+        "Ring Led 1", "Ring Led 2", "Ring Led 3", "Ring Led 4",
+        "Ring Led 5",      "Center Led 1", "Ring Led 6",
+        "Center Led 2","Center Led 3", "Ring Led 7",
+        "Ring Led 8",    "Center Led 4", "Ring Led 9",
+        "Ring Led 10", "Ring Led 11", "Ring Led 12"
     ],
     displayName: "LL Fan",
     ledCount : 16,
@@ -66,6 +76,19 @@ positioning : [
             [0, 3], [2, 3], [2, 3], [4, 3],
             [1, 4], [2, 4], [3, 4],
         ],
+        LedNames : [
+            "Front Ring Led 1","Front Ring Led 2","Front Ring Led 3",
+            "Front Ring Led 12",         "Front Center Led 1",             "Front Ring Led 4",
+            "Front Ring Led 11",  "Front Ring Led 4","Front Ring Led 2",  "Front Ring Led 5", 
+            "Front Ring Led 10",     "Front Ring Led 3",         "Front Ring Led 6",
+            "Front Ring Led 9","Front Ring Led 8","Front Ring Led 7",
+
+            "Back Ring Led 1","Back Ring Led 2","Back Ring Led 3",
+            "Back Ring Led 12",      "Back Ring Led 1","Back Ring Led 2",    "Back Ring Led 4",
+            "Back Ring Led 11",      "Back Ring Led 6","Back Ring Led 3",    "Back Ring Led 5",
+            "Back Ring Led 10",      "Back Ring Led 5","Back Ring Led 4",    "Back Ring Led 6",
+            "Back Ring Led 9","Back Ring Led 8","Back Ring Led 7",
+        ],
 displayName: "QL Fan",
 ledCount : 34,
 width: 5,
@@ -84,6 +107,9 @@ positioning : [
     [1,0], 
 [0,1],      [2,1], 
     [1,2],
+],
+LedNames : [
+    "Led 1", "Led 2", "Led 3", "Led 4"
 ],
 displayName: "ML Fan",
 ledCount : 4,
@@ -104,6 +130,9 @@ positioning : [
   [0,2],     [3,2],
      [1,3],[2,3],
 ],
+LedNames : [
+    "Led 1","Led 2","Led 3","Led 4","Led 5","Led 6","Led 7","Led 8"
+],
 displayName: "SpPro Fan",
 ledCount : 8,
 width: 4,
@@ -123,6 +152,9 @@ positioning : [
     [0,2],       [3,2],
     [0,3],[1,3],[3,3],
 ],
+LedNames : [
+    "Led 1","Led 2","Led 3","Led 4","Led 5","Led 6","Led 7","Led 8","Led 9","Led 10"
+],
 displayName: "XD5 Reservior",
 ledCount : 10,
 width: 4,
@@ -137,6 +169,9 @@ mapping : [
 positioning : [
     [0,0],[1,0],[2,0],[3,0],[4,0],[5,0],[6,0],[7,0],[8,0],[9,0],[10,0],[11,0],[12,0],[13,0],[14,0],[15,0]
 
+],
+LedNames : [
+    "Led 1","Led 2","Led 3","Led 4","Led 5","Led 6","Led 7","Led 8","Led 9","Led 10","Led 11","Led 12","Led 13","Led 14","Led 15","Led 16"
 ],
 displayName: "Gpu WaterBlock",
 ledCount : 16,
@@ -161,6 +196,9 @@ positioning : [
        [0,4],            [3,4],
        [0,5],[1,5],[2,5],[3,5],
 ],
+LedNames : [
+    "Led 1","Led 2","Led 3","Led 4","Led 5","Led 6","Led 7","Led 8","Led 9","Led 10","Led 11","Led 12","Led 13","Led 14","Led 15","Led 16"
+],
 displayName: "XD5 CPU",
 ledCount : 16,
 width: 6,
@@ -170,6 +208,7 @@ image: XD5_Cpu_Image()
 const Custom = {
     mapping : [],
     positioning : [],
+    LedNames : [],
     displayName: "Custom Strip",
     ledCount : 10,
     width: 10,
@@ -304,12 +343,15 @@ var deviceArray = [
 function InitCustomStrip(){
     var mapping = [];
     var positioning = [];
+    var names = [];
     for(let i = 0; i < CustomSize;i++){
         mapping[i] = i;
-        positioning[i] = [i,0];    
+        positioning[i] = [i,0];
+        names[i] = `Led ${i}`;   
     }
     Custom.mapping = mapping;
     Custom.positioning = positioning;
+    Custom.LedNames = names;
     Custom.width = CustomSize;
     Custom.ledCount = CustomSize;
 

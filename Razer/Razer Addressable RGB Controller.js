@@ -6,6 +6,9 @@ const Strip_10Led = {
        positioning : [
         [0,0],[1,0],[2,0],[3,0],[4,0],[5,0],[6,0],[7,0],[8,0],[9,0]
     ],
+    LedNames : [
+        "Led 1","Led 2","Led 3","Led 4","Led 5","Led 6","Led 7","Led 8","Led 9","Led 10"
+    ],
     displayName: "10 Led Strip",
     ledCount : 10,
     width: 10,
@@ -18,6 +21,9 @@ const Strip_8Led = {
        ],
        positioning : [
         [0,0],[1,0],[2,0],[3,0],[4,0],[5,0],[6,0],[7,0]
+    ],
+    LedNames : [
+        "Led 1","Led 2","Led 3","Led 4","Led 5","Led 6","Led 7","Led 8"
     ],
     displayName: "8 Led Strip",
     ledCount : 8,
@@ -32,6 +38,9 @@ const Strip_6Led = {
        positioning : [
         [0,0],[1,0],[2,0],[3,0],[4,0],[5,0]
     ],
+    LedNames : [
+        "Led 1","Led 2","Led 3","Led 4","Led 5","Led 6"
+    ],
     displayName: "6 Led Strip",
     ledCount : 6,
     width: 6,
@@ -39,16 +48,16 @@ const Strip_6Led = {
     image: Placeholder()
 }
 
-
 const Custom = {
     mapping : [],
     positioning : [],
+    LedNames : [],
     displayName: "Custom Strip",
     ledCount : 10,
     width: 10,
     height: 1,
     image: Placeholder()
-} 
+}
 var DeviceDict = {
     "None": null,
     "Strip_10Led" : Strip_10Led,
@@ -136,12 +145,18 @@ function InitCustomStrip(){
         CustomValue = CustomSize;
         var mapping = [];
         var positioning = [];
+        var names = [];
+
         for(let i = 0; i < CustomSize;i++){
             mapping[i] = i;
-            positioning[i] = [i,0];    
+            positioning[i] = [i,0]; 
+            names[i] = `Led ${i}`;   
+   
         }
         Custom.mapping = mapping;
         Custom.positioning = positioning;
+        Custom.LedNames = names;
+
         Custom.width = CustomSize;
         Custom.ledCount = CustomSize;
 
@@ -154,6 +169,7 @@ function InitCustomStrip(){
         }
     }
 }
+
 export function LedNames()
 {
   return vLedNames;
