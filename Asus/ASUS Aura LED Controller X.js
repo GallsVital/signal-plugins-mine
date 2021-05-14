@@ -75,8 +75,8 @@ var deviceArray = [
 ];
 
 export function Name() { return "ASUS Aura LED Controller X"; }
-export function VendorId() { return  0x0B05; }            //0x046D ;}
-export function ProductId() { return 0x0000;} //0x18F3;}//0x1939  //0xC24A ;} Experimental
+export function VendorId() { return  0x046D; }    //0x0B05       //0x046D ;}
+export function ProductId() { return 0xC24A;} //0x18F3;}//0x1939  //0xC24A ;} Experimental
 export function Publisher() { return "WhirlwindFX"; }
 export function Size() { return [9,1]; }
 export function Type() { return "Hid"; }
@@ -87,7 +87,7 @@ export function ControllableParameters(){
         {"property":"shutdownColor", "label":"Shutdown Color","min":"0","max":"360","type":"color","default":"009bde"},
         {"property":"LightingMode", "label":"Lighting Mode", "type":"combobox", "values":["Canvas","Forced"], "default":"Canvas"},
         {"property":"forcedColor", "label":"Forced Color","min":"0","max":"360","type":"color","default":"009bde"},
-        {"property":"RGBHeaderCount", "label":"RGB Header Count","type":"number","min":"0", "max":"2","default":"0"},
+        //{"property":"RGBHeaderCount", "label":"RGB Header Count","type":"number","min":"0", "max":"2","default":"0"},
         {"property":"CustomSize", "label":"Custom Strip Size","type":"number","min":"0", "max":"80","default":"10"},
         {"property":"device1", "label":"Ch1 | Device 1", "type":"combobox",   "values":["None","Strip_10Led","Strip_8Led","Strip_6Led","Custom"], "default":"None"},
         {"property":"device2", "label":"Ch1 | Device 2", "type":"combobox",   "values":["None","Strip_10Led","Strip_8Led","Strip_6Led","Custom"], "default":"None"},
@@ -98,8 +98,8 @@ export function ControllableParameters(){
         ];
 }
 var ParentDeviceName = "ASUS AURA LED Controller";
-var channelCount = 1;
-var MainBoardLedCount = 8;
+var channelCount = 0;
+var MainBoardLedCount = 0;
 function hexToRgb(hex) {
     var result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
     var colors = [];
@@ -349,8 +349,9 @@ function RequestConfig(){
     device.log(config);
     channelCount = config[6]
     device.log(` ARGB channel Count ${channelCount} `);
-MainBoardLedCount = config[31]
-device.log(`MainBoard Led Count ${MainBoardLedCount} `);
+    MainBoardLedCount = config[31]
+    device.log(`MainBoard Led Count ${MainBoardLedCount} `);
+
     //first is channels, second is mainboard led count
 //1E 9F [01] 01 00 00
 //78 3C 00 00 00 00
@@ -372,7 +373,7 @@ function sendPacketString(string, size){
     var data = string.split(' ');
     
     for(let i = 0; i < data.length; i++){
-        packet[parseInt(i,16)] = parseInt(data[i],16)//.toString(16)
+        packet[i] = parseInt(data[i],16)
     }
 
     device.write(packet, size);

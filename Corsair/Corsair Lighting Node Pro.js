@@ -500,6 +500,9 @@ export function Render()
         SetFans();
         SendChannel(0);
         SendChannel(1);
+        
+        device.pause(1);
+
         SubmitLightingColors();
        
 
