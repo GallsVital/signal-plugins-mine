@@ -83,12 +83,12 @@ const MLFan = {
 mapping : [
     0,
  3,  1,
-    2, 
+    2,
 ],
 positioning : [
     [1,0], 
-[0,1],      [2,1], 
-    [1,2],
+[0,1],   [2,1], 
+    [1,2]
 ],
 LedNames : [
     "Led 1", "Led 2", "Led 3", "Led 4"
@@ -179,8 +179,11 @@ export function ControllableParameters(){
     ];
 }
 var vLedNames = [
-    "Logo 1","Logo 2", "Logo 3", "Logo 4","Ring 1", "Ring 2", "Ring 3", "Ring 4",
-  "Ring 5","Ring 6", "Ring 7", "Ring 8", "Ring 9", "Ring 10", "Ring 11", "Ring 12",
+    "Logo 1","Ring 1", "Ring 2", "Ring 3",
+     "Ring 4","Logo 2", "Ring 5",
+     "Ring 6", "Logo 3", "Logo 4","Ring 7", 
+     "Ring 8",  "Ring 9", 
+     "Ring 10", "Ring 11", "Ring 12",
 ];
 var vLedPos = [        
       [1,0],[2,0],[3, 0],
@@ -326,6 +329,9 @@ function SetFans(){
                     device.setSubdeviceName(deviceArray[deviceNumber],`${Name()} - ${DeviceDict[propertyArray[deviceNumber]].displayName} - ${deviceArray[deviceNumber]}`);
                     device.setSubdeviceImage(deviceArray[deviceNumber], DeviceDict[propertyArray[deviceNumber]].image);
                     device.setSubdeviceSize(deviceArray[deviceNumber],DeviceDict[propertyArray[deviceNumber]].width,DeviceDict[propertyArray[deviceNumber]].height);
+                    device.setSubdeviceLeds(deviceArray[deviceNumber],
+                        DeviceDict[propertyArray[deviceNumber]].LedNames,
+                        DeviceDict[propertyArray[deviceNumber]].positioning)
                  }
             }
         }
