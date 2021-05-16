@@ -1,8 +1,8 @@
-export function Name() { return "Roccat Kone"; }
+export function Name() { return "Roccat Kain 120"; }
 export function VendorId() { return 0x1e7d; }
-export function ProductId() { return 0x2e2c; }
+export function ProductId() { return 0x2D5C; }
 export function Publisher() { return "WhirlwindFX"; }
-export function Size() { return [7, 7]; }
+export function Size() { return [3, 3]; }
 export function DefaultPosition(){return [240,120]}
 export function DefaultScale(){return 8.0}
 export function ControllableParameters(){
@@ -17,19 +17,14 @@ export function ControllableParameters(){
 var savedDpi1;
 var vKeys = [
     0,
-    1,2,3,4,
-    5,6,7,8,
-    9,10
+    1
 ];
 var vLedNames = [
-"Scroll Wheel",
- "Left Led 1","Left Led 2","Left Led 3","Left Led 4","Right Led 1","Right Led 2","Right Led 3","Right Led 4","Left Led 5","Right Led 5"
+"Scroll Wheel","Logo"
 ];
 var vLedPositions = [
-    [3,0],
-    [1,1],[2,2],[1,3],[2,4],
-    [5,1],[4,2],[5,3],[4,4],
-    [0,2],[6,2]
+    [1,0],
+    [1,2],
 ];
 function hexToRgb(hex) {
     var result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
@@ -78,7 +73,7 @@ function sendZone(shutdown = false){
 
     var packet = []
     packet[0] = 0x0D;
-    packet[1] = 0x2E;
+    packet[1] = 0x0B;
     for(var iIdx = 0; iIdx < vKeys.length; iIdx++)
     {
         var iPxX = vLedPositions[iIdx][0];
@@ -91,14 +86,13 @@ function sendZone(shutdown = false){
         }else{
             col = device.color(iPxX, iPxY);
         }
-        packet[vKeys[iIdx]*4+2] = col[0];
-        packet[vKeys[iIdx]*4+3] = col[1];
-        packet[vKeys[iIdx]*4+4] = col[2];
-        packet[vKeys[iIdx]*4+5] = 0x00;
+        packet[vKeys[iIdx]*3+2] = col[0];
+        packet[vKeys[iIdx]*3+3] = col[1];
+        packet[vKeys[iIdx]*3+4] = col[2];
 
     }
 
-    device.send_report(packet,46);
+    device.send_report(packet,11);
     device.pause(1);
 
 }
@@ -126,7 +120,7 @@ export function Shutdown()
 
 export function Validate(endpoint)
 {
-    return endpoint.interface === 0;
+    return endpoint.interface === 3;
 }
 
 
