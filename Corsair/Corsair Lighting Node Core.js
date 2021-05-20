@@ -336,9 +336,9 @@ function InitCustomStrip(){
     Custom.width = CustomSize;
     Custom.ledCount = CustomSize;
 
-    var propertyArray = [device1, device2,device3,device4,device5,device6,device7,device8,device9,device10,device11,device12];
+    var propertyArray = [device1, device2,device3,device4,device5,device6];
 
-    for (var deviceNumber = 0; deviceNumber < 12; deviceNumber++ ) {
+    for (var deviceNumber = 0; deviceNumber < 6; deviceNumber++ ) {
              if(deviceValues[deviceNumber] == "Custom"){
                 device.setSubdeviceSize(deviceArray[deviceNumber],DeviceDict[propertyArray[deviceNumber]].width,DeviceDict[propertyArray[deviceNumber]].height);
              }       
@@ -463,6 +463,8 @@ function SendChannel(channel,shutdown = false)
 
    //channelStart(channel);
    InitChannel(channel);
+   device.pause(1);
+
    var ledsSent = 0;
    var TotalLedCount = TotalLedCount >= 204 ? 204 : TotalLedCount;
 
@@ -474,6 +476,8 @@ function SendChannel(channel,shutdown = false)
         StreamLightingPacketChanneled(ledsSent,ledsToSend,2,blue.splice(0,ledsToSend),channel);
         ledsSent += ledsToSend;
         TotalLedCount -= ledsToSend;
+        device.pause(1);
+
     }
 
    //commit packet
@@ -499,9 +503,9 @@ export function Render()
     SetFans();
 
     SendChannel(0);
-
-
+    device.pause(1);
     SubmitLightingColors();
+    device.pause(1);
 
 
 }

@@ -73,10 +73,13 @@ var deviceArray = [
     "Ch2-Port-2",
     "Ch2-Port-3",
 ];
-
+var HeaderArray = [
+    "12v RGB Header 1",
+    "12v RGB Header 2",
+];
 export function Name() { return "ASUS Aura LED Controller X"; }
-export function VendorId() { return  0x046D; }    //0x0B05       //0x046D ;}
-export function ProductId() { return 0xC24A;} //0x18F3;}//0x1939  //0xC24A ;} Experimental
+export function VendorId() { return  0x0B05; }    //0x0B05       //0x046D ;}
+export function ProductId() { return 0x0000;} //0x18F3;}//0x1939  //0xC24A ;} Experimental
 export function Publisher() { return "WhirlwindFX"; }
 export function Size() { return [9,1]; }
 export function Type() { return "Hid"; }
@@ -87,7 +90,7 @@ export function ControllableParameters(){
         {"property":"shutdownColor", "label":"Shutdown Color","min":"0","max":"360","type":"color","default":"009bde"},
         {"property":"LightingMode", "label":"Lighting Mode", "type":"combobox", "values":["Canvas","Forced"], "default":"Canvas"},
         {"property":"forcedColor", "label":"Forced Color","min":"0","max":"360","type":"color","default":"009bde"},
-        //{"property":"RGBHeaderCount", "label":"RGB Header Count","type":"number","min":"0", "max":"2","default":"0"},
+        {"property":"RGBHeaderCount", "label":"RGB Header Count","type":"number","min":"0", "max":"2","default":"0"},
         {"property":"CustomSize", "label":"Custom Strip Size","type":"number","min":"0", "max":"80","default":"10"},
         {"property":"device1", "label":"Ch1 | Device 1", "type":"combobox",   "values":["None","Strip_10Led","Strip_8Led","Strip_6Led","Custom"], "default":"None"},
         {"property":"device2", "label":"Ch1 | Device 2", "type":"combobox",   "values":["None","Strip_10Led","Strip_8Led","Strip_6Led","Custom"], "default":"None"},
@@ -114,16 +117,31 @@ var vLedNames = ["Led 1","Led 2","Led 3","Led 4","Led 5","Led 6","RGB Header 1",
 var vLedPositions = [
     [0,0],[1,0],[2,0],[3,0],[4,0],[5,0],[6,0],[7,0]
 ];
+var savedRGBHeaderCount;
 function InitMainBoardLeds(){
+    savedRGBHeaderCount = RGBHeaderCount;
     var names = [];
     var positions = []
-        for(let i = 0; i < MainBoardLedCount;i++){
+        for(let i = 0; i < MainBoardLedCount-RGBHeaderCount; i++){
             names.append(`Led ${i}`)
             positions.append([i,0]);
         }
         vLedNames = names;
         vLedPositions = positions;
-}
+        for(let header = 0; header < 2;header++){
+
+            if(RGBHeaderCount <= header){
+            device.removeSubdevice(HeaderArray[header]);
+            }else{
+                //"Ch1 | Port 1"
+            device.createSubdevice(HeaderArray[header]); 
+            // Parent Device + Sub device Name + Ports
+            device.setSubdeviceName(HeaderArray[header],`${ParentDeviceName} - ${HeaderArray[header]}`);
+            device.setSubdeviceImage(HeaderArray[header], Placeholder());
+            device.setSubdeviceSize(HeaderArray[header],3,3);
+            }
+        }
+    }   
 
 var CustomValue;
 function InitCustomStrip(){
@@ -168,7 +186,7 @@ export function Initialize()
     InitMainBoardLeds();
 
     //set all channels to direct mode
-    for(let channel = 0; channel < 2; channel++){
+    for(let channel = 0; channel < channelCount+1; channel++){
         sendChannelStart(channel,255);
     }
 }
@@ -227,7 +245,7 @@ function Sendchannel(channel,shutdown = false)
               var ledsToSend = TotalLedCount >= 20 ? 20 : TotalLedCount;
               TotalLedCount -= ledsToSend;
               TotalLedCount == 0 ? apply = true: apply = false;
-              sendDirectPacket(channel-1, ledsSent, ledsToSend, RGBdata.splice(0,ledsToSend*3),apply)
+              sendDirectPacket(channel, ledsSent, ledsToSend, RGBdata.splice(0,ledsToSend*3),apply)
               ledsSent += ledsToSend;
           }
 
@@ -300,6 +318,10 @@ export function Render()
 {        
     InitCustomStrip();
     SetFans();
+    if(savedRGBHeaderCount != RGBHeaderCount){
+        InitMainBoardLeds();
+    }
+
     SendMainboard();
 
     for(let channel = 0; channel < channelCount; channel++){
@@ -346,10 +368,10 @@ function RequestConfig(){
     sendPacketString(`EC B0`,65);
     
     config = device.read(config, 65)
-    device.log(config);
-    channelCount = config[6]
-    device.log(` ARGB channel Count ${channelCount} `);
-    MainBoardLedCount = config[31]
+    //device.log(config);
+    channelCount = config[6];
+    device.log(`ARGB channel Count ${channelCount} `);
+    MainBoardLedCount = config[31];
     device.log(`MainBoard Led Count ${MainBoardLedCount} `);
 
     //first is channels, second is mainboard led count

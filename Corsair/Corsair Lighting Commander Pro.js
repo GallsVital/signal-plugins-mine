@@ -480,6 +480,8 @@ function SendChannel(channel,shutdown = false)
 
    //channelStart(channel);
    InitChannel(channel);
+   device.pause(1);
+
    var ledsSent = 0;
    var TotalLedCount = TotalLedCount >= 204 ? 204 : TotalLedCount;
 
@@ -491,6 +493,7 @@ function SendChannel(channel,shutdown = false)
         StreamLightingPacketChanneled(ledsSent,ledsToSend,2,blue.splice(0,ledsToSend),channel);
         ledsSent += ledsToSend;
         TotalLedCount -= ledsToSend;
+        device.pause(1);
     }
 
 
@@ -515,10 +518,13 @@ export function Render()
     SetFans();
 
     SendChannel(0);
+    device.pause(1);
 
     SendChannel(1);
+    device.pause(1);
 
     SubmitLightingColors();
+    device.pause(1);
 
 }
 

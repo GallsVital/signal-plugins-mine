@@ -34,20 +34,6 @@ export function LedPositions()
 
 export function Initialize()
 {
-    device.set_endpoint(1, 0x0002, 0xff00); // Lighting IF    
-
-        var packet = [];
-       packet[0x00] = 0x11;
-       packet[0x01] = 0xFF;
-       packet[0x02] = 0x0E;
-       packet[0x03] = 0x1A; 
-       packet[0x04] = 0x00;
-       packet[0x05] = 0x07;
-       packet[0x06] = 255;
-       packet[0x07] = 0;
-       packet[0x08] = 0;
-    device.write(packet,20)
-    device.read(packet,20) 
 
 
 if(savedDpi1 != dpi1 && DpiControl) {
@@ -71,7 +57,7 @@ function setDpi(dpi){
     packet[6] = dpi%256;
     device.write(packet, 7);
     device.read(packet, 7);
-    //device.read(packet, 7);
+    device.pause(1);  
 
 
 
@@ -87,8 +73,8 @@ function Apply()
     packet[0x03] = 0x7A;
 
     device.write(packet, 20);  
-    //device.pause(30);  
     device.read(packet,20);
+    device.pause(1);  
 
 }
 function sendColor(shutdown = false){
@@ -125,8 +111,8 @@ function sendColor(shutdown = false){
 
     device.write(packet, 20);
     device.read(packet,20);
+    device.pause(1);  
 
-    //.pause(30);
     
     Apply();
 }

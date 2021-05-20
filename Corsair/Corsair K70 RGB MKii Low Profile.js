@@ -46,9 +46,48 @@ function sendPacketString(string, size){
 
 export function Initialize()
 {
+    var packet = [];
+    packet[0x00]           = 0x00;
+    packet[0x01]           = CORSAIR_COMMAND_WRITE;
+    packet[0x02]           = CORSAIR_PROPERTY_SPECIAL_FUNCTION;
+    packet[0x03]           = CORSAIR_LIGHTING_CONTROL_SOFTWARE;
+    packet[0x05]   = 0x03;
+    device.write(packet, 65);
 
-    sendPacketString("00 07 05 02 00 03",65);
 
+    var packet = [];
+    packet[0x00]           = 0x00;
+    packet[0x01]           = CORSAIR_COMMAND_WRITE;
+    packet[0x02]           = CORSAIR_PROPERTY_LIGHTING_CONTROL;
+    packet[0x03]           = CORSAIR_LIGHTING_CONTROL_SOFTWARE;
+    packet[0x05]   = 0x03;
+    device.write(packet, 65);
+
+    InitScanCodes();
+}
+var SkippedKeys = [
+    0x31, 0x41,0x42,0x48,0x49,0x51,0x55,0x6F,0x7E,0x7F,0x80,0x81
+]
+function InitScanCodes(){
+    sendPacketString("00 07 05 08 00 01",65);
+    var ScanCodes = []
+    for(var ScanCode = 0; ScanCode < 120+SkippedKeys.length;ScanCode++){
+        if(SkippedKeys.includes(ScanCode)){
+            continue;
+        }
+        ScanCodes.push(ScanCode);
+        ScanCodes.push(0xC0);
+    }
+    for(var packetCount = 0; packetCount < 4; packetCount++) {
+        var packet = []
+        packet[0] = 0x00;
+        packet[1] = 0x07;
+        packet[2] = 0x40;
+        packet[3] = 0x1E;
+        packet[4] = 0x00;
+        packet = packet.concat(ScanCodes.splice(0,60))
+        device.write(packet,65);
+    }
 }
 
 

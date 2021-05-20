@@ -346,6 +346,8 @@ function SendChannel(channel, shutdown = false)
         StreamLightingPacketChanneled(ledsSent,ledsToSend,2,blue.splice(0,ledsToSend),channel);
         ledsSent += ledsToSend;
         TotalLedCount -= ledsToSend;
+        device.pause(1);
+
     }
 
 }
@@ -366,12 +368,17 @@ export function Render()
     setEndpoint();
     InitCustomStrip()
     SetFans();
+    device.pause(1);
 
     SendChannel(0);
+    device.pause(1);
 
     SendChannel(1);
+    device.pause(1);
 
     SubmitLightingColors();
+    device.pause(1);
+
 }
 
  

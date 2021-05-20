@@ -192,18 +192,22 @@ export function Render()
     }
     
    channelStart(0);//only one channel for these
+   device.pause(1);
 
    StreamLightingPacket(0x00,0x32,0,red.splice(0,50))
    StreamLightingPacket(0x00,0x32,1,green.splice(0,50))
    StreamLightingPacket(0x00,0x32,2,blue.splice(0,50))
+   device.pause(1);
 
    StreamLightingPacket(0x32,0x32,0,red.splice(0,50))
    StreamLightingPacket(0x32,0x32,1,green.splice(0,50))
    StreamLightingPacket(0x32,0x32,2,blue.splice(0,50))
+   device.pause(1);
 
    StreamLightingPacket(0x64,0x08,0,red.splice(0,8))
    StreamLightingPacket(0x64,0x08,1,green.splice(0,8))
    StreamLightingPacket(0x64,0x08,2,blue.splice(0,8))
+   device.pause(1);
 
    SubmitLightingColors();
 

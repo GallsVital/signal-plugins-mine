@@ -1,6 +1,6 @@
 export function Name() { return "Logitech Wireless Mouse dongle"; }
 export function VendorId() { return 0x046d; }
-export function ProductId() { return 0xC539; }
+export function ProductId() { return 0x0000; }//0xC539
 export function Publisher() { return "WhirlwindFX"; }
 export function Size() { return [3, 3]; }
 export function DefaultPosition(){return [240,120]}
@@ -47,30 +47,39 @@ function sendPacketString(string, size){
 
 export function Initialize()
 {
-    device.set_endpoint(2, 0x0001, 0xff00); // System IF  
+    device.set_endpoint(2, 0x0001, 0xff00); // System IF 
+
      sendPacketString("10 FF 81",7)
      var config = [0x10];
      config = device.read(config,7);
-     //device.log(config)
-     //device.log(config[5] & 1)
-     if(!(config[5] & 1)){
-     sendPacketString("10 FF 80 00 01",7)
+     device.log(config)
+     device.log(config[5] & 1)
+      if(!(config[5] & 1)){
+      sendPacketString("10 FF 80 00 01",7)
+       var config = [0x10];
+       config = device.read(config,7);
+       device.log(config)
+       device.log(config[5] & 1)
+       sendPacketString("10 FF 81",7)
+       var config = [0x10];
+       config = device.read(config,7);
+       device.log(config)
+       device.log(config[5] & 1)
+      }
+
+      sendPacketString("10 FF 80 02 02",7)
       var config = [0x10];
       config = device.read(config,7);
-      //device.log(config)
-      //device.log(config[4] & 1)
-     }
+      device.log(config)
+      var device_id = config[6].toString(16) + config[5].toString(16)
+      var transaction_id = config[3];
+      deviceName = deviceIdMap[device_id]
+      device.log(`Device Id Found: ${device_id} Device Name: ${deviceName}`);
+      device.log("Transaction ID Found: " + transaction_id.toLocaleString("hex",{minimumDigits: 2}));
 
-     sendPacketString("10 FF 80 02 02",7)
-     var config = [0x10];
-     config = device.read(config,7);
-     //device.log(config)
-     var device_id = config[6].toString(16) + config[5].toString(16)
-     var transaction_id = config[3];
-     deviceName = deviceIdMap[device_id]
-     device.log(`Device Id Found: ${device_id} Device Name: ${deviceName}`);
-     device.log("Transaction ID Found: " + transaction_id.toLocaleString("hex",{minimumDigits: 2}));
-
+      if(device_id < 2){
+          Initialize();
+      }
     if(savedDpi1 != dpi1 && DpiControl) {
             setDpi(dpi1);
     }
@@ -84,6 +93,17 @@ var deviceIdMap = {
 "4067" : "Logitech G903L",           
 "4079" : "Logitech GPro Wireless",              
 }
+//wired FF, wireless 01
+var protocolMap = {
+"405d" : [0x01,0x18,0x3A],
+"Logitech G502L" : [0x01,0x07,0x3A],           
+"Logitech G703L" : [0x01,0x18,0x3C],           
+"4053" : [0x01,0x17,0x3A],           
+"Logitech G903L" : [0x01,0x17,0x3A],           
+"Logitech GPro Wireless" : [0x01,0x08,0x3C],   
+}
+
+
 const dpidict2= {
     "G502L" : 0x0C,
     "G703L" : 0x0B,
@@ -111,6 +131,7 @@ function setDpi(dpi){
     packet[5] = Math.floor(dpi/256);
     packet[6] = dpi%256;
     device.write(packet, 7);
+    device.read(packet,7)
 
 
 
@@ -126,6 +147,8 @@ function Apply()
     packet[3] = 0x2F;
     packet[4] = 0x01;
     device.write(packet, 7);
+    device.read(packet,7)
+
 }
 
 const mouseZonedict = {
@@ -142,9 +165,9 @@ function sendZone(zone, shutdown = false){
     device.set_endpoint(2, 0x0002, 0xff00); // Lighting IF    
     var packet = [];
     packet[0x00] = 0x11;
-    packet[0x01] = 0x01;
-    packet[0x02] = 0x07;
-    packet[0x03] = mouseZonedict[deviceName];
+    packet[0x01] = protocolMap[deviceName][0]
+    packet[0x02] = protocolMap[deviceName][1]
+    packet[0x03] = protocolMap[deviceName][2]//mouseZonedict[deviceName];
     packet[0x04] = zone;
     packet[0x05] = 0x01;
 
@@ -173,6 +196,8 @@ if(device_id == "4067" || device_id == "4070") {
 }
 
     device.write(packet, 20);
+    device.read(packet,20)
+
     device.pause(1);
 
 }
