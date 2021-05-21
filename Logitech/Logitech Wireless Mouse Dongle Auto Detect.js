@@ -1,6 +1,6 @@
 export function Name() { return "Logitech Wireless Mouse dongle"; }
 export function VendorId() { return 0x046d; }
-export function ProductId() { return 0x0000; }//0xC539
+export function ProductId() { return 0xC539; }//0xC539
 export function Publisher() { return "WhirlwindFX"; }
 export function Size() { return [3, 3]; }
 export function DefaultPosition(){return [240,120]}
@@ -48,14 +48,14 @@ function sendPacketString(string, size){
 export function Initialize()
 {
     device.set_endpoint(2, 0x0001, 0xff00); // System IF 
-
+    device.flush();
      sendPacketString("10 FF 81",7)
      var config = [0x10];
      config = device.read(config,7);
      device.log(config)
      device.log(config[5] & 1)
       if(!(config[5] & 1)){
-      sendPacketString("10 FF 80 00 01",7)
+      sendPacketString("10 FF 80 00 00 01",7)
        var config = [0x10];
        config = device.read(config,7);
        device.log(config)
@@ -124,15 +124,14 @@ function setDpi(dpi){
 
     var packet = [];
     packet[0] = 0x10;
-    packet[1] = 0x01;
-    packet[2] = transaction_id;
-    packet[3] = dpidict[device_id];
+    packet[1] = protocolMap[deviceName][0];
+    packet[2] = protocolMap[deviceName][2];
+    packet[3] = transaction_id;
     packet[4] = 0x00;
     packet[5] = Math.floor(dpi/256);
     packet[6] = dpi%256;
     device.write(packet, 7);
     device.read(packet,7)
-
 
 
 }
@@ -142,13 +141,12 @@ function Apply()
     device.set_endpoint(2, 0x0001, 0xff00); // System IF    
     var packet = [];
     packet[0] = 0x10;
-    packet[1] = 0x01;
+    packet[1] = protocolMap[deviceName][0]
     packet[2] = 0x0B;
     packet[3] = 0x2F;
     packet[4] = 0x01;
     device.write(packet, 7);
     device.read(packet,7)
-
 }
 
 const mouseZonedict = {

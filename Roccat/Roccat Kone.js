@@ -11,10 +11,23 @@ export function ControllableParameters(){
         {"property":"LightingMode", "label":"Lighting Mode", "type":"combobox", "values":["Canvas","Forced"], "default":"Canvas"},
         {"property":"forcedColor", "label":"Forced Color","min":"0","max":"360","type":"color","default":"009bde"},
         {"property":"DpiControl", "label":"Enable Dpi Control","type":"boolean","default":"false"},
-        {"property":"dpi1", "label":"DPI","step":"50", "type":"number","min":"200", "max":"12400","default":"800"},
+        {"property":"dpi1", "label":"DPI 1","step":"50", "type":"number","min":"200", "max":"16000","default":"800"},
+        {"property":"dpi2", "label":"DPI 2","step":"50", "type":"number","min":"200", "max":"16000","default":"1200"},
+        {"property":"dpi3", "label":"DPI 3","step":"50", "type":"number","min":"200", "max":"16000","default":"1600"},
+        {"property":"dpi4", "label":"DPI 4","step":"50", "type":"number","min":"200", "max":"16000","default":"2000"},
+        {"property":"dpi5", "label":"DPI 5","step":"50", "type":"number","min":"200", "max":"16000","default":"3200"},
+        {"property":"PollingRate", "label":"Polling Rate", "type":"combobox", "values":["125Hz","250Hz","500Hz","1000Hz"], "default":"500Hz"},
+
+
     ];
 }
 var savedDpi1;
+var savedDpi2;
+var savedDpi3;
+var savedDpi4;
+var savedDpi5;
+var savedPollingRate;
+
 var vKeys = [
     0,
     1,2,3,4,
@@ -54,11 +67,62 @@ export function LedPositions()
 export function Initialize()
 {
     sendReportString("0E 06 01 01 00 FF",6);
+    if(DpiControl){
+        setDpi()
+      }
+}
+var SettingReport = [
+    0x06, 0x7E, 0x00, 0x06, 0x1F, 0x00, 0x9E, 0x00, 0x5C, 0x00, 0x39, 0x00, 0x52, 0x00, 0x5E, 0x00, 0x9E, 0x00, 0x5C,
+    0x00, 0x39, 0x00, 0x52, 0x00, 0x5E, 0x00, 0x03, 0x00, 0x00, 0x08, 0xFF, 0x07, 0x00, 0x09, 0x06, 0xFF, 0x1D, 0x13,
+    0xFF, 0x00, 0xFF, 0x59, 0xFF, 0x00, 0x00, 0xFF, 0xFD, 0xFD, 0x00, 0x00, 0xFF, 0xF4, 0x64, 0x00, 0x00, 0xFF, 0xF4,
+    0x00, 0x00, 0x00, 0xFF, 0xFF, 0xFF, 0x00, 0x00, 0x00, 0xFF, 0xFF, 0x00, 0x00, 0x00, 0xFF, 0xFF, 0x50, 0x00, 0x00, 
+    0xFF, 0xFF, 0x50, 0x00, 0x00, 0xFF, 0xE6, 0x8C, 0x00, 0x00, 0xFF, 0xFF, 0x00, 0x00, 0x00, 0xFF, 0xFF, 0x50, 0x00, 
+    0x00, 0xFF, 0xFF, 0x50, 0x00, 0x00, 0xFF, 0xE6, 0x8C, 0x00, 0x00, 0xFF, 0xE6, 0x8C, 0x00, 0x00, 0xFF, 0xE6, 0x8C, 
+    0x00, 0x00, 0x80, 0x01, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0xD1, 0x2B
+];
+const PollingDict = {
+    "125Hz": 0xB6,
+    "250Hz": 0xB7,
+    "500Hz": 0xB8,
+    "1000Hz": 0xB9,
+
 }
 
-function setDpi(dpi){
 
+function setDpi(){
+    savedDpi1 = dpi1;
+    savedDpi2 = dpi2;
+    savedDpi3 = dpi3;
+    savedDpi4 = dpi4;
+    savedDpi5 = dpi5;
+    savedPollingRate = PollingDict[PollingRate];
+//Set X dpi 1-5
+    SettingReport[6] =    (dpi1/50)%256
+    SettingReport[7] =   Math.floor(dpi1/50/256)
+    SettingReport[8] =    (dpi2/50)%256
+    SettingReport[9] =   Math.floor(dpi2/50/256)
+    SettingReport[10] =    (dpi3/50)%256
+    SettingReport[11] =   Math.floor(dpi3/50/256)
+    SettingReport[12] =    (dpi4/50)%256
+    SettingReport[13] =   Math.floor(dpi4/50/256)
+    SettingReport[14] =    (dpi5/50)%256
+    SettingReport[15] =   Math.floor(dpi5/50/256)
+    //Set y dpi 1-5
+    SettingReport[16] =    (dpi1/50)%256
+    SettingReport[17] =   Math.floor(dpi1/50/256)
+    SettingReport[18] =    (dpi2/50)%256
+    SettingReport[19] =   Math.floor(dpi2/50/256)
+    SettingReport[20] =    (dpi3/50)%256
+    SettingReport[21] =   Math.floor(dpi3/50/256)
+    SettingReport[22] =    (dpi4/50)%256
+    SettingReport[23] =   Math.floor(dpi4/50/256)
+    SettingReport[24] =    (dpi5/50)%256
+    SettingReport[25] =   Math.floor(dpi5/50/256)
 
+    SettingReport[124] = savedPollingRate;
+    
+    device.send_report(SettingReport,126);
+    sendReportString("0E 06 01 01 00 FF",6);
 }
 function sendReportString(string, size){
     var packet= [];
@@ -105,11 +169,16 @@ function sendZone(shutdown = false){
 
 export function Render()
 {
-    // Lighting IF    
-    sendZone(0);
+    sendZone();
     
-    if(savedDpi1 != dpi1 && DpiControl){
-      setDpi(dpi1)
+    if((savedDpi1 != dpi1 ||
+        savedDpi2 != dpi2 ||
+        savedDpi3 != dpi3 ||
+        savedDpi4 != dpi4 ||
+        savedDpi5 != dpi5 ||
+        savedPollingRate != PollingDict[PollingRate]) &&
+        DpiControl){
+            setDpi();
     }
 }
 
@@ -117,8 +186,7 @@ export function Render()
 export function Shutdown()
 {
      // Lighting IF    
-    sendZone(0,true);
-    sendZone(1,true);
+    sendZone(true);
     sendReportString("0E 06 00 00 00 FF",6);
 
 }
