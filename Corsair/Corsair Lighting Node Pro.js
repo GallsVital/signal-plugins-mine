@@ -509,11 +509,13 @@ function SendChannel(channel,shutdown = false)
          var ledsToSend = TotalLedCount >= 50 ? 50 : TotalLedCount;
 
          StreamLightingPacketChanneled(ledsSent,ledsToSend,0,red.splice(0,ledsToSend),channel);
+
          StreamLightingPacketChanneled(ledsSent,ledsToSend,1,green.splice(0,ledsToSend),channel);
+
          StreamLightingPacketChanneled(ledsSent,ledsToSend,2,blue.splice(0,ledsToSend),channel);
+
          ledsSent += ledsToSend;
          TotalLedCount -= ledsToSend;
-         device.pause(1);
 
      }
 
