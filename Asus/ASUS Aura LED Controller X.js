@@ -243,9 +243,15 @@ const Custom = {
 }
 var DeviceDict = {
     "None": null,
+    "AER 2 Fan": AER_2,
     "Strip_10Led" : Strip_10Led,
     "Strip_8Led" : Strip_8Led,
     "Strip_6Led" : Strip_6Led,
+    "LL Fan" : LLFan,
+    "QL Fan" : QLFan,
+    "ML Fan" : MLFan,
+    "SpPro Fan" : SpProFan,
+    "MF120Halo":MF120Halo,
     "Custom" : Custom,
 }
 
