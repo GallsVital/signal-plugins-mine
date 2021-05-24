@@ -13,8 +13,8 @@ export function ControllableParameters(){
         {"property":"SettingControl", "label":"Enable Setting Control","type":"boolean","default":"false"},
          {"property":"dpi1", "label":"DPI 1", "step":"50","type":"number","min":"400", "max":"12000","default":"800"},
          {"property":"dpi2", "label":"DPI 2", "step":"50","type":"number","min":"400", "max":"12000","default":"1200"},
-         {"property":"dpi3", "label":"DPI 2", "step":"50","type":"number","min":"400", "max":"12000","default":"1500"},
-         {"property":"dpi4", "label":"DPI 2", "step":"50","type":"number","min":"400", "max":"12000","default":"2000"},
+         {"property":"dpi3", "label":"DPI 3", "step":"50","type":"number","min":"400", "max":"12000","default":"1500"},
+         {"property":"dpi4", "label":"DPI 4", "step":"50","type":"number","min":"400", "max":"12000","default":"2000"},
          {"property":"mousePolling", "label":"Polling Rate", "type":"combobox", "values":["125Hz","250Hz","500Hz","1000Hz"], "default":"500Hz"},
 
     ];
