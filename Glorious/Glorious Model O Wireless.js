@@ -136,6 +136,7 @@ function setDpi(){
 device.send_report(packet,65)
 
 sendReportString(`00 00 00 02 01 01 00 ${(pollingDict[mousePolling]).toString(16)}`,65)
+device.pause(30)
 
 }
 function sendColors(shutdown = false){

@@ -10,6 +10,9 @@ export function ControllableParameters(){
         {"property":"shutdownColor", "label":"Shutdown Color","min":"0","max":"360","type":"color","default":"009bde"},
         {"property":"LightingMode", "label":"Lighting Mode", "type":"combobox", "values":["Canvas","Forced"], "default":"Canvas"},
         {"property":"forcedColor", "label":"Forced Color","min":"0","max":"360","type":"color","default":"009bde"},
+        {"property":"LCDToggle", "label":"LCD Logo","type":"boolean","default":"false"},
+
+
     ];
 }
 var SignalRGB_OLED = [
@@ -58,8 +61,9 @@ var vKeymap = [
 ];
  
 export function Initialize() {
-
+if(LCDToggle){
    device.send_report(SignalRGB_OLED,643)
+}
 }
 
 export function LedNames()

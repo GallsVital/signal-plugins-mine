@@ -10,7 +10,7 @@ export function ControllableParameters(){
         {"property":"shutdownColor", "label":"Shutdown Color","min":"0","max":"360","type":"color","default":"009bde"},
         {"property":"LightingMode", "label":"Lighting Mode", "type":"combobox", "values":["Grid","Forced"], "default":"Grid"},
         {"property":"forcedColor", "label":"Forced Color","min":"0","max":"360","type":"color","default":"009bde"},
-        {"property":"SettingControl", "label":"Enable Setting Control","type":"boolean","default":"false"},
+        //{"property":"SettingControl", "label":"Enable Setting Control","type":"boolean","default":"false"},
         // {"property":"dpi1", "label":"DPI 1", "step":"100","type":"number","min":"400", "max":"12000","default":"1500"},
         // {"property":"dpi2", "label":"DPI 2", "step":"100","type":"number","min":"400", "max":"12000","default":"1500"},
         // {"property":"mousePolling", "label":"Polling Rate", "type":"combobox", "values":["125Hz","250Hz","500Hz","1000Hz"], "default":"500Hz"},
@@ -89,7 +89,7 @@ var savedDpi1;
 var savedDpi2;
 function sendColors(shutdown = false){
 
-    var dirtyConfig = false;
+    //var dirtyConfig = false;
     var packet = config.slice();
     packet[3] = 0x7B;
     packet[53] = 0x02;
@@ -127,9 +127,9 @@ function sendColors(shutdown = false){
      //}
 
     device.send_report(packet,520);
-    if(dirtyConfig){
-    openDevice();
-    }
+    //if(dirtyConfig){
+    //openDevice();
+    //}
 
 }
 function hexToRgb(hex) {

@@ -277,9 +277,9 @@ var HeaderArray = [
 ];
 export function Name() { return "ASUS Aura LED Controller X"; }
 export function VendorId() { return  0x0B05; }    //0x0B05       //0x046D ;}
-export function ProductId() { return 0x0000;} //0x18F3;}//0x1939  //0xC24A ;} Experimental
+export function ProductId() { return 0x18F3;} //0x18F3;}//0x1939  //0xC24A ;} Experimental
 export function Publisher() { return "WhirlwindFX"; }
-export function Size() { return [9,1]; }
+export function Size() { return [15,1]; }
 export function Type() { return "Hid"; }
 export function DefaultPosition(){return [0,0]}
 export function DefaultScale(){return 8.0}
@@ -600,7 +600,7 @@ function sendPacketString(string, size){
 }
 export function Validate(endpoint)
 {
-    return endpoint.interface === 2;
+    return endpoint.interface === 2 | -1;
 
 }
 

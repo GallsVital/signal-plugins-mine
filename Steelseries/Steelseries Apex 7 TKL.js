@@ -62,8 +62,9 @@ var vKeymap = [
  
 export function Initialize() {
 
-   device.send_report(SignalRGB_OLED,643)
-}
+    if(LCDToggle){
+        device.send_report(SignalRGB_OLED,643)
+     }}
 
 export function LedNames()
 {

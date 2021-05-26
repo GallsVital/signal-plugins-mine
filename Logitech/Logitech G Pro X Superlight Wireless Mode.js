@@ -55,7 +55,7 @@ function setDpi(dpi){
     device.set_endpoint(2, 0x0002, 0xff00); // Lighting IF    
     var packet = [];
     packet[0] = 0x11;
-    packet[1] = 0xFF;
+    packet[1] = 0x01;
     packet[2] = 0x0B;
     packet[3] = 0x3B;
     packet[4] = 0x00;
