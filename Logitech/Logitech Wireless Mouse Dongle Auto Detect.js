@@ -1,6 +1,6 @@
 export function Name() { return "Logitech Wireless Mouse dongle"; }
 export function VendorId() { return 0x046d; }
-export function ProductId() { return 0xC539; }//0xC539
+export function ProductId() { return 0x0000; }//0xC539
 export function Publisher() { return "WhirlwindFX"; }
 export function Size() { return [3, 3]; }
 export function DefaultPosition(){return [240,120]}
@@ -48,7 +48,7 @@ function sendPacketString(string, size){
 export function Initialize()
 {
     device.set_endpoint(2, 0x0001, 0xff00); // System IF 
-    device.flush();
+    //device.flush();
      sendPacketString("10 FF 81",7)
      var config = [0x10];
      config = device.read(config,7);
