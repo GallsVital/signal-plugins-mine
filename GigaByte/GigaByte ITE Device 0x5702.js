@@ -274,7 +274,7 @@ var deviceArray = [
 
 export function Name() { return "GIGABYTE Motherboard Controller"; }
 export function VendorId() { return  0x048D; }  
-export function ProductId() { return 0X0000;}//0x5702;} //Experimental Also on 0x8297?
+export function ProductId() { return 0x0000;}//0x5702;} //Experimental Also on 0x8297?
 export function Publisher() { return "WhirlwindFX"; }
 export function Size() { return [3,3]; }
 export function Type() { return "Hid"; }
@@ -299,7 +299,6 @@ export function ControllableParameters(){
         ];
 }
 var ParentDeviceName = "GigaByte MotherBoard";
-var channelCount = 2;
 var MainBoardLedCount = 8;
 
 var D_LED1_Count = 0;
@@ -365,6 +364,9 @@ var vZones = [
     0x22,
     0x23, 
     0x24, // RGB Header Top "LED_C2"
+    0x25,
+    0x26,
+    0x27
 ]
 var vDLED_Zones = [
     0x58, 0x59
@@ -373,6 +375,8 @@ var vLedNames = ["Led 1","Led 2","Led 3","Led 4","Led 5","Led 6","RGB Header 1",
 var vLedPositions = [
     [0,0],
     [1,1],
+    [0,2],
+    [0,2],
     [0,2],
     [0,2],
     [0,2],
