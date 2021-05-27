@@ -91,6 +91,10 @@ var vKeyNames = [
        positioning : [
         [2,26],[2,25],[2,24],[2,23],[2,22],[2,21],[2,20],[2,19],[2,18],[2,17],[2,16],[2,15],[2,14],[2,13],[2,12],[2,11],[2,10],[2,9],[2,8],[2,7],[2,6],[2,5],[2,4],[2,3],[2,2],[2,1],[2,0]
     ],
+    LedNames : [
+        "Led 1","Led 2","Led 3","Led 4","Led 5","Led 6","Led 7","Led 8","Led 9","Led 10","Led 11","Led 12","Led 13","Led 14",
+        "Led 15","Led 16","Led 17","Led 18","Led 19","Led 20","Led 21","Led 22","Led 23","Led 24","Led 25","Led 26","Led 27","Led 28"
+    ],
     displayName: "Light Tower",
     ledCount : 27,
     width: 4,
@@ -142,6 +146,9 @@ function SetFans(){
                     device.setSubdeviceName(deviceArray[deviceNumber],`${ParentDeviceName} - ${DeviceDict[propertyArray[deviceNumber]].displayName} - ${deviceArray[deviceNumber]}`);
                     device.setSubdeviceImage(deviceArray[deviceNumber], DeviceDict[propertyArray[deviceNumber]].image);
                     device.setSubdeviceSize(deviceArray[deviceNumber],DeviceDict[propertyArray[deviceNumber]].width,DeviceDict[propertyArray[deviceNumber]].height);
+                    device.setSubdeviceLeds(deviceArray[deviceNumber],
+                        DeviceDict[propertyArray[deviceNumber]].LedNames,
+                        DeviceDict[propertyArray[deviceNumber]].positioning)
                  }
             }
         }

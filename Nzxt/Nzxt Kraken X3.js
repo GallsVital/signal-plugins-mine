@@ -224,11 +224,14 @@ function hexToRgb(hex) {
         Custom.width = CustomSize;
         Custom.ledCount = CustomSize;
     
-        var propertyArray = [device1, device2,device3,device4,device5,device6,device7,device8,device9,device10,device11,device12];
+        var propertyArray = [device1, device2,device3];
     
-        for (var deviceNumber = 0; deviceNumber < 12; deviceNumber++ ) {
+        for (var deviceNumber = 0; deviceNumber < 3; deviceNumber++ ) {
                  if(deviceValues[deviceNumber] == "Custom"){
                     device.setSubdeviceSize(deviceArray[deviceNumber],DeviceDict[propertyArray[deviceNumber]].width,DeviceDict[propertyArray[deviceNumber]].height);
+                    device.setSubdeviceLeds(deviceArray[deviceNumber],
+                        DeviceDict[propertyArray[deviceNumber]].LedNames,
+                        DeviceDict[propertyArray[deviceNumber]].positioning)
                  }       
         }
     }
@@ -248,6 +251,9 @@ function hexToRgb(hex) {
                         device.setSubdeviceName(deviceArray[deviceNumber],`${Name()} - ${DeviceDict[propertyArray[deviceNumber]].displayName} - ${deviceArray[deviceNumber]}`);
                         device.setSubdeviceImage(deviceArray[deviceNumber], DeviceDict[propertyArray[deviceNumber]].image);
                         device.setSubdeviceSize(deviceArray[deviceNumber],DeviceDict[propertyArray[deviceNumber]].width,DeviceDict[propertyArray[deviceNumber]].height);
+                        device.setSubdeviceLeds(deviceArray[deviceNumber],
+                            DeviceDict[propertyArray[deviceNumber]].LedNames,
+                            DeviceDict[propertyArray[deviceNumber]].positioning)
                      }
                 }
             }
