@@ -1,4 +1,4 @@
-export function Name() { return "Logitech Wireless Mouse Powerplay dongle"; }
+export function Name() { return "Logitech Wireless Mouse dongle - Powerplay"; }
 export function VendorId() { return 0x046d; }
 export function ProductId() { return 0xC53A; }
 export function Publisher() { return "WhirlwindFX"; }
@@ -16,6 +16,20 @@ export function ControllableParameters(){
     ];
 }
 var savedDpi1;
+
+const Powerplay_Mat = {
+    mapping : [
+        0
+       ],
+       positioning : [
+        [0,0]
+    ],
+    displayName: "PowerPlay MousePad",
+    ledCount : 1,
+    width: 3,
+    height: 3,
+    image: Image()
+}
 
 var vLedNames = ["Primary Zone", "Logo Zone"];
 var vLedPositions = [
@@ -36,10 +50,15 @@ export function LedPositions()
 export function Initialize()
 {
     device.set_endpoint(2, 0x0001, 0xff00); // System IF    
-if(savedDpi1 != dpi1 && DpiControl) {
+    if(savedDpi1 != dpi1 && DpiControl) {
         setDpi(dpi1);
-    
-}
+    }
+
+    //Create Mouse Pad Sub Device
+device.createSubdevice("PowerPlayMat"); 
+device.setSubdeviceName("PowerPlayMat",`${Powerplay_Mat.displayName}`);
+device.setSubdeviceImage("PowerPlayMat", Powerplay_Mat.image);
+device.setSubdeviceSize("PowerPlayMat",Powerplay_Mat.width,Powerplay_Mat.height);
 }
 const dpidict2= {
     "G502L" : 0x0C,
@@ -134,14 +153,44 @@ if(MouseType == "G903L" || MouseType == "G703L") {
     device.pause(1);
 
 }
+function sendMousePad(shutdown = false){
+
+    device.set_endpoint(2, 0x0002, 0xff00); // Lighting IF    
+
+    var packet = [];
+    packet[0x00] = 0x11;
+    packet[0x01] = 0x07;
+    packet[0x02] = 0x0b;
+    packet[0x03] = 0x3E;
+    packet[0x04] = 0x00;
+    packet[0x05] = 0x01;
+
+
+
+        var iX = Powerplay_Mat.positioning[0][0];
+        var iY = Powerplay_Mat.positioning[0][1];
+        var color;
+        if(shutdown){
+            color = hexToRgb(shutdownColor)
+        }else if (LightingMode == "Forced") {
+            color = hexToRgb(forcedColor)
+        }else{
+            color = device.subdeviceColor("PowerPlayMat",iX, iY);
+        }
+        packet[0x06] = color[0];
+        packet[0x07] = color[1];
+        packet[0x08] = color[2];
+
+    device.write(packet, 20);
+    device.pause(1);
+
+}
 
 export function Render()
 {
     sendZone(0);
     sendZone(1);
-    
-    
-
+    sendMousePad();
     if(savedDpi1 != dpi1 && DpiControl){
       setDpi(dpi1)
     }

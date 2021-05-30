@@ -43,7 +43,7 @@ var vLedPositions = [                                                           
 ];
 
 var vKeymap = [
-    
+    //took out 77
 
     //Media Keys
     120,123,124,114,
@@ -55,12 +55,15 @@ var vKeymap = [
     1,  7, 13, 19, 25, 31,  37, 43, 49, 55,  61, 67, 73,    79,  85, 91, 97,   103, 109, 115, 121,
     2,   8, 14, 20, 26, 32,  38, 44, 50, 56, 62, 68, 74,    80,  86, 92, 98,   104, 110, 116, 122,
     3,     9, 15, 21, 27, 33,  39, 45, 51, 57, 63, 69,      81,                105, 111, 117, 
-    4,     10, 16, 22, 28,  34, 40, 46, 52, 58, 64, 77,     82,      94,       106, 112, 118, 125,
+    4,     10, 16, 22, 28,  34, 40, 46, 52, 58, 64,         82,      94,       106, 112, 118, 125,
     5,  11,  17,         35,                 53,   65, 59,   83,  89, 95, 101,  107,      119, 
 
 ];
  
 export function Initialize() {
+   device.log(vKeymap.length)
+   device.log(vLedNames.length)
+   device.log(vLedPositions.length)
 
 }
 
@@ -98,7 +101,7 @@ export function Validate(endpoint)
 }
 
 function StartPacket(){
-    sendReportString("00 04 F2",65)
+    sendReportString("00 04 F2 00 00 00 00 00 00 09",65)
 }
 
 function hexToRgb(hex) {

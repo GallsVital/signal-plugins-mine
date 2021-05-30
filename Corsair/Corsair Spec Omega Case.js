@@ -457,7 +457,7 @@ function Send30(channel)
    StreamLightingPacketChanneled(0,30,2,blue.splice(0,30),channel)
 
 }
-function SendChannel(channel)
+function SendChannel(channel, shutdown = false)
 {
     var red = [210];
     var green = [210];

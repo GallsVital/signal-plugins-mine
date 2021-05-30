@@ -215,8 +215,30 @@ const Custom = {
     height: 1,
     image: Placeholder()
 }
-
-const H150iCooler = {
+const MLFan_8Led = {
+    mapping : [
+        6,7,
+     5,     0,
+     4,     1,
+       3, 2,
+    ],
+    positioning : [
+        [1,0],[2,0],
+      [0,1],     [3,1],
+      [0,2],     [3,2],
+         [1,3],[2,3],
+    ],
+    LedNames : [
+        "Led 1","Led 2","Led 3","Led 4","Led 5","Led 6","Led 7","Led 8"
+    ],
+    displayName: "ML Pro Fan - 8 Led",
+    ledCount : 8,
+    width: 4,
+    height: 4,
+    image: ML_Fan_Image()
+    }
+    
+const EliteCapellixCooler = {
         positioning: [
             [0,0],      [2,0],      [4,0],       [6,0],
                  [1,1],       [3,1],       [5,1],
@@ -239,7 +261,7 @@ const H150iCooler = {
         "Led 1","Led 2","Led 3","Led 4","Led 5","Led 6","Led 7","Led 8","Led 9","Led 10","Led 11","Led 12","Led 13","Led 14","Led 15","Led 16",
         "Led 17","Led 18","Led 19","Led 20","Led 21","Led 22","Led 23","Led 24","Led 25","Led 26","Led 27","Led 28","Led 29"
     ],
-     displayName: "H150i Cooler",
+     displayName: "Elite Capellix Cooler",
      ledCount : 29,
      width: 7,
      height: 7,
@@ -257,26 +279,32 @@ export function ControllableParameters(){
     {"property":"shutdownColor", "label":"Shutdown Color","min":"0","max":"360","type":"color","default":"009bde"},
     {"property":"LightingMode", "label":"Lighting Mode", "type":"combobox", "values":["Canvas","Forced"], "default":"Canvas"},
     {"property":"forcedColor", "label":"Forced Color","min":"0","max":"360","type":"color","default":"009bde"},
-    {"property":"selection", "label":"Mode Controller", "type":"number", "min":"0", "max":"2", "default":"1"},
-    {"property":"pump", "label":"Pump Type", "type":"combobox", "values":["None","H150I"], "default":"None"},
-    {"property":"device1",  "label":"Ch1 | Port 1", "type":"combobox",  "values":["None","Strip_Internal","LL", "QL","ML","SpPro","XD5Reservior","GPUBlock","XD5CPU","Custom"], "default":"None"},
-    {"property":"device2",  "label":"Ch1 | Port 2", "type":"combobox",  "values":["None","Strip_Internal","LL", "QL","ML","SpPro","XD5Reservior","GPUBlock","XD5CPU","Custom"], "default":"None"},
-    {"property":"device3",  "label":"Ch1 | Port 3", "type":"combobox",  "values":["None","Strip_Internal","LL", "QL","ML","SpPro","XD5Reservior","GPUBlock","XD5CPU","Custom"], "default":"None"},
-    {"property":"device4",  "label":"Ch1 | Port 4", "type":"combobox",  "values":["None","Strip_Internal","LL", "QL","ML","SpPro","XD5Reservior","GPUBlock","XD5CPU","Custom"], "default":"None"},
-    {"property":"device5",  "label":"Ch1 | Port 5", "type":"combobox",  "values":["None","Strip_Internal","LL", "QL","ML","SpPro","XD5Reservior","GPUBlock","XD5CPU","Custom"], "default":"None"},
-    {"property":"device6",  "label":"Ch1 | Port 6", "type":"combobox",  "values":["None","Strip_Internal","LL", "QL","ML","SpPro","XD5Reservior","GPUBlock","XD5CPU","Custom"], "default":"None"},
+    {"property":"pumpToggle", "label":"Pump Connected","type":"boolean","default":"true"},
+    {"property":"CustomSize", "label":"Custom Strip Size","type":"number","min":"0", "max":"80","default":"10"},
+    {"property":"device1",  "label":"Ch1 | Port 1", "type":"combobox",  "values":["None","Strip_Internal","LL", "QL","ML","ML Fan - 8 Led","SpPro","XD5Reservior","GPUBlock","XD5CPU","Custom"], "default":"None"},
+    {"property":"device2",  "label":"Ch1 | Port 2", "type":"combobox",  "values":["None","Strip_Internal","LL", "QL","ML","ML Fan - 8 Led","SpPro","XD5Reservior","GPUBlock","XD5CPU","Custom"], "default":"None"},
+    {"property":"device3",  "label":"Ch1 | Port 3", "type":"combobox",  "values":["None","Strip_Internal","LL", "QL","ML","ML Fan - 8 Led","SpPro","XD5Reservior","GPUBlock","XD5CPU","Custom"], "default":"None"},
+    {"property":"device4",  "label":"Ch1 | Port 4", "type":"combobox",  "values":["None","Strip_Internal","LL", "QL","ML","ML Fan - 8 Led","SpPro","XD5Reservior","GPUBlock","XD5CPU","Custom"], "default":"None"},
+    {"property":"device5",  "label":"Ch1 | Port 5", "type":"combobox",  "values":["None","Strip_Internal","LL", "QL","ML","ML Fan - 8 Led","SpPro","XD5Reservior","GPUBlock","XD5CPU","Custom"], "default":"None"},
+    {"property":"device6",  "label":"Ch1 | Port 6", "type":"combobox",  "values":["None","Strip_Internal","LL", "QL","ML","ML Fan - 8 Led","SpPro","XD5Reservior","GPUBlock","XD5CPU","Custom"], "default":"None"},
+    //{"property":"FanControl", "label":"enable fan Control","type":"boolean","default":"false"},
+    //{"property":"PumpSpeed", "label":"Pump Speed %","type":"number","min":"50", "max":"100","default":"75"}, //EXPERIMENTAL, don't enable unless you know what your doing.
+    //{"property":"FanSpeed", "label":"Fan Speed %","type":"number","min":"0", "max":"100","default":"60"},
     ];
 }
 var ParentDeviceName = "Corsair Lighting Commander Core";
 
 var CORSAIR_LIGHTING_CONTROL_SOFTWARE           = 0x02;
-
+var pump;
+var savedPumpToggle;
 
 export function Initialize()
 {
    
     sendPacketString("00 08 01 03 00 02",1025) // Lighting Control packet
     sendPacketString("00 08 0D 00 22",1025) // Critical
+
+    setFanMode();
 }
 
 export function Shutdown()
@@ -288,7 +316,7 @@ function sendPacketString(string, size){
     var data = string.split(' ');
     
     for(let i = 0; i < data.length; i++){
-        packet[parseInt(i,16)] = parseInt(data[i],16)//.toString(16)
+        packet[i] = parseInt(data[i],16)//.toString(16)
     }
 
     device.write(packet, size);
@@ -305,7 +333,9 @@ var DeviceDict = {
     "XD5Reservior" : XD5Reservior,
     "GPUBlock" : GPUBlock,
     "XD5CPU" : XD5CPU,
-    "H150I" : H150iCooler,
+    "EliteCapellixCooler" : EliteCapellixCooler,
+    "Custom" : Custom,
+    "ML Fan - 8 Led" : MLFan_8Led
 };
 
 var deviceValues = [
@@ -318,7 +348,7 @@ var deviceValues = [
     ""
 ];
 var deviceArray = [
-    "pump",
+    "Elite Capellix Pump",
     "Ch1-Port-1",
     "Ch1-Port-2",
     "Ch1-Port-3",
@@ -327,7 +357,10 @@ var deviceArray = [
     "Ch1-Port-6",
 
 ];
+var savedCustomSize;
 function InitCustomStrip(){
+    if(savedCustomSize != CustomSize){
+        savedCustomSize = CustomSize
     var mapping = [];
     var positioning = [];
     var names = [];
@@ -342,16 +375,32 @@ function InitCustomStrip(){
     Custom.width = CustomSize;
     Custom.ledCount = CustomSize;
 
-    var propertyArray = [device1, device2,device3,device4,device5,device6,device7,device8,device9,device10,device11,device12];
+    var propertyArray = [device1, device2,device3,device4,device5,device6];
 
-    for (var deviceNumber = 0; deviceNumber < 12; deviceNumber++ ) {
+    for (var deviceNumber = 0; deviceNumber < 6; deviceNumber++ ) {
              if(deviceValues[deviceNumber] == "Custom"){
                 device.setSubdeviceSize(deviceArray[deviceNumber],DeviceDict[propertyArray[deviceNumber]].width,DeviceDict[propertyArray[deviceNumber]].height);
+                device.setSubdeviceLeds(deviceArray[deviceNumber],
+                    DeviceDict[propertyArray[deviceNumber]].LedNames,
+                    DeviceDict[propertyArray[deviceNumber]].positioning)
              }       
-    }
+    }}
+
+
 }
 
 function SetFans(){
+    if(savedPumpToggle != pumpToggle){
+        savedPumpToggle =pumpToggle;
+        
+        if(savedPumpToggle){
+            pump = "EliteCapellixCooler";
+        }else{
+            pump = "None"
+        }
+
+    }
+
     var propertyArray = [pump,device1, device2,device3,device4,device5,device6];
 
         for (var deviceNumber = 0; deviceNumber < 7; deviceNumber++ ) {
@@ -367,6 +416,9 @@ function SetFans(){
                     device.setSubdeviceName(deviceArray[deviceNumber],`${ParentDeviceName} - ${DeviceDict[propertyArray[deviceNumber]].displayName} - ${deviceArray[deviceNumber]}`);
                     device.setSubdeviceImage(deviceArray[deviceNumber], DeviceDict[propertyArray[deviceNumber]].image);
                     device.setSubdeviceSize(deviceArray[deviceNumber],DeviceDict[propertyArray[deviceNumber]].width,DeviceDict[propertyArray[deviceNumber]].height);
+                    device.setSubdeviceLeds(deviceArray[deviceNumber],
+                        DeviceDict[propertyArray[deviceNumber]].LedNames,
+                        DeviceDict[propertyArray[deviceNumber]].positioning)
                  }
             }
         }
@@ -405,7 +457,7 @@ function SendColorData(shutdown = false)
     var TotalLedCount = 0;
     var propertyArray = [pump,device1, device2,device3,device4,device5,device6];
 
-
+    var StartIndex = 0;
     for (var deviceNumber = 0; deviceNumber < 7; deviceNumber++ ) {
 
              if(deviceValues[deviceNumber] != "None"){
@@ -423,15 +475,21 @@ function SendColorData(shutdown = false)
                         mxPxColor = device.subdeviceColor(deviceArray[deviceNumber],iPxX, iPxY);
                     } 
                      //set colors
-                        RGBdata[DeviceDict[propertyArray[deviceNumber]].mapping[iIdx]*3+TotalLedCount*3] = mxPxColor[0];
-                        RGBdata[DeviceDict[propertyArray[deviceNumber]].mapping[iIdx]*3+TotalLedCount*3+1] = mxPxColor[1];
-                        RGBdata[DeviceDict[propertyArray[deviceNumber]].mapping[iIdx]*3+TotalLedCount*3+2] = mxPxColor[2];
+                     //each starting at the its offset
+                        RGBdata[StartIndex + DeviceDict[propertyArray[deviceNumber]].mapping[iIdx]*3] = mxPxColor[0];
+                        RGBdata[StartIndex + DeviceDict[propertyArray[deviceNumber]].mapping[iIdx]*3+1] = mxPxColor[1];
+                        RGBdata[StartIndex + DeviceDict[propertyArray[deviceNumber]].mapping[iIdx]*3+2] = mxPxColor[2];
                     }
                     TotalLedCount += DeviceDict[propertyArray[deviceNumber]].ledCount;
 
+                    //if the device is longer then 34 leds, we need to shift everything after over to the next port. Max Led counts still apply.
+                    //let overlapModifier = Math.floor(DeviceDict[propertyArray[deviceNumber]].ledCount/34)
+                    //deviceNumber == 0 ? StartIndex += 29*3*overlapModifier : StartIndex += 34*3*overlapModifier
                 }
-            
+                //incremement offset by fanmodes led count. pump is only 29.
+                deviceNumber == 0 ? StartIndex += 29*3 : StartIndex += 34*3
     }
+
     var packet = []
     packet[0x00]   = 0x00;
     packet[0x01]   = 0x08;
@@ -441,8 +499,8 @@ function SendColorData(shutdown = false)
     //by default 5 small fans were f2
     //5 ql(34 led fans) were 00 02
     //5 ql plus the h150i pump is 57 02
-    packet[0x04]   = TotalLedCount;//0xF2 //LED COUNT
-    packet[0x05]   = Math.round(selection);//Led count overflow
+    packet[0x04]   = 0x9F;//0xF2 //LED COUNT //maybe BB? 34*6+29 *3?
+    packet[0x05]   = 2;//Led count overflow
     packet[0x06]   = 0x00;
     packet[0x07]   = 0x00;
     packet[0x08]   = 0x12;
@@ -451,17 +509,76 @@ function SendColorData(shutdown = false)
     packet         = packet.concat(RGBdata);
 
     device.write(packet,1025);
+    device.read(packet,1025);
     //device.pause(2)
 
 }
+function setFanMode(){
+    //this seems to relate to the "mode selector" i had. the commander core splits each ports data with a specific spacing while other corsair lighting controllers just put it back to back.
+    //Future lighting controller will likely use this system.
 
+    sendPacketString("00 08 05 01 01",1025) //end point close
+    sendPacketString("00 08 06 00 F2 02 00 00 12",1025) //end point close
+    sendPacketString("00 08 0D 01 1E",1025) //end point open
+    sendPacketString("00 08 09 01",1025) //read
+
+    //01 06 is QL?
+    sendPacketString("00 08 06 01 11 00 00 00 0D 00 07 01 08 01 06 01 06 01 06 01 06 01 06 01 06",1025); //set fan spacing
+    sendPacketString("00 08 05 01 01",1025) //end point close
+    sendPacketString("00 08 15 01",1025) //unknown
+    sendPacketString("00 08 06 00 F2 02 00 00 12",1025)
+
+}
+function readCoolingData(){
+    var CoolingData = [];
+    sendPacketString("00 08 0D 01 21",1025) //open
+    sendPacketString("00 08 09 01",1025) //read?
+    sendPacketString("00 08 08 01",1025) //set?
+    sendPacketString("00 08 05 01 01",1025) //close
+}
+var SavedFanSpeed;
+var SavedPumpSpeed;
+
+function sendCoolingdata(){
+    //fixed %
+    SavedFanSpeed  = FanSpeed;
+    SavedPumpSpeed = PumpSpeed;
+    var CoolingData = [
+        0x00, 0x08, 0x06, 0x01, 0x1F, 0x00, 0x00, 0x00, 0x07, 0x00, 0x07, 0x00, 0x00, 0x64, // Pump %?
+        0x00, 
+        0x01, 0x00, 0x3C, 0x00, //fan Data   00 %% 00
+        0x02, 0x00, 0x3C, 0x00, //fan Data  
+        0x03, 0x00, 0x00, 0x00, //fan Data  
+        0x04, 0x00, 0x00, 0x00, //fan Data  
+        0x05, 0x00, 0x00, 0x00, //fan Data  
+        0x06, 0x00, 0x00, 0x00  //fan Data 
+    ]
+
+    CoolingData[13] = PumpSpeed;
+    for(var fan = 0;fan < 6;fan++){
+        CoolingData[17 + fan*4] = FanSpeed;
+    }
+
+    sendPacketString("00 08 0D 01 18",1025) //open
+    sendPacketString("00 08 09 01",1025) //read?
+    device.write(CoolingData,1025);
+    sendPacketString("00 08 05 01 01",1025) //close
+
+}
 export function Render()
 {
     InitCustomStrip(); 
-
     SetFans();
 
     SendColorData();
+
+    // if(FanControl && 
+    //     (SavedFanSpeed  != FanSpeed || 
+    //     SavedPumpSpeed != PumpSpeed)
+    // ){
+    //     sendCoolingdata();
+
+    // }
 }
 
 export function Validate(endpoint)

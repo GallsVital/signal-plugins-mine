@@ -52,7 +52,7 @@ export function Name() { return "Razer LanceHead TE"; }
 export function VendorId() { return 0x1532; }
 export function ProductId() { return 0x0060; }
 export function Publisher() { return "WhirlwindFX"; }
-export function Size() { return [5,7]; }
+export function Size() { return [5,9]; }
 export function Type() { return "Hid"; }
 export function DefaultPosition(){return [240,120]}
 export function DefaultScale(){return 8.0}
@@ -61,7 +61,7 @@ export function ControllableParameters(){
         {"property":"shutdownColor", "label":"Shutdown Color","min":"0","max":"360","type":"color","default":"009bde"},
         {"property":"LightingMode", "label":"Lighting Mode", "type":"combobox", "values":["Canvas","Forced"], "default":"Canvas"},
         {"property":"forcedColor", "label":"Forced Color","min":"0","max":"360","type":"color","default":"009bde"},
-        {"property":"DpiControl", "label":"Enable Dpi Control","type":"boolean","default":"false"},
+        {"property":"SettingControl", "label":"Enable Setting Control","type":"boolean","default":"false"},
         {"property":"dpi1", "label":"DPI", "step":"50","type":"number","min":"200", "max":"16000","default":"1500"},
         {"property":"mousePolling", "label":"Mouse Polling Rate", "type":"combobox", "values":["125","500","1000"], "default":"1000"},
 
@@ -94,23 +94,23 @@ var vLedNames =  [
 "Left Side Bar 7",                 "Right Side Bar 7",
 ];
 var vLedMap = [
-    0,         7,
-    1,   15,   8,
-    2,         9,
-    3,         10,
-    4,         11,
-    5,  14,    12,
-    6,         13
+    2,       9,
+    3,   0,  10,
+    4,       11,
+    5,       12,
+    6,       13,
+    7,  1,   14,
+    8,       15
 ]
 
 var vLedPositions = [
     [0,0],          [4,0],
-    [0,1], [2,0],   [4,1],
+    [0,1],  [2,0],  [4,1],
     [0,2],          [4,2],
     [0,3],          [4,3],
     [0,4],          [4,4],
-    [0,5], [2,5],   [4,5],
-    [0,6],          [4,6],
+    [0,5],  [2,8],  [4,5],
+    [0,6],          [4,6]
 ];
 
 export function LedNames()
@@ -220,10 +220,11 @@ export function Initialize()
     ChangeControlMode()
 
 
-    if(DpiControl) {
-        //setDPIRazer(dpi1);
+    if(SettingControl) {
+        setDPIRazer(dpi1);
+        setPollingRazer(mousePolling)
+
     }
-    //setPollingRazer(mousePolling)
 }
 
 function setPollingRazer(mousePolling){
@@ -286,9 +287,9 @@ function SendPacket(shutdown = false){
             col = device.color(iPxX, iPxY);
         }    
 
-        packet[vLedMap[iIdx]*3+11] = col[0];
-        packet[vLedMap[iIdx]*3+12] = col[1];
-        packet[vLedMap[iIdx]*3+13] = col[2];
+        packet[vLedMap[iIdx]*3+14] = col[0];
+        packet[vLedMap[iIdx]*3+15] = col[1];
+        packet[vLedMap[iIdx]*3+16] = col[2];
     }
 
     packet[89] = CalculateCrc(packet);
@@ -301,11 +302,11 @@ export function Render()
 {    
     SendPacket();
     
-    if(DpiControl && savedDpi1 != dpi1) {
-        //setDPIRazer(dpi1);
+    if(SettingControl && savedDpi1 != dpi1) {
+        setDPIRazer(dpi1);
     }
-    if(SavedmousePolling != mousePolling) {
-        //setPollingRazer(mousePolling);
+    if(SettingControl && SavedmousePolling != mousePolling) {
+        setPollingRazer(mousePolling);
     }
 }
 
