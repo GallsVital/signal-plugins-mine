@@ -34,13 +34,13 @@ var CORSAIR_PROPERTY_SUBMIT_MOUSE_COLOR         = 0x22;
 
 export function Initialize()
 {
-    var packet = [];
-    packet[0x00]           = 0x00;
-    packet[0x01]           = CORSAIR_COMMAND_WRITE;
-    packet[0x02]           = CORSAIR_PROPERTY_SPECIAL_FUNCTION;
-    packet[0x03]           = CORSAIR_LIGHTING_CONTROL_SOFTWARE;
-    packet[0x05]   = 0x03;
-    device.write(packet, 65);
+    // var packet = [];
+    // packet[0x00]           = 0x00;
+    // packet[0x01]           = CORSAIR_COMMAND_WRITE;
+    // packet[0x02]           = CORSAIR_PROPERTY_SPECIAL_FUNCTION;
+    // packet[0x03]           = CORSAIR_LIGHTING_CONTROL_SOFTWARE;
+    // packet[0x05]   = 0x03;
+    // device.write(packet, 65);
 
 
     var packet = [];
@@ -51,7 +51,7 @@ export function Initialize()
     packet[0x05]   = 0x03;
     device.write(packet, 65);
 
-    InitScanCodes();
+    //InitScanCodes();
 }
 var SkippedKeys = [
     0x31, 0x41,0x42,0x48,0x49,0x51,0x55,0x6F,0x7E,0x7F,0x80,0x81

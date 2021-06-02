@@ -272,9 +272,9 @@ var deviceArray = [
     "Ch2-Port-3",
 ];
 
-export function Name() { return "GIGABYTE Motherboard Controller"; }
+export function Name() { return "GIGABYTE Motherboard LED Controller"; }
 export function VendorId() { return  0x048D; }  
-export function ProductId() { return 0x0000;}//0x5702;} //Experimental Also on 0x8297?
+export function ProductId() { return 0x5702;}//0x5702;} //Experimental Also on 0x8297?
 export function Publisher() { return "WhirlwindFX"; }
 export function Size() { return [3,3]; }
 export function Type() { return "Hid"; }
@@ -286,16 +286,16 @@ export function ControllableParameters(){
         {"property":"LightingMode", "label":"Lighting Mode", "type":"combobox", "values":["Canvas","Forced"], "default":"Canvas"},
         {"property":"forcedColor", "label":"Forced Color","min":"0","max":"360","type":"color","default":"009bde"},
         //{"property":"RGBHeaderCount", "label":"RGB Header Count","type":"number","min":"0", "max":"2","default":"0"},
-        {"property":"RGBconfig", "label":"ARGB Config", "type":"combobox",   "values":["RGB","RBG","BGR","BRG","GBR","GRB"], "default":"GRB"},
+        {"property":"RGBconfig", "label":"ARGB Channel Configuration", "type":"combobox",   "values":["RGB","RBG","BGR","BRG","GBR","GRB"], "default":"GRB"},
 
         {"property":"CustomSize", "label":"Custom Strip Size","type":"number","min":"0", "max":"80","default":"10"},
 
-        {"property":"device1", "label":"Ch1 | Device 1", "type":"combobox",   "values":["None","Strip_10Led","Strip_8Led","Strip_6Led","AER 2 Fan","LL Fan","QL Fan","ML Fan", "SpPro Fan","MF120Halo","Custom"], "default":"None"},
-        {"property":"device2", "label":"Ch1 | Device 2", "type":"combobox",   "values":["None","Strip_10Led","Strip_8Led","Strip_6Led","AER 2 Fan","LL Fan","QL Fan","ML Fan", "SpPro Fan","MF120Halo","Custom"], "default":"None"},
-        {"property":"device3", "label":"Ch1 | Device 3", "type":"combobox",   "values":["None","Strip_10Led","Strip_8Led","Strip_6Led","AER 2 Fan","LL Fan","QL Fan","ML Fan", "SpPro Fan","MF120Halo","Custom"], "default":"None"},
-        {"property":"device4", "label":"Ch2 | Device 1", "type":"combobox",   "values":["None","Strip_10Led","Strip_8Led","Strip_6Led","AER 2 Fan","LL Fan","QL Fan","ML Fan", "SpPro Fan","MF120Halo","Custom"], "default":"None"},
-        {"property":"device5", "label":"Ch2 | Device 2", "type":"combobox",   "values":["None","Strip_10Led","Strip_8Led","Strip_6Led","AER 2 Fan","LL Fan","QL Fan","ML Fan", "SpPro Fan","MF120Halo","Custom"], "default":"None"},
-        {"property":"device6", "label":"Ch2 | Device 3", "type":"combobox",   "values":["None","Strip_10Led","Strip_8Led","Strip_6Led","AER 2 Fan","LL Fan","QL Fan","ML Fan", "SpPro Fan","MF120Halo","Custom"], "default":"None"},
+        {"property":"device1", "label":"Channel 1 Device 1", "type":"combobox",   "values":["None","Strip_10Led","Strip_8Led","Strip_6Led","AER 2 Fan","LL Fan","QL Fan","ML Fan", "SpPro Fan","MF120Halo","Custom"], "default":"None"},
+        {"property":"device2", "label":"Channel 1 Device 2", "type":"combobox",   "values":["None","Strip_10Led","Strip_8Led","Strip_6Led","AER 2 Fan","LL Fan","QL Fan","ML Fan", "SpPro Fan","MF120Halo","Custom"], "default":"None"},
+        {"property":"device3", "label":"Channel 1 Device 3", "type":"combobox",   "values":["None","Strip_10Led","Strip_8Led","Strip_6Led","AER 2 Fan","LL Fan","QL Fan","ML Fan", "SpPro Fan","MF120Halo","Custom"], "default":"None"},
+        {"property":"device4", "label":"Channel 1 Device 1", "type":"combobox",   "values":["None","Strip_10Led","Strip_8Led","Strip_6Led","AER 2 Fan","LL Fan","QL Fan","ML Fan", "SpPro Fan","MF120Halo","Custom"], "default":"None"},
+        {"property":"device5", "label":"Channel 2 Device 2", "type":"combobox",   "values":["None","Strip_10Led","Strip_8Led","Strip_6Led","AER 2 Fan","LL Fan","QL Fan","ML Fan", "SpPro Fan","MF120Halo","Custom"], "default":"None"},
+        {"property":"device6", "label":"Channel 3 Device 3", "type":"combobox",   "values":["None","Strip_10Led","Strip_8Led","Strip_6Led","AER 2 Fan","LL Fan","QL Fan","ML Fan", "SpPro Fan","MF120Halo","Custom"], "default":"None"},
         ];
 }
 var ParentDeviceName = "GigaByte MotherBoard";

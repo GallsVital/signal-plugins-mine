@@ -520,9 +520,9 @@ function SendChannel(channel,shutdown = false)
 
          StreamLightingPacketChanneled(ledsSent,ledsToSend,2,blue.splice(0,ledsToSend),channel);
 
+         device.pause(1);
          ledsSent += ledsToSend;
          TotalLedCount -= ledsToSend;
-
      }
 
 }
