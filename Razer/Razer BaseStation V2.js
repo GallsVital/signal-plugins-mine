@@ -162,7 +162,7 @@ function SendPacket(shutdown = false)
     packet[89] = CalculateCrc(packet);
 
     device.send_report(packet, 91);
-    device.pause(1); // We need a pause here (between packets), otherwise the ornata can't keep up.
+    device.pause(3); // We need a pause here (between packets), otherwise the ornata can't keep up.
 
 }
 

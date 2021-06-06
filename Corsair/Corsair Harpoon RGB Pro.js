@@ -104,13 +104,12 @@ function sendColors(shutdown = false){
         var iX = vLedPositions[zone_idx][0];
         var iY = vLedPositions[zone_idx][1];
         var col
-        var col;
     if(shutdown){
         col = hexToRgb(shutdownColor)
     }else if (LightingMode == "Forced") {
         col = hexToRgb(forcedColor)
     }else{
-        col = device.color(iPxX, iPxY);
+        col = device.color(iX, iY);
     }   
 
         packet[(zone_idx * 4) + 5] = zoneId[zone_idx];

@@ -61,9 +61,6 @@ var vKeymap = [
 ];
  
 export function Initialize() {
-   device.log(vKeymap.length)
-   device.log(vLedNames.length)
-   device.log(vLedPositions.length)
 
 }
 
