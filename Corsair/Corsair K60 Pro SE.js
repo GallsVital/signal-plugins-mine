@@ -59,10 +59,6 @@ export function Shutdown()
 
 // This is an array of key indexes for setting colors in our render array, indexed left to right, row top to bottom.
  var vKeys = [  
-        
-//for testing
-46, 96,  98, 99, 100,
-
     37,   54, 55, 56, 57,     58, 59, 60, 61,     62, 63, 64, 65,     66, 67, 68,    //120, 123, 121, 122,  
     49,   26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 41, 42,     38,     69, 70, 71,    79, 80, 81, 82, 
     39,   16, 22, 4, 17, 19, 24, 20, 8, 14, 15, 43,   44,   45,       72, 73, 74,    91, 92, 93, 83,   
@@ -78,9 +74,6 @@ export function Shutdown()
 // This array must be the same length as vKeys[], and represents the pixel color position in our pixel matrix that we reference.  For example,
 // item at index 3 [9,0] represents the corsair logo, and the render routine will grab its color from [9,0].
 var vKeyPositions = [
-
-    
-    
     [1,1],    [3,1],[4,1], [5,1], [6,1],     [7,1],[8,1], [9,1], [10,1],   [12,1],[13,1], [14,1], [15,1],  [15,1], [16,1], [17,1],     //[18,1], [19,1],[20,1], [21,1], 
     [1,2], [2,2], [3,2], [4,2], [5,2], [6,2], [7,2], [8,2], [9,2], [10,2], [11,2], [12,2], [13,2], [14,2],   [15,2], [16,2], [17,2],   [18,2], [19,2],[20,2], [21,2], 
     [1,3], [2,3], [3,3], [4,3], [5,3], [6,3], [7,3], [8,3], [9,3], [10,3], [11,3], [12,3], [13,3], [14,3],   [15,3], [16,3], [17,3],   [18,3], [19,3],[20,3], [21,3], 
