@@ -297,7 +297,7 @@ export function ControllableParameters(){
         {"property":"shutdownColor", "label":"Shutdown Color","min":"0","max":"360","type":"color","default":"009bde"},
         {"property":"LightingMode", "label":"Lighting Mode", "type":"combobox", "values":["Canvas","Forced"], "default":"Canvas"},
         {"property":"forcedColor", "label":"Forced Color","min":"0","max":"360","type":"color","default":"009bde"},
-        {"property":"CustomSize", "label":"Custom Strip Size","type":"number","min":"0", "max":"80","default":"10"},
+        {"property":"CustomSize", "label":"Custom Strip Size","type":"number","min":"1", "max":"80","default":"10"},
 
         {"property":"device1", "label":"Ch1 | Port 1", "type":"combobox",   "values":["None","Strip_10Led","Strip_8Led","Strip_6Led","AER 2 Fan","LL Fan","QL Fan","ML Fan", "SpPro Fan","MF120Halo","Custom"], "default":"None"},
         {"property":"device2", "label":"Ch1 | Port 2", "type":"combobox",   "values":["None","Strip_10Led","Strip_8Led","Strip_6Led","AER 2 Fan","LL Fan","QL Fan","ML Fan", "SpPro Fan","MF120Halo","Custom"], "default":"None"},
@@ -328,10 +328,13 @@ var vLedNames = ["Device Wide"];
 var vLedPositions = [
     [0,0]
 ];
-var CustomValue;
+var savedCustomSize;
 function InitCustomStrip(){
-    if(CustomValue != CustomSize){
-        CustomValue = CustomSize;
+    if(savedCustomSize == CustomSize){
+        return
+    }
+    savedCustomSize = CustomSize
+
         var mapping = [];
         var positioning = [];
         var names = [];
@@ -359,7 +362,7 @@ function InitCustomStrip(){
                         DeviceDict[propertyArray[deviceNumber]].positioning)
                 }       
         }
-    }
+    
 }
 
 export function LedNames()
@@ -407,7 +410,7 @@ function Sendchannel(channel,shutdown = false)
 
     for (var deviceNumber = 0+2*channel; deviceNumber < 2+2*channel; deviceNumber++ ) {
 
-        if(deviceValues[deviceNumber] != "None"){
+        if(deviceValues[deviceNumber] != "None" && DeviceDict[propertyArray[deviceNumber]] != null){
 
            for(var iIdx = 0; iIdx < DeviceDict[propertyArray[deviceNumber]].mapping.length; iIdx++){
                var iPxX = DeviceDict[propertyArray[deviceNumber]].positioning[iIdx][0];
@@ -470,14 +473,16 @@ function SetFans(){
 
 export function Render()
 {    
-    InitCustomStrip();
-    SetFans();
+
     Sendchannel(0);
     Sendchannel(1);
     Sendchannel(2);
     Sendchannel(3);
     Sendchannel(4);
     Sendchannel(5);
+
+    InitCustomStrip();
+    SetFans();
  
 }
 

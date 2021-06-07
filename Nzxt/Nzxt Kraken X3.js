@@ -144,7 +144,7 @@ export function ControllableParameters(){
         {"property":"shutdownColor", "label":"Shutdown Color","min":"0", "max":"360","type":"color","default":"009bde"},
         {"property":"LightingMode", "label":"Lighting Mode", "type":"combobox", "values":["Canvas","Forced"], "default":"Canvas"},
         {"property":"forcedColor", "label":"Forced Color","min":"0", "max":"360","type":"color","default":"009bde"},
-        {"property":"CustomSize", "label":"Custom Strip Size","type":"number","min":"0", "max":"80","default":"10"},
+        {"property":"CustomSize", "label":"Custom Strip Size","type":"number","min":"1", "max":"80","default":"10"},
         {"property":"device1", "label":"Ch1 | Port 1", "type":"combobox",   "values":["None","AER 2 Fan","Strip_10Led","Strip_8Led","Strip_6Led","Strip_Underglow_200mm","Cable_Comb","Custom"], "default":"None"},
         {"property":"device2", "label":"Ch1 | Port 2", "type":"combobox",   "values":["None","AER 2 Fan","Strip_10Led","Strip_8Led","Strip_6Led","Strip_Underglow_200mm","Cable_Comb","Custom"], "default":"None"},
         {"property":"device3", "label":"Ch1 | Port 3", "type":"combobox",   "values":["None","AER 2 Fan","Strip_10Led","Strip_8Led","Strip_6Led","Strip_Underglow_200mm","Cable_Comb","Custom"], "default":"None"},
@@ -209,8 +209,13 @@ function hexToRgb(hex) {
     
         device.write(packet, size);
     }
+    var savedCustomSize;
     function InitCustomStrip(){
-        var mapping = [];
+        if(savedCustomSize == CustomSize){
+            return
+        }
+        savedCustomSize = CustomSize
+            var mapping = [];
         var positioning = [];
         var names = [];
         for(let i = 0; i < CustomSize;i++){
@@ -261,12 +266,12 @@ function hexToRgb(hex) {
 export function Render()
 {       
 
-    SetFans();
-    InitCustomStrip();
+
     sendchannel1Colors(0);
     sendchannelPumpColors(1);
     sendLogo();
-
+    SetFans();
+    InitCustomStrip();
 }
 
 
@@ -323,7 +328,7 @@ function sendchannel1Colors(channel, shutdown = false){
 
      //Fans
      for (var deviceNumber = 0; deviceNumber < propertyArray.length; deviceNumber++ ) {
-           if(deviceValues[deviceNumber] != "None"){
+           if(deviceValues[deviceNumber] != "None" && DeviceDict[propertyArray[deviceNumber]] != null){
               for(var iIdx = 0; iIdx < DeviceDict[propertyArray[deviceNumber]].mapping.length; iIdx++){
                   var iPxX = DeviceDict[propertyArray[deviceNumber]].positioning[iIdx][0];
                   var iPxY = DeviceDict[propertyArray[deviceNumber]].positioning[iIdx][1];

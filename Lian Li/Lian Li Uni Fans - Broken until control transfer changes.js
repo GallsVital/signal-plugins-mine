@@ -4,7 +4,7 @@ export function VendorId() { return  0x0CF2; }
 export function ProductId() { return 0x0000;}//0x7750; }
 export function Publisher() { return "WhirlwindFX"; }
 export function Size() { return [5, 5]; }
-export function Type(){return "Libusb"};
+export function Type(){return "rawusb"};
 export function ControllableParameters(){
     return [
     {"property":"shutdownColor", "label":"Shutdown Color","min":"0","max":"360","type":"color","default":"009bde"},
@@ -14,6 +14,43 @@ export function ControllableParameters(){
     {"property":"device2", "label":"Fan 2 Type", "type":"combobox", "values":["None","LL", "QL","ML","SpPro"], "default":"None"},
     ];
 }
+const COMMAND_ADDRESS = 0xE021
+const COMMIT_ADDRESS = 0xE02f
+
+
+//MAKE THESE INTO OBJECTS
+const CHANNEL1_ACTION_ADDRESS      = 0xe300
+const CHANNEL1_COMMIT_ADDRESS      = 0xe02f
+const CHANNEL1_MODE        = 0xe021
+const CHANNEL1_SPEED       = 0xe022
+const CHANNEL1_DIRECTION   = 0xe023
+const CHANNEL1_BRIGHTNESS  = 0xe029
+
+
+const CHANNEL2_ACTION      = 0xe3c0
+const CHANNEL2_COMMIT      = 0xe03f
+const CHANNEL2_MODE        = 0xe031
+const CHANNEL2_SPEED       = 0xe032
+const CHANNEL2_DIRECTION   = 0xe033
+const CHANNEL2_BRIGHTNESS  = 0xe039
+
+
+const CHANNEL3_ACTION      = 0xe480
+const CHANNEL3_COMMIT      = 0xe04f
+const CHANNEL3_MODE        = 0xe041
+const CHANNEL3_SPEED       = 0xe042
+const CHANNEL3_DIRECTION   = 0xe043
+const CHANNEL3_BRIGHTNESS  = 0xe049
+
+
+const CHANNEL4_ACTION      = 0xe540
+const CHANNEL4_COMMIT      = 0xe05f
+const CHANNEL4_MODE        = 0xe051
+const CHANNEL4_SPEED       = 0xe052
+const CHANNEL4_DIRECTION   = 0xe053
+const CHANNEL4_BRIGHTNESS  = 0xe059
+
+
 var vLedNames = [
 "Device Wide"
 ];
@@ -45,75 +82,120 @@ export function LedPositions()
   return vLedPos;
 }
 
-function EnableSoftwareControl()
-{
-
-}
-
-function ReturnToHardwareControl()
-{
-
-}
-
-
 export function Initialize()
 {
-    EnableSoftwareControl();
 }
 
-
-
- var DeviceDict = {
-     "None": null,
-
- }
- var deviceValues = [
-     "",
-     "",
- ];
- var deviceArray = [
-     "Port-1",
-     "Port-2",
- ];
-
-
 function SetFans(){
-    // var propertyArray = [device1, device2];
 
-    //     for (var deviceNumber = 0; deviceNumber < 2; deviceNumber++ ) {
-    //           if(deviceValues[deviceNumber] != propertyArray[deviceNumber]){
-    //             deviceValues[deviceNumber] = propertyArray[deviceNumber];
-
-    //              if(deviceValues[deviceNumber] == "None"){
-    //                 device.removeSubdevice(deviceArray[deviceNumber]);
-    //              }else{
-    //                  //"Ch1 | Port 1"
-    //                 device.createSubdevice(deviceArray[deviceNumber]); 
-    //                 // Parent Device + Sub device Name + Ports
-    //                 device.setSubdeviceName(deviceArray[deviceNumber],`${Name()} - ${DeviceDict[propertyArray[deviceNumber]].displayName} - ${deviceArray[deviceNumber]}`);
-    //                 device.setSubdeviceImage(deviceArray[deviceNumber], DeviceDict[propertyArray[deviceNumber]].image);
-    //                 device.setSubdeviceSize(deviceArray[deviceNumber],DeviceDict[propertyArray[deviceNumber]].width,DeviceDict[propertyArray[deviceNumber]].height);
-    //              }
-    //         }
-    //     }
-    var packet = [192];
+    //start configuation
+    var packet = [];
     packet[0] = 0x34;
-    sendControlPacket(0xe021, packet,192);
+    sendControlPacket(COMMAND_ADDRESS, packet,1);
+    sendCommit();
+
+    //set fan counts
+    for(let channel = 0;channel < 4;channel++){
+        var packet = [];
+        packet[0] = 0x32;
+        packet[1] = 16*channel + 2// fan Count on channel
+        sendControlPacket(COMMAND_ADDRESS, packet,2);
+        sendCommit();
+    }
+    //set fan RGB
+
+        packet = new Array(192).fill(200);
+        sendControlPacket(CHANNEL1_ACTION_ADDRESS, packet,192);
+        
+
+        packet = [1]
+        sendControlPacket(        CHANNEL1_MODE      
+            , packet,1);
+
+        packet = [1]
+        sendControlPacket(CHANNEL1_SPEED, packet,1);
+
+        packet = [0]
+        sendControlPacket(CHANNEL1_DIRECTION, packet,1);
+
+        packet = [0]
+        sendControlPacket(CHANNEL1_BRIGHTNESS, packet,1);
+
+        packet = [1]
+        sendControlPacket(CHANNEL1_COMMIT_ADDRESS, packet,1);
+
+// channel 2
+packet = new Array(192).fill(200);
+sendControlPacket(CHANNEL2_ACTION, packet,192);
+
+
+packet = [1]
+sendControlPacket(        CHANNEL2_MODE
+      
+    , packet,1);
+
+packet = [1]
+sendControlPacket(CHANNEL2_SPEED, packet,1);
+
+packet = [0]
+sendControlPacket(CHANNEL2_DIRECTION, packet,1);
+
+packet = [0]
+sendControlPacket(CHANNEL2_BRIGHTNESS, packet,1);
+
+packet = [1]
+sendControlPacket(CHANNEL2_COMMIT, packet,1);
+
+
+
+// channel 3
+packet = new Array(192).fill(200);
+sendControlPacket(CHANNEL3_ACTION, packet,192);
+
+
+packet = [1]
+sendControlPacket(        CHANNEL3_MODE      
+    , packet,1);
+
+packet = [1]
+sendControlPacket(CHANNEL3_SPEED, packet,1);
+
+packet = [0]
+sendControlPacket(CHANNEL3_DIRECTION, packet,1);
+
+packet = [0]
+sendControlPacket(CHANNEL3_BRIGHTNESS, packet,1);
+
+packet = [1]
+sendControlPacket(CHANNEL3_COMMIT, packet,1);
+
+
+//channel 4
+packet = new Array(192).fill(200);
+sendControlPacket(CHANNEL4_ACTION, packet,192);
+
+
+packet = [1]
+sendControlPacket(        CHANNEL4_MODE      
+    , packet,1);
+
+packet = [1]
+sendControlPacket(CHANNEL4_SPEED, packet,1);
+
+packet = [0]
+sendControlPacket(CHANNEL4_DIRECTION, packet,1);
+
+packet = [0]
+sendControlPacket(CHANNEL4_BRIGHTNESS, packet,1);
+
+packet = [1]
+sendControlPacket(CHANNEL4_COMMIT, packet,1);
+
+
 } 
 
 function sendColorPacket(command, data){
-    var packet = [];
-    packet[0] = 0x00;
-    packet[1] = 0x3F;
-    packet[2] = GetPacketSequence();
-    packet[2] |= command;
-    packet = packet.concat(data);
-    packet[63] = 0x00; 
-    packet[64] = ComputePec(packet.slice(2,64));
-    device.write(packet, 65);
-    device.read(packet,65);
-    //10 works well for soft locks
-    device.pause(10);
+
 }
 
 function hexToRgb(hex) {
@@ -127,69 +209,12 @@ function hexToRgb(hex) {
   }
 function sendColor(shutdown = false){
 
-    var RGBdata = [];
-    var TotalLedCount = 0;
-    var propertyArray = [device1, device2];
-    //Pump
-
-            for(var iIdx = 0; iIdx < vLedMapping.length; iIdx++)
-            {
-                var iPxX = vLedPos[iIdx][0];
-                var iPxY = vLedPos[iIdx][1];
-                var col;
-                if(shutdown){
-                    col = hexToRgb(shutdownColor)
-                }else if (LightingMode == "Forced") {
-                    col = hexToRgb(forcedColor)
-                }else{
-                    col = device.color(iPxX, iPxY);
-                }           
-            
-                RGBdata[vLedMapping[iIdx]*3] = col[2];
-                RGBdata[vLedMapping[iIdx]*3+1] = col[1];
-                RGBdata[vLedMapping[iIdx]*3+2] = col[0];
-                TotalLedCount += 1;
-            }
-     //Fans
-     for (var deviceNumber = 0; deviceNumber < 2; deviceNumber++ ) {
-           if(deviceValues[deviceNumber] != "None"){
-              for(var iIdx = 0; iIdx < DeviceDict[propertyArray[deviceNumber]].mapping.length; iIdx++){
-                  var iPxX = DeviceDict[propertyArray[deviceNumber]].positioning[iIdx][0];
-                  var iPxY = DeviceDict[propertyArray[deviceNumber]].positioning[iIdx][1];
-                  var mxPxColor;
-                  //find colors
-                  if(shutdown){
-                      mxPxColor = hexToRgb(shutdownColor)
-                  }else if (LightingMode == "Forced") {
-                      mxPxColor = hexToRgb(forcedColor)
-                  }else{
-                      mxPxColor = device.subdeviceColor(deviceArray[deviceNumber],iPxX, iPxY);
-                  } 
-                   //set colors
-                      RGBdata[DeviceDict[propertyArray[deviceNumber]].mapping[iIdx]*3+0+TotalLedCount*3] = mxPxColor[2];
-                      RGBdata[DeviceDict[propertyArray[deviceNumber]].mapping[iIdx]*3+1+TotalLedCount*3] = mxPxColor[1];
-                      RGBdata[DeviceDict[propertyArray[deviceNumber]].mapping[iIdx]*3+2+TotalLedCount*3] = mxPxColor[0];
-                  }
-                  TotalLedCount += DeviceDict[propertyArray[deviceNumber]].ledCount;
-              }
-    
-  }
-
-
-        sendColorPacket(ColorFlags[0],RGBdata.splice(0,60));
-        if(TotalLedCount > 20) {
-            sendColorPacket(ColorFlags[1],RGBdata.splice(0,60));
-        }
-        if(TotalLedCount > 40) {
-            sendColorPacket(ColorFlags[2],RGBdata.splice(0,60));
-        }
-        //40 is known to be good for soft locks
-    device.pause(20);
 }
 
 export function Render()
 {
     SetFans();
+    device.pause(30)
     //sendColor();
 
 }
@@ -197,7 +222,12 @@ function sendControlPacket(index,data,length){
         //                  iType, iRequest, iValue, iReqIdx, pBuf, iLen, iTimeout 
         device.control_transfer(0x40,0x80,0,index,data,length,1000);
 }
-
+function sendCommit(){
+    var packet = [];
+    packet[1] = 0x01
+    //                  iType, iRequest, iValue, iReqIdx, pBuf, iLen, iTimeout 
+    device.control_transfer(0x40,0x80,0,COMMIT_ADDRESS,packet,1,1000);
+}
 export function Shutdown()
 {
 

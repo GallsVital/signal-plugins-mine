@@ -123,7 +123,7 @@ export function ControllableParameters(){
     {"property":"shutdownColor", "label":"Shutdown Color","min":"0","max":"360","type":"color","default":"009bde"},
     {"property":"LightingMode", "label":"Lighting Mode", "type":"combobox", "values":["Canvas","Forced"], "default":"Canvas"},
     {"property":"forcedColor", "label":"Forced Color","min":"0","max":"360","type":"color","default":"009bde"},
-    {"property":"CustomSize", "label":"Custom Strip Size","type":"number","min":"0", "max":"80","default":"10"},
+    {"property":"CustomSize", "label":"Custom Strip Size","type":"number","min":"1", "max":"80","default":"10"},
 
     {"property":"device1", "label":"Ch1 | Port 1", "type":"combobox",   "values":["None","AER 2 Fan","Strip_10Led","Strip_8Led","Strip_6Led","Strip_Underglow_200mm","Cable_Comb","Custom"], "default":"None"},
     {"property":"device2", "label":"Ch1 | Port 2", "type":"combobox",   "values":["None","AER 2 Fan","Strip_10Led","Strip_8Led","Strip_Underglow_200mm","Cable_Comb","Custom"], "default":"None"},
@@ -194,7 +194,12 @@ var vKeyPositions = [
     [0,0]
 ];
 
+var savedCustomSize;
 function InitCustomStrip(){
+    if(savedCustomSize == CustomSize){
+        return
+    }
+    savedCustomSize = CustomSize
     var mapping = [];
     var positioning = [];
     var names = [];
@@ -320,7 +325,7 @@ function SendChannel(channel,shutdown = false)
 
     for (var deviceNumber = 0+6*channel; deviceNumber < 6+6*channel; deviceNumber++ ) {
 
-             if(deviceValues[deviceNumber] != "None"){
+             if(deviceValues[deviceNumber] != "None"  && DeviceDict[propertyArray[deviceNumber]] != null){
 
                 for(var iIdx = 0; iIdx < DeviceDict[propertyArray[deviceNumber]].mapping.length; iIdx++){
                     var iPxX = DeviceDict[propertyArray[deviceNumber]].positioning[iIdx][0];
@@ -361,11 +366,11 @@ function SendChannel(channel,shutdown = false)
 
 export function Render()
 {
-        InitCustomStrip();
-        SetFans();
+
         SendChannel(0);
         SendChannel(1);
-    
+        InitCustomStrip();
+        SetFans();
 }
 
  

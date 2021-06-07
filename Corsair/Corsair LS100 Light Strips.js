@@ -109,19 +109,19 @@ export function ControllableParameters(){
         {"property":"forcedColor", "label":"Forced Color","min":"0","max":"360","type":"color","default":"009bde"},
         {"property":"EndpointMode", "label":"Endpoint Mode", "type":"combobox", "values":["Corsair","Arduino"], "default":"Corsair"},
 
-        {"property":"CustomSize", "label":"Custom Strip Size","type":"number","min":"0", "max":"80","default":"10"},
-    {"property":"device1",  "label":"Ch1 | Port 1", "type":"combobox",  "values":["None","Strip_Internal","Strip_250mm","Strip_350mm","Strip_450mm","Strip_140CM","Custom"], "default":"None"},
-    {"property":"device2",  "label":"Ch1 | Port 2", "type":"combobox",  "values":["None","Strip_Internal","Strip_250mm","Strip_350mm","Strip_450mm","Strip_140CM","Custom"], "default":"None"},
-    {"property":"device3",  "label":"Ch1 | Port 3", "type":"combobox",  "values":["None","Strip_Internal","Strip_250mm","Strip_350mm","Strip_450mm","Strip_140CM","Custom"], "default":"None"},
-    {"property":"device4",  "label":"Ch1 | Port 4", "type":"combobox",  "values":["None","Strip_Internal","Strip_250mm","Strip_350mm","Strip_450mm","Strip_140CM","Custom"], "default":"None"},
-    {"property":"device5",  "label":"Ch1 | Port 5", "type":"combobox",  "values":["None","Strip_Internal","Strip_250mm","Strip_350mm","Strip_450mm","Strip_140CM","Custom"], "default":"None"},
-    {"property":"device6",  "label":"Ch1 | Port 6", "type":"combobox",  "values":["None","Strip_Internal","Strip_250mm","Strip_350mm","Strip_450mm","Strip_140CM","Custom"], "default":"None"},
-    {"property":"device7",  "label":"Ch2 | Port 1", "type":"combobox",  "values":["None","Strip_Internal","Strip_250mm","Strip_350mm","Strip_450mm","Strip_140CM","Custom"], "default":"None"},
-    {"property":"device8",  "label":"Ch2 | Port 2", "type":"combobox",  "values":["None","Strip_Internal","Strip_250mm","Strip_350mm","Strip_450mm","Strip_140CM","Custom"], "default":"None"},
-    {"property":"device9",  "label":"Ch2 | Port 3", "type":"combobox",  "values":["None","Strip_Internal","Strip_250mm","Strip_350mm","Strip_450mm","Strip_140CM","Custom"], "default":"None"},
-    {"property":"device10", "label":"Ch2 | Port 4", "type":"combobox","values":["None","Strip_Internal","Strip_250mm","Strip_350mm","Strip_450mm","Strip_140CM","Custom"], "default":"None"},
-    {"property":"device11", "label":"Ch2 | Port 5", "type":"combobox","values":["None","Strip_Internal","Strip_250mm","Strip_350mm","Strip_450mm","Strip_140CM","Custom"], "default":"None"},
-    {"property":"device12", "label":"Ch2 | Port 6", "type":"combobox","values":["None","Strip_Internal","Strip_250mm","Strip_350mm","Strip_450mm","Strip_140CM","Custom"], "default":"None"},
+        {"property":"CustomSize", "label":"Custom Strip Size","type":"number","min":"1", "max":"80","default":"10"},
+    {"property":"device7",  "label":"Ch1 | Port 1", "type":"combobox",  "values":["None","Strip_Internal","Strip_250mm","Strip_350mm","Strip_450mm","Strip_140CM","Custom"], "default":"None"},
+    {"property":"device8",  "label":"Ch1 | Port 2", "type":"combobox",  "values":["None","Strip_Internal","Strip_250mm","Strip_350mm","Strip_450mm","Strip_140CM","Custom"], "default":"None"},
+    {"property":"device9",  "label":"Ch1 | Port 3", "type":"combobox",  "values":["None","Strip_Internal","Strip_250mm","Strip_350mm","Strip_450mm","Strip_140CM","Custom"], "default":"None"},
+    {"property":"device10",  "label":"Ch1 | Port 4", "type":"combobox",  "values":["None","Strip_Internal","Strip_250mm","Strip_350mm","Strip_450mm","Strip_140CM","Custom"], "default":"None"},
+    {"property":"device11",  "label":"Ch1 | Port 5", "type":"combobox",  "values":["None","Strip_Internal","Strip_250mm","Strip_350mm","Strip_450mm","Strip_140CM","Custom"], "default":"None"},
+    {"property":"device12",  "label":"Ch1 | Port 6", "type":"combobox",  "values":["None","Strip_Internal","Strip_250mm","Strip_350mm","Strip_450mm","Strip_140CM","Custom"], "default":"None"},
+    {"property":"device1",  "label":"Ch2 | Port 1", "type":"combobox",  "values":["None","Strip_Internal","Strip_250mm","Strip_350mm","Strip_450mm","Strip_140CM","Custom"], "default":"None"},
+    {"property":"device2",  "label":"Ch2 | Port 2", "type":"combobox",  "values":["None","Strip_Internal","Strip_250mm","Strip_350mm","Strip_450mm","Strip_140CM","Custom"], "default":"None"},
+    {"property":"device3",  "label":"Ch2 | Port 3", "type":"combobox",  "values":["None","Strip_Internal","Strip_250mm","Strip_350mm","Strip_450mm","Strip_140CM","Custom"], "default":"None"},
+    {"property":"device4", "label":"Ch2 | Port 4", "type":"combobox","values":["None","Strip_Internal","Strip_250mm","Strip_350mm","Strip_450mm","Strip_140CM","Custom"], "default":"None"},
+    {"property":"device5", "label":"Ch2 | Port 5", "type":"combobox","values":["None","Strip_Internal","Strip_250mm","Strip_350mm","Strip_450mm","Strip_140CM","Custom"], "default":"None"},
+    {"property":"device6", "label":"Ch2 | Port 6", "type":"combobox","values":["None","Strip_Internal","Strip_250mm","Strip_350mm","Strip_450mm","Strip_140CM","Custom"], "default":"None"},
     ];
 }
 var ParentDeviceName = "Corsair Lighting LS100";
@@ -269,7 +269,12 @@ var deviceArray = [
     "Ch2-Port-6",
 ];
 
+var savedCustomSize;
 function InitCustomStrip(){
+    if(savedCustomSize == CustomSize){
+        return
+    }
+    savedCustomSize = CustomSize
     var mapping = [];
     var positioning = [];
     var names = [];
@@ -330,16 +335,16 @@ function hexToRgb(hex) {
 function SendChannel(channel, shutdown = false)
 {
 
-    var red = [135];
-    var green = [135];
-    var blue = [135];
+    var red = [148];
+    var green = [148];
+    var blue = [148];
     var TotalLedCount = 0;
     var propertyArray = [device1, device2,device3,device4,device5,device6,device7,device8,device9,device10,device11,device12];
 
 
     for (var deviceNumber = 0+6*channel; deviceNumber < 6+6*channel; deviceNumber++ ) {
 
-             if(deviceValues[deviceNumber] != "None"){
+             if(deviceValues[deviceNumber] != "None"  && DeviceDict[propertyArray[deviceNumber]] != null){
 
                 for(var iIdx = 0; iIdx < DeviceDict[propertyArray[deviceNumber]].mapping.length; iIdx++){
                     var iPxX = DeviceDict[propertyArray[deviceNumber]].positioning[iIdx][0];
@@ -368,22 +373,18 @@ function SendChannel(channel, shutdown = false)
    InitChannel(channel)
 
    var ledsSent = 0;
-   var TotalLedCount = TotalLedCount >= 127 ? 127 : TotalLedCount;
+   var TotalLedCount = TotalLedCount >= 138 ? 138 : TotalLedCount;
 
     while(TotalLedCount > 0){
         var ledsToSend = TotalLedCount >= 50 ? 50 : TotalLedCount;
 
         StreamLightingPacketChanneled(ledsSent,ledsToSend,0,red.splice(0,ledsToSend),channel);
-        device.pause(1);
 
         StreamLightingPacketChanneled(ledsSent,ledsToSend,1,green.splice(0,ledsToSend),channel);
-        device.pause(1);
 
         StreamLightingPacketChanneled(ledsSent,ledsToSend,2,blue.splice(0,ledsToSend),channel);
         ledsSent += ledsToSend;
         TotalLedCount -= ledsToSend;
-        device.pause(1);
-
     }
 
 }
@@ -402,9 +403,6 @@ function setEndpoint(){
 export function Render()
 {
     setEndpoint();
-    InitCustomStrip()
-    SetFans();
-    device.pause(1);
 
     SendChannel(0);
     device.pause(1);
@@ -415,6 +413,8 @@ export function Render()
     SubmitLightingColors();
     device.pause(1);
 
+    InitCustomStrip()
+    SetFans();
 }
 
  

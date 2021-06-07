@@ -231,7 +231,7 @@ export function ControllableParameters(){
     {"property":"forcedColor", "label":"Forced Color","min":"0","max":"360","type":"color","default":"009bde"},
     {"property":"EndpointMode", "label":"Endpoint Mode", "type":"combobox", "values":["Corsair","Arduino"], "default":"Corsair"},
 
-    {"property":"CustomSize", "label":"Custom Strip Size","type":"number","min":"0", "max":"80","default":"10"},
+    {"property":"CustomSize", "label":"Custom Strip Size","type":"number","min":"1", "max":"80","default":"10"},
 
     {"property":"device1", "label":"Ch1 | Port 1",  "type":"combobox", "values":["None","Strip_Internal","LL", "QL","ML","SpPro","XD5Reservior","GPUBlock","XD5CPU","Custom"], "default":"None"},
     {"property":"device2", "label":"Ch1 | Port 2",  "type":"combobox", "values":["None","Strip_Internal","LL", "QL","ML","SpPro","XD5Reservior","GPUBlock","XD5CPU","Custom"], "default":"None"},
@@ -321,7 +321,13 @@ var vKeyPositions = [
     [0,0]
 ];
 
+var savedCustomSize;
 function InitCustomStrip(){
+    if(savedCustomSize == CustomSize){
+        return
+    }
+    savedCustomSize = CustomSize
+
     var mapping = [];
     var positioning = [];
     var names = [];
@@ -441,7 +447,7 @@ function SendChannel(channel,shutdown = false)
 
     for (var deviceNumber = 0; deviceNumber < 6; deviceNumber++ ) {
 
-             if(deviceValues[deviceNumber] != "None"){
+             if(deviceValues[deviceNumber] != "None"  && DeviceDict[propertyArray[deviceNumber]] != null){
 
                 for(var iIdx = 0; iIdx < DeviceDict[propertyArray[deviceNumber]].mapping.length; iIdx++){
                     var iPxX = DeviceDict[propertyArray[deviceNumber]].positioning[iIdx][0];
@@ -469,7 +475,6 @@ function SendChannel(channel,shutdown = false)
 
    //channelStart(channel);
    InitChannel(channel);
-   device.pause(1);
 
    var ledsSent = 0;
    var TotalLedCount = TotalLedCount >= 204 ? 204 : TotalLedCount;
@@ -482,7 +487,6 @@ function SendChannel(channel,shutdown = false)
         StreamLightingPacketChanneled(ledsSent,ledsToSend,2,blue.splice(0,ledsToSend),channel);
         ledsSent += ledsToSend;
         TotalLedCount -= ledsToSend;
-        device.pause(1);
 
     }
 
@@ -505,15 +509,15 @@ function setEndpoint(){
 export function Render()
 {
     setEndpoint();
-    InitCustomStrip();
-    SetFans();
+
 
     SendChannel(0);
     device.pause(1);
     SubmitLightingColors();
     device.pause(1);
 
-
+    InitCustomStrip();
+    SetFans();
 }
 
  

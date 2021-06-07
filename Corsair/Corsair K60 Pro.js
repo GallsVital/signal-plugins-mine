@@ -58,9 +58,7 @@ export function Shutdown()
 
 
 // This is an array of key indexes for setting colors in our render array, indexed left to right, row top to bottom.
- var vKeys = [  
-        
-
+var vKeys = [  
     37,   54, 55, 56, 57,     58, 59, 60, 61,     62, 63, 64, 65,     66, 67, 68,    //120, 123, 121, 122,  
     49,   26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 41, 42,     38,     69, 70, 71,    79, 80, 81, 82, 
     39,   16, 22, 4, 17, 19, 24, 20, 8, 14, 15, 43,   44,   45,       72, 73, 74,    91, 92, 93, 83,   
@@ -68,20 +66,23 @@ export function Shutdown()
     102,  25, 23, 2, 21, 1, 13, 12, 50, 51, 52,          106,              78,        85, 86, 87, 84,
     101,  104, 103,           40,              107, 108, 97, 105,      76,77,75,     94,    95,
    
+    //ISO
+    96,46
  ];
 
 
 // This array must be the same length as vKeys[], and represents the pixel color position in our pixel matrix that we reference.  For example,
 // item at index 3 [9,0] represents the corsair logo, and the render routine will grab its color from [9,0].
 var vKeyPositions = [
-
     [1,1],    [3,1],[4,1], [5,1], [6,1],     [7,1],[8,1], [9,1], [10,1],   [12,1],[13,1], [14,1], [15,1],  [15,1], [16,1], [17,1],     //[18,1], [19,1],[20,1], [21,1], 
     [1,2], [2,2], [3,2], [4,2], [5,2], [6,2], [7,2], [8,2], [9,2], [10,2], [11,2], [12,2], [13,2], [14,2],   [15,2], [16,2], [17,2],   [18,2], [19,2],[20,2], [21,2], 
     [1,3], [2,3], [3,3], [4,3], [5,3], [6,3], [7,3], [8,3], [9,3], [10,3], [11,3], [12,3], [13,3], [14,3],   [15,3], [16,3], [17,3],   [18,3], [19,3],[20,3], [21,3], 
     [1,4], [2,4], [3,4], [4,4], [5,4], [6,4], [7,4], [8,4], [9,4], [10,4], [11,4], [12,4],         [14,4],                             [18,4], [19,4],[20,4], 
     [1,5],     [3,5], [4,5], [5,5], [6,5], [7,5], [8,5], [9,5], [10,5], [11,5], [12,5],            [14,5],           [16,5],           [18,5], [19,5],[20,5], [21,5],
-    [1,6], [2,6], [3,6],                      [7,6],                       [11,6], [12,6], [13,6], [14,6],   [15,6], [16,6], [17,6],   [18,6],        [20,6] 
+    [1,6], [2,6], [3,6],                      [7,6],                       [11,6], [12,6], [13,6], [14,6],   [15,6], [16,6], [17,6],   [18,6],        [20,6],
 
+    //ISO
+    [2,5],[13,4]
     
 ];
 
@@ -91,7 +92,10 @@ var vKeyNames = [
     "Tab", "Q", "W", "E", "R", "T", "Y", "U", "I", "O", "P", "[", "]", "\\",                               "Del", "End", "Page Down",         "Num 7", "Num 8", "Num 9", "Num +",    //21
     "CapsLock", "A", "S", "D", "F", "G", "H", "J", "K", "L", ";", "'", "Enter",                                                              "Num 4", "Num 5", "Num 6",             //16
     "Left Shift", "Z", "X", "C", "V", "B", "N", "M", ",", ".", "/", "Right Shift",                                  "Up Arrow",               "Num 1", "Num 2", "Num 3", "Num Enter",//17
-    "Left Ctrl", "Left Win", "Left Alt", "Space", "Right Alt", "Fn", "Menu", "Right Ctrl",  "Left Arrow", "Down Arrow", "Right Arrow", "Num 0", "Num ."                       //13
+    "Left Ctrl", "Left Win", "Left Alt", "Space", "Right Alt", "Fn", "Menu", "Right Ctrl",  "Left Arrow", "Down Arrow", "Right Arrow", "Num 0", "Num .",                       //13
+
+    "ISO #", "ISO <"
+    
 ];
 
 export function LedNames()

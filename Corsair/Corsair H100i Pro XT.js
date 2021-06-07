@@ -410,7 +410,7 @@ function sendColor(shutdown = false){
             }
      //Fans
      for (var deviceNumber = 0; deviceNumber < 2; deviceNumber++ ) {
-           if(deviceValues[deviceNumber] != "None"){
+           if(deviceValues[deviceNumber] != "None"  && DeviceDict[propertyArray[deviceNumber]] != null){
               for(var iIdx = 0; iIdx < DeviceDict[propertyArray[deviceNumber]].mapping.length; iIdx++){
                   var iPxX = DeviceDict[propertyArray[deviceNumber]].positioning[iIdx][0];
                   var iPxY = DeviceDict[propertyArray[deviceNumber]].positioning[iIdx][1];
@@ -442,7 +442,9 @@ function sendColor(shutdown = false){
             sendColorPacket(ColorFlags[2],RGBdata.splice(0,60));
         }
         //40 is known to be good for soft locks
-    device.pause(40);
+    device.pause(30);
+    device.pause(20);
+
 }
 
 export function Render()
