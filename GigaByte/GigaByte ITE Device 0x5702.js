@@ -274,7 +274,7 @@ var deviceArray = [
 
 export function Name() { return "GIGABYTE Motherboard LED Controller"; }
 export function VendorId() { return  0x048D; }  
-export function ProductId() { return 0x5702;}//0x5702;} //Experimental Also on 0x8297?
+export function ProductId() { return 0x0000;}//0x5702;} //Experimental Also on 0x8297?
 export function Publisher() { return "WhirlwindFX"; }
 export function Size() { return [3,3]; }
 export function Type() { return "Hid"; }
