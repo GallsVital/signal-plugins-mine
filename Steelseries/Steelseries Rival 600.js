@@ -33,7 +33,7 @@ var vLedPositions = [
 var savedDpi1;
 
 export function Initialize() {
-
+    var packet = [];
     packet[0x00] = 0x00;
     packet[0x01] = 0x33;
     packet[0x02] = 0x00;

@@ -1,6 +1,6 @@
 export function Name() { return "Corsair K57 Wired Mode"; }
 export function VendorId() { return 0x1b1c; }
-export function ProductId() { return 0x0000;}//0x1B6E; }
+export function ProductId() { return 0x1B6E;}
 export function Publisher() { return "WhirlwindFX"; }
 export function Size() { return [24, 8]; }
 export function DefaultPosition() {return [75,70]; }
@@ -39,7 +39,6 @@ export function Initialize()
 {
   
     sendPacketString("00 08 01 03 00 02",65);  //Critical Software control packet
-    //sendPacketString("00 08 02 6E",65);             //critical
     sendPacketString("00 08 0D 00 01",65);          //critical 
 
 }
@@ -62,7 +61,6 @@ export function Shutdown()
  var vKeys = [  
 
      //Main KeyBoard
-                                                                                                           0,   1,
      131,  41,       58,  59,  60,  61,       62,  63,  64,  65,       66,  67,  68,  69,  70,  71,  72, 
      132,  53,  30,  31,  32,  33,  34,  35,  36,  37,  38,  39,       45,  46,  42,       73,  74,  75,  83,  84,  85,  86,
      133,  43,       20,  26,   8,  21,       23,  28,  24,  12,  18,  19,  47,  48,  49,  76,  77,  78,  95,  96,  97,  87,
@@ -78,9 +76,7 @@ export function Shutdown()
 // This array must be the same length as vKeys[], and represents the pixel color position in our pixel matrix that we reference.  For example,
 // item at index 3 [9,0] represents the corsair logo, and the render routine will grab its color from [9,0].
 var vKeyPositions = [
-
-                            [4,0], [5,0], [6,0],                                                                                               [18,0],   
-    [0,1],  [1,1],    [3,1],[4,1], [5,1], [6,1],     [7,1],[8,1], [9,1], [10,1],   [12,1],[13,1], [14,1], [15,1],  [15,1], [16,1], [17,1],        [18,1], [19,1],[20,1], [21,1], 
+    [0,1],  [1,1],    [3,1],[4,1], [5,1], [6,1],     [7,1],[8,1], [9,1], [10,1],   [12,1],[13,1], [14,1], [15,1],  [15,1], [16,1], [17,1],       
     [0,2],  [1,2], [2,2], [3,2], [4,2], [5,2], [6,2], [7,2], [8,2], [9,2], [10,2], [11,2], [12,2], [13,2], [14,2],   [15,2], [16,2], [17,2],   [18,2], [19,2],[20,2], [21,2], 
     [0,3],  [1,3], [2,3], [3,3], [4,3], [5,3], [6,3], [7,3], [8,3], [9,3], [10,3], [11,3], [12,3], [13,3], [14,3],   [15,3], [16,3], [17,3],   [18,3], [19,3],[20,3], [21,3], 
     [0,4],  [1,4], [2,4], [3,4], [4,4], [5,4], [6,4], [7,4], [8,4], [9,4], [10,4], [11,4], [12,4],         [14,4],                             [18,4], [19,4],[20,4], 
@@ -90,8 +86,7 @@ var vKeyPositions = [
 
 var vKeyNames = [
 
-    "Profile","Brightness", "Lock",                                                                                                                                       "Mute",
-    "G1","Esc", "F1", "F2", "F3", "F4", "F5", "F6", "F7", "F8", "F9", "F10", "F11", "F12",        "Print Screen", "Scroll Lock", "Pause Break",   "MediaStop", "MediaRewind","MediaPlayPause","MediaFastForward",
+    "G1","Esc", "F1", "F2", "F3", "F4", "F5", "F6", "F7", "F8", "F9", "F10", "F11", "F12",        "Print Screen", "Scroll Lock", "Pause Break",  
     "G2","`", "1", "2", "3", "4", "5", "6", "7", "8", "9", "0", "-_", "=+", "Backspace",                        "Insert", "Home", "Page Up",       "NumLock", "Num /", "Num *", "Num -",  //21
     "G3","Tab", "Q", "W", "E", "R", "T", "Y", "U", "I", "O", "P", "[", "]", "\\",                               "Del", "End", "Page Down",         "Num 7", "Num 8", "Num 9", "Num +",    //21
     "G4","CapsLock", "A", "S", "D", "F", "G", "H", "J", "K", "L", ";", "'", "Enter",                                                              "Num 4", "Num 5", "Num 6",             //16
@@ -146,12 +141,7 @@ export function Render()
 }
 function sendColors(shutdown = false){
 
-    var red =  new Array(228).fill(0);
-    var green =  new Array(228).fill(0);
-    var blue =  new Array(228).fill(0);
-    var emptyPacket = new Array(900).fill(0);
-    var fullpacket = new Array(900).fill(255);
-    var RGBData = new Array(500).fill(0);
+    var RGBData = new Array(138*3).fill(0);
 
     for(var iIdx = 0; iIdx < vKeys.length; iIdx++)
     {
@@ -165,11 +155,11 @@ function sendColors(shutdown = false){
         }else{
             col = device.color(iPxX, iPxY);
         }           
-        RGBData[vKeys[iIdx] +  0] = col[0]
-        RGBData[vKeys[iIdx] +  137] = col[1]
-        RGBData[vKeys[iIdx] +  274] = col[2]
+        RGBData[vKeys[iIdx] +  0+2] = col[0]
+        RGBData[vKeys[iIdx] +  137+2] = col[1]
+        RGBData[vKeys[iIdx] +  274+2] = col[2]
     }
-    sendInitalPacket(RGBData.splice(0,57)); 
+    sendInitalPacket(RGBData.splice(0,59)); 
     StreamPacket(RGBData.splice(0,61));
     StreamPacket(RGBData.splice(0,61));
     StreamPacket(RGBData.splice(0,61));

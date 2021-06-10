@@ -130,6 +130,8 @@ function sendColors(shutdown = false){
     //if(dirtyConfig){
     //openDevice();
     //}
+    device.pause(30)
+    device.pause(20)
 
 }
 function hexToRgb(hex) {

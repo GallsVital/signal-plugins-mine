@@ -10,8 +10,37 @@ export function ControllableParameters(){
         {"property":"shutdownColor", "label":"Shutdown Color","min":"0","max":"360","type":"color","default":"009bde"},
         {"property":"LightingMode", "label":"Lighting Mode", "type":"combobox", "values":["Canvas","Forced"], "default":"Canvas"},
         {"property":"forcedColor", "label":"Forced Color","min":"0","max":"360","type":"color","default":"009bde"},
-       
+        {"property":"SettingControl", "label":"Enable Setting Control","type":"boolean","default":"false"},
+        {"property":"angleSnapping", "label":"angle snapping","type":"boolean","default":"false"},
+        {"property":"mousePolling", "label":"Polling Rate", "type":"combobox", "values":["125Hz","250Hz","500Hz","1000Hz"], "default":"500Hz"},
+        {"property":"mouseResponse", "label":"button response", "type":"combobox", "values":["12ms","16ms","20ms","24ms","28ms","32ms"], "default":"16ms"},
+        {"property":"dpi1", "label":"DPI 1", "step":"100","type":"number","min":"100", "max":"16000","default":"800"},
+        {"property":"dpi2", "label":"DPI 2", "step":"100","type":"number","min":"100", "max":"16000","default":"1200"},
+        {"property":"dpi3", "label":"DPI 3", "step":"100","type":"number","min":"100", "max":"16000","default":"1500"},
+        {"property":"dpi4", "label":"DPI 4", "step":"100","type":"number","min":"100", "max":"16000","default":"2000"},
+
     ];
+}
+var savedDpi1;
+var savedDpi2;
+var savedDpi3;
+var savedDpi4;
+var savedAngleSnapping 
+var savedPollingRate
+var savedMouseResponse 
+var pollingDict = {
+    "125Hz"  : 0,
+    "250Hz"  : 1,
+    "500Hz"  : 2,
+    "1000Hz" : 3,
+}
+var responseDict = {
+    "12ms" :2 ,
+    "16ms" :3 ,
+    "20ms" :4 ,
+    "24ms" :5 ,
+    "28ms" :6 ,
+    "32ms" :7 ,
 }
 function hexToRgb(hex) {
     var result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
@@ -28,6 +57,10 @@ export function Initialize()
     //Direct mode init?
 //  51 2C 02 00 19 64 00 FF FF 00 00 00 00 00 00 00 00 00 70 05 FE FF FF FF F4 D9 8D 01 52 04 D4 75 7C 2A 50 77 90 E1 D4 75 98 06 00 00 00 00
 // 00 00 1C DA 8D 01 96 CC 8B 70 98 06 00 00 A6 CC 8B 70 
+
+    if(SettingControl){
+        sendMouseSettings();
+    }
 }
 
 
@@ -66,6 +99,17 @@ export function Render()
     sendColors(0);
     sendColors(1);
 
+    
+    if((savedDpi1 != dpi1 ||
+        savedDpi2 != dpi2 ||
+        savedDpi3 != dpi3 ||
+        savedDpi4 != dpi4 ||
+        savedAngleSnapping != angleSnapping ||
+        savedPollingRate != pollingDict[mousePolling] ||
+        savedMouseResponse != responseDict[mouseResponse]) &&
+        SettingControl){
+            sendMouseSettings();
+    }
 }
 function sendColors(zone, shutdown = false){
 
@@ -95,6 +139,25 @@ function sendColors(zone, shutdown = false){
         device.write(packet,65);
 }
 
+function sendMouseSettings(){
+    savedDpi1 = dpi1;
+    savedDpi2 = dpi2;
+    savedDpi3 = dpi3;
+    savedDpi4 = dpi4;
+    savedAngleSnapping = angleSnapping;
+    savedPollingRate = pollingDict[mousePolling];
+    savedMouseResponse = responseDict[mouseResponse];
+
+    sendPacketString(`00 51 31 06 00 ${savedAngleSnapping ? "01" : "00"}`,65);
+    sendPacketString(`00 51 31 04 00 ${savedPollingRate.toString(16)}`,65);
+    sendPacketString(`00 51 31 05 00 ${savedMouseResponse.toString(16)}`,65);
+    sendPacketString(`00 51 31 00 00 ${(savedDpi1/100 + 1).toString(16)}`,65);
+    sendPacketString(`00 51 31 01 00 ${(savedDpi2/100 + 1).toString(16)}`,65);
+    sendPacketString(`00 51 31 02 00 ${(savedDpi3/100 + 1).toString(16)}`,65);
+    sendPacketString(`00 51 31 03 00 ${(savedDpi4/100 + 1).toString(16)}`,65);
+    sendPacketString(`00 50 03 03`,65);
+
+}
 
 export function Validate(endpoint)
 {

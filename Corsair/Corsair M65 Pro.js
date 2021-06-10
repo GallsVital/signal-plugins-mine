@@ -123,7 +123,7 @@ function sendColors(shutdown = false){
 
 export function Validate(endpoint)
 {
-    return endpoint.interface === 2;
+    return endpoint.interface === 1 | 2;
 }
 
 export function Shutdown()

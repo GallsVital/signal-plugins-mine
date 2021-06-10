@@ -1,18 +1,6 @@
-
-var CORSAIR_COMMAND_WRITE       = 0x07;
-var CORSAIR_COMMAND_READ        = 0x0E;
-var CORSAIR_COMMAND_STREAM      = 0x7F;
-
-var CORSAIR_LIGHTING_CONTROL_HARDWARE           = 0x01;
-var CORSAIR_LIGHTING_CONTROL_SOFTWARE           = 0x02;
-
-var CORSAIR_PROPERTY_SPECIAL_FUNCTION = 0x04;
-var CORSAIR_PROPERTY_SUBMIT_MOUSE_COLOR         = 0x22;
-
-
 export function Name() { return "Corsair Void Elite Headset"; }
 export function VendorId() { return 0x1b1c; }
-export function ProductId() { return 0x0000;}//0x0A56; }
+export function ProductId() { return 0x0A56;}
 export function Publisher() { return "WhirlwindFX"; }
 export function Size() { return [3, 3]; }
 export function DefaultPosition(){return [240,120]}
@@ -54,7 +42,6 @@ export function LedPositions()
 
 function EnableSoftwareControl()
 {
- //sendPacketString("02 09 01 03 00 02",64);
 }
 function sendPacketString(string, size){
     var packet= [];
@@ -69,13 +56,13 @@ function sendPacketString(string, size){
 
 function ReturnToHardwareControl()
 {
-    //sendPacketString("02 09 01 03 00 01",64);
 }
 
 
 export function Initialize()
 {
-    EnableSoftwareControl();
+    sendPacketString("C8 01",20)
+
 }
 
 
@@ -91,39 +78,42 @@ var blue = new Array(3).fill(0)
 
 
     var packet = []
-    
     packet[0x00]   = 0xCB;
-    packet[0x01]   = 0x04;
-    packet[0x02]   = 0x16;
-    packet[0x03]   = 0x00;
-    packet[0x04]   = 0x00;
-    packet[0x05]   = 0x00;
-    packet[0x06]   = 0x18;
-    packet[0x07]   = 0x00;
-    packet[0x08]   = 0x00;
-    packet[0x09]   = 0x00;
+    packet[0x01]   = 0x06;
+    packet[0x02]   = 0x1C;
+    packet[0x03]   = 0xFF;
+    packet[0x04]   = 0x16;
+    packet[0x05]   = 0xDC;
+    packet[0x06]   = 0x17;
+    packet[0x07]   = 0x9A;
+    packet[0x08]   = 0x1D;
+    packet[0x09]   = 0xFF;
+    packet[0x0A]   = 0x18;
+    packet[0x0B]   = 0xDC;
+    packet[0x0C]   = 0x19;
+    packet[0x0D]   = 0x9A;
 
     
-    for(var zone_idx = 0; zone_idx < vLedPositions.length; zone_idx++)
-    {
-        var iX = vLedPositions[zone_idx][0];
-        var iY = vLedPositions[zone_idx][1];
-        var col;
-            if(shutdown){
-                col = hexToRgb(shutdownColor)
-            }else if (LightingMode == "Forced") {
-                col = hexToRgb(forcedColor)
-            }else{
-                col = device.color(iX, iY);
-            }
-                
-        packet[zone_idx * 4 + 3] = col[0];
-        packet[zone_idx * 4 + 4] = col[1];
-        packet[zone_idx * 4 + 5] = col[2];
-    }
-
+     for(var zone_idx = 0; zone_idx < vLedPositions.length; zone_idx++)
+     {
+         var iX = vLedPositions[zone_idx][0];
+         var iY = vLedPositions[zone_idx][1];
+         var col;
+             if(shutdown){
+                 col = hexToRgb(shutdownColor)
+             }else if (LightingMode == "Forced") {
+                 col = hexToRgb(forcedColor)
+             }else{
+                 col = device.color(iX, iY);
+             }
+          
+         packet[zone_idx * 6 + 3] = col[0];
+         packet[zone_idx * 6 + 5] = col[1];
+         packet[zone_idx * 6 + 7] = col[2];
+         
+     }
     device.write(packet, 20);
-    device.pause(200);
+    device.pause(30);
 }
 
 export function Validate(endpoint)
@@ -132,30 +122,9 @@ export function Validate(endpoint)
 }
 
 export function Shutdown()
-{
-    var packet = []
-    packet[0x00]   = 0x00;
-    packet[0x01]   = CORSAIR_COMMAND_WRITE;
-    packet[0x02]   = CORSAIR_PROPERTY_SUBMIT_MOUSE_COLOR;
-    packet[0x03]   = 0x03;
-    packet[0x04]   = 0x01;
-    var zoneId = [2,6,1]
+{    
+    sendPacketString("C8 00",20)
 
-    // Single zone - apply to mouse.
-    for(var zone_idx = 0; zone_idx < vLedPositions.length; zone_idx++)
-    {
-        var iX = vLedPositions[zone_idx][0];
-        var iY = vLedPositions[zone_idx][1];
-        var col = device.color(iX,iY);
-        packet[(zone_idx * 4) + 5] = zoneId[zone_idx];
-        packet[(zone_idx * 4) + 6] = 255;
-        packet[(zone_idx * 4) + 7] = 0;
-        packet[(zone_idx * 4) + 8] = 0;
-    }
-
-    device.write(packet, 65);
-
-    ReturnToHardwareControl();
 }
 
 export function Image() 

@@ -1,6 +1,6 @@
 export function Name() { return "ASUS ROG Strix Scope RX"; }
 export function VendorId() { return 0x0B05; }
-export function ProductId() { return 0x0000;}//0x1951; }
+export function ProductId() { return 0x1951;}
 export function Publisher() { return "WhirlwindFX"; }
 export function Size() { return [21, 6] }
 export function DefaultPosition() {return [75,70]; }
