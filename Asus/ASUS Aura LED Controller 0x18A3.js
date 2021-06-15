@@ -271,12 +271,15 @@ var deviceArray = [
     "Ch2-Port-2",
     "Ch2-Port-3",
 ];
-
-export function Name() { return "GIGABYTE Motherboard LED Controller"; }
-export function VendorId() { return  0x048D; }  
-export function ProductId() { return 0x0000;}//0x5702;} //Experimental Also on 0x8297?
+var HeaderArray = [
+    "12v RGB Header 1",
+    "12v RGB Header 2",
+];
+export function Name() { return "ASUS Aura LED Controller "; }
+export function VendorId() { return  0x0B05; }  
+export function ProductId() { return 0x000;}  //0x18A3 Experimental
 export function Publisher() { return "WhirlwindFX"; }
-export function Size() { return [12,2]; }
+export function Size() { return [15,1]; }
 export function Type() { return "Hid"; }
 export function DefaultPosition(){return [0,0]}
 export function DefaultScale(){return 8.0}
@@ -285,25 +288,19 @@ export function ControllableParameters(){
         {"property":"shutdownColor", "label":"Shutdown Color","min":"0","max":"360","type":"color","default":"009bde"},
         {"property":"LightingMode", "label":"Lighting Mode", "type":"combobox", "values":["Canvas","Forced"], "default":"Canvas"},
         {"property":"forcedColor", "label":"Forced Color","min":"0","max":"360","type":"color","default":"009bde"},
-        //{"property":"RGBHeaderCount", "label":"RGB Header Count","type":"number","min":"0", "max":"2","default":"0"},
-        {"property":"RGBconfig", "label":"ARGB Channel Configuration", "type":"combobox",   "values":["RGB","RBG","BGR","BRG","GBR","GRB"], "default":"GRB"},
-
-        {"property":"CustomSize", "label":"Custom Strip Size","type":"number","min":"1", "max":"80","default":"10"},
-
-        {"property":"device1", "label":"Channel 1 Device 1", "type":"combobox",   "values":["None","Strip_10Led","Strip_8Led","Strip_6Led","AER 2 Fan","LL Fan","QL Fan","ML Fan", "SpPro Fan","MF120Halo","Custom"], "default":"None"},
-        {"property":"device2", "label":"Channel 1 Device 2", "type":"combobox",   "values":["None","Strip_10Led","Strip_8Led","Strip_6Led","AER 2 Fan","LL Fan","QL Fan","ML Fan", "SpPro Fan","MF120Halo","Custom"], "default":"None"},
-        {"property":"device3", "label":"Channel 1 Device 3", "type":"combobox",   "values":["None","Strip_10Led","Strip_8Led","Strip_6Led","AER 2 Fan","LL Fan","QL Fan","ML Fan", "SpPro Fan","MF120Halo","Custom"], "default":"None"},
-        {"property":"device4", "label":"Channel 2 Device 1", "type":"combobox",   "values":["None","Strip_10Led","Strip_8Led","Strip_6Led","AER 2 Fan","LL Fan","QL Fan","ML Fan", "SpPro Fan","MF120Halo","Custom"], "default":"None"},
-        {"property":"device5", "label":"Channel 2 Device 2", "type":"combobox",   "values":["None","Strip_10Led","Strip_8Led","Strip_6Led","AER 2 Fan","LL Fan","QL Fan","ML Fan", "SpPro Fan","MF120Halo","Custom"], "default":"None"},
-        {"property":"device6", "label":"Channel 2 Device 3", "type":"combobox",   "values":["None","Strip_10Led","Strip_8Led","Strip_6Led","AER 2 Fan","LL Fan","QL Fan","ML Fan", "SpPro Fan","MF120Halo","Custom"], "default":"None"},
+        {"property":"RGBHeaderCount", "label":"RGB Header Count","type":"number","min":"0", "max":"2","default":"0"},
+        {"property":"CustomSize", "label":"Custom Strip Size","type":"number","min":"0", "max":"80","default":"10"},
+        {"property":"device1", "label":"Ch1 | Device 1", "type":"combobox",   "values":["None","Strip_10Led","Strip_8Led","Strip_6Led","AER 2 Fan","LL Fan","QL Fan","ML Fan", "SpPro Fan","MF120Halo","Custom"], "default":"None"},
+        {"property":"device2", "label":"Ch1 | Device 2", "type":"combobox",   "values":["None","Strip_10Led","Strip_8Led","Strip_6Led","AER 2 Fan","LL Fan","QL Fan","ML Fan", "SpPro Fan","MF120Halo","Custom"], "default":"None"},
+        {"property":"device3", "label":"Ch1 | Device 3", "type":"combobox",   "values":["None","Strip_10Led","Strip_8Led","Strip_6Led","AER 2 Fan","LL Fan","QL Fan","ML Fan", "SpPro Fan","MF120Halo","Custom"], "default":"None"},
+        {"property":"device4", "label":"Ch2 | Device 1", "type":"combobox",   "values":["None","Strip_10Led","Strip_8Led","Strip_6Led","AER 2 Fan","LL Fan","QL Fan","ML Fan", "SpPro Fan","MF120Halo","Custom"], "default":"None"},
+        {"property":"device5", "label":"Ch2 | Device 2", "type":"combobox",   "values":["None","Strip_10Led","Strip_8Led","Strip_6Led","AER 2 Fan","LL Fan","QL Fan","ML Fan", "SpPro Fan","MF120Halo","Custom"], "default":"None"},
+        {"property":"device6", "label":"Ch2 | Device 3", "type":"combobox",   "values":["None","Strip_10Led","Strip_8Led","Strip_6Led","AER 2 Fan","LL Fan","QL Fan","ML Fan", "SpPro Fan","MF120Halo","Custom"], "default":"None"},
         ];
 }
-var ParentDeviceName = "GigaByte MotherBoard";
-var MainBoardLedCount = 8;
-
-var D_LED1_Count = 0;
-var D_LED2_Count = 0;
-
+var ParentDeviceName = "ASUS AURA LED Controller";
+var channelCount = 0;
+var MainBoardLedCount = 0;
 function hexToRgb(hex) {
     var result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
     var colors = [];
@@ -313,115 +310,59 @@ function hexToRgb(hex) {
 
     return colors;
   }
-var RGBConfigs = {
-    "RGB" : [0,1,2],
-    "RBG" : [0,2,1],
-    "BGR" : [2,1,0],
-    "BRG" : [2,0,1],
-    "GBR" : [1,2,0],
-    "GRB" : [1,0,2]
-}
-const Led_Count_32 = 0;
-const Led_Count_64 = 1;
-const Led_Count_256 = 2;
-const Led_Count_512 = 3;
-const Led_Count_1024 = 4;
-function Get_Led_Def(count){
 
-    if(count < 32){
-       return Led_Count_32;
-    }
-    else if(count < 64){
-       return Led_Count_64
-    }
-    else if(count < 256){
-       return Led_Count_256
-    }
-    else if(count < 512){
-       return Led_Count_512
-    }
-    else if(count < 1024){
-       return Led_Count_1024
-    }
-
-}
-
-var TotalZones = [
-    0x20,
-    0x21,
-    0x22,
-    0x23,
-    0x24,
-    0x25,//not added yet 
-    0x26, //not added yet 
-    0x27, // not added yet
-    0x28, //Dled1
-    0x29, //Dled2
-]
-var vZones = [
-    0x20,
-    0x21, //RGB Header Bottom "LED_C1"
-    0x22,
-    0x23, 
-    0x24, // RGB Header Top "LED_C2"
-    0x25,
-    0x26,
-    0x27
-]
-var vDLED_Zones = [
-    0x58, 0x59
-]
-var vLedNames = ["Led 1","RGB Header 1","Led 2", "RGB Header 2","Led 3","Led 4","Led 5","Led 6"];
+var vLedNames = ["Led 1","Led 2","Led 3","Led 4","Led 5","Led 6","RGB Header 1", "RGB Header 2"];
 var vLedPositions = [
-    [0,1],
-    [1,1],
-    [2,1],
-    [3,1],
-    [4,1],
-    [5,1],
-    [6,1],
-    [7,1],
+    [0,0],[1,0],[2,0],[3,0],[4,0],[5,0],[6,0],[7,0]
 ];
+var savedRGBHeaderCount;
 function InitMainBoardLeds(){
+    savedRGBHeaderCount = RGBHeaderCount;
     var names = [];
     var positions = []
-        for(let i = 0; i < MainBoardLedCount;i++){
+        for(let i = 0; i < MainBoardLedCount-RGBHeaderCount; i++){
             names.append(`Led ${i}`)
             positions.append([i,0]);
         }
         vLedNames = names;
         vLedPositions = positions;
-}
-var savedCustomSize;
+        for(let header = 0; header < 2;header++){
+
+            if(RGBHeaderCount <= header){
+            device.removeSubdevice(HeaderArray[header]);
+            }else{
+                //"Ch1 | Port 1"
+            device.createSubdevice(HeaderArray[header]); 
+            // Parent Device + Sub device Name + Ports
+            device.setSubdeviceName(HeaderArray[header],`${ParentDeviceName} - ${HeaderArray[header]}`);
+            device.setSubdeviceImage(HeaderArray[header], Placeholder());
+            device.setSubdeviceSize(HeaderArray[header],3,3);
+            }
+        }
+    }   
+
+var CustomValue;
 function InitCustomStrip(){
-    if(savedCustomSize == CustomSize){
-        return
-    }
-    savedCustomSize = CustomSize
+    if(CustomValue != CustomSize){
+        CustomValue = CustomSize;
+        var mapping = [];
+        var positioning = [];
+        for(let i = 0; i < CustomSize;i++){
+            mapping[i] = i;
+            positioning[i] = [i,0];    
+        }
+        Custom.mapping = mapping;
+        Custom.positioning = positioning;
+        Custom.width = CustomSize;
+        Custom.ledCount = CustomSize;
 
-    var mapping = [];
-    var positioning = [];
-    var names = [];
-    for(let i = 0; i < CustomSize;i++){
-        mapping[i] = i;
-        positioning[i] = [i,0];
-        names[i] = `Led ${i}`;   
-    }
-    Custom.mapping = mapping;
-    Custom.positioning = positioning;
-    Custom.LedNames = names;
-    Custom.width = CustomSize;
-    Custom.ledCount = CustomSize;
+        var propertyArray = [device1, device2,device3,device4,device5,device6];
 
-    var propertyArray = [device1, device2,device3,device4,device5,device6];
-
-    for (var deviceNumber = 0; deviceNumber < 6; deviceNumber++ ) {
-             if(deviceValues[deviceNumber] == "Custom"){
-                device.setSubdeviceSize(deviceArray[deviceNumber],DeviceDict[propertyArray[deviceNumber]].width,DeviceDict[propertyArray[deviceNumber]].height);
-                device.setSubdeviceLeds(deviceArray[deviceNumber],
-                    DeviceDict[propertyArray[deviceNumber]].LedNames,
-                    DeviceDict[propertyArray[deviceNumber]].positioning)
-             }       
+        for (var deviceNumber = 0; deviceNumber < propertyArray.length; deviceNumber++ ) {
+                if(deviceValues[deviceNumber] == "Custom"){
+                    device.setSubdeviceSize(deviceArray[deviceNumber],DeviceDict[propertyArray[deviceNumber]].width,DeviceDict[propertyArray[deviceNumber]].height);
+                }       
+        }
     }
 }
 
@@ -440,17 +381,12 @@ export function Initialize()
     //this needs to read the response packets and set the number of chanels and mainboard leds.
     RequestConfig();
     //this is updated after loading so it won't display in the editor
-    //InitMainBoardLeds();
-
-    sendReportString("CC 32 03",64); //Enable Software Mode Header 1 + 2
-    //sendReportString("CC 32 01",64); //Enable Software Mode Header 2
-    //sendReportString("CC 32 02",64); //Enable Software Mode Header 1
-    device.pause(30)
+    InitMainBoardLeds();
 
     //set all channels to direct mode
-    //for(let channel = 0; channel < channelCount+1; channel++){
-    //    sendChannelStart(channel,255);
-    //}
+    for(let channel = 0; channel < channelCount+1; channel++){
+        sendChannelStart(channel,255);
+    }
 }
 
 function Sendchannel(channel,shutdown = false)
@@ -458,50 +394,69 @@ function Sendchannel(channel,shutdown = false)
     var propertyArray = [device1, device2,device3,device4,device5,device6];
     var TotalLedCount = 0;
     var RGBdata = [];
-         for (var deviceNumber = 0 + 3*(channel); deviceNumber < 3 + 3*(channel); deviceNumber++ ) {
+
+
+        for (var deviceNumber = 0 + 3*(channel); deviceNumber < 3 + 3*(channel); deviceNumber++ ) {
     
-             if(deviceValues[deviceNumber] != "None" && DeviceDict[propertyArray[deviceNumber]] != null){
+            if(deviceValues[deviceNumber] != "None"){
     
-                for(var iIdx = 0; iIdx < DeviceDict[propertyArray[deviceNumber]].mapping.length; iIdx++){
-                    var iPxX = DeviceDict[propertyArray[deviceNumber]].positioning[iIdx][0];
-                    var iPxY = DeviceDict[propertyArray[deviceNumber]].positioning[iIdx][1];
-                    var mxPxColor;
-                    //find colors
-                    if(shutdown){
-                        mxPxColor = hexToRgb(shutdownColor)
-                   }else if (LightingMode == "Forced") {
-                        mxPxColor = hexToRgb(forcedColor)
-                    }else{
-                        mxPxColor = device.subdeviceColor(deviceArray[deviceNumber],iPxX, iPxY);
-                    } 
-                     //set colors
-                     RGBdata[DeviceDict[propertyArray[deviceNumber]].mapping[iIdx]*3+TotalLedCount*3] = mxPxColor[RGBConfigs[RGBconfig][0]];
-                     RGBdata[DeviceDict[propertyArray[deviceNumber]].mapping[iIdx]*3+TotalLedCount*3+1] = mxPxColor[RGBConfigs[RGBconfig][1]];
-                     RGBdata[DeviceDict[propertyArray[deviceNumber]].mapping[iIdx]*3+TotalLedCount*3+2] = mxPxColor[RGBConfigs[RGBconfig][2]];
-                    }
-                    TotalLedCount += DeviceDict[propertyArray[deviceNumber]].ledCount;
-                 }
-             }
-             for(let i = 0; i < 300;i++){
-                device.pause(1);
+               for(var iIdx = 0; iIdx < DeviceDict[propertyArray[deviceNumber]].mapping.length; iIdx++){
+                   var iPxX = DeviceDict[propertyArray[deviceNumber]].positioning[iIdx][0];
+                   var iPxY = DeviceDict[propertyArray[deviceNumber]].positioning[iIdx][1];
+                   var mxPxColor;
+                   //find colors
+                   if(shutdown){
+                       mxPxColor = hexToRgb(shutdownColor)
+                  }else if (LightingMode == "Forced") {
+                       mxPxColor = hexToRgb(forcedColor)
+                   }else{
+                       mxPxColor = device.subdeviceColor(deviceArray[deviceNumber],iPxX, iPxY);
+                   } 
+                    //set colors
+                    RGBdata[DeviceDict[propertyArray[deviceNumber]].mapping[iIdx]*3+TotalLedCount*3] = mxPxColor[0];
+                    RGBdata[DeviceDict[propertyArray[deviceNumber]].mapping[iIdx]*3+TotalLedCount*3+1] = mxPxColor[1];
+                    RGBdata[DeviceDict[propertyArray[deviceNumber]].mapping[iIdx]*3+TotalLedCount*3+2] = mxPxColor[2];
+                   }
+                   TotalLedCount += DeviceDict[propertyArray[deviceNumber]].ledCount;
+                }
             }
+
+        //This is the effect mode setting packets
+        // sendChannelStart(channel)
+        // var ledsSent = 0;
+        // var TotalLedCount = TotalLedCount >= 120 ? 120 : TotalLedCount;
+        //  while(TotalLedCount > 0){
+        //      var ledsToSend = TotalLedCount >= 20 ? 20 : TotalLedCount;
+        //      sendColorPacket(ledsSent, ledsToSend, RGBdata.splice(0,ledsToSend*3))
+
+        //      ledsSent += ledsToSend;
+        //      TotalLedCount -= ledsToSend;
+        //  }
+        // sendCommit();
 
         //we want to try and use direct mode
          var ledsSent = 0;
+         var TotalLedCount = TotalLedCount >= 120 ? 120 : TotalLedCount;
+        //var xChannel = channel == 0 ? 4 : channel-1;
+        var apply = false
           while(TotalLedCount > 0){
-              var ledsToSend = TotalLedCount >= 19 ? 19 : TotalLedCount;
+              var ledsToSend = TotalLedCount >= 20 ? 20 : TotalLedCount;
               TotalLedCount -= ledsToSend;
-              sendDirectPacket(vDLED_Zones[channel], ledsSent*3, ledsToSend*3, RGBdata.splice(0,ledsToSend*3))
+              TotalLedCount == 0 ? apply = true: apply = false;
+              sendDirectPacket(channel, ledsSent, ledsToSend, RGBdata.splice(0,ledsToSend*3),apply)
               ledsSent += ledsToSend;
           }
 
+    //device.pause(1); // We need a pause here (between packets), otherwise the ornata can't keep up.
 
     
 }
 function SendMainboard(shutdown = false)
 {
+    var TotalLedCount = 0;
+    var RGBdata = [];
 
-        for(var iIdx = 0; iIdx < vZones.length; iIdx++)
+        for(var iIdx = 0; iIdx < vLedPositions.length; iIdx++)
         {
             var iPxX = vLedPositions[iIdx][0];
             var iPxY = vLedPositions[iIdx][1];
@@ -513,139 +468,140 @@ function SendMainboard(shutdown = false)
             }else{
                 col = device.color(iPxX, iPxY);
             }           
-            //Data for my B550 Aorus Elite V1 is BGR?
-            sendColorPacket(vZones[iIdx],[col[2],col[1],col[0]]);
-            sendCommit();
+        
+            RGBdata[iIdx*3] = col[0];
+            RGBdata[iIdx*3+1] = col[1];
+            RGBdata[iIdx*3+2] = col[2];
+            TotalLedCount += 1;
         }
+        //we want to try and use direct mode
+         var ledsSent = 0;
+         var TotalLedCount = TotalLedCount >= 120 ? 120 : TotalLedCount;
 
+         //main board is channel 0 normally, but channel 4 in direct mode
+        //var xChannel = channel == 0 ? 4 : channel-1;
+        var xChannel = 4
+        var apply = false
+          while(TotalLedCount > 0){
+              var ledsToSend = TotalLedCount >= 20 ? 20 : TotalLedCount;
+              TotalLedCount -= ledsToSend;
+              TotalLedCount == 0 ? apply = true: apply = false;
+              sendDirectPacket(xChannel, ledsSent, ledsToSend, RGBdata.splice(0,ledsToSend*3),apply)
+              ledsSent += ledsToSend;
+          }
 }
 function SetFans(){
     var propertyArray = [device1, device2,device3,device4,device5,device6];
-    var dirtyCount = false;
-
+var testArray = ["None","Strip_10Led","Strip_8Led","Strip_6Led","AER 2 Fan","LL Fan","QL Fan","ML Fan", "SpPro Fan","MF120Halo","Custom"]
         for (var deviceNumber = 0; deviceNumber < propertyArray.length; deviceNumber++ ) {
-              if(deviceValues[deviceNumber] != propertyArray[deviceNumber]){
-                deviceValues[deviceNumber] = propertyArray[deviceNumber];
-                dirtyCount = true;
-
+              //if(deviceValues[deviceNumber] != propertyArray[deviceNumber]){
+                //deviceValues[deviceNumber] = propertyArray[deviceNumber];
+                deviceValues[deviceNumber] = testArray[Math.random() * testArray.length]
                  if(deviceValues[deviceNumber] == "None"){
                     device.removeSubdevice(deviceArray[deviceNumber]);
                  }else{
                      //"Ch1 | Port 1"
                     device.createSubdevice(deviceArray[deviceNumber]); 
                     // Parent Device + Sub device Name + Ports
-                    device.setSubdeviceName(deviceArray[deviceNumber],`${ParentDeviceName} - ${DeviceDict[propertyArray[deviceNumber]].displayName} - ${deviceArray[deviceNumber]}`);
-                    device.setSubdeviceImage(deviceArray[deviceNumber], DeviceDict[propertyArray[deviceNumber]].image);
-                    device.setSubdeviceSize(deviceArray[deviceNumber],DeviceDict[propertyArray[deviceNumber]].width,DeviceDict[propertyArray[deviceNumber]].height);
+                    device.setSubdeviceName(deviceArray[deviceNumber],`${ParentDeviceName} - ${DeviceDict[testArray[deviceNumber]].displayName} - ${testArray[deviceNumber]}`);
+                    device.setSubdeviceImage(deviceArray[deviceNumber], DeviceDict[testArray[deviceNumber]].image);
+                    device.setSubdeviceSize(deviceArray[deviceNumber],DeviceDict[testArray[deviceNumber]].width,DeviceDict[testArray[deviceNumber]].height);
                  }
-            }
+            //}
         }
-
-        if(dirtyCount){
-    //SetLedCounts for ARGB headers
-    var channel1_ledCount = 0;
-    for(let ARGB_Channel1 = 0; ARGB_Channel1 < 3;ARGB_Channel1++){
-        if(deviceValues[ARGB_Channel1] != "None"){
-            channel1_ledCount += DeviceDict[propertyArray[ARGB_Channel1]].ledCount;
-        }
-    }
-    //device.log(channel1_ledCount);
-
-    var channel2_ledCount = 0;
-    for(let ARGB_Channel2 = 3; ARGB_Channel2 < 6;ARGB_Channel2++){
-        if(deviceValues[ARGB_Channel2] != "None"){
-            channel2_ledCount += DeviceDict[propertyArray[ARGB_Channel2]].ledCount;
-        }
-    }
-    //device.log(channel2_ledCount);
-
-    sendReportString(`CC 34 ${(Get_Led_Def(channel1_ledCount) | Get_Led_Def(channel2_ledCount) << 4)}`,64)
-    }
 } 
 
 
 export function Render()
 {        
+    InitCustomStrip();
+    SetFans();
+
+    if(savedRGBHeaderCount != RGBHeaderCount){
+        InitMainBoardLeds();
+    }
 
     SendMainboard();
 
-    for(let channel = 0; channel < vDLED_Zones.length; channel++){
+    for(let channel = 0; channel < channelCount; channel++){
         Sendchannel(channel);
     }
-    InitCustomStrip();
-    SetFans();
 }
 
-function sendDirectPacket(channel, start, count, data){
+function sendDirectPacket(channel, start, count, data,apply){
 
     var packet = [];         
-    packet[0] = 0xCC;
-    packet[1] = channel;
-    packet[2] = start;
-    packet[3] = 0x00;
-    packet[4] = count
+    packet[0] = 0xEC;
+    packet[1] = 0x40;
+    packet[2] = apply ? 0x80 | channel : channel;
+    packet[3] = start;
+    packet[4] = count;
     packet = packet.concat(data);
 
-    device.send_report(packet, 64);
+    device.write(packet, 65);
 }
+function sendColorPacket(start, count, data){
 
-function sendColorPacket(zone, data){
-    let Mode = 1; //Static mode
+    //these mask's are awful to find out
+    let mask = (((1 << count) -1)<< start);
 
-    //Mainboard Leds seem to need standard effect packets
-    var packet = []; 
-            
-    packet[0x00] = 0xCC;
-    packet[0x01] = zone;
-    packet[0x02] = 2 ** Math.abs((0x20 - zone));
-    packet[0x03] = 0;
-    packet[0x04] = 0;
-    packet[0x0B] = Mode;
-    packet[0x0C] = 0x5A //We Always hardcode brightness to Max in plugins, its handled in the backend
-    packet[0x0D] = 0x00 //Min Brightness for effect - Not needed for us
+    var packet = [];         
+    packet[0] = 0xEC;
+    packet[1] = 0x36;
+    packet[2] = mask >> 8;
+    packet[3] = mask & 0xFF;
+    packet[4] = 0x00;
+
     packet = packet.concat(data);
-
-    //We ignore everything else involing timers and color shift effect info.
-    //device.log(packet);
-    device.send_report(packet, 64);
+    device.write(packet, 65);
 }
 
 function sendCommit(){
-    sendReportString("CC 28 FF",64);
+    sendPacketString("EC 3F 55",65);
 }
-
-var config = [0xCC]
+function sendChannelStart(channel, mode){
+    sendPacketString(`EC 35 ${(channel).toString(16)} 00 00 ${(mode).toString(16)}`,65);
+}
+var config = [0xEC, 0xB0]
 function RequestConfig(){
-    sendReportString(`CC 60 00`,64);
-    config = device.get_report(config, 64)
+    sendPacketString(`EC B0`,65);
+    
+    config = device.read(config, 65)
+    //device.log(config);
+    channelCount = config[6];
+    device.log(`ARGB channel Count ${channelCount} `);
+    MainBoardLedCount = config[31];
+    device.log(`MainBoard Led Count ${MainBoardLedCount} `);
 
-    let product = config[1];
-    let device_number = config[2];
-    let ledCount = config[3];
-    //device.log(config)
-    D_LED1_Count = Get_Led_Def( ledCount & 0x0F)
-    D_LED2_Count = Get_Led_Def( ledCount & 0xF0)
-
-    device.log(`\n Product id:\t${product}\n Device id:\t${device_number}\n D_Led1 Led Count:\t${ledCount & 0x0F} DEF: ${D_LED1_Count}\n D_Led2 Led Count:\t${ledCount & 0x0F} DEF: ${D_LED2_Count}\n`)
-
+    //first is channels, second is mainboard led count
+//1E 9F [01] 01 00 00
+//78 3C 00 00 00 00
+//00 00 00 00 00 00
+//00 00 00 00 00 00
+//00 00 00 [08] 09 02
+//00 00 00 00 00 00
+//00 00 00 00 00 00
+//00 00 00 00 00 00
+//00 00 00 00 00 00
+//00 00 00 00 00 00
 }
 export function Shutdown()
 {
 
 }
-function sendReportString(string, size){
+function sendPacketString(string, size){
     var packet= [];
     var data = string.split(' ');
     
     for(let i = 0; i < data.length; i++){
-        packet[i] =parseInt(data[i],16)
+        packet[i] = parseInt(data[i],16)
     }
 
-    device.send_report(packet, size);
+    device.write(packet, size);
 }
 export function Validate(endpoint)
 {
-    return endpoint.interface === -1 && endpoint.usage === 0x00CC;
+    return endpoint.interface === 2 | -1;
 
 }
 

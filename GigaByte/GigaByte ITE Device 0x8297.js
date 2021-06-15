@@ -274,7 +274,7 @@ var deviceArray = [
 
 export function Name() { return "GIGABYTE Motherboard LED Controller"; }
 export function VendorId() { return  0x048D; }  
-export function ProductId() { return 0x0000;}//0x5702;} //Experimental Also on 0x8297?
+export function ProductId() { return 0x00;} //Experimental  0x8297
 export function Publisher() { return "WhirlwindFX"; }
 export function Size() { return [12,2]; }
 export function Type() { return "Hid"; }
@@ -482,9 +482,7 @@ function Sendchannel(channel,shutdown = false)
                     TotalLedCount += DeviceDict[propertyArray[deviceNumber]].ledCount;
                  }
              }
-             for(let i = 0; i < 300;i++){
-                device.pause(1);
-            }
+
 
         //we want to try and use direct mode
          var ledsSent = 0;
