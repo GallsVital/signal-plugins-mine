@@ -139,6 +139,32 @@ width: 4,
 height: 4,
 image: SpPro_Fan_Image()
 }
+const HDFan = {
+    mapping : [
+        3,1,
+       5,   0,
+      7,     2,
+     9,      4,
+     11,     6,
+       10, 8,
+    ],
+    positioning : [
+                [2,0],[3,0],
+            [1,1],			[4,1],
+        [0,2],					[5,2],
+        [0,3],					[5,3],
+            [1,4],			[4,4],
+                [2,5],[3,5],
+    ],
+    LedNames : [
+        "Led 1","Led 2","Led 3","Led 4","Led 5","Led 6","Led 7","Led 8","Led 9","Led 10","Led 11","Led 12"
+    ],
+    displayName: "HD Fan",
+    ledCount : 12,
+    width: 6,
+    height: 6,
+    image: Placeholder()
+    }
 const XD5Reservior = {
 mapping : [
          0,1,2,
@@ -233,12 +259,12 @@ export function ControllableParameters(){
 
     {"property":"CustomSize", "label":"Custom Strip Size","type":"number","min":"1", "max":"80","default":"10"},
 
-    {"property":"device1", "label":"Ch1 | Port 1",  "type":"combobox", "values":["None","Strip_Internal","LL", "QL","ML","SpPro","XD5Reservior","GPUBlock","XD5CPU","Custom"], "default":"None"},
-    {"property":"device2", "label":"Ch1 | Port 2",  "type":"combobox", "values":["None","Strip_Internal","LL", "QL","ML","SpPro","XD5Reservior","GPUBlock","XD5CPU","Custom"], "default":"None"},
-    {"property":"device3", "label":"Ch1 | Port 3",  "type":"combobox", "values":["None","Strip_Internal","LL", "QL","ML","SpPro","XD5Reservior","GPUBlock","XD5CPU","Custom"], "default":"None"},
-    {"property":"device4", "label":"Ch1 | Port 4",  "type":"combobox", "values":["None","Strip_Internal","LL", "QL","ML","SpPro","XD5Reservior","GPUBlock","XD5CPU","Custom"], "default":"None"},
-    {"property":"device5", "label":"Ch1 | Port 5",  "type":"combobox", "values":["None","Strip_Internal","LL", "QL","ML","SpPro","XD5Reservior","GPUBlock","XD5CPU","Custom"], "default":"None"},
-    {"property":"device6", "label":"Ch1 | Port 6",  "type":"combobox", "values":["None","Strip_Internal","LL", "QL","ML","SpPro","XD5Reservior","GPUBlock","XD5CPU","Custom"], "default":"None"},
+    {"property":"device1", "label":"Ch1 | Port 1",  "type":"combobox", "values":["None","Strip_Internal","LL", "QL","ML","SpPro","HD","XD5Reservior","GPUBlock","XD5CPU","Custom"], "default":"None"},
+    {"property":"device2", "label":"Ch1 | Port 2",  "type":"combobox", "values":["None","Strip_Internal","LL", "QL","ML","SpPro","HD","XD5Reservior","GPUBlock","XD5CPU","Custom"], "default":"None"},
+    {"property":"device3", "label":"Ch1 | Port 3",  "type":"combobox", "values":["None","Strip_Internal","LL", "QL","ML","SpPro","HD","XD5Reservior","GPUBlock","XD5CPU","Custom"], "default":"None"},
+    {"property":"device4", "label":"Ch1 | Port 4",  "type":"combobox", "values":["None","Strip_Internal","LL", "QL","ML","SpPro","HD","XD5Reservior","GPUBlock","XD5CPU","Custom"], "default":"None"},
+    {"property":"device5", "label":"Ch1 | Port 5",  "type":"combobox", "values":["None","Strip_Internal","LL", "QL","ML","SpPro","HD","XD5Reservior","GPUBlock","XD5CPU","Custom"], "default":"None"},
+    {"property":"device6", "label":"Ch1 | Port 6",  "type":"combobox", "values":["None","Strip_Internal","LL", "QL","ML","SpPro","HD","XD5Reservior","GPUBlock","XD5CPU","Custom"], "default":"None"},
     ];
 }
 var ParentDeviceName = "Corsair Lighting Node Core";
@@ -360,6 +386,7 @@ var DeviceDict = {
     "QL" : QLFan,
     "ML" : MLFan,
     "SpPro" : SpProFan,
+    "HD" : HDFan,
     "XD5Reservior" : XD5Reservior,
     "GPUBlock" : GPUBlock,
     "XD5CPU" : XD5CPU,
