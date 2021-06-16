@@ -265,6 +265,34 @@ width: 6,
 height: 6,
 image: XD5_Cpu_Image()
 }
+
+const MF120Halo = 
+{   mapping : [
+		7, 6, 5, 4, 3, 2, 1, 0,
+		23, 22, 21, 20, 19, 18, 17, 16, 15, 14, 13, 12, 11, 10, 9, 8,      
+    ],
+positioning : [
+		[0, 1], [0, 3], [1, 4],
+		[3, 4], [4, 3],
+		[4, 1], [3, 0], [1, 0],
+		[1, 1], [0, 2],
+		[0, 3], [0, 4], [1, 5], [2, 6],
+		[3, 6], [4, 6], [5, 5], [6, 4],
+		[6, 3], [6, 2], [5, 1], [4, 0],
+		[3, 0], [2, 0],
+	],
+	LedNames : [
+        "Fan Led 1","Fan Led 2","Fan Led 3","Fan Led 4","Fan Led 5","Fan Led 6","Fan Led 7","Fan Led 8",
+		"Ring Led 1","Ring Led 2", "Ring Led 3","Ring Led 4","Ring Led 5","Ring Led 6","Ring Led 7","Ring Led 8",
+		"Ring Led 9","Ring Led 10","Ring Led 11","Ring Led 12", "Ring Led 13","Ring Led 14","Ring Led 15","Ring Led 16",
+    ],
+displayName: "MF120Halo Fan",
+ledCount : 24,
+width: 5,
+height: 5,
+image: Placeholder()
+}
+
 const Custom = {
     mapping : [],
     positioning : [],
@@ -294,22 +322,14 @@ export function ControllableParameters(){
 
     {"property":"CustomSize", "label":"Custom Strip Size","type":"number","min":"1", "max":"80","default":"10"},
 
-    {"property":"device1",  "label":"Ch1 | Port 1", "type":"combobox",  "values":["None","Strip_Internal","LL", "QL","ML","SpPro","XD5Reservior","GPUBlock","XD5CPU","MasterFan 120AB",
-    "ML240 RGB Pump","Custom"], "default":"None"},
-    {"property":"device2",  "label":"Ch1 | Port 2", "type":"combobox",  "values":["None","Strip_Internal","LL", "QL","ML","SpPro","XD5Reservior","GPUBlock","XD5CPU","MasterFan 120AB",
-    "ML240 RGB Pump","Custom"], "default":"None"},
-    {"property":"device3",  "label":"Ch2 | Port 1", "type":"combobox",  "values":["None","Strip_Internal","LL", "QL","ML","SpPro","XD5Reservior","GPUBlock","XD5CPU","MasterFan 120AB",
-    "ML240 RGB Pump","Custom"], "default":"None"},
-    {"property":"device4",  "label":"Ch2 | Port 2", "type":"combobox",  "values":["None","Strip_Internal","LL", "QL","ML","SpPro","XD5Reservior","GPUBlock","XD5CPU","MasterFan 120AB",
-    "ML240 RGB Pump","Custom"], "default":"None"},
-    {"property":"device5",  "label":"Ch3 | Port 1", "type":"combobox",  "values":["None","Strip_Internal","LL", "QL","ML","SpPro","XD5Reservior","GPUBlock","XD5CPU","MasterFan 120AB",
-    "ML240 RGB Pump","Custom"], "default":"None"},
-    {"property":"device6",  "label":"Ch3 | Port 2", "type":"combobox",  "values":["None","Strip_Internal","LL", "QL","ML","SpPro","XD5Reservior","GPUBlock","XD5CPU","MasterFan 120AB",
-    "ML240 RGB Pump","Custom"], "default":"None"},
-    {"property":"device7",  "label":"Ch4 | Port 1", "type":"combobox",  "values":["None","Strip_Internal","LL", "QL","ML","SpPro","XD5Reservior","GPUBlock","XD5CPU","MasterFan 120AB",
-    "ML240 RGB Pump","Custom"], "default":"None"},
-    {"property":"device8",  "label":"Ch4 | Port 2", "type":"combobox",  "values":["None","Strip_Internal","LL", "QL","ML","SpPro","XD5Reservior","GPUBlock","XD5CPU","MasterFan 120AB",
-    "ML240 RGB Pump","Custom"], "default":"None"},
+    {"property":"device1",  "label":"Ch1 | Port 1", "type":"combobox",  "values":["None","Strip_Internal","LL", "QL","ML","SpPro","XD5Reservior","GPUBlock","XD5CPU","MasterFan 120AB","ML240 RGB Pump","MF120Halo","Custom"], "default":"None"},
+    {"property":"device2",  "label":"Ch1 | Port 2", "type":"combobox",  "values":["None","Strip_Internal","LL", "QL","ML","SpPro","XD5Reservior","GPUBlock","XD5CPU","MasterFan 120AB","ML240 RGB Pump","MF120Halo","Custom"], "default":"None"},
+    {"property":"device3",  "label":"Ch2 | Port 1", "type":"combobox",  "values":["None","Strip_Internal","LL", "QL","ML","SpPro","XD5Reservior","GPUBlock","XD5CPU","MasterFan 120AB","ML240 RGB Pump","MF120Halo","Custom"], "default":"None"},
+    {"property":"device4",  "label":"Ch2 | Port 2", "type":"combobox",  "values":["None","Strip_Internal","LL", "QL","ML","SpPro","XD5Reservior","GPUBlock","XD5CPU","MasterFan 120AB","ML240 RGB Pump","MF120Halo","Custom"], "default":"None"},
+    {"property":"device5",  "label":"Ch3 | Port 1", "type":"combobox",  "values":["None","Strip_Internal","LL", "QL","ML","SpPro","XD5Reservior","GPUBlock","XD5CPU","MasterFan 120AB","ML240 RGB Pump","MF120Halo","Custom"], "default":"None"},
+    {"property":"device6",  "label":"Ch3 | Port 2", "type":"combobox",  "values":["None","Strip_Internal","LL", "QL","ML","SpPro","XD5Reservior","GPUBlock","XD5CPU","MasterFan 120AB","ML240 RGB Pump","MF120Halo","Custom"], "default":"None"},
+    {"property":"device7",  "label":"Ch4 | Port 1", "type":"combobox",  "values":["None","Strip_Internal","LL", "QL","ML","SpPro","XD5Reservior","GPUBlock","XD5CPU","MasterFan 120AB","ML240 RGB Pump","MF120Halo","Custom"], "default":"None"},
+    {"property":"device8",  "label":"Ch4 | Port 2", "type":"combobox",  "values":["None","Strip_Internal","LL", "QL","ML","SpPro","XD5Reservior","GPUBlock","XD5CPU","MasterFan 120AB","ML240 RGB Pump","MF120Halo","Custom"], "default":"None"},
     ];
 }
 var ParentDeviceName = "Cooler Master ARGB Controller";
@@ -375,6 +395,7 @@ var DeviceDict = {
     "XD5CPU" : XD5CPU,
     "MasterFan 120AB": MasterFan_120AB,
     "ML240 RGB Pump" : ML240_RGB_Pump,
+	"MF120Halo" : MF120Halo,
     "Custom" : Custom,
 }
 
