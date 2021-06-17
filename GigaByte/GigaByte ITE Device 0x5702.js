@@ -1,7 +1,7 @@
 const deviceList = ["None", "NZXT Strip 10 Led", "NZXT Strip 8 Led", "NZXT Strip 6 Led","Corsair Internal Strip (10)", "Corsair Strip 250mm (15)", "Corsair Strip 350mm (21)", "Corsair Strip 450mm (27)", "Corsair Strip 140cm (87)", "Corsair LL Fan (16)", "Corsair QL Fan (34)", "Corsair ML Fan (4)", "Corsair ML Fan (8)", "Corsair SpPro Fan (8)",  "Corsair HD Fan (12)", "NZXT AER 2 Fan (8)", "MasterFan 120 AB (8)", "MasterFan Halo Fan (24)",  "Lian Li GPU Strimer Plus (27)",  "MasterFan ML240 Pump (10)", "Custom"];
 export function Name() { return "GIGABYTE Motherboard LED Controller"; }
 export function VendorId() { return  0x048D; }  
-export function ProductId() { return 0x5702;}//0x5702;} //Experimental Also on 0x8297?
+export function ProductId() { return 0x5702;}
 export function Publisher() { return "WhirlwindFX"; }
 export function Size() { return [12,2]; }
 export function Type() { return "Hid"; }

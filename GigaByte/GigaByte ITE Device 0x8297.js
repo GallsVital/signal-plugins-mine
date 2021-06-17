@@ -2,7 +2,7 @@ const deviceList = ["None", "NZXT Strip 10 Led", "NZXT Strip 8 Led", "NZXT Strip
 
 export function Name() { return "GIGABYTE Motherboard LED Controller"; }
 export function VendorId() { return  0x048D; }  
-export function ProductId() { return 0x8297;}//0x5702;} //Experimental Also on 0x8297?
+export function ProductId() { return 0x8297;}
 export function Publisher() { return "WhirlwindFX"; }
 export function Size() { return [12,2]; }
 export function Type() { return "Hid"; }
