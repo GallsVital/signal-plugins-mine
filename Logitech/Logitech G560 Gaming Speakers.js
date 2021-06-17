@@ -5,6 +5,9 @@ const G560_Speaker_Right = {
        positioning : [
         [0,2],[2,0]
     ],
+    LedNames : [
+        "Led 1","Led 2",
+    ],
     displayName: "Right Speaker",
     ledCount : 2,
     width: 3,
@@ -18,6 +21,9 @@ const G560_Speaker_Left = {
        positioning : [
         [2,0],[0,2]
     ],
+    LedNames : [
+        "Led 1","Led 2",
+    ],
     displayName: "Left Speaker",
     ledCount : 2,
     width: 3,
@@ -26,8 +32,8 @@ const G560_Speaker_Left = {
 }
 
 export function Name() { return "Logitech G560 Gaming Speakers"; }
-export function VendorId() { return 0x046d; }
-export function ProductId() { return 0x0A78; }
+export function VendorId() { return 0x046d} //0x046d; }
+export function ProductId() { return 0x0A78}//0x0A78; }
 export function Publisher() { return "WhirlwindFX"; }
 export function Size() { return [4, 4]; }
 export function DefaultPosition(){return [240,120]}
@@ -39,10 +45,8 @@ export function ControllableParameters(){
         {"property":"forcedColor", "label":"Forced Color","min":"0","max":"360","type":"color","default":"009bde"},
     ];
 }
-var vLedNames = ["Speakers"];
-var vLedPositions = [
-    [0,0]
-];
+var vLedNames = [];
+var vLedPositions = [];
 
 export function LedNames()
 {
@@ -63,14 +67,18 @@ device.createSubdevice("Left Speaker");
 device.setSubdeviceName("Left Speaker",`Logitech G560 - ${G560_Speaker_Left.displayName}`);
 device.setSubdeviceImage("Left Speaker", G560_Speaker_Left.image);
 device.setSubdeviceSize("Left Speaker",G560_Speaker_Left.width,G560_Speaker_Left.height);
-
-//Left Speaker
+device.setSubdeviceLeds("Left Speaker",
+G560_Speaker_Left.LedNames,
+    G560_Speaker_Left.positioning)
+//Right Speaker
 device.createSubdevice("Right Speaker"); 
 // Parent Device + Sub device Name + Ports
 device.setSubdeviceName("Right Speaker",`Logitech G560 - ${G560_Speaker_Right.displayName}`);
 device.setSubdeviceImage("Right Speaker", G560_Speaker_Right.image);
 device.setSubdeviceSize("Right Speaker",G560_Speaker_Right.width,G560_Speaker_Right.height);
-
+device.setSubdeviceLeds("Right Speaker",
+G560_Speaker_Right.LedNames,
+    G560_Speaker_Right.positioning)
 }
 
 

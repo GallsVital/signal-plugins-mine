@@ -95,6 +95,8 @@ function Apply()
 
     device.set_endpoint(1, 0x0602, 0xff43); // System IF    
     device.write(packet, 20);  
+    device.read(packet,20);
+    device.pause(1);
 }
 
 
@@ -142,11 +144,11 @@ export function Render()
     SendPacket(14, 14);
     SendPacket(28, 14);
     SendPacket(42, 14);
+    Apply();
     SendPacket(56, 14);
     SendPacket(70, 14);
     SendPacket(84, 14);
     SendPacket(98, 8);
-
     Apply();
 }
 
