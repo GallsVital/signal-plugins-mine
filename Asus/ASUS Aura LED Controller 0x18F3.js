@@ -13,7 +13,7 @@ export function ControllableParameters(){
         {"property":"LightingMode", "label":"Lighting Mode", "type":"combobox", "values":["Canvas","Forced"], "default":"Canvas"},
         {"property":"forcedColor", "label":"Forced Color","min":"0","max":"360","type":"color","default":"009bde"},
         {"property":"RGBHeaderCount", "label":"12v RGB Header Count","type":"number","min":"0", "max":"2","default":"0"},
-        {"property":"CustomSize", "label":"Custom Strip Size","type":"number","min":"0", "max":"80","default":"10"},
+        {"property":"CustomSize", "label":"Custom Strip Size","type":"number","min":"1", "max":"80","default":"10"},
         {"property":"device1", "label":"5v Header 1 | Device 1", "type":"combobox",   "values":deviceList, "default":"None"},
         {"property":"device2", "label":"5v Header 1 | Device 2", "type":"combobox",   "values":deviceList, "default":"None"},
         {"property":"device3", "label":"5v Header 1 | Device 3", "type":"combobox",   "values":deviceList, "default":"None"},
@@ -85,30 +85,38 @@ function InitMainBoardLeds(){
         }
     }   
 
-var CustomValue;
-function InitCustomStrip(){
-    if(CustomValue != CustomSize){
-        CustomValue = CustomSize;
+    var savedCustomSize;
+    function InitCustomStrip(){
+        if(savedCustomSize == CustomSize){
+            return
+        }
+        savedCustomSize = CustomSize
+    
         var mapping = [];
         var positioning = [];
+        var names = [];
         for(let i = 0; i < CustomSize;i++){
             mapping[i] = i;
-            positioning[i] = [i,0];    
+            positioning[i] = [i,0];
+            names[i] = `Led ${i}`;   
         }
         Custom.mapping = mapping;
         Custom.positioning = positioning;
+        Custom.LedNames = names;
         Custom.width = CustomSize;
         Custom.ledCount = CustomSize;
-
+    
         var propertyArray = [device1, device2,device3,device4,device5,device6];
-
-        for (var deviceNumber = 0; deviceNumber < propertyArray.length; deviceNumber++ ) {
-                if(deviceValues[deviceNumber] == "Custom"){
+    
+        for (var deviceNumber = 0; deviceNumber < 6; deviceNumber++ ) {
+                 if(deviceValues[deviceNumber] == "Custom"){
                     device.setSubdeviceSize(deviceArray[deviceNumber],DeviceDict[propertyArray[deviceNumber]].width,DeviceDict[propertyArray[deviceNumber]].height);
-                }       
+                    device.setSubdeviceLeds(deviceArray[deviceNumber],
+                        DeviceDict[propertyArray[deviceNumber]].LedNames,
+                        DeviceDict[propertyArray[deviceNumber]].positioning)
+                 }       
         }
     }
-}
 
 export function LedNames()
 {
