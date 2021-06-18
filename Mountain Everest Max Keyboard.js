@@ -1,6 +1,6 @@
 export function Name() { return "Mountain Everest Max Keyboard"; }
 export function VendorId() { return 0x3282; }//
-export function ProductId() { return 0x0000; }//0x0001
+export function ProductId() { return 0x0001; }//0x0001
 export function Publisher() { return "WhirlwindFX"; }
 export function Size() { return [22, 6] }
 export function DefaultPosition() {return [75,70]; }
@@ -25,9 +25,26 @@ function hexToRgb(hex) {
 
 export function Initialize()
 {
-sendPacketString("1b 00 10 f0 29 54 81 8b ff ff 00 00 00 00 09 00 00 01 00 03 00 05 01 40 00 00 00 11 01 00 02 01 06 02 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00",65);
-}
+// sendPacketString("00 1b 00 10 20 9e f7 8e ca ff ff 00 00 00 00 09 00 01 03 00 0b 00 84 01 40 00 00 00 11 14 00 00 02 bf 00 ff 00 ed 01 1e 00 1e 00 01 12 13 14 15 02 00 32",65);
 
+// sendPacketString("00 11 80 00 00 01 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00",65); 
+
+// sendPacketString("00 11 84 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00",65); 
+
+// sendPacketString("00 11 84 00 01 00 00 06 0b 10 21 2e 00 00 00 00 00 00 00 00 00 00 00 00 00",65); 
+
+// sendPacketString("00 12 00 00 00 32 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00",65); 
+
+// sendPacketString("00 11 80 00 00 01 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00",65); 
+
+// sendPacketString("00 11 14 00 00 02 bf 00 ff 00 ed 01 1e 00 1e 00 01 12 13 14 15 02 00 32 00",65); 
+
+// sendPacketString("00 11 14 00 00 02 bf 00 ff 00 ed 01 1e 00 1e 00 01 12 13 14 15 02 00 32 00",65); 
+
+// sendPacketString("00 14 00 00 00 01 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00",65); 
+
+// sendPacketString("00 11 14 00 00 02 bf 00 ff 00 ed 01 1e 00 1e 00 01 12 13 14 15 02 00 32 00",65); 
+}
 
 
 export function Shutdown()
@@ -70,7 +87,19 @@ export function Render()
     sendColors();
 }
 function sendColors(shutdown = false){
+   //14 2c 0a 00 00
+   //4b 00 01 00 dc 29 bc 01 00 44 ff 02 00 44 ff 03
+   //00 44 ff 04 00 44 ff 05 00 44 ff 06 00 44 ff 07
+   //00 44 ff 08 ff ff ff 09 dc 29 bc 0a 00 44 ff 0b
+   //00 44 ff 0c 00 44 ff 0d ff ff ff
+    
 
+   //14 2c 0a 00 00
+   //4b 00 02 2a 00 44 ff 2b 00 44 ff 2c ff ff ff 2d
+   //00 44 ff 2e 00 44 ff 2f 00 44 ff 30 00 44 ff 31
+   //00 44 ff 32 ff ff ff 33 00 44 ff 34 00 44 ff 35
+   //ff ff ff 36 00 44 ff 37 00 44 ff
+    var TotalLedCount = 0;
     var RGBData = []
     for(var iIdx = 0; iIdx < vKeyPositions.length; iIdx++)
     {
@@ -83,24 +112,39 @@ function sendColors(shutdown = false){
             col = hexToRgb(forcedColor)
         }else{
             col = device.color(iPxX, iPxY);
-        }           
-        RGBData[iIdx * 3 + 0] = col[0];
-        RGBData[iIdx * 3 + 1] = col[1];
-        RGBData[iIdx * 3 + 2] = col[2];
-        //TotalLedCount++;
+        }
+        RGBData[iIdx * 4] = iIdx;       
+        RGBData[iIdx * 4 + 1] = col[0];
+        RGBData[iIdx * 4 + 2] = col[1];
+        RGBData[iIdx * 4 + 3] = col[2];
+        TotalLedCount++;
     }
+    sendPacketString("00 11 14",65); 
+    sendPacketString("00 12 08 00 01",65); 
+    sendPacketString("00 11 01 00 02 01 06 02",65); 
 
-    let packetCount = 2
-    while(packetCount < 11){
+    let packetCount = 0
+    while(TotalLedCount > 0){
+        var ledsToSend = TotalLedCount >= 14 ? 14 : TotalLedCount;
 
         var packet = [];
         packet[0] = 0x00
-        packet[1] = packetCount
-        packet = packet.concat(RGBData.splice(0,21*3))
+        packet[1] = 0x14
+        packet[2] = 0x2C
+        packet[3] = 0x0a
+        packet[4] = 0x00
+        packet[5] = 0x00
+        packet[6] = 0x4B
+        packet[7] = 0x00
+        packet[8] = packetCount++ == 0 ? 0x01 : packetCount < 13 ? 0x02 : 0x03
+        packet = packet.concat(RGBData.splice(0,ledsToSend*4))
         device.write(packet,65)
-
+        device.read(packet,65)
+        TotalLedCount -= ledsToSend;
     }
 
+  sendPacketString("00 13 55",65); 
+    device.pause(2)
 }
 
 
