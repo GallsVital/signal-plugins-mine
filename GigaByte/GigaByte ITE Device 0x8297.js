@@ -226,9 +226,7 @@ function Sendchannel(channel,shutdown = false)
                     TotalLedCount += DeviceDict[propertyArray[deviceNumber]].ledCount;
                  }
              }
-             for(let i = 0; i < 300;i++){
-                device.pause(1);
-            }
+
 
         //we want to try and use direct mode
          var ledsSent = 0;

@@ -166,7 +166,6 @@ function sendColors(shutdown = false){
     StreamPacket(RGBData.splice(0,61));
     StreamPacket(RGBData.splice(0,61));
     StreamPacket(RGBData.splice(0,61));
-    device.pause(50)
 }
 
 export function Validate(endpoint)

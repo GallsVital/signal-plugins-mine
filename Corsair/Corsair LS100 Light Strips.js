@@ -386,7 +386,6 @@ function SendChannel(channel, shutdown = false)
         ledsSent += ledsToSend;
         TotalLedCount -= ledsToSend;
     }
-    SubmitLightingColors();
 
 }
 var savedEndpointValue;
@@ -411,6 +410,9 @@ export function Render()
     SendChannel(1);
     device.pause(1);
 
+    SubmitLightingColors();
+    device.pause(1)
+    
     InitCustomStrip()
     SetFans();
 }

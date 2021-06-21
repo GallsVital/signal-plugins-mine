@@ -76,7 +76,7 @@ export function Shutdown()
     device.write(packet, 65);
 }
 var SkippedKeys = [
-    0x31, 0x41,0x42,0x48,0x49,0x51,0x55,0x6F,0x7E,0x7F,0x80,0x81
+    49, 63, 65, 66, 81, 83, 85, 111, 126, 127, 128, 129,
 ]
 function InitScanCodes(){
     sendPacketString("00 07 05 08 00 01",65);

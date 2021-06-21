@@ -1,8 +1,8 @@
 
 const deviceList = ["None","Corsair Internal Strip (10)", "Corsair Strip 250mm (15)", "Corsair Strip 350mm (21)", "Corsair Strip 450mm (27)", "Corsair Strip 140cm (87)", "Corsair LL Fan (16)", "Corsair QL Fan (34)", "Corsair ML Fan (4)", "Corsair ML Fan (8)", "Corsair SpPro Fan (8)",  "Corsair HD Fan (12)","Lian Li GPU Strimer Plus (27)", "Custom"];
 export function Name() { return "Corsair Lighting Node Pro"; }
-export function VendorId() { return  0x1b1c; }
-export function ProductId() { return 0x0C0B; }
+export function VendorId() { return  0x048D;} //0x1b1c; }
+export function ProductId() { return 0x5702;} //0x0C0B; }
 export function Publisher() { return "WhirlwindFX"; }
 export function Size() { return [1,1]; }
 export function DefaultPosition(){return [0,0]}
@@ -296,7 +296,6 @@ function SendChannel(channel,shutdown = false)
          TotalLedCount -= ledsToSend;
 
      }
-     SubmitLightingColors();
 }
 var savedEndpointValue;
 function setEndpoint(){
@@ -318,7 +317,9 @@ export function Render()
         device.pause(1);
 
         SendChannel(1);
-    
+        device.pause(1);
+
+        SubmitLightingColors();
         device.pause(1);
 
         InitCustomStrip()

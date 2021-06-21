@@ -522,7 +522,7 @@ var DeviceDict = {
     "Corsair ML Fan (8)": Corsair_MLFan_8Led,
     "Corsair SpPro Fan (8)" : Corsair_SpProFan,
 	"Corsair HD Fan (12)" : Corsair_HDFan,
-    "Corsair Elite Capillex Cooler": EliteCapellixCooler,
+    "EliteCapellixCooler": EliteCapellixCooler,
     "Custom" : Custom,
 } 
 

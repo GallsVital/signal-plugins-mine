@@ -247,8 +247,6 @@ function SendChannel(channel,shutdown = false)
 
     }
 
-   //commit packet
-   SubmitLightingColors();
 }
 
 var savedEndpointValue;
@@ -269,7 +267,10 @@ export function Render()
 
     SendChannel(0);
     device.pause(1);
-    
+
+    SubmitLightingColors();
+    device.pause(1);
+
     InitCustomStrip();
     SetFans();
 }
