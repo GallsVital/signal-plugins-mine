@@ -1,6 +1,6 @@
-export function Name() { return "Roccat Kone"; }
+export function Name() { return "Roccat Kone Remastered"; }
 export function VendorId() { return 0x1e7d; }
-export function ProductId() { return 0x0000;}//0x2e27; }
+export function ProductId() { return 0x2e2c; }
 export function Publisher() { return "WhirlwindFX"; }
 export function Size() { return [7, 7]; }
 export function DefaultPosition(){return [240,120]}
