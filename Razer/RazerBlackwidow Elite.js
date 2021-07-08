@@ -52,7 +52,7 @@ export function Name() { return "Razer Blackwidow Elite"; }
 export function VendorId() { return 0x1532; }
 export function ProductId() { return 0x0228; }
 export function Publisher() { return "WhirlwindFX"; }
-export function Size() { return [22,10]; }
+export function Size() { return [22,6]; }
 export function Type() { return "Hid"; }
 export function DefaultPosition() {return [75,70]; }
 export function DefaultScale(){return 8.0}

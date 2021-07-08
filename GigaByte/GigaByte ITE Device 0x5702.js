@@ -10,12 +10,12 @@ export function DefaultScale(){return 8.0}
 export function ControllableParameters(){
     return [
         {"property":"shutdownColor", "label":"Shutdown Color","min":"0","max":"360","type":"color","default":"009bde"},
-        {"property":"LightingMode", "label":"Lighting Mode", "type":"combobox", "values":["Canvas","Forced"], "default":"Canvas"},
+        {"property":"LightingMode", "label":"Lighting Mode", "type":"combobox", "values":["Canvas","Forced"], "default":"Canvas", "tooltip":"This toggles the device between displaying its canvas position, or being locked to its Forced Color"},
         {"property":"forcedColor", "label":"Forced Color","min":"0","max":"360","type":"color","default":"009bde"},
         //{"property":"RGBHeaderCount", "label":"RGB Header Count","type":"number","min":"0", "max":"2","default":"0"},
         {"property":"RGBconfig", "label":"ARGB Channel Configuration", "type":"combobox",   "values":["RGB","RBG","BGR","BRG","GBR","GRB"], "default":"GRB"},
 
-        {"property":"CustomSize", "label":"Custom Strip Size","type":"number","min":"1", "max":"80","default":"10"},
+        {"property":"CustomSize", "label":"Custom Strip Size","type":"number","min":"1", "max":"80","default":"10", "tooltip":"This controls the number of leds/base size of the Custom Strip option. This is currently not capable of setting per Custom Strip counts."},
 
         {"property":"device1", "label":"5v Header 1 Device 1", "type":"combobox",   "values":deviceList, "default":"None"},
         {"property":"device2", "label":"5v Header 1 Device 2", "type":"combobox",   "values":deviceList, "default":"None"},
@@ -304,7 +304,7 @@ function SetFans(){
 
 export function Render()
 {        
-
+    //device.log("test");
     SendMainboard();
 
     for(let channel = 0; channel < vDLED_Zones.length; channel++){
