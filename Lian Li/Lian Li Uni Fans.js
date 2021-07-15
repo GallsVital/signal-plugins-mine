@@ -1,5 +1,5 @@
 
-export function Name() { return "Lian Li Uni Fans"; }
+export function Name() { return "Lian Li Uni Fan Controller"; }
 export function VendorId() { return  0x0CF2; }
 export function ProductId() { return 0x0000;}//0x7750; }
 export function Publisher() { return "WhirlwindFX"; }
@@ -10,10 +10,11 @@ export function ControllableParameters(){
     {"property":"shutdownColor", "label":"Shutdown Color","min":"0","max":"360","type":"color","default":"009bde"},
     {"property":"LightingMode", "label":"Lighting Mode", "type":"combobox", "values":["Canvas","Forced"], "default":"Canvas"},
     {"property":"forcedColor", "label":"Forced Color","min":"0","max":"360","type":"color","default":"009bde"},
-    {"property":"Channel1Count", "label":"Channel 1 Fan count","type":"number","min":"0", "max":"4","default":"1"},
-    {"property":"Channel2Count", "label":"Channel 2 Fan count","type":"number","min":"0", "max":"4","default":"1"},
-    {"property":"Channel3Count", "label":"Channel 3 Fan count","type":"number","min":"0", "max":"4","default":"1"},
-    {"property":"Channel4Count", "label":"Channel 4 Fan count","type":"number","min":"0", "max":"4","default":"1"},
+    {"property":"moboSync", "label":"Enable Passthrough Control","type":"boolean","default":"false"},
+    {"property":"Channel1Count", "label":"Channel 1 Fan count","type":"combobox","values":["0","1","2","3","4"],"default":"0"},
+    {"property":"Channel2Count", "label":"Channel 2 Fan count","type":"combobox","values":["0","1","2","3","4"],"default":"0"},
+    {"property":"Channel3Count", "label":"Channel 3 Fan count","type":"combobox","values":["0","1","2","3","4"],"default":"0"},
+    {"property":"Channel4Count", "label":"Channel 4 Fan count","type":"combobox","values":["0","1","2","3","4"],"default":"0"},
 
     ];
 }
@@ -119,14 +120,15 @@ function setFans(){
     for(let channel = 0; channel < 4;channel++){
         //if dirty, make sub device changes as needed, and set the new count
         if(channelArray[channel].count != propertyArray[channel]){
-            
-            for(let fan = 1; fan < 5;fan++){
+            device.log(`count ${channelArray[channel].count}, new count ${propertyArray[channel]}`)
+            for(let fan = 0; fan < 4;fan++){
                 //if fan already exists and shouldn't, delete it
-                if(fan > propertyArray[channel]){
-                        device.removeSubdevice(channelArray[channel].fan_objects[fan-1]);
+                if(fan > propertyArray[channel]-1 && fan < channelArray[channel].count){
+                        device.removeSubdevice(channelArray[channel].fan_objects[fan]);
                 }
                 //if fan doesn't exists and should, make it
                 if(fan <= propertyArray[channel] && fan > channelArray[channel].count){
+                        device.log(`${fan} ${propertyArray[channel]}`)
                          //"Ch1 | Port 1"
                          device.createSubdevice(channelArray[channel].fan_objects[fan-1]); 
                          // Parent Device + Sub device Name + Ports
@@ -155,7 +157,7 @@ function sendChannels(){
     for(let channel = 0;channel < 4;channel++){
         var packet = [];
         packet[0] = 0x32;
-        packet[1] = 16*channel + 2// fan Count on channel
+        packet[1] = 16*channel + 4// fan Count on channel
         sendControlPacket(COMMAND_ADDRESS, packet,2);
         sendCommit();
     }
@@ -184,6 +186,24 @@ function sendChannels(){
     }
 
 } 
+
+var savedMoboPassthrough
+function setMoboPassthrough(){
+    if(savedMoboPassthrough != moboSync){
+        savedMoboPassthrough = moboSync;
+        if(savedMoboPassthrough){
+            
+            var packet = [0x30,0x01];
+            sendControlPacket(COMMAND_ADDRESS, packet,2);
+            sendCommit();
+        }else{
+
+            var packet = [0x30,0x00];
+            sendControlPacket(COMMAND_ADDRESS, packet,2);
+            sendCommit();
+        }
+    }
+}
 function  getChannelColors(channel,shutdown = false){
     var RGBdata = new Array(192).fill(0);
     let channelObject = channelArray[channel];
@@ -207,7 +227,7 @@ function  getChannelColors(channel,shutdown = false){
              RGBdata[Lian_Li_UniFan.mapping[iIdx]*3+TotalLedCount*3+2] = mxPxColor[1];
             }
             TotalLedCount += Lian_Li_UniFan.ledCount;
-    }
+   }
 
     return RGBdata;
 }
@@ -227,19 +247,24 @@ function sendColor(shutdown = false){
 
 export function Render()
 {
-    sendChannels();
+    
+    if(!savedMoboPassthrough){
+        sendChannels();
+    }
     setFans();
-    device.pause(1);
+    setMoboPassthrough()
 }
 function sendControlPacket(index,data,length){
         //                  iType, iRequest, iValue, iReqIdx, pBuf, iLen, iTimeout 
         device.control_transfer(0x40,0x80,0,index,data,length,1000);
+        device.pause(1)
+
 }
 function sendCommit(){
-    var packet = [];
-    packet[1] = 0x01
+    var packet = [0x01];
     //                  iType, iRequest, iValue, iReqIdx, pBuf, iLen, iTimeout 
     device.control_transfer(0x40,0x80,0,COMMIT_ADDRESS,packet,1,1000);
+    device.pause(1)
 }
 export function Shutdown()
 {
