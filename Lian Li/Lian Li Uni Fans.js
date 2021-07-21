@@ -1,7 +1,7 @@
 
 export function Name() { return "Lian Li Uni Fan Controller"; }
 export function VendorId() { return  0x0CF2; }
-export function ProductId() { return 0x0000;}//0x7750; }
+export function ProductId() { return 0x7750; }
 export function Publisher() { return "WhirlwindFX"; }
 export function Size() { return [5, 5]; }
 export function Type(){return "rawusb"};
@@ -15,7 +15,8 @@ export function ControllableParameters(){
     {"property":"Channel2Count", "label":"Channel 2 Fan count","type":"combobox","values":["0","1","2","3","4"],"default":"0"},
     {"property":"Channel3Count", "label":"Channel 3 Fan count","type":"combobox","values":["0","1","2","3","4"],"default":"0"},
     {"property":"Channel4Count", "label":"Channel 4 Fan count","type":"combobox","values":["0","1","2","3","4"],"default":"0"},
-
+    {"property":"targetRPM", "label":"Fan RPM", "step":"50","type":"number","min":"800", "max":"1900","default":"1300"},
+    {"property":"FanMode", "label":"Fan Speed Mode","type":"combobox","values":["Manual","PWM"],"default":"PWM"},
     ];
 }
 
@@ -44,11 +45,14 @@ const Channel_1_Controller = {
     mode: 0xe021,
     speed: 0xe022,
     direction: 0xe023,
-    brgihtness: 0xe029,
+    brightness: 0xe029,
     count: 0,
-    fan_objects: ["Channel 1 Fan 1","Channel 1 Fan 2","Channel 1 Fan 3","Channel 1 Fan 4"]
+    fan_objects: ["Channel 1 Fan 1","Channel 1 Fan 2","Channel 1 Fan 3","Channel 1 Fan 4"],
+    fanAction: 0xe8a0,
+    fanCommit:0xe890,
+    fanRead: 0xe800,
+    fanPMWCommit: 0xe818
 }
-
 
 const Channel_2_Controller = {
     action: 0xe3c0,
@@ -56,9 +60,13 @@ const Channel_2_Controller = {
     mode: 0xe031,
     speed: 0xe032,
     direction: 0xe033,
-    brgihtness: 0xe039,
+    brightness: 0xe039,
     count: 0,
-    fan_objects: ["Channel 2 Fan 1","Channel 2 Fan 2","Channel 2 Fan 3","Channel 2 Fan 4"]
+    fan_objects: ["Channel 2 Fan 1","Channel 2 Fan 2","Channel 2 Fan 3","Channel 2 Fan 4"],
+    fanAction: 0xe8a2,
+    fanCommit:0xe891,
+    fanRead: 0xe802,
+    fanPMWCommit: 0xe81A
 }
 
 const Channel_3_Controller = {
@@ -67,9 +75,13 @@ const Channel_3_Controller = {
     mode: 0xe041,
     speed: 0xe042,
     direction: 0xe043,
-    brgihtness: 0xe049,
+    brightness: 0xe049,
     count: 0,
-    fan_objects: ["Channel 3 Fan 1","Channel 3 Fan 2","Channel 3 Fan 3","Channel 3 Fan 4"]
+    fan_objects: ["Channel 3 Fan 1","Channel 3 Fan 2","Channel 3 Fan 3","Channel 3 Fan 4"],
+    fanAction: 0xe8a4,
+    fanCommit:0xe892,
+    fanRead: 0xe804,
+    fanPMWCommit: 0xe81C
 }
 
 const Channel_4_Controller = {
@@ -78,9 +90,13 @@ const Channel_4_Controller = {
     mode: 0xe051,
     speed: 0xe052,
     direction: 0xe053,
-    brgihtness: 0xe059,
+    brightness: 0xe059,
     count: 0,
-    fan_objects: ["Channel 4 Fan 1","Channel 4 Fan 2","Channel 4 Fan 3","Channel 4 Fan 4"]
+    fan_objects: ["Channel 4 Fan 1","Channel 4 Fan 2","Channel 4 Fan 3","Channel 4 Fan 4"],
+    fanAction: 0xe8a6,
+    fanCommit:0xe893,
+    fanRead: 0xe806,
+    fanPMWCommit: 0xe81E
 }
 
 var vLedNames = [];
@@ -110,10 +126,32 @@ export function LedPositions()
   return vLedPos;
 }
 
+
 export function Initialize()
 {
+    // init mode, spd, dir, brightness.
+    for(let channel = 0; channel < 4;channel++){
+        var packet = [1]
+        sendControlPacket(channelArray[channel].mode, packet,1);
+
+        packet = [1]
+        sendControlPacket(channelArray[channel].speed, packet,1);
+
+        packet = [0]
+        sendControlPacket(channelArray[channel].direction, packet,1);
+
+        packet = [0]
+        sendControlPacket(channelArray[channel].brightness, packet,1);
+
+        packet = [1]
+        sendControlPacket(channelArray[channel].commit, packet,1);
+    }
+
 
 }
+
+
+
 function setFans(){
     var propertyArray = [Channel1Count,Channel2Count,Channel3Count,Channel4Count];
     //check every channels fan count
@@ -145,6 +183,12 @@ function setFans(){
         }
     }
 }
+
+function isChannelActive(channelIdx)
+{
+    return channelArray[channelIdx].count > 0;
+}
+
 function sendChannels(){
 
     //start configuation
@@ -155,34 +199,40 @@ function sendChannels(){
 
     //set fan counts
     for(let channel = 0;channel < 4;channel++){
-        var packet = [];
-        packet[0] = 0x32;
-        packet[1] = 16*channel + 4// fan Count on channel
-        sendControlPacket(COMMAND_ADDRESS, packet,2);
-        sendCommit();
+        if (isChannelActive(channel))
+        {
+            var packet = [];
+            packet[0] = 0x32;
+            packet[1] = 16*channel + 3// fan Count on channel (0 == 1)
+            sendControlPacket(COMMAND_ADDRESS, packet,2);
+            sendCommit();
+        }
     }
     //set fan RGB
     for(let channel = 0; channel < 4;channel++){
-    
-        let channelObject = channelArray[channel];
+        if (isChannelActive(channel))
+        {
+            packet = getChannelColors(channel);
+            sendControlPacket(channelArray[channel].action, packet,192);
 
-        packet = getChannelColors(channel);
-        sendControlPacket(channelObject.action, packet,192);
+            //not sending these each frame causes the lian li to lock up for a moment every few seconds
+            // - Seems to have stopped
+            
+            // packet = [1]
+            // sendControlPacket(channelArray[channel].mode, packet,1);
 
-        packet = [1]
-        sendControlPacket(channelObject.mode, packet,1);
+            // packet = [1]
+            // sendControlPacket(channelArray[channel].speed, packet,1);
 
-        packet = [1]
-        sendControlPacket(channelObject.speed, packet,1);
+            // packet = [0]
+            // sendControlPacket(channelArray[channel].direction, packet,1);
 
-        packet = [0]
-        sendControlPacket(channelObject.direction, packet,1);
-
-        packet = [0]
-        sendControlPacket(channelObject.brightness, packet,1);
-
-        packet = [1]
-        sendControlPacket(channelObject.commit, packet,1);
+            // packet = [0]
+            // sendControlPacket(channelArray[channel].brightness, packet,1);
+            
+            packet = [1]
+            sendControlPacket(channelArray[channel].commit, packet,1);
+        }
     }
 
 } 
@@ -204,11 +254,19 @@ function setMoboPassthrough(){
         }
     }
 }
-function  getChannelColors(channel,shutdown = false){
-    var RGBdata = new Array(192).fill(0);
+
+// Allocate this statically, once.
+var RGBdata = new Array(192);
+
+function  getChannelColors(channel,shutdown = false) {
+
+    // Filling is cheaper than allocation.
+    RGBdata.fill(0);
+
     let channelObject = channelArray[channel];
     var TotalLedCount = 0;
-    for(let fan = 0; fan < channelObject.count;fan++){
+    for(let fan = 0; fan < channelObject.count;fan++)
+    {
         for(var iIdx = 0; iIdx < Lian_Li_UniFan.mapping.length; iIdx++){
             var iPxX = Lian_Li_UniFan.positioning[iIdx][0];
             var iPxY = Lian_Li_UniFan.positioning[iIdx][1];
@@ -216,21 +274,22 @@ function  getChannelColors(channel,shutdown = false){
             //find colors
             if(shutdown){
                 mxPxColor = hexToRgb(shutdownColor)
-           }else if (LightingMode == "Forced") {
+            }else if (LightingMode == "Forced") {
                 mxPxColor = hexToRgb(forcedColor)
             }else{
                 mxPxColor = device.subdeviceColor(channelObject.fan_objects[fan],iPxX, iPxY);
             } 
-             //set colors
-             RGBdata[Lian_Li_UniFan.mapping[iIdx]*3+TotalLedCount*3] = mxPxColor[0];
-             RGBdata[Lian_Li_UniFan.mapping[iIdx]*3+TotalLedCount*3+1] = mxPxColor[2];
-             RGBdata[Lian_Li_UniFan.mapping[iIdx]*3+TotalLedCount*3+2] = mxPxColor[1];
-            }
-            TotalLedCount += Lian_Li_UniFan.ledCount;
+            //set colors
+            RGBdata[Lian_Li_UniFan.mapping[iIdx]*3+TotalLedCount*3] = mxPxColor[0];
+            RGBdata[Lian_Li_UniFan.mapping[iIdx]*3+TotalLedCount*3+1] = mxPxColor[2];
+            RGBdata[Lian_Li_UniFan.mapping[iIdx]*3+TotalLedCount*3+2] = mxPxColor[1];
+        }
+        TotalLedCount += Lian_Li_UniFan.ledCount;
    }
 
-    return RGBdata;
+   return RGBdata;
 }
+
 
 function hexToRgb(hex) {
     var result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
@@ -241,9 +300,7 @@ function hexToRgb(hex) {
 
     return colors;
   }
-function sendColor(shutdown = false){
 
-}
 
 export function Render()
 {
@@ -251,20 +308,85 @@ export function Render()
     if(!savedMoboPassthrough){
         sendChannels();
     }
+    
     setFans();
-    setMoboPassthrough()
+    setMoboPassthrough();
+
+    setFanRPM();
+    setFanMode();
+}
+function readFanRPM(){
+        
+        for(let channel = 0; channel < 4;channel++){
+            var packet;
+            packet = readControlPacket(channelArray[channel].fanRead,packet,2);
+            device.log(packet);
+        }
+}
+
+var savedTargetRPM;
+function setFanRPM(){
+    if(savedTargetRPM != targetRPM){
+        savedTargetRPM = targetRPM;
+    
+        for(let channel = 0; channel < 4;channel++){
+            var packet = [];
+            packet[0] = targetRPM % 256
+            packet[1] = Math.floor(targetRPM / 256)
+
+            sendControlPacket(channelArray[channel].fanAction,packet,2)
+
+            packet[0] = 1;
+            sendControlPacket(channelArray[channel].fanCommit,packet,1)
+        }
+    }
+
+}
+
+var savedFanMode;
+function setFanMode(){
+    if(savedFanMode != FanMode){
+        savedFanMode = FanMode;
+    
+        if(savedFanMode == "Manual"){
+            //Set manual fan RPM control
+            var packet = [0x31,0xF0]
+            sendControlPacket(COMMAND_ADDRESS,packet,2)
+            sendCommit();
+        }else if(savedFanMode == "PWM"){
+
+            for(let channel = 0; channel < 4;channel++){
+                var packet = [0];
+                sendControlPacket(channelArray[channel].fanCommit,packet,2) //Action address for PWM is the same as the commit for Manual RPM control
+    
+                packet[0] = 1;
+                sendControlPacket(channelArray[channel].fanPMWCommit,packet,1)
+            }
+
+            //Set PWM fan RPM control
+            var packet = [0x31,0xFF]
+            sendControlPacket(COMMAND_ADDRESS,packet,2)
+            sendCommit();
+        }
+
+    }
+}
+
+function readControlPacket(index,data,length){
+        //                  iType, iRequest, iValue, iReqIdx, pBuf, iLen, iTimeout 
+        device.control_transfer(0xC0,0x81,0,index,data,length,1000);
 }
 function sendControlPacket(index,data,length){
         //                  iType, iRequest, iValue, iReqIdx, pBuf, iLen, iTimeout 
         device.control_transfer(0x40,0x80,0,index,data,length,1000);
-        device.pause(1)
+        //device.pause(1)
 
 }
 function sendCommit(){
     var packet = [0x01];
     //                  iType, iRequest, iValue, iReqIdx, pBuf, iLen, iTimeout 
     device.control_transfer(0x40,0x80,0,COMMIT_ADDRESS,packet,1,1000);
-    device.pause(1)
+    //device.pause(1)
 }
 export function Shutdown()
 {
