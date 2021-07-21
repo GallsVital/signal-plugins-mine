@@ -358,8 +358,8 @@ positioning : [
     ],
 displayName: "MF120Halo Fan",
 ledCount : 24,
-width: 5,
-height: 5,
+width: 7,
+height: 7,
 image: Placeholder()
 }
 const Corsair_LLFan ={
