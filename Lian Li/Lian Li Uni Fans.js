@@ -159,7 +159,7 @@ function setFans(){
         //if dirty, make sub device changes as needed, and set the new count
         if(channelArray[channel].count != propertyArray[channel]){
             device.log(`count ${channelArray[channel].count}, new count ${propertyArray[channel]}`)
-            for(let fan = 0; fan < 4;fan++){
+            for(let fan = 0; fan <= 4;fan++){
                 //if fan already exists and shouldn't, delete it
                 if(fan > propertyArray[channel]-1 && fan < channelArray[channel].count){
                         device.removeSubdevice(channelArray[channel].fan_objects[fan]);
