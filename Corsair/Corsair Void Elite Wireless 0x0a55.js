@@ -1,6 +1,6 @@
 export function Name() { return "Corsair Void Elite Wireless Headset"; }
 export function VendorId() { return 0x1b1c; }
-export function ProductId() { return 0x0A54;}
+export function ProductId() { return 0x0A55;}
 export function Publisher() { return "WhirlwindFX"; }
 export function Size() { return [3, 3]; }
 export function DefaultPosition(){return [240,120]}

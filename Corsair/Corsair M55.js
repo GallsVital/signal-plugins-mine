@@ -41,25 +41,30 @@ export function LedPositions()
   return vLedPositions;
 }
 
+function sendPacketString(string, size){
+    var packet= [];
+    var data = string.split(' ');
+    
+    for(let i = 0; i < data.length; i++){
+        packet[i] = parseInt(data[i],16)//.toString(16)
+    }
+
+    device.write(packet, size);
+}
+
 function EnableSoftwareControl()
 {
-    var packet = [];
-    packet[0x00]           = 0x00;
-    packet[0x01]           = 0x08;
-    packet[0x02]           = 0x01;
-    packet[0x03]           = 0x03;  
-    packet[0x04]           = 0x00;
-    packet[0x05]           = 0x02;
-    device.write(packet,65);
 
-    var packet = [];
-    packet[0x00]           = 0x00;
-    packet[0x01]           = 0x08;
-    packet[0x02]           = 0x0D;
-    packet[0x03]           = 0x00;
-    packet[0x04]           = 0x01;
-    device.write(packet, 65);
-    setDpi(dpi1);
+    sendPacketString("00 08 01 03 00 02",65)//software control packet
+
+    sendPacketString("00 08 0D 00 02",65) //open key endpoint
+    sendPacketString("00 08 06 00 08 00 00 00 01 01 01 01 01 01 01",65) // set key bindings - fixes loss of right mouse button
+    
+    sendPacketString("00 08 0D 00 01",65) // open lighting endpoint
+
+    if(DpiControl){
+        setDpi(dpi1)
+    }
 }
 
 

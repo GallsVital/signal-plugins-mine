@@ -46,20 +46,62 @@ function sendPacketString(string, size){
     var data = string.split(' ');
     
     for(let i = 0; i < data.length; i++){
-        packet[parseInt(i,16)] = parseInt(data[i],16)//.toString(16)
+        packet[i] = parseInt(data[i],16)//.toString(16)
     }
 
     device.write(packet, size);
 }
 function EnableSoftwareControl()
 {
+    //Poll for init hardware/software mode status
+
+    // sendPacketString("00 08 02 03",65)
+    // var packet = [0x08];
+    // packet = device.read(packet,65)[4];
+    // if(packet == 2){
+    //     device.log("Device is already in software mode. aborting init.")
+    // }else if(packet == 1){
+    //     device.log("Starting Software Mode Init")
+    // }
+    
+    //scan for firmware version
+
+    //sendPacketString("00 08 02 13",65)
+    //var packet = [0x08];
+    //packet = device.read(packet,65);
+    //var firmware = `firmware version = ${packet[4]}.${packet[5]}.${packet[6]}`
+    //device.log(firmware);
+
     sendPacketString("00 08 01 03 00 02",65)//software control packet
-    sendPacketString("00 08 02 00 E8 03",65) // Critical
-    sendPacketString("00 08 0D 00 01",65) // Critical
+    //device.read(packet,65);
+
+    //checking mode after init
+
+    //sendPacketString("00 08 02 03",65)
+    //var packet = [0x08];
+    //packet = device.read(packet,65)[4];
+    //device.log(packet)
+
+    //sendPacketString("00 08 0D 00 27",65)
+
+    sendPacketString("00 08 0D 00 02",65) //open key endpoint
+
+    sendPacketString("00 08 06 00 06 00 00 00 01 01 01 00 00 01",65) // set key bindings - fixes loss of right mouse button
+
+    //sendPacketString("00 08 01 02 00 E8 03",65)
+
+    sendPacketString("00 08 0D 00 01",65) // open lighting endpoint
+
+    // sendPacketString("00 08 0D 01 02",65) //open key endpoint
+    // sendPacketString("00 08 06 01 06 00 00 00 01 01 01 00 00 01",65) // set key bindings - fixes loss of right mouse button
+    // sendPacketString("00 08 05 01 01",65) //open key endpoint
+
+
 
 if(DpiControl){
         setDpi(dpi1)
-    }}
+    }
+}
 
 function setDpi(dpi){
 
@@ -74,7 +116,9 @@ function setDpi(dpi){
     packet[5] = RoundedDpi%256;
     packet[6] = Math.floor(RoundedDpi/256);
     device.write(packet, 65);
+    device.read(packet,65)
     //device.pause(1)
+
     var packet = [];
     packet[0] = 0x00;
     packet[1] = 0x08;
@@ -84,6 +128,7 @@ function setDpi(dpi){
     packet[5] = RoundedDpi%256;
     packet[6] = Math.floor(RoundedDpi/256);
     device.write(packet, 65);
+    device.read(packet,65)
 }
 
 
@@ -143,6 +188,7 @@ function sendColors(shutdown = false){
     }
     packet = packet.concat(RGBData);
     device.write(packet, 65);
+    device.read(packet,65)
 }
 
 export function Validate(endpoint)
@@ -152,6 +198,9 @@ export function Validate(endpoint)
 
 export function Shutdown()
 {
+    sendPacketString("00 08 01 03 00 01",65)//hardware control packet'
+    var packet = [0x08]
+    device.read(packet,65)
 
 }
 

@@ -37,12 +37,12 @@ export function Initialize() {
     packet[0x00] = 0x00;
     packet[0x01] = 0x33;
     packet[0x02] = 0x00;
-    packet[0x03] = 31
-    packet[0x04] = 0;
+    packet[0x03] = 0x31;
+    packet[0x04] = 0x00;
     packet[0x05] = 0x00;
-    packet[0x06] = 0
+    packet[0x06] = 0x00;
     packet[0x07] = 0x00;
-    packet[0x08] = 0x32
+    packet[0x08] = 0x32;
     device.write(packet, 33);
 
     
@@ -74,7 +74,7 @@ export function Validate(endpoint)
 {
     return endpoint.interface === 0;
 }
-function SendColorPacket(zoneid,zoneToken,secondToken, shutdown = false) {
+function SendColorPacket(zoneid, shutdown = false) {
     var packet = [];
     var iPxX = vLedPositions[zoneid][0];
     var iPxY = vLedPositions[zoneid][1];
@@ -92,13 +92,13 @@ function SendColorPacket(zoneid,zoneToken,secondToken, shutdown = false) {
     packet[0x01] = 0x05;
     packet[0x02] = 0x00;
     packet[0x03] = zoneid
-    packet[0x04] = zoneToken;
+    packet[0x04] = 0x55//zoneToken;
     packet[0x05] = 0x00;
-    packet[0x06] = secondToken
+    packet[0x06] = 0x91//secondToken
     packet[0x07] = 0x00;
-    packet[0x07] = zoneid
-    packet[0x08] = 0x10;
-    packet[0x09] = 0x27;
+    packet[0x08] = zoneid
+    packet[0x09] = 0x10;
+    packet[10] = 0x27;
     packet[25] = 0x01;
     packet[30] = 0x04;
     packet[31] = color[0];
@@ -119,10 +119,8 @@ function SendColorPacket(zoneid,zoneToken,secondToken, shutdown = false) {
 }
 
 export function Render() {
-    let zoneIds = [0x55,0x55,0x32,0x78,0x2D,0x7D,0x19,0x91];
-    let secondaryZoneId = [0x46,0x0E,0x91,0x91,0xB4,0xB4,0xD2,0xD2];
     for(let i = 0 ;i < 8;i++){
-        SendColorPacket(i,zoneIds[i],secondaryZoneId[i]);
+        SendColorPacket(i);
     }
 
     if(savedDpi1 != dpi1 && DpiControl){
