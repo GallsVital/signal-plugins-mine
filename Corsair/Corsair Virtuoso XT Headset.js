@@ -10,8 +10,7 @@ export function ControllableParameters(){
         {"property":"shutdownColor", "label":"Shutdown Color","min":"0","max":"360","type":"color","default":"009bde"},
         {"property":"LightingMode", "label":"Lighting Mode", "type":"combobox", "values":["Canvas","Forced"], "default":"Canvas"},
         {"property":"forcedColor", "label":"Forced Color","min":"0","max":"360","type":"color","default":"009bde"},
-        {"property":"micLedControl", "label":"Enable Mic Led","type":"boolean","default":"false"},
-        {"property":"frameRate", "label":"Frame Rate", "type":"number","min":"1", "max":"10","default":"5"},
+
     ];
 }
 
@@ -42,7 +41,8 @@ export function LedPositions()
 
 function EnableSoftwareControl()
 {
- sendPacketString("02 09 01 03 00 02",64);
+    sendPacketString("02 09 01 03 00 02",64); // Enable Software Mode
+    sendPacketString("02 09 0D 00 01",64); //Open lighting endpoint
 }
 function sendPacketString(string, size){
     var packet= [];
@@ -73,49 +73,49 @@ export function Render()
 }
 function sendColors(shutdown = false){
 
-var red = new Array(3).fill(0)
-var green = new Array(3).fill(0)
-var blue = new Array(3).fill(0)
-
-
-    var packet = []
+    var red = new Array(3).fill(0)
+    var green = new Array(3).fill(0)
+    var blue = new Array(3).fill(0)
     
-    packet[0x00]   = 0x02;
-    packet[0x01]   = 0x09;
-    packet[0x02]   = 0x06;
-    packet[0x03]   = 0x00;
-    packet[0x04]   = 0x09;
-    packet[0x05]   = 0x00;
-    packet[0x06]   = 0x00;
-    packet[0x07]   = 0x00;
-
     
-    for(var zone_idx = 0; zone_idx < vLedPositions.length; zone_idx++)
-    {
-        var iX = vLedPositions[zone_idx][0];
-        var iY = vLedPositions[zone_idx][1];
-        var col;
-        if(zone_idx = 2 && !micLedControl) {
-             col = [0,80,0];
-        }else{
-            if(shutdown){
-                col = hexToRgb(shutdownColor)
-            }else if (LightingMode == "Forced") {
-                col = hexToRgb(forcedColor)
-            }else{
-                col = device.color(iX, iY);
-            }
-        }        
-        red[zone_idx] = col[0];
-        green[zone_idx] = col[1];
-        blue[zone_idx] = col[2];
-    }
-    packet = packet.concat(red);
-    packet = packet.concat(green);
-    packet = packet.concat(blue);
-
-    device.write(packet, 64);
-    device.pause(200);
+         var packet = []
+        
+         packet[0x00]   = 0x02;
+         packet[0x01]   = 0x09;
+         packet[0x02]   = 0x06;
+         packet[0x03]   = 0x00;
+         packet[0x04]   = 0x09;
+         packet[0x05]   = 0x00;
+         packet[0x06]   = 0x00;
+         packet[0x07]   = 0x00;
+    
+        
+         for(var zone_idx = 0; zone_idx < vLedPositions.length; zone_idx++)
+         {
+             var iX = vLedPositions[zone_idx][0];
+             var iY = vLedPositions[zone_idx][1];
+             var col;
+        //     if(zone_idx = 2 && !micLedControl) {
+        //          col = [0,80,0];
+        //     }else{
+                 if(shutdown){
+                     col = hexToRgb(shutdownColor)
+                 }else if (LightingMode == "Forced") {
+                     col = hexToRgb(forcedColor)
+                 }else{
+                     col = device.color(iX, iY);
+                 }
+        //     }        
+             red[zone_idx] = col[0];
+             green[zone_idx] = col[1];
+             blue[zone_idx] = col[2];
+        }
+        packet = packet.concat(red);
+        packet = packet.concat(green);
+        packet = packet.concat(blue);
+    
+        device.write(packet, 64);
+        //device.pause(200);
 }
 
 export function Validate(endpoint)
