@@ -157,7 +157,6 @@ function sendColors(shutdown = false){
 
         sendPacketString("06 8A 42 20 05", 37);
 
-        device.pause(80);
     }
 }
 
