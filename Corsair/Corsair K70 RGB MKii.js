@@ -10,7 +10,7 @@ export function ControllableParameters(){
         {"property":"shutdownColor", "label":"Shutdown Color","min":"0","max":"360","type":"color","default":"009bde"},
         {"property":"LightingMode", "label":"Lighting Mode", "type":"combobox", "values":["Canvas","Forced"], "default":"Canvas"},
         {"property":"forcedColor", "label":"Forced Color","min":"0","max":"360","type":"color","default":"009bde"},
-       
+        {"property":"layout", "label":"Keyboard Layout", "type":"combobox", "values":["ANSI","ISO"], "default":"ANSI"},       
     ];
 }
 function hexToRgb(hex) {
@@ -22,46 +22,71 @@ function hexToRgb(hex) {
 
     return colors;
   }
-var CORSAIR_COMMAND_WRITE       = 0x07;
-var CORSAIR_COMMAND_READ        = 0x0E;
-var CORSAIR_COMMAND_STREAM      = 0x7F;
-var CORSAIR_PROPERTY_LIGHTING_CONTROL           = 0x05;
-var CORSAIR_LIGHTING_CONTROL_HARDWARE           = 0x01;
-var CORSAIR_LIGHTING_CONTROL_SOFTWARE           = 0x02;
-var CORSAIR_PROPERTY_SUBMIT_KEYBOARD_COLOR_24   = 0x28;
-var CORSAIR_PROPERTY_SPECIAL_FUNCTION = 0x04;
-var CORSAIR_PROPERTY_SUBMIT_MOUSE_COLOR         = 0x22;
+var COMMAND_WRITE       = 0x07;
+var COMMAND_READ        = 0x0E;
+var COMMAND_STREAM      = 0x7F;
+var COMMAND_SUBMIT   = 0x28;
 
+function sendPacketString(string, size){
+    var packet= [];
+    var data = string.split(' ');
+    
+    for(let i = 0; i < data.length; i++){
+        packet[i] = parseInt(data[i],16)//.toString(16)
+    }
 
+    device.write(packet, size);
+}
+function sendReportString(string, size){
+    var packet= [];
+    var data = string.split(' ');
+    
+    for(let i = 0; i < data.length; i++){
+        packet[i] = parseInt(data[i],16)//.toString(16)
+    }
+
+    device.send_report(packet, size);
+}
+var layoutDict = {
+    0 : "ANSI",
+    1 : "ISO"
+}
 export function Initialize()
 {
-    //var packet = [];
-    //packet[0x00]           = 0x00;
-    //packet[0x01]           = CORSAIR_COMMAND_WRITE;
-    //packet[0x02]           = CORSAIR_PROPERTY_SPECIAL_FUNCTION;
-    //packet[0x03]           = CORSAIR_LIGHTING_CONTROL_SOFTWARE;
-    //packet[0x05]   = 0x03;
-    //device.write(packet, 65);
+       sendReportString("00 0E 01",65)
+      var packet = [0x0E, 0x01];
+      packet = device.get_report(packet,65);
+      var firmware = `firmware version = ${packet[10]}.${packet[9].toString(16)}`
+      device.log(firmware);
+      //var layout = `layout = ${layoutDict[packet[18]]}`
+      //device.log(layout);
+
+    sendPacketString("00 07 04 02",65) //enable software keys
+    sendPacketString("00 07 05 02 00 03",65) //enable software lighting control
 
 
-    var packet = [];
-    packet[0x00]           = 0x00;
-    packet[0x01]           = CORSAIR_COMMAND_WRITE;
-    packet[0x02]           = CORSAIR_PROPERTY_LIGHTING_CONTROL;
-    packet[0x03]           = CORSAIR_LIGHTING_CONTROL_SOFTWARE;
-    packet[0x05]   = 0x03;
-    device.write(packet, 65);
-
-    //InitScanCodes();
+    InitScanCodes(); //set key codes to get the keys working again
 }
-var SkippedKeys = [
-    0x31, 0x41,0x42,0x48,0x49,0x51,0x55,0x6F,0x7E,0x7F,0x80,0x81
+
+var savedLayout;
+var SkippedKeys_ANSI = [
+    49, 63, 65, 66, 81, 83, 85, 111, 126, 127, 128, 129,
 ]
+var SkippedKeys_ISO = [
+    63, 65, 66, 72, 80, 83, 85, 111, 126, 127, 128, 129,
+]
+const LayoutDict = {
+    "ANSI": SkippedKeys_ANSI,
+    "ISO": SkippedKeys_ISO
+}
+
 function InitScanCodes(){
     sendPacketString("00 07 05 08 00 01",65);
+    savedLayout = layout;
+    device.log(`Setting layout to ${savedLayout}`)
     var ScanCodes = []
-    for(var ScanCode = 0; ScanCode < 120+SkippedKeys.length;ScanCode++){
-        if(SkippedKeys.includes(ScanCode)){
+    for(var ScanCode = 0; ScanCode < 120 +  LayoutDict[layout].length; ScanCode++){
+        if(LayoutDict[layout].includes(ScanCode)){
             continue;
         }
         ScanCodes.push(ScanCode);
@@ -82,37 +107,8 @@ function InitScanCodes(){
 
 export function Shutdown()
 {
-    var red = [144];
-    var green = [144];
-    var blue = [144];
-
-
-    for(var iIdx = 0; iIdx < vKeys.length; iIdx++)
-    {
-        var iPxX = vKeyPositions[iIdx][0];
-        var iPxY = vKeyPositions[iIdx][1];
-        var mxPxColor = device.color(iPxX, iPxY);
-        red[vKeys[iIdx]] = 255;
-        green[vKeys[iIdx]] = 0;
-        blue[vKeys[iIdx]] = 0;
-    }
-    
-    
-
-   StreamPacket(1, 60, red.splice(0,60));
-   StreamPacket(2, 60, red.splice(0,60));
-   StreamPacket(3, 24, red.splice(0,24));
-   SubmitKbColors(1, 3, 1);
-
-   StreamPacket(1, 60, green.splice(0,60));
-   StreamPacket(2, 60, green.splice(0,60));
-   StreamPacket(3, 24, green.splice(0,24));
-   SubmitKbColors(2, 3, 1);
-
-   StreamPacket(1, 60, blue.splice(0,60));
-   StreamPacket(2, 60, blue.splice(0,60));
-   StreamPacket(3, 24, blue.splice(0,24));
-   SubmitKbColors(3, 3, 2);
+    sendPacketString("00 07 04 01",65)
+    sendPacketString("00 07 05 01 00 03",65) 
 }
 
 
@@ -122,7 +118,7 @@ function StreamPacket(packet_id, data_sz, data)
 
 
     packet[0x00]   = 0x00;
-    packet[0x01]   = CORSAIR_COMMAND_STREAM;
+    packet[0x01]   = COMMAND_STREAM;
     packet[0x02]   = packet_id;
     packet[0x03]   = data_sz;
     packet[0x04]   = 0;
@@ -139,8 +135,8 @@ function SubmitKbColors(color_channel, packet_count, finish_val)
 
   
     packet[0x00]   = 0x00;
-    packet[0x01]   = CORSAIR_COMMAND_WRITE;
-    packet[0x02]   = CORSAIR_PROPERTY_SUBMIT_KEYBOARD_COLOR_24;
+    packet[0x01]   = COMMAND_WRITE;
+    packet[0x02]   = COMMAND_SUBMIT;
     packet[0x03]   = color_channel;
     packet[0x04]   = packet_count;
     packet[0x05]   = finish_val;
@@ -209,6 +205,9 @@ export function LedPositions()
 
 export function Render()
 {       
+    if(savedLayout != layout){
+        InitScanCodes();
+    }
     sendColors();
 }
 function sendColors(shutdown = false){
