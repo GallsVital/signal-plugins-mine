@@ -302,7 +302,6 @@ export function Render()
     device.pause(1);
 
     SubmitLightingColors();
-    device.pause(1);
 
     InitCustomStrip(); 
     SetFans();
