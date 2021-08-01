@@ -162,9 +162,7 @@ export function Initialize()
     packet[89] = CalculateCrc(packet);
     device.send_report(packet, 91);
 
-
-
-
+    //Enable Idle Mode
     var packet = [];
     packet[0] = 0x00;
     packet[1] = 0x00;
@@ -179,9 +177,28 @@ export function Initialize()
     packet[10] = 0x00;
     packet[11] = 0x0FF;
 
-
     packet[89] = CalculateCrc(packet);
     device.send_report(packet, 91);
+
+    //Enable all charge modes
+    for(let i = 0x20; i <= 0x22; i++){
+        var packet = [];
+        packet[0] = 0x00;
+        packet[1] = 0x00;
+        packet[2] = 0x1F;
+        packet[3] = 0x00;
+        packet[4] = 0x00; 
+        packet[5] = 0x00;
+        packet[6] = 0x03;
+        packet[7] = 0x0F;
+        packet[8] = 0x04;
+        packet[9] = 0x01;
+        packet[10] = i;
+        packet[11] = 0x0FF;
+
+        packet[89] = CalculateCrc(packet);
+        device.send_report(packet, 91);
+    }
 
 }
 
@@ -222,6 +239,47 @@ function SendPacket(shutdown = false)
 
     device.send_report(packet, 91);
     device.pause(1); // We need a pause here (between packets), otherwise the ornata can't keep up.
+
+    //02 1F 00 00 00 09 0F 02 01 20 01 00 01 01 FF FF FF 
+    for(let mode = 0x20; mode < 0x23;mode++){
+    var packet = [];     
+    packet[0] = 0x00;  
+    packet[1] = 0x00;
+    packet[2] = 0x1F;
+    packet[3] = 0x00;
+    packet[4] = 0x00;
+    packet[5] = 0x00;
+    packet[6] = 0x09;
+    packet[7] = 0x0F;
+    packet[8] = 0x02;
+    packet[9] = 0x01;
+    packet[10] = mode;
+    packet[11] = 0x01;
+    packet[12] = 0x00;
+    packet[13] = 0x02;
+    packet[14] = 0x01;
+        //grab first led for overrides/settings
+    var iPxX = vLedPositions[0][0];
+    var iPxY = vLedPositions[0][1];
+    var col;
+    if(shutdown){
+        col = hexToRgb(shutdownColor)
+    }else if (LightingMode == "Forced") {
+        col = hexToRgb(forcedColor)
+    }else{
+        //but grab middle of device
+        col = device.color(3, 3);
+    }   
+
+    packet[15] = col[0];
+    packet[16] = col[1];
+    packet[17] = col[2];
+
+    packet[89] = CalculateCrc(packet);
+
+    device.send_report(packet, 91);
+    }
+
 
 } 
 
