@@ -56,10 +56,10 @@ function setDpi(dpi){
     packet[5] = Math.floor(dpi/256);
     packet[6] = dpi%256;
     device.write(packet, 7);
-    device.read(packet, 7);
+    //device.read(packet, 7);
     device.pause(1);  
 
-
+    
 
 
 }
@@ -73,8 +73,9 @@ function Apply()
     packet[0x03] = 0x7A;
 
     device.write(packet, 20);  
-    device.read(packet,20);
+    //device.read(packet,20);
     device.pause(1);  
+
 
 }
 function sendColor(shutdown = false){
@@ -110,7 +111,7 @@ function sendColor(shutdown = false){
     packet[0x10] = 0xFF;
 
     device.write(packet, 20);
-    device.read(packet,20);
+    //device.read(packet,20);
     device.pause(1);  
 
     
@@ -132,6 +133,8 @@ export function Render()
     if(savedDpi1 != dpi1 && DpiControl){
         setDpi(dpi1)
       }
+
+
 
 }
 
