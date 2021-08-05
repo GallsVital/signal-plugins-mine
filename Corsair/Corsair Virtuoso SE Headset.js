@@ -1,15 +1,3 @@
-
-var CORSAIR_COMMAND_WRITE       = 0x07;
-var CORSAIR_COMMAND_READ        = 0x0E;
-var CORSAIR_COMMAND_STREAM      = 0x7F;
-
-var CORSAIR_LIGHTING_CONTROL_HARDWARE           = 0x01;
-var CORSAIR_LIGHTING_CONTROL_SOFTWARE           = 0x02;
-
-var CORSAIR_PROPERTY_SPECIAL_FUNCTION = 0x04;
-var CORSAIR_PROPERTY_SUBMIT_MOUSE_COLOR         = 0x22;
-
-
 export function Name() { return "Corsair Virtuoso SE Headset"; }
 export function VendorId() { return 0x1b1c; }
 export function ProductId() { return 0x0A3E; }

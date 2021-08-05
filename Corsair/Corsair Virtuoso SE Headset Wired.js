@@ -1,6 +1,6 @@
-export function Name() { return "Corsair Virtuoso Headset"; }
+export function Name() { return "Corsair Virtuoso SE Headset - Wired"; }
 export function VendorId() { return 0x1b1c; }
-export function ProductId() { return 0x0A42; }
+export function ProductId() { return 0x0A3D; }
 export function Publisher() { return "WhirlwindFX"; }
 export function Size() { return [3, 3]; }
 export function DefaultPosition(){return [240,120]}
@@ -41,8 +41,9 @@ export function LedPositions()
 
 function EnableSoftwareControl()
 {
-    sendPacketString("02 09 01 03 00 02",64); // Enable Software Mode
-    sendPacketString("02 09 0D 00 01",64); //Open lighting endpoint
+    sendPacketString("02 08 01 03 00 02",64); // Enable Software Mode
+    sendPacketString("02 08 0D 00 01",64); //Open lighting endpoint
+
 }
 function sendPacketString(string, size){
     var packet= [];
@@ -57,13 +58,14 @@ function sendPacketString(string, size){
 
 function ReturnToHardwareControl()
 {
-    sendPacketString("02 09 01 03 00 01",64);
+    sendPacketString("02 08 01 03 00 01",64);
 }
 
 
 export function Initialize()
 {
     EnableSoftwareControl();
+
 }
 
 
@@ -73,49 +75,49 @@ export function Render()
 }
 function sendColors(shutdown = false){
 
-    var red = new Array(3).fill(0)
-    var green = new Array(3).fill(0)
-    var blue = new Array(3).fill(0)
+var red = new Array(3).fill(0)
+var green = new Array(3).fill(0)
+var blue = new Array(3).fill(0)
+
+
+     var packet = []
     
+     packet[0x00]   = 0x02;
+     packet[0x01]   = 0x08;
+     packet[0x02]   = 0x06;
+     packet[0x03]   = 0x00;
+     packet[0x04]   = 0x09;
+     packet[0x05]   = 0x00;
+     packet[0x06]   = 0x00;
+     packet[0x07]   = 0x00;
+
     
-         var packet = []
-        
-         packet[0x00]   = 0x02;
-         packet[0x01]   = 0x09;
-         packet[0x02]   = 0x06;
-         packet[0x03]   = 0x00;
-         packet[0x04]   = 0x09;
-         packet[0x05]   = 0x00;
-         packet[0x06]   = 0x00;
-         packet[0x07]   = 0x00;
-    
-        
-         for(var zone_idx = 0; zone_idx < vLedPositions.length; zone_idx++)
-         {
-             var iX = vLedPositions[zone_idx][0];
-             var iY = vLedPositions[zone_idx][1];
-             var col;
-        //     if(zone_idx = 2 && !micLedControl) {
-        //          col = [0,80,0];
-        //     }else{
-                 if(shutdown){
-                     col = hexToRgb(shutdownColor)
-                 }else if (LightingMode == "Forced") {
-                     col = hexToRgb(forcedColor)
-                 }else{
-                     col = device.color(iX, iY);
-                 }
-        //     }        
-             red[zone_idx] = col[0];
-             green[zone_idx] = col[1];
-             blue[zone_idx] = col[2];
-        }
-        packet = packet.concat(red);
-        packet = packet.concat(green);
-        packet = packet.concat(blue);
-    
-        device.write(packet, 64);
-        //device.pause(200);
+     for(var zone_idx = 0; zone_idx < vLedPositions.length; zone_idx++)
+     {
+         var iX = vLedPositions[zone_idx][0];
+         var iY = vLedPositions[zone_idx][1];
+         var col;
+    //     if(zone_idx = 2 && !micLedControl) {
+    //          col = [0,80,0];
+    //     }else{
+             if(shutdown){
+                 col = hexToRgb(shutdownColor)
+             }else if (LightingMode == "Forced") {
+                 col = hexToRgb(forcedColor)
+             }else{
+                 col = device.color(iX, iY);
+             }
+    //     }        
+         red[zone_idx] = col[0];
+         green[zone_idx] = col[1];
+         blue[zone_idx] = col[2];
+    }
+    packet = packet.concat(red);
+    packet = packet.concat(green);
+    packet = packet.concat(blue);
+
+    device.write(packet, 64);
+    //device.pause(200);
 }
 
 export function Validate(endpoint)
@@ -125,28 +127,6 @@ export function Validate(endpoint)
 
 export function Shutdown()
 {
-    var packet = []
-    packet[0x00]   = 0x00;
-    packet[0x01]   = CORSAIR_COMMAND_WRITE;
-    packet[0x02]   = CORSAIR_PROPERTY_SUBMIT_MOUSE_COLOR;
-    packet[0x03]   = 0x03;
-    packet[0x04]   = 0x01;
-    var zoneId = [2,6,1]
-
-    // Single zone - apply to mouse.
-    for(var zone_idx = 0; zone_idx < vLedPositions.length; zone_idx++)
-    {
-        var iX = vLedPositions[zone_idx][0];
-        var iY = vLedPositions[zone_idx][1];
-        var col = device.color(iX,iY);
-        packet[(zone_idx * 4) + 5] = zoneId[zone_idx];
-        packet[(zone_idx * 4) + 6] = 255;
-        packet[(zone_idx * 4) + 7] = 0;
-        packet[(zone_idx * 4) + 8] = 0;
-    }
-
-    device.write(packet, 65);
-
     ReturnToHardwareControl();
 }
 
