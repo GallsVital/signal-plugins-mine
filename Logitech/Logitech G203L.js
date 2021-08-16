@@ -1,6 +1,6 @@
 export function Name() { return "Logitech G203 Lightsync"; }
 export function VendorId() { return 0x046d; }
-export function ProductId() { return 0xc092; }
+export function ProductId() { return 0xc092}//0xc092; }
 export function Publisher() { return "WhirlwindFX"; }
 export function Size() { return [3, 3]; }
 export function DefaultPosition(){return [240,120]}
@@ -74,7 +74,7 @@ function Apply()
 
     device.write(packet, 20);  
     //device.read(packet,20);
-    device.pause(1);  
+    device.pause(200);  
 
 
 }
