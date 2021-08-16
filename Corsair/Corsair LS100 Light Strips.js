@@ -138,7 +138,8 @@ function SubmitLightingColors()
     packet[0x02]   = 0xFF;
 
     device.write(packet, 65);
-    device.read(packet,65);
+    //This read takes 10ms to complete. 30% frame time increase
+    //device.read(packet,65);
 }
 
 
@@ -235,24 +236,26 @@ function SetFans(){
                   }
               
       }
-    InitChannel(channel);
-    channelStart(channel);
+    
+    if(TotalLedCount > 0){
+        InitChannel(channel);
+        channelStart(channel);
 
-    var ledsSent = 0;
-    var TotalLedCount = TotalLedCount >= 138 ? 138 : TotalLedCount;
+        var ledsSent = 0;
+        var TotalLedCount = TotalLedCount >= 138 ? 138 : TotalLedCount;
 
-    while(TotalLedCount > 0){
-        var ledsToSend = TotalLedCount >= 50 ? 50 : TotalLedCount;
+        while(TotalLedCount > 0){
+            var ledsToSend = TotalLedCount >= 50 ? 50 : TotalLedCount;
 
-        StreamLightingPacketChanneled(ledsSent,ledsToSend,0,red.splice(0,ledsToSend),channel);
+            StreamLightingPacketChanneled(ledsSent,ledsToSend,0,red.splice(0,ledsToSend),channel);
 
-        StreamLightingPacketChanneled(ledsSent,ledsToSend,1,green.splice(0,ledsToSend),channel);
+            StreamLightingPacketChanneled(ledsSent,ledsToSend,1,green.splice(0,ledsToSend),channel);
 
-        StreamLightingPacketChanneled(ledsSent,ledsToSend,2,blue.splice(0,ledsToSend),channel);
-        ledsSent += ledsToSend;
-        TotalLedCount -= ledsToSend;
+            StreamLightingPacketChanneled(ledsSent,ledsToSend,2,blue.splice(0,ledsToSend),channel);
+            ledsSent += ledsToSend;
+            TotalLedCount -= ledsToSend;
+        }
     }
-  
   }
 
 
@@ -261,15 +264,11 @@ export function Render()
      setEndpoint();
 
      SendChannel(0);
-     device.pause(1);
-
      SendChannel(1);
-     device.pause(1);
 
      SubmitLightingColors();
-     device.pause(1)
     
-     InitCustomStrip()
+     InitCustomStrip();
      SetFans();
 }
 
