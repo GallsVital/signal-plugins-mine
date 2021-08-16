@@ -105,7 +105,7 @@ var vKeys = [
      53,   0, 18, 3, 5, 6, 7, 9, 10, 11, 47, 48,         36,                       
      102,  25, 23, 2, 21, 1, 13, 12, 50, 51, 52,          106,              78,    
      101,  104, 103,           40,              107, 118, 97, 105,      76,77,75,  
-  
+     96,46 //ISO
 ]
 
 var vKeyNames = [
@@ -115,7 +115,8 @@ var vKeyNames = [
     "Tab", "Q", "W", "E", "R", "T", "Y", "U", "I", "O", "P", "[", "]", "\\",                               "Del", "End", "Page Down",         
     "CapsLock", "A", "S", "D", "F", "G", "H", "J", "K", "L", ";", "'", "Enter",                                                              
     "Left Shift", "Z", "X", "C", "V", "B", "N", "M", ",", ".", "/", "Right Shift",                                  "Up Arrow",               
-    "Left Ctrl", "Left Win", "Left Alt", "Space", "Right Alt", "Fn", "Menu", "Right Ctrl",  "Left Arrow", "Down Arrow", "Right Arrow" 
+    "Left Ctrl", "Left Win", "Left Alt", "Space", "Right Alt", "Fn", "Menu", "Right Ctrl",  "Left Arrow", "Down Arrow", "Right Arrow",
+    "ISO #", "ISO <" 
 ];
 
  var vKeyPositions = [
@@ -126,6 +127,8 @@ var vKeyNames = [
     [0,4], [1,4], [2,4], [3,4], [4,4], [5,4], [6,4], [7,4], [8,4], [9,4],  [10,4], [11,4],         [13,4],                          
     [0,5],        [2,5], [3,5], [4,5], [5,5], [6,5], [7,5], [8,5], [9,5],  [10,5], [11,5],         [13,5],           [15,5],        
     [0,6], [1,6], [2,6],                      [6,6],                       [10,6], [11,6], [12,6], [13,6],   [14,6], [15,6], [16,6],
+    //ISO
+    [2,5],[13,4]
 
     
  ];

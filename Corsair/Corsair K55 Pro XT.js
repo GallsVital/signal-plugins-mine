@@ -69,7 +69,7 @@ export function Shutdown()
       135, 106,       29,  27,   6,  25,        5,       17,  16,  54,  55,  56, 110,            82,       89,  90,  91,  88,
       136, 105, 108, 107,                      44,                     111, 122, 101, 109,  80,  81,  79,  98,    99,
 
-   
+      96,46 //ISO
  ];
 
 
@@ -84,6 +84,8 @@ var vKeyPositions = [
     [0,4],  [1,4], [2,4], [3,4], [4,4], [5,4], [6,4], [7,4], [8,4], [9,4], [10,4], [11,4], [12,4],         [14,4],                             [18,4], [19,4],[20,4], 
     [0,5],  [1,5],     [3,5], [4,5], [5,5], [6,5], [7,5], [8,5], [9,5], [10,5], [11,5], [12,5],            [14,5],           [16,5],           [18,5], [19,5],[20,5], [21,5],
     [0,6],  [1,6], [2,6], [3,6],                      [7,6],                       [11,6], [12,6], [13,6], [14,6],   [15,6], [16,6], [17,6],   [18,6],        [20,6] 
+    //ISO
+    [2,5],[13,4]
 ];
 
 var vKeyNames = [
@@ -93,7 +95,8 @@ var vKeyNames = [
     "G3","Tab", "Q", "W", "E", "R", "T", "Y", "U", "I", "O", "P", "[", "]", "\\",                               "Del", "End", "Page Down",         "Num 7", "Num 8", "Num 9", "Num +",    //21
     "G4","CapsLock", "A", "S", "D", "F", "G", "H", "J", "K", "L", ";", "'", "Enter",                                                              "Num 4", "Num 5", "Num 6",             //16
     "G5","Left Shift", "Z", "X", "C", "V", "B", "N", "M", ",", ".", "/", "Right Shift",                                  "Up Arrow",               "Num 1", "Num 2", "Num 3", "Num Enter",//17
-    "G6","Left Ctrl", "Left Win", "Left Alt", "Space", "Right Alt", "Fn", "Menu", "Right Ctrl",  "Left Arrow", "Down Arrow", "Right Arrow", "Num 0", "Num ."                       //13
+    "G6","Left Ctrl", "Left Win", "Left Alt", "Space", "Right Alt", "Fn", "Menu", "Right Ctrl",  "Left Arrow", "Down Arrow", "Right Arrow", "Num 0", "Num .",                       //13
+    "ISO #", "ISO <" 
 ];
 
 export function LedNames()
