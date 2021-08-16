@@ -10,7 +10,8 @@ export function ControllableParameters(){
         {"property":"shutdownColor", "label":"Shutdown Color","min":"0","max":"360","type":"color","default":"009bde"},
         {"property":"LightingMode", "label":"Lighting Mode", "type":"combobox", "values":["Canvas","Forced"], "default":"Canvas"},
         {"property":"forcedColor", "label":"Forced Color","min":"0","max":"360","type":"color","default":"009bde"},
-        
+        {"property":"layout", "label":"Keyboard Layout", "type":"combobox", "values":["ANSI","ISO"], "default":"ANSI"},       
+
     ];
 }
 function hexToRgb(hex) {
@@ -47,13 +48,10 @@ function hexToRgb(hex) {
   
       device.send_report(packet, size);
   }
-  var layoutDict = {
-      0 : "ANSI",
-      1 : "ISO"
-  }
+
   export function Initialize()
   {
-         sendReportString("00 0E 01",65)
+        sendReportString("00 0E 01",65)
         var packet = [0x0E, 0x01];
         packet = device.get_report(packet,65);
         var firmware = `firmware version = ${packet[10]}.${packet[9].toString(16)}`
