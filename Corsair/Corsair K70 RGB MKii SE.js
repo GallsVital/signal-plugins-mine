@@ -200,6 +200,9 @@ export function LedPositions()
 
 export function Render()
 {       
+    if(savedLayout != layout){
+        InitScanCodes();
+    }
     sendColors();
 }
 function sendColors(shutdown = false){

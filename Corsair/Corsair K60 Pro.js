@@ -28,7 +28,7 @@ function sendPacketString(string, size){
     var data = string.split(' ');
     
     for(let i = 0; i < data.length; i++){
-        packet[parseInt(i,16)] =parseInt(data[i],16)//.toString(16)
+        packet[parseInt(i,16)] = parseInt(data[i],16)//.toString(16)
     }
 
     device.write(packet, size);
@@ -126,6 +126,8 @@ function sendInitalPacket(data){
     packet = packet.concat(data);
 
     device.write(packet, 65);
+    device.read(packet, 65);
+
 }
 function StreamDoublePacket(data1, data2,space1,space2){
     var packet = [];
@@ -141,6 +143,8 @@ function StreamDoublePacket(data1, data2,space1,space2){
     packet = packet.concat(data2);
 
     device.write(packet, 65);
+    device.read(packet, 65);
+
 }
 function StreamPacket(space,data){
     var packet = [];
@@ -153,6 +157,7 @@ function StreamPacket(space,data){
     packet = packet.concat(data);
 
     device.write(packet, 65);
+    device.read(packet, 65);
 }
 
 export function Render()

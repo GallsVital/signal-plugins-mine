@@ -47,10 +47,7 @@ function sendReportString(string, size){
 
     device.send_report(packet, size);
 }
-var layoutDict = {
-    0 : "ANSI",
-    1 : "ISO"
-}
+
 export function Initialize()
 {
        sendReportString("00 0E 01",65)
