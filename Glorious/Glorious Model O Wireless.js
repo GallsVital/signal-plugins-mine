@@ -176,8 +176,8 @@ function sendColors(shutdown = false){
     }
 
     device.send_report(packet,65);
-    sendReportString("00 00 00 02 02 02 02 01 FF",65)
-    sendReportString("00 00 00 02 02 02 02 00 FF",65)
+    //sendReportString("00 00 00 02 02 02 02 01 FF",65)
+    //sendReportString("00 00 00 02 02 02 02 00 FF",65)
 
 
 }
