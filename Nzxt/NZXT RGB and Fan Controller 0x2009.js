@@ -275,7 +275,7 @@ function SetFans(){
               if(deviceValues[deviceNumber] != propertyArray[deviceNumber]){
                 deviceValues[deviceNumber] = propertyArray[deviceNumber];
 
-                 if(deviceValues[deviceNumber] == "None" && DeviceDict[propertyArray[deviceNumber]] != null){
+                 if(deviceValues[deviceNumber] == "None"){
                     device.removeSubdevice(deviceArray[deviceNumber]);
                  }else{
                      //"Ch1 | Port 1"
@@ -325,7 +325,7 @@ function SendChannel(channel,shutdown = false)
 
     for (var deviceNumber = 0+6*channel; deviceNumber < 6+6*channel; deviceNumber++ ) {
 
-             if(deviceValues[deviceNumber] != "None"){
+             if(deviceValues[deviceNumber] != "None" && DeviceDict[propertyArray[deviceNumber]] != null){
 
                 for(var iIdx = 0; iIdx < DeviceDict[propertyArray[deviceNumber]].mapping.length; iIdx++){
                     var iPxX = DeviceDict[propertyArray[deviceNumber]].positioning[iIdx][0];
