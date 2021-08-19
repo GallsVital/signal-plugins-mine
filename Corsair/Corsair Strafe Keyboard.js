@@ -218,7 +218,7 @@ function sendColors(shutdown = false){
 
 export function Validate(endpoint)
 {
-    return endpoint.interface === 1;
+    return (endpoint.interface === 1 && endpoint.usage_page == 0xffc2) || (endpoint.interface === 2 && endpoint.usage_page == 0xffc2);
 }
 
 
