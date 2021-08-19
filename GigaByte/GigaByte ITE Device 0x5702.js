@@ -1,4 +1,4 @@
-const deviceList = ["None", "NZXT Strip 10 Led", "NZXT Strip 8 Led", "NZXT Strip 6 Led","Corsair Internal Strip (10)", "Corsair Strip 250mm (15)", "Corsair Strip 350mm (21)", "Corsair Strip 450mm (27)", "Corsair Strip 140cm (87)", "Corsair LL Fan (16)", "Corsair QL Fan (34)", "Corsair ML Fan (4)", "Corsair ML Fan (8)", "Corsair SpPro Fan (8)",  "Corsair HD Fan (12)", "NZXT AER 2 Fan (8)", "MasterFan 120 AB (8)", "MasterFan Halo Fan (24)",  "Lian Li GPU Strimer Plus (27)",  "MasterFan ML240 Pump (10)", "Custom"];
+const deviceList = ["None", "NZXT Strip 10 Led", "NZXT Strip 8 Led", "NZXT Strip 6 Led","Corsair Internal Strip (10)", "Corsair Strip 250mm (15)", "Corsair Strip 350mm (21)", "Corsair Strip 450mm (27)", "Corsair Strip 140cm (87)", "Corsair LL Fan (16)", "Corsair QL Fan (34)", "Corsair ML Fan (4)", "Corsair ML Fan (8)", "Corsair SpPro Fan (8)",  "Corsair HD Fan (12)", "NZXT AER 2 Fan (8)", "MasterFan 120 AB (8)", "MasterFan Halo Fan (24)",  "Lian Li GPU Strimer Plus (27)",  "MasterFan ML240 Pump (10)", "Custom", "Jupiter AJ120 (6)","ThermalTake TT1225 (9)","CoolerOne Stealth Cpu Fan (8)","CoolerOne Spire Cpu Fan (6)","CoolerOne 120mm HeatPipe (16)","GAMDIAS M2 1201R Fan (16)","GAMDIAS E2 120R AIO (9)"];
 export function Name() { return "GIGABYTE Motherboard LED Controller"; }
 export function VendorId() { return  0x048D; }  
 export function ProductId() { return 0x5702;}
@@ -225,7 +225,6 @@ function Sendchannel(channel,shutdown = false)
                  }
              }
 
-
         //we want to try and use direct mode
          var ledsSent = 0;
           while(TotalLedCount > 0){
@@ -275,6 +274,9 @@ function SetFans(){
                     device.setSubdeviceName(deviceArray[deviceNumber],`${DeviceDict[propertyArray[deviceNumber]].displayName} - ${deviceArray[deviceNumber]}`);
                     device.setSubdeviceImage(deviceArray[deviceNumber], DeviceDict[propertyArray[deviceNumber]].image);
                     device.setSubdeviceSize(deviceArray[deviceNumber],DeviceDict[propertyArray[deviceNumber]].width,DeviceDict[propertyArray[deviceNumber]].height);
+                    device.setSubdeviceLeds(deviceArray[deviceNumber],
+                        DeviceDict[propertyArray[deviceNumber]].LedNames,
+                        DeviceDict[propertyArray[deviceNumber]].positioning)
                  }
             }
         }
@@ -814,6 +816,182 @@ const Custom = {
     image: Placeholder()
 }
 
+
+
+const Jupiter_AJ120 = {
+    mapping : [
+           4,3,
+         5,   2,
+          0, 1
+    ],
+    positioning : [
+        [1,0],[3,0],
+    [0,2],      [4,2],
+        [1,4],[3,4],
+    ],
+    LedNames : [
+        "Led 1","Led 2","Led 3","Led 4","Led 5","Led 6"
+    ],
+    displayName: "Jupiter AJ120 Fan - 6 LED",
+    ledCount : 6,
+    width: 5,
+    height: 5,
+    image: Placeholder()
+    }
+
+const ThermalTake_TT1225 = {
+    mapping : [
+          4,5,
+       3,      6,
+       2,      7,
+        1, 0, 8,
+    ],
+    positioning : [
+         [2,0],[3,0],
+    [1,1],          [4,1],
+    [0,2],          [4,2],
+    [1,3], [2,4],[3,3],
+    ],
+    LedNames : [
+        "Led 1","Led 2","Led 3","Led 4","Led 5","Led 6","Led 7","Led 8","Led 9"
+    ],
+    displayName: "ThermalTake TT1225 Fan - 9 LED",
+    ledCount : 9,
+    width: 5,
+    height: 5,
+    image: Placeholder()
+    }
+
+const CoolerOne_STEALTH_CPU_FAN = {
+    mapping : [
+            0,  7,
+        1,          6,
+        2,          5,
+            3,  4,
+        ],
+        positioning : [
+            [1,0], [2,0],
+        [0,1],       [3,1],
+        [0,2],       [3,2],
+            [1,3],  [2,3]
+    ],
+    LedNames : [
+        "Led 1","Led 2","Led 3","Led 4","Led 5","Led 6","Led 7","Led 8"
+    ],
+    displayName: "CoolerOne Stealth Cpu Fan - 8 LED",
+    ledCount : 8,
+    width: 4,
+    height: 4,
+    image:  Placeholder()
+}
+const CoolerOne_SPIRE_CPU_FAN = {
+    mapping : [
+           4,3,
+         5,   2,
+          0, 1
+    ],
+    positioning : [
+        [1,0],[3,0],
+    [0,2],      [4,2],
+        [1,4],[3,4],
+    ],
+    LedNames : [
+        "Led 1","Led 2","Led 3","Led 4","Led 5","Led 6"
+    ],
+    displayName: "CoolerOne Spire Cpu Fan - 6 LED",
+    ledCount : 6,
+    width: 5,
+    height: 5,
+    image: Placeholder()
+    }
+
+const CoolerOne_120MM_HEATPIPE = {
+    mapping : [
+      12, 11, 10,9,
+    13,           8,
+    14,           7,
+    15,           6,
+    0,            5,
+        1,2,3,4,
+
+    ],
+    positioning : [
+           [2,1],[3,0],[4,0],[5,1],
+        [1,2],                  [6,2],
+        [0,3],                  [7,3],
+        [0,4],                  [7,4],
+        [1,5],                  [6,5],
+          [2,6],[3,7],[4,7],[5,6]
+    ],
+    LedNames : [
+        "Led 13","Led 12","Led 11","Led 10",
+        "Led 14","Led 9",
+        "Led 15","Led 8",
+        "Led 16","Led 7",
+        "Led 1","Led 6",
+        "Led 2","Led 3","Led 4","Led 5"
+    ],
+    displayName: "CoolerOne 120MM Heatpipe Fan - 16 LED",
+    ledCount : 16,
+    width: 8,
+    height:8,
+    image: Placeholder()
+    }
+
+const GAMDIAS_M2_1201R_Fan ={
+    mapping : [
+    11, 12, 13, 14,
+    10,  4, 5,  15,
+    9,  3,   0,  //0
+    8,  2, 1,    //1
+    7,  6, //5,4,3,2
+    ],
+    positioning : [
+        [1,0],[2,0],[3,0],[4,0],
+    [0,1],     [3,1],[4,1],  [5,1],
+    [0,2], [2,2],       [5,2],
+    [0,3],      [3,3],[4,3],
+    [0,4], [1,4], 
+    ],
+    LedNames : [
+        "Ring Led 1", "Ring Led 2", "Ring Led 3", "Ring Led 4",
+        "Ring Led 5",      "Center Led 1", "Ring Led 6",
+        "Center Led 2","Center Led 3", "Ring Led 7",
+        "Ring Led 8",    "Center Led 4", "Ring Led 9",
+        "Ring Led 10", "Ring Led 11", "Ring Led 12"
+    ],
+    displayName: "GAMDIAS M2 1201R Fan - 16 LED",
+    ledCount : 17,
+    width: 7,
+    height: 7,
+    image: Placeholder()
+}
+const GAMDIAS_E2_120R_AIO ={
+    mapping : [
+               7,8, 0,
+              6,     1,
+              5,    2, 
+                4,3
+    ],
+    positioning : [
+        
+    [0,0], [1,0],[2,0],
+    [0,1],           [3,1],
+    [0,2],           [3,2],
+          [1,3], [2,3]
+    ],
+    LedNames : [
+        "Ring Led 8", "Ring Led 9", "Ring Led 1",
+        "Ring Led 7",                "Ring Led 2",
+        "Ring Led 6",                "Ring Led 3",
+        "Ring Led 5",            "Ring Led 4",
+    ],
+    displayName: "GAMDIAS E2 CHIONE Pump - 9 LED",
+    ledCount : 9,
+    width: 4,
+    height: 4,
+    image: Placeholder()
+}
 var DeviceDict = {
     "None": null,
     "NZXT Strip 10 Led" : NZXT_Strip_10Led,
@@ -836,6 +1014,13 @@ var DeviceDict = {
 	"Lian Li GPU Strimer Plus (27)" : LianLi_GPUStrimerPlus,
     "MasterFan ML240 Pump (10)":MasterFan_ML240_RGB_Pump,
     "Custom" : Custom,
+    "Jupiter AJ120 (6)" : Jupiter_AJ120,
+    "ThermalTake TT1225 (9)" : ThermalTake_TT1225,
+    "CoolerOne Stealth Cpu Fan (8)": CoolerOne_STEALTH_CPU_FAN,
+    "CoolerOne Spire Cpu Fan (6)" : CoolerOne_SPIRE_CPU_FAN,
+    "CoolerOne 120mm HeatPipe (16)" : CoolerOne_120MM_HEATPIPE,
+    "GAMDIAS M2 1201R Fan (16)" : GAMDIAS_M2_1201R_Fan,
+    "GAMDIAS E2 120R AIO (9)" : GAMDIAS_E2_120R_AIO,
 } 
 
 
