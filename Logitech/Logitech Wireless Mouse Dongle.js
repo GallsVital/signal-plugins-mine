@@ -35,11 +35,31 @@ export function LedPositions()
 
 export function Initialize()
 {
-    device.set_endpoint(2, 0x0001, 0xff00); // System IF    
-if(savedDpi1 != dpi1 && DpiControl) {
-        setDpi(dpi1);
-    
+    device.set_endpoint(2, 0x0001, 0xff00); // System IF 
+    sendPacketString("10 01 08 7E 01 04 00",7)
+
+    device.set_endpoint(2, 0x0002, 0xff00); // Lighting IF    
+    sendPacketString("11 01 08 5E 01 00 02 00 02 00 00 00 00 00 00 00 00 00 00 00",20)
+
+    device.set_endpoint(2, 0x0001, 0xff00); // System IF 
+    sendPacketString("10 01 08 6E 01 00 00",7)
+
+
+    if(savedDpi1 != dpi1 && DpiControl) {
+            setDpi(dpi1);
+    }
 }
+
+function sendPacketString(string, size){
+
+    var packet= [];
+    var data = string.split(' ');
+    
+    for(let i = 0; i < data.length; i++){
+        packet[i] = parseInt(data[i],16)//.toString(16)
+    }
+
+    device.write(packet, size);
 }
 
 const dpidict2= {
@@ -69,9 +89,7 @@ function setDpi(dpi){
     packet[5] = Math.floor(dpi/256);
     packet[6] = dpi%256;
     device.write(packet, 7);
-
-
-
+    device.read(packet, 7)
 }
 function Apply()
 {
@@ -84,6 +102,8 @@ function Apply()
     packet[3] = 0x2F;
     packet[4] = 0x01;
     device.write(packet, 7);
+    device.read(packet,7)
+    device.read(packet,7)
 }
 
 const mouseZonedict = {
@@ -132,6 +152,9 @@ if(MouseType == "G903L" || MouseType == "G703L") {
 }
 
     device.write(packet, 20);
+    device.read(packet, 0)
+    device.read(packet, 0)
+
     device.pause(1);
 
 }
