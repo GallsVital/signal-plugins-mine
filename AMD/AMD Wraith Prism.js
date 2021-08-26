@@ -2,7 +2,7 @@ export function Name() { return "AMD Wraith Prism"; }
 export function VendorId() { return 0x2516; }
 export function ProductId() { return 0x0051; }
 export function Publisher() { return "WhirlwindFX"; }
-export function Size() { return [3, 3]; }
+export function Size() { return [5, 5]; }
 export function DefaultPosition(){return [50,100]}
 export function DefaultScale(){return 8.0}
 export function ControllableParameters(){
