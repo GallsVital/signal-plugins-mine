@@ -103,7 +103,6 @@ function Apply()
     packet[4] = 0x01;
     device.write(packet, 7);
     device.read(packet,7)
-    device.read(packet,7)
 }
 
 const mouseZonedict = {
@@ -152,8 +151,7 @@ if(MouseType == "G903L" || MouseType == "G703L") {
 }
 
     device.write(packet, 20);
-    device.read(packet, 0)
-    device.read(packet, 0)
+    device.read(packet, 20)
 
     device.pause(1);
 
