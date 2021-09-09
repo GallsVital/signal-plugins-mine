@@ -2,7 +2,7 @@ export function Name() { return "Logitech G815 Lightsync"; }
 export function VendorId() { return 0x046d; }
 export function ProductId() { return 0xc33f; }
 export function Publisher() { return "WhirlwindFX"; }
-export function Size() { return [21, 6]; }
+export function Size() { return [22, 7]; }
 export function DefaultPosition() {return [75,70]; }
 export function DefaultScale(){return 8.0}
 export function ControllableParameters(){
@@ -45,7 +45,7 @@ var vLedPositions = [
     [1,5], [2,5], [2,5], [3,5], [4,5], [5,5], [6,5], [7,5], [8,5], [9,5], [10,5],  [11,5],         [14,5],           [16,5],           [18,5], [19,5], [20,5], [21,5], // 17
     [1,6], [2,6], [3,6],                      [7,6],                       [11,6], [12,6], [13,6], [14,6],   [15,6], [16,6], [17,6],   [18,6], [19,6], // 13
     
-    [0,0],[0,0],[0,0],[0,0],[0,0], [0,0],[0,0],[0,0],[0,0],[0,0]
+    [0,1],[0,2],[0,3],[0,4],[0,5], [0,0],[0,0],[0,0],[0,0],[0,0]
 ];
     
 function hexToRgb(hex) {
@@ -211,7 +211,7 @@ export function Render()
     SendPacket(56, 14);
     SendPacket(70, 14);
     SendPacket(84, 14);
-    SendPacket(98, 6);    
+    SendPacket(98, 8);    
     Apply();
 }
 
@@ -225,7 +225,7 @@ export function Shutdown()
     SendPacket(56, 14,true);
     SendPacket(70, 14,true);
     SendPacket(84, 14,true);
-    SendPacket(98, 6,true);    
+    SendPacket(98, 8,true);    
     Apply();
 }
 
