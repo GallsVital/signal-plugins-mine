@@ -8,10 +8,10 @@ export function DefaultPosition(){return [0,0]}
 export function DefaultScale(){return 1.0}
 export function ControllableParameters(){
     return [
-    {"property":"shutdownColor", "label":"Shutdown Color","min":"0","max":"360","type":"color","default":"009bde"},
+    {"property":"shutdownColor", "label":"Shutdown Color","min":"0","max":"360","type":"color","default":"#009bde"},
     {"property":"LightingMode", "label":"Lighting Mode", "type":"combobox", "values":["Canvas","Forced"], "default":"Canvas"},
-    {"property":"forcedColor", "label":"Forced Color","min":"0","max":"360","type":"color","default":"009bde"},
-    {"property":"pumpToggle", "label":"Pump Connected","type":"boolean","default":"true"},
+    {"property":"forcedColor", "label":"Forced Color","min":"0","max":"360","type":"color","default":"#009bde"},
+    {"property":"pumpToggle", "label":"Pump Connected","type":"boolean","default":"1"},
     {"property":"CustomSize", "label":"Custom Strip Size","type":"number","min":"1", "max":"80","default":"10"},
     {"property":"device1",  "label":"Ch1 | Port 1", "type":"combobox",  "values":deviceList, "default":"None"},
     {"property":"device2",  "label":"Ch1 | Port 2", "type":"combobox",  "values":deviceList, "default":"None"},
@@ -108,9 +108,9 @@ function InitCustomStrip(){
 
 function SetFans(){
     if(savedPumpToggle != pumpToggle){
-        savedPumpToggle =pumpToggle;
+        savedPumpToggle = pumpToggle;
         
-        if(savedPumpToggle){
+        if(pumpToggle){
             pump = "EliteCapellixCooler";
         }else{
             pump = "None"
@@ -285,7 +285,7 @@ function sendCoolingdata(){
 export function Render()
 {
     SendColorData();
-
+    CheckComponentStatus();
     InitCustomStrip(); 
     SetFans();
 
@@ -297,7 +297,26 @@ export function Render()
 
     // }
 }
+var ComponentNotificationId;
+function CheckComponentStatus(){
+    if(ComponentNotificationId == true){
+        return;
+    }
+    var propertyArray = [device1, device2,device3,device4,device5,device6];
+        for (var deviceNumber = 0; deviceNumber < propertyArray.length; deviceNumber++ ) {
+            if(propertyArray[deviceNumber] != "None"){
+                if(ComponentNotificationId != true){
+                    device.denotify(ComponentNotificationId);
+                    ComponentNotificationId = true;
+                }
+                return;
+                }
+        }
 
+    if(typeof ComponentNotificationId === 'undefined'){
+        ComponentNotificationId = device.notify("Device configuration needed", `You have not configured any connected components for this device. SignalRGB cannot control any connected fans or light strips until this is done.`, 0);
+    }
+}
 export function Validate(endpoint)
 {
     return endpoint.interface === 0;

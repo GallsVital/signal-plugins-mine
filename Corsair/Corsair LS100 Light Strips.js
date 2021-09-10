@@ -262,7 +262,7 @@ function SetFans(){
 export function Render()
 {
      setEndpoint();
-
+     CheckComponentStatus();
      SendChannel(0);
      SendChannel(1);
 
@@ -271,7 +271,26 @@ export function Render()
      InitCustomStrip();
      SetFans();
 }
+var ComponentNotificationId;
+function CheckComponentStatus(){
+    if(ComponentNotificationId == true){
+        return;
+    }
+    var propertyArray = [device1, device2,device3,device4,device5,device6,device7,device8,device9,device10,device11,device12];
+        for (var deviceNumber = 0; deviceNumber < propertyArray.length; deviceNumber++ ) {
+            if(propertyArray[deviceNumber] != "None"){
+                if(ComponentNotificationId != true){
+                    device.denotify(ComponentNotificationId);
+                    ComponentNotificationId = true;
+                }
+                return;
+                }
+        }
 
+    if(typeof ComponentNotificationId === 'undefined'){
+        ComponentNotificationId = device.notify("Device configuration needed", `You have not configured any connected components for this device. SignalRGB cannot control any connected fans or light strips until this is done.`, 0);
+    }
+}
  
 export function Validate(endpoint)
 {

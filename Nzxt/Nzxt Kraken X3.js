@@ -266,14 +266,33 @@ function hexToRgb(hex) {
 export function Render()
 {       
 
-
+    CheckComponentStatus();
     sendchannel1Colors(0);
     sendchannelPumpColors(1);
     sendLogo();
     SetFans();
     InitCustomStrip();
 }
+var ComponentNotificationId;
+function CheckComponentStatus(){
+    if(ComponentNotificationId == true){
+        return;
+    }
+    var propertyArray = [device1, device2,device3];
+        for (var deviceNumber = 0; deviceNumber < propertyArray.length; deviceNumber++ ) {
+            if(propertyArray[deviceNumber] != "None"){
+                if(ComponentNotificationId != true){
+                    device.denotify(ComponentNotificationId);
+                    ComponentNotificationId = true;
+                }
+                return;
+                }
+        }
 
+    if(typeof ComponentNotificationId === 'undefined'){
+        ComponentNotificationId = device.notify("Device configuration needed", `You have not configured any connected components for this device. SignalRGB cannot control any connected fans or light strips until this is done.`, 0);
+    }
+}
 
 
 function StreamLightingPacketChanneled(count, data, channel){

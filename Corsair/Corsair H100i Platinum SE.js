@@ -178,6 +178,7 @@ export function ControllableParameters(){
     {"property":"device2", "label":"Fan 2 Type", "type":"combobox", "values":["None","LL", "QL","ML","SpPro"], "default":"None"},
     ];
 }
+
 var vLedNames = [
     "Logo 1","Ring 1", "Ring 2", "Ring 3",
      "Ring 4","Logo 2", "Ring 5",
@@ -451,7 +452,7 @@ function sendColor(shutdown = false){
 export function Render()
 {
     SetFans();
-
+    CheckComponentStatus();
     if(CurrentFanSpeed != FanSpeed) {
         CurrentFanSpeed = FanSpeed;
         sendCoolingPacket(CoolingDict[CurrentFanSpeed]);
@@ -459,7 +460,26 @@ export function Render()
 
     sendColor();
 }
+var ComponentNotificationId;
+function CheckComponentStatus(){
+    if(ComponentNotificationId == true){
+        return;
+    }
+    var propertyArray = [device1, device2];
+        for (var deviceNumber = 0; deviceNumber < propertyArray.length; deviceNumber++ ) {
+            if(propertyArray[deviceNumber] != "None"){
+                if(ComponentNotificationId != true){
+                    device.denotify(ComponentNotificationId);
+                    ComponentNotificationId = true;
+                }
+                return;
+                }
+        }
 
+    if(typeof ComponentNotificationId === 'undefined'){
+        ComponentNotificationId = device.notify("Device configuration needed", `You have not configured any connected components for this device. SignalRGB cannot control any connected fans or light strips until this is done.`, 0);
+    }
+}
 
 export function Shutdown()
 {

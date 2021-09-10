@@ -310,14 +310,33 @@ export function Render()
 {        
 
     SendMainboard();
-
+    CheckComponentStatus();
     for(let channel = 0; channel < vDLED_Zones.length; channel++){
         Sendchannel(channel);
     }
     InitCustomStrip();
     SetFans();
 }
+var ComponentNotificationId;
+function CheckComponentStatus(){
+    if(ComponentNotificationId == true){
+        return;
+    }
+    var propertyArray = [device1, device2,device3,device4,device5,device6];
+        for (var deviceNumber = 0; deviceNumber < propertyArray.length; deviceNumber++ ) {
+            if(propertyArray[deviceNumber] != "None"){
+                if(ComponentNotificationId != true){
+                    device.denotify(ComponentNotificationId);
+                    ComponentNotificationId = true;
+                }
+                return;
+                }
+        }
 
+    if(typeof ComponentNotificationId === 'undefined'){
+        ComponentNotificationId = device.notify("Device configuration needed", `You have not configured any connected components for this device. SignalRGB cannot control any connected fans or light strips until this is done.`, 0);
+    }
+}
 function sendDirectPacket(channel, start, count, data){
 
     var packet = [];         
