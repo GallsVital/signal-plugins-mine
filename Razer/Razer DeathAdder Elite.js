@@ -129,6 +129,10 @@ export function Initialize()
     packet[11] = 0x08;
     packet[12] = 0x01;
     packet[13] = 0x01;
+
+    packet[89] = CalculateCrc(packet);
+    device.send_report(packet, 91);
+
     if(DpiControl) {
         setDPIRazer(dpi1);
     }
