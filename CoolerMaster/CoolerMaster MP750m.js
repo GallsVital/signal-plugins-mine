@@ -2,7 +2,7 @@ export function Name() { return "Cooler Master MP750m Mouse Pad"; }
 export function VendorId() { return 0x2516; }
 export function ProductId() { return 0x0105; }
 export function Publisher() { return "WhirlwindFX"; }
-export function Size() { return [1,1]; }
+export function Size() { return [3,3]; }
 export function DefaultPosition() {return [75,70]; }
 export function DefaultScale(){return 8.0}
 export function ControllableParameters(){
@@ -17,7 +17,7 @@ var vLedNames = [
 
 ]
 var vLedPositions = [
-    [0,0],
+    [1,1],
 
 ];
 
