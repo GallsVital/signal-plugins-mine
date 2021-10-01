@@ -38,7 +38,8 @@ function InitChannel(channel){
     packet[0x02]           = channel;   
     packet[0x03]           = CORSAIR_LIGHTING_CONTROL_SOFTWARE; 
     device.write(packet, 65);
-    //device.read(packet, 17);
+    device.read(packet, 17);
+
 }
 export function Initialize()
 {
@@ -48,10 +49,6 @@ export function Initialize()
 
 export function Shutdown()
 {
-    SendChannel(0,true);
-    SendChannel(1,true);
-
-
     //channel 0
     var packet = [];
 
@@ -279,6 +276,7 @@ function SendChannel(channel,shutdown = false)
     //channelReset(channel)
     //channelStart(channel);
     InitChannel(channel);
+    channelStart(channel);
 
     var ledsSent = 0;
     var TotalLedCount = TotalLedCount >= 204 ? 204 : TotalLedCount;
