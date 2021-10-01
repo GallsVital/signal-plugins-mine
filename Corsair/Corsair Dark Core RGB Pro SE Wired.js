@@ -12,6 +12,8 @@ export function ControllableParameters(){
         {"property":"forcedColor", "label":"Forced Color","min":"0","max":"360","type":"color","default":"009bde"},
         {"property":"DpiControl", "label":"Enable Dpi Control","type":"boolean","default":"false"},
         {"property":"dpi1", "label":"DPI","step":"50", "type":"number","min":"200", "max":"12400","default":"800"},
+        //{"property":"PollRate", "label":"Poll Rate", "type":"combobox", "values":["1","2","3","4","5"], "default":"3"},
+
     ];
 }
 function hexToRgb(hex) {
@@ -44,15 +46,33 @@ export function LedPositions()
 {
   return vLedPositions;
 }
-
+function Corsair_Get(index){
+    var packet = [0x00, CORSAIR_COMMAND,CORSAIR_READ,index,0x00]
+    device.write(packet,65)
+    packet = device.read(packet,65)
+    return packet[4] | (packet[5] << 8)
+}
+function Corsair_Set(index, value){
+    var packet = [0x00, CORSAIR_COMMAND,CORSAIR_WRITE,index,0x00, (value & 0xFF), (value >> 8 & 0xFF)]
+    device.write(packet,65)
+    packet = device.read(packet,65)
+    if(packet[3] == 3){
+        device.log(`Set Packet Error`)
+    }
+}
+function Corsair_Open_Endpoint(endpoint){
+    var packet = [0x00, CORSAIR_COMMAND,CORSAIR_ENDPOINT,0x00,endpoint]
+    device.write(packet,65)
+    packet = device.read(packet,65)
+    if(packet[3] == 3){
+        device.log(`Open Endpoint Error`)
+    }
+}
 function EnableSoftwareControl()
 {
-    sendPacketString("00 08 01 03 00 02",65)//software control packet
-
-    sendPacketString("00 08 02 6E",65) // Critical
-    sendPacketString("00 08 0D 00 01",65) // Critical
-
-
+    Corsair_Set(CORSAIR_MODE,CORSAIR_SOFTWARE_MODE)
+    device.log(`Mode is Now ${Corsair_Get(CORSAIR_MODE)}`)
+    Corsair_Open_Endpoint(CORSAIR_LIGHTING_ENDPOINT)
 }
 
 function sendPacketString(string, size){
@@ -68,18 +88,80 @@ function sendPacketString(string, size){
 
 function ReturnToHardwareControl()
 {
- sendPacketString("00 08 01 03 00 01",65) //hardware control packet
+    Corsair_Set(CORSAIR_MODE,CORSAIR_HARDWARE_MODE)
+    device.log(`Mode is Now ${Corsair_Get(CORSAIR_MODE)}`)
 }
+const CORSAIR_WRITE = 0x01;
+const CORSAIR_READ = 0x02;
+const CORSAIR_COMMAND = 0x08;
+const CORSAIR_ENDPOINT = 0x0D;
 
+const CORSAIR_POLL_RATE = 0x01;
+const CORSAIR_BRIGHTNESS = 0x02
+const CORSAIR_MODE = 0x03;
+const CORSAIR_ANGLE_SNAP = 0x07;
+const CORSAIR_VID = 0x11
+const CORSAIR_PID = 0x12
+const CORSAIR_BATTERY_LEVEL = 0x0F
+const CORSAIR_BATTERY_STATUS = 0x10
+const CORSAIR_DPI_X = 0x21
+const CORSAIR_DPI_Y = 0x22
+
+const CORSAIR_LIGHTING_ENDPOINT = 1;
+const CORSAIR_HARDWARE_MODE = 1;
+const CORSAIR_SOFTWARE_MODE = 2;
 
 export function Initialize()
 {
-    EnableSoftwareControl();
+    if(Corsair_Get(CORSAIR_MODE) == CORSAIR_HARDWARE_MODE){
+        EnableSoftwareControl();
+    }
+
+    device.log(`Poll Rate is ${Corsair_Get(CORSAIR_POLL_RATE)}`)
+    device.log(`Angle Snap is ${Corsair_Get(CORSAIR_ANGLE_SNAP)}`)
+    device.log(`Vid is ${Corsair_Get(CORSAIR_VID)}`)
+    device.log(`Pid is ${Corsair_Get(CORSAIR_PID)}`)
+    device.log(`Battery Level is ${Corsair_Get(CORSAIR_BATTERY_LEVEL)/10}%`)
+    device.log(`Battery Status is ${Corsair_Get(CORSAIR_BATTERY_STATUS)}`)
+    device.log(`DPI x is ${Corsair_Get(CORSAIR_DPI_X)}`)
+    device.log(`DPI y is ${Corsair_Get(CORSAIR_DPI_Y)}`)
+    device.log(`Brightness is ${Corsair_Get(CORSAIR_BRIGHTNESS)}`)
+    device.log(`DPI Profile is ${Corsair_Get(0x1E)}`)
+
+    setbrightness(1000)
+
 }
 
+var savedDpi1;
+function setDpi(dpi){
+    savedDpi1 = dpi;
+    Corsair_Set(CORSAIR_DPI_X,savedDpi1)
+    Corsair_Set(CORSAIR_DPI_Y,savedDpi1)
 
+    device.log(`DPI x is now ${Corsair_Get(CORSAIR_DPI_X)}`)
+    device.log(`DPI y is now ${Corsair_Get(CORSAIR_DPI_Y)}`)
+}
+
+var savedPollRate;
+function setPollRate(){
+    savedPollRate = PollRate;
+    Corsair_Set(CORSAIR_POLL_RATE,PollRate)
+}
+
+function setbrightness(Brightness){
+    Corsair_Set(CORSAIR_BRIGHTNESS,Brightness)
+    device.log(`Brightness is now ${Corsair_Get(CORSAIR_BRIGHTNESS)}`)
+}
 export function Render()
-{    sendColors();
+{    
+    sendColors();
+    if(dpi1 != savedDpi1) {
+        setDpi(dpi1);
+    }
+    // if(PollRate != savedPollRate) {
+    //     //setPollRate();
+    // }
+
 }
 function sendColors(shutdown = false){
 
@@ -134,6 +216,7 @@ function sendColors(shutdown = false){
      packet = packet.concat(blue.splice(0,12));
 
     device.write(packet, 65);
+    device.read(packet,65)
 }
 
 export function Validate(endpoint)
@@ -143,7 +226,9 @@ export function Validate(endpoint)
 
 export function Shutdown()
 {
-    ReturnToHardwareControl();
+    if(Corsair_Get(CORSAIR_MODE) == CORSAIR_SOFTWARE_MODE){
+        ReturnToHardwareControl();
+    }
 }
 
 export function Image() 
