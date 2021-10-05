@@ -9,7 +9,7 @@ export function ControllableParameters(){
     return [
         {"property":"shutdownColor", "label":"Shutdown Color","min":"0","max":"360","type":"color","default":"009bde"},
         {"property":"DpiControl", "label":"Enable Dpi Control","type":"boolean","default":"false"},
-        {"property":"dpi1", "label":"DPI 1", "step":"50","type":"number","min":"200", "max":"8000","default":"800"},
+        //{"property":"dpi1", "label":"DPI 1", "step":"50","type":"number","min":"200", "max":"8000","default":"800"},
     ];
 }
 
@@ -25,9 +25,9 @@ var savedDpi1;
 
 export function Initialize() {
 
-if(DpiControl) {
-        setDpi(dpi1);
-    }
+// if(DpiControl) {
+//         setDpi(dpi1);
+//     }
 }
 
 export function LedNames()
@@ -51,14 +51,13 @@ export function Validate(endpoint)
 }
 
 function SendColorPacket(shutdown = false) {
-    let zones = [0,1,2];
     for(var iIdx = 0; iIdx < 3; iIdx++){
         var packet = [];
         packet[0x00]  = 0x00;
         packet[0x01]  = 0x61;
         packet[0x02]  = 0x01;
+        packet[0x03] =  iIdx;
 
-        packet[0x03] = zones[iIdx];
         var iPxX = vLedPositions[iIdx][0];
         var iPxY = vLedPositions[iIdx][1];
 
@@ -72,21 +71,22 @@ function SendColorPacket(shutdown = false) {
         packet[4] = color[0];
         packet[5] = color[1];
         packet[6] = color[2];
+        device.log(packet)
 
         device.write(packet, 65);
+        device.read(packet, 65)
         device.pause(2)
-
     }
-    device.pause(10)
+    device.pause(20)
 }
 
 export function Render() {
     
     SendColorPacket();
 
-    if(savedDpi1 != dpi1 && DpiControl){
-        setDpi(dpi1)
-    }
+    //if(savedDpi1 != dpi1 && DpiControl){
+        //setDpi(dpi1)
+    //}
 
     device.pause(1)
 }
