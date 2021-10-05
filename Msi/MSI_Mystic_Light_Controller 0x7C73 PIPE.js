@@ -1,9 +1,7 @@
-
-
 export function Name() { return "MSI Mystic Light Controller"; }
 export function VendorId() { return  0x1462; }    
 // DO NOT PID SWAP THIS IF YOU DONT KNOW WHAT YOUR DOING
-export function ProductId() { return 0x7C90;} 
+export function ProductId() { return 0x7C73;} 
 // YOU CAN BRICK THESE MOTHERBOARDS RGB CONTROLLER WITH ONE WRONG PACKET
 export function Publisher() { return "WhirlwindFX"; }
 export function Size() { return [10,1]; }
@@ -103,6 +101,11 @@ const mainboardDict = [
     MSI_185_MAINBOARD_9_OFFSET,
     MSI_185_MAINBOARD_10_OFFSET
 ]
+const JPipeDict = [
+    MSI_185_JPIPE1_OFFSET,
+    MSI_185_JPIPE2_OFFSET
+]
+
 const HeaderDict = [
     MSI_185_JRGB1_OFFSET,
     MSI_185_JRGB2_OFFSET
@@ -111,6 +114,11 @@ const ARGBHeaderDict = [
     MSI_185_RAINBOW1_OFFSET,
     MSI_185_RAINBOW2_OFFSET
 ]
+var JPipeHeaderArray = [
+    "jPipe Header 1",
+    "jPipe Header 2",
+];
+
 var HeaderArray = [
     "12v RGB Header 1",
     "12v RGB Header 2",
@@ -175,6 +183,7 @@ export function Initialize()
     CheckPacketLength();
     CreateRGBHeaders();
     CreateARGBHeaders();
+    CreateJPipeHeaders();
 }
 function CreateRGBHeaders(){
     for(let header = 0; header < 2;header++){
@@ -196,6 +205,18 @@ function CreateARGBHeaders(){
         device.setSubdeviceSize(ARGBHeaderArray[header],3,3);
     }
 }
+
+function CreateJPipeHeaders(){
+    for(let header = 0; header < 2;header++){
+            //"Ch1 | Port 1"
+        device.createSubdevice(JPipeHeaderArray[header]); 
+        // Parent Device + Sub device Name + Ports
+        device.setSubdeviceName(JPipeHeaderArray[header],`${ParentDeviceName} - ${JPipeHeaderArray[header]}`);
+        device.setSubdeviceImage(JPipeHeaderArray[header], Placeholder());
+        device.setSubdeviceSize(JPipeHeaderArray[header],3,3);
+    }
+}
+
 function SetMainboardLeds(shutdown = false)
 {
          for(var iIdx = 0; iIdx < vLedMap.length; iIdx++)
@@ -241,6 +262,21 @@ function  SetARGBHeaderLeds(shutdown = false){
     SetZoneColor(configPacket, ARGBHeaderDict[iIdx], col);
     }
 }
+
+function  SetJPipeHeaderLeds(shutdown = false){
+    for(var iIdx = 0; iIdx < JPipeHeaderArray.length; iIdx++){
+        var col;
+        if(shutdown){
+            col = hexToRgb(shutdownColor)
+        }else if (LightingMode == "Forced") {
+            col = hexToRgb(forcedColor)
+        }else{
+            col = device.subdeviceColor(JPipeHeaderArray[iIdx], 1, 1);
+        }           
+    SetZoneColor(configPacket, JPipeDict[iIdx], col);
+    }
+}
+
 var configPacket = initialPacket.slice();
 export function Render()
 {        
@@ -253,6 +289,8 @@ export function Render()
     SetRGBHeaderLeds();
 
     SetARGBHeaderLeds();
+
+    SetJPipeHeaderLeds();
 
     //LogPacket(configPacket)
     
