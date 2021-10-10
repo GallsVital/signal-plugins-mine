@@ -65,12 +65,14 @@ export function Initialize()
     InitScanCodes(); //set key codes to get the keys working again
 }
 
+  
 var savedLayout;
 var SkippedKeys_ANSI = [
     49, 63, 65, 66, 81, 83, 85, 111, 126, 127, 128, 129,
 ]
+
 var SkippedKeys_ISO = [
-    63, 65, 66, 72, 80, 83, 85, 111, 126, 127, 128, 129,
+    63, 65, 66, 80, 83, 85, 111, 120,121,122,123,124, 125, 126, 127, 128, 129,
 ]
 const LayoutDict = {
     "ANSI": SkippedKeys_ANSI,
@@ -82,7 +84,7 @@ function InitScanCodes(){
     savedLayout = layout;
     device.log(`Setting layout to ${savedLayout}`)
     var ScanCodes = []
-    for(var ScanCode = 0; ScanCode < 120 +  LayoutDict[layout].length; ScanCode++){
+    for(var ScanCode = 0; ScanCode < 120 + LayoutDict[layout].length && ScanCode < 0x84; ScanCode++){
         if(LayoutDict[layout].includes(ScanCode)){
             continue;
         }
@@ -94,7 +96,7 @@ function InitScanCodes(){
         packet[0] = 0x00;
         packet[1] = 0x07;
         packet[2] = 0x40;
-        packet[3] = 0x1E;
+        packet[3] = packetCount == 3 ? 0x19 : 0x1E;
         packet[4] = 0x00;
         packet = packet.concat(ScanCodes.splice(0,60))
         device.write(packet,65);
@@ -152,7 +154,9 @@ var vKeys = [
     2,   14, 26, 38, 50, 62, 74, 86, 98, 110, 122, 134,   90,   102,     43, 55, 67,    9,  21, 33,  128, //21   
     3,   15, 27, 39, 51, 63, 75, 87, 99, 111, 123, 135,         126,                    57, 69, 81,       //16
     4,   28, 40, 52, 64, 76, 88, 100,112, 124, 136,          79,         103,       93, 105, 117, 140,
-    5,   17, 29,            53,                    89, 101, 113, 91,     115,127,139,   129, 141
+    5,   17, 29,            53,                    89, 101, 113, 91,     115,127,139,   129, 141,
+        //ISO
+        16, 114
 ];
 
 var vKeyNames = [
@@ -162,7 +166,9 @@ var vKeyNames = [
     "Tab", "Q", "W", "E", "R", "T", "Y", "U", "I", "O", "P", "[", "]", "\\",                               "Del", "End", "Page Down",         "Num 7", "Num 8", "Num 9", "Num +",    //21
     "CapsLock", "A", "S", "D", "F", "G", "H", "J", "K", "L", ";", "'", "Enter",                                                              "Num 4", "Num 5", "Num 6",             //16
     "Left Shift", "Z", "X", "C", "V", "B", "N", "M", ",", ".", "/", "Right Shift",                                  "Up Arrow",               "Num 1", "Num 2", "Num 3", "Num Enter",//17
-    "Left Ctrl", "Left Win", "Left Alt", "Space", "Right Alt", "Fn", "Menu", "Right Ctrl",  "Left Arrow", "Down Arrow", "Right Arrow", "Num 0", "Num ."                       //13
+    "Left Ctrl", "Left Win", "Left Alt", "Space", "Right Alt", "Fn", "Menu", "Right Ctrl",  "Left Arrow", "Down Arrow", "Right Arrow", "Num 0", "Num .",                       //13
+       //ISO
+       "ISO #", "ISO <"
 ];
 
 // This array must be the same length as vKeys[], and represents the pixel color position in our pixel matrix that we reference.  For example,
@@ -174,7 +180,9 @@ var vKeyPositions = [
     [0,3], [1,3], [2,3], [3,3], [4,3], [5,3], [6,3], [7,3], [8,3], [9,3], [10,3], [11,3], [12,3], [13,3],   [14,3], [15,3], [16,3],   [17,3], [18,3],[19,3], [20,3], //21
     [0,4], [1,4], [2,4], [3,4], [4,4], [5,4], [6,4], [7,4], [8,4], [9,4], [10,4], [11,4],         [13,4],                             [17,4], [18,4],[19,4], // 16
     [0,5], [1,5], [2,5], [3,5], [4,5], [5,5], [6,5], [7,5], [8,5], [9,5], [10,5], [11,5],         [13,5],           [15,5],           [17,5], [18,5],[19,5], // 17
-    [0,6], [1,6], [2,6],                      [6,6],                      [10,6], [11,6], [12,6], [13,6],   [14,6], [15,6], [16,6],   [17,6],        [19,6] // 14
+    [0,6], [1,6], [2,6],                      [6,6],                      [10,6], [11,6], [12,6], [13,6],   [14,6], [15,6], [16,6],   [17,6],        [19,6], // 14
+      //ISO
+      [2,5],[13,4]
 ];
 
 // These arrays are unused and for development reference.
