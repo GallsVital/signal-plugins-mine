@@ -49,13 +49,16 @@ function hexToRgb(hex) {
       device.send_report(packet, size);
   }
 
-  export function Initialize()
+
+export
+ function Initialize()
   {
-        sendReportString("00 0E 01",65)
-        var packet = [0x0E, 0x01];
-        packet = device.get_report(packet,65);
-        var firmware = `firmware version = ${packet[10]}.${packet[9].toString(16)}`
-        device.log(firmware);
+        // sendReportString("00 0E 01",65)
+        // var packet = [0x0E, 0x01];
+        // packet = device.get_report(packet,65);
+        // var firmware = `firmware version = ${packet[10]}.${packet[9].toString(16)}`
+        // device.log(firmware);
+
         //var layout = `layout = ${layoutDict[packet[18]]}`
         //device.log(layout);
   
@@ -70,8 +73,9 @@ function hexToRgb(hex) {
   var SkippedKeys_ANSI = [
       49, 63, 65, 66, 81, 83, 85, 111, 126, 127, 128, 129,
   ]
+
   var SkippedKeys_ISO = [
-      63, 65, 66, 72, 80, 83, 85, 111, 126, 127, 128, 129,
+      63, 65, 66, 80, 83, 85, 111, 120,121,122,123,124, 125, 126, 127, 128, 129,
   ]
   const LayoutDict = {
       "ANSI": SkippedKeys_ANSI,
@@ -83,7 +87,7 @@ function hexToRgb(hex) {
       savedLayout = layout;
       device.log(`Setting layout to ${savedLayout}`)
       var ScanCodes = []
-      for(var ScanCode = 0; ScanCode < 120 +  LayoutDict[layout].length; ScanCode++){
+      for(var ScanCode = 0; ScanCode < 120 + LayoutDict[layout].length && ScanCode < 0x84; ScanCode++){
           if(LayoutDict[layout].includes(ScanCode)){
               continue;
           }
@@ -95,7 +99,7 @@ function hexToRgb(hex) {
           packet[0] = 0x00;
           packet[1] = 0x07;
           packet[2] = 0x40;
-          packet[3] = 0x1E;
+          packet[3] = packetCount == 3 ? 0x19 : 0x1E;
           packet[4] = 0x00;
           packet = packet.concat(ScanCodes.splice(0,60))
           device.write(packet,65);
@@ -150,48 +154,41 @@ function SubmitKbColors(color_channel, packet_count, finish_val)
 // This is an array of key indexes for setting colors in our render array, indexed left to right, row top to bottom.
 var vKeys = [
                    125, 137, 8,                       59,                               20,    // Special key row.
-    0,     12, 24, 36, 48,     60, 72, 84, 96,     108, 120, 132, 6,     18, 30, 42,    32, 44, 56,  68,  //20
-    1,   13, 25, 37, 49, 61, 73, 85, 97, 109, 121, 133, 7,       31,     54, 66, 78,    80, 92, 104, 116, //21
-    2,   14, 26, 38, 50, 62, 74, 86, 98, 110, 122, 134,   90,   102,     43, 55, 67,    9,  21, 33,  128, //21   
-    3,   15, 27, 39, 51, 63, 75, 87, 99, 111, 123, 135,         126,                    57, 69, 81,       //16
-    4,   28, 40, 52, 64, 76, 88, 100,112, 124, 136,          79,         103,       93, 105, 117, 140,
-    5,   17, 29,            53,                    89, 101, 113, 91,     115,127,139,   129, 141
+    0,     12, 24, 36, 48,     60, 72, 84, 96,     108, 120, 132, 6,   18, 30, 42,    32, 44, 56,  68,  //20
+    1,   13, 25, 37, 49, 61, 73, 85, 97, 109, 121, 133, 7,       31,   54, 66, 78,    80, 92, 104, 116, //21
+    2,   14, 26, 38, 50, 62, 74, 86, 98, 110, 122, 134,   90, 102,     43, 55, 67,    9,  21, 33,  128, //21   
+    3,   15, 27, 39, 51, 63, 75, 87, 99, 111, 123, 135,         126,                  57, 69, 81,       //16
+    4,   28, 40, 52, 64, 76, 88, 100,112, 124, 136,              79,       103,       93, 105, 117, 140,
+    5,   17, 29,            53,                    89, 101, 113, 91,   115,127,139,   129, 141,                   
+    //ISO
+    16, 114
 ];
 
 var vKeyNames = [
     "Profile","Brightness", "Lock",                  "Logo",                   "Mute",
     "Esc", "F1", "F2", "F3", "F4", "F5", "F6", "F7", "F8", "F9", "F10", "F11", "F12",         "Print Screen", "Scroll Lock", "Pause Break",   "MediaStop", "MediaRewind","MediaPlayPause","MediaFastForward",
     "`", "1", "2", "3", "4", "5", "6", "7", "8", "9", "0", "-_", "=+", "Backspace",                        "Insert", "Home", "Page Up",       "NumLock", "Num /", "Num *", "Num -",  //21
-    "Tab", "Q", "W", "E", "R", "T", "Y", "U", "I", "O", "P", "[", "]", "\\",                               "Del", "End", "Page Down",         "Num 7", "Num 8", "Num 9", "Num +",    //21
+    "Tab", "Q", "W", "E", "R", "T", "Y", "U", "I", "O", "P", "[", "]", "\\",  "ISO \\\\",                             "Del", "End", "Page Down",         "Num 7", "Num 8", "Num 9", "Num +",    //21
     "CapsLock", "A", "S", "D", "F", "G", "H", "J", "K", "L", ";", "'", "Enter",                                                              "Num 4", "Num 5", "Num 6",             //16
-    "Left Shift", "Z", "X", "C", "V", "B", "N", "M", ",", ".", "/", "Right Shift",                                  "Up Arrow",               "Num 1", "Num 2", "Num 3", "Num Enter",//17
-    "Left Ctrl", "Left Win", "Left Alt", "Space", "Right Alt", "Fn", "Menu", "Right Ctrl",  "Left Arrow", "Down Arrow", "Right Arrow", "Num 0", "Num ."                       //13
+    "Left Shift", "ISO <", "Z", "X", "C", "V", "B", "N", "M", ",", ".", "/", "Right Shift",                                  "Up Arrow",               "Num 1", "Num 2", "Num 3", "Num Enter",//17
+    "Left Ctrl", "Left Win", "Left Alt", "Space", "Right Alt", "Fn", "Menu", "Right Ctrl",  "Left Arrow", "Down Arrow", "Right Arrow", "Num 0", "Num .",                       //13
+    //ISO
+    "ISO #", "ISO <"
 ];
 
 // This array must be the same length as vKeys[], and represents the pixel color position in our pixel matrix that we reference.  For example,
 // item at index 3 [9,0] represents the corsair logo, and the render routine will grab its color from [9,0].
 var vKeyPositions = [
                          [3,0], [4,0], [5,0],                      [9,0],                                                             [17,0],   // Logo & specialkey row.
-    [0,1], [1,1], [2,1], [3,1], [4,1], [5,1], [6,1], [7,1], [8,1], [9,1], [10,1], [11,1],         [13,1],   [14,1], [15,1], [16,1],   [17,1], [18,1],[19,1], [20,1], //20
-    [0,2], [1,2], [2,2], [3,2], [4,2], [5,2], [6,2], [7,2], [8,2], [9,2], [10,2], [11,2], [12,2], [13,2],   [14,2], [15,2], [16,2],   [17,2], [18,2],[19,2], [20,2], //21
+    [0,1], [1,1], [2,1], [3,1], [4,1], [5,1], [6,1], [7,1], [8,1], [9,1], [10,1], [11,1],         [13,1],          [14,1], [15,1], [16,1],   [17,1], [18,1],[19,1], [20,1], //20
+    [0,2], [1,2], [2,2], [3,2], [4,2], [5,2], [6,2], [7,2], [8,2], [9,2], [10,2], [11,2], [12,2], [13,2],          [14,2], [15,2], [16,2],   [17,2], [18,2],[19,2], [20,2], //21
     [0,3], [1,3], [2,3], [3,3], [4,3], [5,3], [6,3], [7,3], [8,3], [9,3], [10,3], [11,3], [12,3], [13,3],   [14,3], [15,3], [16,3],   [17,3], [18,3],[19,3], [20,3], //21
     [0,4], [1,4], [2,4], [3,4], [4,4], [5,4], [6,4], [7,4], [8,4], [9,4], [10,4], [11,4],         [13,4],                             [17,4], [18,4],[19,4], // 16
-    [0,5], [1,5], [2,5], [3,5], [4,5], [5,5], [6,5], [7,5], [8,5], [9,5], [10,5], [11,5],         [13,5],           [15,5],           [17,5], [18,5],[19,5], // 17
-    [0,6], [1,6], [2,6],                      [6,6],                      [10,6], [11,6], [12,6], [13,6],   [14,6], [15,6], [16,6],   [17,6],        [19,6] // 14
+    [0,5], [1,5], [2,5], [3,5], [4,5], [5,5], [6,5], [7,5], [8,5], [9,5], [10,5], [11,5],         [13,5],                  [15,5],           [17,5], [18,5],[19,5], // 17
+    [0,6], [1,6], [2,6],                      [6,6],                      [10,6], [11,6], [12,6], [13,6],          [14,6], [15,6], [16,6],   [17,6],        [19,6], // 14
+    //ISO
+    [2,5],[13,4]
 ];
-
-// These arrays are unused and for development reference.
-var vMedia = [
-    32, 44, 56, 68
-];
-
-var vSpecial = [
-    125, 137, 8, 59, 20
-]
-
-var vSpecialPositions = [
-    [0,3], [0,4], [0,5], [0,9], [0,17]
-]
 
 export function LedNames()
 {
@@ -210,6 +207,7 @@ export function Render()
     }
     sendColors();
 }
+
 function sendColors(shutdown = false){
 
     var red = [170];
