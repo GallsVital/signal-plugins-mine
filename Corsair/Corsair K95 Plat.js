@@ -10,7 +10,8 @@ export function ControllableParameters(){
         {"property":"shutdownColor", "label":"Shutdown Color","min":"0","max":"360","type":"color","default":"009bde"},
         {"property":"LightingMode", "label":"Lighting Mode", "type":"combobox", "values":["Canvas","Forced"], "default":"Canvas"},
         {"property":"forcedColor", "label":"Forced Color","min":"0","max":"360","type":"color","default":"009bde"},
-       
+        {"property":"layout", "label":"Keyboard Layout", "type":"combobox", "values":["ANSI","ISO"], "default":"ANSI"},       
+
     ];
 }
 function hexToRgb(hex) {
@@ -55,14 +56,27 @@ export function Initialize()
     InitScanCodes();
 
 }
-var SkippedKeys = [
+
+var savedLayout;
+var SkippedKeys_ANSI = [
     49, 63, 65, 66, 81, 83, 85, 111, 126, 127, 128, 129,
 ]
+
+var SkippedKeys_ISO = [
+    63, 65, 66, 80, 83, 85, 111, 120,121,122,123,124, 125, 126, 127, 128, 129,
+]
+const LayoutDict = {
+    "ANSI": SkippedKeys_ANSI,
+    "ISO": SkippedKeys_ISO
+}
+
 function InitScanCodes(){
     sendPacketString("00 07 05 08 00 01",65);
+    savedLayout = layout;
+    device.log(`Setting layout to ${savedLayout}`)
     var ScanCodes = []
-    for(var ScanCode = 0; ScanCode < 120+SkippedKeys.length;ScanCode++){
-        if(SkippedKeys.includes(ScanCode)){
+    for(var ScanCode = 0; ScanCode < 120 + LayoutDict[layout].length && ScanCode < 0x84; ScanCode++){
+        if(LayoutDict[layout].includes(ScanCode)){
             continue;
         }
         ScanCodes.push(ScanCode);
@@ -73,12 +87,14 @@ function InitScanCodes(){
         packet[0] = 0x00;
         packet[1] = 0x07;
         packet[2] = 0x40;
-        packet[3] = 0x1E;
+        packet[3] = packetCount == 3 ? 0x19 : 0x1E;
         packet[4] = 0x00;
         packet = packet.concat(ScanCodes.splice(0,60))
         device.write(packet,65);
     }
 }
+
+
 function sendPacketString(string, size){
 
     var packet= [];
@@ -179,6 +195,8 @@ function SubmitKbColors(color_channel, packet_count, finish_val)
  58, 4,   28, 40, 52, 64, 76, 88, 100,112, 124, 136,          79,         103,       93, 105, 117, 140,
  70, 5,   17, 29,            53,                    89, 101, 113, 91,     115,127,139,   129, 141,
 
+//ISO
+16, 114,
 //Top Light Strip
  144,145,146,158,160,147,148,149,150,151,152,153,154,155, 159,162,161,156,157,
  
@@ -194,7 +212,8 @@ var vKeyPositions = [
 [0,4], [1,4], [2,4], [3,4], [4,4], [5,4], [6,4], [7,4], [8,4], [9,4], [10,4], [11,4], [12,4],         [14,4],                             [18,4], [19,4],[20,4], // 16
 [0,5], [1,5], [2,5], [3,5], [4,5], [5,5], [6,5], [7,5], [8,5], [9,5], [10,5], [11,5], [13,5],                           [16,5],           [18,5], [19,5],[20,5],[21,5], // 17
 [0,6], [1,6], [2,6], [3,6],                      [7,6],                       [11,6], [12,6], [13,6], [14,6],   [15,6], [16,6], [17,6],   [18,6],        [20,6], // 14
-
+      //ISO
+      [2,5],[13,4],
 //Top Light Strip
 [0,0],[1,0],[2,0],[3,0],[5,0],[6,0],[7,0],[8,0],[9,0],[11,0],[12,0],[13,0],[14,0],[16,0],[17,0],[18,0],[19,0],[20,0],[21,0],
     
@@ -208,6 +227,8 @@ var vKeyNames = [
     "G4","CapsLock", "A", "S", "D", "F", "G", "H", "J", "K", "L", ";", "'", "Enter",                                                              "Num 4", "Num 5", "Num 6",             //16
     "G5","Left Shift", "Z", "X", "C", "V", "B", "N", "M", ",", ".", "/", "Right Shift",                                  "Up Arrow",               "Num 1", "Num 2", "Num 3", "Num Enter",//17
     "G6","Left Ctrl", "Left Win", "Left Alt", "Space", "Right Alt", "Fn", "Menu", "Right Ctrl",  "Left Arrow", "Down Arrow", "Right Arrow", "Num 0", "Num .",                       //13
+    //ISO
+    "ISO #", "ISO <",
 
     "Lightbar Lightbar Led 1", "Lightbar Led 2", "Lightbar Led 3", "Lightbar Led 4", "Lightbar Led 5", "Lightbar Led 6", "Lightbar Led 7", "Lightbar Led 8", "Lightbar Led 9", "Lightbar Led 10", "Lightbar Led 11", "Lightbar Led 12",
     "Lightbar Led 13", "Lightbar Led 14", "Lightbar Led 15", "Lightbar Led 16", "Lightbar Led 17", "Lightbar Led 18", "Lightbar Led 19"
@@ -240,6 +261,10 @@ export function LedPositions()
 
 export function Render()
 {       
+    if(savedLayout != layout){
+        InitScanCodes();
+    }
+
     sendColors();
 }
 function sendColors(shutdown = false){
