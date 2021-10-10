@@ -139,7 +139,7 @@ function SubmitLightingColors()
 
     device.write(packet, 65);
     //This read takes 10ms to complete. 30% frame time increase
-    //device.read(packet,65);
+    device.read(packet,65);
 }
 
 
@@ -227,9 +227,9 @@ function SetFans(){
                           mxPxColor = device.subdeviceColor(deviceArray[deviceNumber],iPxX, iPxY);
                       } 
                        //set colors
-                          red[DeviceDict[propertyArray[deviceNumber]].mapping[iIdx]+TotalLedCount] = mxPxColor[0]*brightness;
-                          green[DeviceDict[propertyArray[deviceNumber]].mapping[iIdx]+TotalLedCount] = mxPxColor[1]*brightness;
-                          blue[DeviceDict[propertyArray[deviceNumber]].mapping[iIdx]+TotalLedCount] = mxPxColor[2]*brightness;
+                          red[DeviceDict[propertyArray[deviceNumber]].mapping[iIdx]+TotalLedCount] = Math.floor(mxPxColor[0]*brightness);
+                          green[DeviceDict[propertyArray[deviceNumber]].mapping[iIdx]+TotalLedCount] = Math.floor(mxPxColor[1]*brightness);
+                          blue[DeviceDict[propertyArray[deviceNumber]].mapping[iIdx]+TotalLedCount] = Math.floor(mxPxColor[2]*brightness);
                       }
                       TotalLedCount += DeviceDict[propertyArray[deviceNumber]].ledCount;
   
@@ -237,7 +237,7 @@ function SetFans(){
               
       }
     
-    if(TotalLedCount > 0){
+    //if(TotalLedCount > 0){
         InitChannel(channel);
         channelStart(channel);
 
@@ -255,7 +255,7 @@ function SetFans(){
             ledsSent += ledsToSend;
             TotalLedCount -= ledsToSend;
         }
-    }
+    //}
   }
 
 
@@ -264,7 +264,10 @@ export function Render()
      setEndpoint();
      CheckComponentStatus();
      SendChannel(0);
+     device.pause(1);
+
      SendChannel(1);
+     device.pause(1);
 
      SubmitLightingColors();
     
