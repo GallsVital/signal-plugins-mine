@@ -199,7 +199,7 @@ export function Render()
     SendPacket(42, 14);
     SendPacket(56, 14);
     SendPacket(70, 14);
-    SendPacket(84, 3);
+    SendPacket(84, 5);
     SendMediaPacket(0,2);
     SendLogoZones();
     Apply();
@@ -214,7 +214,7 @@ export function Shutdown()
     SendPacket(42, 14,true);
     SendPacket(56, 14,true);
     SendPacket(70, 14,true);
-    SendPacket(84, 3,true);
+    SendPacket(84, 5,true);
     SendMediaPacket(0,2,true);
     SendLogoZones(true);
     Apply();
@@ -224,7 +224,7 @@ export function Shutdown()
 export function Validate(endpoint)
 {    
     return (endpoint.interface === 1 && endpoint.usage === 0x0602) ||
-           (endpoint.interface === 1 && endpoint.usage === 0x0604);
+           (endpoint.interface === 1 && endpoint.usage === 0x0604) || True;
 }
 
 export function Image()
