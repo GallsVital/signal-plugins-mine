@@ -1,6 +1,6 @@
 export function Name() { return "Logitech G915 TKL Wireless"; }
 export function VendorId() { return 0x046d; }
-export function ProductId() { return 0xc343; }
+export function ProductId() { return 0xc343; }// 0xc343
 export function Publisher() { return "WhirlwindFX"; }
 export function Size() { return [24, 9]; }
 export function DefaultPosition() {return [75,70]; }
@@ -22,6 +22,12 @@ function hexToRgb(hex) {
 
     return colors;
   }
+
+const ZONE_KEYBOARD = 0x00;
+const ZONE_MEDIA_KEYS = 0x01;
+const ZONE_LOGO = 0x10;
+const ZONE_INDICATORS = 0x40;
+
 var vLedNames = [
     "logo" , "brightness","Rewind","PlayPause","Fastforward","Stop",
     "Esc", "F1", "F2", "F3", "F4", "F5", "F6", "F7", "F8", "F9", "F10", "F11", "F12",         "Print Screen", "Scroll Lock", "Pause Break",   
@@ -94,41 +100,6 @@ function Apply()
 
     device.set_endpoint(2, 0x0002, 0xff00); // lighting IF
     device.write(packet, 20);  
-}
-function SendGkeys(shutdown = false)
-{
-    var packet = [];
-    packet[0] = 0x12;
-    packet[1] = 0xFF;
-    packet[2] = 0x0F;
-    packet[3] = 0x3F;
-    packet[4] = 0x00;
-    packet[5] = 4;
-    packet[6] = 0x00;
-    packet[7] = 9; // led count
-    
-    for(var iIdx = 0; iIdx < vGkeyPositions.length; iIdx++){
-        var iLedIdx = (iIdx * 4) + 8;
-        var iKeyPosX = vGkeyPositions[iIdx][0];
-        var iKeyPosY = vGkeyPositions[iIdx][1];
-        var color;
-        if(shutdown){
-            color = hexToRgb(shutdownColor)
-        }else if (LightingMode == "Forced") {
-            color = hexToRgb(forcedColor)
-        }else{
-            color = device.color(iKeyPosX, iKeyPosY);
-        }
-        packet[iLedIdx] = iIdx
-        packet[iLedIdx+1] = color[0];
-        packet[iLedIdx+2] = color[1];
-        packet[iLedIdx+3] = color[2];        
-    }
-                                              
-
-    device.set_endpoint(2, 0x0002, 0xff00); // Lighting IF
-    device.write(packet, 64);
-    device.pause(1);
 }
 
 function SendLogoZone(shutdown = false){
@@ -210,51 +181,68 @@ function SendMediaZones(shutdown = false){
 function SendPacket(shutdown = false)
 {
     //1B 210 vLogoPositions
+    let count = 0
 
-    for(var iIdx = 0; iIdx < vKeymap.length; iIdx = iIdx + 4){
+    var RGBData = []
+    let TotalKeys = 0
+    for (var iIdx = 0; iIdx < vKeymap.length; iIdx++){
         
+        var iKeyPosX = vLedPositions[iIdx][0];
+        var iKeyPosY = vLedPositions[iIdx][1];
+        var color;
+        if(shutdown){
+            color = hexToRgb(shutdownColor)
+        }else if (LightingMode == "Forced") {
+            color = hexToRgb(forcedColor)
+        }else{
+            color = device.color(iKeyPosX, iKeyPosY);
+        }
+        if(OldValue[iIdx] != -1){
+           //device.log(`test ${OldValue[iIdx]} ${color} ${arrayEquals(OldValue[iIdx], color)}`)
+               if(arrayEquals(OldValue[iIdx], color)){
+                   count++
+                   continue;
+               }
+           }
+        OldValue[iIdx] = color
+
+        let keyValue = vKeymap[iIdx]
+        if(keyValue >= 80){keyValue += 24;}
+        if(vKeymap[iIdx] >= 88){keyValue -= 14;}
+
+        RGBData[TotalKeys*4] = keyValue;
+        RGBData[TotalKeys*4+1] = color[0]
+        RGBData[TotalKeys*4+2] = color[1]
+        RGBData[TotalKeys*4+3] = color[2]
+        TotalKeys++
+    }
+
+    while(TotalKeys > 0){
         var packet = [];
         packet[0] = 0x11;
         packet[1] = 0xFF;
         packet[2] = 0x0A;
         let zone = 0x18;
-        if(vKeymap[iIdx] >= 80){zone = 0x1D;}
-        if(vKeymap[iIdx] >= 88){zone = 0x1C;}
+        //if(vKeymap[iIdx] >= 80){zone = 0x1D;}
+        //if(vKeymap[iIdx] >= 88){zone = 0x1C;}
         packet[3] = zone;
-
-        for (var index = 0; index < 4;index++) {
-            let keyNumber = index+iIdx;
-            var iKeyPosX = vLedPositions[keyNumber][0];
-            var iKeyPosY = vLedPositions[keyNumber][1];
-            var color;
-            if(shutdown){
-                color = hexToRgb(shutdownColor)
-            }else if (LightingMode == "Forced") {
-                color = hexToRgb(forcedColor)
-            }else{
-                color = device.color(iKeyPosX, iKeyPosY);
-            }
-            let keyValue = vKeymap[keyNumber]
-            if(keyValue >= 80){keyValue += 24;}
-            if(vKeymap[keyNumber] >= 88){keyValue -= 14;}
-
-            packet[4 + index*4] = keyValue;
-            packet[5 + index*4] = color[0];
-            packet[6 + index*4] = color[1];
-            packet[7 + index*4] = color[2];
-            
-        }    
+        
+        packet = packet.concat(RGBData.splice(0,16))
+        TotalKeys -= 4
         device.set_endpoint(2, 0x0002, 0xff00); // Lighting IF
         device.write(packet, 20);
-        //Apply();
-
-        //device.pause(1); 
     }
+
+    //device.log(`Saved ${count/4} packets of ${vKeymap.length/4}`)
 }
 
-
-
-
+const OldValue = new Array(250).fill(-1)
+function arrayEquals(a, b) {
+    return Array.isArray(a) &&
+      Array.isArray(b) &&
+      a.length === b.length &&
+      a.every((val, index) => val === b[index]);
+  }
 
 export function Render()
 {    
