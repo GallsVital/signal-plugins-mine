@@ -1,6 +1,6 @@
 export function Name() { return "Corsair Dark Core RGB Pro SE Wireless Mode"; }
 export function VendorId() { return 0x1b1c; }
-export function ProductId() { return  0x1B7F; }
+export function ProductId() { return  0x00; }//0x1B7F
 export function Publisher() { return "WhirlwindFX"; }
 export function Size() { return [7, 7]; }
 export function DefaultPosition(){return [240,120]}
@@ -11,7 +11,7 @@ export function ControllableParameters(){
         {"property":"LightingMode", "label":"Lighting Mode", "type":"combobox", "values":["Canvas","Forced"], "default":"Canvas"},
         {"property":"forcedColor", "label":"Forced Color","min":"0","max":"360","type":"color","default":"009bde"},
         {"property":"DpiControl", "label":"Enable Dpi Control","type":"boolean","default":"false"},
-        {"property":"dpi1", "label":"DPI","step":"50", "type":"number","min":"200", "max":"12400","default":"800"},
+        {"property":"dpi1", "label":"DPI","step":"50", "type":"number","min":"200", "max":"18000","default":"800"},
     ];
 }
 function hexToRgb(hex) {
@@ -76,9 +76,22 @@ export function Initialize()
     EnableSoftwareControl();
 }
 
+var savedDpi1;
+function setDpi(dpi){
+    savedDpi1 = dpi;
+    Corsair_Set(CORSAIR_DPI_X,savedDpi1)
+    Corsair_Set(CORSAIR_DPI_Y,savedDpi1)
+
+    device.log(`DPI x is now ${Corsair_Get(CORSAIR_DPI_X)}`)
+    device.log(`DPI y is now ${Corsair_Get(CORSAIR_DPI_Y)}`)
+}
 
 export function Render()
-{    sendColors();
+{    
+    sendColors();
+    if(dpi1 != savedDpi1) {
+        setDpi(dpi1);
+    }
 }
 function sendColors(shutdown = false){
 
