@@ -76,6 +76,7 @@ export function Shutdown()
     packet2[0x02] = 0x01;
     packet2[0x03] = 0x01;
     device.write(packet2, 65);
+
 }
 
 function channelStart(channel){
@@ -87,6 +88,8 @@ function channelStart(channel){
     packet[0x02]   = channel;
 
     device.write(packet, 65);
+    device.read(packet, 17);
+
 }
 
 function StreamLightingPacketChanneled(start, count, colorChannel, data, channel){
@@ -103,6 +106,8 @@ function StreamLightingPacketChanneled(start, count, colorChannel, data, channel
 
     packet = packet.concat(data);
     device.write(packet, 65);
+    device.read(packet, 17);
+
 }
 
 function SubmitLightingColors(){
@@ -114,6 +119,8 @@ function SubmitLightingColors(){
     packet[0x02]   = 0xFF;
 
     device.write(packet, 65);
+    device.read(packet, 17);
+
 }
 
 var savedCustomSize;
@@ -180,7 +187,7 @@ function InitChannel(channel){
     packet[0x02]           = channel;   
     packet[0x03]           = CORSAIR_LIGHTING_CONTROL_SOFTWARE; 
     device.write(packet, 65);
-    //device.read(packet, 17);
+    device.read(packet, 17);
 }
 
 function hexToRgb(hex) {
@@ -229,8 +236,8 @@ function SendChannel(channel,shutdown = false)
     }
 
 
-   //channelStart(channel);
    InitChannel(channel);
+   channelStart(channel);
 
    var ledsSent = 0;
    var TotalLedCount = TotalLedCount >= 204 ? 204 : TotalLedCount;
@@ -264,6 +271,7 @@ export function Render()
 {
     setEndpoint();
     CheckComponentStatus();
+
     SendChannel(0);
     device.pause(1);
 
