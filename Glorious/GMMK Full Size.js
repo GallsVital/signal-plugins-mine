@@ -1,6 +1,6 @@
 export function Name() { return "GMMK Full Size"; }
 export function VendorId() { return 0x0C45; }
-export function ProductId() { return 0x652F; }
+export function ProductId() { return 0x000; }//0x652F
 export function Publisher() { return "WhirlwindFX"; }
 export function Size() { return [21, 7]; }
 export function DefaultPosition() {return [75,70]; }
@@ -84,7 +84,7 @@ export function Initialize()
       sendPacketString(`04 ${(0xE0 + profile).toString(16)} 03 04 2C 00 00 00 55 AA FF 02 45 0C 2F 65 03 01 ${profile} 08 00 00 00 00 01 02 03 04 05 06 08 07 09 0B 0A 0C 0D 0E 0F 10 11 12 14`,64);
 
       //set to custom Mode
-      //sendPacketString("04 1B 00 06 01 00 00 00 14",64);
+      sendPacketString("04 1B 00 06 01 00 00 00 14",64);
 
 
       //Led Edit Mode
@@ -198,30 +198,28 @@ function sendColors(shutdown = false){
      sendPacketString("04 02 00 02",64);
 
 }
-const reducer = (accumulator,currentValue) => accumulator + (currentValue != 0 ? 1 : 0);
+
+const reducer = (accumulator,currentValue) => accumulator + currentValue;
 
 function StreamLightingPacket(ledsSent,ledsToSend,data){
     var packet = [];
     packet[0x00] = 0x04;
-    //some odd packets relating to RGB values that's arnt needed?
+
     packet[0x01] = 0x00;
     packet[0x02] = 0x00;
 
     packet[0x03] = 0x11;
     packet[0x04] = ledsToSend;
-    //odd masks?
     packet[0x05] = ledsSent & 0x00FF;
     packet[0x06] = ledsSent >> 8;
-    if(ledsSent == 0){
-        packet[0x0A] = 0x00;
-    }else{
-        packet[0x07] = 0x00;
-    }
+
 
     packet = packet.concat(data);
     
-    //packet[2] = data.reduce(reducer);
-    //packet[1] = packet[3] + packet[4] + packet[5] + packet[6] - packet[2];
+    let CRC = packet.slice(3).reduce(reducer)
+    packet[1] = CRC & 0xFF
+    packet[2] = CRC >> 8
+
     device.write(packet,64);
     device.pause(1);
     device.read(packet,64);
