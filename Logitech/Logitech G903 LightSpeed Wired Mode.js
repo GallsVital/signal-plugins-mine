@@ -15,6 +15,7 @@ export function ControllableParameters(){
     ];
 }
 var savedDpi1;
+var FeatureId = 0x07;
 
 var vLedNames = ["Primary Zone", "Logo Zone"];
 var vLedPositions = [
@@ -39,6 +40,8 @@ if(DpiControl) {
         setDpi(dpi1);
     
 }
+SetDirectMode(true);
+
 }
 
 function setDpi(dpi){
@@ -115,7 +118,10 @@ export function Shutdown()
     sendZone(1,true);
     
 }
-
+function SetDirectMode(direct){
+    let packet = [0x10, 0x01, FeatureId,0x80, direct,direct]
+    device.write(packet, 7)
+}
 
 export function Validate(endpoint)
 {

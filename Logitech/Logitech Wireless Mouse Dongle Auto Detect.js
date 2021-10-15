@@ -1,6 +1,6 @@
 export function Name() { return "Logitech Wireless Mouse dongle"; }
 export function VendorId() { return 0x046d; }
-export function ProductId() { return 0x0000; }//0xC539
+export function ProductId() { return 0x00; }//0xC539
 export function Publisher() { return "WhirlwindFX"; }
 export function Size() { return [3, 3]; }
 export function DefaultPosition(){return [240,120]}
@@ -8,7 +8,6 @@ export function DefaultScale(){return 8.0}
 export function ControllableParameters(){
     return [
         {"property":"shutdownColor", "label":"Shutdown Color","min":"0","max":"360","type":"color","default":"009bde"},
-        //{"property":"MouseType", "label":"Connected Mouse", "type":"combobox", "values":["G502L","G703L","G903L","GPro"], "default":"G502L"},
         {"property":"LightingMode", "label":"Lighting Mode", "type":"combobox", "values":["Canvas","Forced"], "default":"Canvas"},
         {"property":"forcedColor", "label":"Forced Color","min":"0","max":"360","type":"color","default":"009bde"},
         {"property":"DpiControl", "label":"Enable Dpi Control","type":"boolean","default":"false"},
@@ -16,9 +15,14 @@ export function ControllableParameters(){
     ];
 }
 var savedDpi1;
-var device_id;
-var transaction_id;
+var DeviceId;
+var TransactionId;
 var deviceName;
+var FeatureId;
+
+const WIRED = 0xFF;
+const WIRELESS = 0x01;
+
 var vLedNames = ["Primary Zone", "Logo Zone"];
 var vLedPositions = [
     [0,1],[0,2]
@@ -45,127 +49,147 @@ function sendPacketString(string, size){
     device.write(packet, size);
 }
 
+
+function Logitech_Short_Get(WIRED, data){
+    device.set_endpoint(2, 0x0001, 0xff00); // System IF 
+
+    var packet = [0x10,WIRED, 0x81]
+    data  = data || [0x00, 0x00, 0x00];
+
+    packet = packet.concat(data)
+    
+    device.write(packet, 7)
+    packet = device.read(packet,7);
+
+    return packet.slice(3,7)
+}
+
+function Logitech_Short_Set(Mode, data){
+    device.set_endpoint(2, 0x0001, 0xff00); // System IF 
+
+    var packet = [0x10,Mode, 0x80]
+    data  = data || [0x00, 0x00, 0x00];
+
+    packet = packet.concat(data)
+    
+    device.write(packet, 7)
+    packet = device.read(packet,7);
+
+    return packet.slice(3,7)
+}
+
+function Logitech_Long_Get(Mode, data){
+    device.set_endpoint(2, 0x0002, 0xff00); // Lighting IF 
+
+    var packet = [0x11,Mode]
+    data = data || [0x00, 0x00, 0x00];
+
+    packet = packet.concat(data)
+ 
+
+    device.write(packet, 20)
+    packet = device.read(packet,20);
+
+    return packet.slice(4,7)
+}
 export function Initialize()
 {
-    device.set_endpoint(2, 0x0001, 0xff00); // System IF 
-    //device.flush();
-     sendPacketString("10 FF 81",7)
-     var config = [0x10];
-     config = device.read(config,7);
-     device.log(config)
-     device.log(config[5] & 1)
-      if(!(config[5] & 1)){
-      sendPacketString("10 FF 80 00 00 01",7)
-       var config = [0x10];
-       config = device.read(config,7);
-       device.log(config)
-       device.log(config[5] & 1)
-       sendPacketString("10 FF 81",7)
-       var config = [0x10];
-       config = device.read(config,7);
-       device.log(config)
-       device.log(config[5] & 1)
-      }
+    device.flush()
 
-      sendPacketString("10 FF 80 02 02",7)
-      var config = [0x10];
-      config = device.read(config,7);
-      device.log(config)
-      var device_id = config[6].toString(16) + config[5].toString(16)
-      var transaction_id = config[3];
-      deviceName = deviceIdMap[device_id]
-      device.log(`Device Id Found: ${device_id} Device Name: ${deviceName}`);
-      device.log("Transaction ID Found: " + transaction_id.toLocaleString("hex",{minimumDigits: 2}));
+    let value = Logitech_Short_Get(WIRED)
 
-      if(device_id < 2){
-          Initialize();
-      }
-    if(savedDpi1 != dpi1 && DpiControl) {
-            setDpi(dpi1);
-    }
+    let data = [0x00, 0x00, 0x01]
+    Logitech_Short_Set(WIRED, data)
+
+    data = [0x02, 0x00, 0x00]
+    value = Logitech_Short_Set(WIRED, data)
+
+    data = [0x02, 0x02, 0x00]
+    value = Logitech_Short_Set(WIRED, data)
+    DeviceId = value[3].toString(16) + value[2].toString(16)
+    TransactionId = value[0];
+
+    deviceName = deviceIdMap[DeviceId] || "UNKNOWN"
+    device.log(`Device Id Found: ${DeviceId}`);
+    device.log(`Device Name: ${deviceName}`);
+
+    device.log("Transaction ID Found: " + TransactionId.toString(16));
+
+    data = [0x00, 0x01,0x80,0x70]
+    FeatureId = Logitech_Long_Get(WIRELESS, data)[0]
+    device.log("Feature ID Found: " + FeatureId.toString(16));
+
+
+    SetDpiLightAlwaysOn(false);
+    SetDirectMode(true);
+
+     if(savedDpi1 != dpi1 && DpiControl) {
+             setDpi(dpi1);
+     }
+
 
 }
+
 var deviceIdMap = {
 "405d" : "Logitech G403L",
 "407f" : "Logitech G502L",           
 "4070" : "Logitech G703L",           
 "4053" : "Logitech G900L",           
-"4067" : "Logitech G903L",           
+"4067" : "Logitech G903L",    
+"4087" : "Logitech G903 Hero",       
 "4079" : "Logitech GPro Wireless",              
 }
-//wired FF, wireless 01
-var protocolMap = {
-"405d" : [0x01,0x18,0x3A],
-"Logitech G502L" : [0x01,0x07,0x3A],           
-"Logitech G703L" : [0x01,0x18,0x3C],           
-"4053" : [0x01,0x17,0x3A],           
-"Logitech G903L" : [0x01,0x17,0x3A],           
-"Logitech GPro Wireless" : [0x01,0x08,0x3C],   
-}
 
-
-const dpidict2= {
-    "G502L" : 0x0C,
-    "G703L" : 0x0B,
-    "G903L" : 0x0B,
-    "GPro" : 0x0C,
-};
 const dpidict= {
-    "Logitech G502L" : 0x3A,
-    "Logitech G703L" : 0x3F,
-    "Logitech G903L" : 0x3F,
-    "Logitech GPro Wireless" : 0x3E,
+    "407f" : 0x3A,
+    "4070" : 0x3F,
+    "4067" : 0x3F,
+    "4079" : 0x3E,
+    "405d" : 0x3E,
 };
 
 function setDpi(dpi){
+    device.set_endpoint(2, 0x0001, 0xff00); // System IF 
 
-    device.set_endpoint(2, 0x0001, 0xff00); // System IF    
     savedDpi1 = dpi1;
 
     var packet = [];
     packet[0] = 0x10;
-    packet[1] = protocolMap[deviceName][0];
-    packet[2] = protocolMap[deviceName][2];
-    packet[3] = transaction_id;
+    packet[1] = 0x01;
+    packet[2] = TransactionId;
+    packet[3] =  dpidict[DeviceId]
     packet[4] = 0x00;
     packet[5] = Math.floor(dpi/256);
     packet[6] = dpi%256;
     device.write(packet, 7);
-    device.read(packet,7)
-
-
+    //device.read(packet,7)
 }
+
+
 function Apply()
 {
 
     device.set_endpoint(2, 0x0001, 0xff00); // System IF    
     var packet = [];
     packet[0] = 0x10;
-    packet[1] = protocolMap[deviceName][0]
+    packet[1] = WIRELESS
     packet[2] = 0x0B;
     packet[3] = 0x2F;
     packet[4] = 0x01;
     device.write(packet, 7);
-    device.read(packet,7)
+    //device.read(packet,7)
 }
 
-const mouseZonedict = {
-    "Logitech G502L" : 0x3E,
-    "Logitech G703L" : 0x1B,
-    "Logitech G903L" : 0x1B,
-    "Logitech GPro Wireless" : 0x3F,
-}
+
 function sendZone(zone, shutdown = false){
 
-    if(device_id == "4079"){
-        Apply();
-    }
+
     device.set_endpoint(2, 0x0002, 0xff00); // Lighting IF    
     var packet = [];
     packet[0x00] = 0x11;
-    packet[0x01] = protocolMap[deviceName][0]
-    packet[0x02] = protocolMap[deviceName][1]
-    packet[0x03] = protocolMap[deviceName][2]//mouseZonedict[deviceName];
+    packet[0x01] = WIRELESS
+    packet[0x02] = FeatureId
+    packet[0x03] = dpidict[DeviceId]
     packet[0x04] = zone;
     packet[0x05] = 0x01;
 
@@ -188,13 +212,18 @@ function sendZone(zone, shutdown = false){
     
     
     packet[0x09] = 0x02;
-if(device_id == "4067" || device_id == "4070") {
+
+if(DeviceId == "4067" || DeviceId == "4070" || DeviceId == "4087") {
         packet[16] = 0x01;
     
 }
 
     device.write(packet, 20);
     device.read(packet,20)
+
+    if(DeviceId == "4079" || DeviceId == "4087" || DeviceId == "405d"){
+        Apply();
+    }
 
     device.pause(1);
 
@@ -220,8 +249,32 @@ export function Shutdown()
     sendZone(1,true);
     
 }
+function SetDpiLightAlwaysOn(always){
+    device.set_endpoint(2, 0x0001, 0xff00); // System IF 
+    let packet = [0x10, 0x01, 0x08, 0x7E, 0x01, always ? 0x02 : 0x04,0x00]
+    device.write(packet, 7)
+    device.read(packet, 7)
+
+    device.set_endpoint(2, 0x0002, 0xff00); // Lighting IF    
+    packet = [0x11, 0x01, 0x08, 0x5E, 0x01,0x00,0x02, 0x00, 0x02]
+    device.write(packet, 20)
+    device.read(packet, 20)
 
 
+    device.set_endpoint(2, 0x0001, 0xff00); // System IF 
+    packet = [0x10, 0x01, 0x08, 0x6E, 0x01,0x00,0x00]
+    device.write(packet, 7)
+    device.read(packet, 7)
+
+    packet = [0x10, 0x01, 0x08, 0x6E, 0x01,0x00,0x00]
+    device.write(packet, 7)
+    device.read(packet, 7)
+}
+
+function SetDirectMode(direct){
+    let packet = [0x10, 0x01, FeatureId,0x80, direct,direct]
+    device.write(packet, 7)
+}
 export function Validate(endpoint)
 {
     return endpoint.interface === 2 && endpoint.usage === 0x0002 && endpoint.usage_page === 0xff00

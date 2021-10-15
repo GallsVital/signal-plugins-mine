@@ -1,6 +1,6 @@
 export function Name() { return "Logitech G403 Prodigy Gaming Mouse"; }
 export function VendorId() { return 0x046d; }
-export function ProductId() { return 0xc083; }
+export function ProductId() { return 0xc082; }
 export function Publisher() { return "SeedyRom"; }
 export function Size() { return [3, 3]; }
 export function DefaultPosition(){return [240,120]}
@@ -15,6 +15,7 @@ export function ControllableParameters(){
     ];
 }
 var savedDpi1;
+var FeatureId = 0x18;
 
 var vLedNames = ["Primary Zone", "Logo Zone"];
 var vLedPositions = [
@@ -39,6 +40,8 @@ if(savedDpi1 != dpi1 && DpiControl) {
         setDpi(dpi1);
     
 }
+SetDirectMode(true);
+
 }
 
 function setDpi(dpi){
@@ -67,7 +70,7 @@ function sendZone(zone, shutdown = false){
     var packet = [];
     packet[0x00] = 0x11;
     packet[0x01] = 0xFF;
-    packet[0x02] = 0x0E;
+    packet[0x02] = 0x18;
     packet[0x03] = 0x3C;
     packet[0x04] = zone;
     packet[0x05] = 0x01;
@@ -115,7 +118,10 @@ export function Shutdown()
     sendZone(1,true);
     
 }
-
+function SetDirectMode(direct){
+    let packet = [0x10, 0x01, FeatureId,0x80, direct,direct]
+    device.write(packet, 7)
+}
 
 export function Validate(endpoint)
 {

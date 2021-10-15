@@ -15,6 +15,7 @@ export function ControllableParameters(){
     ];
 }
 var savedDpi1;
+var FeatureId = 0x02;
 
 var vLedNames = ["Dpi Zone", "Logo Zone"];
 var vLedPositions = [
@@ -38,6 +39,8 @@ export function Initialize()
         setDpi(dpi1);
     
 }
+SetDirectMode(true);
+
 }
 
 function setDpi(dpi){
@@ -133,7 +136,10 @@ export function Shutdown()
     sendZone(1,true);
     //Apply(); //Makes Dpi zone flicker''
 }
-
+function SetDirectMode(direct){
+    let packet = [0x10, 0x01, FeatureId,0x80, direct,direct]
+    device.write(packet, 7)
+}
 
 export function Validate(endpoint)
 {

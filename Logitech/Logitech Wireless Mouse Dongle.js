@@ -1,6 +1,6 @@
 export function Name() { return "Logitech Wireless Mouse dongle"; }
 export function VendorId() { return 0x046d; }
-export function ProductId() { return 0xC539; }
+export function ProductId() { return 0xC539; }//0xC539
 export function Publisher() { return "WhirlwindFX"; }
 export function Size() { return [3, 3]; }
 export function DefaultPosition(){return [240,120]}
@@ -48,6 +48,8 @@ export function Initialize()
     if(savedDpi1 != dpi1 && DpiControl) {
             setDpi(dpi1);
     }
+    SetDirectMode(true);
+
 }
 
 function sendPacketString(string, size){
@@ -89,7 +91,7 @@ function setDpi(dpi){
     packet[5] = Math.floor(dpi/256);
     packet[6] = dpi%256;
     device.write(packet, 7);
-    device.read(packet, 7)
+    //device.read(packet, 7)
 }
 function Apply()
 {
@@ -102,7 +104,7 @@ function Apply()
     packet[3] = 0x2F;
     packet[4] = 0x01;
     device.write(packet, 7);
-    device.read(packet,7)
+    //device.read(packet,7)
 }
 
 const mouseZonedict = {
@@ -149,9 +151,8 @@ if(MouseType == "G903L" || MouseType == "G703L") {
         packet[16] = 0x01;
     
 }
-
     device.write(packet, 20);
-    device.read(packet, 20)
+    //device.read(packet, 20)
 
     device.pause(1);
 
@@ -177,7 +178,10 @@ export function Shutdown()
     sendZone(1,true);
     
 }
-
+function SetDirectMode(direct){
+    let packet = [0x10, 0x01, mouseZonedict[MouseType],0x80, direct,direct]
+    device.write(packet, 7)
+}
 
 export function Validate(endpoint)
 {
