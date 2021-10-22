@@ -117,8 +117,8 @@ function SubmitLightingColors()
     packet[0x02]   = 0xFF;
     device.write(packet, 65);
     device.read(packet, 17);
-
 }
+
 var vKeyNames = [
     "Device Wide",
 ];
@@ -276,7 +276,10 @@ function SendChannel(channel,shutdown = false)
     //channelReset(channel)
     //channelStart(channel);
     InitChannel(channel);
-    channelStart(channel);
+
+    if(savedEndpointValue == "Arduino"){
+        channelStart(channel);
+    }
 
     var ledsSent = 0;
     var TotalLedCount = TotalLedCount >= 204 ? 204 : TotalLedCount;
@@ -312,6 +315,7 @@ export function Render()
 {
         setEndpoint();
         CheckComponentStatus();
+
         SendChannel(0);
         device.pause(1);
 
@@ -319,6 +323,7 @@ export function Render()
         device.pause(1);
 
         SubmitLightingColors();
+ 
 
         InitCustomStrip()
         SetFans();
