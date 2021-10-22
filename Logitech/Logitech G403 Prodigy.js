@@ -1,7 +1,7 @@
-export function Name() { return "Logitech G403 Prodigy Gaming Mouse"; }
+export function Name() { return "Logitech G403 Prodigy"; }
 export function VendorId() { return 0x046d; }
-export function ProductId() { return 0xc082; }
-export function Publisher() { return "SeedyRom"; }
+export function ProductId() { return 0xC082; }
+export function Publisher() { return "TheDongster"; }
 export function Size() { return [3, 3]; }
 export function DefaultPosition(){return [240,120]}
 export function DefaultScale(){return 8.0}
@@ -11,11 +11,11 @@ export function ControllableParameters(){
         {"property":"LightingMode", "label":"Lighting Mode", "type":"combobox", "values":["Canvas","Forced"], "default":"Canvas"},
         {"property":"forcedColor", "label":"Forced Color","min":"0","max":"360","type":"color","default":"009bde"},
         {"property":"DpiControl", "label":"Enable Dpi Control","type":"boolean","default":"false"},
-        {"property":"dpi1", "label":"DPI", "step":"50","type":"number","min":"200", "max":"12400","default":"800"},
+        {"property":"dpi1", "label":"DPI", "step":"50","type":"number","min":"50", "max":"12000","default":"800"},
     ];
 }
 var savedDpi1;
-var FeatureId = 0x18;
+var FeatureId = 0x0E;
 
 var vLedNames = ["Primary Zone", "Logo Zone"];
 var vLedPositions = [
@@ -35,7 +35,7 @@ export function LedPositions()
 
 export function Initialize()
 {
-    device.set_endpoint(1, 0x0001, 0xff00, 0x0004); // System IF    
+    device.set_endpoint(1, 0x0001, 0xff00); // System IF    
 if(savedDpi1 != dpi1 && DpiControl) {
         setDpi(dpi1);
     
@@ -46,14 +46,14 @@ SetDirectMode(true);
 
 function setDpi(dpi){
 
-    device.set_endpoint(1, 0x0001, 0xff00, 0x0004); // System IF    
+    device.set_endpoint(1, 0x0001, 0xff00); // System IF    
     savedDpi1 = dpi1;
 
     var packet = [];
     packet[0] = 0x10;
     packet[1] = 0xFF;
     packet[2] = 0x0A;
-    packet[3] = 0x3C;
+    packet[3] = 0x3A;
     packet[4] = 0x00;
     packet[5] = Math.floor(dpi/256);
     packet[6] = dpi%256;
@@ -71,7 +71,7 @@ function sendZone(zone, shutdown = false){
     packet[0x00] = 0x11;
     packet[0x01] = 0xFF;
     packet[0x02] = 0x18;
-    packet[0x03] = 0x3C;
+    packet[0x03] = 0x3E;
     packet[0x04] = zone;
     packet[0x05] = 0x01;
 
@@ -96,14 +96,15 @@ function sendZone(zone, shutdown = false){
     packet[16] = 0x01;
 
     device.write(packet, 20);
-    device.pause(30);
+    device.pause(1);
 }
 
 export function Render()
 {
-    device.set_endpoint(1, 0x0002, 0xff00, 0x0005); // Lighting IF    
+    device.set_endpoint(1, 0x0002, 0xff00); // Lighting IF    
     sendZone(0);
     sendZone(1);
+    
 
     if(savedDpi1 != dpi1 && DpiControl){
       setDpi(dpi1)
@@ -113,13 +114,13 @@ export function Render()
 
 export function Shutdown()
 {
-    device.set_endpoint(1, 0x0002, 0xff00, 0x0005); // Lighting IF    
+    device.set_endpoint(1, 0x0002, 0xff00); // Lighting IF    
     sendZone(0,true);
     sendZone(1,true);
     
 }
 function SetDirectMode(direct){
-    let packet = [0x10, 0x01, FeatureId,0x80, direct,direct]
+    let packet = [0x10,0xFF, 0x18,0x80, direct,direct, 0x00]
     device.write(packet, 7)
 }
 
