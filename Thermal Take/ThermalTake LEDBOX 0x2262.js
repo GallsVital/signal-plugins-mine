@@ -2,7 +2,7 @@ const deviceList = ["None","TT Riing Quad 12", "Custom"]; //Object.keys(DeviceDi
 
 export function Name() { return "ThermalTake LedBox"; }
 export function VendorId() { return 0x264A; }
-export function ProductId() { return 0x2261; }
+export function ProductId() { return 0x2262; }
 export function Publisher() { return "WhirlwindFX"; }
 export function Size() { return [1,1]; }
 export function Type() { return "Hid"; }
