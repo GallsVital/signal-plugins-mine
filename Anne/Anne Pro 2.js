@@ -130,7 +130,7 @@ function sendColorPacket(index,data){
     packet[12] = 0x02;
     packet = packet.concat(data);
     device.write(packet,65);
-    device.pause(51);
+    device.pause(10);
     //device.read(packet,65);
 }
 function sendApplyPacket(data){
@@ -152,7 +152,7 @@ function sendApplyPacket(data){
     packet[12] = 0x02;
     packet = packet.concat(data);
     device.write(packet,65);
-    device.pause(51);
+    device.pause(15);
 }
 
 export function Validate(endpoint)
