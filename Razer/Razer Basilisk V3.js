@@ -52,7 +52,7 @@ export function Name() { return "Razer Basilisk V3"; }
 export function VendorId() { return 0x1532; }
 export function ProductId() { return 0x0099; }
 export function Publisher() { return "vermis"; }
-export function Size() { return [5,7]; }
+export function Size() { return [6,5]; }
 export function Type() { return "Hid"; }
 export function DefaultPosition(){return [240,120]}
 export function DefaultScale(){return 8.0}
@@ -76,8 +76,12 @@ function hexToRgb(hex) {
     return colors;
   }
 
-var vLedNames = ["ScrollWheel", "Logo", "UnderLeft1","UnderLeft2","UnderLeft3","UnderLeft4","UnderBottom","UnderRight1","UnderRight2","UnderRight3","UnderRight4" ];
-var vLedPositions = [[3,0], [3,3], [0,1], [0,2], [0,3], [0,4], [3,4], [5,4], [5,3], [5,2], [5,1]];
+var vLedNames = ["Logo", "Scrollwheel",
+	"UnderLeft1","UnderLeft2","UnderLeft3","UnderLeft4", "UnderBottom","UnderRight1","UnderRight2","UnderRight3","UnderRight4"];
+var vLedPositions = [[3,3], [3,0],
+	[0,1],[0,2],[0,3],[0,4],[3,4],[5,4],[5,3],[5,2],[5,1]
+
+];
 
 export function LedNames()
 {
@@ -242,7 +246,7 @@ export function Shutdown()
 
 export function Validate(endpoint)
 {
-    return endpoint.interface === 0 && endpoint.usage === 0x0002;
+    return endpoint.interface === 3 && endpoint.usage === 0x0001;
 }
 
 export function Image()
