@@ -8,7 +8,7 @@ export function DefaultScale(){return 8.0}
 export function ControllableParameters(){
     return [
         {"property":"shutdownColor", "label":"Shutdown Color","min":"0","max":"360","type":"color","default":"009bde"},
-        {"property":"DpiControl", "label":"Enable Dpi Control","type":"boolean","default":"false"},
+        // {"property":"DpiControl", "label":"Enable Dpi Control","type":"boolean","default":"false"},
         //{"property":"dpi1", "label":"DPI 1", "step":"50","type":"number","min":"200", "max":"8000","default":"800"},
     ];
 }
@@ -71,13 +71,12 @@ function SendColorPacket(shutdown = false) {
         packet[4] = color[0];
         packet[5] = color[1];
         packet[6] = color[2];
-        device.log(packet)
 
         device.write(packet, 65);
         device.read(packet, 65)
-        device.pause(2)
+        device.pause(5)
     }
-    device.pause(20)
+    device.pause(30)
 }
 
 export function Render() {
@@ -88,7 +87,6 @@ export function Render() {
         //setDpi(dpi1)
     //}
 
-    device.pause(1)
 }
 
 function setDpi(dpi){
