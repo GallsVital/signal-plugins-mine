@@ -1,7 +1,7 @@
-export function Name() { return "ThermalTake LedBox"; }
+export function Name() { return "TT Floe Riing Controller"; }
 export function VendorId() { return 0x264A; }
-export function ProductId() { return 0x2261; }
-export function Publisher() { return "WhirlwindFX"; }
+export function ProductId() { return 0x1fa5; }
+export function Publisher() { return "ChrisAdkins/WhirlwindFX"; }
 export function Size() { return [1,1]; }
 export function Type() { return "Hid"; }
 export function DefaultPosition(){return [0,0]}
@@ -11,9 +11,6 @@ export function ControllableParameters(){
         {"property":"shutdownColor", "label":"Shutdown Color","min":"0","max":"360","type":"color","default":"009bde"},
         {"property":"LightingMode", "label":"Lighting Mode", "type":"combobox", "values":["Canvas","Forced"], "default":"Canvas"},
         {"property":"forcedColor", "label":"Forced Color","min":"0","max":"360","type":"color","default":"009bde"},
-        {"property":"CustomSize", "label":"Custom Strip Size","type":"number","min":"1", "max":"80","default":"10"},
-        {"property":"FanSpeedPercent", "label":"Fan Speed Percent","type":"number","min":"20", "max":"100","default":"60"},
-
         ];
 }
 const vLedNames = []
@@ -38,16 +35,6 @@ function SetupChannels(){
         device.addChannel(ChannelArray[i][0],ChannelArray[i][1]);
     }
 }
-
-function hexToRgb(hex) {
-    var result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
-    var colors = [];
-    colors[0] = parseInt(result[1], 16);
-    colors[1] = parseInt(result[2], 16);
-    colors[2] = parseInt(result[3], 16);
-
-    return colors;
-  }
 
 export function LedNames()
 {
@@ -105,15 +92,6 @@ export function Render()
     for(let channel = 0; channel < 5; channel++){
         Sendchannel(channel);
     }
-
-    if(savedFanSpeed != FanSpeedPercent){
-        setFanRPM();
-    }
-    // if(Date.now() - LastFanCheck > 5000){
-    //     LastFanCheck = Date.now()
-    //     readFanRPM();
-    // }
-
 }
 
 function sendDirectPacket(LEDCount, Channel, data){
@@ -123,44 +101,11 @@ function sendDirectPacket(LEDCount, Channel, data){
     packet[1] = 0x32;
     packet[2] = 0x52;
     packet[3] = Channel + 1;
-    packet[4] = 0x24;
+    packet[4] = 0x18;
     packet = packet.concat(data);
 
     device.write(packet, 193);
     device.read(packet,64)
-}
-var savedFanSpeed;
-var LastFanCheck = Date.now();
-
-function setFanRPM(){
-    savedFanSpeed = FanSpeedPercent;
-    for(var channel = 1;channel <= 5;channel++){
-        var packet = [];
-        packet[0] = 0x00;
-        packet[1] = 0x32;
-        packet[2] = 0x51;
-        packet[3] = channel;
-        packet[4] = 0x01;
-        packet[5] = FanSpeedPercent
-        device.write(packet, 193);
-        device.read(packet,64);
-    }
-}
-function readFanRPM(){
-    var FanData = []
-    for(var channel = 1;channel <= 5;channel++){
-        var packet = [];
-        packet[0] = 0x00;
-        packet[1] = 0x33;
-        packet[2] = 0x51;
-        packet[3] = channel;
-        device.write(packet, 193);
-        packet = device.read(packet,64);
-        let RPM = (packet[7] << 8) + packet[6]
-        //device.log(parseInt((packet[7] << 8) + packet[6],16))
-        FanData.push(`Fan ${channel} ${RPM}`)
-    }
-    device.log(FanData)
 }
 
 export function Shutdown()

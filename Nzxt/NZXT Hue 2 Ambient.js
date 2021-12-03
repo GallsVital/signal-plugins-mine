@@ -1,6 +1,6 @@
-export function Name() { return "NZXT RGB and Fan Controller"; }
+export function Name() { return "NZXT Hue 2 Ambient"; }
 export function VendorId() { return   0x1E71; }
-export function ProductId() { return   0x2010; }
+export function ProductId() { return   0x2002; }
 export function Publisher() { return "WhirlwindFX"; }
 export function Size() { return [1,1]; }
 export function DefaultPosition(){return [0,0]}
@@ -124,6 +124,7 @@ export function Render()
 {
         SendChannel(0);
         SendChannel(1);
+
 }
 
 export function Validate(endpoint)

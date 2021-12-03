@@ -1,6 +1,6 @@
 export function Name() { return "Corsair LT100 Lighting Tower Controller"; }
-export function VendorId() { return 0x1b1c; }//0x046D; }
-export function ProductId() { return 0x0C23; }// 0xC24A;}
+export function VendorId() { return 0x1b1c; }
+export function ProductId() { return 0x0C23; }
 export function Publisher() { return "WhirlwindFX"; }
 export function Size() { return [1, 1]; }
 export function DefaultPosition(){return [0,0]}
@@ -9,98 +9,48 @@ export function ControllableParameters(){
     return [
     {"property":"LightingMode", "label":"Lighting Mode", "type":"combobox", "values":["Canvas","Forced"], "default":"Canvas"},
     {"property":"forcedColor", "label":"Forced Color","min":"0","max":"360","type":"color","default":"009bde"},
-    {"property":"device1", "label":"Ch1 | Port 1",  "type":"combobox", "values":["None","Light Tower"], "default":"None"},
-    {"property":"device2", "label":"Ch1 | Port 2",  "type":"combobox", "values":["None","Light Tower"], "default":"None"},
-    {"property":"device3", "label":"Ch1 | Port 3",  "type":"combobox", "values":["None","Light Tower"], "default":"None"},
-    {"property":"device4", "label":"Ch1 | Port 4",  "type":"combobox", "values":["None","Light Tower"], "default":"None"},
     ];
 }
-var ParentDeviceName = "Corsair LT100";
+const BrightnessLimiter = .5;
+const vKeyNames = []
+const vKeyPositions = []
 
-var CORSAIR_LIGHTING_CONTROL_SOFTWARE           = 0x02;
+const CORSAIR_LIGHTING_CONTROLLER_STREAM    = 0x32
+const CORSAIR_LIGHTING_CONTROLLER_COMMIT    = 0x33
+const CORSAIR_LIGHTING_CONTROLLER_START     = 0x34
+const CORSAIR_LIGHTING_CONTROLLER_RESET     = 0x37
+const CORSAIR_LIGHTING_CONTROLLER_MODE      = 0x38
 
-var brightness = .5;
+const CORSAIR_HARDWARE_MODE = 0x01;
+const CORSAIR_SOFTWARE_MODE = 0x02;
+
+export function SupportsSubdevices(){ return true; }
+const DeviceMaxLedLimit = 108;
+
+//Channel Name, Led Limit
+var ChannelArray = [
+    ["Channel 1", 108],
+]
+
+function SetupChannels(){
+    device.SetLedLimit(DeviceMaxLedLimit);
+    for(let i = 0; i < ChannelArray.length; i++){
+        device.addChannel(ChannelArray[i][0],ChannelArray[i][1]);
+    }
+}
 
 export function Initialize()
 {
-    var packet = [];
-    packet[0x00]           = 0x00;
-    packet[0x01]           = 0x38;
-    packet[0x02]           = 0x00;    //Channel 0/1
-    packet[0x03]           = CORSAIR_LIGHTING_CONTROL_SOFTWARE;
-    device.write(packet, 65);
+    SetupChannels()
 }
 
 export function Shutdown()
 {
-    // Return to some BS here?  Solid color?
-    var packet = [];
-    packet[0x00] = 0x00;
-    packet[0x01] = 0x38;
-    packet[0x02] = 0x00;
-    packet[0x03] = 0x01;
+    //channel 0
+    let packet = [0x00, CORSAIR_LIGHTING_CONTROLLER_MODE, 0x00, CORSAIR_HARDWARE_MODE];
     device.write(packet, 65);
 }
 
-function StreamLightingPacket(start, count, colorChannel, data)
-{
-    //channel selection == 32 0/1 Start Count Channel LEDS
-    //(Start, Count, Color, Data)
-    var packet = [];
-    packet[0x00]   = 0x00;
-    packet[0x01]   = 0x32;
-    packet[0x02]   = 0x00;
-    packet[0x03]   = start;
-    packet[0x04]   = count;
-    packet[0x05]   = colorChannel;
-    packet = packet.concat(data);
-    device.write(packet, 65);
-}
-
-function channelStart(channel){
-    var packet = [];
-    //start packet == 34 00 channel (len 64)
-    packet[0x00]   = 0x00;
-    packet[0x01]   = 0x34;
-    packet[0x02]   = channel;
-    device.write(packet, 65);
-}
-
-function SubmitLightingColors()
-{
-    var packet = [];
-    //commit packet == 32 FF (len 64)
-    packet[0x00]   = 0x00;
-    packet[0x01]   = 0x33;
-    packet[0x02]   = 0xFF;
-    device.write(packet, 65);
-}
-var vKeyNames = [
-"Device Wide"
-];
-//32 X 20
- var vKeyPositions = [
-[0,0]
-    
-
- ];
- const Light_Tower = {
-    mapping : [
-        0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26
-       ],
-       positioning : [
-        [2,26],[2,25],[2,24],[2,23],[2,22],[2,21],[2,20],[2,19],[2,18],[2,17],[2,16],[2,15],[2,14],[2,13],[2,12],[2,11],[2,10],[2,9],[2,8],[2,7],[2,6],[2,5],[2,4],[2,3],[2,2],[2,1],[2,0]
-    ],
-    LedNames : [
-        "Led 1","Led 2","Led 3","Led 4","Led 5","Led 6","Led 7","Led 8","Led 9","Led 10","Led 11","Led 12","Led 13","Led 14",
-        "Led 15","Led 16","Led 17","Led 18","Led 19","Led 20","Led 21","Led 22","Led 23","Led 24","Led 25","Led 26","Led 27","Led 28"
-    ],
-    displayName: "Light Tower",
-    ledCount : 27,
-    width: 4,
-    height: 27,
-    image: Placeholder()
- };
 export function LedNames()
 {
     return vKeyNames;
@@ -110,135 +60,105 @@ export function LedPositions()
 {
     return vKeyPositions;
 }
-var DeviceDict = {
-    "None": null,
-    "Light Tower" : Light_Tower,
+function SendChannel(Channel)
+{
+    let ChannelLedCount = device.channel(ChannelArray[Channel][0]).LedCount();
+
+    let ColorData = []
+    if(LightingMode == "Forced"){
+        ColorData = device.createColorArray(forcedColor, ChannelLedCount, "Seperate");
+
+    }else if(device.getLedCount() == 0){
+        ChannelLedCount = 27;
+        let pulseColor = device.getChannelPulseColor(ChannelArray[Channel][0], ChannelLedCount);
+        ColorData = device.createColorArray(pulseColor, ChannelLedCount, "Seperate");
+
+    }else{
+        ColorData = device.channel(ChannelArray[Channel][0]).getColors("Seperate");
+    }
+
+    let RedChannelData = ColorData[0].map( x => x * BrightnessLimiter)
+    let GreenChannelData = ColorData[1].map( x => x * BrightnessLimiter)
+    let BlueChannelData = ColorData[2].map( x => x * BrightnessLimiter)
+
+    //Set up for update
+    InitChannel(Channel);
+    channelStart(Channel);
+
+    //Stream RGB Data
+    let ledsSent = 0;
+    ChannelLedCount = ChannelLedCount >= 204 ? 204 : ChannelLedCount;
+
+    while(ChannelLedCount > 0){
+        let ledsToSend = ChannelLedCount >= 50 ? 50 : ChannelLedCount;
+
+        StreamLightingPacketChanneled(ledsSent,ledsToSend,0,RedChannelData.splice(0,ledsToSend),Channel);
+
+        StreamLightingPacketChanneled(ledsSent,ledsToSend,1,GreenChannelData.splice(0,ledsToSend),Channel);
+
+        StreamLightingPacketChanneled(ledsSent,ledsToSend,2,BlueChannelData.splice(0,ledsToSend),Channel);
+
+        ledsSent += ledsToSend;
+        ChannelLedCount -= ledsToSend;
+    }
 }
 
-var deviceValues = [
-    "",
-    "",
-    "",
-    "",
-
-];
-var deviceArray = [
-    "Ch1-Port-1",
-    "Ch1-Port-2",
-    "Ch1-Port-3",
-    "Ch1-Port-4",
-];
-
-
-function SetFans(){
-    var propertyArray = [device1,device2,device3,device4];
-
-        for (var deviceNumber = 0; deviceNumber < 4; deviceNumber++ ) {
-              if(deviceValues[deviceNumber] != propertyArray[deviceNumber]){
-                deviceValues[deviceNumber] = propertyArray[deviceNumber];
-
-                 if(deviceValues[deviceNumber] == "None"){
-                    device.removeSubdevice(deviceArray[deviceNumber]);
-                 }else{
-                     //"Ch1 | Port 1"
-                    device.createSubdevice(deviceArray[deviceNumber]); 
-                    // Parent Device + Sub device Name + Ports
-                    device.setSubdeviceName(deviceArray[deviceNumber],`${ParentDeviceName} - ${DeviceDict[propertyArray[deviceNumber]].displayName} - ${deviceArray[deviceNumber]}`);
-                    device.setSubdeviceImage(deviceArray[deviceNumber], DeviceDict[propertyArray[deviceNumber]].image);
-                    device.setSubdeviceSize(deviceArray[deviceNumber],DeviceDict[propertyArray[deviceNumber]].width,DeviceDict[propertyArray[deviceNumber]].height);
-                    device.setSubdeviceLeds(deviceArray[deviceNumber],
-                        DeviceDict[propertyArray[deviceNumber]].LedNames,
-                        DeviceDict[propertyArray[deviceNumber]].positioning)
-                 }
-            }
-        }
-} 
-function hexToRgb(hex) {
-    var result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
-    var colors = [];
-    colors[0] = parseInt(result[1], 16);
-    colors[1] = parseInt(result[2], 16);
-    colors[2] = parseInt(result[3], 16);
-
-    return colors;
-  }
 export function Render()
 {
-    SetFans();
-    CheckComponentStatus();
+    SendChannel(0)
+    device.pause(1);
 
-    var red = [144];
-    var green = [144];
-    var blue = [144];
-    var TotalLedCount = 0;
-    var propertyArray = [device1, device2,device3,device4];
-
-
-    for (var deviceNumber = 0; deviceNumber < 4; deviceNumber++ ) {
-
-             if(deviceValues[deviceNumber] != "None"){
-
-                for(var iIdx = 0; iIdx < DeviceDict[propertyArray[deviceNumber]].mapping.length; iIdx++){
-                    var iPxX = DeviceDict[propertyArray[deviceNumber]].positioning[iIdx][0];
-                    var iPxY = DeviceDict[propertyArray[deviceNumber]].positioning[iIdx][1];
-                    var mxPxColor;
-                    //find colors
-                    if (LightingMode == "Forced") {
-                        mxPxColor = hexToRgb(forcedColor)
-                    }else{
-                        mxPxColor = device.subdeviceColor(deviceArray[deviceNumber],iPxX, iPxY);
-                    } 
-                     //set colors
-                        red[DeviceDict[propertyArray[deviceNumber]].mapping[iIdx]+TotalLedCount] = mxPxColor[0]*brightness;
-                        green[DeviceDict[propertyArray[deviceNumber]].mapping[iIdx]+TotalLedCount] = mxPxColor[1]*brightness;
-                        blue[DeviceDict[propertyArray[deviceNumber]].mapping[iIdx]+TotalLedCount] = mxPxColor[2]*brightness;
-                    }
-                    TotalLedCount += DeviceDict[propertyArray[deviceNumber]].ledCount;
-                }
-            
-    }
-    
-   channelStart(0);//only one channel for these
-   device.pause(1);
-
-   StreamLightingPacket(0x00,0x32,0,red.splice(0,50))
-   StreamLightingPacket(0x00,0x32,1,green.splice(0,50))
-   StreamLightingPacket(0x00,0x32,2,blue.splice(0,50))
-   device.pause(1);
-
-   StreamLightingPacket(0x32,0x32,0,red.splice(0,50))
-   StreamLightingPacket(0x32,0x32,1,green.splice(0,50))
-   StreamLightingPacket(0x32,0x32,2,blue.splice(0,50))
-   device.pause(1);
-
-   StreamLightingPacket(0x64,0x08,0,red.splice(0,8))
-   StreamLightingPacket(0x64,0x08,1,green.splice(0,8))
-   StreamLightingPacket(0x64,0x08,2,blue.splice(0,8))
-   device.pause(1);
-
-   SubmitLightingColors();
+    SubmitLightingColors();
 
 }
-var ComponentNotificationId;
-function CheckComponentStatus(){
-    if(ComponentNotificationId == true){
-        return;
-    }
-    var propertyArray = [device1, device2,device3,device4];
-        for (var deviceNumber = 0; deviceNumber < propertyArray.length; deviceNumber++ ) {
-            if(propertyArray[deviceNumber] != "None"){
-                if(ComponentNotificationId != true){
-                    device.denotify(ComponentNotificationId);
-                    ComponentNotificationId = true;
-                }
-                return;
-                }
-        }
 
-    if(typeof ComponentNotificationId === 'undefined'){
-        ComponentNotificationId = device.notify("Device configuration needed", `You have not configured any connected components for this device. SignalRGB cannot control any connected fans or light strips until this is done.`, 0);
-    }
+function InitChannel(channel){
+    let packet = [0x00, CORSAIR_LIGHTING_CONTROLLER_MODE, channel, CORSAIR_SOFTWARE_MODE];
+
+    device.write(packet, 65);
+    device.read(packet, 17);
+
 }
+
+function StreamLightingPacketChanneled(start, count, colorChannel, data, channel)
+{
+    //channel selection == 32 0/1 Start Count Channel LEDS
+    //(Start, Count, Color, Data)
+    let packet = [0x00, CORSAIR_LIGHTING_CONTROLLER_STREAM, channel, start, count, colorChannel];
+    packet = packet.concat(data);
+
+    device.write(packet, 65);
+    device.read(packet, 17);
+}
+
+function channelStart(channel){
+    //start packet == 34 00 channel (len 64)
+    let packet = [0x00, CORSAIR_LIGHTING_CONTROLLER_START, channel];
+
+    device.write(packet, 65);
+    device.read(packet, 17);
+}
+
+function channelReset(channel){
+    let packet = [0x00, CORSAIR_LIGHTING_CONTROLLER_RESET, channel];
+
+    device.write(packet, 65);
+    device.read(packet, 17);
+}
+
+
+function SubmitLightingColors()
+{
+    let packet = [0x00,CORSAIR_LIGHTING_CONTROLLER_COMMIT,0xFF];
+
+    device.write(packet, 65);
+    device.read(packet, 17);
+}
+export function Validate(endpoint)
+{
+    return endpoint.interface === -1 | 2;
+}
+
 export function Validate(endpoint)
 {
     return endpoint.interface === -1;

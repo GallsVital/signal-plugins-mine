@@ -1,6 +1,6 @@
-export function Name() { return "NZXT RGB and Fan Controller"; }
+export function Name() { return "NZXT Case Controller"; }
 export function VendorId() { return   0x1E71; }
-export function ProductId() { return   0x2010; }
+export function ProductId() { return   0x200D; }
 export function Publisher() { return "WhirlwindFX"; }
 export function Size() { return [1,1]; }
 export function DefaultPosition(){return [0,0]}
