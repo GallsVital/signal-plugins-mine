@@ -1,0 +1,23 @@
+{
+    "ProductName": "ThermalTake Floe Riing RGB AIO",
+    "DisplayName": "ThermalTake Floe Riing RGB AIO - 6 Led",
+    "Brand" : "ThermalTake",
+    "Type" : "AIO",
+    "LedCount" : 6,
+    "Width": 3,
+    "Height": 3,
+    "LedMapping" : [
+        1, 0,
+       3,   2,
+        5, 4
+        ],
+    "LedCoordinates" : [
+        [2, 0], [3, 0],
+   [1, 1],           [4, 1],
+        [0, 2], [5, 2]
+    ],
+    "LedNames" : [
+        "Led 1", "Led 2", "Led 3", "Led 4", "Led 5", "Led 6"
+        ],
+    "Image": ""
+}
