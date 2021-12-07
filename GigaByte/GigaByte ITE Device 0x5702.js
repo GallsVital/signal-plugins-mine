@@ -12,12 +12,15 @@ export function ControllableParameters(){
         {"property":"shutdownColor", "label":"Shutdown Color","min":"0","max":"360","type":"color","default":"009bde"},
         {"property":"LightingMode", "label":"Lighting Mode", "type":"combobox", "values":["Canvas","Forced"], "default":"Canvas", "tooltip":"This toggles the device between displaying its canvas position, or being locked to its Forced Color"},
         {"property":"forcedColor", "label":"Forced Color","min":"0","max":"360","type":"color","default":"009bde"},
-        //{"property":"RGBHeaderCount", "label":"RGB Header Count","type":"number","min":"0", "max":"2","default":"0"},
+        {"property":"RGBHeaderCount", "label":"RGB Header Count","type":"number","min":"0", "max":"2","default":"0"},
         {"property":"Mainboardconfig", "label":"MainBoard Configuration", "type":"combobox",   "values":["RGB","RBG","BGR","BRG","GBR","GRB"], "default":"BGR"},
+        {"property":"Headerconfig", "label":"12v Header Configuration", "type":"combobox",   "values":["RGB","RBG","BGR","BRG","GBR","GRB"], "default":"RGB"},
+
         {"property":"RGBconfig", "label":"ARGB Channel Configuration", "type":"combobox",   "values":["RGB","RBG","BGR","BRG","GBR","GRB"], "default":"GRB"},
 
         ];
 } 
+const ParentDeviceName = "Gigabyte Motherboard"
 var MainBoardLedCount = 8;
 var D_LED1_Count = 0;
 var D_LED2_Count = 0;
@@ -34,6 +37,34 @@ function SetupChannels(){
         device.addChannel(ChannelArray[i][0],ChannelArray[i][1]);
     }
 }
+const HeaderArray = [
+    "12v RGB Header 1",
+    "12v RGB Header 2",
+];
+
+function onRGBHeaderChanged(){
+    device.log("test")
+    
+}
+
+
+var savedRGBHeaderCount;
+function Init12vHeaders(){
+    savedRGBHeaderCount = RGBHeaderCount;
+    for(let header = 0; header < 2;header++){
+
+        if(savedRGBHeaderCount <= header){
+        device.removeSubdevice(HeaderArray[header]);
+        }else{
+            //"Ch1 | Port 1"
+        device.createSubdevice(HeaderArray[header]); 
+        // Parent Device + Sub device Name + Ports
+        device.setSubdeviceName(HeaderArray[header],`${ParentDeviceName} - ${HeaderArray[header]}`);
+        device.setSubdeviceImage(HeaderArray[header], "");
+        device.setSubdeviceSize(HeaderArray[header],3,3);
+        }
+    }
+}   
 
 function hexToRgb(hex) {
     var result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
@@ -91,18 +122,21 @@ var TotalZones = [
 ]
 var vZones = [
     0x20,
-    0x21, //RGB Header Bottom "LED_C1"
     0x22,
     0x23, 
-    0x24, // RGB Header Top "LED_C2"
     0x25,
     0x26,
     0x27
 ]
+var RGBHeaders = [
+    0x21, //RGB Header Bottom "LED_C1"
+    0x24, // RGB Header Top "LED_C2"
+
+]
 var vDLED_Zones = [
     0x58, 0x59
 ]
-var vLedNames = ["Led 1","RGB Header 1","Led 2", "RGB Header 2","Led 3","Led 4","Led 5","Led 6"];
+var vLedNames = ["Led 1","Led 2","Led 3","Led 4","Led 5","Led 6"];
 var vLedPositions = [
     [0,1],
     [1,1],
@@ -110,9 +144,10 @@ var vLedPositions = [
     [3,1],
     [4,1],
     [5,1],
-    [6,1],
-    [7,1],
+
 ];
+
+
 function InitMainBoardLeds(){
     var names = [];
     var positions = []
@@ -192,7 +227,8 @@ function SendMainboard(shutdown = false)
                 col = hexToRgb(forcedColor)
             }else{
                 col = device.color(iPxX, iPxY);
-            }           
+            } 
+            
             //Data for my B550 Aorus Elite V1 is BGR?
             sendColorPacket(vZones[iIdx],[
                 col[RGBConfigs[Mainboardconfig][0]],
@@ -200,7 +236,26 @@ function SendMainboard(shutdown = false)
                 col[RGBConfigs[Mainboardconfig][2]]]);
             sendCommit();
         }
+}
 
+function Send12vHeaders(){
+
+    for(var iIdx = 0; iIdx < savedRGBHeaderCount; iIdx++)
+    {
+        var col;
+        if (LightingMode == "Forced") {
+            col = hexToRgb(forcedColor)
+        }else{
+            col = device.subdeviceColor(HeaderArray[iIdx],1,1);
+        }           
+
+        //Data for my B550 Aorus Elite V1 is BGR?
+        sendColorPacket(RGBHeaders[iIdx],[
+            col[RGBConfigs[Headerconfig][0]],
+            col[RGBConfigs[Headerconfig][1]],
+            col[RGBConfigs[Headerconfig][2]]]);
+        sendCommit();
+    }
 }
 function SetLedCounts(){
 
@@ -218,6 +273,11 @@ export function Render()
     SendMainboard();
     for(let channel = 0; channel < vDLED_Zones.length; channel++){
         Sendchannel(channel);
+    }
+    Send12vHeaders()
+
+    if(RGBHeaderCount != savedRGBHeaderCount){
+        Init12vHeaders();
     }
 }
 

@@ -1,6 +1,6 @@
 export function Name() { return "Logitech Wireless Mouse dongle"; }
 export function VendorId() { return 0x046d; }
-export function ProductId() { return 0xC539; }//0xC539
+export function ProductId() { return 0x00; }//0xC539
 export function Publisher() { return "WhirlwindFX"; }
 export function Size() { return [3, 3]; }
 export function DefaultPosition(){return [240,120]}

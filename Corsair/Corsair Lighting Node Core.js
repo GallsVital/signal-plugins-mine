@@ -75,7 +75,7 @@ function SendChannel(Channel)
         ColorData = device.createColorArray(forcedColor, ChannelLedCount, "Seperate");
 
     }else if(device.getLedCount() == 0){
-        ChannelLedCount = 40;
+        ChannelLedCount = 80;
         let pulseColor = device.getChannelPulseColor(ChannelArray[Channel][0], ChannelLedCount);
         ColorData = device.createColorArray(pulseColor, ChannelLedCount, "Seperate");
 
