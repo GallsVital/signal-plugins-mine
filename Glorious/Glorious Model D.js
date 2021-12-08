@@ -1,6 +1,6 @@
 export function Name() { return "Glorious Model D"; }
 export function VendorId() { return 0x258A; }
-export function ProductId() { return 0x0033; }
+//export function ProductId() { return 0x0033; }
 export function Publisher() { return "WhirlwindFX"; }
 export function Size() { return [3,3]; }
 export function DefaultPosition(){return [240,120]}
