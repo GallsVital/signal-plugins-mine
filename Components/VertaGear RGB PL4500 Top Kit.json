@@ -1,0 +1,19 @@
+{
+    "ProductName": "VertaGear PL4500 RGB Top Kit (Chair Back)",
+    "DisplayName": "VertaGear PL4500 RGB Top Kit (Chair Back) - 5 Zone",
+    "Brand" : "Vertagear",
+    "Type" : "Chair",
+    "LedCount" : 5,
+    "Width": 5,
+    "Height": 5,
+    "LedMapping" : [
+        0,1,2,3,4
+        ],
+    "LedCoordinates" : [
+        [0,0], [0,1], [1,0], [2,0], [2,1]
+    ],
+    "LedNames" : [
+        "Back Side - Top","Back Side - Bottom","Center Acrylic","Front Side - Top", "Front Side - Bottom"
+    ],
+    "Image": ""
+}
