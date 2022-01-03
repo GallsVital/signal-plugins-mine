@@ -30,6 +30,8 @@ export function ControllableParameters(){
     //{"property":"FanSpeed", "label":"Fan Speed %","type":"number","min":"0", "max":"100","default":"60"},
     ];
 }
+export function DefaultComponentBrand() { return "Corsair"}
+
 var ParentDeviceName = "Corsair Lighting Commander Core XT";
 
 export function Initialize()

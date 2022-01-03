@@ -25,6 +25,8 @@ const CORSAIR_HARDWARE_MODE = 0x01;
 const CORSAIR_SOFTWARE_MODE = 0x02;
 
 export function SupportsSubdevices(){ return true; }
+export function DefaultComponentBrand() { return "Corsair"}
+
 const DeviceMaxLedLimit = 108;
 
 //Channel Name, Led Limit

@@ -18,6 +18,7 @@ export function ControllableParameters(){
 }
 var ParentDeviceName = "Corsair Lighting Commander Core";
 export function SupportsSubdevices(){ return true; }
+export function DefaultComponentBrand() { return "Corsair"}
 const DeviceMaxLedLimit = 233;
 //Channel Name, Led Limit
 var ChannelArray = [

@@ -15,6 +15,7 @@ export function ControllableParameters(){
 var vLedNames = [
     "Led 1","Led 2","Led 3","Led 4","Led 5","Led 6","Led 7","Led 8", "Logo"
 ];
+export function DefaultComponentBrand() { return "NZXT"}
 
 var vLedPositions = [
 

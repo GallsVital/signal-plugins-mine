@@ -18,6 +18,8 @@ const vKeyNames = []
 const vKeyPositions = []
 
 export function SupportsSubdevices(){ return true; }
+export function DefaultComponentBrand() { return "Vertagear"}
+
 const DeviceMaxLedLimit = 80;
 
 //Channel Name, Led Limit
