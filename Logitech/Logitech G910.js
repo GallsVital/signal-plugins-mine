@@ -155,6 +155,7 @@ function SendLogoZones(shutdown = false){
     device.set_endpoint(1, 0x0602, 0xff43); // System IF    
 
     device.write(packet, 20);
+	device.pause(1);
 }
 
 function hexToRgb(hex) {
@@ -199,6 +200,7 @@ function SendZonePacket(startIdx, count, zone,shutdown = false)
 
     device.set_endpoint(1, 0x0604, 0xff43); // Lighting IF
     device.write(packet, 64);
+	device.pause(1);
 }
 
 function SendPacket(startIdx, count,shutdown = false)
@@ -234,6 +236,7 @@ function SendPacket(startIdx, count,shutdown = false)
 
     device.set_endpoint(1, 0x0604, 0xff43); // Lighting IF
     device.write(packet, 64);
+	device.pause(1);
 }
 
 export function NewApply()
