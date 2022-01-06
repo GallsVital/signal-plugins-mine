@@ -15,6 +15,7 @@ export function ControllableParameters(){
     ];
 }
 var savedDpi1;
+export function LacksOnBoardLeds() { return true; }
 
 var vLedNames = ["Primary Zone", "Logo Zone"];
 var vLedPositions = [

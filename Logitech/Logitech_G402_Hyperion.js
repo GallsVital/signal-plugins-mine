@@ -13,7 +13,7 @@ export function ControllableParameters(){
 }
 var Brightness;
 var savedDpi1;
-
+export function DeviceMessage() { return ["Brightness Control Only", "This device lacks ARGB leds, but brightness control is retained"]; }
 export function Initialize()
 {
     device.set_endpoint(1, 0x0001, 0xff00); // System IF 
@@ -48,8 +48,6 @@ export function Shutdown()
 {
 
 }
-
-export function LacksOnBoardLeds() {return true;}
 
 export function onBrightnessChanged()
 {

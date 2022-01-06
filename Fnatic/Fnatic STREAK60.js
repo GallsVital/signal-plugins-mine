@@ -12,7 +12,7 @@ export function ControllableParameters() {
         {"property":"forcedColor", "label":"Forced Color","min":"0","max":"360","type":"color","default":"009bde"},
     ];
 }
-
+export function DeviceMessage() { return ["Limited Functionality", "Due to firmware limitations this device is limited to Solid Colors only"]; }
 function hexToRgb(hex) {
     var result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
     var colors = [];
