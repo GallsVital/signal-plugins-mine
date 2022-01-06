@@ -19,6 +19,7 @@ var ParentDeviceName = "Razer Addressable RGB Controller";
 const vLedNames = []
 const vLedPositions = []
 export function SupportsSubdevices(){ return true; }
+export function LacksOnBoardLeds() {return true;}
 const DeviceMaxLedLimit = 240;
 
 //Channel Name, Led Limit
