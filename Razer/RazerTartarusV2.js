@@ -1,60 +1,11 @@
-function GetReport(cmd_class, cmd_id, size)
-{
-    var report = new Array(91).fill(0);
-
-    report[0] = 0;
-
-    // Status.
-    report[1] = 0x00;
-
-    // Transaction ID.
-    report[2] = 0xFF;
-    
-    // Remaining packets.
-    report[3] = 0x00;
-    report[4] = 0x00;
-
-    // Protocol type.
-    report[5] = 0x00;
-
-    // Data size.
-    report[6] = size;
-
-    // Command class.
-    report[7] = cmd_class;
-
-    // Command id.
-    report[8] = cmd_id;
-
-    //report[8-87] = data;
-
-    //report[89] = crc;
-
-    //report[89] = reserved;
-
-    return report;
-}
-
-
-function CalculateCrc(report)
-{
-    var iCrc = 0;
-
-    for (var iIdx = 3; iIdx < 89; iIdx++) {
-        iCrc ^= report[iIdx];
-    }
-
-    return iCrc;
-}
-
-
 export function Name() { return "Razer Tartarus V2"; }
 export function VendorId() { return 0x1532; }
 export function ProductId() { return 0x022b; }
 export function Publisher() { return "WhirlwindFX"; }
-export function Size() { return [10,12]; }
+export function Size() { return [6,7]; }
 export function DefaultPosition(){return [50,100]}
 export function DefaultScale(){return 8.0}
+export function Type() { return "Hid"; }
 export function ControllableParameters(){
     return [
         {"property":"shutdownColor", "label":"Shutdown Color","min":"0","max":"360","type":"color","default":"009bde"},
@@ -62,19 +13,70 @@ export function ControllableParameters(){
         {"property":"forcedColor", "label":"Forced Color","min":"0","max":"360","type":"color","default":"009bde"},
     ];
 }
+
+function GetReport(cmd_class, cmd_id, size)
+{
+    var report = new Array(91).fill(0);
+    report[0] = 0;
+    report[1] = 0x00;
+    report[2] = 0xFF;
+    report[3] = 0x00;
+    report[4] = 0x00;
+    report[5] = 0x00;
+    report[6] = size;
+    report[7] = cmd_class;
+    report[8] = cmd_id;
+    return report;
+}
+
+function CalculateCrc(report)
+{
+    var iCrc = 0;
+    for (var iIdx = 3; iIdx < 89; iIdx++) {
+        iCrc ^= report[iIdx];
+    }
+    return iCrc;
+}
+
 function hexToRgb(hex) {
     var result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
     var colors = [];
     colors[0] = parseInt(result[1], 16);
     colors[1] = parseInt(result[2], 16);
     colors[2] = parseInt(result[3], 16);
-
     return colors;
-  }
-export function Type() { return "Hid"; }
-var vLedNames = ["Keyboard"];
+}
 
-var vLedPositions = [[0,1]];
+var vLedNames = [
+    "Key 01","Key 02","Key 03","Key 04","Key 05",
+    "Key 06","Key 07","Key 08","Key 09","Key 10",
+	"Key 11","Key 12","Key 13","Key 14","Key 15",
+	"Key 16","Key 17","Key 18","Key 19","Scroll Wheel",
+    "Key 20",
+];
+
+var vKeymap = [
+    0,1,2,3,4,
+    5,6,7,8,9,
+    10,11,12,13,14,
+    15,16,17,18,19,
+                    20
+];
+
+var vLedPositions = [
+    [0,0],[1,0],[2,0],[3,0],[4,0],
+    [0,1],[1,1],[2,1],[3,1],[4,1],
+    [0,2],[1,2],[2,2],[3,2],[4,2],
+    [0,3],[1,3],[2,3],[3,3],[4,4],
+                                [5,6],
+];
+
+var vRowKeys = [
+	[0,1,2,3,4],
+	[5,6,7,8,9],
+	[10,11,12,13,14],
+	[15,16,17,18,19,20],
+];
 
 export function LedNames()
 {
@@ -89,32 +91,24 @@ export function LedPositions()
 function EnableSoftwareControl()
 {    
     var report = GetReport(0x0F, 0x03, 0x47);
-
-    report[2] = 0x3F; // transaction id.
-
-    report[11] = 0; // row index.
-
-    report[13] = 15; // led count.
-
+    report[2] = 0x3F;
+    report[11] = 0;
+    report[13] = 15;
     report[89] = CalculateCrc(report);
-
-    
     device.send_report(report, 91);    
 }
-
 
 function ReturnToHardwareControl()
 {
 
 }
 
-
 export function Initialize()
 {
-    
+
 }
 
-function SendPacket(idx,shutdown = false)
+function SendPacket(shutdown = false)
 {
     var packet = [];
     packet[0] = 0x00;
@@ -126,72 +120,42 @@ function SendPacket(idx,shutdown = false)
     packet[6] = 0x17;  
     packet[7] = 0x0F;
     packet[8] = 0x03;
-    packet[11] = idx;
     packet[13] = 0x05;
 
-    
-    for(var iIdx = 0; iIdx < 6; iIdx++){
-        var col;
-        if(shutdown){
-            col = hexToRgb(shutdownColor)
-        }else if (LightingMode == "Forced") {
-            col = hexToRgb(forcedColor)
-        }else{
-            col = device.color(iIdx, idx);
-        }    
-        
-        var iLedIdx = (iIdx*3) + 14;
-        packet[iLedIdx] = col[0];
-        packet[iLedIdx+1] = col[1];
-        packet[iLedIdx+2] = col[2];
-    }
-
-    packet[89] = CalculateCrc(packet);
-
-    device.send_report(packet, 91);
-    device.pause(1)
+    for(var iRow = 0; iRow <= 3; iRow++)
+	{
+		packet[11] = iRow;
+		for(var iRowKey = 0; iRowKey < vRowKeys[iRow].length; iRowKey++)
+		{
+			var iPxX = vLedPositions[vRowKeys[iRow][iRowKey]][0];
+			var iPxY = vLedPositions[vRowKeys[iRow][iRowKey]][1];
+			var color;
+			if(shutdown){
+				color = hexToRgb(shutdownColor)
+			}else if (LightingMode == "Forced") {
+				color = hexToRgb(forcedColor)
+			}else{
+				color = device.color(iPxX, iPxY);
+			}            
+			var iLedIdx = (iRowKey*3) + 14;
+			packet[iLedIdx] = color[0];
+			packet[iLedIdx+1] = color[1]; 
+			packet[iLedIdx+2] = color[2];
+		}
+		packet[89] = CalculateCrc(packet);
+		device.send_report(packet, 91);
+	}
 }
-
-
-function Apply()
-{
-    var packet = []; //new Array(91).fill(0);
-    packet[0] = 0x00;
-    packet[1] = 0x00;
-    packet[2] = 0x3F;
-    packet[3] = 0x00;
-    packet[4] = 0x00;
-    packet[5] = 0x00;
-    packet[6] = 0x0C;
-    packet[7] = 0x0F;
-    packet[8] = 0x02;
-    packet[11] = 0x08;
-    
-    packet[89] = CalculateCrc(packet);
-
-    device.send_report(packet, 91);
-}
-
 
 export function Render()
 {    
-    SendPacket(0);
-    SendPacket(1);
-    SendPacket(2);
-    SendPacket(3);
-
-    
+    SendPacket();
 }
 
 
 export function Shutdown()
 {
-    SendPacket(0,true);
-    SendPacket(1,true);
-    SendPacket(2,true);
-    SendPacket(3,true);
-
-    
+    SendPacket(true);
 }
 
 export function Validate(endpoint)
