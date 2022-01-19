@@ -3,8 +3,8 @@ export function VendorId() { return 0x046d; }
 export function ProductId() { return 0x0a89;}
 export function Publisher() { return "TheDongster"; }
 export function Size() { return [2, 2]; }
-export function DefaultPosition(){return [240,120]}
-export function DefaultScale(){return 8.0}
+export function DefaultPosition(){return [145,85]}
+export function DefaultScale(){return 10.0}
 export function ControllableParameters()
 {
     return [
