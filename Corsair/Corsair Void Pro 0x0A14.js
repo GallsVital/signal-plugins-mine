@@ -10,20 +10,12 @@ export function ControllableParameters(){
         {"property":"shutdownColor", "label":"Shutdown Color","min":"0","max":"360","type":"color","default":"009bde"},
         {"property":"LightingMode", "label":"Lighting Mode", "type":"combobox", "values":["Canvas","Forced"], "default":"Canvas"},
         {"property":"forcedColor", "label":"Forced Color","min":"0","max":"360","type":"color","default":"009bde"},
-        //{"property":"micLedControl", "label":"Enable Mic Led","type":"boolean","default":"false"},
-        //{"property":"frameRate", "label":"Frame Rate", "type":"number","min":"1", "max":"10","default":"5"},
+		{"property":"SidetoneControl", "label":"Sidetone", "type":"combobox", "values":["Off","On"], "default":"Off"},
+		{"property":"SidetoneAmount", "label":"Sidetone Amount","step":"1", "type":"number","min":"0", "max":"100","default":"0"},
+
     ];
 }
 
-function hexToRgb(hex) {
-    var result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
-    var colors = [];
-    colors[0] = parseInt(result[1], 16);
-    colors[1] = parseInt(result[2], 16);
-    colors[2] = parseInt(result[3], 16);
-
-    return colors;
-  }
 var vLedNames = ["Left Cans","Right Can"];
 
 var vLedPositions = [
@@ -40,9 +32,6 @@ export function LedPositions()
   return vLedPositions;
 }
 
-function EnableSoftwareControl()
-{
-}
 function sendPacketString(string, size){
     var packet= [];
     var data = string.split(' ');
@@ -54,15 +43,18 @@ function sendPacketString(string, size){
     device.write(packet, size);
 }
 
-function ReturnToHardwareControl()
-{
-}
-
-
 export function Initialize()
 {
-    sendPacketString("C8 01",20)
-
+    device.set_endpoint(3, 1, 0xffc5); // Main Endpoint 
+	
+	sendPacketString("C8 01",20)
+	
+	if(SidetoneControl)
+	{
+	setSidetone();	
+	}
+	
+	ReadBattery();
 }
 
 
@@ -70,13 +62,72 @@ export function Render()
 {       
     sendColors();
 }
-function sendColors(shutdown = false){
+
+export function onSidetoneAmountChanged()
+{
+	setSidetone();	
+}
+
+function setSidetone()
+{
+	device.set_endpoint(3, 1, 0xff00); // Sidetone Endpoint 
+	
+	var packet = []
+    packet[0x00]   = 0xFF;
+    packet[0x01]   = 0x0B;
+    packet[0x02]   = 0x00;
+    packet[0x03]   = 0xFF;
+    packet[0x04]   = 0x04;
+    packet[0x05]   = 0x0E;
+    packet[0x06]   = 0xFF;
+    packet[0x07]   = 0x05;
+    packet[0x08]   = 0x01;
+    packet[0x09]   = 0x04;
+    packet[0x0A]   = 0x00;
+    packet[0x0B]   = (SidetoneAmount+200);
+	packet[0x0C]   = 0x00;
+    packet[0x0D]   = 0x00;
+	packet[0x0E]   = 0x00;
+    packet[0x0F]   = 0x00;
+	device.log("Sidetone is set to: " + (SidetoneAmount));
+	device.send_report(packet,64);
+	ReadBattery();
+}
+
+function ReadBattery()
+{
+	device.set_endpoint(3, 1, 0xffc5); // Main Endpoint 
+	
+	var packet = []
+    packet[0x00]   = 0xC9;
+    packet[0x01]   = 0x0B;
+	
+	device.write(packet,20);
+	
+	packet = device.read(packet,20);
+	
+	if (packet[2] >= 101)
+		{
+	var	Battery = (packet[2] - 128)
+	device.log("Battery Percentage: " + (Battery) + "%");
+		}
+	else if (packet[2] != 0)
+		{
+	var	Battery = packet[2];
+	device.log("Battery Percentage: " + (Battery) + "%");
+		}
+	
+}
+
+function sendColors(shutdown = false)
+{
 
 var red = new Array(3).fill(0)
 var green = new Array(3).fill(0)
 var blue = new Array(3).fill(0)
 
-
+	device.set_endpoint(3, 1, 0xffc5); // Main Endpoint   
+	
     var packet = []
     packet[0x00]   = 0xCB;
     packet[0x01]   = 0x06;
@@ -116,15 +167,28 @@ var blue = new Array(3).fill(0)
     device.pause(30);
 }
 
+function hexToRgb(hex) 
+{
+    var result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+    var colors = [];
+    colors[0] = parseInt(result[1], 16);
+    colors[1] = parseInt(result[2], 16);
+    colors[2] = parseInt(result[3], 16);
+
+    return colors;
+ }
+
 export function Validate(endpoint)
 {
-    return endpoint.interface === 3 && endpoint.usage === 1 && endpoint.usage_page === 0xffc5;
+    return endpoint.interface === 3 && endpoint.usage === 1 && endpoint.usage_page === 0xffc5 
+	    || endpoint.interface === 3 && endpoint.usage === 1 && endpoint.usage_page === 0xff00;;
 }
 
 export function Shutdown()
-{    
+{   
+	device.set_endpoint(3, 1, 0xffc5); // Main Endpoint   
+	
     sendPacketString("C8 00",20)
-
 }
 
 export function Image() 
