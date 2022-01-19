@@ -3,7 +3,8 @@ export function VendorId() { return 0x1e71; }
 export function ProductId() { return 0x000;} //0x170E; }
 export function Publisher() { return "WhirlwindFX"; }
 export function Size() { return [9,9]; }
-
+export function DefaultPosition(){return [165,60]}
+export function DefaultScale(){return 3.0}
 var vLedNames = [
     "Led 1","Led 2","Led 3","Led 4","Led 5","Led 6","Led 7","Led 8","Led 9", "Logo"
 ];
