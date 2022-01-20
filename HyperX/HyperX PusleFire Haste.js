@@ -10,7 +10,7 @@ export function ControllableParameters(){
         {"property":"shutdownColor", "label":"Shutdown Color","min":"0","max":"360","type":"color","default":"009bde"},
         {"property":"LightingMode", "label":"Lighting Mode", "type":"combobox", "values":["Canvas","Forced"], "default":"Canvas"},
         {"property":"forcedColor", "label":"Forced Color","min":"0","max":"360","type":"color","default":"009bde"},
-        {"property":"DpiControl", "label":"Enable Dpi Control","type":"boolean","default":"false"},
+        //{"property":"DpiControl", "label":"Enable Dpi Control","type":"boolean","default":"false"},
         //{"property":"dpi1", "label":"DPI","step":"50", "type":"number","min":"200", "max":"12400","default":"800"},
     ];
 }
@@ -28,9 +28,9 @@ var vLedPositions = [
 ];
 
 export function Initialize() {
-    if(DpiControl) {
-        setDpi(dpi1);
-    }
+    // if(DpiControl) {
+    //     setDpi(dpi1);
+    // }
 }
 
 export function LedNames()
@@ -95,9 +95,9 @@ function sendColors(shutdown = false){
 }
 export function Render() {
     sendColors();
-    if(savedDpi1 != dpi1 && DpiControl){
-        setDpi(dpi1)
-    }
+    // if(savedDpi1 != dpi1 && DpiControl){
+    //     setDpi(dpi1)
+    // }
 }
 
 function setDpi(dpi){
