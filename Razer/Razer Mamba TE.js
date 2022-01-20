@@ -54,7 +54,7 @@ export function ProductId() { return 0x0046; }
 export function Publisher() { return "WhirlwindFX"; }
 export function Size() { return [5,7]; }
 export function Type() { return "Hid"; }
-export function DefaultPosition(){return [240,120]}
+export function DefaultPosition() {return [225,120]; }
 export function DefaultScale(){return 8.0}
 export function ControllableParameters(){
     return [

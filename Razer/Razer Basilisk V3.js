@@ -54,7 +54,7 @@ export function ProductId() { return 0x0099; }
 export function Publisher() { return "vermis"; }
 export function Size() { return [6,5]; }
 export function Type() { return "Hid"; }
-export function DefaultPosition(){return [240,120]}
+export function DefaultPosition() {return [225,120]; }
 export function DefaultScale(){return 8.0}
 export function ControllableParameters(){
     return [

@@ -3,8 +3,8 @@ export function VendorId() { return 0x046d; }
 export function ProductId() { return 0xC07E; }
 export function Publisher() { return "WhirlwindFX"; }
 export function Size() { return [3, 3]; }
-export function DefaultPosition(){return [240,120]}
-export function DefaultScale(){return 8.0}
+export function DefaultPosition() {return [225,120]; }
+export function DefaultScale(){return 15.0}
 export function ControllableParameters(){
     return [
         {"property":"DpiControl", "label":"Enable Dpi Control","type":"boolean","default":"false"},

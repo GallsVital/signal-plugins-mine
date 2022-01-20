@@ -3,8 +3,8 @@ export function VendorId() { return 0x1038; }
 export function ProductId() { return 0x184C; }
 export function Publisher() { return "Rafee"; }
 export function Size() { return [4,4]; }
-export function DefaultPosition(){return [240,120]}
-export function DefaultScale(){return 8.0}
+export function DefaultPosition() {return [225,120]; }
+export function DefaultScale(){return 12.0}
 export function ControllableParameters(){
     return [
         {"property":"shutdownColor", "label":"Shutdown Color","min":"0","max":"360","type":"color","default":"009bde"},

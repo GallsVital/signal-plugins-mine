@@ -3,7 +3,7 @@ export function VendorId() { return 0x0951; }
 export function ProductId() { return 0x16D3; }
 export function Publisher() { return "WhirlwindFX"; }
 export function Size() { return [8,12]; }
-export function DefaultPosition(){return [240,120]}
+export function DefaultPosition() {return [225,120]; }
 export function DefaultScale(){return 5.0}
 export function ControllableParameters(){
     return [

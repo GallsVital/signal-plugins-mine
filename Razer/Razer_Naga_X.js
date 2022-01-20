@@ -54,8 +54,8 @@ export function ProductId() { return 0x0096; }
 export function Publisher() { return "TheDongster"; }
 export function Size() { return [3,3]; }
 export function Type() { return "Hid"; }
-export function DefaultPosition(){return [240,120];}
-export function DefaultScale(){return 8.0;}
+export function DefaultPosition() {return [225,120]; }
+export function DefaultScale(){return 15.0}
 export function ControllableParameters(){
     return [
         {"property":"shutdownColor", "label":"Shutdown Color","min":"0","max":"360","type":"color","default":"009bde"},

@@ -54,8 +54,8 @@ export function ProductId() { return 0x006f; }
 export function Publisher() { return "WhirlwindFX"; }
 export function Size() { return [10,10]; }
 export function Type() { return "Hid"; }
-export function DefaultPosition(){return [240,120]}
-export function DefaultScale(){return 8.0}
+export function DefaultPosition() {return [225,120]; }
+export function DefaultScale(){return 5.0}
 export function ControllableParameters(){
     return [
         {"property":"shutdownColor", "label":"Shutdown Color","min":"0","max":"360","type":"color","default":"009bde"},

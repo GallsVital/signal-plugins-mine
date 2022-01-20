@@ -14,8 +14,8 @@ export function Name() { return "Corsair Glaive Pro RGB Mouse"; }
 export function VendorId() { return 0x1b1c; }
 export function ProductId() { return 0x1b74; }
 export function Publisher() { return "WhirlwindFX"; }
-export function DefaultPosition(){return [240,120]}
-export function DefaultScale(){return 8.0}
+export function DefaultPosition() {return [225,120]; }
+export function DefaultScale(){return 15.0}
 export function Size() { return [3, 3]; }
 export function ControllableParameters(){
     return [
