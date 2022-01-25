@@ -1,6 +1,6 @@
 export function Name() { return "ASUS ROG Claymore II Wired Mode"; }
-export function VendorId() { return 0x046d; }
-export function ProductId() { return 0xC539; }
+export function VendorId() { return 0x0B05; }
+export function ProductId() { return 0x1934; }
 export function Publisher() { return "WhirlwindFX"; }
 export function Size() { return [21, 7] }
 export function DefaultPosition(){return [10,100]}
