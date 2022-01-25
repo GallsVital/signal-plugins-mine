@@ -3,8 +3,9 @@ export function VendorId() { return 0x1b1c; }
 export function ProductId() { return 0x1BAF; }
 export function Publisher() { return "WhirlwindFX"; }
 export function Size() { return [22, 8]; }
-export function DefaultPosition() {return [75,70]; }
-export function DefaultScale(){return 8.0}
+export function DefaultPosition(){return [10,100]}
+const DESIRED_HEIGHT = 85;
+export function DefaultScale(){return Math.floor(DESIRED_HEIGHT/Size()[1])}
 export function ControllableParameters(){
     return [
         {"property":"startupMode", "label":"Start Up Mode","type":"boolean","default":"true"},
