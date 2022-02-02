@@ -2,7 +2,7 @@
     "ProductName": "be quiet! Pure Base 500DX",
     "DisplayName": "be quiet! Pure Base 500DX - 14 LED",
     "Brand" : "be quiet!",
-    "Type" : "AIO",
+    "Type" : "Strip",
     "LedCount" : 14,
     "Width": 3,
     "Height": 14,

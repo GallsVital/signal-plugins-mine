@@ -1,4 +1,4 @@
-export function Name() { return "Vertagear RGB Chair Upgrade"; }
+export function Name() { return "Vertagear RGB LED Upgrade Kits"; }
 export function VendorId() { return   0x1E71; }
 export function ProductId() { return   0x2004; }
 export function Publisher() { return "WhirlwindFX"; }

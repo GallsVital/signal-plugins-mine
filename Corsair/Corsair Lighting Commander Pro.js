@@ -15,6 +15,19 @@ export function ControllableParameters(){
 const vKeyNames = []
 const vKeyPositions = []
 
+const MAX_FAN_COUNT = 6
+const MAX_TEMP_SENSOR_COUNT = 4
+
+const CORSAIR_LIGHTING_CONTROLLER_GET_TEMPCONFIGURATION = 0x10
+const CORSAIR_LIGHTING_CONTROLLER_GET_TEMPSENSORS = 0x11
+
+const CORSAIR_LIGHTING_CONTROLLER_GET_FANCONFIGURATION = 0x20
+const CORSAIR_LIGHTING_CONTROLLER_GET_FANRPM = 0x21;
+const CORSAIR_LIGHTING_CONTROLLER_GET_FANPERCENT = 0x22;
+const CORSAIR_LIGHTING_CONTROLLER_SET_FANPERCENT = 0x23;
+const CORSAIR_LIGHTING_CONTROLLER_SET_FANRPM = 0x24;
+
+
 const CORSAIR_LIGHTING_CONTROLLER_STREAM    = 0x32
 const CORSAIR_LIGHTING_CONTROLLER_COMMIT    = 0x33
 const CORSAIR_LIGHTING_CONTROLLER_START     = 0x34
@@ -39,10 +52,23 @@ function SetupChannels(){
         device.addChannel(ChannelArray[i][0],ChannelArray[i][1]);
     }
 }
+var ConnectedFans = []
+function SetupFans(){
+    ConnectedFans = FindFans()
+    for (let i = 0; i < ConnectedFans.length;i++){
+        device.createFanControl("CoPro Fan " + ConnectedFans[i]);
+    }
+}
 
 export function Initialize()
 {
     SetupChannels()
+    SetupFans()
+    //SetAllFanRPM(700)
+    //SetAllFanPercent(75)
+    device.log(`Temp Sensors Found: ${FindTempSensors()}`)
+    device.log(`Fans Found: ${FindFans()}`)
+
 }
 
 
@@ -52,9 +78,12 @@ export function Shutdown()
     //channel 0
     let packet = [0x00, CORSAIR_LIGHTING_CONTROLLER_MODE, 0x00, CORSAIR_HARDWARE_MODE];
     device.write(packet, 65);
+    device.read(packet, 17);
     //channel 1
     packet = [0x00, CORSAIR_LIGHTING_CONTROLLER_MODE, 0x01, CORSAIR_HARDWARE_MODE];
     device.write(packet, 65);
+    device.read(packet, 17);
+
 }
 
 export function LedNames()
@@ -108,6 +137,25 @@ function SendChannel(Channel,shutdown = false)
         ChannelLedCount -= ledsToSend;
     }
 }
+// Idle Mode Detection and Recovery
+var savedPollFanTimer = Date.now();
+var PollModeInternal = 500;
+function PollFans() {
+	//Break if were not ready to poll
+	if (Date.now() - savedPollFanTimer < PollModeInternal) {
+		return
+	}
+	savedPollFanTimer = Date.now();
+
+    for (var i = 0; i < ConnectedFans.length; i++){
+        device.log(`Fan ${ConnectedFans[i]} RPM: ${GetFanRPM(ConnectedFans[i])}`)
+        device.setRPM("CoPro Fan " + ConnectedFans[i], GetFanRPM(ConnectedFans[i]))
+    }
+
+    //device.log(`Fan RPM: ${GetAllFanRPMS()}`)
+    //device.log(`Fan Percents: ${GetAllFanPercents()}`)
+    //device.log(`Temp Sensors (Celsius ): ${GetAllTempSensors()}`)
+}
 
 export function Render()
 {
@@ -118,6 +166,14 @@ export function Render()
     device.pause(1);
 
     SubmitLightingColors();
+
+    device.pause(1);
+    PollFans()
+    for(let i = 0; i < ConnectedFans.length; i++){
+        let level = device.getNormalizedFanlevel(`CoPro Fan ${ConnectedFans[i]}`)
+        //device.log(`Fan ${ConnectedFans[i]} level is: `+level);
+        SetFanPercent(ConnectedFans[i], level * 100)
+    }
 }
 
 
@@ -162,6 +218,129 @@ function SubmitLightingColors()
     device.write(packet, 65);
     device.read(packet, 17);
 }
+function GetAllFanPercents(){
+    let FanSpeeds = []
+    for(let i = 0; i < MAX_FAN_COUNT;i++){
+        FanSpeeds.push(GetFanPercent(i))
+    }
+    return FanSpeeds
+}
+function GetFanPercent(fan){
+    let packet = [0x00,CORSAIR_LIGHTING_CONTROLLER_GET_FANPERCENT, fan];
+
+    device.write(packet, 65);
+    packet = device.read(packet, 17);
+    return packet[2]
+}
+
+function GetAllFanRPMS(){
+    let FanSpeeds = []
+    for(let i = 0; i < MAX_FAN_COUNT;i++){
+        FanSpeeds.push(GetFanRPM(i))
+    }
+    return FanSpeeds
+}
+
+function GetFanRPM(fan){
+    let packet = [0x00,CORSAIR_LIGHTING_CONTROLLER_GET_FANRPM,fan];
+
+    device.write(packet, 65);
+    packet = device.read(packet, 17);
+    return (packet[2] << 8) + packet[3]
+}
+
+function SetAllFanRPM(rpm){
+    for(let i = 0; i < MAX_FAN_COUNT;i++){
+        SetFanRPM(i, rpm)
+    }
+}
+
+function SetFanRPM(fan, rpm){
+    let low = rpm & 0xFF
+    let high = rpm >> 8
+    device.log(`Setting Fan: ${fan} RPM.  high: ${high}, Low:${low}`)
+    let packet = [0x00,CORSAIR_LIGHTING_CONTROLLER_SET_FANRPM , fan, high, low];
+
+    device.write(packet, 65);
+    device.read(packet, 17);
+}
+
+function SetAllFanPercent(percent){
+    for(let i = 0; i < MAX_FAN_COUNT;i++){
+        SetFanPercent(i, percent)
+    }
+}
+
+function SetFanPercent(fan, percent){
+
+    //device.log(`Setting Fan: ${fan} Percent to ${percent}.`)
+    let packet = [0x00,CORSAIR_LIGHTING_CONTROLLER_SET_FANPERCENT, fan, percent];
+
+    device.write(packet, 65);
+    device.read(packet, 17);
+}
+
+function FindFans(){
+    let connectedFans = []
+    let config = GetFanConfiguration()
+    for (let i = 0; i < MAX_FAN_COUNT;i++){
+        if(config[i] == 1 || config[i] == 2){
+            connectedFans.push(i)
+            device.log(`Found Fan on Port ${i + 1}`)
+        }
+    }
+    return connectedFans
+}
+
+function GetFanConfiguration(){
+    let packet = [0x00,CORSAIR_LIGHTING_CONTROLLER_GET_FANCONFIGURATION];
+
+
+    device.write(packet, 65);
+    packet = device.read(packet, 17);
+    device.log(packet)
+    return packet.slice(2,8)
+}
+
+function FindTempSensors(){
+    let connectedSensors = []
+    let config = GetTempConfiguration()
+    for (let i = 0; i < MAX_TEMP_SENSOR_COUNT;i++){
+        if(config[i] == 1){
+            connectedSensors.push(i)
+            device.log(`Found Temp Sensor on Port ${i + 1}`)
+        }
+    }
+    return connectedSensors
+}
+
+
+
+function GetAllTempSensors(){
+    let Temps = []
+    for(let i = 0; i < MAX_TEMP_SENSOR_COUNT;i++){
+        Temps.push(GetTempSensor(i)/100)
+    }
+    return Temps
+}
+
+function GetTempSensor(sensor){
+    let packet = [0x00,CORSAIR_LIGHTING_CONTROLLER_GET_TEMPSENSORS,sensor];
+
+    device.write(packet, 65);
+    packet = device.read(packet, 17);
+    return (packet[2] << 8) + packet[3]
+} 
+
+function GetTempConfiguration(){
+    let packet = [0x00,CORSAIR_LIGHTING_CONTROLLER_GET_TEMPCONFIGURATION];
+
+
+    device.write(packet, 65);
+    packet = device.read(packet, 17);
+    return packet.slice(2,8)
+}
+
 
 export function Validate(endpoint)
 {
