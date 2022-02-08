@@ -15,12 +15,12 @@ export function ControllableParameters(){
     {"property":"Channel2Count", "label":"Channel 2 Fan count","type":"combobox","values":["0","1","2","3","4"],"default":"0"},
     {"property":"Channel3Count", "label":"Channel 3 Fan count","type":"combobox","values":["0","1","2","3","4"],"default":"0"},
     {"property":"Channel4Count", "label":"Channel 4 Fan count","type":"combobox","values":["0","1","2","3","4"],"default":"0"},
-    {"property":"targetRPM", "label":"Fan RPM", "step":"50","type":"number","min":"800", "max":"1900","default":"1300"},
-    {"property":"FanMode", "label":"Fan Speed Mode","type":"combobox","values":["Manual","PWM"],"default":"PWM"},
+    // {"property":"targetRPM", "label":"Fan RPM", "step":"50","type":"number","min":"800", "max":"1900","default":"1300"},
+    {"property":"FanMode", "label":"Fan Speed Mode","type":"combobox","values":["SignalRGB","Motherboard PWM"],"default":"SignalRGB"},
     ];
 }
 export function DeviceMessage() { return ["Limited Frame Rate", "This device’s firmware is limited to a slower refresh rate then other device’s when using more then 2 channels"]; }
-
+var ConnectedFans = []
 const Lian_Li_UniFan = {
     mapping : [
  0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15
@@ -302,10 +302,40 @@ function hexToRgb(hex) {
     return colors;
   }
 
+var savedPollFanTimer = Date.now();
+var PollModeInternal = 3000;
+function PollFans(){
+        //Break if were not ready to poll
+    if (Date.now() - savedPollFanTimer < PollModeInternal) {
+        return
+    }
+    savedPollFanTimer = Date.now();
+
+    for(let fan = 0; fan < 4; fan++){
+        let rpm = readFanRPM(fan)
+        device.log(`Fan ${fan}: ${rpm}rpm`)
+
+        if(rpm > 0 && !ConnectedFans.includes(`Fan ${fan}`)){
+            ConnectedFans.push(`Fan ${fan}`)
+            device.createFanControl(`Fan ${fan}`);
+        }
+
+        if(ConnectedFans.includes(`Fan ${fan}`)){
+            device.setRPM(`Fan ${fan}`, rpm)
+                
+            let newSpeed = device.getNormalizedFanlevel(`Fan ${fan}`) * 100
+            setFanPercent(fan, newSpeed)
+        }
+    }
+}
+
 
 export function Render()
 {
-    
+    if(FanMode == "SignalRGB"){
+        PollFans()
+    }
+
     if(!savedMoboPassthrough){
         sendChannels();
     }
@@ -313,35 +343,30 @@ export function Render()
     setFans();
     setMoboPassthrough();
 
-    setFanRPM();
     setFanMode();
 }
-function readFanRPM(){
-        
-        for(let channel = 0; channel < 4;channel++){
-            var packet;
-            packet = readControlPacket(channelArray[channel].fanRead,packet,2);
-            device.log(packet);
-        }
+function readFanRPM(channel){
+    let packet = readControlPacket(channelArray[channel].fanRead,[],2);
+    return packet[0] | (packet[1] << 8)
 }
 
-var savedTargetRPM;
-function setFanRPM(){
-    if(savedTargetRPM != targetRPM){
-        savedTargetRPM = targetRPM;
+function setFanRPM(channel, rpm){
+
+    var packet = [];
+    packet[0] = rpm % 256
+    packet[1] = Math.floor(rpm / 256)
+    //device.log(`Setting Channel ${channel} to ${rpm}rpm, [${packet[0]}, ${packet[1]}]`)
+    sendControlPacket(channelArray[channel].fanAction,packet,2)
+
+    packet[0] = 1;
+    sendControlPacket(channelArray[channel].fanCommit,packet,1)
+
+}
     
-        for(let channel = 0; channel < 4;channel++){
-            var packet = [];
-            packet[0] = targetRPM % 256
-            packet[1] = Math.floor(targetRPM / 256)
-
-            sendControlPacket(channelArray[channel].fanAction,packet,2)
-
-            packet[0] = 1;
-            sendControlPacket(channelArray[channel].fanCommit,packet,1)
-        }
-    }
-
+function setFanPercent(channel, percent){
+    let rpm = Math.round(1900 * percent/100)
+    device.log(`Setting Channel ${channel} to ${Math.round(percent)}% Fan Speed, UniFan rpm equivalent: ${rpm}`)
+    setFanRPM(channel, rpm)
 }
 
 var savedFanMode;
@@ -375,7 +400,8 @@ function setFanMode(){
 
 function readControlPacket(index,data,length){
         //                  iType, iRequest, iValue, iReqIdx, pBuf, iLen, iTimeout 
-        device.control_transfer(0xC0,0x81,0,index,data,length,1000);
+        return device.control_transfer(0xC0,0x81,0,index,data,length,1000);
+
 }
 function sendControlPacket(index,data,length){
         //                  iType, iRequest, iValue, iReqIdx, pBuf, iLen, iTimeout 

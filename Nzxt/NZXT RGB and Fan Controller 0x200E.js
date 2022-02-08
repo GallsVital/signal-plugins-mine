@@ -1,6 +1,6 @@
 export function Name() { return "NZXT RGB and Fan Controller"; }
 export function VendorId() { return   0x1E71; }
-export function ProductId() { return   0x200E; }
+export function ProductId() { return   0x2010; }
 export function Publisher() { return "WhirlwindFX"; }
 export function Size() { return [1,1]; }
 export function DefaultPosition(){return [0,0]}
@@ -34,9 +34,36 @@ function SetupChannels(){
         device.addChannel(ChannelArray[i][0],ChannelArray[i][1]);
     }
 }
+
+function SetFanPollRate(seconds){
+    //    devicelet pollRate = (1 + ((seconds-.5) * 4)) / 2
+
+    let packet = [0x60, 0x03]
+    device.write(packet,64)
+    device.read([0x00], 64)
+
+    packet = [0x60, 0x02, 0x01, 0xe8, 0x03, 0x01, 0xe8, 0x03]
+    device.write(packet,64)
+    device.read([0x00], 64)
+
+}
+
+var ConnectedFans = []
+function SetupFans(){
+    SetFanPollRate()
+
+
+    //ConnectedFans = FindFans()
+    //for (let i = 0; i < ConnectedFans.length;i++){
+    //    device.createFanControl("Fan " + ConnectedFans[i]);
+    //}
+}
+
 export function Initialize()
 {
     SetupChannels()
+    SetupFans()
+
 }
 
 export function Shutdown()
@@ -56,7 +83,7 @@ function StreamLightingPacketChanneled(packetNumber, count, data, channel)
     packet = packet.concat(data);
 
     device.write(packet,64);
-    device.read(packet,64);
+    //device.read(packet,64);
 }
 
 function SubmitLightingColors(channel)
@@ -79,6 +106,7 @@ function SubmitLightingColors(channel)
     packet[14] = 0x00;
     packet[15] = 0x01;
     device.write(packet,64)
+    //device.read([0x00], 64)
 }
 
 export function LedNames()
@@ -121,11 +149,115 @@ function SendChannel(Channel,shutdown = false)
       SubmitLightingColors(Channel);
 
 }
+const NZXT_GETFANSTATE_FAN1_RPM = 24
+const NZXT_GETFANSTATE_FAN2_RPM = 26
+const NZXT_GETFANSTATE_FAN3_RPM = 28
 
+const NZXT_GETFANSTATE_FAN1_DUTY = 40
+const NZXT_GETFANSTATE_FAN2_DUTY = 41
+const NZXT_GETFANSTATE_FAN3_DUTY = 42
+class ReadFanPacket{
+    
+    constructor(data){
+        this.data = data
+        this.rpmMap = {
+            0: NZXT_GETFANSTATE_FAN1_RPM,
+            1: NZXT_GETFANSTATE_FAN2_RPM,
+            2: NZXT_GETFANSTATE_FAN3_RPM
+        }
+        this.dutyMap = {
+            0: NZXT_GETFANSTATE_FAN1_DUTY,
+            1: NZXT_GETFANSTATE_FAN2_DUTY,
+            2: NZXT_GETFANSTATE_FAN3_DUTY
+        }
+    }
+    getFanRpm(FanId){
+        return this.data[this.rpmMap[FanId]] | (this.data[this.rpmMap[FanId] + 1] << 8)
+    }
+    printFanRpm(FanId){
+        device.log(`Fan ${FanId}, ${this.data[this.rpmMap[FanId]] | (this.data[this.rpmMap[FanId] + 1] << 8)} rpm`)
+    }
+    printFanRpm(FanId){
+        device.log(`Fan ${FanId}, ${this.data[this.dutyMap[FanId]]} Duty`)
+    }
+    printFanState(FanId){
+        device.log(`Fan ${FanId}, ${this.data[this.dutyMap[FanId]]} Duty, ${this.data[this.rpmMap[FanId]] | (this.data[this.rpmMap[FanId] + 1] << 8)} rpm`)
+    }
+    
+    Process(){
+        this.printFanState(0)
+        this.printFanState(1)
+        this.printFanState(2)
+
+        for(let i = 0; i < 3;i++){
+            let rpm = this.getFanRpm(i) || 0;
+
+            if(rpm > 0 && !ConnectedFans.includes(`Fan ${i}`)){
+                ConnectedFans.push(`Fan ${i}`)
+                device.createFanControl(`Fan ${i}`);
+            }
+
+            if(ConnectedFans.includes(`Fan ${i}`)){
+                device.setRPM(`Fan ${i}`, rpm)
+                    
+                let newSpeed = device.getNormalizedFanlevel(`Fan ${i}`) * 100
+                SetFanState(i, newSpeed)
+            }
+            
+        }
+    }
+
+    toPacket(){
+            return this.data
+    }
+}
+
+
+var savedPollFanTimer = Date.now();
+var PollModeInternal = 3000;
+function PollFans(){
+    	//Break if were not ready to poll
+	if (Date.now() - savedPollFanTimer < PollModeInternal) {
+		return
+	}
+	savedPollFanTimer = Date.now();
+
+    
+    do {
+        let packet = device.readTimeout([0x0], 64, 10)
+        if(packet[0] == 0x67 && packet[1] == 0x02){
+
+            let FanData = new ReadFanPacket(packet)
+            FanData.Process()
+
+        }
+    }while(device.getLastReadSize() > 0)
+    
+}
+
+function SetFanState(FanId, PercentDuty){
+    //let start = Date.now()
+
+    let packet = [0x62, 0x01, (0x01 << FanId)]
+    packet[FanId + 3] = PercentDuty
+    device.write(packet,64)
+    //device.read([0x00], 64)
+
+    //device.log(`Setting Fan ${FanId} took ${Date.now() - start}ms`)
+}
 export function Render()
 {
+
+        let start = Date.now()
+        PollFans();
+
+
         SendChannel(0);
         SendChannel(1);
+
+        
+        //device.log(`Render took ${Date.now() - start}ms`)
+
 }
 
 export function Validate(endpoint)

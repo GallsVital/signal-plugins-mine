@@ -54,9 +54,11 @@ function SetupChannels(){
 }
 var ConnectedFans = []
 function SetupFans(){
+    ClearReadBuffer(100)
+
     ConnectedFans = FindFans()
     for (let i = 0; i < ConnectedFans.length;i++){
-        device.createFanControl("CoPro Fan " + ConnectedFans[i]);
+        device.createFanControl("Fan " + ConnectedFans[i]);
     }
 }
 
@@ -66,8 +68,8 @@ export function Initialize()
     SetupFans()
     //SetAllFanRPM(700)
     //SetAllFanPercent(75)
-    device.log(`Temp Sensors Found: ${FindTempSensors()}`)
-    device.log(`Fans Found: ${FindFans()}`)
+    //device.log(`Temp Sensors Found: ${FindTempSensors()}`)
+    //device.log(`Fans Found: ${FindFans()}`)
 
 }
 
@@ -137,9 +139,11 @@ function SendChannel(Channel,shutdown = false)
         ChannelLedCount -= ledsToSend;
     }
 }
-// Idle Mode Detection and Recovery
+
 var savedPollFanTimer = Date.now();
-var PollModeInternal = 500;
+var PollModeInternal = 1000;
+var index = 0
+var longestDelay = 0
 function PollFans() {
 	//Break if were not ready to poll
 	if (Date.now() - savedPollFanTimer < PollModeInternal) {
@@ -147,18 +151,53 @@ function PollFans() {
 	}
 	savedPollFanTimer = Date.now();
 
-    for (var i = 0; i < ConnectedFans.length; i++){
-        device.log(`Fan ${ConnectedFans[i]} RPM: ${GetFanRPM(ConnectedFans[i])}`)
-        device.setRPM("CoPro Fan " + ConnectedFans[i], GetFanRPM(ConnectedFans[i]))
+    ClearReadBuffer()
+    //device.log(`Checking Buffers took ${Date.now() - savedPollFanTimer}ms`)
+
+    let rpm = GetFanRPM(ConnectedFans[index])
+    device.setRPM("Fan " + ConnectedFans[index], rpm)
+    
+    let level = device.getNormalizedFanlevel(`Fan ${ConnectedFans[index]}`)
+    SetFanPercent(ConnectedFans[index], level * 100)
+
+    device.log(`Fan ${ConnectedFans[index]} RPM: ${rpm}, Level: ${(level).toFixed(2)}, took ${Date.now() - savedPollFanTimer}ms`)
+
+
+    index = (index + 1) % ConnectedFans.length
+    if(index == 0){
+        PollModeInternal = 3000
+        device.log(`Longest Fan Polling took ${longestDelay}ms`)
+    }else{
+        PollModeInternal = 100
     }
+    if(longestDelay < Date.now() - savedPollFanTimer){
+        longestDelay = Date.now() - savedPollFanTimer
+    }
+}
+
+    // for (var i = 0; i < ConnectedFans.length; i++){
+    //     let rpm = GetFanRPM(ConnectedFans[i])
+    //     device.log(`Fan ${ConnectedFans[i]} RPM: ${rpm}`)
+    //     device.setRPM("Fan " + ConnectedFans[i], rpm)
+    // }
+
+    //ClearReadBuffer()
+    // for(let i = 0; i < ConnectedFans.length; i++){
+    //     let level = device.getNormalizedFanlevel(`Fan ${ConnectedFans[i]}`)
+    //     //device.log(`Fan ${ConnectedFans[i]} level is: `+level);
+    //     //SetFanPercent(ConnectedFans[i], level * 100)
+    // }
 
     //device.log(`Fan RPM: ${GetAllFanRPMS()}`)
     //device.log(`Fan Percents: ${GetAllFanPercents()}`)
     //device.log(`Temp Sensors (Celsius ): ${GetAllTempSensors()}`)
-}
+
 
 export function Render()
 {
+    
+
+
     SendChannel(0);
     device.pause(1);
 
@@ -166,16 +205,22 @@ export function Render()
     device.pause(1);
 
     SubmitLightingColors();
-
     device.pause(1);
+
     PollFans()
-    for(let i = 0; i < ConnectedFans.length; i++){
-        let level = device.getNormalizedFanlevel(`CoPro Fan ${ConnectedFans[i]}`)
-        //device.log(`Fan ${ConnectedFans[i]} level is: `+level);
-        SetFanPercent(ConnectedFans[i], level * 100)
-    }
 }
 
+function ClearReadBuffer(timeout = 10){
+    let count = 0
+    let readCounts = []
+    device.flush()
+    while(device.getLastReadSize() > 0){
+        device.readTimeout([0x00], 17, timeout)
+        count++
+        readCounts.push(device.getLastReadSize())
+    }
+    //device.log(`Read Count ${count}: ${readCounts} Bytes`)
+}
 
 function InitChannel(channel){
     let packet = [0x00, CORSAIR_LIGHTING_CONTROLLER_MODE, channel, CORSAIR_SOFTWARE_MODE];
@@ -227,7 +272,7 @@ function GetAllFanPercents(){
 }
 function GetFanPercent(fan){
     let packet = [0x00,CORSAIR_LIGHTING_CONTROLLER_GET_FANPERCENT, fan];
-
+    device.flush()
     device.write(packet, 65);
     packet = device.read(packet, 17);
     return packet[2]
@@ -243,9 +288,10 @@ function GetAllFanRPMS(){
 
 function GetFanRPM(fan){
     let packet = [0x00,CORSAIR_LIGHTING_CONTROLLER_GET_FANRPM,fan];
-
+    //let start = Date.now()
     device.write(packet, 65);
-    packet = device.read(packet, 17);
+    packet = device.read([0x00], 17);
+    //device.log(`GetFanRPM took: ${Date.now() - start}ms!`)
     return (packet[2] << 8) + packet[3]
 }
 
@@ -260,7 +306,7 @@ function SetFanRPM(fan, rpm){
     let high = rpm >> 8
     device.log(`Setting Fan: ${fan} RPM.  high: ${high}, Low:${low}`)
     let packet = [0x00,CORSAIR_LIGHTING_CONTROLLER_SET_FANRPM , fan, high, low];
-
+    device.flush()
     device.write(packet, 65);
     device.read(packet, 17);
 }
@@ -272,12 +318,12 @@ function SetAllFanPercent(percent){
 }
 
 function SetFanPercent(fan, percent){
-
     //device.log(`Setting Fan: ${fan} Percent to ${percent}.`)
     let packet = [0x00,CORSAIR_LIGHTING_CONTROLLER_SET_FANPERCENT, fan, percent];
-
+    //let start = Date.now();
     device.write(packet, 65);
-    device.read(packet, 17);
+    //packet = device.read([0x00], 17);
+    //device.log(`SetFanPercent took ${Date.now() - start}ms!`)
 }
 
 function FindFans(){
@@ -294,8 +340,7 @@ function FindFans(){
 
 function GetFanConfiguration(){
     let packet = [0x00,CORSAIR_LIGHTING_CONTROLLER_GET_FANCONFIGURATION];
-
-
+    device.flush()
     device.write(packet, 65);
     packet = device.read(packet, 17);
     device.log(packet)
@@ -315,7 +360,6 @@ function FindTempSensors(){
 }
 
 
-
 function GetAllTempSensors(){
     let Temps = []
     for(let i = 0; i < MAX_TEMP_SENSOR_COUNT;i++){
@@ -326,7 +370,6 @@ function GetAllTempSensors(){
 
 function GetTempSensor(sensor){
     let packet = [0x00,CORSAIR_LIGHTING_CONTROLLER_GET_TEMPSENSORS,sensor];
-
     device.write(packet, 65);
     packet = device.read(packet, 17);
     return (packet[2] << 8) + packet[3]
@@ -334,7 +377,6 @@ function GetTempSensor(sensor){
 
 function GetTempConfiguration(){
     let packet = [0x00,CORSAIR_LIGHTING_CONTROLLER_GET_TEMPCONFIGURATION];
-
 
     device.write(packet, 65);
     packet = device.read(packet, 17);

@@ -27,7 +27,15 @@ var ChannelArray = [
     ["4 pin Ports", 204],
     ["3 Pin Lighting Channel", 128],
 ]
-
+var FanControllerArray = [
+    "Fan 1",
+    "Fan 2",
+    "Fan 3",
+    "Fan 4",
+    "Fan 5",
+    "Fan 6",
+]
+var ConnectedFans = [];
 function SetupChannels(){
     device.SetLedLimit(DeviceMaxLedLimit);
     for(let i = 0; i < ChannelArray.length; i++){
@@ -51,8 +59,8 @@ export function Initialize()
     device.log(`Vid is ${Corsair_Get(CORSAIR_VID)}`)
     device.log(`Pid is ${Corsair_Get(CORSAIR_PID)}`)
 
-
-    setFanMode();
+    GetFanSettings()
+    //setFanMode();
     //SetRGBHeaderLength(5);
 }
 
@@ -60,7 +68,8 @@ export function Initialize()
 const CommandDict = {
     0x06 : "Send Command",
     0x0d : "Open Endpoint",
-    0x05 : "Close Endpoint"
+    0x05 : "Close Endpoint",
+    0x08 : "Fan Speeds"
 }
 
 const CORSAIR_COMMAND = 0x08;
@@ -81,11 +90,20 @@ const CORSAIR_LIGHTING_CONTROLLER_ENDPOINT = 0x22;
 const CORSAIR_HARDWARE_MODE = 1;
 const CORSAIR_SOFTWARE_MODE = 2;
 
+
+const MAX_FAN_COUNT = 6
+
 function Corsair_Get(index){
     var packet = [0x00, CORSAIR_COMMAND,0x02,index,0x00]
     device.write(packet,1025)
     packet = device.read(packet,1025)
     return packet[4] | (packet[5] << 8)
+}
+function Corsair_Get_Packet(index){
+    var packet = [0x00, CORSAIR_COMMAND,0x02,index,0x00]
+    device.write(packet,1025)
+    packet = device.read(packet,1025)
+    return packet
 }
 function Corsair_Set(index, value){
     var packet = [0x00, CORSAIR_COMMAND,0x01,index,0x00, (value & 0xFF), (value >> 8 & 0xFF)]
@@ -96,6 +114,7 @@ function Corsair_Set(index, value){
     }
 }
 function Corsair_Open_Endpoint(endpoint, index = 0){
+    
     var packet = [0x00, CORSAIR_COMMAND,0x0D,index,endpoint]
     device.write(packet,1025)
     packet = device.read(packet,1025)
@@ -111,46 +130,172 @@ function Corsair_Close_Endpoint(endpoint){
         device.log(`Close Endpoint Error`)
     }
 }
+
+var savedPollFanTimer = Date.now();
+var PollModeInternal = 3000;
+function PollFans() {
+	//Break if were not ready to poll
+	if (Date.now() - savedPollFanTimer < PollModeInternal) {
+		return
+	}
+	savedPollFanTimer = Date.now();
+
+    GetFanSpeeds()
+    sendCoolingdata()
+    //let level = device.getNormalizedFanlevel(`Fan ${ConnectedFans[index]}`)
+    //SetFanPercent(ConnectedFans[index], level * 100)
+
+    //device.log(`Fan ${ConnectedFans[index]} RPM: ${rpm}, Level: ${(level).toFixed(2)}, took ${Date.now() - savedPollFanTimer}ms`)
+
+}
+
+function GetFanSettings(){
+    device.log(`Reading Fan Data`)
+
+    let CoolingData = [0x00];
+    //Corsair_Close_Endpoint(1, 0)
+
+    Corsair_Open_Endpoint(0x1a, 1)
+
+    sendPacketString("00 08 09 01",1025)
+    device.read([0x00],1025);
+    sendPacketString("00 08 08 01",1025)
+    CoolingData = device.read(CoolingData, 1025);
+
+    //device.log(`Command: ${CommandDict[CoolingData[2]]}`)
+
+    if(CoolingData[4] == 9 && CoolingData[5] == 0){
+        let allFanData = CoolingData.slice(7,7+MAX_FAN_COUNT);
+        device.log(allFanData)
+        for(let i = 0; i < MAX_FAN_COUNT; i++){
+           if(allFanData[i] == 0x07){
+                device.createFanControl(FanControllerArray[i])
+                ConnectedFans.push(i)
+                device.log(`Found ${FanControllerArray[i]}`)
+            }
+        }
+    }else{
+        device.log("Failed to get Fan RPM's")
+    }
+    Corsair_Close_Endpoint(1, 1)
+}
+
+
+function InitFanControllers(){
+    let CoolingData = [0x00];
+    Corsair_Open_Endpoint(0x17, 1)
+    sendPacketString("00 08 09 01",1025)
+    device.read([0x00],1025);
+    sendPacketString("00 08 08 01",1025)
+    CoolingData = device.read(CoolingData, 1025);
+
+    device.log(`Command: ${CommandDict[CoolingData[2]]}`)
+    if(CoolingData[4] == 6 && CoolingData[5] == 0){
+        let allFanData = CoolingData.slice(7,7+2*CoolingData[6]);
+
+        for(let i = 0; i < MAX_FAN_COUNT; i++){
+            let fanData = allFanData.splice(0,2);
+            let fanRPM = fanData[0]  + (fanData[1] << 8)
+            if(fanRPM > 0){
+                device.createFanControl(FanControllerArray[i])
+                ConnectedFans.push(FanControllerArray[i])
+                device.log(`Found ${FanControllerArray[i]}`)
+            }
+        }
+    }else{
+        device.log("Failed to get Fan Count")
+    }
+
+    Corsair_Close_Endpoint(1, 1)
+}
+
 function GetFanSpeeds(){
     device.log(`Reading Fan Data`)
 
-    let CoolingData = [0,8,0,1 ];
-    var packet = []
-    //Corsair_Close_Endpoint(1, 1)
-    //sendPacketString("00 08 05 01 01",1025) //close
-    //device.read(packet,1025);
-    Corsair_Open_Endpoint(17, 1)
-    //sendPacketString("00 08 0D 01 17",1025) //open
-    //device.read(packet,1025);
-    
-    sendPacketString("00 08 09 01",1025) //read?
-    device.read(packet,1025);
+    let CoolingData = [0x00];
+    //Corsair_Close_Endpoint(1, 0)
 
-    sendPacketString("00 08 08 01",1025) //read?
+    Corsair_Open_Endpoint(0x17, 1)
 
+    sendPacketString("00 08 09 01",1025)
+    device.read([0x00],1025);
+    sendPacketString("00 08 08 01",1025)
     CoolingData = device.read(CoolingData, 1025);
-    device.log(CommandDict[CoolingData[2]])
-    device.log(CoolingData.slice(4,6))
+
+    device.log(`Command: ${CommandDict[CoolingData[2]]}`)
+
     if(CoolingData[4] == 6 && CoolingData[5] == 0){
-        device.log(`Valid Fan Data`)
-        device.log(`Fan Speeds Found ${CoolingData[6]}`)
-        var fanSpeeds = CoolingData.slice(7,7+2*CoolingData[6]);
-        for(let i = 0; i < CoolingData[6]; i++){
-            let fanRPM = fanSpeeds[i*2]  + (fanSpeeds[i*2+1]  << 8)
-            device.log(`Fan ${i+1} rpm ${fanRPM} << ${fanSpeeds[i*2]} << ${fanSpeeds[i*2+1]}`)
+        device.log(`Valid Fan Data, Fans Found ${CoolingData[6]}`)
+        let allFanData = CoolingData.slice(7,7+2*CoolingData[6]);
+
+        for(let i = 0; i < MAX_FAN_COUNT; i++){
+            let fanData = allFanData.splice(0,2);
+            let fanRPM = fanData[0]  + (fanData[1] << 8)
+                device.log(`${FanControllerArray[i]} rpm ${fanRPM}`)
+                device.setRPM(FanControllerArray[i], fanRPM)
         }
+    }else{
+        device.log("Failed to get Fan RPM's")
     }
     Corsair_Close_Endpoint(1, 1)
+}
 
-    //sendPacketString("00 08 05 01 01",1025) //close
-    //device.read(packet,1025);
+function readCoolingData(){
+    var CoolingData = [0x00];
+    
 
+    sendPacketString("00 08 05 01 01",1025) //close
+    device.read([0x00],1025);
+
+    sendPacketString("00 08 0D 01 17",1025) //open
+    device.read([0x00],1025);
+
+    sendPacketString("00 08 02",1025) //read?
+
+    CoolingData = device.read(CoolingData, 1025);
+    device.log(CoolingData.slice(0,20));
+    sendPacketString("00 08 05 01 01",1025) //close
+    device.read([0x00],1025);
+
+    sendPacketString("00 08 0D 00 22",1025) // Critical
+    device.read([0x00],1025);
 
 }
+
+function sendCoolingdata(){
+
+    var CoolingData = [
+        0x00, 0x08, 0x06, 0x01, 0x1F, 0x00, 0x00, 0x00, 0x07, 0x00, 0x07, 0x00, 0x00, 0x64, // Pump %?
+        0x00, 
+        0x01, 0x00, 0x3C, 0x00, //fan Data   00 %% 00
+        0x02, 0x00, 0x3C, 0x00, //fan Data  
+        0x03, 0x00, 0x00, 0x00, //fan Data  
+        0x04, 0x00, 0x00, 0x00, //fan Data  
+        0x05, 0x00, 0x00, 0x00, //fan Data  
+        0x06, 0x00, 0x00, 0x00  //fan Data 
+    ]
+
+    for(var fan = 0; fan < ConnectedFans.length; fan++){
+        CoolingData[13 + ConnectedFans[fan]*4] = device.getNormalizedFanlevel(FanControllerArray[ConnectedFans[fan]]) * 100
+    }
+
+    Corsair_Open_Endpoint(0x18, 1)
+
+    sendPacketString("00 08 09 01",1025) //read?
+    device.read([0x00],1025);
+
+    device.write(CoolingData,1025);
+    device.read([0x00],1025);
+
+    Corsair_Close_Endpoint(1, 1)
+
+}
+
 function GetTemps(){
     device.log(`Reading Temp Data`)
     let CoolingData = [0,8,0,1];
-    var packet = []
+    var packet = [0x00]
+
     sendPacketString("00 08 0D 01 21",1025) //open
     device.read(packet,1025);
 
@@ -165,15 +310,15 @@ function GetTemps(){
          var tempData = CoolingData.slice(7,7+3*CoolingData[6]);
          for(let i = 0; i < CoolingData[6]; i++){
              let temp = (tempData[i*3+1]  + (tempData[i*3+2]  << 8)) /10
-             device.log(`Temp ${i+1} is ${temp} << ${tempData[i*3+1]} << ${tempData[i*3+2]}`)
+             device.log(`Temp ${i+1} is ${temp}C`)
          }
      }
 
     sendPacketString("00 08 05 01 01",1025) //close
     device.read(packet,1025);
-    device.read(packet,1025);
-
 }
+
+
 export function Shutdown()
 {
     if(Corsair_Get(CORSAIR_MODE) == CORSAIR_SOFTWARE_MODE){
@@ -411,60 +556,16 @@ function SetRGBHeaderLength(ledCount){
     sendPacketString("00 08 15 01",1025) //apply changes
 
 }
-function readCoolingData(){
-    var CoolingData = [0,8,0 ,1 ];
-    
-    
-    //sendPacketString("00 08 05 01 01",1025) //close
-    //sendPacketString("00 08 0D 01 17",1025) //open
-    //sendPacketString("00 08 09 01",1025) //read?
-    //CoolingData = device.read(coolingData, 1025);
-    //device.log(CoolingData);
-    //sendPacketString("00 08 05 01 01",1025) //close
 
-    //sendPacketString("00 08 0D 00 22",1025) // Critical
 
-}
-var SavedFanSpeed;
-var SavedPumpSpeed;
 
-function sendCoolingdata(){
-    //fixed %
-    SavedFanSpeed  = FanSpeed;
-    SavedPumpSpeed = PumpSpeed;
-    var CoolingData = [
-        0x00, 0x08, 0x06, 0x01, 0x1F, 0x00, 0x00, 0x00, 0x07, 0x00, 0x07, 0x00, 0x00, 0x64, // Pump %?
-        0x00, 
-        0x01, 0x00, 0x3C, 0x00, //fan Data   00 %% 00
-        0x02, 0x00, 0x3C, 0x00, //fan Data  
-        0x03, 0x00, 0x00, 0x00, //fan Data  
-        0x04, 0x00, 0x00, 0x00, //fan Data  
-        0x05, 0x00, 0x00, 0x00, //fan Data  
-        0x06, 0x00, 0x00, 0x00  //fan Data 
-    ]
 
-    CoolingData[13] = PumpSpeed;
-    for(var fan = 0;fan < 6;fan++){
-        CoolingData[17 + fan*4] = FanSpeed;
-    }
-
-    sendPacketString("00 08 0D 01 18",1025) //open
-    sendPacketString("00 08 09 01",1025) //read?
-    device.write(CoolingData,1025);
-    sendPacketString("00 08 05 01 01",1025) //close
-
-}
 export function Render()
 {
     SendColorData();
 
-    // if(FanControl && 
-    //     (SavedFanSpeed  != FanSpeed || 
-    //     SavedPumpSpeed != PumpSpeed)
-    // ){
-    //     sendCoolingdata();
+    PollFans();
 
-    // }
 }
 
 export function Validate(endpoint)
