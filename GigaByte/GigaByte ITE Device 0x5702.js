@@ -90,19 +90,19 @@ const Led_Count_512 = 3;
 const Led_Count_1024 = 4;
 function Get_Led_Def(count){
 
-    if(count < 32){
+    if(count <= 32){
        return Led_Count_32;
     }
-    else if(count < 64){
+    else if(count <= 64){
        return Led_Count_64
     }
-    else if(count < 256){
+    else if(count <= 256){
        return Led_Count_256
     }
-    else if(count < 512){
+    else if(count <= 512){
        return Led_Count_512
     }
-    else if(count < 1024){
+    else if(count <= 1024){
        return Led_Count_1024
     }
 
@@ -182,6 +182,7 @@ export function Initialize()
 }
 
 var SavedLedCount;
+
 function Sendchannel(Channel,shutdown = false)
 {
     let ChannelLedCount = device.channel(ChannelArray[Channel][0]).LedCount();
@@ -260,10 +261,9 @@ function Send12vHeaders(){
 function SetLedCounts(){
 
     //Set Led Counts for ARGB headers
-    let Channel1Leds = device.channel(ChannelArray[0][0].LedCount())
-    let Channel2Leds = device.channel(ChannelArray[1][0].LedCount())
-
-    sendReportString(`CC 34 ${(Get_Led_Def(Channel1Leds) | Get_Led_Def(Channel2Leds) << 4)}`,64)
+    let Channel1Leds = device.channel(ChannelArray[0][0]).LedCount()
+    let Channel2Leds = device.channel(ChannelArray[1][0]).LedCount()
+    sendReportString(`CC 34 ${((Get_Led_Def(Channel1Leds)) | (Get_Led_Def(Channel2Leds)) << 4)}`,64)
 }
 
 
@@ -282,12 +282,11 @@ export function Render()
 }
 
 function sendDirectPacket(channel, start, count, data){
-
     var packet = [];         
     packet[0] = 0xCC;
     packet[1] = channel;
-    packet[2] = start;
-    packet[3] = 0x00;
+    packet[2] = start & 0xFF;
+    packet[3] = (start >> 8);
     packet[4] = count
     packet = packet.concat(data);
 
@@ -323,11 +322,10 @@ var config = [0xCC]
 function RequestConfig(){
     sendReportString(`CC 60 00`,64);
     config = device.get_report(config, 64)
-
+    device.log(config, {hex:true})
     let product = config[1];
     let device_number = config[2];
-    let ledCount = config[3];
-    //device.log(config)
+    let ledCount = config[8];
     D_LED1_Count = Get_Led_Def( ledCount & 0x0F)
     D_LED2_Count = Get_Led_Def( ledCount & 0xF0)
 
@@ -346,7 +344,6 @@ function sendReportString(string, size){
     for(let i = 0; i < data.length; i++){
         packet[i] =parseInt(data[i],16)
     }
-
     device.send_report(packet, size);
 }
 export function Validate(endpoint)
