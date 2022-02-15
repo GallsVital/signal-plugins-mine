@@ -19,7 +19,7 @@ export function ControllableParameters(){
     {"property":"FanMode", "label":"Fan Speed Mode","type":"combobox","values":["SignalRGB","Motherboard PWM"],"default":"SignalRGB"},
     ];
 }
-export function DeviceMessage() { return ["Limited Frame Rate", "This device’s firmware is limited to a slower refresh rate then other device’s when using more then 2 channels"]; }
+export function DeviceMessage() { return ["Limited Frame Rate", "This device’s firmware is limited to a slower refresh rate than other device’s when using more then 2 channels"]; }
 var ConnectedFans = []
 const Lian_Li_UniFan = {
     mapping : [
@@ -401,8 +401,8 @@ function setFanMode(){
 function readControlPacket(index,data,length){
         //                  iType, iRequest, iValue, iReqIdx, pBuf, iLen, iTimeout 
         return device.control_transfer(0xC0,0x81,0,index,data,length,1000);
-
 }
+
 function sendControlPacket(index,data,length){
         //                  iType, iRequest, iValue, iReqIdx, pBuf, iLen, iTimeout 
         device.control_transfer(0x40,0x80,0,index,data,length,1000);

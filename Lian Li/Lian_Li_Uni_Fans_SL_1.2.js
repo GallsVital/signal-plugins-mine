@@ -19,7 +19,7 @@ export function ControllableParameters(){
     {"property":"FanMode", "label":"Fan Speed Mode","type":"combobox","values":["Manual","PWM"],"default":"PWM"},
     ];
 }
-export function DeviceMessage() { return ["Limited Frame Rate", "This device’s firmware is limited to a slower refresh rate then other device’s when using more then 2 channels"]; }
+export function DeviceMessage() { return ["Limited Frame Rate", "This device’s firmware is limited to a slower refresh rate than other device’s when using more then 2 channels"]; }
 
 const Lian_Li_UniFan = {
     mapping : [
