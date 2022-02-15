@@ -192,15 +192,15 @@ class ReadFanPacket{
         for(let i = 0; i < 3;i++){
             let rpm = this.getFanRpm(i) || 0;
 
-            if(rpm > 0 && !ConnectedFans.includes(`Fan ${i}`)){
-                ConnectedFans.push(`Fan ${i}`)
-                device.createFanControl(`Fan ${i}`);
+            if(rpm > 0 && !ConnectedFans.includes(`Fan ${i + 1}`)){
+                ConnectedFans.push(`Fan ${i + 1}`)
+                device.createFanControl(`Fan ${i + 1}`);
             }
 
-            if(ConnectedFans.includes(`Fan ${i}`)){
-                device.setRPM(`Fan ${i}`, rpm)
+            if(ConnectedFans.includes(`Fan ${i + 1}`)){
+                device.setRPM(`Fan ${i + 1}`, rpm)
                     
-                let newSpeed = device.getNormalizedFanlevel(`Fan ${i}`) * 100
+                let newSpeed = device.getNormalizedFanlevel(`Fan ${i + 1}`) * 100
                 SetFanState(i, newSpeed)
             }
             

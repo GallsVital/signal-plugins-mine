@@ -58,7 +58,7 @@ function SetupFans(){
 
     ConnectedFans = FindFans()
     for (let i = 0; i < ConnectedFans.length;i++){
-        device.createFanControl("Fan " + ConnectedFans[i]);
+        device.createFanControl(`Fan ${ConnectedFans[i] + 1}`);
     }
 }
 
@@ -155,12 +155,12 @@ function PollFans() {
     //device.log(`Checking Buffers took ${Date.now() - savedPollFanTimer}ms`)
 
     let rpm = GetFanRPM(ConnectedFans[index])
-    device.setRPM("Fan " + ConnectedFans[index], rpm)
+    device.setRPM(`Fan ${ConnectedFans[index] + 1}`, rpm)
     
-    let level = device.getNormalizedFanlevel(`Fan ${ConnectedFans[index]}`)
+    let level = device.getNormalizedFanlevel(`Fan ${ConnectedFans[index] + 1}`)
     SetFanPercent(ConnectedFans[index], level * 100)
 
-    device.log(`Fan ${ConnectedFans[index]} RPM: ${rpm}, Level: ${(level).toFixed(2)}, took ${Date.now() - savedPollFanTimer}ms`)
+    device.log(`Fan ${ConnectedFans[index]+1} RPM: ${rpm}, Level: ${(level).toFixed(2)}, took ${Date.now() - savedPollFanTimer}ms`)
 
 
     index = (index + 1) % ConnectedFans.length
@@ -304,7 +304,7 @@ function SetAllFanRPM(rpm){
 function SetFanRPM(fan, rpm){
     let low = rpm & 0xFF
     let high = rpm >> 8
-    device.log(`Setting Fan: ${fan} RPM.  high: ${high}, Low:${low}`)
+    device.log(`Setting Fan: ${fan+1} RPM.  high: ${high}, Low:${low}`)
     let packet = [0x00,CORSAIR_LIGHTING_CONTROLLER_SET_FANRPM , fan, high, low];
     device.flush()
     device.write(packet, 65);

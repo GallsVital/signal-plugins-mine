@@ -44,10 +44,10 @@ function SetupChannels(){
 }
 export function Initialize()
 {
+    ConnectedFans = []
     SetupChannels()
 
     if(Corsair_Get(CORSAIR_MODE) == CORSAIR_HARDWARE_MODE){
-
         Corsair_Set(CORSAIR_MODE,CORSAIR_SOFTWARE_MODE)
         device.log(`Mode is Now ${Corsair_Get(CORSAIR_MODE)}`)
         Corsair_Open_Endpoint(CORSAIR_LIGHTING_CONTROLLER_ENDPOINT)
@@ -60,7 +60,7 @@ export function Initialize()
     device.log(`Pid is ${Corsair_Get(CORSAIR_PID)}`)
 
     GetFanSettings()
-    //setFanMode();
+    setFanMode();
     //SetRGBHeaderLength(5);
 }
 
@@ -142,31 +142,32 @@ function PollFans() {
 
     GetFanSpeeds()
     sendCoolingdata()
+
+
     //let level = device.getNormalizedFanlevel(`Fan ${ConnectedFans[index]}`)
     //SetFanPercent(ConnectedFans[index], level * 100)
 
     //device.log(`Fan ${ConnectedFans[index]} RPM: ${rpm}, Level: ${(level).toFixed(2)}, took ${Date.now() - savedPollFanTimer}ms`)
-
 }
 
 function GetFanSettings(){
-    device.log(`Reading Fan Data`)
 
+    device.log(`Reading Fan Data`)
     let CoolingData = [0x00];
+
     //Corsair_Close_Endpoint(1, 0)
 
     Corsair_Open_Endpoint(0x1a, 1)
-
+    device.read([0x00], 1025);
     sendPacketString("00 08 09 01",1025)
-    device.read([0x00],1025);
-    sendPacketString("00 08 08 01",1025)
+    sendPacketString("00 08 08 01",1025, false)
+
     CoolingData = device.read(CoolingData, 1025);
 
     //device.log(`Command: ${CommandDict[CoolingData[2]]}`)
-
+    device.log(CoolingData.slice(0,20))
     if(CoolingData[4] == 9 && CoolingData[5] == 0){
         let allFanData = CoolingData.slice(7,7+MAX_FAN_COUNT);
-        device.log(allFanData)
         for(let i = 0; i < MAX_FAN_COUNT; i++){
            if(allFanData[i] == 0x07){
                 device.createFanControl(FanControllerArray[i])
@@ -175,64 +176,40 @@ function GetFanSettings(){
             }
         }
     }else{
-        device.log("Failed to get Fan RPM's")
+        device.log("Failed to get Fan Settings")
     }
     Corsair_Close_Endpoint(1, 1)
+
 }
 
-
-function InitFanControllers(){
-    let CoolingData = [0x00];
-    Corsair_Open_Endpoint(0x17, 1)
-    sendPacketString("00 08 09 01",1025)
-    device.read([0x00],1025);
-    sendPacketString("00 08 08 01",1025)
-    CoolingData = device.read(CoolingData, 1025);
-
-    device.log(`Command: ${CommandDict[CoolingData[2]]}`)
-    if(CoolingData[4] == 6 && CoolingData[5] == 0){
-        let allFanData = CoolingData.slice(7,7+2*CoolingData[6]);
-
-        for(let i = 0; i < MAX_FAN_COUNT; i++){
-            let fanData = allFanData.splice(0,2);
-            let fanRPM = fanData[0]  + (fanData[1] << 8)
-            if(fanRPM > 0){
-                device.createFanControl(FanControllerArray[i])
-                ConnectedFans.push(FanControllerArray[i])
-                device.log(`Found ${FanControllerArray[i]}`)
-            }
-        }
-    }else{
-        device.log("Failed to get Fan Count")
-    }
-
-    Corsair_Close_Endpoint(1, 1)
-}
 
 function GetFanSpeeds(){
     device.log(`Reading Fan Data`)
 
     let CoolingData = [0x00];
-    //Corsair_Close_Endpoint(1, 0)
 
     Corsair_Open_Endpoint(0x17, 1)
 
     sendPacketString("00 08 09 01",1025)
-    device.read([0x00],1025);
-    sendPacketString("00 08 08 01",1025)
+
+    sendPacketString("00 08 08 01",1025, false)
     CoolingData = device.read(CoolingData, 1025);
 
     device.log(`Command: ${CommandDict[CoolingData[2]]}`)
+    device.log(CoolingData.slice(0,20))
 
     if(CoolingData[4] == 6 && CoolingData[5] == 0){
+        device.log(CoolingData.slice(6,20))
         device.log(`Valid Fan Data, Fans Found ${CoolingData[6]}`)
         let allFanData = CoolingData.slice(7,7+2*CoolingData[6]);
 
         for(let i = 0; i < MAX_FAN_COUNT; i++){
             let fanData = allFanData.splice(0,2);
             let fanRPM = fanData[0]  + (fanData[1] << 8)
+            if(fanRPM > 0){
                 device.log(`${FanControllerArray[i]} rpm ${fanRPM}`)
-                device.setRPM(FanControllerArray[i], fanRPM)
+            }
+            device.setRPM(FanControllerArray[i], fanRPM)
         }
     }else{
         device.log("Failed to get Fan RPM's")
@@ -243,46 +220,43 @@ function GetFanSpeeds(){
 function readCoolingData(){
     var CoolingData = [0x00];
     
-
     sendPacketString("00 08 05 01 01",1025) //close
-    device.read([0x00],1025);
 
     sendPacketString("00 08 0D 01 17",1025) //open
-    device.read([0x00],1025);
 
     sendPacketString("00 08 02",1025) //read?
 
     CoolingData = device.read(CoolingData, 1025);
     device.log(CoolingData.slice(0,20));
     sendPacketString("00 08 05 01 01",1025) //close
-    device.read([0x00],1025);
 
     sendPacketString("00 08 0D 00 22",1025) // Critical
-    device.read([0x00],1025);
 
 }
 
+//00 08 06 01 1B 00 00 00 07 00 06 00 00 29 00 01 00 00 00 02 00 00 00 03 00 00 00 04 00 00 00 05 00 00 00 00 00  . . . . . . . . . . . . ) . . . . . . . . . . . . . . . . . . . 
 function sendCoolingdata(){
 
     var CoolingData = [
-        0x00, 0x08, 0x06, 0x01, 0x1F, 0x00, 0x00, 0x00, 0x07, 0x00, 0x07, 0x00, 0x00, 0x64, // Pump %?
-        0x00, 
-        0x01, 0x00, 0x3C, 0x00, //fan Data   00 %% 00
-        0x02, 0x00, 0x3C, 0x00, //fan Data  
-        0x03, 0x00, 0x00, 0x00, //fan Data  
-        0x04, 0x00, 0x00, 0x00, //fan Data  
-        0x05, 0x00, 0x00, 0x00, //fan Data  
-        0x06, 0x00, 0x00, 0x00  //fan Data 
+        0x00, 0x08, 0x06, 0x01, 0x1B, 0x00, 0x00, 0x00, 0x07, 0x00, 0x06, 
+        0x00, 0x00, 0x64, 0x00, //fan Data
+        0x01, 0x00, 0x32, 0x00, //fan Data
+        0x02, 0x00, 0x32, 0x00, //fan Data  
+        0x03, 0x00, 0x32, 0x00, //fan Data  
+        0x04, 0x00, 0x32, 0x00, //fan Data  
+        0x05, 0x00, 0x32, 0x00, //fan Data  
     ]
 
     for(var fan = 0; fan < ConnectedFans.length; fan++){
-        CoolingData[13 + ConnectedFans[fan]*4] = device.getNormalizedFanlevel(FanControllerArray[ConnectedFans[fan]]) * 100
+        let fanLevel = device.getNormalizedFanlevel(FanControllerArray[ConnectedFans[fan]]) * 100
+        device.log(`Fan ${ConnectedFans[fan] + 1} level set to ${fanLevel}`)
+        CoolingData[13 + ConnectedFans[fan]*4] = fanLevel
     }
 
     Corsair_Open_Endpoint(0x18, 1)
 
-    sendPacketString("00 08 09 01",1025) //read?
-    device.read([0x00],1025);
+    sendPacketString("00 08 09 01",1025)
+    sendPacketString("00 08 08 01",1025)
 
     device.write(CoolingData,1025);
     device.read([0x00],1025);
@@ -322,12 +296,13 @@ function GetTemps(){
 export function Shutdown()
 {
     if(Corsair_Get(CORSAIR_MODE) == CORSAIR_SOFTWARE_MODE){
+        Corsair_Close_Endpoint(CORSAIR_LIGHTING_CONTROLLER_ENDPOINT,0)
         Corsair_Set(CORSAIR_MODE,CORSAIR_HARDWARE_MODE)
         device.log(`Mode is Now ${Corsair_Get(CORSAIR_MODE)}`)   
-    }
 
+    }
 }
-function sendPacketString(string, size){
+function sendPacketString(string, size, read = true){
     var packet= [];
     var data = string.split(' ');
     
@@ -336,49 +311,10 @@ function sendPacketString(string, size){
     }
 
     device.write(packet, size);
+    if(read){
+        device.read([0x00], size)
+    }
 }
-
-
-var savedLedCount;
-function SetFans(){
-
-    var propertyArray = [
-        device7,device8,device9,device10,device11,device12,
-        device1, device2,device3,device4,device5,device6
-    ];
-
-    for (var deviceNumber = 0; deviceNumber < propertyArray.length; deviceNumber++ ) {
-            if(deviceValues[deviceNumber] != propertyArray[deviceNumber]){
-            deviceValues[deviceNumber] = propertyArray[deviceNumber];
-
-                if(deviceValues[deviceNumber] == "None"){
-                device.removeSubdevice(deviceArray[deviceNumber]);
-                }else{
-                    //"Ch1 | Port 1"
-                device.createSubdevice(deviceArray[deviceNumber]); 
-                // Parent Device + Sub device Name + Ports
-                device.setSubdeviceName(deviceArray[deviceNumber],`${ParentDeviceName} - ${DeviceDict[propertyArray[deviceNumber]].displayName} - ${deviceArray[deviceNumber]}`);
-                device.setSubdeviceImage(deviceArray[deviceNumber], DeviceDict[propertyArray[deviceNumber]].image);
-                device.setSubdeviceSize(deviceArray[deviceNumber],DeviceDict[propertyArray[deviceNumber]].width,DeviceDict[propertyArray[deviceNumber]].height);
-                device.setSubdeviceLeds(deviceArray[deviceNumber],
-                    DeviceDict[propertyArray[deviceNumber]].LedNames,
-                    DeviceDict[propertyArray[deviceNumber]].positioning)
-                }
-        }
-    }
-
-    var newledCount = 0;
-    for (var deviceNumber = 0; deviceNumber < 6; deviceNumber++ ) {
-        if(deviceValues[deviceNumber] != "None" && DeviceDict[propertyArray[deviceNumber]] != null){
-            newledCount += DeviceDict[propertyArray[deviceNumber]].ledCount;
-        }
-    }
-
-    if(savedLedCount != newledCount) {
-        savedLedCount = newledCount
-        SetRGBHeaderLength(savedLedCount);
-    }
-} 
 
 var vKeyNames = [];
 
@@ -499,35 +435,56 @@ function sendSecondaryColorPacket(colorData){
 function setFanMode(){
     //this seems to relate to the "mode selector" i had. the commander core splits each ports data with a specific spacing while other corsair lighting controllers just put it back to back.
     //Future lighting controller will likely use this system.
-    var packet = [0, 8]
+//     var packet = [0, 8]
 
-    Corsair_Close_Endpoint(1)
-    Corsair_Open_Endpoint(0x1E, 1)
+//     Corsair_Close_Endpoint(1)
+//     Corsair_Open_Endpoint(0x1E, 1)
 
+
+//     sendPacketString("00 08 09 01",1025) //read
+//     device.read(packet,1025);
+
+//     //01 06 is QL?
+//     sendPacketString("00 08 06 01 11 00 00 00 0D 00 07 01 01 01 06 01 06 01 06 01 06 01 06 01 06",1025); //set fan spacing
+//     device.read(packet,1025);
+
+//     //Corsair_Open_Endpoint(0x1D, 2)
+
+//     //sendPacketString("00 08 09 02",1025) //read
+//    // device.read(packet,1025);
+//     //let ledCount = 5
+//     //sendPacketString(`00 08 06 02 11 00 00 00 0C 00 07 ${ledCount % 256} ${ ledCount << 8}`,1025); //Set Led Count
+//     //device.read(packet,1025);
+
+
+//     //Corsair_Close_Endpoint(2)
+//     Corsair_Close_Endpoint(1)
+
+//     sendPacketString("00 08 15 01",1025) //apply changes
+//     device.read(packet,1025);
+
+//     //sendPacketString("00 08 06 00 F2 02 00 00 12",1025)
+
+
+    sendPacketString("00 08 05 01 01",1025) //end point close
+    
+    sendPacketString("00 08 06 00 F2 02 00 00 12",1025) //end point close
+
+    sendPacketString("00 08 0D 01 1E",1025) //end point open
 
     sendPacketString("00 08 09 01",1025) //read
-    device.read(packet,1025);
-
-    //01 06 is QL?
-    sendPacketString("00 08 06 01 11 00 00 00 0D 00 07 01 01 01 06 01 06 01 06 01 06 01 06 01 06",1025); //set fan spacing
-    device.read(packet,1025);
-
-    //Corsair_Open_Endpoint(0x1D, 2)
-
-    //sendPacketString("00 08 09 02",1025) //read
-   // device.read(packet,1025);
-    //let ledCount = 5
-    //sendPacketString(`00 08 06 02 11 00 00 00 0C 00 07 ${ledCount % 256} ${ ledCount << 8}`,1025); //Set Led Count
-    //device.read(packet,1025);
 
 
-    //Corsair_Close_Endpoint(2)
-    Corsair_Close_Endpoint(1)
+    sendPacketString("00 08 06 01 11 00 00 00 0D 00 07 01 08 01 06 01 06 01 06 01 06 01 06 01 06",1025); //set fan spacing
 
-    sendPacketString("00 08 15 01",1025) //apply changes
-    device.read(packet,1025);
+    sendPacketString("00 08 05 01 01",1025) //end point close
 
-    //sendPacketString("00 08 06 00 F2 02 00 00 12",1025)
+    sendPacketString("00 08 15 01",1025) //unknown
+
+    sendPacketString("00 08 06 00 F2 02 00 00 12",1025)
+
+    sendPacketString("00 08 05 01 01",1025) //end point close
+
 }
 function SetRGBHeaderLength(ledCount){
     device.log(`Setting to ${ledCount}`)
@@ -538,20 +495,15 @@ function SetRGBHeaderLength(ledCount){
     var packet = [0, 8]
 
      sendPacketString("00 08 05 01 01",1025) //end point close
-     device.read(packet,1025);
 
      sendPacketString("00 08 0D 01 1D",1025) //end point open
-     device.read(packet,1025);
 
      sendPacketString("00 08 09 01",1025) //read
-     device.read(packet,1025);
 
      sendPacketString(`00 08 06 01 11 00 00 00 0C 00 07 ${(ledCount % 256).toString(16)} ${ (ledCount >> 8).toString(16)}`,1025); //Set Led Count
-     device.read(packet,1025);
 
 
     sendPacketString("00 08 05 01 01",1025) //end point close
-    device.read(packet,1025);
 
     sendPacketString("00 08 15 01",1025) //apply changes
 
@@ -562,9 +514,10 @@ function SetRGBHeaderLength(ledCount){
 
 export function Render()
 {
-    SendColorData();
 
     PollFans();
+
+    SendColorData();
 
 }
 
