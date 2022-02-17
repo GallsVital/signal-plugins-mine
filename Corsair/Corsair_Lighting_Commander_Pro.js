@@ -54,6 +54,9 @@ function SetupChannels(){
 }
 var ConnectedFans = []
 function SetupFans(){
+    if(device.fanControlDisabled()){
+        return;
+    }
     ClearReadBuffer(100)
 
     ConnectedFans = FindFans()
@@ -150,7 +153,9 @@ function PollFans() {
 		return
 	}
 	savedPollFanTimer = Date.now();
-
+    if(device.fanControlDisabled()){
+        return;
+    }
     ClearReadBuffer()
     //device.log(`Checking Buffers took ${Date.now() - savedPollFanTimer}ms`)
 

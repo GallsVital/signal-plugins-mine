@@ -50,6 +50,9 @@ function SetFanPollRate(seconds){
 
 var ConnectedFans = []
 function SetupFans(){
+    if(device.fanControlDisabled()){
+        return;
+    }
     SetFanPollRate()
 
 
@@ -222,7 +225,9 @@ function PollFans(){
 	}
 	savedPollFanTimer = Date.now();
 
-    
+    if(device.fanControlDisabled()){
+        return;
+    }
     do {
         let packet = device.readTimeout([0x0], 64, 10)
         if(packet[0] == 0x67 && packet[1] == 0x02){
