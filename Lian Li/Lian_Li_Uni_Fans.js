@@ -158,7 +158,6 @@ export function Initialize()
 
     SetMoboPassthrough();
     SetFanMode();
-    SetFans();
 
     BurstFans();
 }
@@ -179,7 +178,6 @@ export function Render()
         sendChannels();
     }
     
-    SetFans();
 }
 
 function isChannelActive(channelIdx)
