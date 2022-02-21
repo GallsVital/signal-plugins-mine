@@ -15,28 +15,56 @@ export function ControllableParameters(){
     {"property":"Channel2Count", "label":"Channel 2 Fan count","type":"combobox","values":["0","1","2","3","4"],"default":"0"},
     {"property":"Channel3Count", "label":"Channel 3 Fan count","type":"combobox","values":["0","1","2","3","4"],"default":"0"},
     {"property":"Channel4Count", "label":"Channel 4 Fan count","type":"combobox","values":["0","1","2","3","4"],"default":"0"},
-    // {"property":"targetRPM", "label":"Fan RPM", "step":"50","type":"number","min":"800", "max":"1900","default":"1300"},
     {"property":"FanMode", "label":"Fan Speed Mode","type":"combobox","values":["SignalRGB","Motherboard PWM"],"default":"SignalRGB"},
     ];
 }
 export function DeviceMessage() { return ["Limited Frame Rate", "This device’s firmware is limited to a slower refresh rate than other device’s when using more then 2 channels"]; }
-var ConnectedFans = []
-const Lian_Li_UniFan = {
-    mapping : [
- 0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15
-    ],
-    positioning : [
-        [0,0],[1,0],[2,0],[3,0],[4,0],[5,0],[6,0],[7,0],[8,0],[9,0],[10,0],[11,0],[12,0],[13,0],[14,0],[15,0]
-    ],
-    LedNames : [
-        "Led 1","Led 2","Led 3","Led 4","Led 5","Led 6","Led 7","Led 8","Led 9","Led 10","Led 11","Led 12","Led 13","Led 14","Led 15","Led 16"
-    ],
-    displayName: "Lian Li UniFan",
-    ledCount : 16,
-    width: 16,
-    height: 16,
-    image: lian_Li_UniFan_Image()
+export function SupportsSubdevices(){ return true; }
+export function DefaultComponentBrand() { return "LianLi"}
+
+const DeviceMaxLedLimit = 64 * 3;
+
+//Channel Name, Led Limit
+var ChannelArray = [
+    ["Channel 1", 64],
+    ["Channel 2", 64],
+    ["Channel 3", 64],
+    ["Channel 4", 64],
+]
+
+function SetupChannels(){
+    device.SetLedLimit(DeviceMaxLedLimit);
+    for(let i = 0; i < ChannelArray.length; i++){
+        device.addChannel(ChannelArray[i][0],ChannelArray[i][1]);
+    }
 }
+
+
+
+var ConnectedFans = []
+
+
+var vLedNames = [];
+var vLedPos = [];
+
+
+
+export function LedNames()
+{
+  return vLedNames;
+}
+
+export function LedPositions()
+{
+  return vLedPos;
+}
+
+// Protocol Constants
+const LIAN_LI_COMMAND_FAN = 0x31
+
+const LIAN_LI_FAN_MANUAL_MODE = 0xF0
+const LIAN_LI_FAN_PWM_MODE = 0xFF
+
 const COMMAND_ADDRESS = 0xE021
 const COMMIT_ADDRESS = 0xE02f
 
@@ -99,39 +127,18 @@ const Channel_4_Controller = {
     fanRead: 0xe806,
     fanPMWCommit: 0xe81E
 }
-
-var vLedNames = [];
-var vLedPos = [];
-
 const channelArray = [Channel_1_Controller,Channel_2_Controller,Channel_3_Controller,Channel_4_Controller];
-
-
-export function LedNames()
-{
-  return vLedNames;
-}
-
-function sendPacketString(string, size){
-    var packet= [];
-    var data = string.split(' ');
-    
-    for(let i = 0; i < data.length; i++){
-        packet[parseInt(i,16)] = parseInt(data[i],16)//.toString(16)
-    }
-
-    device.write(packet, size);
-}
-
-export function LedPositions()
-{
-  return vLedPos;
-}
 
 
 export function Initialize()
 {
+
+    SetupChannels()
+    
+    
     // init mode, spd, dir, brightness.
-    for(let channel = 0; channel < 4;channel++){
+    for(let channel = 0; channel < 4; channel++){
+        
         var packet = [1]
         sendControlPacket(channelArray[channel].mode, packet,1);
 
@@ -146,43 +153,33 @@ export function Initialize()
 
         packet = [1]
         sendControlPacket(channelArray[channel].commit, packet,1);
+
     }
 
+    SetMoboPassthrough();
+    SetFanMode();
+    SetFans();
+
+    BurstFans();
+}
+
+
+export function Shutdown()
+{
 
 }
 
 
+export function Render()
+{
+    PollFans()
+    
 
-function setFans(){
-    var propertyArray = [Channel1Count,Channel2Count,Channel3Count,Channel4Count];
-    //check every channels fan count
-    for(let channel = 0; channel < 4;channel++){
-        //if dirty, make sub device changes as needed, and set the new count
-        if(channelArray[channel].count != propertyArray[channel]){
-            device.log(`count ${channelArray[channel].count}, new count ${propertyArray[channel]}`)
-            for(let fan = 0; fan <= 4;fan++){
-                //if fan already exists and shouldn't, delete it
-                if(fan > propertyArray[channel]-1 && fan < channelArray[channel].count){
-                        device.removeSubdevice(channelArray[channel].fan_objects[fan]);
-                }
-                //if fan doesn't exists and should, make it
-                if(fan <= propertyArray[channel] && fan > channelArray[channel].count){
-                        device.log(`${fan} ${propertyArray[channel]}`)
-                         //"Ch1 | Port 1"
-                         device.createSubdevice(channelArray[channel].fan_objects[fan-1]); 
-                         // Parent Device + Sub device Name + Ports
-                         device.setSubdeviceName(channelArray[channel].fan_objects[fan-1],`${Lian_Li_UniFan.displayName} - ${channelArray[channel].fan_objects[fan-1]}`);
-                         device.setSubdeviceImage(channelArray[channel].fan_objects[fan-1], Lian_Li_UniFan.image);
-                         device.setSubdeviceSize(channelArray[channel].fan_objects[fan-1],Lian_Li_UniFan.width,Lian_Li_UniFan.height);
-                         device.setSubdeviceLeds(channelArray[channel].fan_objects[fan-1],
-                            Lian_Li_UniFan.LedNames,
-                            Lian_Li_UniFan.positioning)
-                }
-            }
-
-            channelArray[channel].count = propertyArray[channel];
-        }
+    if(!moboSync){
+        sendChannels();
     }
+    
+    SetFans();
 }
 
 function isChannelActive(channelIdx)
@@ -190,6 +187,7 @@ function isChannelActive(channelIdx)
     return channelArray[channelIdx].count > 0;
 }
 
+var ChannelIndex = 0
 function sendChannels(){
 
     //start configuation
@@ -200,107 +198,67 @@ function sendChannels(){
 
     //set fan counts
     for(let channel = 0;channel < 4;channel++){
-        if (isChannelActive(channel))
-        {
-            var packet = [];
-            packet[0] = 0x32;
-            packet[1] = 16*channel + 3// fan Count on channel (0 == 1)
-            sendControlPacket(COMMAND_ADDRESS, packet,2);
-            sendCommit();
-        }
-    }
-    //set fan RGB
-    for(let channel = 0; channel < 4;channel++){
-        if (isChannelActive(channel))
-        {
-            packet = getChannelColors(channel);
-            sendControlPacket(channelArray[channel].action, packet,192);
-
-            //not sending these each frame causes the lian li to lock up for a moment every few seconds
-            // - Seems to have stopped
-            
-            // packet = [1]
-            // sendControlPacket(channelArray[channel].mode, packet,1);
-
-            // packet = [1]
-            // sendControlPacket(channelArray[channel].speed, packet,1);
-
-            // packet = [0]
-            // sendControlPacket(channelArray[channel].direction, packet,1);
-
-            // packet = [0]
-            // sendControlPacket(channelArray[channel].brightness, packet,1);
-            
-            packet = [1]
-            sendControlPacket(channelArray[channel].commit, packet,1);
-        }
+        var packet = [0x32, 16*channel + 3]; // fan Count on channel (0 == 1)
+        sendControlPacket(COMMAND_ADDRESS, packet,2);
+        sendCommit();
     }
 
+    // If no Active Channels Use Default Pulse on each Channel
+    if(device.getLedCount() == 0){
+        SendChannel(ChannelIndex)
+        ChannelIndex = (ChannelIndex + 1) % 4
+    }else{
+        //set fan RGB one channel at a time
+        // Find Channel with Leds on it
+        while(device.channel(ChannelArray[ChannelIndex][0]).LedCount() == 0){
+            ChannelIndex = (ChannelIndex + 1) % 4
+        }
+        SendChannel(ChannelIndex)
+    }
 } 
 
-var savedMoboPassthrough
-function setMoboPassthrough(){
-    if(savedMoboPassthrough != moboSync){
-        savedMoboPassthrough = moboSync;
-        if(savedMoboPassthrough){
-            
-            var packet = [0x30,0x01];
-            sendControlPacket(COMMAND_ADDRESS, packet,2);
-            sendCommit();
-        }else{
+function SendChannel(Channel){
+    let packet = getChannelColors(Channel);
+    sendControlPacket(channelArray[Channel].action, packet,192);
 
-            var packet = [0x30,0x00];
-            sendControlPacket(COMMAND_ADDRESS, packet,2);
-            sendCommit();
-        }
+    // This needs a slight delay to not stutter
+    device.pause(5)
+
+    packet = [1]
+    sendControlPacket(channelArray[Channel].commit, packet,1);
+}
+
+export function onmoboSyncChanged(){
+    SetMoboPassthrough(moboSync)
+}
+
+function SetMoboPassthrough(Enable){
+        var packet = [0x30, Enable];
+        sendControlPacket(COMMAND_ADDRESS, packet,2);
+        sendCommit();
+}
+
+
+function  getChannelColors(Channel,shutdown = false) {
+    let ChannelLedCount = device.channel(ChannelArray[Channel][0]).LedCount();
+
+    let RGBData = []
+    if(LightingMode == "Forced"){
+        RGBData = device.createColorArray(forcedColor, ChannelLedCount, "Inline", "RBG");
+
+    }else if(device.getLedCount() == 0){
+        ChannelLedCount = 32;
+        let pulseColor = device.getChannelPulseColor(ChannelArray[Channel][0], ChannelLedCount);
+        RGBData = device.createColorArray(pulseColor, ChannelLedCount, "Inline", "RBG");
+
+    }else{
+        RGBData = device.channel(ChannelArray[Channel][0]).getColors("Inline", "RBG");
     }
+
+    return RGBData;
+
 }
 
-// Allocate this statically, once.
-var RGBdata = new Array(192);
-
-function  getChannelColors(channel,shutdown = false) {
-
-    // Filling is cheaper than allocation.
-    RGBdata.fill(0);
-
-    let channelObject = channelArray[channel];
-    var TotalLedCount = 0;
-    for(let fan = 0; fan < channelObject.count;fan++)
-    {
-        for(var iIdx = 0; iIdx < Lian_Li_UniFan.mapping.length; iIdx++){
-            var iPxX = Lian_Li_UniFan.positioning[iIdx][0];
-            var iPxY = Lian_Li_UniFan.positioning[iIdx][1];
-            var mxPxColor;
-            //find colors
-            if(shutdown){
-                mxPxColor = hexToRgb(shutdownColor)
-            }else if (LightingMode == "Forced") {
-                mxPxColor = hexToRgb(forcedColor)
-            }else{
-                mxPxColor = device.subdeviceColor(channelObject.fan_objects[fan],iPxX, iPxY);
-            } 
-            //set colors
-            RGBdata[Lian_Li_UniFan.mapping[iIdx]*3+TotalLedCount*3] = mxPxColor[0];
-            RGBdata[Lian_Li_UniFan.mapping[iIdx]*3+TotalLedCount*3+1] = mxPxColor[2];
-            RGBdata[Lian_Li_UniFan.mapping[iIdx]*3+TotalLedCount*3+2] = mxPxColor[1];
-        }
-        TotalLedCount += Lian_Li_UniFan.ledCount;
-   }
-
-   return RGBdata;
-}
-
-
-function hexToRgb(hex) {
-    var result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
-    var colors = [];
-    colors[0] = parseInt(result[1], 16);
-    colors[1] = parseInt(result[2], 16);
-    colors[2] = parseInt(result[3], 16);
-
-    return colors;
-  }
 
 var savedPollFanTimer = Date.now();
 var PollModeInternal = 3000;
@@ -313,47 +271,46 @@ function PollFans(){
     if(device.fanControlDisabled()){
         return;
     }
+
     for(let fan = 0; fan < 4; fan++){
         let rpm = readFanRPM(fan)
         device.log(`Fan ${fan}: ${rpm}rpm`)
 
-        if(rpm > 0 && !ConnectedFans.includes(`Fan ${fan}`)){
-            ConnectedFans.push(`Fan ${fan}`)
-            device.createFanControl(`Fan ${fan}`);
-        }
+         if(rpm > 0  && !ConnectedFans.includes(`Fan ${fan}`)){
+             ConnectedFans.push(`Fan ${fan}`)
+             device.createFanControl(`Fan ${fan}`);
+         }
 
-        if(ConnectedFans.includes(`Fan ${fan}`)){
-            device.setRPM(`Fan ${fan}`, rpm)
+         if(FanMode == "SignalRGB" && ConnectedFans.includes(`Fan ${fan}`)){
+             device.setRPM(`Fan ${fan}`, rpm)
                 
-            let newSpeed = device.getNormalizedFanlevel(`Fan ${fan}`) * 100
-            setFanPercent(fan, newSpeed)
-        }
+             let newSpeed = device.getNormalizedFanlevel(`Fan ${fan}`) * 100
+             SetFanPercent(fan, newSpeed)
+         }
     }
 }
 
 
-export function Render()
-{
-    if(FanMode == "SignalRGB"){
-        PollFans()
-    }
 
-    if(!savedMoboPassthrough){
-        sendChannels();
-    }
-    
-    setFans();
-    setMoboPassthrough();
-
-    setFanMode();
-}
 function readFanRPM(channel){
     let packet = readControlPacket(channelArray[channel].fanRead,[],2);
     return packet[0] | (packet[1] << 8)
 }
+function BurstFans(){
+    device.log("Bursting Fans for RPM based Detection")
+    for(let Channel = 0; Channel < 4; Channel++){
+        SetFanPercent(Channel,75)
+    }
+}
 
-function setFanRPM(channel, rpm){
 
+function SetFanPercent(channel, percent){
+    let rpm = Math.round(1900 * percent/100)
+    device.log(`Setting Channel ${channel} to ${Math.round(percent)}% Fan Speed, UniFan rpm equivalent: ${rpm}`)
+    SetFanRPM(channel, rpm)
+}
+
+function SetFanRPM(channel, rpm){
     var packet = [];
     packet[0] = rpm % 256
     packet[1] = Math.floor(rpm / 256)
@@ -364,42 +321,40 @@ function setFanRPM(channel, rpm){
     sendControlPacket(channelArray[channel].fanCommit,packet,1)
 
 }
-    
-function setFanPercent(channel, percent){
-    let rpm = Math.round(1900 * percent/100)
-    device.log(`Setting Channel ${channel} to ${Math.round(percent)}% Fan Speed, UniFan rpm equivalent: ${rpm}`)
-    setFanRPM(channel, rpm)
+export function onFanModeChanged(){
+    SetFanMode()
 }
 
-var savedFanMode;
-function setFanMode(){
-    if(savedFanMode != FanMode){
-        savedFanMode = FanMode;
-    
-        if(savedFanMode == "Manual"){
-            //Set manual fan RPM control
-            var packet = [0x31,0xF0]
-            sendControlPacket(COMMAND_ADDRESS,packet,2)
-            sendCommit();
-        }else if(savedFanMode == "PWM"){
+function SetFanMode(){
 
-            for(let channel = 0; channel < 4;channel++){
-                var packet = [0];
-                sendControlPacket(channelArray[channel].fanCommit,packet,2) //Action address for PWM is the same as the commit for Manual RPM control
     
-                packet[0] = 1;
-                sendControlPacket(channelArray[channel].fanPMWCommit,packet,1)
-            }
+    if(FanMode == "SignalRGB"){
+        //Set manual fan RPM control
+        SendFanControlModePacket(LIAN_LI_FAN_MANUAL_MODE)
 
-            //Set PWM fan RPM control
-            var packet = [0x31,0xFF]
-            sendControlPacket(COMMAND_ADDRESS,packet,2)
-            sendCommit();
+    }else{
+
+        for(let channel = 0; channel < 4;channel++){
+            var packet = [0];
+            sendControlPacket(channelArray[channel].fanCommit,packet,2) //Action address for PWM is the same as the commit for Manual RPM control
+
+            packet[0] = 1;
+            sendControlPacket(channelArray[channel].fanPMWCommit,packet,1)
         }
 
+        //Set PWM fan RPM control
+        SendFanControlModePacket(LIAN_LI_FAN_PWM_MODE)
     }
 }
 
+function SendFanControlModePacket(mode){
+
+    let packet = [LIAN_LI_COMMAND_FAN,mode]
+    sendControlPacket(COMMAND_ADDRESS,packet,2)
+    sendCommit();
+}
+
+// Protocol Functions
 function readControlPacket(index,data,length){
         //                  iType, iRequest, iValue, iReqIdx, pBuf, iLen, iTimeout 
         return device.control_transfer(0xC0,0x81,0,index,data,length,1000);
@@ -417,10 +372,19 @@ function sendCommit(){
     device.control_transfer(0x40,0x80,0,COMMIT_ADDRESS,packet,1,1000);
     //device.pause(1)
 }
-export function Shutdown()
-{
 
-}
+// Helper Functions 
+function hexToRgb(hex) {
+    var result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+    var colors = [];
+    colors[0] = parseInt(result[1], 16);
+    colors[1] = parseInt(result[2], 16);
+    colors[2] = parseInt(result[3], 16);
+
+    return colors;
+  }
+
+
 
 export function Image() 
 {
