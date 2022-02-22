@@ -5,7 +5,7 @@ export function Publisher() { return "Lightvortex"; }
 export function Size() { return [3, 3]; }
 export function DefaultPosition(){return [240,120]}
 export function DefaultScale(){return 4.0}
-export function ControllableParameters(){
+export function ControllableParameters(){
     return [
         {"property":"Ledoff", "label":"Disable Led", "type":"boolean", "default":"false"},
         {"property":"shutdownColor", "label":"Shutdown Color","min":"0","max":"360","type":"color","default":"009bde"},

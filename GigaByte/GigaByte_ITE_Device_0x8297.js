@@ -7,7 +7,7 @@ export function Size() { return [12,2]; }
 export function Type() { return "Hid"; }
 export function DefaultPosition(){return [0,0]}
 export function DefaultScale(){return 8.0}
-export function ControllableParameters(){
+export function ControllableParameters(){
     return [
         {"property":"shutdownColor", "label":"Shutdown Color","min":"0","max":"360","type":"color","default":"009bde"},
         {"property":"LightingMode", "label":"Lighting Mode", "type":"combobox", "values":["Canvas","Forced"], "default":"Canvas", "tooltip":"This toggles the device between displaying its canvas position, or being locked to its Forced Color"},

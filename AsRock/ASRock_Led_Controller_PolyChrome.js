@@ -6,7 +6,7 @@ export function Size() { return [3,3]; }
 export function Type() { return "Hid"; }
 export function DefaultPosition(){return [0,0]}
 export function DefaultScale(){return 8.0}
-export function ControllableParameters(){
+export function ControllableParameters(){
     return [
 
         {"property":"Zone1Color", "label":"12v RGB Header 1 Color","min":"0","max":"360","type":"color","default":"009bde"},

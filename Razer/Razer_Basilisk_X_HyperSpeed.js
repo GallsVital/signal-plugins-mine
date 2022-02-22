@@ -56,7 +56,7 @@ export function Size() { return [10,10]; }
 export function DefaultPosition() {return [225,120]; }
 export function DefaultScale(){return 5.0}
 export function Type() { return "Hid"; }
-export function ControllableParameters(){
+export function ControllableParameters(){
     return [
         {"property":"DpiControl", "label":"Enable Dpi Control","type":"boolean","default":"false"},
         {"property":"dpi1", "label":"DPI", "step":"50","type":"number","min":"100", "max":"8000","default":"800"},

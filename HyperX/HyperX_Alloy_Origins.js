@@ -9,7 +9,7 @@ export function DefaultScale(){return Math.floor(DESIRED_HEIGHT/Size()[1])}
 export function ConflictingProcesses() {
     return ["NGenuity2.exe"];
 }
-export function ControllableParameters(){
+export function ControllableParameters(){
     return [
         {"property":"shutdownColor", "label":"Shutdown Color","min":"0","max":"360","type":"color","default":"009bde"},
         {"property":"LightingMode", "label":"Lighting Mode", "type":"combobox", "values":["Canvas","Forced"], "default":"Canvas"},

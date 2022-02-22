@@ -5,7 +5,7 @@ export function ProductId() { return 0x7750; }
 export function Publisher() { return "WhirlwindFX"; }
 export function Size() { return [5, 5]; }
 export function Type(){return "rawusb"};
-export function ControllableParameters(){
+export function ControllableParameters(){
     return [
     {"property":"shutdownColor", "label":"Shutdown Color","min":"0","max":"360","type":"color","default":"009bde"},
     {"property":"LightingMode", "label":"Lighting Mode", "type":"combobox", "values":["Canvas","Forced"], "default":"Canvas"},

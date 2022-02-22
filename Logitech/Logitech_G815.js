@@ -15,7 +15,7 @@ export function Size() { return [22, 7]; }
 export function DefaultPosition(){return [10,100]}
 const DESIRED_HEIGHT = 85;
 export function DefaultScale(){return Math.floor(DESIRED_HEIGHT/Size()[1])}
-export function ControllableParameters(){
+export function ControllableParameters(){
     return [
         {"property":"shutdownColor", "label":"Shutdown Color","min":"0","max":"360","type":"color","default":"009bde"},
         {"property":"LightingMode", "label":"Lighting Mode", "type":"combobox", "values":["Canvas","Forced"], "default":"Canvas"},

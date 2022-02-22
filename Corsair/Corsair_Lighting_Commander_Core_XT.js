@@ -5,14 +5,11 @@ export function Publisher() { return "WhirlwindFX"; }
 export function Size() { return [1, 1]; }
 export function DefaultPosition(){return [0,0]}
 export function DefaultScale(){return 1.0}
-export function ControllableParameters(){
+export function ControllableParameters(){
     return [
     {"property":"shutdownColor", "label":"Shutdown Color","min":"0","max":"360","type":"color","default":"#009bde"},
     {"property":"LightingMode", "label":"Lighting Mode", "type":"combobox", "values":["Canvas","Forced"], "default":"Canvas"},
     {"property":"forcedColor", "label":"Forced Color","min":"0","max":"360","type":"color","default":"#009bde"},
-    //{"property":"FanControl", "label":"enable fan Control","type":"boolean","default":"false"},
-    //{"property":"PumpSpeed", "label":"Pump Speed %","type":"number","min":"50", "max":"100","default":"75"}, //EXPERIMENTAL, don't enable unless you know what your doing.
-    //{"property":"FanSpeed", "label":"Fan Speed %","type":"number","min":"0", "max":"100","default":"60"},
     ];
 }
 
@@ -356,7 +353,7 @@ function sendInitialColorPacket(ledCount, colorData){
 
     packet         = packet.concat(colorData);
 
-    device.write(packet,1025);
+    device.write(packet,1330);
     device.read(packet,1025);
 }
 
@@ -370,7 +367,7 @@ function sendSecondaryColorPacket(colorData){
     packet[0x03]   = 0x00;
     packet         = packet.concat(colorData);
 
-    device.write(packet,1025);
+    device.write(packet,1330);
     device.read(packet,1025);
 }
 

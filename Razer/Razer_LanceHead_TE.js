@@ -56,7 +56,7 @@ export function Size() { return [5,9]; }
 export function Type() { return "Hid"; }
 export function DefaultPosition() {return [225,120]; }
 export function DefaultScale(){return 7.0}
-export function ControllableParameters(){
+export function ControllableParameters(){
     return [
         {"property":"shutdownColor", "label":"Shutdown Color","min":"0","max":"360","type":"color","default":"009bde"},
         {"property":"LightingMode", "label":"Lighting Mode", "type":"combobox", "values":["Canvas","Forced"], "default":"Canvas"},

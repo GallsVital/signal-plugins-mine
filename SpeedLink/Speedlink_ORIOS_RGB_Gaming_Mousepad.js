@@ -5,7 +5,7 @@ export function Publisher() { return "FeuerSturm"; }
 export function Size() { return [4,3]; }
 export function DefaultPosition(){return [50,50]}
 export function DefaultScale(){return 28.0}
-export function ControllableParameters(){
+export function ControllableParameters(){
 	return [
 		{"property":"shutdownColor", "label":"Shutdown Color","min":"0","max":"360","type":"color","default":"009bde"},
 		{"property":"LightingMode", "label":"Lighting Mode", "type":"combobox", "values":["Canvas","Forced"], "default":"Canvas"},
