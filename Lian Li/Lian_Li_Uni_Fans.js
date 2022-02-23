@@ -11,10 +11,6 @@ export function ControllableParameters(){
     {"property":"LightingMode", "label":"Lighting Mode", "type":"combobox", "values":["Canvas","Forced"], "default":"Canvas"},
     {"property":"forcedColor", "label":"Forced Color","min":"0","max":"360","type":"color","default":"009bde"},
     {"property":"moboSync", "label":"Enable Passthrough Control","type":"boolean","default":"false"},
-    {"property":"Channel1Count", "label":"Channel 1 Fan count","type":"combobox","values":["0","1","2","3","4"],"default":"0"},
-    {"property":"Channel2Count", "label":"Channel 2 Fan count","type":"combobox","values":["0","1","2","3","4"],"default":"0"},
-    {"property":"Channel3Count", "label":"Channel 3 Fan count","type":"combobox","values":["0","1","2","3","4"],"default":"0"},
-    {"property":"Channel4Count", "label":"Channel 4 Fan count","type":"combobox","values":["0","1","2","3","4"],"default":"0"},
     {"property":"FanMode", "label":"Fan Speed Mode","type":"combobox","values":["SignalRGB","Motherboard PWM"],"default":"SignalRGB"},
     ];
 }
@@ -40,14 +36,9 @@ function SetupChannels(){
 }
 
 
-
 var ConnectedFans = []
-
-
 var vLedNames = [];
 var vLedPos = [];
-
-
 
 export function LedNames()
 {
@@ -208,9 +199,11 @@ function sendChannels(){
     }else{
         //set fan RGB one channel at a time
         // Find Channel with Leds on it
-        while(device.channel(ChannelArray[ChannelIndex][0]).LedCount() == 0){
+        do{
             ChannelIndex = (ChannelIndex + 1) % 4
-        }
+        }while(device.channel(ChannelArray[ChannelIndex][0]).LedCount() == 0)
+        
+
         SendChannel(ChannelIndex)
     }
 } 
