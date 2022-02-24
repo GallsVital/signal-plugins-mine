@@ -115,22 +115,30 @@ export function LedPositions()
 
 function EnableSoftwareControl()
 {
-    sendColorPacket(StartFlags[0],magic1);
-    sendColorPacket(StartFlags[1],magic2);
-    sendColorPacket(StartFlags[2],magic3);
+    SendColorPacket(StartFlags[0],magic1);
+    SendColorPacket(StartFlags[1],magic2);
+    SendColorPacket(StartFlags[2],magic3);
 }
 
 function ReturnToHardwareControl()
 {
 
 }
+function CreateFans(){
+    device.createFanControl(`Fan 1`);
+    device.createFanControl(`Fan 2`);
+    device.createFanControl(`Pump`);
 
+}
 
 export function Initialize()
 {
     SetupChannels();
 
     EnableSoftwareControl();
+
+    //CreateFans();
+
 }
 
 
@@ -180,7 +188,7 @@ export function Initialize()
 
 
 
-function sendColorPacket(command, data){
+function SendColorPacket(command, data){
     var packet = [];
     packet[0] = 0x00;
     packet[1] = 0x3F;
@@ -193,6 +201,47 @@ function sendColorPacket(command, data){
     device.read(packet,65);
     //10 works well for soft locks
     device.pause(10);
+}
+
+function GetCoolingPacket(){
+    var packet = [];
+    packet[0] = 0x00;
+    packet[1] = 0x3F;
+    packet[2] = GetPacketSequence();
+    packet[2] |= 0b100;
+    packet[3] = 0xFF
+    packet[64] = ComputePec(packet.slice(2,64));
+
+    device.write(packet, 65);
+    let config = device.read(packet,65);
+
+    return config
+}
+
+function ParseFanSpeeds(data){
+
+    let fan1RPM = data[16] + (data[17] << 8)
+    let fan1Duty = data[15] / 255 * 100
+
+    device.log(`Fan 1 Duty ${fan1RPM}, Speed ${fan1Duty.toFixed(2)}`)
+    device.setRPM("Fan 1", fan1RPM)
+
+    let fan2RPM = data[23] + (data[24] << 8)
+    let fan2Duty = data[22] / 255 * 100
+
+    device.log(`Fan 2 Duty ${fan2RPM}, Speed ${fan2Duty.toFixed(2)}`)
+    device.setRPM("Fan 2", fan2RPM)
+    
+    let pumpRPM = data[30] + (data[31] << 8)
+    let pumpDuty = data[29] / 255 * 100
+
+    device.log(`Pump Duty ${pumpRPM}, Speed ${pumpDuty.toFixed(2)}`)
+    device.setRPM("Pump", pumpRPM)
+
+}
+
+function ParseLiquidTemp(data){
+    device.log(`Liquid Temp ${(data[9] + data[10] / 255).toFixed(2)}`)
 }
 function sendCoolingPacket(data){
     var packet = [];
@@ -272,24 +321,44 @@ function sendColor(shutdown = false){
     TotalLedCount += ChannelLedCount;
 
 
-    sendColorPacket(ColorFlags[0],RGBdata.splice(0,60));
+    SendColorPacket(ColorFlags[0],RGBdata.splice(0,60));
     if(TotalLedCount > 20) {
-        sendColorPacket(ColorFlags[1],RGBdata.splice(0,60));
+        SendColorPacket(ColorFlags[1],RGBdata.splice(0,60));
     }
     if(TotalLedCount > 40) {
-        sendColorPacket(ColorFlags[2],RGBdata.splice(0,60));
+        SendColorPacket(ColorFlags[2],RGBdata.splice(0,60));
     }
     //40 is known to be good for soft locks
     device.pause(30);
-    device.pause(20);}
+    device.pause(20);
+}
 
+    var savedPollFanTimer = Date.now();
+    var PollModeInternal = 3000;
+    function PollFans() {
+        //Break if were not ready to poll
+        if (Date.now() - savedPollFanTimer < PollModeInternal) {
+            return
+        }
+        savedPollFanTimer = Date.now();
+        
+        if(device.fanControlDisabled()){
+            return;
+        }
+        let FanData = GetCoolingPacket();
+        ParseFanSpeeds(FanData)
+        ParseLiquidTemp(FanData)
+
+        //device.log(`Fan ${ConnectedFans[index]} RPM: ${rpm}, Level: ${(level).toFixed(2)}, took ${Date.now() - savedPollFanTimer}ms`)
+    }
 export function Render()
 {
     if(CurrentFanSpeed != FanSpeed) {
         CurrentFanSpeed = FanSpeed;
         sendCoolingPacket(CoolingDict[CurrentFanSpeed]);
     }   
-
+    //PollFans();
+    //device.pause(10)
     sendColor();
 }
 
