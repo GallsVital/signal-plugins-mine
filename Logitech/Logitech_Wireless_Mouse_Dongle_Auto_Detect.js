@@ -1,32 +1,75 @@
-export function Name() { return "Logitech Wireless Mouse dongle"; }
+export function Name() { return "Logitech Wireless Mouse Dongle"; }
 export function VendorId() { return 0x046d; }
-export function ProductId() { return 0x00; }//0xC539
+export function ProductId() { return 0xC539; }
 export function Publisher() { return "WhirlwindFX"; }
 export function Size() { return [3, 3]; }
 export function DefaultPosition(){return [240,120]}
 export function DefaultScale(){return 8.0}
-export function ControllableParameters(){
+export function ControllableParameters(){
     return [
         {"property":"shutdownColor", "label":"Shutdown Color","min":"0","max":"360","type":"color","default":"009bde"},
         {"property":"LightingMode", "label":"Lighting Mode", "type":"combobox", "values":["Canvas","Forced"], "default":"Canvas"},
         {"property":"forcedColor", "label":"Forced Color","min":"0","max":"360","type":"color","default":"009bde"},
         {"property":"DpiControl", "label":"Enable Dpi Control","type":"boolean","default":"false"},
-        {"property":"dpi1", "label":"DPI","step":"50", "type":"number","min":"200", "max":"12400","default":"800"},
+        {"property":"dpi1", "label":"DPI","step":"50", "type":"number","min":"200", "max":"12000","default":"800"},
+		{"property":"DpiLight", "label":"DPI Light Always On","type":"boolean","default":1},
+		{"property":"pollingrate", "label":"Polling Rate","type":"combobox", "values":[ "1000","500", "250", "100" ], "default":"1000"},
     ];
 }
+
+const WIRED = 0xFF;
+const WIRELESS = 0x01;
+
+const LogitechBatteryVoltageDict = 
+{
+    4186 : 100,
+    4067 : 90,
+    3989 : 80,
+    3922 : 70,
+    3859 : 60,
+    3811 : 50,
+    3778 : 40,
+    3751 : 30,
+    3717 : 20,
+    3671 : 10,
+    3646 : 5,
+    3579 : 2,
+    3500 : 0,
+    0 : 0
+}
+
+var Hero = false;
 var savedDpi1;
 var DeviceId;
 var TransactionId;
 var deviceName;
 var FeatureId;
+var PollingId;
+var g_iFramecounter;
 
-const WIRED = 0xFF;
-const WIRELESS = 0x01;
+const deviceIdMap = 
+{
+"405d" : "Logitech G403L",
+"407f" : "Logitech G502L",           
+"4070" : "Logitech G703L", 
+"4086" : "Logitech G703 Hero",        
+"4053" : "Logitech G900L",           
+"4067" : "Logitech G903L",    
+"4087" : "Logitech G903 Hero",       
+"4079" : "Logitech GPro Wireless",              
+}
+
+const dpidict = //We need to find the rest of these dpidicts. They aren't the same as the transaction id. I only know the G403 one offhand.
+{ 
+	"405d" : 0x0A,
+    "407f" : 0x3A,
+    "4070" : 0x3F,
+    "4067" : 0x3F,
+    "4079" : 0x3E,
+}
 
 var vLedNames = ["Primary Zone", "Logo Zone"];
-var vLedPositions = [
-    [0,1],[0,2]
-];
+var vLedPositions = [ [0,1],[0,2] ];
 
 export function LedNames()
 {
@@ -37,75 +80,19 @@ export function LedPositions()
 {
     return vLedPositions;
 }
-function sendPacketString(string, size){
 
-    var packet= [];
-    var data = string.split(' ');
-    
-    for(let i = 0; i < data.length; i++){
-        packet[i] = parseInt(data[i],16)//.toString(16)
-    }
-
-    device.write(packet, size);
-}
-
-
-function Logitech_Short_Get(WIRED, data){
-    device.set_endpoint(2, 0x0001, 0xff00); // System IF 
-
-    var packet = [0x10,WIRED, 0x81]
-    data  = data || [0x00, 0x00, 0x00];
-
-    packet = packet.concat(data)
-    
-    device.write(packet, 7)
-    packet = device.read(packet,7);
-
-    return packet.slice(3,7)
-}
-
-function Logitech_Short_Set(Mode, data){
-    device.set_endpoint(2, 0x0001, 0xff00); // System IF 
-
-    var packet = [0x10,Mode, 0x80]
-    data  = data || [0x00, 0x00, 0x00];
-
-    packet = packet.concat(data)
-    
-    device.write(packet, 7)
-    packet = device.read(packet,7);
-
-    return packet.slice(3,7)
-}
-
-function Logitech_Long_Get(Mode, data){
-    device.set_endpoint(2, 0x0002, 0xff00); // Lighting IF 
-
-    var packet = [0x11,Mode]
-    data = data || [0x00, 0x00, 0x00];
-
-    packet = packet.concat(data)
- 
-
-    device.write(packet, 20)
-    packet = device.read(packet,20);
-
-    return packet.slice(4,7)
-}
 export function Initialize()
 {
     device.flush()
-
+	
     let value = Logitech_Short_Get(WIRED)
 
     let data = [0x00, 0x00, 0x01]
-    Logitech_Short_Set(WIRED, data)
-
-    data = [0x02, 0x00, 0x00]
-    value = Logitech_Short_Set(WIRED, data)
 
     data = [0x02, 0x02, 0x00]
+	
     value = Logitech_Short_Set(WIRED, data)
+
     DeviceId = value[3].toString(16) + value[2].toString(16)
     TransactionId = value[0];
 
@@ -114,57 +101,384 @@ export function Initialize()
     device.log(`Device Name: ${deviceName}`);
 
     device.log("Transaction ID Found: " + TransactionId.toString(16));
+	
+	if(DeviceId == "00")//make hero mice not angry. They won't run without that extra junk and always give 00.
+	{
+	
+	let value = Logitech_Short_Get(WIRED)
 
-    data = [0x00, 0x01,0x80,0x70]
-    FeatureId = Logitech_Long_Get(WIRELESS, data)[0]
-    device.log("Feature ID Found: " + FeatureId.toString(16));
+    let data = [0x00, 0x00, 0x01]
+    Logitech_Short_Set(WIRED, data)
+  
+    data = [0x02, 0x00, 0x00]
+    value = Logitech_Short_Set(WIRED, data)
 
+    data = [0x02, 0x02, 0x00]
+    value = Logitech_Short_Set(WIRED, data)
 
-    SetDpiLightAlwaysOn(false);
-    SetDirectMode(true);
+    DeviceId = value[3].toString(16) + value[2].toString(16)
+    TransactionId = value[0];
 
-     if(savedDpi1 != dpi1 && DpiControl) {
-             setDpi(dpi1);
-     }
-
-
+    deviceName = deviceIdMap[DeviceId] || "UNKNOWN"
+    device.log(`Device Id Found: ${DeviceId}`);
+    device.log(`Device Name: ${deviceName}`);
+	
+	}
+	
+	if(DeviceId == "4087" || DeviceId == "4086" )
+    {
+		Hero = true;
+		data = [0x00, 0x01,0x80,0x71]
+		FeatureId = Logitech_Long_Get(WIRELESS, data)[0]
+		device.log("Feature ID Found: " + FeatureId.toString(16));
+		DPI_Light_Toggle();
+		SetHeroDpiLightAlwaysOn(DpiLight);
+    }
+	else
+	{
+		data = [0x00, 0x01,0x80,0x70]
+		FeatureId = Logitech_Long_Get(WIRELESS, data)[0]
+		device.log("Feature ID Found: " + FeatureId.toString(16));
+		SetDirectMode();
+		SetDpiLightAlwaysOn(DpiLight)
+	}
+	
+	if (DeviceId == "405d")
+	{
+	 PollingId = 0x0d;
+	}
+	else
+	{
+	 PollingId = 0x0a;
+	}
+	
+    if(savedDpi1 != dpi1 && DpiControl) 
+	{
+      setDpi(dpi1);
+    }
 }
 
-var deviceIdMap = {
-"405d" : "Logitech G403L",
-"407f" : "Logitech G502L",           
-"4070" : "Logitech G703L",           
-"4053" : "Logitech G900L",           
-"4067" : "Logitech G903L",    
-"4087" : "Logitech G903 Hero",       
-"4079" : "Logitech GPro Wireless",              
+export function Render()
+{
+	LogitechSetState();//moved this to the bottom, but can probably go back up top
+    if(Hero == true)
+	{
+	    sendHeroZone(0);
+	    sendHeroZone(1);
+    }
+	else
+	{
+        sendZone(0);
+        sendZone(1);
+    }
+	
+    if(savedDpi1 != dpi1 && DpiControl)
+    {
+     setDpi(dpi1);
+    }
+	
 }
 
-const dpidict= {
-    "407f" : 0x3A,
-    "4070" : 0x3F,
-    "4067" : 0x3F,
-    "4079" : 0x3E,
-    "405d" : 0x3E,
-};
 
-function setDpi(dpi){
+export function Shutdown()
+{    
+	if(Hero = true)
+	{
+	    sendHeroZone(0, true);
+	    sendHeroZone(1, true);
+    }
+	else
+	{
+	    sendZone(0, true);
+        sendZone(1, true);
+    }
+}
+
+export function onDpiLightChanged()
+{
+    if (Hero = true)
+	{
+		SetHeroDpiLightAlwaysOn(DpiLight)
+	}
+	else
+	{
+		SetDpiLightAlwaysOn(DpiLight)	
+	}
+}
+
+export function onpollingrateChanged()
+{
+	setPollingRate();
+}
+
+function clearShortReadBuffer(){
+    device.set_endpoint(2, 0x0001, 0xff00); // System IF 
+    device.read([0x10,0x01],7)
+    while(device.getLastReadSize() > 0){
+        device.read([0x10,0xFF],7)
+    }
+}
+
+function clearLongReadBuffer(){
+    device.set_endpoint(2, 0x0002, 0xff00); // Lighting IF 
+    device.read([0x11,0x01],20)
+    while(device.getLastReadSize() > 0){
+        device.read([0x10,0x01],20)
+    }
+}
+
+function Logitech_Short_Get(WIRED, data)
+{
+    device.set_endpoint(2, 0x0001, 0xff00); // System IF 
+    clearShortReadBuffer();
+    var packet = [0x10,WIRED, 0x81]
+    data  = data || [0x00, 0x00, 0x00];
+    packet = packet.concat(data)
+    device.write(packet, 7)
+	//device.pause(100);
+    packet = device.read(packet,7);
+    return packet.slice(3,7)
+}
+
+function Logitech_Short_Set(Mode, data)
+{
+    device.set_endpoint(2, 0x0001, 0xff00); // System IF 
+    clearShortReadBuffer();
+    var packet = [0x10,Mode, 0x80]
+    data  = data || [0x00, 0x00, 0x00];
+    packet = packet.concat(data)
+    device.write(packet, 7)
+	//device.pause(100);
+    packet = device.read(packet,7);
+
+    return packet.slice(3,7)
+}
+
+function Logitech_Long_Get(Mode, data)
+{
+    device.set_endpoint(2, 0x0002, 0xff00); // Lighting IF 
+	clearLongReadBuffer();
+    var packet = [0x11,Mode]
+    data = data || [0x00, 0x00, 0x00];
+    packet = packet.concat(data)
+    device.write(packet, 20)
+	//device.pause(100);
+    packet = device.read(packet,20);
+	
+    return packet.slice(4,7)
+}
+
+
+
+export function GetBatteryCharge(){
+    let [voltage,state] = LogitechGetBatteryVoltage()
+    return GetApproximateBatteryPercentage(voltage)
+}
+
+const BatteryStatusMap = {
+    0 : 1,
+    0x10 : 3,
+    0x80 : 3
+}
+export function GetBatteryStatus(){
+    let [voltage,state] = LogitechGetBatteryVoltage()
+    return BatteryStatusMap[state]
+}
+function LogitechGetBatteryVoltage()
+{
+	let BatteryId = 0x06; //This is true for G903 Hero and G502, no idea on other mice.
+
+	if (DeviceId == "405d"){
+		BatteryId = 0x04;
+	}
+
+	let data = [BatteryId, 0x00, 0x0D] 
+	let BatteryArray = Logitech_Long_Get(0x01, data)
+    device.log(BatteryArray)
+	let BatteryVoltage = (BatteryArray[0] << 8) + BatteryArray[1]
+    let BatteryStatus = BatteryArray[2]
+
+	device.log("Battery Voltage: " + BatteryVoltage);
+	return [BatteryVoltage, BatteryStatus];
+}
+
+const VoltageArray = [ 3500, 3579, 3646, 3671, 3717, 3751, 3778, 3811, 3859, 3922, 3989, 4067, 4186 ];
+function GetApproximateBatteryPercentage(BatteryVoltage){
+    
+	const nearestVoltageBand = VoltageArray.reduce((prev, curr) => {
+		return (Math.abs(curr - BatteryVoltage) < Math.abs(prev - BatteryVoltage) ? curr : prev);
+    });
+    
+    return LogitechBatteryVoltageDict[nearestVoltageBand]
+}
+
+var lastStateCheck = Date.now();
+var StackCheckInterval = 15000;
+function LogitechSetState()
+{
+    	//Break if were not ready to poll
+	if (Date.now() - lastStateCheck < StackCheckInterval) {
+        return
+	}
+	lastStateCheck = Date.now();
+	LogitechGetBatteryVoltage();
+	device.pause(1);
+	if(Hero == true){
+		SetHeroDirectMode(); //of note this does have a small speed hit.
+		SetHeroDpiLightAlwaysOn(DpiLight)
+    }else{
+        SetDirectMode(); //For now this puts a band-aid fix on the flash problem. Would like to make nicer in the future.
+    }  
+}
+
+function setDpi(dpi)
+{
     device.set_endpoint(2, 0x0001, 0xff00); // System IF 
 
     savedDpi1 = dpi1;
 
     var packet = [];
     packet[0] = 0x10;
-    packet[1] = 0x01;
-    packet[2] = TransactionId;
-    packet[3] =  dpidict[DeviceId]
+    packet[1] = WIRELESS;
+    packet[2] = dpidict[DeviceId];
+    packet[3] = 0x3E;
     packet[4] = 0x00;
     packet[5] = Math.floor(dpi/256);
     packet[6] = dpi%256;
+	
     device.write(packet, 7);
-    //device.read(packet,7)
+    device.pause(1); //This is here because I was having issues with the device applying the dpi consistenly
 }
 
+function setPollingRate()
+{
+    device.set_endpoint(2, 0x0001, 0xff00); // System IF 
+
+    var packet = [];
+    packet[0] = 0x10;
+    packet[1] = WIRELESS;
+    packet[2] = PollingId; //G903 Hero Value. Will need a dict.
+    packet[3] = 0x2E;
+    packet[4] = 1000/pollingrate; //1 is 1000, 8 is 125, 4 is 250, 2 is 500. Looks like you divide 1000 by the PollingRate
+	
+    device.write(packet, 7);
+    device.pause(1); 
+}
+
+function SetDpiLightAlwaysOn(DpiLight){
+
+    device.set_endpoint(2, 0x0001, 0xff00); // System IF 
+    var packet = [0x10, 0x01, 0x08, 0x07E, 0x01, (DpiLight ? 0x02 : 0x04) ,0x00]
+    device.write(packet, 7)
+
+    device.set_endpoint(2, 0x0002, 0xff00); // Lighting IF    
+    var packet = [0x11, 0x01, 0x08, 0x05E, 0x01,0x00,0x02, 0x00, 0x02]
+    device.write(packet, 20)
+
+    device.set_endpoint(2, 0x0001, 0xff00); // System IF 
+    var packet = [0x10, 0x01, 0x08, 0x06E, 0x01]
+    device.write(packet, 7)
+}
+
+function DPI_Light_Toggle()
+{
+	SetHeroDpiLightAlwaysOn(2);
+	SetHeroDpiLightAlwaysOn(4);
+}
+
+
+function SetHeroDpiLightAlwaysOn(DpiLight)
+{
+    device.set_endpoint(2, 0x0002, 0xff00);  
+    var packet = [0x11, 0x01, 0x07, 0x03B, 0x01, 0x00 ,0x08, (DpiLight ? 0x04 : 0x02), 0x07]
+    device.write(packet, 20)
+
+    device.set_endpoint(2, 0x0001, 0xff00);    
+    var packet = [0x10, 0x01, 0x07, 0x02B, 0x00, 0x03, 0x00 ]
+    device.write(packet, 7)
+
+    device.set_endpoint(2, 0x0001, 0xff00);  
+    var packet = [0x10, 0x01, 0x07, 0x03B, 0x00, 0x00, 0x08]
+    device.write(packet, 7)
+}
+
+function sendZone(zone, shutdown = false)
+{
+    device.set_endpoint(2, 0x0002, 0xff00);  
+    var packet = [];
+    packet[0x00] = 0x11;
+    packet[0x01] = WIRELESS;
+    packet[0x02] = FeatureId;
+    packet[0x03] = 0x3B;
+    packet[0x04] = zone;
+    packet[0x05] = 0x01;
+
+        var iX = vLedPositions[zone][0];
+        var iY = vLedPositions[zone][1];
+        var color;
+        if(shutdown)
+		{
+         color = hexToRgb(shutdownColor);
+        }else if (LightingMode == "Forced")
+		{
+         color = hexToRgb(forcedColor);
+        }else
+		{
+         color = device.color(iX, iY);
+        }
+        packet[0x06] = color[0];
+        packet[0x07] = color[1];
+        packet[0x08] = color[2];
+    packet[0x09] = 0x02;
+
+if(DeviceId == "4067" || DeviceId == "4070" || DeviceId == "4087") 
+	{
+     packet[16] = 0x01;
+	}
+    device.write(packet, 20);
+    device.read(packet, 20)
+
+if(DeviceId == "4079" || DeviceId == "4087" || DeviceId == "405d")
+	{
+     Apply();
+    }
+
+}
+
+function sendHeroZone(zone, shutdown = false)
+{
+    device.set_endpoint(2, 0x0002, 0xff00); // Lighting IF    
+    var packet = [];
+    packet[0x00] = 0x11;
+    packet[0x01] = WIRELESS;
+    packet[0x02] = 0x07;
+    packet[0x03] = 0x1A;
+    packet[0x04] = zone;
+    packet[0x05] = 0x01;
+
+        var iX = vLedPositions[zone][0];
+        var iY = vLedPositions[zone][1];
+        var color;
+        if(shutdown)
+		{
+         color = hexToRgb(shutdownColor);
+        }else if (LightingMode == "Forced")
+		{
+         color = hexToRgb(forcedColor);
+        }else
+		{
+         color = device.color(iX, iY);
+        }
+        packet[0x06] = color[0];
+        packet[0x07] = color[1];
+        packet[0x08] = color[2];
+    packet[0x10] = 0x02;
+
+     packet[16] = 0x01;
+
+    device.write(packet, 20);
+    device.read(packet, 20)
+}
 
 function Apply()
 {
@@ -172,115 +486,37 @@ function Apply()
     device.set_endpoint(2, 0x0001, 0xff00); // System IF    
     var packet = [];
     packet[0] = 0x10;
-    packet[1] = WIRELESS
+    packet[1] = WIRELESS;
     packet[2] = 0x0B;
     packet[3] = 0x2F;
     packet[4] = 0x01;
     device.write(packet, 7);
-    //device.read(packet,7)
+    device.read(packet, 7)
 }
 
-
-function sendZone(zone, shutdown = false){
-
-
-    device.set_endpoint(2, 0x0002, 0xff00); // Lighting IF    
-    var packet = [];
-    packet[0x00] = 0x11;
-    packet[0x01] = WIRELESS
-    packet[0x02] = FeatureId
-    packet[0x03] = dpidict[DeviceId]
-    packet[0x04] = zone;
-    packet[0x05] = 0x01;
-
-
-
-        var iX = vLedPositions[zone][0];
-        var iY = vLedPositions[zone][1];
-        var color
-        var color;
-        if(shutdown){
-            color = hexToRgb(shutdownColor)
-        }else if (LightingMode == "Forced") {
-            color = hexToRgb(forcedColor)
-        }else{
-            color = device.color(iX, iY);
-        }
-        packet[0x06] = color[0];
-        packet[0x07] = color[1];
-        packet[0x08] = color[2];
-    
-    
-    packet[0x09] = 0x02;
-
-if(DeviceId == "4067" || DeviceId == "4070" || DeviceId == "4087") {
-        packet[16] = 0x01;
-    
-}
-
-    device.write(packet, 20);
-    device.read(packet,20)
-
-    if(DeviceId == "4079" || DeviceId == "4087" || DeviceId == "405d"){
-        Apply();
-    }
-
-    device.pause(1);
-
-}
-
-export function Render()
+function SetDirectMode()
 {
-    sendZone(0);
-    sendZone(1);
-    
-    
-
-    if(savedDpi1 != dpi1 && DpiControl){
-      setDpi(dpi1)
-    }
+ device.set_endpoint(2, 0x0001, 0xff00); 
+ let packet = [0x10, 0x01, FeatureId, 0x80, 0x01, 0x01]
+ device.write(packet, 7)
+ device.read(packet, 7)
 }
 
-
-export function Shutdown()
+function SetHeroDirectMode()
 {
-    device.set_endpoint(2, 0x0002, 0xff00); // Lighting IF    
-    sendZone(0,true);
-    sendZone(1,true);
-    
-}
-function SetDpiLightAlwaysOn(always){
-    device.set_endpoint(2, 0x0001, 0xff00); // System IF 
-    let packet = [0x10, 0x01, 0x08, 0x7E, 0x01, always ? 0x02 : 0x04,0x00]
-    device.write(packet, 7)
-    device.read(packet, 7)
-
-    device.set_endpoint(2, 0x0002, 0xff00); // Lighting IF    
-    packet = [0x11, 0x01, 0x08, 0x5E, 0x01,0x00,0x02, 0x00, 0x02]
-    device.write(packet, 20)
-    device.read(packet, 20)
-
-
-    device.set_endpoint(2, 0x0001, 0xff00); // System IF 
-    packet = [0x10, 0x01, 0x08, 0x6E, 0x01,0x00,0x00]
-    device.write(packet, 7)
-    device.read(packet, 7)
-
-    packet = [0x10, 0x01, 0x08, 0x6E, 0x01,0x00,0x00]
-    device.write(packet, 7)
-    device.read(packet, 7)
+ device.set_endpoint(2, 0x0001, 0xff00); 
+ let packet = [0x10, 0x01, 0x07, 0x5A, 0x01, 0x03, 0x05]
+ device.write(packet, 7)
+ device.read(packet, 7)
 }
 
-function SetDirectMode(direct){
-    let packet = [0x10, 0x01, FeatureId,0x80, direct,direct]
-    device.write(packet, 7)
-}
 export function Validate(endpoint)
 {
     return endpoint.interface === 2 && endpoint.usage === 0x0002 && endpoint.usage_page === 0xff00
      || endpoint.interface === 2 && endpoint.usage === 0x0001 && endpoint.usage_page === 0xff00;
 }
-function hexToRgb(hex) {
+function hexToRgb(hex) 
+{
     var result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
     var colors = [];
     colors[0] = parseInt(result[1], 16);
@@ -288,7 +524,7 @@ function hexToRgb(hex) {
     colors[2] = parseInt(result[3], 16);
 
     return colors;
-  }
+ }
 
 export function Image()
 {

@@ -70,7 +70,7 @@ function hexToRgb(hex) {
   
   var savedLayout;
   var SkippedKeys_ANSI = [
-      49, 63, 65, 66, 81, 83, 85, 111, 126, 127, 128, 129,
+      63, 65, 66, 81, 83, 85, 111, 120,121,122,123,124, 125, 126, 127, 128, 129,
   ]
 
   var SkippedKeys_ISO = [
