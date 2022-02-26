@@ -14,10 +14,10 @@ export function ControllableParameters(){
 	];
 }
 
-const DeviceMaxLedLimit = 800;
+const DeviceMaxLedLimit = 1000;
 var ChannelArray = [
-	["Channel 1", 400],
-	["Channel 2", 400],
+	["Channel 1", 500],
+	["Channel 2", 500],
 ];
 
 function SetupChannels()

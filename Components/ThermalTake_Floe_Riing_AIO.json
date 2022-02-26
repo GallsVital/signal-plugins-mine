@@ -4,7 +4,7 @@
     "Brand" : "ThermalTake",
     "Type" : "AIO",
     "LedCount" : 6,
-    "Width": 3,
+    "Width": 4,
     "Height": 3,
     "LedMapping" : [
         1, 0,

@@ -1,11 +1,11 @@
-﻿export function Name() { return "Cooler Master ARGB Controller A1"; }
+﻿export function Name() { return "Cooler Master Gen2 LED Controller A1"; }
 export function VendorId() { return 0x2516;}
 export function ProductId() { return 0x0173;}
 export function Publisher() { return "FeuerSturm"; }
 export function Size() { return [1,1]; }
 export function DefaultPosition(){return [1,1]}
 export function DefaultScale(){return 1.0}
-export function ControllableParameters(){
+export function ControllableParameters(){
 	return [
 	{"property":"shutdownColor", "label":"Shutdown Color","min":"0","max":"360","type":"color","default":"009bde"},
 	{"property":"LightingMode", "label":"Lighting Mode", "type":"combobox", "values":["Canvas","Forced"], "default":"Canvas"},
@@ -15,6 +15,7 @@ export function ControllableParameters(){
 	{"property":"GenCh3", "label":"Channel 3 Mode", "type":"combobox", "values":["GEN1","GEN2"], "default":"GEN1", "tooltip":"GEN2 will ONLY work with daisy-chained Cooler Master GEN2 devices!"},
 	];
 }
+export function ConflictingProcesses() { return ["MasterPlusApp.exe"]; }
 export function SupportsSubdevices(){ return true; }
 
 const Gen1ChLedLimit = 48;
@@ -174,7 +175,7 @@ function SendChannel(Channel,shutdown = false, GEN2 = false)
 				}
 				device.write(packet,65);
 			}
-			device.pause(10);
+			device.pause(2);
 		}
 	}
 }
