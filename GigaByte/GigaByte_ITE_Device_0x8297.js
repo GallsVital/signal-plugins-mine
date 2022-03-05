@@ -12,7 +12,7 @@ export function ControllableParameters(){
         {"property":"shutdownColor", "label":"Shutdown Color","min":"0","max":"360","type":"color","default":"009bde"},
         {"property":"LightingMode", "label":"Lighting Mode", "type":"combobox", "values":["Canvas","Forced"], "default":"Canvas", "tooltip":"This toggles the device between displaying its canvas position, or being locked to its Forced Color"},
         {"property":"forcedColor", "label":"Forced Color","min":"0","max":"360","type":"color","default":"009bde"},
-        {"property":"RGBHeaderCount", "label":"RGB Header Count","type":"number","min":"0", "max":"2","default":"0"},
+        {"property":"RGBHeaderCount", "label":"RGB Header Count","type":"number","min":"0", "max":"2","default":"2"},
         {"property":"Mainboardconfig", "label":"MainBoard Configuration", "type":"combobox",   "values":["RGB","RBG","BGR","BRG","GBR","GRB"], "default":"BGR"},
         {"property":"Headerconfig", "label":"12v Header Configuration", "type":"combobox",   "values":["RGB","RBG","BGR","BRG","GBR","GRB"], "default":"RGB"},
 
