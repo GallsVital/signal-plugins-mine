@@ -16,6 +16,7 @@ export function ControllableParameters(){
 var ParentDeviceName = "Corsair Lighting Commander Core XT";
 export function SupportsSubdevices(){ return true; }
 export function DefaultComponentBrand() { return "Corsair"}
+export function SystemResumeDelay(){ return 6000; }
 var vKeyNames = [];
 
 var vKeyPositions = [];
@@ -52,12 +53,9 @@ function SetupChannels(){
     }
 }
 
-
-
-
 //Device Constants
-const Write_Length = 1025;
-const Read_Length = 1025;
+const Device_Write_Length = 1025;
+const Device_Read_Length = 1025;
 
 const MAX_FAN_COUNT = 6;
 
@@ -99,20 +97,34 @@ const CommandDict = {
     0x0F : "Led Settings"
 }
 
-
 export function Initialize()
 {
+    let CurrentMode = Corsair_Get(CORSAIR_MODE)
+    device.log(`Mode is Currently: ${CurrentMode == CORSAIR_SOFTWARE_MODE ? "Software" : "Hardware"}`)
+
+    if(CurrentMode == CORSAIR_SOFTWARE_MODE){
+        device.log("Resetting Endpoints!")
+        Corsair_Set(CORSAIR_MODE,CORSAIR_HARDWARE_MODE)
+        Corsair_Set(CORSAIR_MODE,CORSAIR_SOFTWARE_MODE)
+        Corsair_Open_Endpoint(CORSAIR_LIGHTING_CONTROLLER_ENDPOINT)
+
+        CurrentMode = Corsair_Get(CORSAIR_MODE)
+        device.log(`Mode is now: ${CurrentMode == CORSAIR_SOFTWARE_MODE ? "Software" : "Hardware"}`)
+    }
+
+    if(CurrentMode == CORSAIR_HARDWARE_MODE){
+        Corsair_Set(CORSAIR_MODE,CORSAIR_SOFTWARE_MODE)
+        CurrentMode = Corsair_Get(CORSAIR_MODE)
+        device.log(`Mode is now: ${CurrentMode == CORSAIR_SOFTWARE_MODE ? "Software" : "Hardware"}`)
+
+        Corsair_Open_Endpoint(CORSAIR_LIGHTING_CONTROLLER_ENDPOINT)
+    }
+
     ConnectedFans = []
     savedLedCount = -1
 
     SetupChannels()
 
-    if(Corsair_Get(CORSAIR_MODE) == CORSAIR_HARDWARE_MODE){
-        Corsair_Set(CORSAIR_MODE,CORSAIR_SOFTWARE_MODE)
-        device.log(`Mode is Now ${Corsair_Get(CORSAIR_MODE)}`)
-        Corsair_Open_Endpoint(CORSAIR_LIGHTING_CONTROLLER_ENDPOINT)
-
-    }
 
     device.log(`Vid is ${Corsair_Get(CORSAIR_VID)}`)
     device.log(`Pid is ${Corsair_Get(CORSAIR_PID)}`)
@@ -120,13 +132,16 @@ export function Initialize()
     GetFanSettings();
 
     SetFanLedCount();
+
 }
 
 export function Shutdown()
 {
     if(Corsair_Get(CORSAIR_MODE) == CORSAIR_SOFTWARE_MODE){
 
-        Corsair_Close_Endpoint(CORSAIR_LIGHTING_CONTROLLER_ENDPOINT,0)
+        Corsair_Close_Endpoint(0)
+        Corsair_Close_Endpoint(1)
+
         Corsair_Set(CORSAIR_MODE,CORSAIR_HARDWARE_MODE)
         device.log(`Mode is Now ${Corsair_Get(CORSAIR_MODE)}`)   
     }
@@ -160,12 +175,12 @@ function PollFans() {
     }
 
     GetFanSpeeds()
-    //GetTemps()
+    GetTemps()
     SendCoolingdata()
 
     //device.log(`Fan ${ConnectedFans[index]} RPM: ${rpm}, Level: ${(level).toFixed(2)}, took ${Date.now() - savedPollFanTimer}ms`)
 }
- 
+
 function GetFanSettings(){
 
     if(device.fanControlDisabled()){
@@ -180,13 +195,19 @@ function GetFanSettings(){
     if(FanSettings[4] == 9 && FanSettings[5] == 0){
         let allFanData = FanSettings.slice(7,7+MAX_FAN_COUNT);
         for(let i = 0; i < MAX_FAN_COUNT; i++){
-           if(allFanData[i] == 0x07){
+
+        if(allFanData[i] == 0x04){
+            device.log("DEVICE IS STILL BOOTING")
+        }
+
+        if(allFanData[i] == 0x07){
                 device.createFanControl(FanControllerArray[i])
                 ConnectedFans.push(i)
                 device.log(`Found ${FanControllerArray[i]}`)
             }
 
         }
+
     }else{
         device.log("Failed to get Fan Settings")
     }
@@ -222,12 +243,12 @@ function SendCoolingdata(){
 
     let CoolingData = [
         0x00, 0x08, 0x06, 0x01, 0x1B, 0x00, 0x00, 0x00, 0x07, 0x00, 0x06, 
-        0x00, 0x00, 0x00, 0x00,
-        0x01, 0x00, 0x00, 0x00,
-        0x02, 0x00, 0x00, 0x00,
-        0x03, 0x00, 0x00, 0x00,
-        0x04, 0x00, 0x00, 0x00,
-        0x05, 0x00, 0x00, 0x00,
+        0x00, 0x00, 0x32, 0x00,
+        0x01, 0x00, 0x32, 0x00,
+        0x02, 0x00, 0x32, 0x00,
+        0x03, 0x00, 0x32, 0x00,
+        0x04, 0x00, 0x32, 0x00,
+        0x05, 0x00, 0x32, 0x00,
     ]
 
     for(var fan = 0; fan < ConnectedFans.length; fan++){
@@ -353,8 +374,8 @@ function sendInitialColorPacket(ledCount, colorData){
 
     packet         = packet.concat(colorData);
 
-    device.write(packet,1330);
-    device.read(packet,1025);
+    device.write(packet,Device_Write_Length);
+    device.read(packet,Device_Read_Length);
 }
 
 
@@ -367,8 +388,8 @@ function sendSecondaryColorPacket(colorData){
     packet[0x03]   = 0x00;
     packet         = packet.concat(colorData);
 
-    device.write(packet,1330);
-    device.read(packet,1025);
+    device.write(packet,Device_Write_Length);
+    device.read(packet,Device_Read_Length);
 }
 
 
@@ -388,22 +409,22 @@ function SetFanLedCount(ledCount){
 
     // We must open and set the Fan Ports
     Corsair_Open_Endpoint(CORSAIR_ENDPOINT_4PIN_LEDCOUNT, 1)
-    sendPacketString("00 08 09 01",1025) 
+    sendPacketString("00 08 09 01",Device_Write_Length) 
 
-    device.write(FanSettings,1025);
-    device.read([0x00],1025);
+    device.write(FanSettings,Device_Write_Length);
+    device.read([0x00],Device_Read_Length);
     // THEN open and set the strip ports before closing the endpoints
     // If we don't then the Fan Leds will toggle on and off with each sending of this
     Corsair_Open_Endpoint(CORSAIR_ENDPOINT_3PIN_LEDCOUNT, 2)
-    sendPacketString("00 08 09 02",1025) 
-    device.write(StripSettings,1025);
-    device.read([0x00],1025);
+    sendPacketString("00 08 09 02",Device_Write_Length) 
+    device.write(StripSettings,Device_Write_Length);
+    device.read([0x00],Device_Read_Length);
 
 
     Corsair_Close_Endpoint(2)
     Corsair_Close_Endpoint(1)
 
-    sendPacketString("00 08 15 01",1025) //apply changes
+    sendPacketString("00 08 15 01",Device_Write_Length) //apply changes
 }
 
 
@@ -411,22 +432,22 @@ function SetFanLedCount(ledCount){
 
 function Corsair_Get(index){
     var packet = [0x00, CORSAIR_COMMAND,0x02,index,0x00]
-    device.write(packet,1025)
-    packet = device.read(packet,1025)
+    device.write(packet,Device_Write_Length)
+    packet = device.read(packet,Device_Read_Length)
     return packet[4] | (packet[5] << 8)
 }
 
 function Corsair_Get_Packet(index){
     var packet = [0x00, CORSAIR_COMMAND,0x02,index,0x00]
-    device.write(packet,1025)
-    packet = device.read(packet,1025)
+    device.write(packet,Device_Write_Length)
+    packet = device.read(packet,Device_Read_Length)
     return packet
 }
 
 function Corsair_Set(index, value){
     var packet = [0x00, CORSAIR_COMMAND,0x01,index,0x00, (value & 0xFF), (value >> 8 & 0xFF)]
-    device.write(packet,1025)
-    packet = device.read(packet,1025)
+    device.write(packet,Device_Write_Length)
+    packet = device.read(packet,Device_Read_Length)
     if(packet[3] == 3){
         device.log(`Set Packet Error`)
     }
@@ -435,8 +456,8 @@ function Corsair_Set(index, value){
 function Corsair_Open_Endpoint(endpoint, index = CORSAIR_LIGHTING_ENDPOINT_INDEX){
     
     var packet = [0x00, CORSAIR_COMMAND,0x0D,index,endpoint]
-    device.write(packet,1025)
-    packet = device.read(packet,1025)
+    device.write(packet,Device_Write_Length)
+    packet = device.read(packet,Device_Read_Length)
     if(packet[3] == 3){
         device.log(`Open Endpoint Error`)
     }
@@ -444,8 +465,8 @@ function Corsair_Open_Endpoint(endpoint, index = CORSAIR_LIGHTING_ENDPOINT_INDEX
 
 function Corsair_Close_Endpoint(endpoint){
     var packet = [0x00, CORSAIR_COMMAND,0x05,1,endpoint]
-    device.write(packet,1025)
-    packet = device.read(packet,1025)
+    device.write(packet,Device_Write_Length)
+    packet = device.read(packet,Device_Read_Length)
     if(packet[3] == 3){
         device.log(`Close Endpoint Error`)
     }
@@ -455,19 +476,18 @@ function Corsair_Close_Endpoint(endpoint){
 function Corsair_Read_Data(Endpoint, Index, Command){
 
     Corsair_Open_Endpoint(Endpoint, Index)
-    device.write([0x00, 0x09, 0x08, Index], 1025)
-     device.read([0x00], 1025);
+    device.write([0x00, 0x09, 0x08, Index], Device_Write_Length)
+     device.read([0x00], Device_Read_Length);
 
-    device.write([0x00, 0x08, 0x08, Index], 1025)
+    device.write([0x00, 0x08, 0x08, Index], Device_Write_Length)
     let Data = []
-    Data = device.read([0x00], 1025);
+    Data = device.read([0x00], Device_Read_Length);
 
     let RetryCount = 4
     do{
         RetryCount--;
-
-        sendPacketString("00 08 08 01",1025, false)
-        Data = device.read(Data, 1025);
+        device.write([0x00, 0x08, 0x08, Index], Device_Write_Length)
+        Data = device.read(Data, Device_Read_Length);
 
         if(CommandDict[Data[4]] != CommandDict[Command]){
             device.log(`Invalid Command Read: Got [${CommandDict[Data[2]]}][${Data[4]}], Wanted [${CommandDict[Command]}][${Command}]`)
@@ -484,11 +504,11 @@ function Corsair_Read_Data(Endpoint, Index, Command){
 function Corsair_Write_Packet(Endpoint, Index, Command, Data){
     Corsair_Open_Endpoint(Endpoint, Index)
 
-    device.write([0x00, 0x08, 0x08, Index], 1025);
-    device.read([0x00], 1025);
+    device.write([0x00, 0x08, 0x08, Index], Device_Write_Length);
+    device.read([0x00], Device_Read_Length);
 
-    device.write(Data,1025);
-    let packet = device.read([0x00],1025);
+    device.write(Data,Device_Write_Length);
+    let packet = device.read([0x00],Device_Read_Length);
     if(packet[3] == 3){
         device.log(`Set Packet Error`)
     }
