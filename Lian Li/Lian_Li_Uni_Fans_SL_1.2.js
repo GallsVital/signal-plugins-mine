@@ -176,6 +176,10 @@ function PollFans(){
         return
     }
     savedPollFanTimer = Date.now();
+    
+	if(device.fanControlDisabled()){
+		return;
+	}
 
     for(let fan = 0; fan < 4; fan++){
         let rpm = readFanRPM(fan)
