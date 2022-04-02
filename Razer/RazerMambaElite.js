@@ -52,7 +52,7 @@ export function Name() { return "Razer Mamba Elite"; }
 export function VendorId() { return 0x1532; }
 export function ProductId() { return 0x006c; }
 export function Publisher() { return "WhirlwindFX"; }
-export function Size() { return [10,10]; }
+export function Size() { return [10,11]; }
 export function Type() { return "Hid"; }
 export function DefaultPosition() {return [225,120]; }
 export function DefaultScale(){return 5.0}
@@ -80,8 +80,8 @@ var vLedNames = ["ScrollWheel", "Logo",
 "SideBarLeft1","SideBarLeft2","SideBarLeft3","SideBarLeft4","SideBarLeft5","SideBarLeft6","SideBarLeft7","SideBarLeft8","SideBarLeft9",
 "SideBarRight1","SideBarRight2","SideBarRight3","SideBarRight4","SideBarRight5","SideBarRight6","SideBarRight7","SideBarRight8","SideBarRight9"];
 var vLedPositions = [[5,0], [5,8],
-[0,1],[0,2],[0,3],[0,4],[0,5],[0,7],[0,8],[0,9],[0,9],
-[9,1],[9,2],[9,3],[9,4],[9,5],[9,7],[9,8],[9,9],[9,9]
+[0,1],[0,2],[0,3],[0,4],[0,5],[0,7],[0,8],[0,9],[0,10],
+[9,1],[9,2],[9,3],[9,4],[9,5],[9,7],[9,8],[9,9],[9,10]
 ];
 
 export function LedNames()
