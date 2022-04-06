@@ -182,7 +182,7 @@ export function Render()
 
 export function Shutdown()
 {    
-	if(Hero = true)
+	if(Hero == true)
 	{
 	    sendHeroZone(0, true);
 	    sendHeroZone(1, true);
@@ -196,7 +196,7 @@ export function Shutdown()
 
 export function onDpiLightChanged()
 {
-    if (Hero = true)
+    if (Hero == true)
 	{
 		SetHeroDpiLightAlwaysOn(DpiLight)
 	}

@@ -159,12 +159,12 @@ export function Render() //I don't care how jank it is, it works.
 
     if(!savedMoboPassthrough)
 	{
-        sendChannels();
+      var outerringcount = sendChannels();
     }
-
+	
     sendControlPacket(channelArray[Commitloop].commitOuter, PACKET_COMMIT, 16);
     Commitloop++
-    if(Commitloop == 4)//Current Commit loop. Works better for smoothness of inner rings. In future will add detection logic for more than 2 channels.
+    if(Commitloop == outerringcount)//Current Commit loop. Works better for smoothness of inner rings. Current detection is POC.
     {
     Commitloop = 0;
     }
@@ -197,8 +197,11 @@ function isChannelActive(channelIdx)
     return channelArray[channelIdx].count > 0;
 }
 
+var outerring;
+
 function sendChannels() 
 {
+	outerring = 0;
     for(let Channel = 0; Channel < 4;Channel++)
 	{
         if (isChannelActive(Channel))
@@ -226,10 +229,13 @@ function sendChannels()
                 outerRGBData = ChannelRGBData.splice(0, 12 * 3);
                 sendControlPacket(channelArray[Channel].outerAction[fan], outerRGBData, 36); 
             }
+			device.pause(5);
             sendControlPacket(channelArray[Channel].commitInner, PACKET_COMMIT, 16);
             }
+			outerring++;
         }
     }
+	return(outerring)
 } 
 
 function  getChannelColors(Channel, ledcount, shutdown = false) 

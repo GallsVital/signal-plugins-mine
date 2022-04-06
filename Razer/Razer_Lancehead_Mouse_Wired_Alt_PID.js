@@ -48,9 +48,9 @@ function CalculateCrc(report)
 }
 
 
-export function Name() { return "Razer LanceHead Wireless UnPlugged"; }
+export function Name() { return "Razer LanceHead Wired Mode"; }
 export function VendorId() { return 0x1532; }
-export function ProductId() { return 0x006f; }
+export function ProductId() { return 0x0059; }
 export function Publisher() { return "WhirlwindFX"; }
 export function Size() { return [10,10]; }
 export function Type() { return "Hid"; }
@@ -170,12 +170,12 @@ function SendPacket(shutdown = false){
         }else{
             col = device.color(iPxX, iPxY);
         }    
-                
+        
         var iLedIdx = (iIdx*3) + 14;
         packet[iLedIdx] = col[0];
         packet[iLedIdx+1] = col[1];
         packet[iLedIdx+2] = col[2];
-    } 
+    }
 
     packet[89] = CalculateCrc(packet);
 

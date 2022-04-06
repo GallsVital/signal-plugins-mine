@@ -48,9 +48,9 @@ function CalculateCrc(report)
 }
 
 
-export function Name() { return "Razer LanceHead Wireless"; }
+export function Name() { return "Razer LanceHead Wired Mode"; }
 export function VendorId() { return 0x1532; }
-export function ProductId() { return 0x0059; }
+export function ProductId() { return 0x0070; }
 export function Publisher() { return "WhirlwindFX"; }
 export function Size() { return [10,10]; }
 export function Type() { return "Hid"; }
