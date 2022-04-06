@@ -119,7 +119,7 @@ function sendZone(zone,shutdown = false){
 
     device.write(packet,20);
     device.read(packet,20);
-    device.pause(1);
+    device.pause(2);
 }
 
 export function Render()
