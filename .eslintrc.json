@@ -23,9 +23,9 @@
         "no-unused-vars":"warn",
         "comma-spacing":["warn", {"after":true,"before":false}],
         "no-trailing-spaces":"warn",
-        "max-len":["warn",150],
+        "max-len":["off",150],
         "no-multiple-empty-lines": ["warn",{ "max": 2 }],
-        "no-undef":["error"],
+        "no-undef":["warn"],
         "eqeqeq": "warn",
         "no-cond-assign":"warn",
         "padding-line-between-statements": [
