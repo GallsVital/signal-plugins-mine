@@ -11,6 +11,8 @@ export function ControllableParameters(){
         {"property":"shutdownColor", "label":"Shutdown Color","min":"0","max":"360","type":"color","default":"009bde"},
         {"property":"LightingMode", "label":"Lighting Mode", "type":"combobox", "values":["Canvas","Forced"], "default":"Canvas"},
         {"property":"forcedColor", "label":"Forced Color","min":"0","max":"360","type":"color","default":"009bde"},
+        {"property":"disableRGBHeaders", "label":"Disable 12v Headers","type":"boolean","default":"0"},
+
         ];
 }
 export function LedNames(){ return vLedNames; }
@@ -21,6 +23,16 @@ export function Validate(endpoint)
     return endpoint.interface === 2 | -1;
 }
 
+export function ondisableRGBHeadersChanged(){
+    if(disableRGBHeaders){
+        for(let i = 0; i < HeaderArray.length; i++){
+            device.removeSubdevice(HeaderArray[i])
+        }
+        HeaderArray  = [];
+    }else{
+        Create12vHeaders();
+    }
+}
 
 function SetupChannels() {
 	device.SetLedLimit(Device_ChannelLedLimit * DeviceInfo.ARGBChannelCount);
@@ -60,12 +72,20 @@ const ASUS_RESPONSE_CONFIGTABLE = 0x30;
 
 const ASUS_CONFIG_ARGB_CHANNELS = 0x06;
 const ASUS_CONFIG_MAINBOARD_LEDS = 31;
-const ASUS_CONFIG_12V_HEADERS = 34;
+const ASUS_CONFIG_12V_HEADERS = 33;
 
 const ASUS_MAINBOARD_DIRECTIDX = 4;
 const ASUS_MODE_DIRECT = 0xFF;
+// AULA3-AR32-0207 - 3 mainboard, 3 ARGB, 1 12V - ROG STRIX Z690 GAMING WIFI
+// AULA3-AR42-0207 - 3 Mainboard, 1 ARGB, 2 12V - TUF GAMING X570-PRO (WI-FI)
+// AULA3-6K75-0207 - 3 Mainboard, 1 ARGB, 2 12V - TUF GAMING X570-PLUS
 
-const DeviceInfo = {
+let ConfigurationOverrides = {
+    "AULA3-AR32-0207":{MainboardCount: 3, ARGBChannelCount:3, RGBHeaderCount: 1} // THIS HAS A SPACE AT THE END?!?!?!
+
+}
+
+let DeviceInfo = {
     Model: "Unknown",
     ConfigTable: [ASUS_COMMAND, ASUS_COMMAND_CONFIG],
     MainChannelLedCount: 0,
@@ -79,16 +99,19 @@ export function Initialize()
 {
     SetMotherboardName();
 
+    FetchFirmwareVersion();
+
     // Read and parse the device's config table
     let ValidConfig = FetchConfigTable();
     if(ValidConfig){
         ParseConfigTable();
     }
-    FetchFirmwareVersion();
 
     //this is updated after loading so it won't display in the editor
     CreateMainBoardLeds();
-    Create12vHeaders();
+    if(!disableRGBHeaders){
+        Create12vHeaders();
+    }
 
     // Set Mainboard to direct Mode
     SetChannelModeDirect(0);
@@ -132,11 +155,12 @@ function CreateMainBoardLeds(){
     vLedNames = []
     vLedPositions = []
 
-    for(let i = 0; i < DeviceInfo.MainBoardLedCount; i++){
+    for(let i = 0; i < DeviceInfo.MainChannelLedCount; i++){
         vLedNames.push(`Led ${i}`);
         vLedPositions.push([i,0]);
     }
-    device_width = DeviceInfo.MainBoardLedCount
+    device_width = DeviceInfo.MainChannelLedCount
+    device.repollLeds();
 }   
 
 
@@ -340,6 +364,13 @@ function FetchConfigTable(){
 
 function ParseConfigTable(){
 
+    for(let config in ConfigurationOverrides){
+        if(DeviceInfo.Model.localeCompare(config) == 0){
+            LoadOverrideConfiguration(config)
+            return;
+        }
+    }
+
     DeviceInfo.ARGBChannelCount = DeviceInfo.ConfigTable[ASUS_CONFIG_ARGB_CHANNELS];
     device.log(`ARGB channel Count ${DeviceInfo.ARGBChannelCount} `);
 
@@ -357,6 +388,23 @@ function ParseConfigTable(){
     }
 
 }
+
+
+function LoadOverrideConfiguration(DeviceName){
+    let configuration = ConfigurationOverrides[DeviceName]
+    device.log(`Using Config Override for Model: ${DeviceName}`)
+
+    DeviceInfo.ARGBChannelCount = configuration.ARGBChannelCount
+    device.log(`ARGB channel Count ${DeviceInfo.ARGBChannelCount} `);
+
+    DeviceInfo.MainChannelLedCount = configuration.MainboardCount
+    device.log(`MainBoard Led Count ${DeviceInfo.MainChannelLedCount} `);
+
+    DeviceInfo.RGBHeaderCount = configuration.RGBHeaderCount
+    device.log(`12V Header Count ${DeviceInfo.RGBHeaderCount} `);
+
+}
+
 
 function FetchFirmwareVersion(){
     ClearReadBuffer();
