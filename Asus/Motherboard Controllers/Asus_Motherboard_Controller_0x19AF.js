@@ -1,8 +1,8 @@
-export function Name() { return "ASUS Aura LED Controller"; }
+export function Name() { return DeviceName; }
 export function VendorId() { return  0x0B05; }
 export function ProductId() { return 0x19AF;}
 export function Publisher() { return "WhirlwindFX"; }
-export function Size() { return [15,1]; }
+export function Size() { return [device_width,1]; }
 export function Type() { return "Hid"; }
 export function DefaultPosition(){return [120,80]}
 export function DefaultScale(){return 8.0}
@@ -11,226 +11,249 @@ export function ControllableParameters(){
         {"property":"shutdownColor", "label":"Shutdown Color","min":"0","max":"360","type":"color","default":"009bde"},
         {"property":"LightingMode", "label":"Lighting Mode", "type":"combobox", "values":["Canvas","Forced"], "default":"Canvas"},
         {"property":"forcedColor", "label":"Forced Color","min":"0","max":"360","type":"color","default":"009bde"},
-        {"property":"RGBHeaderCount", "label":"12v RGB Header Count","type":"number","min":"0", "max":"2","default":"0"},
-
         ];
 }
+export function LedNames(){ return vLedNames; }
+export function LedPositions(){ return vLedPositions; }
+
+export function Validate(endpoint)
+{
+    return endpoint.interface === 2 | -1;
+}
+
+
+function SetupChannels() {
+	device.SetLedLimit(Device_ChannelLedLimit * DeviceInfo.ARGBChannelCount);
+
+	for(let i = 0; i < DeviceInfo.ARGBChannelCount; i++) {
+		device.addChannel(ChannelArray[i][0], ChannelArray[i][1]);
+	}
+}
+
+// Global Variables
 const ParentDeviceName = "ASUS AURA LED Controller";
-const DeviceMaxLedLimit = 204;
 
-//Channel Name, Led Limit
-const ChannelArray = [
-    ["Channel 1", 120],
-    ["Channel 2", 120],
-    ["Channel 3", 120],
-    ["Channel 4", 120],
-    ["Channel 5", 120],
-]
+var ChannelArray = [];
+var HeaderArray = [];
+let DeviceName = "ASUS Aura Motherboard Controller"
+var vLedNames = [];
+var vLedPositions = [];
+var device_width = 15
 
-var channelCount = 0;
-var MainBoardLedCount = 0;
+// Device Constants
+const Device_ChannelLedLimit = 120;
+const Device_PacketLedLimit = 20;
+const Device_PulseLedCount = 40;
 
-const HeaderArray = [
-    "12v RGB Header 1",
-    "12v RGB Header 2",
-];
-function hexToRgb(hex) {
-    var result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
-    var colors = [];
-    colors[0] = parseInt(result[1], 16);
-    colors[1] = parseInt(result[2], 16);
-    colors[2] = parseInt(result[3], 16);
+const Device_Write_Length = 65;
+const Device_Read_Length = 65;
 
-    return colors;
+// Protocol Constants
+const ASUS_COMMAND = 0xEC;
+const ASUS_COMMAND_SETMODE = 0x35;
+const ASUS_COMMAND_CONFIG = 0xB0;
+const ASUS_COMMAND_DIRECTCONTROL = 0x40;
+const ASUS_COMMAND_FIRMWARE = 0x82;
+
+const ASUS_RESPONSE_FIRMWARE = 0x02;
+const ASUS_RESPONSE_CONFIGTABLE = 0x30;
+
+const ASUS_CONFIG_ARGB_CHANNELS = 0x06;
+const ASUS_CONFIG_MAINBOARD_LEDS = 31;
+const ASUS_CONFIG_12V_HEADERS = 34;
+
+const ASUS_MAINBOARD_DIRECTIDX = 4;
+const ASUS_MODE_DIRECT = 0xFF;
+
+const DeviceInfo = {
+    Model: "Unknown",
+    ConfigTable: [ASUS_COMMAND, ASUS_COMMAND_CONFIG],
+    MainChannelLedCount: 0,
+    ARGBChannelCount: 0,
+    MainBoardLedCount: 0,
+    RGBHeaderCount: 0
 }
 
-var vLedNames = ["Led 1","Led 2","Led 3","Led 4","Led 5","Led 6","RGB Header 1", "RGB Header 2"];
-var vLedPositions = [
-    [0,0],[1,0],[2,0],[3,0],[4,0],[5,0],[6,0],[7,0]
-];
-
-var savedRGBHeaderCount;
-function InitMainBoardLeds(){
-    savedRGBHeaderCount = RGBHeaderCount;
-    var names = [];
-    var positions = []
-        for(let i = 0; i < MainBoardLedCount-savedRGBHeaderCount; i++){
-            names[i] = `Led ${i}`
-            positions[i] = [i,0];
-        }
-        vLedNames = names;
-        vLedPositions = positions;
-    for(let header = 0; header < 2;header++){
-
-        if(savedRGBHeaderCount <= header){
-        device.removeSubdevice(HeaderArray[header]);
-        }else{
-            //"Ch1 | Port 1"
-        device.createSubdevice(HeaderArray[header]); 
-        // Parent Device + Sub device Name + Ports
-        device.setSubdeviceName(HeaderArray[header],`${ParentDeviceName} - ${HeaderArray[header]}`);
-        device.setSubdeviceImage(HeaderArray[header], "");
-        device.setSubdeviceSize(HeaderArray[header],3,3);
-        }
-    }
-}   
-
-export function LedNames()
-{
-  return vLedNames;
-}
-
-export function LedPositions()
-{
-  return vLedPositions;
-}
 
 export function Initialize()
 {
-    //this needs to read the response packets and set the number of chanels and mainboard leds.
-    RequestConfig();
+    SetMotherboardName();
+
+    // Read and parse the device's config table
+    let ValidConfig = FetchConfigTable();
+    if(ValidConfig){
+        ParseConfigTable();
+    }
+    FetchFirmwareVersion();
+
     //this is updated after loading so it won't display in the editor
-    InitMainBoardLeds();
+    CreateMainBoardLeds();
+    Create12vHeaders();
 
-    for(let channel = 0; channel < channelCount; channel++){
-        device.addChannel(ChannelArray[channel][0],ChannelArray[channel][1]);
+    // Set Mainboard to direct Mode
+    SetChannelModeDirect(0);
+
+    //set all ARGB channels to direct mode
+    for(let channel = 1; channel < DeviceInfo.ARGBChannelCount + 1; channel++){
+        SetChannelModeDirect(channel);
+        ChannelArray.push([`Channel ${channel}`, Device_ChannelLedLimit])
     }
 
-    //set all channels to direct mode
-    for(let channel = 0; channel < channelCount + 1; channel++){
-        sendChannelStart(channel);
-    }
-    device.SetLedLimit(120 * channelCount);
+    // For Component Backend
+    SetupChannels();
 
 }
 
-function Sendchannel(Channel,shutdown = false)
+
+export function Shutdown()
 {
-    let ChannelLedCount = device.channel(ChannelArray[Channel][0]).LedCount();
+
+}
+
+export function Render()
+{        
+    SendMainBoardLeds();
+
+    for(let channel = 0; channel < DeviceInfo.ARGBChannelCount; channel++){
+        SendARGBChannel(channel);
+    }
+}
+function SetMotherboardName(){
+    let MotherboardName = device.getMotherboardName();
+
+    if(MotherboardName != "Unknown"){
+        DeviceName = `Asus ${MotherboardName} Controller`
+        device.repollName();
+    }
+}
+
+function CreateMainBoardLeds(){
+    // Blow Away and recreate
+    vLedNames = []
+    vLedPositions = []
+
+    for(let i = 0; i < DeviceInfo.MainBoardLedCount; i++){
+        vLedNames.push(`Led ${i}`);
+        vLedPositions.push([i,0]);
+    }
+    device_width = DeviceInfo.MainBoardLedCount
+}   
+
+
+function Create12vHeaders(){
+
+    //Blow away and recreate 12v Headers
+    for(let i = 0; i < HeaderArray.length; i++){
+        device.removeSubdevice(HeaderArray[i])
+    }
+    HeaderArray = []
+
+    for(let headerIdx = 0; headerIdx < DeviceInfo.RGBHeaderCount ;headerIdx++){
+        let HeaderName = `12V Header ${headerIdx + 1}`
+        HeaderArray.push(HeaderName);
+
+        device.createSubdevice(HeaderName); 
+        // Parent Device + Sub device Name + Ports
+        device.setSubdeviceName(HeaderName,`${ParentDeviceName} - ${HeaderName}`);
+        device.setSubdeviceImage(HeaderName, "");
+        device.setSubdeviceSize(HeaderName,3,3);
+        device.setSubdeviceLeds(HeaderName, ["12v RGB Header"], [[1,1]]);
+    }
+}
+
+
+function SendMainBoardLeds(shutdown = false)
+{
+    //Fetch Mainboard RGB Info
+    let [RGBData, TotalLedCount] = FetchMainBoardColors(shutdown);
+
+    //Fetch 12v Header RGB Info
+    let [HeaderRGBData, HeaderLedCount] = Fetch12VHeaderColors(shutdown);
+
+    // Append 12v Header Info, Both are sent together with 12v Headers always at the end of the Mainboard LEDS
+    RGBData = RGBData.concat(HeaderRGBData)
+    TotalLedCount += HeaderLedCount
+
+    //Mainboard is channel 0 normally, but channel 4 in direct mode
+    StreamDirectColors(ASUS_MAINBOARD_DIRECTIDX, RGBData, TotalLedCount)
+}
+
+
+function FetchMainBoardColors(shutdown = false){
+    let RGBData = []
+    let TotalLedCount = 0;
+
+    for(var iIdx = 0; iIdx < vLedPositions.length; iIdx++)
+    {
+        var iPxX = vLedPositions[iIdx][0];
+        var iPxY = vLedPositions[iIdx][1];
+        var col;
+        if(shutdown){
+            col = hexToRgb(shutdownColor)
+        }else if (LightingMode == "Forced") {
+            col = hexToRgb(forcedColor)
+        }else{
+            col = device.color(iPxX, iPxY);
+        }           
+    
+        RGBData[iIdx*3] = col[0];
+        RGBData[iIdx*3+1] = col[1];
+        RGBData[iIdx*3+2] = col[2];
+        TotalLedCount += 1;
+    }
+    return [RGBData, TotalLedCount]
+
+}
+
+
+function Fetch12VHeaderColors(shutdown = false){
+    let RGBData = []
+    let TotalLedCount = 0;
+
+    for(var iIdx = 0; iIdx < DeviceInfo.RGBHeaderCount; iIdx++)
+    {
+        var col;
+        if(shutdown){
+            col = hexToRgb(shutdownColor)
+        }else if (LightingMode == "Forced") {
+            col = hexToRgb(forcedColor)
+        }else{
+            col = device.subdeviceColor(HeaderArray[iIdx],1,1);
+        }           
+    
+        RGBData[iIdx*3] = col[0];
+        RGBData[iIdx*3+1] = col[1];
+        RGBData[iIdx*3+2] = col[2];
+        TotalLedCount += 1;
+    }
+    return [RGBData, TotalLedCount]
+}
+
+function SendARGBChannel(ChannelIdx, shutdown = false)
+{
+    //Fetch Colors
+    let ChannelLedCount = device.channel(ChannelArray[ChannelIdx][0]).LedCount();
 
     let RGBData = []
     if(LightingMode == "Forced"){
         RGBData = device.createColorArray(forcedColor, ChannelLedCount, "Inline");
 
     }else if(device.getLedCount() == 0){
-        ChannelLedCount = 40;
-        let pulseColor = device.getChannelPulseColor(ChannelArray[Channel][0], ChannelLedCount);
+        ChannelLedCount = Device_PulseLedCount;
+        let pulseColor = device.getChannelPulseColor(ChannelArray[ChannelIdx][0], ChannelLedCount);
         RGBData = device.createColorArray(pulseColor, ChannelLedCount, "Inline");
 
     }else{
-    RGBData = device.channel(ChannelArray[Channel][0]).getColors("Inline");
-
+        RGBData = device.channel(ChannelArray[ChannelIdx][0]).getColors("Inline");
     }
 
-    //This is the effect mode setting packets
-    // sendChannelStart(channel)
-    // var ledsSent = 0;
-    // var TotalLedCount = TotalLedCount >= 120 ? 120 : TotalLedCount;
-    //  while(TotalLedCount > 0){
-    //      var ledsToSend = TotalLedCount >= 20 ? 20 : TotalLedCount;
-    //      sendColorPacket(ledsSent, ledsToSend, RGBdata.splice(0,ledsToSend*3))
 
-    //      ledsSent += ledsToSend;
-    //      TotalLedCount -= ledsToSend;
-    //  }
-    // sendCommit();
-
-    //we want to try and use direct mode
-        var ledsSent = 0;
-        ChannelLedCount = ChannelLedCount >= 120 ? 120 : ChannelLedCount;
-    //var xChannel = channel == 0 ? 4 : channel-1;
-    var apply = false
-        while(ChannelLedCount > 0){
-            var ledsToSend = ChannelLedCount >= 20 ? 20 : ChannelLedCount;
-            ChannelLedCount -= ledsToSend;
-            ChannelLedCount == 0 ? apply = true: apply = false;
-            sendDirectPacket(Channel, ledsSent, ledsToSend, RGBData.splice(0,ledsToSend*3),apply)
-            ledsSent += ledsToSend;
-        }
+    StreamDirectColors(ChannelIdx, RGBData, ChannelLedCount)
+    
 }
 
 
-function SendMainboard(shutdown = false)
-{
-    var TotalLedCount = 0;
-    var RGBdata = [];
-
-        for(var iIdx = 0; iIdx < vLedPositions.length; iIdx++)
-        {
-            var iPxX = vLedPositions[iIdx][0];
-            var iPxY = vLedPositions[iIdx][1];
-            var col;
-            if(shutdown){
-                col = hexToRgb(shutdownColor)
-            }else if (LightingMode == "Forced") {
-                col = hexToRgb(forcedColor)
-            }else{
-                col = device.color(iPxX, iPxY);
-            }           
-        
-            RGBdata[iIdx*3] = col[0];
-            RGBdata[iIdx*3+1] = col[1];
-            RGBdata[iIdx*3+2] = col[2];
-            TotalLedCount += 1;
-        }
-        for(var iIdx = 0; iIdx < savedRGBHeaderCount; iIdx++)
-        {
-            var col;
-            if(shutdown){
-                col = hexToRgb(shutdownColor)
-            }else if (LightingMode == "Forced") {
-                col = hexToRgb(forcedColor)
-            }else{
-                col = device.subdeviceColor(HeaderArray[iIdx],1,1);
-            }           
-        
-            RGBdata[vLedPositions.length*3 + iIdx*3] = col[0];
-            RGBdata[vLedPositions.length*3 +iIdx*3+1] = col[1];
-            RGBdata[vLedPositions.length*3 +iIdx*3+2] = col[2];
-            TotalLedCount += 1;
-        }
-        //we want to try and use direct mode
-         var ledsSent = 0;
-         var TotalLedCount = TotalLedCount >= 120 ? 120 : TotalLedCount;
-
-         //main board is channel 0 normally, but channel 4 in direct mode
-        //var xChannel = channel == 0 ? 4 : channel-1;
-        var xChannel = 4
-        var apply = false
-          while(TotalLedCount > 0){
-              var ledsToSend = TotalLedCount >= 20 ? 20 : TotalLedCount;
-              TotalLedCount -= ledsToSend;
-              TotalLedCount == 0 ? apply = true: apply = false;
-              sendDirectPacket(xChannel, ledsSent, ledsToSend, RGBdata.splice(0,ledsToSend*3),apply)
-              ledsSent += ledsToSend;
-          }
-}
-
-export function Render()
-{        
-    if(savedRGBHeaderCount != RGBHeaderCount){
-        InitMainBoardLeds();
-    }
-
-    SendMainboard();
-
-    for(let channel = 0; channel < channelCount; channel++){
-        Sendchannel(channel);
-    }
-}
-
-function sendDirectPacket(channel, start, count, data,apply){
-
-    var packet = [];         
-    packet[0] = 0xEC;
-    packet[1] = 0x40;
-    packet[2] = apply ? 0x80 | channel : channel;
-    packet[3] = start;
-    packet[4] = count;
-    packet = packet.concat(data);
-
-    device.write(packet, 65);
-}
+//Protocol Functions
 function sendColorPacket(start, count, data){
 
     //these mask's are awful to find out
@@ -247,55 +270,137 @@ function sendColorPacket(start, count, data){
     device.write(packet, 65);
 }
 
+
 function sendCommit(){
-    sendPacketString("EC 3F 55",65);
+    let packet = [ASUS_COMMAND, 0x3f, 0x55];
+    device.write(packet, Device_Write_Length)
 }
-function sendChannelStart(channel){
-    var packet = [0xEC, 0x35,channel, 0x00,0x00,0xFF];
-    device.log(packet)
-    device.write(packet,65)
-}
-var config = [0xEC, 0xB0]
-function RequestConfig(){
-    sendPacketString(`EC B0`,65);
-    
-    config = device.read(config, 65)
-    //device.log(config);
-    channelCount = config[6];
-    device.log(`ARGB channel Count ${channelCount} `);
-    MainBoardLedCount = config[31];
-    device.log(`MainBoard Led Count ${MainBoardLedCount} `);
 
-    //first is channels, second is mainboard led count
-//1E 9F [01] 01 00 00
-//78 3C 00 00 00 00
-//00 00 00 00 00 00
-//00 00 00 00 00 00
-//00 00 00 [08] 09 02
-//00 00 00 00 00 00
-//00 00 00 00 00 00
-//00 00 00 00 00 00
-//00 00 00 00 00 00
-//00 00 00 00 00 00
-}
-export function Shutdown()
-{
 
-}
-function sendPacketString(string, size){
-    var packet= [];
-    var data = string.split(' ');
-    
-    for(let i = 0; i < data.length; i++){
-        packet[i] = parseInt(data[i],16)
+function SetChannelModeDirect(ChannelIdx){
+    if(ChannelIdx == 0){
+        device.log(`Setting Mainboard to Direct Mode`)
+    }else{
+        device.log(`Setting Channel ${ChannelIdx} to Direct Mode`)
     }
 
-    device.write(packet, size);
+    let packet = [ASUS_COMMAND, ASUS_COMMAND_SETMODE, ChannelIdx, 0x00, 0x00, ASUS_MODE_DIRECT];
+    device.write(packet, Device_Write_Length)
 }
-export function Validate(endpoint)
-{
-    return endpoint.interface === 2 | -1;
 
+function StreamDirectColors(ChannelIdx, RGBData, LedCount){
+    let ledsSent = 0;
+    let isApplyPacket = false
+    LedCount = Math.min(LedCount, Device_ChannelLedLimit);
+
+    while(LedCount > 0){
+        // Gate Led count to max per packet size
+        let ledsToSend = Math.min(LedCount, Device_PacketLedLimit);
+        LedCount -= ledsToSend;
+        //Set apply falg when we're out of LED's
+        isApplyPacket = LedCount == 0
+        SendDirectPacket(ChannelIdx, ledsSent, ledsToSend, RGBData.splice(0,ledsToSend*3),isApplyPacket)
+        ledsSent += ledsToSend;
+    }
+}
+
+function SendDirectPacket(channel, start, count, data,apply){
+
+    var packet = [];         
+    packet[0] = ASUS_COMMAND;
+    packet[1] = ASUS_COMMAND_DIRECTCONTROL;
+    packet[2] = apply ? 0x80 | channel : channel;
+    packet[3] = start;
+    packet[4] = count;
+    packet = packet.concat(data);
+
+    device.write(packet, Device_Write_Length);
+}
+
+
+function FetchConfigTable(){
+    ClearReadBuffer();
+
+    let packet = [ASUS_COMMAND, ASUS_COMMAND_CONFIG];
+    device.write(packet, Device_Write_Length)
+
+    let data = device.read([0x00], Device_Read_Length)
+
+    if(data[1] = ASUS_RESPONSE_CONFIGTABLE){
+        DeviceInfo.ConfigTable = data
+        device.log("Config Table")
+        for(let i = 0; i < DeviceInfo.ConfigTable.length; i += 8){
+            device.log(DeviceInfo.ConfigTable.slice(i,i+8));
+        }
+        return true;
+    }
+    device.log("Failed to Read Config Table")
+    return false;
+}
+
+function ParseConfigTable(){
+
+    DeviceInfo.ARGBChannelCount = DeviceInfo.ConfigTable[ASUS_CONFIG_ARGB_CHANNELS];
+    device.log(`ARGB channel Count ${DeviceInfo.ARGBChannelCount} `);
+
+    DeviceInfo.MainChannelLedCount = DeviceInfo.ConfigTable[ASUS_CONFIG_MAINBOARD_LEDS];
+    device.log(`MainBoard Led Count ${DeviceInfo.MainChannelLedCount} `);
+
+    DeviceInfo.RGBHeaderCount = DeviceInfo.ConfigTable[ASUS_CONFIG_12V_HEADERS];
+    device.log(`12V Header Count ${DeviceInfo.RGBHeaderCount} `);
+
+    // Edge Case where model report the wrong number of RGB Headers
+    if(DeviceInfo.MainChannelLedCount < DeviceInfo.RGBHeaderCount){
+        DeviceInfo.RGBHeaderCount = 0;
+    }else{
+        DeviceInfo.MainBoardLedCount = DeviceInfo.MainChannelLedCount - DeviceInfo.RGBHeaderCount
+    }
+
+}
+
+function FetchFirmwareVersion(){
+    ClearReadBuffer();
+
+    let packet = [ASUS_COMMAND, ASUS_COMMAND_FIRMWARE];
+    device.write(packet, Device_Write_Length)
+    let data = device.read([0x00], Device_Read_Length)
+
+    if(data[1] == ASUS_RESPONSE_FIRMWARE){
+        DeviceInfo.Model = "";
+        for(let i = 2; i < 18; i++){
+            DeviceInfo.Model += String.fromCharCode(data[i])
+        }
+        device.log(`Found Device Model: ${DeviceInfo.Model}`)
+        return true;
+    }
+    device.log("Failed to Fetch Firmware Version")
+    return false
+
+}
+
+
+// Helper Functions
+
+function hexToRgb(hex) {
+    var result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+    var colors = [];
+    colors[0] = parseInt(result[1], 16);
+    colors[1] = parseInt(result[2], 16);
+    colors[2] = parseInt(result[3], 16);
+
+    return colors;
+}
+
+function ClearReadBuffer(timeout = 10){
+    let count = 0
+    let readCounts = []
+    device.flush()
+    while(device.getLastReadSize() > 0){
+        device.readTimeout([0x00], Device_Read_Length, timeout)
+        count++
+        readCounts.push(device.getLastReadSize())
+    }
+    //device.log(`Read Count ${count}: ${readCounts} Bytes`)
 }
 
 export function Image()
