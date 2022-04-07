@@ -229,7 +229,7 @@ function SetMainboardLeds(shutdown = false) {
 
 		if(shutdown){
 			col = hexToRgb(shutdownColor);
-		}else if (LightingMode == "Forced") {
+		}else if (LightingMode === "Forced") {
 			col = hexToRgb(forcedColor);
 		}else{
 			col = device.color(iPxX, iPxY);
@@ -246,7 +246,7 @@ function SetRGBHeaderLeds(shutdown = false){
 
 		if(shutdown){
 			col = hexToRgb(shutdownColor);
-		}else if (LightingMode == "Forced") {
+		}else if (LightingMode === "Forced") {
 			col = hexToRgb(forcedColor);
 		}else{
 			col = device.subdeviceColor(HeaderArray[iIdx], 1, 1);
@@ -262,7 +262,7 @@ function  SetARGBHeaderLeds(shutdown = false){
 
 		if(shutdown){
 			col = hexToRgb(shutdownColor);
-		}else if (LightingMode == "Forced") {
+		}else if (LightingMode === "Forced") {
 			col = hexToRgb(forcedColor);
 		}else{
 			col = device.subdeviceColor(ARGBHeaderArray[iIdx], 1, 1);
@@ -278,7 +278,7 @@ function  SetJPipeHeaderLeds(shutdown = false){
 
 		if(shutdown){
 			col = hexToRgb(shutdownColor);
-		}else if (LightingMode == "Forced") {
+		}else if (LightingMode === "Forced") {
 			col = hexToRgb(forcedColor);
 		}else{
 			col = device.subdeviceColor(JPipeHeaderArray[iIdx], 1, 1);

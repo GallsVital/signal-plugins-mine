@@ -168,7 +168,6 @@ export function Render() {
 }
 
 
-
 function SendChannels(){
 	//start configuation
 	let packet = [];
@@ -216,7 +215,7 @@ function  getChannelColors(Channel) {
 	let RGBData = [];
 
 
-	if(LightingMode === "Forced"){
+	if(LightingMode  === "Forced"){
 		RGBData = device.createColorArray(forcedColor, ChannelLedCount, "Inline", "RBG");
 
 	}else if(device.getLedCount() === 0){

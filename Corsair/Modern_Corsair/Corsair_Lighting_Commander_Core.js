@@ -52,9 +52,9 @@ let ChannelArray = [
 let ConnectedFans = [];
 let savedPollFanTimer = Date.now();
 let PollModeInternal = 3000;
-var pump;
-var savedPumpToggle;
-var savedCpuCooler;
+let pump;
+let savedPumpToggle;
+let savedCpuCooler;
 
 let FanControllerArray = [
 	"Pump",
@@ -155,7 +155,7 @@ export function Shutdown() {
 }
 
 export function Render() {
-    SetFans();
+	SetFans();
 
 	SendColorData();
 
@@ -220,7 +220,7 @@ function SendColorData() {
 				let mxPxColor;
 
 				//find colors
-				if(LightingMode === "Forced") {
+				if(LightingMode  === "Forced") {
 					mxPxColor = hexToRgb(forcedColor);
 				} else {
 					mxPxColor = device.subdeviceColor(deviceArray[deviceNumber], iPxX, iPxY);
@@ -241,14 +241,14 @@ function SendColorData() {
 		}
 
 		//incremement offset by fanmodes led count. pump is only 29.
-        deviceNumber === 0 ? StartIndex += DeviceDict[cpuCooler].ledCount*3 : StartIndex += 34*3
+		deviceNumber === 0 ? StartIndex += DeviceDict[cpuCooler].ledCount*3 : StartIndex += 34*3;
 	}
 
 	let ChannelLedCount = device.channel(ChannelArray[0][0]).LedCount();
 
 	let ColorData = [];
 
-	if(LightingMode === "Forced") {
+	if(LightingMode  === "Forced") {
 		ColorData = device.createColorArray(forcedColor, ChannelLedCount, "Inline");
 
 	} else if(device.getLedCount() === 0) {

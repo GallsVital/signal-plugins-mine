@@ -119,7 +119,7 @@ function sendColors(shutdown = false){
     var col;
     if(shutdown){
         col = hexToRgb(shutdownColor)
-    }else if (LightingMode == "Forced") {
+    }else if (LightingMode === "Forced") {
         col = hexToRgb(forcedColor)
     }else{
         col = device.color(iPxX, iPxY);

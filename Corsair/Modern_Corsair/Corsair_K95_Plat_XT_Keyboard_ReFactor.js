@@ -101,7 +101,8 @@ export function Render() {
 }
 
 function CheckDirectControlMode(){
-    const PollInterval = 5000;
+	const PollInterval = 5000;
+
 	if(Date.now() - CheckDirectControlMode.lastPollTime < PollInterval) {
 		return;
 	}
@@ -110,10 +111,10 @@ function CheckDirectControlMode(){
 
 	if(CurrentMode !== CORSAIR_SOFTWARE_MODE){
 		device.log("Found Device in hardware mode! Attempting to reinitalize...");
-        // We need to force reInit the plugin here most likely. Icue closing breaks every read command
-        Corsair_Set_Mode(CORSAIR_SOFTWARE_MODE);
+		// We need to force reInit the plugin here most likely. Icue closing breaks every read command
+		Corsair_Set_Mode(CORSAIR_SOFTWARE_MODE);
 
-        Corsair_Open_Endpoint(CORSAIR_HANDLE_LIGHTING, CORSAIR_ENDPOINT_LIGHTING);
+		Corsair_Open_Endpoint(CORSAIR_HANDLE_LIGHTING, CORSAIR_ENDPOINT_LIGHTING);
 	}
 
 	CheckDirectControlMode.lastPollTime = Date.now();
@@ -144,7 +145,7 @@ function GetColors(shutdown = false){
 
 		if(shutdown){
 			col = hexToRgb(shutdownColor);
-		}else if (LightingMode === "Forced") {
+		}else if (LightingMode  === "Forced") {
 			col = hexToRgb(forcedColor);
 		}else{
 			col = device.color(iPxX, iPxY);
@@ -264,7 +265,7 @@ function Corsair_Set_Mode(mode){
 		device.log(`Setting Device Mode to ${mode === CORSAIR_SOFTWARE_MODE ? "Software" : "Hardware"}`);
 		Corsair_SetValue(CORSAIR_MODE, mode);
 		//CurrentMode = Corsair_GetValue(CORSAIR_MODE);
-        device.log(Corsair_GetPacket(CORSAIR_MODE))
+		device.log(Corsair_GetPacket(CORSAIR_MODE));
 		//device.log(`Mode is Now ${CurrentMode === CORSAIR_SOFTWARE_MODE ? "Software" : "Hardware"}`);
 	}
 }
@@ -353,7 +354,7 @@ function Corsair_SetValue(endpoint, value) {
 	let packet = [0x00, CORSAIR_COMMAND, CORSAIR_COMMAND_SET, endpoint, 0x00, (value & 0xFF), (value >> 8 & 0xFF)];
 	device.write(packet, Device_Write_Length);
 	packet = device.read(packet, Device_Read_Length);
-    device.readTimeout([0x00], Device_Read_Length,10);
+	device.readTimeout([0x00], Device_Read_Length, 10);
 
 	Corsair_Check_Error(packet, "Set Packet");
 

@@ -3,8 +3,8 @@ export function VendorId() { return 0x1b1c; }
 //export function ProductId() { return  0x1B7E; }
 export function Publisher() { return "WhirlwindFX"; }
 export function Size() { return [7, 7]; }
-export function DefaultPosition(){return [225,120]}
-export function DefaultScale(){return 7.0}
+export function DefaultPosition(){return [225, 120];}
+export function DefaultScale(){return 7.0;}
 export function ControllableParameters() {
 	return [
 		{ property: "LightingMode", label: "Lighting Mode", type: "combobox", values: ["Canvas", "Forced"], default: "Canvas" },
@@ -98,45 +98,50 @@ const Leds = [
 
 
 export function LedNames() {
-	var LedNames = [];
+	let LedNames = [];
 	Leds.forEach((led) => {
 		LedNames.push(led.name);
 	});
+
 	return LedNames;
 }
 
 export function LedPositions() {
-	var LedPositions = [];
+	let LedPositions = [];
 	Leds.forEach((led) => {
 		LedPositions.push(led.position);
 	});
+
 	return LedPositions;
 }
 
 
 // Corsair Protocol Abstractions
 function Corsair_Get(index) {
-	var packet = [0x00, CORSAIR_COMMAND, CORSAIR_READ, index, 0x00];
+	let packet = [0x00, CORSAIR_COMMAND, CORSAIR_READ, index, 0x00];
 	device.flush();
 	device.write(packet, 65);
 	packet = device.read(packet, 65);
+
 	return packet[4] | ((packet[5] << 8) | (packet[6] << 16));
 }
 
 function Corsair_Set(index, value) {
-	var packet = [0x00, CORSAIR_COMMAND, CORSAIR_WRITE, index, 0x00, value & 0xff, (value >> 8) & 0xff, (value >> 16) & 0xff];
+	let packet = [0x00, CORSAIR_COMMAND, CORSAIR_WRITE, index, 0x00, value & 0xff, (value >> 8) & 0xff, (value >> 16) & 0xff];
 	device.write(packet, 65);
 	device.read(packet, 65);
 	packet = device.read(packet, 65);
+
 	if (packet[3] == 3) {
 		device.log(`Set Packet Error`);
 	}
 }
 
 function Corsair_Open_Endpoint(endpoint) {
-	var packet = [0x00, CORSAIR_COMMAND, CORSAIR_ENDPOINT, 0x00, endpoint];
+	let packet = [0x00, CORSAIR_COMMAND, CORSAIR_ENDPOINT, 0x00, endpoint];
 	device.write(packet, 65);
 	packet = device.read(packet, 65);
+
 	if (packet[3] == 3) {
 		device.log(`Open Endpoint Error`);
 	}
@@ -185,6 +190,7 @@ function ReturnToHardwareControl() {
 
 export function Shutdown() {
 	device.flush();
+
 	if (Corsair_Get(CORSAIR_MODE) == CORSAIR_SOFTWARE_MODE) {
 		ReturnToHardwareControl();
 	}
@@ -206,6 +212,7 @@ function VerifyMouseSettings() {
 	if (Corsair_Get(CORSAIR_DPI_X) != dpi1) {
 		setDpi(dpi1);
 	}
+
 	if (Corsair_Get(CORSAIR_IDLE_MODE) != SleepMode || Corsair_Get(CORSAIR_IDLE_TIMEOUT) / 60 / 1000 != SleepModeTime) {
 		setSleepMode(SleepMode, SleepModeTime);
 	}
@@ -229,6 +236,7 @@ function setDpi(dpi) {
 	if (!SettingControl) {
 		return;
 	}
+
 	device.log(`Setting Dpi to ${dpi}`);
 	Corsair_Set(CORSAIR_DPI_X, dpi);
 	Corsair_Set(CORSAIR_DPI_Y, dpi);
@@ -250,6 +258,7 @@ function setSleepMode(SleepMode, SleepModeTime) {
 	if (!SettingControl) {
 		return;
 	}
+
 	device.log(`Setting Sleep Mode to ${SleepMode}`);
 	Corsair_Set(CORSAIR_IDLE_MODE, SleepMode);
 	device.log(`Sleep Mode is now ${Corsair_Get(CORSAIR_IDLE_MODE)}`);
@@ -268,6 +277,7 @@ function setAngleSnap(angleSnap) {
 	if (!SettingControl) {
 		return;
 	}
+
 	device.log(`Setting Angle Snapping to ${angleSnap}`);
 	Corsair_Set(CORSAIR_ANGLE_SNAP, angleSnap);
 	device.log(`Angle Snapping is now ${Corsair_Get(CORSAIR_ANGLE_SNAP)}`);
@@ -296,29 +306,36 @@ function setbrightness(Brightness) {
 }
 
 // Idle Mode Detection and Recovery
-var savedPollModeTimer = Date.now();
-var PollModeInternal = 5000;
-var isDeviceIdle = false;
+let savedPollModeTimer = Date.now();
+let PollModeInternal = 5000;
+let isDeviceIdle = false;
+
 function PollMode() {
 	//Break if were not ready to poll
 	if (Date.now() - savedPollModeTimer < PollModeInternal) {
 		return isDeviceIdle;
 	}
+
 	savedPollModeTimer = Date.now();
 
 	//Poll mode
 	device.flush();
+
 	let CurrentMode = Corsair_Get(CORSAIR_MODE);
+
 	if (device.getLastReadSize() == 0) {
 		device.log(`Failed to Poll Mode. retrying...`);
 		CurrentMode = Corsair_Get(CORSAIR_MODE);
+
 		if (device.getLastReadSize() == 0) {
 			device.log(`Failed to Poll Mode. Device is Idle!`);
 			PollModeInternal = 10000;
 			isDeviceIdle = true;
+
 			return isDeviceIdle;
 		}
 	}
+
 	//If hardware mode reinit
 	if (CurrentMode == 1) {
 		PollModeInternal = 5000;
@@ -327,6 +344,7 @@ function PollMode() {
 	}
 
 	isDeviceIdle = false;
+
 	return isDeviceIdle;
 }
 
@@ -340,7 +358,7 @@ export function Render() {
 }
 
 function sendColors(shutdown = false) {
-	var packet = [];
+	let packet = [];
 	packet[0x00] = 0x00;
 	packet[0x01] = 0x09;
 	packet[0x02] = 0x06;
@@ -356,12 +374,14 @@ function sendColors(shutdown = false) {
 	//FF FF FF FF FF FF FF FF 00 00 00 00 // 12 Leds - Blue
 
 	Leds.forEach((led, index) => {
-		var col;
-		if (LightingMode == "Forced") {
+		let col;
+
+		if (LightingMode === "Forced") {
 			col = device.createColorArray(forcedColor, 1, "Inline");
 		} else {
 			col = device.color(...led.position);
 		}
+
 		// Offset Colors by 8 indexs, Each channel is spaced by 12 indexes
 		packet[8 + index] = col[0];
 		packet[8 + index + 12] = col[1];

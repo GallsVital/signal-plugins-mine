@@ -304,7 +304,7 @@ function GetColors() {
 	// Channel 1, 3 Pin Strips
 	let ChannelLedCount = device.channel(ChannelArray[1][0]).LedCount();
 
-	if(LightingMode === "Forced") {
+	if(LightingMode  === "Forced") {
 		ChannelData = device.createColorArray(forcedColor, ChannelLedCount, "Inline");
 
 	} else if(device.getLedCount() === 0) {
@@ -329,7 +329,7 @@ function GetColors() {
 
 	ChannelData = [];
 
-	if(LightingMode === "Forced") {
+	if(LightingMode  === "Forced") {
 		ChannelData = device.createColorArray(forcedColor, ChannelLedCount, "Inline");
 
 	} else if(device.getLedCount() === 0) {

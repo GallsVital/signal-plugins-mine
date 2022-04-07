@@ -13,8 +13,8 @@ export function ControllableParameters(){
 		{"property":"LightingMode", "label":"Lighting Mode", "type":"combobox", "values":["Canvas", "Forced"], "default":"Canvas", "tooltip":"This toggles the device between displaying its canvas position, or being locked to its Forced Color"},
 		{"property":"forcedColor", "label":"Forced Color", "min":"0", "max":"360", "type":"color", "default":"009bde"},
 		{"property":"Mainboardconfig", "label":"MainBoard Configuration", "type":"combobox",   "values":["RGB", "RBG", "BGR", "BRG", "GBR", "GRB"], "default":"BGR"},
-        {"property":"Headerconfig", "label":"12v Header Configuration", "type":"combobox",   "values":["RGB","RBG","BGR","BRG","GBR","GRB"], "default":"RGB"},		{"property":"RGBconfig", "label":"ARGB Channel Configuration", "type":"combobox",   "values":["RGB", "RBG", "BGR", "BRG", "GBR", "GRB"], "default":"GRB"},
-        {"property":"ForceAllZonesActive", "label":"Force Enable All Zones", "type":"boolean",  "default":"0"},
+		{"property":"Headerconfig", "label":"12v Header Configuration", "type":"combobox",   "values":["RGB", "RBG", "BGR", "BRG", "GBR", "GRB"], "default":"RGB"},		{"property":"RGBconfig", "label":"ARGB Channel Configuration", "type":"combobox",   "values":["RGB", "RBG", "BGR", "BRG", "GBR", "GRB"], "default":"GRB"},
+		{"property":"ForceAllZonesActive", "label":"Force Enable All Zones", "type":"boolean",  "default":"0"},
 	];
 }
 
@@ -51,11 +51,11 @@ function SetupChannels(){
 }
 
 function MainboardConfiguration(){
-    return Mainboardconfig;
+	return Mainboardconfig;
 }
 
 function HeaderConfiguration(){
-    return Headerconfig;
+	return Headerconfig;
 }
 
 // let TotalZones = [
@@ -91,11 +91,11 @@ const MotherboardConfigs = {
 	},
 
 	"B550 AORUS ELITE": {
-        0x20: ["Back IO", MainboardConfiguration],
-        0x21: ["12v Header Bottom", MainboardConfiguration],
-        0x23: ["PCIe", MainboardConfiguration],
-        0x24: ["12V Header Top", HeaderConfiguration]
-    },
+		0x20: ["Back IO", MainboardConfiguration],
+		0x21: ["12v Header Bottom", MainboardConfiguration],
+		0x23: ["PCIe", MainboardConfiguration],
+		0x24: ["12V Header Top", HeaderConfiguration]
+	},
 };
 
 function CreateZone(ZoneId, ZoneName, ZoneConfig){
@@ -105,7 +105,7 @@ function CreateZone(ZoneId, ZoneName, ZoneConfig){
 	device.setSubdeviceName(ZoneName, `${ParentDeviceName} - ${ZoneName}`);
 	device.setSubdeviceImage(ZoneName, "");
 	device.setSubdeviceSize(ZoneName, 3, 3);
-    device.setSubdeviceLeds(ZoneName, ["Led 1"], [[1, 1]]);
+	device.setSubdeviceLeds(ZoneName, ["Led 1"], [[1, 1]]);
 	ActiveZones.push({id:ZoneId, name:ZoneName, config: ZoneConfig});
 }
 
@@ -113,15 +113,16 @@ function InitializeZones(){
 	let MotherboardName = device.getMotherboardName();
 	let configuration = MotherboardConfigs['Auto'];
 
-    // Blow away current zones
-    for(let i = 0; i < ActiveZones.length;i++){
-        device.removeSubdevice(ActiveZones[i].name);
-    }
-    ActiveZones = [];
+	// Blow away current zones
+	for(let i = 0; i < ActiveZones.length;i++){
+		device.removeSubdevice(ActiveZones[i].name);
+	}
 
-    if(!ForceAllZonesActive && MotherboardName in MotherboardConfigs ){
-        configuration = MotherboardConfigs[MotherboardName]
-    }
+	ActiveZones = [];
+
+	if(!ForceAllZonesActive && MotherboardName in MotherboardConfigs ){
+		configuration = MotherboardConfigs[MotherboardName];
+	}
 
 	for(const zone in configuration){
 		device.log(`Adding zone [${configuration[zone][0]}], Id: ${zone}`);
@@ -145,11 +146,11 @@ export function Initialize() {
 }
 
 export function onForceAllZonesActiveChanged(){
-    InitializeZones();
+	InitializeZones();
 }
 
 export function Render() {
-    UpdateActiveZones();
+	UpdateActiveZones();
 
 	for(let channel = 0; channel < vDLED_Zones.length; channel++){
 		UpdateARGBChannels(channel);
@@ -157,18 +158,17 @@ export function Render() {
 }
 
 
-
 export function Shutdown() {
 
 }
 
 function UpdateActiveZones(){
-    
+
 	for(let iIdx = 0 ; iIdx < ActiveZones.length; iIdx++){
-        let zone = ActiveZones[iIdx];
+		let zone = ActiveZones[iIdx];
 		let col;
 
-		if (LightingMode === "Forced") {
+		if (LightingMode  === "Forced") {
 			col = hexToRgb(forcedColor);
 		}else{
 			col = device.subdeviceColor(zone.name, 1, 1);
@@ -223,7 +223,6 @@ function Get_Led_Def(count){
 }
 
 
-
 function SetDirectHeaderMode(){
 
 	let packet = [GIGABYTE_COMMAND, GIGABYTE_COMMAND_SOFTWAREMODE, 1 | 2]; // ARGB Header idx
@@ -250,7 +249,7 @@ function UpdateARGBChannels(Channel, shutdown = false) {
 	}
 	let RGBData = [];
 
-	if(LightingMode === "Forced"){
+	if(LightingMode  === "Forced"){
 		RGBData = device.createColorArray(forcedColor, ChannelLedCount, "Inline", RGBconfig);
 
 	}else if(device.getLedCount() === 0){
@@ -350,15 +349,18 @@ function RequestConfig(){
 	D_LED2_Count = Get_Led_Def( ledCount & 0xF0);
 	device.log(`D_Led1 Led Count: ${ledCount & 0x0F}, ENUM: ${D_LED1_Count}`);
 	device.log(`D_Led1 Led Count: ${ledCount & 0xF0}, ENUM: ${D_LED2_Count}`);
-	let Firmware = `${config[4]}.${config[5]}.${config[6]}.${config[7]}`
-	device.log(`Firmware Version ${Firmware}`)
+
+	let Firmware = `${config[4]}.${config[5]}.${config[6]}.${config[7]}`;
+	device.log(`Firmware Version ${Firmware}`);
 	device.log(`Developed on Firmware ${"2.0.10.0"}`);
 
 	let description = "";
+
 	for(let i = 0; i < 28; i++){
-		description += String.fromCharCode(config[i + 12])
+		description += String.fromCharCode(config[i + 12]);
 	}
-	device.log(`Device Description: ${description}`)
+
+	device.log(`Device Description: ${description}`);
 
 	// for(let i = 0; i < config.length; i = i + 8){
 	// 	device.log(config.slice(i, i+8));
