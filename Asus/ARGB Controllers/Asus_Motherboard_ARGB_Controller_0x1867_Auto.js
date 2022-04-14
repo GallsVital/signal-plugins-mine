@@ -1,8 +1,6 @@
 export function Name() { return DeviceName; }
 export function VendorId() { return  0x0B05; }
-export function ProductId() { return 0x18A3;}
-// export function VendorId() { return  0x1b1c;}
-// export function ProductId() { return 0x0C0B;}
+export function ProductId() { return 0x1867;}
 export function Publisher() { return "WhirlwindFX"; }
 export function Size() { return [15, 1]; }
 export function Type() { return "Hid"; }
@@ -35,6 +33,7 @@ let DeviceName = "ASUS Aura ARGB Header Controller";
 export function LedNames() {
 	return vLedNames;
 }
+export function SupportsSubdevices(){ return true; }
 
 export function LedPositions() {
 	return vLedPositions;

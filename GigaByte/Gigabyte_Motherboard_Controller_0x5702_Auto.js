@@ -35,12 +35,10 @@ let vLedPositions = [];
 let ActiveZones = [];
 
 const DeviceMaxLedLimit = 240;
+const DevicePerChannelLedLimit = 120;
 
 //Channel Name, Led Limit
-let ChannelArray = [
-	["5v ARGB Header 1", 120],
-	["5v ARGB Header 2", 120]
-];
+let ChannelArray = [];
 
 function SetupChannels(){
 	device.SetLedLimit(DeviceMaxLedLimit);
@@ -76,25 +74,121 @@ function HeaderConfiguration(){
 // 	0x24, // RGB Header Top "LED_C2"
 // ];
 
-let vDLED_Zones = [ 0x58, 0x59 ];
+let vDLED_Zones = [];
 
 const MotherboardConfigs = {
 	'Auto': {
-		0x20: ["Led 1", MainboardConfiguration],
-		0x21: ["12v Header 1", HeaderConfiguration],
-		0x22: ["Led 2", MainboardConfiguration],
-		0x23: ["Led 3", MainboardConfiguration],
-		0x24: ["12v Header 2", HeaderConfiguration],
-		0x25: ["Led 4", MainboardConfiguration],
-		0x26: ["Led 5", MainboardConfiguration],
-		0x27: ["Led 6", MainboardConfiguration],
+		ARGB:{
+			"5v ARGB Header 1": 0x58,
+			"5v ARGB Header 2": 0x59,
+		},
+		Mainboard:{
+			0x20: ["Led 1", MainboardConfiguration],
+			0x21: ["12v Header 1", HeaderConfiguration],
+			0x22: ["Led 2", MainboardConfiguration],
+			0x23: ["Led 3", MainboardConfiguration],
+			0x24: ["12v Header 2", HeaderConfiguration],
+			0x25: ["Led 4", MainboardConfiguration],
+			0x26: ["Led 5", MainboardConfiguration],
+			0x27: ["Led 6", MainboardConfiguration],
+		}
 	},
 
 	"B550 AORUS ELITE": {
-		0x20: ["Back IO", MainboardConfiguration],
-		0x21: ["12v Header Bottom", MainboardConfiguration],
-		0x23: ["PCIe", MainboardConfiguration],
-		0x24: ["12V Header Top", HeaderConfiguration]
+		ARGB:{
+			"5v ARGB Header 1": 0x58,
+			"5v ARGB Header 2": 0x59,
+		},
+		Mainboard:{
+			0x20: ["Back IO", MainboardConfiguration],
+			0x21: ["12v Header Bottom", HeaderConfiguration],
+			0x23: ["PCIe", MainboardConfiguration],
+			0x24: ["12V Header Top", HeaderConfiguration]
+		}
+	},
+	"B550 AORUS PRO": {
+		ARGB:{
+			"5v ARGB Header 1": 0x58,
+			"5v ARGB Header 2": 0x59,
+		},
+		Mainboard:{
+			0x20: ["Back IO", MainboardConfiguration],
+			0x21: ["12v Header Bottom", HeaderConfiguration],
+			0x23: ["PCIe", MainboardConfiguration],
+			0x24: ["12V Header Top", HeaderConfiguration]
+		}
+	},
+	"X570 AORUS ELITE": {
+		ARGB:{
+			"5v ARGB Header 1": 0x58,
+			"5v ARGB Header 2": 0x59,
+		},
+		Mainboard:{
+			0x20: ["Back IO", MainboardConfiguration],
+			0x21: ["12v Header Bottom", HeaderConfiguration],
+			0x23: ["PCIe", MainboardConfiguration],
+			0x24: ["12V Header Top", HeaderConfiguration]
+		}
+	},
+	"X570 AORUS ELITE WIFI": {
+		ARGB:{
+			"5v ARGB Header 1": 0x58,
+			"5v ARGB Header 2": 0x59,
+		},
+		Mainboard:{
+			0x20: ["Back IO", MainboardConfiguration],
+			0x21: ["12v Header Bottom", HeaderConfiguration],
+			0x23: ["PCIe", MainboardConfiguration],
+			0x24: ["12V Header Top", HeaderConfiguration]
+		}
+	},
+	"X570 AORUS PRO WIFI": {
+		ARGB:{
+			"5v ARGB Header 1": 0x58,
+			"5v ARGB Header 2": 0x59,
+		},
+		Mainboard:{
+			0x20: ["Back IO", MainboardConfiguration],
+			0x21: ["12v Header Bottom", HeaderConfiguration],
+			0x23: ["PCIe", MainboardConfiguration],
+			0x24: ["12V Header Top", HeaderConfiguration]
+		}
+	},
+	"X570 AORUS ULTRA": {
+		ARGB:{
+			"5v ARGB Header 1": 0x58,
+			"5v ARGB Header 2": 0x59,
+		},
+		Mainboard:{
+			0x20: ["Back IO", MainboardConfiguration],
+			0x21: ["12v Header Bottom", HeaderConfiguration],
+			0x23: ["PCIe", MainboardConfiguration],
+			0x24: ["12V Header Top", HeaderConfiguration]
+		}
+	},
+	"Z390 AORUS PRO-CF": {
+		ARGB:{
+			"5v ARGB Header 1": 0x58,
+		},
+		Mainboard:{
+			0x20: ["Back IO", MainboardConfiguration],
+			0x21: ["Ram Slots/XPM Logo", MainboardConfiguration],
+			0x22: ["South Bridge", MainboardConfiguration],
+			0x23: ["PCIe", MainboardConfiguration],
+			0x24: ["12V Header C1/C2", HeaderConfiguration]
+		}
+	},
+	"Z390 AORUS MASTER-CF": {
+		ARGB:{
+			"5v ARGB Header 1": 0x58,
+		},
+		Mainboard:{
+			0x20: ["Back IO", MainboardConfiguration],
+			0x21: ["Ram Slots/XPM Logo", MainboardConfiguration],
+			0x22: ["South Bridge", MainboardConfiguration],
+			0x23: ["PCIe", MainboardConfiguration],
+			0x24: ["12V Header C1/C2", HeaderConfiguration]
+		}
 	},
 };
 
@@ -124,9 +218,15 @@ function InitializeZones(){
 		configuration = MotherboardConfigs[MotherboardName];
 	}
 
-	for(const zone in configuration){
-		device.log(`Adding zone [${configuration[zone][0]}], Id: ${zone}`);
-		CreateZone(zone, ...configuration[zone]);
+	for(const zone in configuration.Mainboard){
+		device.log(`Adding zone [${configuration.Mainboard[zone][0]}], Id: ${zone}`);
+		CreateZone(zone, ...configuration.Mainboard[zone]);
+	}
+
+	for(const header in configuration.ARGB){
+		device.log(`Adding ARGB Header [${header}], Id: ${configuration.ARGB[header]}`);
+		ChannelArray.push([header, DevicePerChannelLedLimit]);
+		vDLED_Zones.push(configuration.ARGB[header]);
 	}
 }
 
@@ -134,13 +234,13 @@ function InitializeZones(){
 export function Initialize() {
 	SetMotherboardName();
 
-	SetupChannels();
-
 	RequestConfig();
 
 	SetDirectHeaderMode();
 
 	InitializeZones();
+
+	SetupChannels();
 
 	device.pause(30);
 }

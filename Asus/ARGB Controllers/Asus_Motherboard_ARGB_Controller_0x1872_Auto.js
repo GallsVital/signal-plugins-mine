@@ -1,6 +1,6 @@
-export function Name() { return "ASUS Aura ARGB Header Controller"; }
+export function Name() { return DeviceName; }
 export function VendorId() { return  0x0B05; }
-export function ProductId() { return 0x1867;}
+export function ProductId() { return 0x1872;}
 export function Publisher() { return "WhirlwindFX"; }
 export function Size() { return [15, 1]; }
 export function Type() { return "Hid"; }
@@ -29,16 +29,19 @@ const vLedNames = ["Led 1", "Led 2", "Led 3", "Led 4", "Led 5", "Led 6", "RGB He
 const vLedPositions = [
 	[0, 0], [1, 0], [2, 0], [3, 0], [4, 0], [5, 0], [6, 0], [7, 0]
 ];
-
+let DeviceName = "ASUS Aura ARGB Header Controller";
 export function LedNames() {
 	return vLedNames;
 }
+export function SupportsSubdevices(){ return true; }
 
 export function LedPositions() {
 	return vLedPositions;
 }
 
 export function Initialize() {
+	SetMotherboardName();
+
 	//this needs to read the response packets and set the number of chanels and mainboard leds.
 	RequestConfig();
 
@@ -52,6 +55,15 @@ export function Initialize() {
 	}
 
 	device.SetLedLimit(120 * channelCount);
+}
+
+function SetMotherboardName(){
+	let MotherboardName = device.getMotherboardName();
+
+	if(MotherboardName != "Unknown"){
+		DeviceName = `Asus ${MotherboardName} ARGB Headers`;
+		device.repollName();
+	}
 }
 
 function Sendchannel(Channel, shutdown = false) {
