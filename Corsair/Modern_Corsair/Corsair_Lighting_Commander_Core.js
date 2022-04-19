@@ -112,7 +112,6 @@ const CommandDict = {
 	0x0F: "Led Settings"
 };
 
-
 export function Initialize() {
 	let CurrentMode = Corsair_Get(CORSAIR_MODE);
 	device.log(`Mode is Currently: ${CurrentMode === CORSAIR_SOFTWARE_MODE ? "Software" : "Hardware"}`);
@@ -145,6 +144,7 @@ export function Initialize() {
 	GetFanSettings();
 
 	SetFanLedCount();
+
 }
 
 export function Shutdown() {
@@ -356,6 +356,9 @@ function GetFanSettings() {
 		let allFanData = FanSettings.slice(7, 7 + MAX_FAN_COUNT);
 
 		for(let i = 0; i < MAX_FAN_COUNT; i++) {
+			if(allFanData[i] === 0x04) {
+				device.log("DEVICE IS STILL BOOTING");
+			}
 			if(allFanData[i] === 0x07) {
 				device.createFanControl(FanControllerArray[i]);
 				ConnectedFans.push(i);
@@ -460,6 +463,7 @@ function Corsair_Set(index, value) {
 
 	if(packet[3] === 3) {
 		device.log(`Set Packet Error`);
+		Initialize();
 	}
 }
 
@@ -471,6 +475,7 @@ function Corsair_Open_Endpoint(endpoint, index = 0) {
 
 	if(packet[3] === 3) {
 		device.log(`Open Endpoint Error`);
+		Initialize();
 	}
 }
 
@@ -481,6 +486,7 @@ function Corsair_Close_Endpoint(endpoint) {
 
 	if(packet[3] === 3) {
 		device.log(`Close Endpoint Error`);
+		Initialize();
 	}
 }
 
@@ -526,6 +532,7 @@ function Corsair_Write_Packet(Endpoint, Index, Command, Data) {
 
 	if(packet[3] === 3) {
 		device.log(`Set Packet Error`);
+		Initialize();
 	}
 
 	Corsair_Close_Endpoint(Index);
