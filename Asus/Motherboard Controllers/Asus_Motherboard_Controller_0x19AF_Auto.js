@@ -11,8 +11,10 @@ export function ControllableParameters(){
 		{"property":"shutdownColor", "label":"Shutdown Color", "min":"0", "max":"360", "type":"color", "default":"009bde"},
 		{"property":"LightingMode", "label":"Lighting Mode", "type":"combobox", "values":["Canvas", "Forced"], "default":"Canvas"},
 		{"property":"forcedColor", "label":"Forced Color", "min":"0", "max":"360", "type":"color", "default":"009bde"},
+		{"property":"Mainboardconfig", "label":"MainBoard Configuration", "type":"combobox",   "values":["RGB", "RBG", "BGR", "BRG", "GBR", "GRB"], "default":"RGB"},
+		{"property":"Headerconfig", "label":"12v Header Configuration", "type":"combobox",   "values":["RGB", "RBG", "BGR", "BRG", "GBR", "GRB"], "default":"RGB"},
+		{"property":"RGBconfig", "label":"ARGB Channel Configuration", "type":"combobox",   "values":["RGB", "RBG", "BGR", "BRG", "GBR", "GRB"], "default":"RGB"},
 		{"property":"disableRGBHeaders", "label":"Disable 12v Headers", "type":"boolean", "default":"0"},
-
 	];
 }
 export function LedNames(){ return vLedNames; }
@@ -44,6 +46,15 @@ function SetupChannels() {
 
 // Global Variables
 const ParentDeviceName = "ASUS AURA LED Controller";
+
+const RGBConfigs = {
+	"RGB" : [0, 1, 2],
+	"RBG" : [0, 2, 1],
+	"BGR" : [2, 1, 0],
+	"BRG" : [2, 0, 1],
+	"GBR" : [1, 2, 0],
+	"GRB" : [1, 0, 2]
+};
 
 var ChannelArray = [];
 var HeaderArray = [];
@@ -222,9 +233,9 @@ function FetchMainBoardColors(shutdown = false){
 			col = device.color(iPxX, iPxY);
 		}
 
-		RGBData[iIdx*3] = col[0];
-		RGBData[iIdx*3+1] = col[1];
-		RGBData[iIdx*3+2] = col[2];
+		RGBData[iIdx*3] = col[RGBConfigs[Mainboardconfig][0]];
+		RGBData[iIdx*3+1] = col[RGBConfigs[Mainboardconfig][1]];
+		RGBData[iIdx*3+2] = col[RGBConfigs[Mainboardconfig][2]];
 		TotalLedCount += 1;
 	}
 
@@ -248,9 +259,9 @@ function Fetch12VHeaderColors(shutdown = false){
 			col = device.subdeviceColor(HeaderArray[iIdx], 1, 1);
 		}
 
-		RGBData[iIdx*3] = col[0];
-		RGBData[iIdx*3+1] = col[1];
-		RGBData[iIdx*3+2] = col[2];
+		RGBData[iIdx*3] = col[RGBConfigs[Headerconfig][1]];
+		RGBData[iIdx*3+1] = col[RGBConfigs[Headerconfig][2]];
+		RGBData[iIdx*3+2] = col[RGBConfigs[Headerconfig][3]];
 		TotalLedCount += 1;
 	}
 
@@ -264,16 +275,16 @@ function SendARGBChannel(ChannelIdx, shutdown = false) {
 	let RGBData = [];
 
 	if(LightingMode === "Forced"){
-		RGBData = device.createColorArray(forcedColor, ChannelLedCount, "Inline");
+		RGBData = device.createColorArray(forcedColor, ChannelLedCount, "Inline", RGBconfig);
 
 	}else if(device.getLedCount() == 0){
 		ChannelLedCount = Device_PulseLedCount;
 
 		let pulseColor = device.getChannelPulseColor(ChannelArray[ChannelIdx][0], ChannelLedCount);
-		RGBData = device.createColorArray(pulseColor, ChannelLedCount, "Inline");
+		RGBData = device.createColorArray(pulseColor, ChannelLedCount, "Inline",RGBconfig);
 
 	}else{
-		RGBData = device.channel(ChannelArray[ChannelIdx][0]).getColors("Inline");
+		RGBData = device.channel(ChannelArray[ChannelIdx][0]).getColors("Inline",RGBconfig);
 	}
 
 

@@ -190,6 +190,19 @@ const MotherboardConfigs = {
 			0x24: ["12V Header C1/C2", HeaderConfiguration]
 		}
 	},
+	"Z690 AORUS MASTER": {
+		ARGB:{
+			"5v ARGB Header 1": 0x58,
+			"5v ARGB Header 2": 0x59,
+		},
+		Mainboard:{
+			0x20: ["Back IO", MainboardConfiguration],
+			0x21: ["12 Header 1", HeaderConfiguration],
+			0x22: ["Back IO 2", MainboardConfiguration],
+			0x23: ["South Bridge", MainboardConfiguration],
+			0x24: ["12V Header 2", HeaderConfiguration]
+		}
+	},
 };
 
 function CreateZone(ZoneId, ZoneName, ZoneConfig){
