@@ -15,7 +15,7 @@ export function ControllableParameters(){
 const vKeys = [ 0 ];
 const vLedNames = [ "Cans" ];
 const vLedPositions = [ [1, 0], ];
-let SavedPollFanTimer = Date.now();
+let SavedPollTimer = Date.now();
 const PollModeInterval = 10000;
 const BatteryDict =
 {
@@ -103,11 +103,11 @@ export function Shutdown() {
 
 function GetBatteryStatus(){
 	//Break if were not ready to poll
-	if(Date.now() - SavedPollFanTimer < PollModeInterval) {
+	if(Date.now() - SavedPollTimer < PollModeInterval) {
 		return;
 	}
 
-	SavedPollFanTimer = Date.now();
+	SavedPollTimer = Date.now();
 	PollBattery();
 }
 
