@@ -14,7 +14,11 @@ export function ControllableParameters(){
 
 	];
 }
-export function DeviceMessage() { return ["Limited Frame Rate", "This device's firmware is limited to a slower refresh rate than other device's"]; }
+export function DeviceMessages() { 
+	return [
+	{property: "Limited Frame Rate", message:"Limited Frame Rate", tooltip: "This device's firmware is limited to a slower refresh rate than other device's"},
+	];
+}
 
 function hexToRgb(hex) {
 	let result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);

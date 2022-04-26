@@ -16,8 +16,11 @@ export function ControllableParameters(){
 	];
 }
 
-export function DeviceMessage() { return ["Limited Frame Rate", "This device’s firmware is limited to a slower refresh rate then other devices. Adjusting RGB Packet Delay may help, but may also increase instability."]; }
-
+export function DeviceMessages() { 
+	return [
+	{property: "Limited Frame Rate", message:"Limited Frame Rate", tooltip: "This device’s firmware is limited to a slower refresh rate then other devices. Adjusting RGB Packet Delay may help, but may also increase instability"},
+	];
+}
 let vLedNames =
 [
 	"Scroll", "Logo",

@@ -21,7 +21,6 @@ export function ControllableParameters() {
 export function LacksOnBoardLeds() {
 	return true;
 }
-export function DeviceMessage() { return ["This device has a weird quirk!", "The quirk is this!"]; }
 
 // Command Ids
 const CORSAIR_WRITE = 0x01;

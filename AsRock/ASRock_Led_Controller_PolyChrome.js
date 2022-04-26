@@ -52,6 +52,11 @@ export function ControllableParameters(){
 
 	];
 }
+export function DeviceMessages() { 
+	return [
+	{property: "Limited Functionality", message:"Limited Functionality", tooltip: "Due to firmware limitations this device is limited to matching Polychrome functionality"},
+	];
+}
 export function DeviceMessage() { return ["Limited Functionality", "Due to firmware limitations this device is limited to matching Polychrome functionality"]; }
 
 const ModeDict = {

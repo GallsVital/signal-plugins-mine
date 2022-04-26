@@ -15,8 +15,12 @@ export function ControllableParameters(){
 		{"property":"send_delay1", "label":"RGB Packet Delay", "step":"1", "type":"number", "min":"0", "max":"200", "default":"60", "tooltip":"Time in milliseconds in between rgb updates. Lower delay increases smoothness, but also increases chance of mouse locking up."}
 	];
 }
+export function DeviceMessages() { 
+	return [
+	{property: "Limited Frame Rate", message:"Limited Frame Rate", tooltip: "This device’s firmware is limited to a slower refresh rate then other devices. Adjusting RGB Packet Delay may help, but may also increase instability"},
+	];
+}
 
-export function DeviceMessage() { return ["Limited Frame Rate", "This device’s firmware is limited to a slower refresh rate then other devices. Adjusting RGB Packet Delay may help, but may also increase instability."];}
 
 let vLedNames =
 [

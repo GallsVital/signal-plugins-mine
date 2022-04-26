@@ -18,7 +18,11 @@ export function ControllableParameters(){
 export function LedNames() { return vLedNames; }
 export function LedPositions() { return vLedPos; }
 
-export function DeviceMessage() { return ["Limited Frame Rate", "This device’s firmware is limited to a slower refresh rate than other device’s when using more then 2 channels"]; }
+export function DeviceMessages() { 
+	return [
+	{property: "Limited Frame Rate", message:"Limited Frame Rate", tooltip: "This device's firmware is limited to a slower refresh rate than other device's when using more then 2 channels"},
+	];
+}
 export function SupportsSubdevices(){ return true; }
 export function DefaultComponentBrand() { return "LianLi";}
 
