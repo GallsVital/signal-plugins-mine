@@ -259,9 +259,9 @@ function Fetch12VHeaderColors(shutdown = false){
 			col = device.subdeviceColor(HeaderArray[iIdx], 1, 1);
 		}
 
-		RGBData[iIdx*3] = col[RGBConfigs[Headerconfig][1]];
-		RGBData[iIdx*3+1] = col[RGBConfigs[Headerconfig][2]];
-		RGBData[iIdx*3+2] = col[RGBConfigs[Headerconfig][3]];
+		RGBData[iIdx*3] = col[RGBConfigs[Headerconfig][0]];
+		RGBData[iIdx*3+1] = col[RGBConfigs[Headerconfig][1]];
+		RGBData[iIdx*3+2] = col[RGBConfigs[Headerconfig][2]];
 		TotalLedCount += 1;
 	}
 
@@ -368,16 +368,16 @@ function FetchConfigTable(){
 
 	if(data[1] = ASUS_RESPONSE_CONFIGTABLE){
 		DeviceInfo.ConfigTable = data;
-		device.log("Config Table");
+		device.log("Config Table", {toFile: true});
 
 		for(let i = 0; i < DeviceInfo.ConfigTable.length; i += 8){
-			device.log(DeviceInfo.ConfigTable.slice(i, i+8));
+			device.log(DeviceInfo.ConfigTable.slice(i, i+8), {toFile: true});
 		}
 
 		return true;
 	}
 
-	device.log("Failed to Read Config Table");
+	device.log("Failed to Read Config Table", {toFile: true});
 
 	return false;
 }
@@ -393,13 +393,13 @@ function ParseConfigTable(){
 	}
 
 	DeviceInfo.ARGBChannelCount = DeviceInfo.ConfigTable[ASUS_CONFIG_ARGB_CHANNELS];
-	device.log(`ARGB channel Count ${DeviceInfo.ARGBChannelCount} `);
+	device.log(`ARGB channel Count ${DeviceInfo.ARGBChannelCount} `, {toFile: true});
 
 	DeviceInfo.MainChannelLedCount = DeviceInfo.ConfigTable[ASUS_CONFIG_MAINBOARD_LEDS];
-	device.log(`MainBoard Led Count ${DeviceInfo.MainChannelLedCount} `);
+	device.log(`MainBoard Led Count ${DeviceInfo.MainChannelLedCount} `, {toFile: true});
 
 	DeviceInfo.RGBHeaderCount = DeviceInfo.ConfigTable[ASUS_CONFIG_12V_HEADERS];
-	device.log(`12V Header Count ${DeviceInfo.RGBHeaderCount} `);
+	device.log(`12V Header Count ${DeviceInfo.RGBHeaderCount} `, {toFile: true});
 
 	// Edge Case where model report the wrong number of RGB Headers
 	if(DeviceInfo.MainChannelLedCount < DeviceInfo.RGBHeaderCount){
@@ -413,16 +413,16 @@ function ParseConfigTable(){
 
 function LoadOverrideConfiguration(DeviceName){
 	let configuration = ConfigurationOverrides[DeviceName];
-	device.log(`Using Config Override for Model: ${DeviceName}`);
+	device.log(`Using Config Override for Model: ${DeviceName}`, {toFile: true});
 
 	DeviceInfo.ARGBChannelCount = configuration.ARGBChannelCount;
-	device.log(`ARGB channel Count ${DeviceInfo.ARGBChannelCount} `);
+	device.log(`ARGB channel Count ${DeviceInfo.ARGBChannelCount} `, {toFile: true});
 
 	DeviceInfo.MainChannelLedCount = configuration.MainboardCount;
-	device.log(`MainBoard Led Count ${DeviceInfo.MainChannelLedCount} `);
+	device.log(`MainBoard Led Count ${DeviceInfo.MainChannelLedCount} `, {toFile: true});
 
 	DeviceInfo.RGBHeaderCount = configuration.RGBHeaderCount;
-	device.log(`12V Header Count ${DeviceInfo.RGBHeaderCount} `);
+	device.log(`12V Header Count ${DeviceInfo.RGBHeaderCount} `, {toFile: true});
 
 }
 
@@ -442,12 +442,12 @@ function FetchFirmwareVersion(){
 			DeviceInfo.Model += String.fromCharCode(data[i]);
 		}
 
-		device.log(`Found Device Model: ${DeviceInfo.Model}`);
+		device.log(`Found Device Model: ${DeviceInfo.Model}`, {toFile: true});
 
 		return true;
 	}
 
-	device.log("Failed to Fetch Firmware Version");
+	device.log("Failed to Fetch Firmware Version", {toFile: true});
 
 	return false;
 

@@ -1,7 +1,7 @@
 
 export function Name() { return DeviceName; }
 export function VendorId() { return  0x048D; }
-export function ProductId() { return 0x8297;}//0x8297
+export function ProductId() { return 0x8297;}
 export function Publisher() { return "WhirlwindFX"; }
 export function Size() { return [10, 10]; }
 export function Type() { return "Hid"; }
@@ -46,6 +46,7 @@ function SetupChannels(){
 	for(let i = 0; i < ChannelArray.length; i++){
 		device.addChannel(ChannelArray[i][0], ChannelArray[i][1]);
 	}
+
 }
 
 function MainboardConfiguration(){
@@ -232,12 +233,12 @@ function InitializeZones(){
 	}
 
 	for(const zone in configuration.Mainboard){
-		device.log(`Adding zone [${configuration.Mainboard[zone][0]}], Id: ${zone}`);
+		device.log(`Adding zone [${configuration.Mainboard[zone][0]}], Id: ${zone}`, {toFile: true});
 		CreateZone(zone, ...configuration.Mainboard[zone]);
 	}
 
 	for(const header in configuration.ARGB){
-		device.log(`Adding ARGB Header [${header}], Id: ${configuration.ARGB[header]}`);
+		device.log(`Adding ARGB Header [${header}], Id: ${configuration.ARGB[header]}`, {toFile: true});
 		ChannelArray.push([header, DevicePerChannelLedLimit]);
 		vDLED_Zones.push(configuration.ARGB[header]);
 	}
@@ -272,6 +273,7 @@ export function Render() {
 
 
 export function Shutdown() {
+	device.removeMessage("firmware test");
 
 }
 
@@ -464,7 +466,7 @@ function RequestConfig(){
 	device.log(`D_Led1 Led Count: ${ledCount & 0xF0}, ENUM: ${D_LED2_Count}`);
 
 	let Firmware = `${config[4]}.${config[5]}.${config[6]}.${config[7]}`;
-	device.log(`Firmware Version ${Firmware}`);
+	device.log(`Firmware Version ${Firmware}`, {toFile: true});
 	device.log(`Developed on Firmware ${"2.0.10.0"}`);
 
 	let description = "";
@@ -473,11 +475,11 @@ function RequestConfig(){
 		description += String.fromCharCode(config[i + 12]);
 	}
 
-	device.log(`Device Description: ${description}`);
-
-	// for(let i = 0; i < config.length; i = i + 8){
-	// 	device.log(config.slice(i, i+8));
-	// }
+	device.log(`Device Description: ${description}`, {toFile: true});
+	device.log(`Config Table`, {toFile: true})
+	 for(let i = 0; i < config.length; i = i + 8){
+	 	device.log(config.slice(i, i+8), {toFile: true});
+	 }
 }
 
 
