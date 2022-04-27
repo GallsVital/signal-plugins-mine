@@ -1,6 +1,6 @@
 export function Name() { return "Corsair Commander Core"; }
 export function VendorId() { return 0x1b1c; }
-export function ProductId() { return 0x0C1C; }
+//export function ProductId() { return 0x0C1C; }
 export function Publisher() { return "WhirlwindFX"; }
 export function Size() { return [1, 1]; }
 export function DefaultPosition() { return [0, 0]; }
@@ -70,11 +70,9 @@ let FanControllerArray = [
 const Device_Write_Length = 1025;
 const Device_Read_Length = 1025;
 const DeviceMaxLedLimit = 233;
-let LedsPerPacket = 1015;
-let InitialRGBPacketOffset = 0;
 
 const MAX_FAN_COUNT = 7;
-const DevFirmwareVersion = "2.10.219";
+const DevFirmwareVersion = "2.6.201";
 
 // Protocol Constants
 const CORSAIR_COMMAND = 0x08;
@@ -148,14 +146,7 @@ export function Initialize() {
 
 	device.log(`Vid is ${Corsair_Get(CORSAIR_VID)}`);
 	device.log(`Pid is ${Corsair_Get(CORSAIR_PID)}`);
-	let firmwareVersion = Corsair_Get_Firmware();
-	
-	// Any Firmware => 2.10.219 requires a different packet size
-	if(SemanticVersionCheck(firmwareVersion,"2.10.218")){
-		LedsPerPacket = 93;
-		InitialRGBPacketOffset = 6;
-	}
-
+	Corsair_Get_Firmware();
 	GetFanSettings();
 
 	SetFanLedCount();
@@ -168,12 +159,10 @@ export function Shutdown() {
 		device.log(`Mode is Now ${Corsair_Get(CORSAIR_MODE)}`);
 	}
 }
-const SemanticVersionCheck = (a, b) => {
-	return a.localeCompare(b, undefined, { numeric: true }) === 1;
-  };
 
 export function Render() {
 	SetFans();
+
 	UpdateRGB();
 
 	PollFans();
@@ -197,7 +186,6 @@ function Corsair_Get_Firmware(){
 	let firmwareString = `${data[4]}.${data[5]}.${data[6]}`;
 	device.log(`Firmware Version: ${firmwareString}`);
 	device.log(`Developed on Firmware ${DevFirmwareVersion}`);
-	return firmwareString;
 
 }
 
@@ -275,7 +263,7 @@ function GetColors() {
 			RGBData[DeviceDict[pump].mapping[iIdx] * 3 + 2] = mxPxColor[2];
 		}
 
-		TotalLedCount += 29 //DeviceDict[pump].ledCount;
+		TotalLedCount += DeviceDict[pump].ledCount;
 	}
 
 
@@ -313,21 +301,20 @@ function GetColors() {
 }
 
 function Corsair_Send_RGBData(RGBData, LedCount){
-	let BytesSent = 0;
-	let TotalBytes = LedCount * 3;
+	let LedsPerPacket = 1015/3;
+	let LedsSent = 0;
 
-	while(TotalBytes > 0){
-		let BytesToSend = Math.min(LedsPerPacket, TotalBytes);
+	while(LedCount > 0){
+		let ledsToSend = Math.min(LedsPerPacket, LedCount);
 
-		if(BytesSent === 0){
-			BytesToSend -= InitialRGBPacketOffset; // New Firmware
-			SendInitialColorPacket(RGBData.length, RGBData.splice(0, BytesToSend));
+		if(LedsSent === 0){
+			SendInitialColorPacket(RGBData.length, RGBData.splice(0, ledsToSend * 3));
 		}else{
-			StreamLightingData(RGBData.splice(0, BytesToSend));
+			StreamLightingData(RGBData.splice(0, ledsToSend * 3));
 		}
 
-		TotalBytes -= BytesToSend;
-		BytesSent += BytesToSend;
+		LedCount -= ledsToSend;
+		LedsSent += ledsToSend;
 	}
 }
 

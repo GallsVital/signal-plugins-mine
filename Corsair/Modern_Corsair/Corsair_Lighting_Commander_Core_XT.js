@@ -77,6 +77,8 @@ const CORSAIR_BATTERY_LEVEL = 0x0F;
 const CORSAIR_BATTERY_STATUS = 0x10;
 const CORSAIR_DPI_X = 0x21;
 const CORSAIR_DPI_Y = 0x22;
+const CORSAIR_FIRMWARE = 0x13;
+const DevFirmwareVersion = "1.3.54";
 
 const CORSAIR_LIGHTING_ENDPOINT_INDEX = 0;
 const CORSAIR_BACKGROUND_ENDPOINT_INDEX = 1;
@@ -133,11 +135,34 @@ export function Initialize() {
 
 	device.log(`Vid is ${Corsair_Get(CORSAIR_VID)}`);
 	device.log(`Pid is ${Corsair_Get(CORSAIR_PID)}`);
+	Corsair_Get_Firmware();
 
 	GetFanSettings();
-
+	
 	SetFanLedCount();
 
+}
+function Corsair_Get_Firmware(){
+	let data = Corsair_GetPacket(CORSAIR_FIRMWARE);
+
+	if(Corsair_Check_Error(data, "Get Firmware")){
+		return;
+	}
+
+	let firmwareString = `${data[4]}.${data[5]}.${data[6]}`;
+	device.log(`Firmware Version: ${firmwareString}`);
+	device.log(`Developed on Firmware ${DevFirmwareVersion}`);
+
+}
+
+function Corsair_Check_Error(Data, Context){
+	let isError = Data[3] === 3;
+
+	if(isError){
+		device.log(`${Context} Packet Error!`);
+	}
+
+	return isError;
 }
 
 export function Shutdown() {
@@ -439,7 +464,7 @@ function Corsair_Get(index) {
 	return packet[4] | (packet[5] << 8);
 }
 
-function Corsair_Get_Packet(index) {
+function Corsair_GetPacket(index) {
 	let packet = [0x00, CORSAIR_COMMAND, 0x02, index, 0x00];
 	device.write(packet, Device_Write_Length);
 	packet = device.read(packet, Device_Read_Length);
