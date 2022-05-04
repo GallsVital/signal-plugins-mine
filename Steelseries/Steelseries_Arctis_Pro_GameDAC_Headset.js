@@ -17,7 +17,7 @@ export function ControllableParameters(){
 		{"property":"Surround", "label":"Enable Surround Sound","type":"boolean","default":"false"},
 		{"property":"EQ", "label":"EQ Type", "type":"combobox", "values":["Flat","Bass Boost","Reference","Smiley","Custom"], "default":"Flat"},
 		{"property":"Gain", "label":"Extra Gain", "type":"boolean","default":"true"},
-		{"property":"Mode", "label":"Audio Mix Mode", "type":"combobox", "values":["Standard","Custom"], "default":"Standard"},
+		{"property":"Mode", "label":"Line Out Mix Mode", "type":"combobox", "values":["Standard","Custom"], "default":"Standard"},
 		{"property":"VolumeGame","label":"Game Mix Volume","step":"1", "type":"number","min":"0", "max":"20","default":"10"},
 		{"property":"VolumeChat","label":"Chat Mix Volume","step":"1", "type":"number","min":"0", "max":"20","default":"10"},
 		{"property":"VolumeAux", "label":"Aux Mix Volume", "step":"1", "type":"number","min":"0", "max":"20","default":"10"},
@@ -166,16 +166,13 @@ const VolumeMixDict =
 
 export function Initialize() 
 {
-	sendPacketString(" 00 10 00 ",3);//Firmware Version?
-	sendPacketString(" 00 10 00 ",3);
-	sendPacketString(" 00 10 00 ",3);
+	grabFirmware();
 	sendPacketString(" 00 2c 01 00 ",4);
-	sendPacketString(" 00 20 00 ",3);
-	sendPacketString(" 00 a0 00 ",3);
-	sendPacketString(" 00 80 00 ",3);
+	grabSettings();
+	grabUnknown();
+	grabScreenSettings();
 	sendPacketString(" 00 85 18 00 ",3)
-	device.pause(1000);
-	
+	setCustomEQ();
 }
 
 export function LedNames()
@@ -258,6 +255,77 @@ export function onVolumeMicChanged()
 	setMix();
 }
 
+function grabFirmware()
+{
+	var packet = []
+	packet[0]   = 0x00;
+    packet[1]   = 0x10;
+	device.write(packet,4);
+
+	packet=device.read(packet,64);
+	let DSPByte1 = packet[2];
+	let DSPByte2 = packet[6];
+	let DSPByte3 = packet[10];
+	let DSPByte4 = packet[14];
+	device.log("DSP Firmware Version: " + DSPByte1 + "." + DSPByte2 + "." + DSPByte3 + "." + DSPByte4);
+
+	let MCUByte1 = packet[18];
+	let MCUByte2 = packet[22];
+	let MCUByte3 = packet[26];
+
+	device.log("MCU Firmware Version: " + MCUByte1 + "." + MCUByte2 + "." + MCUByte3);
+
+	let HeadsetByte1 = packet[35];
+	let HeadsetByte2 = packet[36];
+
+	device.log("Headset Firmware Version: " + HeadsetByte1 + "." + HeadsetByte2);
+
+}
+
+function grabSettings()//Settings I think
+{
+	var packet = []
+	packet[0]   = 0x00;
+    packet[1]   = 0x20;
+	device.write(packet,4);
+
+	packet=device.read(packet,64);
+
+	let GainSet = packet[5];
+	let DTSSet = packet[7];
+	let EqualizerSet = packet[9];
+	let MicSetByte1 = packet[51];
+	let MicSetByte2 = packet[52];
+	let SidetoneSet = packet[53];
+	let LineoutSet = packet[57];
+	
+}
+
+function grabUnknown()
+{
+	var packet = []
+	packet[0]   = 0x00;
+    packet[1]   = 0xA0;
+	device.write(packet,4);
+
+	packet=device.read(packet,64);
+}
+
+function grabScreenSettings()//These functions are going on the backburner until the backend can actually do something with them.
+{
+	var packet = []
+	packet[0]   = 0x00;
+    packet[1]   = 0x80;
+	device.write(packet,4);
+
+	packet=device.read(packet,64);
+
+	let OLEDBrightnessSet = packet[6];
+	let OLEDTimeoutSetByte1 = packet[2];
+	let OLEDTimeoutSetByte2 = packet[3];
+	let OLEDTimeoutSetByte3 = packet[4];
+}
+
 function setOLEDBrightness()
 {
 	var packet = []
@@ -266,7 +334,7 @@ function setOLEDBrightness()
         packet[1]   = 0x85;
         packet[2]   = OLEDBrightnessDict[OLEDBrightness];	
 		
-	device.pause(1500);
+	device.pause(100);
 	device.write(packet,4);
 	sendPacketString("00 a3 00", 3);
 }
@@ -281,7 +349,7 @@ function setOLEDTimeout()
 		packet[3] 	= OLEDTimeoutDict2[OLEDTimeout];
 		packet[4]   = OLEDTimeoutDict3[OLEDTimeout];
 	
-	device.pause(1500);
+	device.pause(100);
 	device.write(packet,6);
 	sendPacketString("00 a3 00", 3);
 }
@@ -294,7 +362,7 @@ function setSidetone()
         packet[1]   = 0x39;
         packet[2]   = SidetoneDict[Sidetone];
 
-	device.pause(1500);
+	device.pause(100);
 	device.write(packet,4);
 	sendPacketString("00 a3 00", 3);
 }
@@ -308,7 +376,7 @@ function setVolume()
         packet[4] 	= MicVolumeDict[MicVolume];
 		packet[5]   = MicVolumeDict2[MicVolume];
 
-	device.pause(1500);
+	//device.pause(100);
 	device.write(packet,7);
 	sendPacketString("00 a3 00", 3);
 }
@@ -321,7 +389,7 @@ function setSurround()
         packet[1]   = 0x2a;
         packet[2] 	= Surround;
 
-	device.pause(1500);
+	device.pause(100);
 	device.write(packet,4);
 	sendPacketString("00 a3 00", 3);
 }
@@ -334,9 +402,47 @@ function setEQ()
         packet[1]   = 0x2e;
         packet[2] 	= EQDict[EQ]; 
 
-	device.pause(1000);
+	device.pause(100);
 	device.write(packet,4);
 	sendPacketString("00 a3 00", 3);
+}
+
+//-10 is 00 fb, -9.5 is 40 fb, -9 is 80 fb, -8.5 = C0 FB, -8 is 00 fc, -7.5 is 40 fc, - 7 is 80 fc, - 6.5 is C0 fc, -6 is 00 fd, -5.5 is 40 fd, -5 is 80 fd, -4.5 is 00 00 c0 fd, -4 is 00 00 00 fe, -3.5 is 00 00 40 fe, -3 is 00 00 80 fe, - 2.5 is 00 00 c0 fe, -2 is ff, -1.5 is 40 ff, -1 is 80 ff, -0.5 is  = c0 ff, 0 is 00 00, 0.5 is 00 40, 1 is 00 80, 1.5 is C0 00, 2 is 00 01, 2.5 is 40 01, 3 is 80 01, 3.5 is c0 01, 4 is 00 02, 4.5 is 40 02, 5 is 80 02, 5.5 is c0 02, 6 is 00 03, 6.5 is 40 03, 7 is 80 03, 7.5 is c0 03, 8 is 00 04, 8.5 is 40 04, 9 is 80 04, 9.5 is c0 04, 10 is 00 05.
+
+//Lovely Giant Dict or math for that needs done.
+
+var band1 = 0x05; 
+var band2 = 0x05;
+var band3 = 0x05; //fb is -10 05 is 10
+var band4 = 0x05;
+var band5 = 0x05;
+var band6 = 0x05;
+var band7 = 0x05;
+var band8 = 0x05;
+var band9 = 0x05;
+var band10 = 0x05;
+
+function setCustomEQ()
+{
+	var packet = []
+        
+	packet[0]   = 0x00;
+	packet[1]   = 0x33;
+	packet[5] 	= band1; 
+	packet[9] 	= band2;
+	packet[13] 	= band3;
+	packet[17] 	= band4;
+	packet[21] 	= band5;
+	packet[25] 	= band6;
+	packet[29] 	= band7;
+	packet[33] 	= band8;
+	packet[37] 	= band9;
+	packet[41] 	= band10;
+
+	device.pause(100);
+	device.write(packet,64);
+	sendPacketString("00 a3 00", 3);
+
 }
 
 function setGain()
@@ -347,7 +453,7 @@ function setGain()
         packet[1]   = 0x27;
         packet[2] 	= (Gain ? 0x02 : 0x01);
 		
-	device.pause(1000);
+	device.pause(100);
 	device.write(packet,4);
 	sendPacketString("00 a3 00", 3);
 }
@@ -360,7 +466,7 @@ function setMode()
         packet[1]   = 0x43;
         packet[2] 	= ModeDict[Mode];
 		
-	device.pause(1000);
+	device.pause(100);
 	device.write(packet,4);
 	sendPacketString("00 a3 00", 3);
 }
@@ -375,10 +481,11 @@ function setMix()
 		packet[4] 	= VolumeMixDict[VolumeAux];
 		packet[5] 	= VolumeMixDict[VolumeMic];
 	
-	device.pause(1500);
+	device.pause(100);
 	device.write(packet,7);
 	sendPacketString("00 a3 00", 3);
 }
+
 
 function sendColors(shutdown = false)
 {
@@ -414,13 +521,13 @@ function sendColors(shutdown = false)
         packet[12] = 0x01;
     
         device.write(packet,14);
-		device.pause(13);
+		device.pause(20);
     }
-	//sendPacketString("00 a5 08 0a 00", 5);
-	//sendPacketString("00 a5 03 0a 00", 5);
-	//sendPacketString("00 a5 04 0a 00", 5);
+	sendPacketString("00 a5 08 0a 00", 5);
+	sendPacketString("00 a5 03 0a 00", 5);
+	sendPacketString("00 a5 04 0a 00", 5);
 	sendPacketString("00 a3 00", 3);//A3 is software saving?
-	device.pause(300);
+	device.pause(150);
 }
 
 export function Validate(endpoint)
@@ -449,18 +556,6 @@ function sendPacketString(string, size){
     }
 
     device.write(packet, size);
-}
-
-function sendReportString(string, size){
-    var packet= [];
-    var data = string.split(' ');
-    
-    for(let i = 0; i < data.length; i++)
-	{
-        packet[parseInt(i,16)] =parseInt(data[i],16)//.toString(16)
-    }
-
-    device.send_report(packet, size);
 }
 
 export function Image() 
