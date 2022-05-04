@@ -43,6 +43,9 @@ function SetupChannels() {
 	for(let i = 0; i < ChannelArray.length; i++) {
 		device.addChannel(ChannelArray[i][0], ChannelArray[i][1]);
 	}
+	device.log("test")
+	device.log(`${Corsair.property.pollingRate}`)
+
 }
 
 //Global Variables
@@ -73,6 +76,25 @@ const DeviceMaxLedLimit = 233;
 
 const MAX_FAN_COUNT = 7;
 const DevFirmwareVersion = "2.6.201";
+
+class ModernCorsairProtocol{
+
+	static command = 0x08;
+
+	static set = 0x01;
+	static get = 0x02;
+	static closeEndpoint = 0x05;
+	static write = 0x06;
+	static stream = 0x07;
+	static read = 0x08;
+	static checkEndpoint = 0x09;
+	static setEndpoint = 0x0D;
+
+	static property = {
+		pollingRate: 0x01,
+	}
+}
+let Corsair = ModernCorsairProtocol();
 
 // Protocol Constants
 const CORSAIR_COMMAND = 0x08;

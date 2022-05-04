@@ -160,7 +160,7 @@ function SendPacket(shutdown = false){
 		}else{
 			col = device.color(iPxX, iPxY);
 		}
-		let iLedIdx = (iIdx*3) + 13;
+		let iLedIdx = (iIdx*3) + 14;
 		packet[iLedIdx] = col[0];
 		packet[iLedIdx+1] = col[1];
 		packet[iLedIdx+2] = col[2];
