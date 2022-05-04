@@ -41,7 +41,6 @@ export function ControllableParameters(){
         {"property":"shutdownColor", "label":"Shutdown Color","min":"0","max":"360","type":"color","default":"009bde"},
         {"property":"LightingMode", "label":"Lighting Mode", "type":"combobox", "values":["Canvas","Forced"], "default":"Canvas"},
         {"property":"forcedColor", "label":"Forced Color","min":"0","max":"360","type":"color","default":"009bde"},
-        {"property":"DpiControl", "label":"Enable Dpi Control","type":"boolean","default":"false"},
         {"property":"dpi1", "label":"DPI Stage 1", "step":"50","type":"number","min":"100", "max":"18000","default":"800"},
         {"property":"dpi2", "label":"DPI Stage 2", "step":"50","type":"number","min":"100", "max":"18000","default":"800"},
         {"property":"dpi3", "label":"DPI Stage 3", "step":"50","type":"number","min":"100", "max":"18000","default":"800"},
@@ -110,7 +109,7 @@ export function Initialize()
 
 export function Render()
 {
-    DPIInputChecks();
+    DPIChecks();
     sendColors();
 }
 
@@ -144,6 +143,18 @@ export function ondpi6Changed()
     SetDPI(DPISTAGES[6]);
 }
 
+function GrabFirmware()
+{
+    var packet = []
+    packet[0x00]   = 0x00;
+    packet[0x01]   = CORSAIR_COMMAND_READ;
+    packet[0x02]   = 0x01;
+
+    device.write(packet, 65);
+    packet = device.read(packet,64);
+    device.log(packet);
+}
+
 function SetDPI(DpiStage)
 {
     let LowDpi = DpiStage.dpi() %256
@@ -169,7 +180,7 @@ function SetDPI(DpiStage)
 
 var DPIStage = 1;
 
-function DPIInputChecks()//Checking for presses of the DPI and Sniper buttons.
+function DPIChecks()
 {
     device.set_endpoint(0, 0x0002, 0xffc1); // Macro input endpoint
     do
