@@ -8,12 +8,12 @@ export function DefaultPosition(){return [1, 1];}
 export function DefaultScale(){return 1.0;}
 export function ControllableParameters(){
 	return [
-		{"property":"shutdownColor", "label":"Shutdown Color", "min":"0", "max":"360", "type":"color", "default":"009bde"},
-		{"property":"LightingMode", "label":"Lighting Mode", "type":"combobox", "values":["Canvas", "Forced"], "default":"Canvas"},
-		{"property":"forcedColor", "label":"Forced Color", "min":"0", "max":"360", "type":"color", "default":"009bde"},
-		{"property":"MotherboardPass", "label":"Enable MotherBoard Passthrough", "type":"boolean", "default":"false"},
-		{"property":"RGBHeaderToggle", "label":"Enable RGBHeader", "type":"boolean", "default":"True"},
-		{"property":"RGBconfig", "label":"RGB Header Config", "type":"combobox",   "values":["RGB", "RBG", "BGR", "BRG", "GBR", "GRB"], "default":"GRB"},
+		{"property":"shutdownColor", "group":"lighting", "label":"Shutdown Color", "min":"0", "max":"360", "type":"color", "default":"009bde"},
+		{"property":"LightingMode", "group":"lighting", "label":"Lighting Mode", "type":"combobox", "values":["Canvas", "Forced"], "default":"Canvas"},
+		{"property":"forcedColor", "group":"lighting", "label":"Forced Color", "min":"0", "max":"360", "type":"color", "default":"009bde"},
+		{"property":"MotherboardPass", "group":"", "label":"Enable MotherBoard Passthrough", "type":"boolean", "default":"false"},
+		{"property":"RGBHeaderToggle", "group":"", "label":"Enable RGBHeader", "type":"boolean", "default":"True"},
+		{"property":"RGBconfig", "group":"lighting", "label":"RGB Header Config", "type":"combobox",   "values":["RGB", "RBG", "BGR", "BRG", "GBR", "GRB"], "default":"GRB"},
 
 
 	];

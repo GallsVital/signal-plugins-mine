@@ -7,15 +7,15 @@ export function DefaultPosition(){return [240,120]}
 export function DefaultScale(){return 8.0}
 export function ControllableParameters(){
     return [
-        {"property":"shutdownColor", "label":"Shutdown Color","min":"0","max":"360","type":"color","default":"009bde"},
-        {"property":"LightingMode", "label":"Lighting Mode", "type":"combobox", "values":["Canvas","Forced"], "default":"Canvas"},
-        {"property":"forcedColor", "label":"Forced Color","min":"0","max":"360","type":"color","default":"009bde"},
-        {"property":"dpi1", "label":"DPI 1","step":"50", "type":"number","min":"100", "max":"16000","default":"800"},
-        {"property":"dpi2", "label":"DPI 2","step":"50", "type":"number","min":"100", "max":"16000","default":"1200"},
-        {"property":"dpi3", "label":"DPI 3","step":"50", "type":"number","min":"100", "max":"16000","default":"1600"},
-        {"property":"dpi4", "label":"DPI 4","step":"50", "type":"number","min":"100", "max":"16000","default":"2000"},
-        {"property":"LOD", "label":"High Lift Off Distance", "type":"boolean", "default":"false","tooltip":"This setting determines how high off the table the mouse is before it stops registering inputs. Low is 2mm, High is 3mm."},
-        {"property":"Pollingrate", "label":"High Polling Rate", "type":"boolean", "default":"true","tooltip":"This setting determines how high off the table the mouse is before it stops registering inputs. Low is 500Hz, High is 1000Hz."},
+        {"property":"shutdownColor", "group":"lighting", "label":"Shutdown Color","min":"0","max":"360","type":"color","default":"009bde"},
+        {"property":"LightingMode", "group":"lighting", "label":"Lighting Mode", "type":"combobox", "values":["Canvas","Forced"], "default":"Canvas"},
+        {"property":"forcedColor", "group":"lighting", "label":"Forced Color","min":"0","max":"360","type":"color","default":"009bde"},
+        {"property":"dpi1", "group":"mouse", "label":"DPI 1","step":"50", "type":"number","min":"100", "max":"16000","default":"800"},
+        {"property":"dpi2", "group":"mouse", "label":"DPI 2","step":"50", "type":"number","min":"100", "max":"16000","default":"1200"},
+        {"property":"dpi3", "group":"mouse", "label":"DPI 3","step":"50", "type":"number","min":"100", "max":"16000","default":"1600"},
+        {"property":"dpi4", "group":"mouse", "label":"DPI 4","step":"50", "type":"number","min":"100", "max":"16000","default":"2000"},
+        {"property":"LOD", "group":"mouse", "label":"High Lift Off Distance", "type":"boolean", "default":"false","tooltip":"This setting determines how high off the table the mouse is before it stops registering inputs. Low is 2mm, High is 3mm."},
+        {"property":"pollingrate", "group":"mouse", "label":"High Polling Rate", "type":"boolean", "default":"true","tooltip":"This setting determines how high off the table the mouse is before it stops registering inputs. Low is 500Hz, High is 1000Hz."},
     ];
 }
 

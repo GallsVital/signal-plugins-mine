@@ -49,9 +49,9 @@ export function DefaultPosition(){return [165, 60];}
 export function DefaultScale(){return 6.0;}
 export function ControllableParameters(){
 	return [
-		{"property":"LightingMode", "label":"Lighting Mode", "type":"combobox", "values":["Canvas", "Forced"], "default":"Canvas"},
-		{"property":"forcedColor", "label":"Forced Color", "min":"0", "max":"360", "type":"color", "default":"009bde"},
-		{"property":"FanSpeed", "label":"Fan Speed", "type":"combobox", "values":["Quiet", "Balanced", "Extreme"], "default":"Balanced"},
+		{"property":"LightingMode", "group":"lighting", "label":"Lighting Mode", "type":"combobox", "values":["Canvas", "Forced"], "default":"Canvas"},
+		{"property":"forcedColor", "group":"lighting", "label":"Forced Color", "min":"0", "max":"360", "type":"color", "default":"009bde"},
+		{"property":"FanSpeed",  "group":"", "label":"Fan Speed", "type":"combobox", "values":["Quiet", "Balanced", "Extreme"], "default":"Balanced"},
 	];
 }
 const DeviceMaxLedLimit = 32;

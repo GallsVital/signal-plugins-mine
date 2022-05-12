@@ -7,12 +7,12 @@ export function DefaultPosition(){return [225, 120];}
 export function DefaultScale(){return 7.0;}
 export function ControllableParameters(){
 	return [
-		{"property":"shutdownColor", "label":"Shutdown Color", "min":"0", "max":"360", "type":"color", "default":"009bde"},
-		{"property":"LightingMode", "label":"Lighting Mode", "type":"combobox", "values":["Canvas", "Forced"], "default":"Canvas"},
-		{"property":"forcedColor", "label":"Forced Color", "min":"0", "max":"360", "type":"color", "default":"009bde"},
-		{"property":"DpiControl", "label":"Enable Dpi Control", "type":"boolean", "default":"false"},
-		{"property":"dpi1", "label":"DPI", "step":"50", "type":"number", "min":"200", "max":"18000", "default":"800"},
-		//{"property":"PollRate", "label":"Poll Rate", "type":"combobox", "values":["1","2","3","4","5"], "default":"3"},
+		{"property":"shutdownColor", "group":"lighting", "label":"Shutdown Color", "min":"0", "max":"360", "type":"color", "default":"009bde"},
+		{"property":"LightingMode", "group":"lighting", "label":"Lighting Mode", "type":"combobox", "values":["Canvas", "Forced"], "default":"Canvas"},
+		{"property":"forcedColor", "group":"lighting", "label":"Forced Color", "min":"0", "max":"360", "type":"color", "default":"009bde"},
+		{"property":"DpiControl", "group":"mouse", "label":"Enable Dpi Control", "type":"boolean", "default":"false"},
+		{"property":"dpi1", "group":"mouse", "label":"DPI", "step":"50", "type":"number", "min":"200", "max":"18000", "default":"800"},
+		//{"property":"PollRate", "group":"mouse", "label":"Poll Rate", "type":"combobox", "values":["1","2","3","4","5"], "default":"3"},
 
 	];
 }

@@ -7,19 +7,19 @@ export function DefaultPosition(){return [240, 120];}
 export function DefaultScale(){return 8.0;}
 export function ControllableParameters(){
 	return [
-		{"property":"shutdownColor", "label":"Shutdown Color", "min":"0", "max":"360", "type":"color", "default":"009bde"},
-		{"property":"LightingMode", "label":"Lighting Mode", "type":"combobox", "values":["Canvas", "Forced"], "default":"Canvas"},
-		{"property":"forcedColor", "label":"Forced Color", "min":"0", "max":"360", "type":"color", "default":"009bde"},
-		{"property":"DpiControl", "label":"Enable Dpi Control", "type":"boolean", "default":"false"},
-		{"property":"dpi1", "label":"DPI 1", "step":"50", "type":"number", "min":"200", "max":"8500", "default":"800"},
-		{"property":"dpi2", "label":"DPI 2", "step":"50", "type":"number", "min":"200", "max":"8500", "default":"1200"},
-		{"property":"dpi3", "label":"DPI 3", "step":"50", "type":"number", "min":"200", "max":"8500", "default":"1600"},
-		{"property":"dpi4", "label":"DPI 4", "step":"50", "type":"number", "min":"200", "max":"8500", "default":"2000"},
-		{"property":"dpi5", "label":"DPI 5", "step":"50", "type":"number", "min":"200", "max":"8500", "default":"3200"},
-		{"property":"PollingRate", "label":"Polling Rate", "type":"combobox", "values":["125Hz", "250Hz", "500Hz", "1000Hz"], "default":"500Hz"},
-		{"property":"anglesnapping", "label":"Angle Snapping", "type":"boolean", "default":"false", "tooltip":"This toggles smoothing of the cursor. Increases smoothness of mouse movement, but decreases accuracy."},
-		{"property":"timeout", "label":"Led Timeout", "type":"boolean", "default":"true", "tooltip":"This toggles whether the leds will shut off after the Led Timeout Length"},
-		{"property":"timeoutlength", "label":"Led Timeout Length (Minutes)", "step":"1", "type":"number", "min":"0", "max":"30", "default":"15", "tooltip":"This sets the amount of time in minutes that the mouse is idle before the leds turn off"},
+		{"property":"shutdownColor", "group":"lighting", "label":"Shutdown Color", "min":"0", "max":"360", "type":"color", "default":"009bde"},
+		{"property":"LightingMode", "group":"lighting", "label":"Lighting Mode", "type":"combobox", "values":["Canvas", "Forced"], "default":"Canvas"},
+		{"property":"forcedColor", "group":"lighting", "label":"Forced Color", "min":"0", "max":"360", "type":"color", "default":"009bde"},
+		{"property":"DpiControl", "group":"mouse", "label":"Enable Dpi Control", "type":"boolean", "default":"false"},
+		{"property":"dpi1", "group":"mouse", "label":"DPI 1", "step":"50", "type":"number", "min":"200", "max":"8500", "default":"800"},
+		{"property":"dpi2", "group":"mouse", "label":"DPI 2", "step":"50", "type":"number", "min":"200", "max":"8500", "default":"1200"},
+		{"property":"dpi3", "group":"mouse", "label":"DPI 3", "step":"50", "type":"number", "min":"200", "max":"8500", "default":"1600"},
+		{"property":"dpi4", "group":"mouse", "label":"DPI 4", "step":"50", "type":"number", "min":"200", "max":"8500", "default":"2000"},
+		{"property":"dpi5", "group":"mouse", "label":"DPI 5", "step":"50", "type":"number", "min":"200", "max":"8500", "default":"3200"},
+		{"property":"pollingrate", "group":"mouse", "label":"Polling Rate", "type":"combobox", "values":["125Hz", "250Hz", "500Hz", "1000Hz"], "default":"500Hz"},
+		{"property":"angleSnapping", "group":"mouse", "label":"Angle Snapping", "type":"boolean", "default":"false", "tooltip":"This toggles smoothing of the cursor. Increases smoothness of mouse movement, but decreases accuracy."},
+		{"property":"timeout", "group":"", "label":"Led Timeout", "type":"boolean", "default":"true", "tooltip":"This toggles whether the leds will shut off after the Led Timeout Length"},
+		{"property":"timeoutlength", "group":"", "label":"Led Timeout Length (Minutes)", "step":"1", "type":"number", "min":"0", "max":"30", "default":"15", "tooltip":"This sets the amount of time in minutes that the mouse is idle before the leds turn off"},
 	];
 }
 

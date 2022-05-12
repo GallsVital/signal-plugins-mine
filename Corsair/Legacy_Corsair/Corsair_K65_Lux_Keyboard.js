@@ -9,12 +9,12 @@ export function DefaultScale(){return Math.floor(DESIRED_HEIGHT/Size()[1]);}
 
 export function ControllableParameters(){
 	return [
-		{"property":"endpointUsed", "label":"Endpoint Selection", "type":"combobox", "values":["Endpoint 1", "Endpoint 2", ], "default":"Endpoint 1"},
-		{"property":"shutdownColor", "label":"Shutdown Color", "min":"0", "max":"360", "type":"color", "default":"009bde"},
-		{"property":"LightingMode", "label":"Lighting Mode", "type":"combobox", "values":["Canvas", "Forced"], "default":"Canvas"},
-		{"property":"forcedColor", "label":"Forced Color", "min":"0", "max":"360", "type":"color", "default":"009bde"},
-		{"property":"DpiControl", "label":"Enable Dpi Control", "type":"boolean", "default":"false"},
-		{"property":"dpi1", "label":"DPI", "type":"number", "min":"200", "max":"12400", "default":"800"},
+		{"property":"endpointUsed", "group":"", "label":"Endpoint Selection", "type":"combobox", "values":["Endpoint 1", "Endpoint 2", ], "default":"Endpoint 1"},
+		{"property":"shutdownColor", "group":"lighting", "label":"Shutdown Color", "min":"0", "max":"360", "type":"color", "default":"009bde"},
+		{"property":"LightingMode", "group":"lighting", "label":"Lighting Mode", "type":"combobox", "values":["Canvas", "Forced"], "default":"Canvas"},
+		{"property":"forcedColor", "group":"lighting", "label":"Forced Color", "min":"0", "max":"360", "type":"color", "default":"009bde"},
+		{"property":"DpiControl", "group":"mouse", "label":"Enable Dpi Control", "type":"boolean", "default":"false"},
+		{"property":"dpi1", "group":"mouse", "label":"DPI", "type":"number", "min":"200", "max":"12400", "default":"800"},
 	];
 }
 

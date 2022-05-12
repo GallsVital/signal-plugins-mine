@@ -7,11 +7,11 @@ export function DefaultPosition(){return [145, 85];}
 export function DefaultScale(){return 10.0;}
 export function ControllableParameters(){
 	return [
-		{"property":"shutdownColor", "label":"Shutdown Color", "min":"0", "max":"360", "type":"color", "default":"009bde"},
-		{"property":"LightingMode", "label":"Lighting Mode", "type":"combobox", "values":["Canvas", "Forced"], "default":"Canvas"},
-		{"property":"forcedColor", "label":"Forced Color", "min":"0", "max":"360", "type":"color", "default":"009bde"},
-		{"property":"SidetoneControl", "label":"Sidetone", "type":"combobox", "values":["Off", "On"], "default":"Off"},
-		{"property":"SidetoneAmount", "label":"Sidetone Amount", "step":"1", "type":"number", "min":"0", "max":"100", "default":"0"},
+		{"property":"shutdownColor", "group":"lighting", "label":"Shutdown Color", "min":"0", "max":"360", "type":"color", "default":"009bde"},
+		{"property":"LightingMode", "group":"lighting", "label":"Lighting Mode", "type":"combobox", "values":["Canvas", "Forced"], "default":"Canvas"},
+		{"property":"forcedColor", "group":"lighting", "label":"Forced Color", "min":"0", "max":"360", "type":"color", "default":"009bde"},
+		{"property":"SidetoneControl", "group":"", "label":"Sidetone", "type":"combobox", "values":["Off", "On"], "default":"Off"},
+		{"property":"SidetoneAmount", "group":"", "label":"Sidetone Amount", "step":"1", "type":"number", "min":"0", "max":"100", "default":"0"},
 
 	];
 }

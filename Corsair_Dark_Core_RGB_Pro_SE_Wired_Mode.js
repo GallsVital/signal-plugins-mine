@@ -7,12 +7,12 @@ export function DefaultPosition(){return [225, 120];}
 export function DefaultScale(){return 7.0;}
 export function ControllableParameters(){
 	return [
-		{ property: "LightingMode", label: "Lighting Mode", type: "combobox", values: ["Canvas", "Forced"], default: "Canvas" },
-		{ property: "forcedColor", label: "Forced Color", min: "0", max: "360", type: "color", default: "#009bde" },
-		{ property: "SettingControl", label: "Enable Setting Control", type: "boolean", default: "false" },
-		{ property: "dpi1", label: "DPI", step: "50", type: "number", min: "200", max: "18000", default: "800" },
+		{ property: "LightingMode", "group":"lighting", label: "Lighting Mode", type: "combobox", values: ["Canvas", "Forced"], default: "Canvas" },
+		{ property: "forcedColor", "group":"lighting", label: "Forced Color", min: "0", max: "360", type: "color", default: "#009bde" },
+		{ property: "SettingControl", "group":"mouse", label: "Enable Setting Control", type: "boolean", default: "false" },
+		{ property: "dpi1", "group":"mouse", label: "DPI", step: "50", type: "number", min: "200", max: "18000", default: "800" },
 		//{ property: "PollRate", label: "Poll Rate", type: "combobox", values: ["1", "2", "3", "4", "5"], default: "3" },
-		{ property: "AngleSnap", label: "Angle Snapping", type: "boolean", default: "0" },
+		{ property: "AngleSnap", "group":"mouse", label: "Angle Snapping", type: "boolean", default: "0" },
 		{ property: "SleepMode", label: "Sleep Mode", type: "boolean", default: "1" },
 		{ property: "SleepModeTime", label: "Sleep After x Minutes", type: "combobox", values: [5, 10, 15, 30, 60], default: 10 },
 	];

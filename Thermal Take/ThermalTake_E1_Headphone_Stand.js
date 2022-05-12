@@ -7,9 +7,9 @@ export function DefaultPosition(){return [240, 120];}
 export function DefaultScale(){return 8.0;}
 export function ControllableParameters(){
 	return [
-		{"property":"shutdownColor", "label":"Shutdown Color", "min":"0", "max":"360", "type":"color", "default":"009bde"},
-		{"property":"LightingMode", "label":"Lighting Mode", "type":"combobox", "values":["Canvas", "Forced"], "default":"Canvas"},
-		{"property":"forcedColor", "label":"Forced Color", "min":"0", "max":"360", "type":"color", "default":"009bde"},
+		{"property":"shutdownColor", "group":"lighting", "label":"Shutdown Color", "min":"0", "max":"360", "type":"color", "default":"009bde"},
+		{"property":"LightingMode", "group":"lighting", "label":"Lighting Mode", "type":"combobox", "values":["Canvas", "Forced"], "default":"Canvas"},
+		{"property":"forcedColor", "group":"lighting", "label":"Forced Color", "min":"0", "max":"360", "type":"color", "default":"009bde"},
 	];
 }
 let vKeymap = [ 0x00, 0x08, 0x10, 0x18, 0x01, 0x09, 0x11, 0x19, 0x21, 0x02, 0x0A, 0x12, 0x1A, 0x20, 0x22, 0x03, 0x0b, 0x13, 0x1b, 0x23, 0x04, 0x0C, 0x14, 0x1C, 0x24  ];

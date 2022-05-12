@@ -7,8 +7,8 @@ export function DefaultPosition() {return [225, 120]; }
 export function DefaultScale(){return 15.0;}
 export function ControllableParameters(){
 	return [
-		{"property":"DpiControl", "label":"Enable Dpi Control", "type":"boolean", "default":"false"},
-		{"property":"dpi1", "label":"DPI", "step":"50", "type":"number", "min":"200", "max":"4000", "default":"800"},
+		{"property":"DpiControl", "group":"mouse", "label":"Enable Dpi Control", "type":"boolean", "default":"false"},
+		{"property":"dpi1", "group":"mouse", "label":"DPI", "step":"50", "type":"number", "min":"200", "max":"4000", "default":"800"},
 	];
 }
 let Brightness;

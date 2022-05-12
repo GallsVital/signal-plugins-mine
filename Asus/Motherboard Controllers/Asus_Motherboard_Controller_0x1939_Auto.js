@@ -8,13 +8,13 @@ export function DefaultPosition(){return [120, 80];}
 export function DefaultScale(){return 8.0;}
 export function ControllableParameters(){
 	return [
-		{"property":"shutdownColor", "label":"Shutdown Color", "min":"0", "max":"360", "type":"color", "default":"009bde"},
-		{"property":"LightingMode", "label":"Lighting Mode", "type":"combobox", "values":["Canvas", "Forced"], "default":"Canvas"},
-		{"property":"forcedColor", "label":"Forced Color", "min":"0", "max":"360", "type":"color", "default":"009bde"},
-		{"property":"Mainboardconfig", "label":"MainBoard Configuration", "type":"combobox",   "values":["RGB", "RBG", "BGR", "BRG", "GBR", "GRB"], "default":"RGB"},
-		{"property":"Headerconfig", "label":"12v Header Configuration", "type":"combobox",   "values":["RGB", "RBG", "BGR", "BRG", "GBR", "GRB"], "default":"RGB"},
-		{"property":"RGBconfig", "label":"ARGB Channel Configuration", "type":"combobox",   "values":["RGB", "RBG", "BGR", "BRG", "GBR", "GRB"], "default":"RGB"},
-		{"property":"disableRGBHeaders", "label":"Disable 12v Headers", "type":"boolean", "default":"0"},
+		{"property":"shutdownColor", "group":"lighting", "label":"Shutdown Color", "min":"0", "max":"360", "type":"color", "default":"009bde"},
+		{"property":"LightingMode", "group":"lighting", "label":"Lighting Mode", "type":"combobox", "values":["Canvas", "Forced"], "default":"Canvas"},
+		{"property":"forcedColor", "group":"lighting", "label":"Forced Color", "min":"0", "max":"360", "type":"color", "default":"009bde"},
+		{"property":"Mainboardconfig", "group":"lighting", "label":"MainBoard Configuration", "type":"combobox",   "values":["RGB", "RBG", "BGR", "BRG", "GBR", "GRB"], "default":"RGB"},
+		{"property":"Headerconfig", "group":"lighting", "label":"12v Header Configuration", "type":"combobox",   "values":["RGB", "RBG", "BGR", "BRG", "GBR", "GRB"], "default":"RGB"},
+		{"property":"RGBconfig", "group":"lighting", "label":"ARGB Channel Configuration", "type":"combobox",   "values":["RGB", "RBG", "BGR", "BRG", "GBR", "GRB"], "default":"RGB"},
+		{"property":"disableRGBHeaders", "group":"", "label":"Disable 12v Headers", "type":"boolean", "default":"0"},
 	];
 }
 export function LedNames(){ return vLedNames; }
@@ -92,8 +92,8 @@ const ASUS_MODE_DIRECT = 0xFF;
 // AULA3-6K75-0207 - 3 Mainboard, 1 ARGB, 2 12V - TUF GAMING X570-PLUS
 
 let ConfigurationOverrides = {
-	"AULA3-AR32-0207":{MainboardCount: 3, ARGBChannelCount:3, RGBHeaderCount: 1} // THIS HAS A SPACE AT THE END?!?!?!
-
+	"AULA3-AR32-0207":{MainboardCount: 3, ARGBChannelCount:3, RGBHeaderCount: 1}, // THIS HAS A SPACE AT THE END?!?!?!
+	"AULA3-AR42-0207":{MainboardCount: 3, ARGBChannelCount:1, RGBHeaderCount: 2}
 };
 
 let DeviceInfo = {
@@ -318,7 +318,7 @@ function sendCommit(){
 
 
 function SetChannelModeDirect(ChannelIdx){
-	if(ChannelIdx == 0){
+	if(ChannelIdx === 0){
 		device.log(`Setting Mainboard to Direct Mode`);
 	}else{
 		device.log(`Setting Channel ${ChannelIdx} to Direct Mode`);
@@ -338,7 +338,7 @@ function StreamDirectColors(ChannelIdx, RGBData, LedCount){
 		let ledsToSend = Math.min(LedCount, Device_PacketLedLimit);
 		LedCount -= ledsToSend;
 		//Set apply falg when we're out of LED's
-		isApplyPacket = LedCount == 0;
+		isApplyPacket = LedCount === 0;
 		SendDirectPacket(ChannelIdx, ledsSent, ledsToSend, RGBData.splice(0, ledsToSend*3), isApplyPacket);
 		ledsSent += ledsToSend;
 	}
@@ -366,7 +366,7 @@ function FetchConfigTable(){
 
 	let data = device.read([0x00], Device_Read_Length);
 
-	if(data[1] = ASUS_RESPONSE_CONFIGTABLE){
+	if(data[1] === ASUS_RESPONSE_CONFIGTABLE){
 		DeviceInfo.ConfigTable = data;
 		device.log("Config Table", {toFile: true});
 
@@ -435,7 +435,7 @@ function FetchFirmwareVersion(){
 
 	let data = device.read([0x00], Device_Read_Length);
 
-	if(data[1] == ASUS_RESPONSE_FIRMWARE){
+	if(data[1] === ASUS_RESPONSE_FIRMWARE){
 		DeviceInfo.Model = "";
 
 		for(let i = 2; i < 18; i++){
@@ -455,7 +455,6 @@ function FetchFirmwareVersion(){
 
 
 // Helper Functions
-
 function hexToRgb(hex) {
 	let result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
 	let colors = [];

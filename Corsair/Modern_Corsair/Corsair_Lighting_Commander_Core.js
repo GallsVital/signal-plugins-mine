@@ -8,8 +8,8 @@ export function DefaultScale() { return 1.0; }
 /* global LightingMode:readonly pumpToggle:readonly forcedColor:readonly cpuCooler:readonly*/
 export function ControllableParameters() {
 	return [
-		{ "property": "LightingMode", "label": "Lighting Mode", "type": "combobox", "values": ["Canvas", "Forced"], "default": "Canvas" },
-		{ "property": "forcedColor", "label": "Forced Color", "min": "0", "max": "360", "type": "color", "default": "#009bde" },
+		{ "property": "LightingMode", "group":"lighting", "label": "Lighting Mode", "type": "combobox", "values": ["Canvas", "Forced"], "default": "Canvas" },
+		{ "property": "forcedColor", "group":"lighting", "label": "Forced Color", "min": "0", "max": "360", "type": "color", "default": "#009bde" },
 		{ "property": "pumpToggle", "label": "Pump Connected", "type": "boolean", "default": "1" },
 		{ "property": "cpuCooler", "label": "CPU Cooler", "type": "combobox", "values": ["Elite Capellix", "Elite LCD"], "default": "Elite Capellix" },
 
@@ -79,6 +79,22 @@ const CommandDict = {
 	0x0F: "Led Settings"
 };
 
+function compareVersion(a, b) {
+	return compareVersionRecursive(a.split("."), b.split(".")) >= 0;
+}
+
+function compareVersionRecursive(a, b) {
+	if (a.length === 0) { a = [0]; }
+
+	if (b.length === 0) { b = [0]; }
+
+	if (a[0] !== b[0] || (a.length === 1 && b.length === 1)) {
+		return a[0] - b[0];
+	}
+
+	return compareVersionRecursive(a.slice(1), b.slice(1));
+}
+
 export function Initialize() {
 	SetPumpType();
 
@@ -95,7 +111,7 @@ export function Initialize() {
 	device.log(`Developed on Firmware ${DevFirmwareVersion}`);
 
 	// Any Firmware => 2.10.219 requires a different packet size
-	if(SemanticVersionCheck(firmwareVersion, "2.10.218")){
+	if(compareVersion(firmwareVersion, "2.10.219")){
 		Device_Write_Length = 97;
 	}
 
@@ -115,16 +131,12 @@ export function Initialize() {
 	});
 
 	Corsair.SetFanType();
-
 }
 
 
 export function Shutdown() {
 	Corsair.SetMode(Corsair.hardwareMode);
 }
-const SemanticVersionCheck = (a, b) => {
-	return a.localeCompare(b, undefined, { numeric: true }) === 1;
-};
 
 export function Render() {
 	UpdateRGB();
@@ -248,7 +260,7 @@ function PollFans() {
 	let FanSpeeds = Corsair.FetchFanRPM();
 	FanSpeeds.forEach(function (rpm, iIdx) {
 		if(rpm > 0){
-			device.log(`${FanControllerArray[iIdx]} is running at ${rpm}rpm`);
+			//device.log(`${FanControllerArray[iIdx]} is running at ${rpm}rpm`);
 			device.setRPM(FanControllerArray[iIdx], rpm);
 		}
 	});
@@ -256,7 +268,7 @@ function PollFans() {
 	// Read Temperature Probes
 	let Temperatures = Corsair.FetchTemperatures();
 	Temperatures.forEach(function (temp, iIdx) {
-		device.log(`Temp ${iIdx + 1} is ${temp}C`);
+		//device.log(`Temp ${iIdx + 1} is ${temp}C`);
 	});
 
 	//Set Fan Speeds
@@ -281,7 +293,7 @@ function SendCoolingdata() {
 
 	for(let fan = 0; fan < ConnectedFans.length; fan++) {
 		let fanLevel = (device.getNormalizedFanlevel(FanControllerArray[ConnectedFans[fan]]) * 100).toFixed(0);
-		device.log(`${FanControllerArray[ConnectedFans[fan]]} level set to ${fanLevel}%`);
+		//device.log(`${FanControllerArray[ConnectedFans[fan]]} level set to ${fanLevel}%`);
 		CoolingData[13 + ConnectedFans[fan] * 4] = fanLevel;
 	}
 
@@ -548,7 +560,7 @@ class ModernCorsairProtocol{
 	}
 	SetMode(mode){
 		let CurrentMode = this.FetchProperty(this.property.mode);
-	
+
 		// Bash Handles and reopen as needed
 		this.CloseEndpoint(this.handles.lighting);
 		this.CloseEndpoint(this.handles.background);
@@ -593,6 +605,7 @@ class ModernCorsairProtocol{
 	FetchFanStates() {
 
 		if(device.fanControlDisabled()) {
+			device.log("Fan Control Disabled");
 			return [];
 		}
 

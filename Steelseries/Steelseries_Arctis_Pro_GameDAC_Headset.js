@@ -7,21 +7,21 @@ export function DefaultPosition(){return [145,85]}
 export function DefaultScale(){return 10.0}
 export function ControllableParameters(){
     return [
-        {"property":"shutdownColor", "label":"Shutdown Color","min":"0","max":"360","type":"color","default":"009bde"},
-        {"property":"LightingMode", "label":"Lighting Mode", "type":"combobox", "values":["Canvas","Forced"], "default":"Canvas"},
-        {"property":"forcedColor", "label":"Forced Color","min":"0","max":"360","type":"color","default":"009bde"},
-		{"property":"OLEDTimeout", "label":"Screen Timeout (Minutes)", "type":"combobox", "values":["1","5","10","15","30","60","Never"], "default":"30"},
-		{"property":"OLEDBrightness", "label":"OLED Brightness","step":"1", "type":"number","min":"1", "max":"10","default":"8"},
-		{"property":"Sidetone", "label":"Sidetone Amount", "type":"combobox", "values":["None","Low","Medium","High"], "default":"None"},
-		{"property":"MicVolume", "label":"Microphone Volume","step":"10", "type":"number","min":"0", "max":"100","default":"100"},
-		{"property":"Surround", "label":"Enable Surround Sound","type":"boolean","default":"false"},
-		{"property":"EQ", "label":"EQ Type", "type":"combobox", "values":["Flat","Bass Boost","Reference","Smiley","Custom"], "default":"Flat"},
-		{"property":"Gain", "label":"Extra Gain", "type":"boolean","default":"true"},
-		{"property":"Mode", "label":"Line Out Mix Mode", "type":"combobox", "values":["Standard","Custom"], "default":"Standard"},
-		{"property":"VolumeGame","label":"Game Mix Volume","step":"1", "type":"number","min":"0", "max":"20","default":"10"},
-		{"property":"VolumeChat","label":"Chat Mix Volume","step":"1", "type":"number","min":"0", "max":"20","default":"10"},
-		{"property":"VolumeAux", "label":"Aux Mix Volume", "step":"1", "type":"number","min":"0", "max":"20","default":"10"},
-		{"property":"VolumeMic", "label":"Mic Mix Volume", "step":"1", "type":"number","min":"0", "max":"20","default":"10"},
+        {"property":"shutdownColor", "group":"lighting", "label":"Shutdown Color","min":"0","max":"360","type":"color","default":"009bde"},
+        {"property":"LightingMode", "group":"lighting", "label":"Lighting Mode", "type":"combobox", "values":["Canvas","Forced"], "default":"Canvas"},
+        {"property":"forcedColor", "group":"lighting", "label":"Forced Color","min":"0","max":"360","type":"color","default":"009bde"},
+		{"property":"OLEDTimeout", "group":"", "label":"Screen Timeout (Minutes)", "type":"combobox", "values":["1","5","10","15","30","60","Never"], "default":"30"},
+		{"property":"OLEDBrightness", "group":"", "label":"OLED Brightness","step":"1", "type":"number","min":"1", "max":"10","default":"8"},
+		{"property":"Sidetone", "group":"", "label":"Sidetone Amount", "type":"combobox", "values":["None","Low","Medium","High"], "default":"None"},
+		{"property":"MicVolume", "group":"", "label":"Microphone Volume","step":"10", "type":"number","min":"0", "max":"100","default":"100"},
+		{"property":"Surround", "group":"", "label":"Enable Surround Sound","type":"boolean","default":"false"},
+		{"property":"EQ", "group":"", "label":"EQ Type", "type":"combobox", "values":["Flat","Bass Boost","Reference","Smiley","Custom"], "default":"Flat"},
+		{"property":"Gain", "group":"", "label":"Extra Gain", "type":"boolean","default":"true"},
+		{"property":"Mode", "group":"", "label":"Line Out Mix Mode", "type":"combobox", "values":["Standard","Custom"], "default":"Standard"},
+		{"property":"VolumeGame", "group":"", "label":"Game Mix Volume","step":"1", "type":"number","min":"0", "max":"20","default":"10"},
+		{"property":"VolumeChat", "group":"", "label":"Chat Mix Volume","step":"1", "type":"number","min":"0", "max":"20","default":"10"},
+		{"property":"VolumeAux", "group":"", "label":"Aux Mix Volume", "step":"1", "type":"number","min":"0", "max":"20","default":"10"},
+		{"property":"VolumeMic", "group":"", "label":"Mic Mix Volume", "step":"1", "type":"number","min":"0", "max":"20","default":"10"},
     ];
 }
 

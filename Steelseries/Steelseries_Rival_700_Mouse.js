@@ -7,13 +7,13 @@ export function DefaultPosition() {return [225, 120]; }
 export function DefaultScale(){return 15.0;}
 export function ControllableParameters(){
 	return [
-		{"property":"shutdownColor", "label":"Shutdown Color", "min":"0", "max":"360", "type":"color", "default":"009bde"},
-		{"property":"LightingMode", "label":"Lighting Mode", "type":"combobox", "values":["Canvas", "Forced"], "default":"Canvas"},
-		{"property":"forcedColor", "label":"Forced Color", "min":"0", "max":"360", "type":"color", "default":"009bde"},
-		{"property":"ScreenControl", "label":"Enable Lcd Control", "type":"boolean", "default":"false"},
-		{"property":"DpiControl", "label":"Enable Dpi Control", "type":"boolean", "default":"false"},
-		{"property":"dpi1", "label":"DPI", "step":"100", "type":"number", "min":"400", "max":"15600", "default":"1500"},
-		{"property":"dpi2", "label":"DPI 2", "step":"100", "type":"number", "min":"400", "max":"15600", "default":"1500"},
+		{"property":"shutdownColor", "group":"lighting", "label":"Shutdown Color", "min":"0", "max":"360", "type":"color", "default":"009bde"},
+		{"property":"LightingMode", "group":"lighting", "label":"Lighting Mode", "type":"combobox", "values":["Canvas", "Forced"], "default":"Canvas"},
+		{"property":"forcedColor", "group":"lighting", "label":"Forced Color", "min":"0", "max":"360", "type":"color", "default":"009bde"},
+		{"property":"ScreenControl", "group":"", "label":"Enable Lcd Control", "type":"boolean", "default":"false"},
+		{"property":"DpiControl", "group":"mouse", "label":"Enable Dpi Control", "type":"boolean", "default":"false"},
+		{"property":"dpi1", "group":"mouse", "label":"DPI", "step":"100", "type":"number", "min":"400", "max":"15600", "default":"1500"},
+		{"property":"dpi2", "group":"mouse", "label":"DPI 2", "step":"100", "type":"number", "min":"400", "max":"15600", "default":"1500"},
 	];
 }
 

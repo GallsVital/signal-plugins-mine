@@ -38,15 +38,15 @@ export function DefaultPosition() {return [225,120]; }
 export function DefaultScale(){return 15.0}
 export function ControllableParameters(){
     return [
-        {"property":"shutdownColor", "label":"Shutdown Color","min":"0","max":"360","type":"color","default":"009bde"},
-        {"property":"LightingMode", "label":"Lighting Mode", "type":"combobox", "values":["Canvas","Forced"], "default":"Canvas"},
-        {"property":"forcedColor", "label":"Forced Color","min":"0","max":"360","type":"color","default":"009bde"},
-        {"property":"dpi1", "label":"DPI Stage 1", "step":"50","type":"number","min":"100", "max":"18000","default":"800"},
-        {"property":"dpi2", "label":"DPI Stage 2", "step":"50","type":"number","min":"100", "max":"18000","default":"800"},
-        {"property":"dpi3", "label":"DPI Stage 3", "step":"50","type":"number","min":"100", "max":"18000","default":"800"},
-        {"property":"dpi4", "label":"DPI Stage 4", "step":"50","type":"number","min":"100", "max":"18000","default":"800"},
-        {"property":"dpi5", "label":"DPI Stage 5", "step":"50","type":"number","min":"100", "max":"18000","default":"800"},
-        {"property":"dpi6", "label":"DPI Sniper Stage", "step":"50","type":"number","min":"100", "max":"18000","default":"800"}, 
+        {"property":"shutdownColor", "group":"lighting", "label":"Shutdown Color","min":"0","max":"360","type":"color","default":"009bde"},
+        {"property":"LightingMode", "group":"lighting", "label":"Lighting Mode", "type":"combobox", "values":["Canvas","Forced"], "default":"Canvas"},
+        {"property":"forcedColor", "group":"lighting", "label":"Forced Color","min":"0","max":"360","type":"color","default":"009bde"},
+        {"property":"dpi1", "group":"mouse", "label":"DPI Stage 1", "step":"50","type":"number","min":"100", "max":"18000","default":"800"},
+        {"property":"dpi2", "group":"mouse", "label":"DPI Stage 2", "step":"50","type":"number","min":"100", "max":"18000","default":"800"},
+        {"property":"dpi3", "group":"mouse", "label":"DPI Stage 3", "step":"50","type":"number","min":"100", "max":"18000","default":"800"},
+        {"property":"dpi4", "group":"mouse", "label":"DPI Stage 4", "step":"50","type":"number","min":"100", "max":"18000","default":"800"},
+        {"property":"dpi5", "group":"mouse", "label":"DPI Stage 5", "step":"50","type":"number","min":"100", "max":"18000","default":"800"},
+        {"property":"dpi6", "group":"mouse", "label":"DPI Sniper Stage", "step":"50","type":"number","min":"100", "max":"18000","default":"800"}, 
     ];
 }
 

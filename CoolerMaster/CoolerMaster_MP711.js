@@ -7,18 +7,18 @@ export function DefaultPosition() {return [225, 120]; }
 export function DefaultScale(){return 15.0;}
 export function ControllableParameters(){
 	return [
-		{"property":"shutdownColor", "label":"Shutdown Color", "min":"0", "max":"360", "type":"color", "default":"009bde"},
-		{"property":"LightingMode", "label":"Lighting Mode", "type":"combobox", "values":["Canvas", "Forced"], "default":"Canvas"},
-		{"property":"forcedColor", "label":"Forced Color", "min":"0", "max":"360", "type":"color", "default":"009bde"},
-		{"property":"SettingControl", "label":"Enable Setting Control", "type":"boolean", "default":"false"},
-		{"property":"mousePolling", "label":"Polling Rate", "type":"combobox", "values":["125Hz", "250Hz", "500Hz", "1000Hz"], "default":"500Hz"},
-		{"property":"dpi1", "label":"DPI 1", "step":"100", "type":"number", "min":"400", "max":"32000", "default":"800"},
-		{"property":"dpi2", "label":"DPI 2", "step":"100", "type":"number", "min":"400", "max":"32000", "default":"1200"},
-		{"property":"dpi3", "label":"DPI 3", "step":"100", "type":"number", "min":"400", "max":"32000", "default":"1500"},
-		{"property":"dpi4", "label":"DPI 4", "step":"100", "type":"number", "min":"400", "max":"32000", "default":"2000"},
-		{"property":"dpi5", "label":"DPI 5", "step":"100", "type":"number", "min":"400", "max":"32000", "default":"3200"},
-		{"property":"dpi6", "label":"DPI 6", "step":"100", "type":"number", "min":"400", "max":"32000", "default":"4800"},
-		{"property":"dpi7", "label":"DPI 7", "step":"100", "type":"number", "min":"400", "max":"32000", "default":"4800"},
+		{"property":"shutdownColor", "group":"lighting", "label":"Shutdown Color", "min":"0", "max":"360", "type":"color", "default":"009bde"},
+		{"property":"LightingMode", "group":"lighting", "label":"Lighting Mode", "type":"combobox", "values":["Canvas", "Forced"], "default":"Canvas"},
+		{"property":"forcedColor", "group":"lighting", "label":"Forced Color", "min":"0", "max":"360", "type":"color", "default":"009bde"},
+		{"property":"SettingControl", "group":"mouse", "label":"Enable Setting Control", "type":"boolean", "default":"false"},
+		{"property":"mousePolling", "group":"mouse", "label":"Polling Rate", "type":"combobox", "values":["125Hz", "250Hz", "500Hz", "1000Hz"], "default":"500Hz"},
+		{"property":"dpi1", "group":"mouse", "label":"DPI 1", "step":"100", "type":"number", "min":"400", "max":"32000", "default":"800"},
+		{"property":"dpi2", "group":"mouse", "label":"DPI 2", "step":"100", "type":"number", "min":"400", "max":"32000", "default":"1200"},
+		{"property":"dpi3", "group":"mouse", "label":"DPI 3", "step":"100", "type":"number", "min":"400", "max":"32000", "default":"1500"},
+		{"property":"dpi4", "group":"mouse", "label":"DPI 4", "step":"100", "type":"number", "min":"400", "max":"32000", "default":"2000"},
+		{"property":"dpi5", "group":"mouse", "label":"DPI 5", "step":"100", "type":"number", "min":"400", "max":"32000", "default":"3200"},
+		{"property":"dpi6", "group":"mouse", "label":"DPI 6", "step":"100", "type":"number", "min":"400", "max":"32000", "default":"4800"},
+		{"property":"dpi7", "group":"mouse", "label":"DPI 7", "step":"100", "type":"number", "min":"400", "max":"32000", "default":"4800"},
 
 	];
 }

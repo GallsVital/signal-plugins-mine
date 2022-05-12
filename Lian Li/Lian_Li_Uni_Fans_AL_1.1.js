@@ -8,13 +8,13 @@ export function Type(){return "rawusb";}
 ;
 export function ControllableParameters(){
 	return [
-		{"property":"shutdownColor", "label":"Shutdown Color", "min":"0", "max":"360", "type":"color", "default":"009bde"},
-		{"property":"LightingMode", "label":"Lighting Mode", "type":"combobox", "values":["Canvas", "Forced"], "default":"Canvas"},
-		{"property":"forcedColor", "label":"Forced Color", "min":"0", "max":"360", "type":"color", "default":"009bde"},
-		{"property":"moboSync", "label":"Enable Passthrough Control", "type":"boolean", "default":"false"},
-		{"property":"FanMode", "label":"Fan Speed Mode", "type":"combobox", "values":["SignalRGB", "Motherboard PWM"], "default":"SignalRGB"},
-		//{"property":"targetRPM", "label":"Fan RPM", "step":"50","type":"number","min":"800", "max":"1900","default":"1300"},
-		//{"property":"FanMode", "label":"Fan Speed Mode","type":"combobox","values":["Manual","PWM"],"default":"PWM"},
+		{"property":"shutdownColor", "group":"lighting", "label":"Shutdown Color", "min":"0", "max":"360", "type":"color", "default":"009bde"},
+		{"property":"LightingMode", "group":"lighting", "label":"Lighting Mode", "type":"combobox", "values":["Canvas", "Forced"], "default":"Canvas"},
+		{"property":"forcedColor", "group":"lighting", "label":"Forced Color", "min":"0", "max":"360", "type":"color", "default":"009bde"},
+		{"property":"moboSync", "group":"", "label":"Enable Passthrough Control", "type":"boolean", "default":"false"},
+		{"property":"FanMode", "group":"", "label":"Fan Speed Mode", "type":"combobox", "values":["SignalRGB", "Motherboard PWM"], "default":"SignalRGB"},
+		//{"property":"targetRPM", "group":"", "label":"Fan RPM", "step":"50","type":"number","min":"800", "max":"1900","default":"1300"},
+		//{"property":"FanMode", "group":"", "label":"Fan Speed Mode","type":"combobox","values":["Manual","PWM"],"default":"PWM"},
 	];
 }
 export function DeviceMessages() { 

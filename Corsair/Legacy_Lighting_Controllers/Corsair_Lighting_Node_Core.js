@@ -8,9 +8,9 @@ export function DefaultPosition(){return [0, 0];}
 export function DefaultScale(){return 1.0;}
 export function ControllableParameters(){
 	return [
-		{"property":"LightingMode", "label":"Lighting Mode", "type":"combobox", "values":["Canvas", "Forced"], "default":"Canvas"},
-		{"property":"forcedColor", "label":"Forced Color", "min":"0", "max":"360", "type":"color", "default":"009bde"},
-		{"property":"EndpointMode", "label":"Endpoint Mode", "type":"combobox", "values":["Corsair", "Arduino"], "default":"Corsair"},
+		{"property":"LightingMode", "group":"lighting", "label":"Lighting Mode", "type":"combobox", "values":["Canvas", "Forced"], "default":"Canvas"},
+		{"property":"forcedColor", "group":"lighting", "label":"Forced Color", "min":"0", "max":"360", "type":"color", "default":"009bde"},
+		{"property":"EndpointMode", "group":"", "label":"Endpoint Mode", "type":"combobox", "values":["Corsair", "Arduino"], "default":"Corsair"},
 	];
 }
 

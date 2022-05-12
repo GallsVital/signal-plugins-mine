@@ -9,46 +9,46 @@ export function DefaultScale(){return 8.0;}
 export function ControllableParameters(){
 	return [
 
-		{"property":"Zone1Color", "label":"12v RGB Header 1 Color", "min":"0", "max":"360", "type":"color", "default":"009bde"},
-		{"property":"Zone1Mode", "label":"12v RGB Header 1 Mode", "type":"combobox",
+		{"property":"Zone1Color", "group":"lighing", "label":"12v RGB Header 1 Color", "min":"0", "max":"360", "type":"color", "default":"009bde"},
+		{"property":"Zone1Mode", "group":"lighing", "label":"12v RGB Header 1 Mode", "type":"combobox",
 			"values":["Off", "Static", "Breathing", "Strobe", "Spectrum Cycle", "Wave", "Spring", "Stack", "Cram", "Scan", "Neon", "Water", "Rainbow"], "default":"Static"},
-		{"property":"Zone1Speed", "label":"12v RGB Header 1 Speed", "type":"number", "min":"0", "max":"255", "default":"80"},
+		{"property":"Zone1Speed", "group":"lighing", "label":"12v RGB Header 1 Speed", "type":"number", "min":"0", "max":"255", "default":"80"},
 
-		{"property":"Zone2Color", "label":"12v RGB Header 2 Color", "min":"0", "max":"360", "type":"color", "default":"009bde"},
-		{"property":"Zone2Mode", "label":"12v RGB Header 2 Mode", "type":"combobox",
+		{"property":"Zone2Color", "group":"lighing", "label":"12v RGB Header 2 Color", "min":"0", "max":"360", "type":"color", "default":"009bde"},
+		{"property":"Zone2Mode", "group":"lighing", "label":"12v RGB Header 2 Mode", "type":"combobox",
 			"values":["Off", "Static", "Breathing", "Strobe", "Spectrum Cycle", "Wave", "Spring", "Stack", "Cram", "Scan", "Neon", "Water", "Rainbow"], "default":"Static"},
-		{"property":"Zone2Speed", "label":"12v RGB Header 2 Speed", "type":"number", "min":"0", "max":"255", "default":"80"},
+		{"property":"Zone2Speed", "group":"lighing", "label":"12v RGB Header 2 Speed", "type":"number", "min":"0", "max":"255", "default":"80"},
 
-		{"property":"Zone3Color", "label":"5v ARGB Header 1 Color", "min":"0", "max":"360", "type":"color", "default":"009bde"},
-		{"property":"Zone3Mode", "label":"5v ARGB Header 1 Mode", "type":"combobox",
+		{"property":"Zone3Color", "group":"lighing", "label":"5v ARGB Header 1 Color", "min":"0", "max":"360", "type":"color", "default":"009bde"},
+		{"property":"Zone3Mode", "group":"lighing", "label":"5v ARGB Header 1 Mode", "type":"combobox",
 			"values":["Off", "Static", "Breathing", "Strobe", "Spectrum Cycle", "Wave", "Spring", "Stack", "Cram", "Scan", "Neon", "Water", "Rainbow"], "default":"Static"},
-		{"property":"Zone3Speed", "label":"5v ARGB Header 2 Speed", "type":"number", "min":"0", "max":"255", "default":"80"},
+		{"property":"Zone3Speed", "group":"lighing", "label":"5v ARGB Header 2 Speed", "type":"number", "min":"0", "max":"255", "default":"80"},
 
-		{"property":"Zone4Color", "label":"5v ARGB Header 2 Color", "min":"0", "max":"360", "type":"color", "default":"009bde"},
-		{"property":"Zone4Mode", "label":"5v ARGB Header 2 Mode", "type":"combobox",
+		{"property":"Zone4Color", "group":"lighing", "label":"5v ARGB Header 2 Color", "min":"0", "max":"360", "type":"color", "default":"009bde"},
+		{"property":"Zone4Mode", "group":"lighing", "label":"5v ARGB Header 2 Mode", "type":"combobox",
 			"values":["Off", "Static", "Breathing", "Strobe", "Spectrum Cycle", "Wave", "Spring", "Stack", "Cram", "Scan", "Neon", "Water", "Rainbow"], "default":"Static"},
-		{"property":"Zone4Speed", "label":"5v ARGB Header 2 Speed", "type":"number", "min":"0", "max":"255", "default":"80"},
+		{"property":"Zone4Speed", "group":"lighing", "label":"5v ARGB Header 2 Speed", "type":"number", "min":"0", "max":"255", "default":"80"},
 
 
-		{"property":"Zone5Color", "label":"PCH Color", "min":"0", "max":"360", "type":"color", "default":"009bde"},
-		{"property":"Zone5Mode", "label":"PCH Mode", "type":"combobox",
+		{"property":"Zone5Color", "group":"lighing", "label":"PCH Color", "min":"0", "max":"360", "type":"color", "default":"009bde"},
+		{"property":"Zone5Mode", "group":"lighing", "label":"PCH Mode", "type":"combobox",
 			"values":["Off", "Static", "Breathing", "Strobe", "Spectrum Cycle", "Wave", "Spring", "Stack", "Cram", "Scan", "Neon", "Water", "Rainbow"], "default":"Static"},
-		{"property":"Zone5Speed", "label":"IO Speed", "type":"number", "min":"0", "max":"255", "default":"80"},
+		{"property":"Zone5Speed", "group":"lighing", "label":"IO Speed", "type":"number", "min":"0", "max":"255", "default":"80"},
 
-		{"property":"Zone6Color", "label":"IO Color", "min":"0", "max":"360", "type":"color", "default":"009bde"},
-		{"property":"Zone6Mode", "label":"IO Mode", "type":"combobox",
+		{"property":"Zone6Color", "group":"lighing", "label":"IO Color", "min":"0", "max":"360", "type":"color", "default":"009bde"},
+		{"property":"Zone6Mode", "group":"lighing", "label":"IO Mode", "type":"combobox",
 			"values":["Off", "Static", "Breathing", "Strobe", "Spectrum Cycle", "Wave", "Spring", "Stack", "Cram", "Scan", "Neon", "Water", "Rainbow"], "default":"Static"},
-		{"property":"Zone6Speed", "label":"IO Speed", "type":"number", "min":"0", "max":"255", "default":"80"},
+		{"property":"Zone6Speed", "group":"lighing", "label":"IO Speed", "type":"number", "min":"0", "max":"255", "default":"80"},
 
-		{"property":"Zone7Color", "label":"PCB Color", "min":"0", "max":"360", "type":"color", "default":"009bde"},
-		{"property":"Zone7Mode", "label":"PCB Mode", "type":"combobox",
+		{"property":"Zone7Color", "group":"lighing", "label":"PCB Color", "min":"0", "max":"360", "type":"color", "default":"009bde"},
+		{"property":"Zone7Mode", "group":"lighing", "label":"PCB Mode", "type":"combobox",
 			"values":["Off", "Static", "Breathing", "Strobe", "Spectrum Cycle", "Wave", "Spring", "Stack", "Cram", "Scan", "Neon", "Water", "Rainbow"], "default":"Static"},
-		{"property":"Zone7Speed", "label":"PCB Speed", "type":"number", "min":"0", "max":"255", "default":"80"},
+		{"property":"Zone7Speed", "group":"lighing", "label":"PCB Speed", "type":"number", "min":"0", "max":"255", "default":"80"},
 
-		{"property":"Zone8Color", "label":"Audio Color", "min":"0", "max":"360", "type":"color", "default":"009bde"},
-		{"property":"Zone8Mode", "label":"Audio Mode", "type":"combobox",
+		{"property":"Zone8Color", "group":"lighing", "label":"Audio Color", "min":"0", "max":"360", "type":"color", "default":"009bde"},
+		{"property":"Zone8Mode", "group":"lighing", "label":"Audio Mode", "type":"combobox",
 			"values":["Off", "Static", "Breathing", "Strobe", "Spectrum Cycle", "Wave", "Spring", "Stack", "Cram", "Scan", "Neon", "Water", "Rainbow"], "default":"Static"},
-		{"property":"Zone8Speed", "label":"Audio Speed", "type":"number", "min":"0", "max":"255", "default":"80"},
+		{"property":"Zone8Speed", "group":"lighing", "label":"Audio Speed", "type":"number", "min":"0", "max":"255", "default":"80"},
 
 	];
 }
