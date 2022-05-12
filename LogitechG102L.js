@@ -7,7 +7,7 @@ export function DefaultPosition(){return [240, 120];}
 export function DefaultScale(){return 4.0;}
 export function ControllableParameters(){
 	return [
-		{"property":"Ledoff", "label":"Disable Led", "type":"boolean", "default":"false"},
+		{"property":"Ledoff", "group":"", "label":"Disable Led", "type":"boolean", "default":"false"},
 		{"property":"shutdownColor", "group":"lighting", "label":"Shutdown Color", "min":"0", "max":"360", "type":"color", "default":"009bde"},
 		{"property":"LightingMode", "group":"lighting", "label":"Lighting Mode", "type":"combobox", "values":["Canvas", "Forced"], "default":"Canvas"},
 		{"property":"forcedColor", "group":"lighting", "label":"Forced Color", "min":"0", "max":"360", "type":"color", "default":"009bde"},
