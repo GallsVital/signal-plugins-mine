@@ -59,6 +59,8 @@ export function DeviceMessages() {
 }
 export function DeviceMessage() { return ["Limited Functionality", "Due to firmware limitations this device is limited to matching Polychrome functionality"]; }
 
+export function SupportsSubdevices(){ return true; }
+
 const ModeDict = {
 	"Static" : 1,
 	"Breathing" : 2,
