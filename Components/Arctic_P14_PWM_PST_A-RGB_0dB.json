@@ -1,0 +1,29 @@
+{
+    "ProductName": "Arctic P14 PWM PST A-RGB 0dB",
+    "DisplayName": "Arctic P14 PWM PST A-RGB 0dB - 12 LED",
+    "Brand" : "Arctic",
+    "Type" : "Fan",
+    "LedCount" : 12,
+    "Width": 6,
+    "Height": 6,
+    "LedMapping" : [
+        3,1,
+       5,   0,
+      7,     2,
+     9,      4,
+     11,     6,
+       10, 8
+        ],
+    "LedCoordinates" : [
+        [2,0],[3,0],
+        [1,1],			[4,1],
+    [0,2],					[5,2],
+    [0,3],					[5,3],
+        [1,4],			[4,4],
+            [2,5],[3,5]
+    ],
+    "LedNames" : [
+        "Fan Led 1","Fan Led 2","Fan Led 3","Fan Led 4","Fan Led 5","Fan Led 6","Fan Led 7","Fan Led 8","Fan Led 9","Fan Led 10","Fan Led 11","Fan Led 12"
+    ],
+    "Image": ""
+}
