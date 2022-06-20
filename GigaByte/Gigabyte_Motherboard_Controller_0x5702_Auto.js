@@ -359,23 +359,28 @@ function SetMotherboardName(){
 function UpdateARGBChannels(Channel, shutdown = false) {
 	let ChannelLedCount = device.channel(ChannelArray[Channel][0]).LedCount();
 
+
 	if(device.getLedCount() !== CurrentLedCount){
 		CurrentLedCount = device.getLedCount();
 		SetLedCounts();
 	}
+
 	let RGBData = [];
+	let componentChannel = device.channel(ChannelArray[Channel][0]);
 
 	if(LightingMode  === "Forced"){
 		RGBData = device.createColorArray(forcedColor, ChannelLedCount, "Inline", RGBconfig);
 
-	}else if(device.getLedCount() === 0){
-		ChannelLedCount = 40;
+	}else if(componentChannel.shouldPulseColors()){
+		ChannelLedCount = 80;
 
-		let pulseColor = device.getChannelPulseColor(ChannelArray[Channel][0], ChannelLedCount);
+		let pulseColor = device.getChannelPulseColor(ChannelArray[Channel][0]);
+		device.log(pulseColor);
+
 		RGBData = device.createColorArray(pulseColor, ChannelLedCount, "Inline", RGBconfig);
 
 	}else{
-		RGBData = device.channel(ChannelArray[Channel][0]).getColors("Inline", RGBconfig);
+		RGBData = componentChannel.getColors("Inline", RGBconfig);
 	}
 
 	StreamDirectColors(RGBData, ChannelLedCount, vDLED_Zones[Channel]);

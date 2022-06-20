@@ -242,7 +242,7 @@ function  getChannelColors(Channel, ledcount, shutdown = false) {
 	if(LightingMode === "Forced") {
 		RGBData = device.createColorArray(forcedColor, ledcount, "Inline", "RBG");
 
-	} else if(device.getLedCount() == 0) {
+	} else if(device.shouldPulseColors()) {
 		ledcount = 80;
 
 		let pulseColor = device.getChannelPulseColor(ChannelArray[Channel][0], ledcount);

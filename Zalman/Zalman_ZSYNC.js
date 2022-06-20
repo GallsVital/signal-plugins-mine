@@ -95,7 +95,7 @@ function SendChannel(Channel) {
 	if(LightingMode === "Forced"){
 		ColorData = device.createColorArray(forcedColor, ChannelLedCount, "Seperate");
 
-	}else if(device.getLedCount() == 0){
+	}else if(device.shouldPulseColors()){
 		ChannelLedCount = 80;
 
 		let pulseColor = device.getChannelPulseColor(ChannelArray[Channel][0], ChannelLedCount);

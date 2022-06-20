@@ -103,20 +103,21 @@ export function LedPositions() {
 
 function SendChannel(Channel, shutdown = false) {
 	let ChannelLedCount = device.channel(ChannelArray[Channel][0]).LedCount();
+	let componentChannel = device.channel(ChannelArray[Channel][0]);
 
 	let ColorData = [];
 
 	if(LightingMode === "Forced"){
 		ColorData = device.createColorArray(forcedColor, ChannelLedCount, "Seperate");
+	}else if(componentChannel.shouldPulseColors()){
 
-	}else if(device.getLedCount() == 0){
-		ChannelLedCount = 80;
+		ChannelLedCount = 120;
 
 		let pulseColor = device.getChannelPulseColor(ChannelArray[Channel][0], ChannelLedCount);
 		ColorData = device.createColorArray(pulseColor, ChannelLedCount, "Seperate");
 
 	}else{
-		ColorData = device.channel(ChannelArray[Channel][0]).getColors("Seperate");
+		ColorData = componentChannel.getColors("Seperate");
 	}
 
 	let RedChannelData = ColorData[0];

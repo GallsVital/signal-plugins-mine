@@ -57,7 +57,7 @@ function SendChannel(Channel, shutdown = false) {
 		RGBData = device.createColorArray(shutdownColor, ChannelLedCount, "Inline", "RBG");
 	} else if(LightingMode === "Forced") {
 		RGBData = device.createColorArray(forcedColor, ChannelLedCount, "Inline", "RBG");
-	} else if(device.getLedCount() == 0) {
+	} else if(device.shouldPulseColors()) {
 		ChannelLedCount = 90;
 
 		let pulseColor = device.getChannelPulseColor(ChannelArray[Channel][0], ChannelLedCount);
