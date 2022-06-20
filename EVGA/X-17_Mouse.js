@@ -39,6 +39,7 @@ export function Render()
     Apply(2);
 }
 
+
 function sendZone(zone, shutdown = false)
 {
     var packet = []
@@ -93,13 +94,12 @@ function Apply(zone)
     packet[0x06] = 0x01;
     packet[0x07] = 0x01;
 
-
     device.send_report(packet,40);
 }
 
 export function Validate(endpoint)
 {
-    return endpoint.interface === 1;
+    return endpoint.interface === 1 && endpoint.usage === 0x004b && endpoint.usage_page === 0x0008;
 }
 
 function hexToRgb(hex)
