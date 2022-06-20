@@ -156,6 +156,10 @@ function PollFans() {
 		return;
 	}
 
+	if(ConnectedFans.length === 0){
+		return;
+	}
+
 	savedPollFanTimer = Date.now();
 
 	if(device.fanControlDisabled()){
@@ -227,7 +231,7 @@ function ClearReadBuffer(timeout = 10){
 	device.flush();
 
 	while(device.getLastReadSize() > 0){
-		device.readTimeout([0x00], 17, timeout);
+		device.read([0x00], 17, timeout);
 		count++;
 		readCounts.push(device.getLastReadSize());
 	}
@@ -364,7 +368,7 @@ function GetFanConfiguration(){
 	device.flush();
 	device.write(packet, 65);
 	packet = device.read(packet, 17);
-	device.log(packet);
+	//device.log(packet);
 
 	return packet.slice(2, 8);
 }

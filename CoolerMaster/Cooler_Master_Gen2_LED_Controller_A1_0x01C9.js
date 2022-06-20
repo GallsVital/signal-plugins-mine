@@ -111,7 +111,7 @@ function SendChannel(Channel,shutdown = false, GEN2 = false)
 	{
 		RGBData = device.createColorArray(forcedColor, ChannelLedCount, "Inline");
 	}
-	else if(componentChannel.shouldPulseColors()())
+	else if(componentChannel.shouldPulseColors())
 	{
 		ChannelLedCount = GEN2 ? Gen2ChLedLimit : Gen1ChLedLimit;
 		var pulseColor = device.getChannelPulseColor(ChannelArray[Channel], ChannelLedCount);
@@ -122,7 +122,7 @@ function SendChannel(Channel,shutdown = false, GEN2 = false)
 		RGBData = device.channel(ChannelArray[Channel]).getColors("Inline");
 	}
 	
-	if(!GEN2 || componentChannel.shouldPulseColors()())
+	if(!GEN2 || componentChannel.shouldPulseColors())
 	{
 		for(var Packets = 0; Packets <= 2; Packets++)
 		{
