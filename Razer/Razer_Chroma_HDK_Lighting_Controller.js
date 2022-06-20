@@ -109,12 +109,13 @@ function ReturnToHardwareControl(){
 function SendChannel(Channel, shutdown=false){
 	let ChannelLedCount = device.channel(ChannelArray[Channel].Name).ledCount;
 	let RGBData = [];
+	let componentChannel = device.channel(ChannelArray[Channel][0]);
 
 	if(shutdown){
 		RGBData = device.createColorArray(shutdownColor, ChannelLedCount, "Inline");
 	}else if(LightingMode === "Forced"){
 		RGBData = device.createColorArray(forcedColor, ChannelLedCount, "Inline");
-	}else if(device.shouldPulseColors()){
+	}else if(componentChannel.shouldPulseColors()()){
 		ChannelLedCount = LedsPerChannel;
 
 		let pulseColor = device.getChannelPulseColor(ChannelArray[Channel].Name, ChannelLedCount);

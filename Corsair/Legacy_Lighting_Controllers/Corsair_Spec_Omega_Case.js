@@ -105,6 +105,7 @@ function Send30(channel) {
 
 function SendChannel(Channel) {
 	let ChannelLedCount = device.channel(ChannelArray[Channel][0]).LedCount();
+	let componentChannel = device.channel(ChannelArray[Channel][0]);
 
 
 	let ColorData = [];
@@ -112,7 +113,7 @@ function SendChannel(Channel) {
 	if(LightingMode === "Forced"){
 		ColorData = device.createColorArray(forcedColor, ChannelLedCount, "Seperate");
 
-	}else if(device.shouldPulseColors()){
+	}else if(componentChannel.shouldPulseColors()()){
 		ChannelLedCount = 120;
 
 		let pulseColor = device.getChannelPulseColor(ChannelArray[Channel][0], ChannelLedCount);

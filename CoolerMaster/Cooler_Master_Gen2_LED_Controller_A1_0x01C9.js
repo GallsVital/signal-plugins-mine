@@ -100,6 +100,7 @@ export function Shutdown()
 function SendChannel(Channel,shutdown = false, GEN2 = false)
 {
 	var ChannelLedCount = device.channel(ChannelArray[Channel]).ledCount;
+	let componentChannel = device.channel(ChannelArray[Channel][0]);
 
 	var RGBData = [];
 	if(shutdown)
@@ -110,7 +111,7 @@ function SendChannel(Channel,shutdown = false, GEN2 = false)
 	{
 		RGBData = device.createColorArray(forcedColor, ChannelLedCount, "Inline");
 	}
-	else if(device.shouldPulseColors())
+	else if(componentChannel.shouldPulseColors()())
 	{
 		ChannelLedCount = GEN2 ? Gen2ChLedLimit : Gen1ChLedLimit;
 		var pulseColor = device.getChannelPulseColor(ChannelArray[Channel], ChannelLedCount);
@@ -121,7 +122,7 @@ function SendChannel(Channel,shutdown = false, GEN2 = false)
 		RGBData = device.channel(ChannelArray[Channel]).getColors("Inline");
 	}
 	
-	if(!GEN2 || device.shouldPulseColors())
+	if(!GEN2 || componentChannel.shouldPulseColors()())
 	{
 		for(var Packets = 0; Packets <= 2; Packets++)
 		{

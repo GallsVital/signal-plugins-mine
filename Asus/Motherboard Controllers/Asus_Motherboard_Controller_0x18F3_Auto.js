@@ -271,13 +271,14 @@ function Fetch12VHeaderColors(shutdown = false){
 function SendARGBChannel(ChannelIdx, shutdown = false) {
 	//Fetch Colors
 	let ChannelLedCount = device.channel(ChannelArray[ChannelIdx][0]).LedCount();
+	let componentChannel = device.channel(ChannelArray[ChannelIdx][0]);
 
 	let RGBData = [];
 
 	if(LightingMode === "Forced"){
 		RGBData = device.createColorArray(forcedColor, ChannelLedCount, "Inline", RGBconfig);
 
-	}else if(device.shouldPulseColors()){
+	}else if(componentChannel.shouldPulseColors()()){
 		ChannelLedCount = Device_PulseLedCount;
 
 		let pulseColor = device.getChannelPulseColor(ChannelArray[ChannelIdx][0], ChannelLedCount);

@@ -60,13 +60,14 @@ export function Shutdown() {
 
 function SendChannel(Channel) {
 	let ChannelLedCount = device.channel(ChannelArray[Channel][0]).ledCount;
+	let componentChannel = device.channel(ChannelArray[Channel][0]);
 
 	let RGBData = [];
 
 	if(LightingMode === "Forced"){
 		RGBData = device.createColorArray(forcedColor, ChannelLedCount, "Inline");
 
-	}else if(device.shouldPulseColors()){
+	}else if(componentChannel.shouldPulseColors()()){
 		ChannelLedCount = 40;
 
 		let pulseColor = device.getChannelPulseColor(ChannelArray[Channel][0], ChannelLedCount);

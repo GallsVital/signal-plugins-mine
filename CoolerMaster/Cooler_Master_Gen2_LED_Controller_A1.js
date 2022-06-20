@@ -94,6 +94,7 @@ export function Shutdown() {
 
 function SendChannel(Channel, shutdown = false, GEN2 = false) {
 	let ChannelLedCount = device.channel(ChannelArray[Channel]).ledCount;
+	let componentChannel = device.channel(ChannelArray[Channel][0]);
 
 	let RGBData = [];
 
@@ -101,7 +102,7 @@ function SendChannel(Channel, shutdown = false, GEN2 = false) {
 		RGBData = device.createColorArray(shutdownColor, ChannelLedCount, "Inline");
 	} else if(LightingMode === "Forced") {
 		RGBData = device.createColorArray(forcedColor, ChannelLedCount, "Inline");
-	} else if(device.shouldPulseColors()) {
+	} else if(componentChannel.shouldPulseColors()()) {
 		ChannelLedCount = GEN2 ? Gen2ChLedLimit : Gen1ChLedLimit;
 
 		let pulseColor = device.getChannelPulseColor(ChannelArray[Channel], ChannelLedCount);
@@ -110,7 +111,7 @@ function SendChannel(Channel, shutdown = false, GEN2 = false) {
 		RGBData = device.channel(ChannelArray[Channel]).getColors("Inline");
 	}
 
-	if(!GEN2 || device.shouldPulseColors()) {
+	if(!GEN2 || componentChannel.shouldPulseColors()()) {
 		for(var Packets = 0; Packets <= 2; Packets++) {
 			var packet = [];
 			packet[0] = 0x00;

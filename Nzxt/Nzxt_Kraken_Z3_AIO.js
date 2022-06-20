@@ -204,12 +204,13 @@ function StreamLightingPacketChanneled(count, data, channel){
 function sendchannel1Colors(Channel, shutdown = false){
 
     let ChannelLedCount = device.channel(ChannelArray[Channel][0]).LedCount();
+	let componentChannel = device.channel(ChannelArray[Channel][0]);
 
     let RGBData = []
     if(LightingMode == "Forced"){
         RGBData = device.createColorArray(forcedColor, ChannelLedCount, "Inline", "GRB");
 
-    }else if(device.shouldPulseColors()){
+    }else if(componentChannel.shouldPulseColors()()){
         ChannelLedCount = 40;
         let pulseColor = device.getChannelPulseColor(ChannelArray[Channel][0], ChannelLedCount);
         RGBData = device.createColorArray(pulseColor, ChannelLedCount, "Inline", "GRB");
