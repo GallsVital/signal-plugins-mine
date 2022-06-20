@@ -138,10 +138,11 @@ export function Initialize() {
 	Corsair_Get_Firmware();
 
 	GetFanSettings();
-	
+
 	SetFanLedCount();
 
 }
+
 function Corsair_Get_Firmware(){
 	let data = Corsair_GetPacket(CORSAIR_FIRMWARE);
 
@@ -332,7 +333,7 @@ function GetColors() {
 	if(LightingMode  === "Forced") {
 		ChannelData = device.createColorArray(forcedColor, ChannelLedCount, "Inline");
 
-	} else if(device.getLedCount() === 0) {
+	} else if(device.channel(ChannelArray[1][0]).shouldPulseColors()) {
 		ChannelLedCount = 36 * 3;
 
 		let pulseColor = device.getChannelPulseColor(ChannelArray[1][0], ChannelLedCount);
@@ -357,7 +358,7 @@ function GetColors() {
 	if(LightingMode  === "Forced") {
 		ChannelData = device.createColorArray(forcedColor, ChannelLedCount, "Inline");
 
-	} else if(device.getLedCount() === 0) {
+	} else if(device.channel(ChannelArray[0][0]).shouldPulseColors()) {
 		ChannelLedCount = 36 * 3;
 
 		let pulseColor = device.getChannelPulseColor(ChannelArray[0][0], ChannelLedCount);

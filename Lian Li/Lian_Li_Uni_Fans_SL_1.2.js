@@ -280,7 +280,7 @@ function  getChannelColors(Channel,shutdown = false)
         RGBData = device.createColorArray(forcedColor, ChannelLedCount, "Inline", "RBG");
 
     }
-    else if(componentChannel.shouldPulseColors()()){
+    else if(componentChannel.shouldPulseColors()){
         ChannelLedCount = 64;
         let pulseColor = device.getChannelPulseColor(ChannelArray[Channel][0], ChannelLedCount);
         RGBData = device.createColorArray(pulseColor, ChannelLedCount, "Inline", "RBG");

@@ -265,7 +265,7 @@ function sendColor(shutdown = false){
 	if(LightingMode === "Forced"){
 		ColorData = device.createColorArray(forcedColor, ChannelLedCount, "Inline", "BGR");
 
-	}else if(componentChannel.shouldPulseColors()()){
+	}else if(componentChannel.shouldPulseColors()){
 		ChannelLedCount = 16;
 
 		let pulseColor = device.getChannelPulseColor(ChannelArray[0][0], ChannelLedCount);

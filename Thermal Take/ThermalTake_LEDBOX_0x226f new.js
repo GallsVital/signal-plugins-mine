@@ -1,6 +1,6 @@
 export function Name() { return "ThermalTake LedBox"; }
 export function VendorId() { return 0x264A; }
-export function ProductId() { return 0x2263; }
+export function ProductId() { return 0x226f; }
 export function Publisher() { return "WhirlwindFX"; }
 export function Size() { return [1, 1]; }
 export function Type() { return "Hid"; }
@@ -8,11 +8,11 @@ export function DefaultPosition(){return [0, 0];}
 export function DefaultScale(){return 8.0;}
 export function ControllableParameters(){
 	return [
-		{"property":"shutdownColor", "group":"lighting", "label":"Shutdown Color", "min":"0", "max":"360", "type":"color", "default":"009bde"},
-		{"property":"LightingMode", "group":"lighting", "label":"Lighting Mode", "type":"combobox", "values":["Canvas", "Forced"], "default":"Canvas"},
-		{"property":"forcedColor", "group":"lighting", "label":"Forced Color", "min":"0", "max":"360", "type":"color", "default":"009bde"},
-		{"property":"CustomSize", "group":"", "label":"Custom Strip Size", "type":"number", "min":"1", "max":"80", "default":"10"},
-		{"property":"FanSpeedPercent", "group":"", "label":"Fan Speed Percent", "type":"number", "min":"20", "max":"100", "default":"60"},
+		{"property":"shutdownColor", "label":"Shutdown Color", "min":"0", "max":"360", "type":"color", "default":"009bde"},
+		{"property":"LightingMode", "label":"Lighting Mode", "type":"combobox", "values":["Canvas", "Forced"], "default":"Canvas"},
+		{"property":"forcedColor", "label":"Forced Color", "min":"0", "max":"360", "type":"color", "default":"009bde"},
+		{"property":"CustomSize", "label":"Custom Strip Size", "type":"number", "min":"1", "max":"80", "default":"10"},
+		{"property":"FanSpeedPercent", "label":"Fan Speed Percent", "type":"number", "min":"20", "max":"100", "default":"60"},
 
 	];
 }
@@ -81,7 +81,6 @@ function sendPacketString(string, size){
 
 function Sendchannel(Channel, shutdown = false) {
 	let ChannelLedCount = device.channel(ChannelArray[Channel][0]).ledCount;
-	let componentChannel = device.channel(ChannelArray[Channel][0]);
 
 	let RGBData = [];
 
