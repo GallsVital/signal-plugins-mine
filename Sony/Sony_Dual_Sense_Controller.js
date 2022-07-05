@@ -12,6 +12,7 @@ export function ControllableParameters(){
         {"property":"forcedColor", "group":"lighting", "label":"Forced Color","min":"0","max":"360","type":"color","default":"009bde"},
         {"property":"LIntensity", "group":"", "label":"Left Trigger Intensity","step":"1", "type":"number","min":"0", "max":"100","default":"0"},
         {"property":"RIntensity", "group":"", "label":"Right Trigger Intensity","step":"1", "type":"number","min":"0", "max":"100","default":"0"},
+        {"property":"HapticsControl","group":"", "label":"Haptics Control","type":"boolean","default": "true"},
     ];
 }
 
@@ -55,7 +56,7 @@ function sendColors(shutdown = false)
     packet[8] = 0x7C;
     packet[9] = 0x02;
     packet[10] = 0x00;
-    packet[11] = 0x01;//0x00 turns it off 0x01 is linear, 0x02 clicks
+    packet[11] = HapticsControl;//0x00 turns it off 0x01 is linear, 0x02 clicks
     packet[13] = RIntensity;//Right Trigger Toughness //13-18 There's 7 force vectors
     packet[14] = RIntensity; 
     packet[15] = RIntensity;
@@ -63,7 +64,7 @@ function sendColors(shutdown = false)
     packet[17] = RIntensity;
     packet[18] = RIntensity;
     packet[21] = RIntensity;//So many force vectors
-    packet[22] = 0x01; //0x00 turns it off 0x01 is linear, 0x02 clicks
+    packet[22] = HapticsControl; //0x00 turns it off 0x01 is linear, 0x02 clicks
     packet[23] = 0x00;
     packet[24] = LIntensity;//Left Trigger 24-29
     packet[25] = LIntensity;
