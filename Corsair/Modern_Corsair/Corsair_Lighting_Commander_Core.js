@@ -114,30 +114,21 @@ export function Initialize() {
 		Device_Write_Length = 97;
 	}
 
-
-	let FanStates = Corsair.FetchFanStates();
-	ConnectedFans = [];
-	FanStates.forEach(function(state, iIdx){
-		if(state === Corsair.fanState.Initializing) {
-			device.log(`${FanControllerArray[iIdx]} is still being initialized by the controller`, {toFile: true});
-		}
-
-		if(state === Corsair.fanState.connected) {
-			device.log(`Found ${FanControllerArray[iIdx]}`, {toFile: true});
-			device.createFanControl(FanControllerArray[iIdx]);
-			ConnectedFans.push(iIdx);
-		}
-	});
-
 	Corsair.SetFanType();
 }
 
+function ConvertWordToBytes(word){
+	return {low: word & 0xFF, high: word >> 8}
+}
 
 export function Shutdown() {
 	Corsair.SetMode(Corsair.hardwareMode);
+	ConnectedFans = [];
+
 }
 
 export function Render() {
+
 	UpdateRGB();
 
 	PollFans();
@@ -148,7 +139,6 @@ function UpdateRGB(shutdown = false){
 	let [RGBData, TotalLedCount] = GetColors(shutdown);
 
 	Corsair.SendRGBData(RGBData, TotalLedCount, Device_Write_Length);
-
 }
 
 export function onpumpToggleChanged(){
@@ -255,13 +245,36 @@ function PollFans() {
 	if(device.fanControlDisabled()) {
 		return;
 	}
+
+	if(ConnectedFans.length === 0){
+		let FanStates = Corsair.FetchFanStates();
+		ConnectedFans = [];
+		FanStates.every(function(state, iIdx){
+			if(state === Corsair.fanState.Initializing) {
+				device.log(`${FanControllerArray[iIdx]} is still being initialized by the controller. Aborting Detection!`, {toFile: true});
+				ConnectedFans = [];
+
+				return false;
+			}
+
+			if(state === Corsair.fanState.connected) {
+				device.log(`Found ${FanControllerArray[iIdx]}`, {toFile: true});
+				device.createFanControl(FanControllerArray[iIdx]);
+				ConnectedFans.push(iIdx);
+			}
+
+			return true;
+		});
+	}
+
 	// Read Fan RPM
 	let FanSpeeds = Corsair.FetchFanRPM();
 	FanSpeeds.forEach(function (rpm, iIdx) {
 		if(rpm > 0){
-			//device.log(`${FanControllerArray[iIdx]} is running at ${rpm}rpm`);
-			device.setRPM(FanControllerArray[iIdx], rpm);
+			device.log(`${FanControllerArray[iIdx]} is running at ${rpm}rpm`);
 		}
+
+		device.setRPM(FanControllerArray[iIdx], rpm);
 	});
 
 	// Read Temperature Probes
@@ -512,6 +525,7 @@ class ModernCorsairProtocol{
 				}
 
 				this.WriteLighting(RGBData.length, RGBData.splice(0, BytesToSend));
+
 			}else{
 				this.StreamLighting(RGBData.splice(0, BytesToSend));
 			}
@@ -519,6 +533,7 @@ class ModernCorsairProtocol{
 			TotalBytes -= BytesToSend;
 			BytesSent += BytesToSend;
 		}
+
 	}
 
 	WriteLighting(LedCount, RGBData){

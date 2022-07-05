@@ -330,8 +330,7 @@ function Get4PinColors(){
 	if(LightingMode  === "Forced") {
 		ChannelData = device.createColorArray(forcedColor, ChannelLedCount, "Inline");
 
-
-	}else if(device.channel(ChannelArray[0][0]).overrideColors){
+	}else if(device.channel(ChannelArray[0][0]).shouldPulseColors()){
 		let components = device.channel(ChannelArray[0][0]).getComponentNames();
 
 		for(let i = 0; i < components.length; i++) {
@@ -352,12 +351,6 @@ function Get4PinColors(){
 		while(ChannelData.length < 34*6*3){
 			ChannelData.push(0);
 		}
-
-	} else if(device.channel(ChannelArray[0][0]).shouldPulseColors()) {
-		ChannelLedCount = 34 * 3;
-
-		let pulseColor = device.getChannelPulseColor(ChannelArray[0][0], ChannelLedCount);
-		ChannelData = device.createColorArray(pulseColor, ChannelLedCount, "Inline");
 
 	} else {
 		let components = device.channel(ChannelArray[0][0]).getComponentNames();
