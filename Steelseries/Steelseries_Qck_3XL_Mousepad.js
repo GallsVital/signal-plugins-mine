@@ -1,5 +1,6 @@
 export function Name() { return "Steelseries QcK Prism 3XL"; }
 export function VendorId() { return 0x1038; }
+export function Documentation(){ return "troubleshooting/steelseries"; }
 export function ProductId() { return 0x1516; }
 export function Publisher() { return "WhirlwindFX"; }
 export function Size() { return [2, 2]; }

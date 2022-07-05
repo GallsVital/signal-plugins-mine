@@ -1,5 +1,6 @@
 export function Name() { return "Logitech Pro TKL"; }
 export function VendorId() { return 0x046d; }
+export function Documentation(){ return "troubleshooting/logitech"; }
 export function ProductId() { return 0xc339; }
 export function Publisher() { return "WhirlwindFX"; }
 export function Size() { return [18, 7]; }

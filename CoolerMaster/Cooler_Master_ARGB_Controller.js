@@ -1,7 +1,8 @@
 
 export function Name() { return "Cooler Master ARGB Controller"; }
-export function VendorId() { return   0x2516;}//0x2516; }
-export function ProductId() { return   0x1011;}//0x1011; }
+export function VendorId() { return   0x2516;}
+export function Documentation(){ return "troubleshooting/coolermaster"; }
+export function ProductId() { return   0x1011;}
 export function Publisher() { return "WhirlwindFX"; }
 export function Size() { return [1, 1]; }
 export function DefaultPosition(){return [1, 1];}

@@ -1,5 +1,6 @@
 export function Name() { return "SteelSeries Apex 3 TKL"; }
 export function VendorId() { return 0x1038; }
+export function Documentation(){ return "troubleshooting/steelseries"; }
 export function ProductId() { return 0x1622; }
 export function Publisher() { return "WhirlwindFX"; }
 export function Size() { return [10, 3]; }

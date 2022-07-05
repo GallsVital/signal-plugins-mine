@@ -25,6 +25,7 @@ const vKeyPositions = [
 	[31, 0], [32, 0]
 ];
 export function DefaultComponentBrand() { return "Corsair";}
+export function Documentation(){ return "troubleshooting/corsair"; }
 
 const CORSAIR_LIGHTING_CONTROLLER_STREAM    = 0x32;
 const CORSAIR_LIGHTING_CONTROLLER_COMMIT    = 0x33;

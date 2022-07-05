@@ -1,5 +1,6 @@
 export function Name() { return "Logitech G635 Lightsync Headset"; }
 export function VendorId() { return 0x046d; }
+export function Documentation(){ return "troubleshooting/logitech"; }
 export function ProductId() { return 0x0a89;}
 export function Publisher() { return "TheDongster"; }
 export function Size() { return [2, 2]; }

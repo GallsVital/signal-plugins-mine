@@ -1,5 +1,6 @@
 export function Name() { return "ASUS Gladius II Core"; }
 export function VendorId() { return 0x0B05; }
+export function Documentation(){ return "troubleshooting/asus"; }
 export function ProductId() { return 0x18DD; }
 export function Publisher() { return "vermis"; }
 export function Size() { return [7,8]; }

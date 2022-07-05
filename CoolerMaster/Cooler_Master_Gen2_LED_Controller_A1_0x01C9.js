@@ -1,5 +1,7 @@
 ﻿export function Name() { return "Cooler Master Gen2 LED Controller A1"; }
-export function VendorId() { return 0x2516;}
+export function VendorId() { return 0x2516; }
+export function Documentation(){ return "troubleshooting/coolermaster"; }
+export function Documentation(){ return "troubleshooting/coolermaster"; }
 export function ProductId() { return 0x01c9;}
 export function Publisher() { return "FeuerSturm"; }
 export function Size() { return [1,1]; }

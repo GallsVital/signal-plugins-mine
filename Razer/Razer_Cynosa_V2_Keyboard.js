@@ -48,6 +48,7 @@ function CalculateCrc(report) {
 
 export function Name() { return "Razer Cynosa V2"; }
 export function VendorId() { return 0x1532; }
+export function Documentation(){ return "troubleshooting/razer"; }
 export function ProductId() { return 0x025E; }
 export function Publisher() { return "WhirlwindFX"; }
 export function Size() { return [22, 10]; }

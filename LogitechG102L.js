@@ -1,5 +1,6 @@
 export function Name() { return "Logitech G102 Lightsync"; }
 export function VendorId() { return 0x046d; }
+export function Documentation(){ return "troubleshooting/logitech"; }
 export function ProductId() { return 0x0000; }//0xc092
 export function Publisher() { return "Lightvortex"; }
 export function Size() { return [3, 3]; }

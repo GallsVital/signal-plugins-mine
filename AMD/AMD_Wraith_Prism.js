@@ -1,5 +1,6 @@
 export function Name() { return "AMD Wraith Prism"; }
 export function VendorId() { return 0x2516; }
+export function Documentation(){ return "troubleshooting/coolermaster"; }
 export function ProductId() { return 0x0051; }
 export function Publisher() { return "WhirlwindFX"; }
 export function Size() { return [5, 5]; }

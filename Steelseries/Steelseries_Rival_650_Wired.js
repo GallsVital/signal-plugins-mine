@@ -1,5 +1,6 @@
 export function Name() { return "SteelSeries Rival 650 Wired Mode"; }
 export function VendorId() { return 0x1038; }
+export function Documentation(){ return "troubleshooting/steelseries"; }
 export function ProductId() { return 0x172B; }
 export function Publisher() { return "WhirlwindFX"; }
 export function Size() { return [7, 7]; }

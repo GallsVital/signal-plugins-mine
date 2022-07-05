@@ -2,6 +2,7 @@ export function Name() { return "Steelseries QcK Prism"; }
 export function VendorId() { return  0x1038; }
 export function ProductId() { return 0x1507; }
 export function Publisher() { return "WhirlwindFX"; }
+export function Documentation(){ return "troubleshooting/steelseries"; }
 export function Size() { return [5, 5]; }
 export function DefaultPosition(){return [240, 120];}
 export function DefaultScale(){return 8.0;}

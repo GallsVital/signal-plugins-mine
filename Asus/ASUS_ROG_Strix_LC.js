@@ -1,6 +1,7 @@
 
 export function Name() { return "ASUS ROG Strix LC"; }
 export function VendorId() { return  0x0B05; }
+export function Documentation(){ return "troubleshooting/asus"; }
 export function ProductId() { return 0x879E;}
 export function Publisher() { return "WhirlwindFX"; }
 export function Size() { return [4, 4]; }

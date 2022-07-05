@@ -15,6 +15,7 @@ export function ControllableParameters(){
 
 	];
 }
+export function Documentation(){ return "troubleshooting/corsair"; }
 
 
 export function Initialize() {

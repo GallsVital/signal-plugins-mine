@@ -2,6 +2,7 @@ export function Name() { return "MSI MAG274QRF-QD"; }
 export function VendorId() { return 0x1462; }
 export function ProductId() { return 0x3fa4; }
 export function Publisher() { return "Derek Huber"; }
+export function Documentation(){ return "troubleshooting/logitech"; }
 export function Size() { return [12,1]; }
 export function DefaultPosition(){return [240,120]}
 export function DefaultScale(){return 8.0}

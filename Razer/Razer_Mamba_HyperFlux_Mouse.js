@@ -50,6 +50,7 @@ export function Name() { return "Razer Mamba HyperFlux MousePad"; }
 export function VendorId() { return  0x1532; } //0x1532; }
 export function ProductId() { return  0x0068;} //0x0068; }
 export function Publisher() { return "WhirlwindFX"; }
+export function Documentation(){ return "troubleshooting/razer"; }
 export function Size() { return [5, 5]; }
 export function Type() { return "Hid"; }
 export function DefaultPosition() {return [225, 120]; }

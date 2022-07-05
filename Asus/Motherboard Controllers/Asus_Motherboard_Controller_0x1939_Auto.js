@@ -20,6 +20,8 @@ export function ControllableParameters(){
 export function LedNames(){ return vLedNames; }
 export function LedPositions(){ return vLedPositions; }
 
+export function Documentation(){ return "troubleshooting/asus"; }
+
 export function Validate(endpoint) {
 	return endpoint.interface === 2 | -1;
 }

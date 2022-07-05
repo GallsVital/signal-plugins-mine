@@ -1,5 +1,6 @@
 export function Name() { return "Logitech G Pro Wireless Mouse"; }
 export function VendorId() { return 0x046d; }
+export function Documentation(){ return "troubleshooting/logitech"; }
 export function ProductId() { return 0xC088; }
 export function Publisher() { return "WhirlwindFX"; }
 export function Size() { return [3, 3]; }

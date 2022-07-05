@@ -50,6 +50,8 @@ export function ControllableParameters(){
     ];
 }
 
+export function Documentation(){ return "troubleshooting/corsair"; }
+
 var vLedNames = ["Scroll Zone", "Dpi Zone", "Logo Zone"];
 
 var vLedPositions = [[1,0],[1,1],[1,2]];

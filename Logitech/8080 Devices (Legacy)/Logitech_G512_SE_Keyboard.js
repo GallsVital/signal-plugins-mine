@@ -1,5 +1,6 @@
 export function Name() { return "Logitech G512 SE"; }
 export function VendorId() { return 0x046d; }
+export function Documentation(){ return "troubleshooting/logitech"; }
 export function ProductId() { return 0xc342; }
 export function Publisher() { return "WhirlwindFX"; }
 export function Size() { return [21, 6]; }

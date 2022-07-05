@@ -48,6 +48,7 @@ function CalculateCrc(report) {
 
 export function Name() { return "Razer Tartarus Pro"; }
 export function VendorId() { return 0x1532; }
+export function Documentation(){ return "troubleshooting/razer"; }
 export function ProductId() { return 0x0244; }
 export function Publisher() { return "WhirlwindFX"; }
 export function Size() { return [6, 7]; }

@@ -48,6 +48,7 @@ function CalculateCrc(report) {
 
 export function Name() { return "Razer Cynosa Lite"; }
 export function VendorId() { return 0x1532; }
+export function Documentation(){ return "troubleshooting/razer"; }
 export function ProductId() { return 0x023F; }
 export function Publisher() { return "WhirlwindFX"; }
 export function Size() { return [1, 1]; }

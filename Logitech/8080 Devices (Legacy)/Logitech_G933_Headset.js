@@ -1,5 +1,6 @@
 export function Name() { return "Logitech G933 Artemis Headset"; }
 export function VendorId() { return 0x046d; }
+export function Documentation(){ return "troubleshooting/logitech"; }
 export function ProductId() { return 0x0a5b;}
 export function Publisher() { return "TheDongster"; }
 export function Size() { return [3, 3]; }

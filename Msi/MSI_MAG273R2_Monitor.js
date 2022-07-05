@@ -2,6 +2,7 @@ export function Name() { return "MSI MAG 273R2"; }
 export function VendorId() { return 0x1462; }
 export function ProductId() { return 0x3fa4; }
 export function Publisher() { return "WhirlwindFX"; }
+export function Documentation(){ return "troubleshooting/logitech"; }
 export function Size() { return [9,1]; }
 export function DefaultPosition(){return [240,120]}
 export function DefaultScale(){return 8.0}

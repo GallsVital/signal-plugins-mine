@@ -1,7 +1,8 @@
 
 
 export function Name() { return "MSI Mystic Light Controller (162 Byte)"; }   //Should fit Z390 Pro Carbon 
-export function VendorId() { return  0x1462; }    
+export function VendorId() { return 0x1462; }
+export function Documentation(){ return "troubleshooting/msi"; }    
 // DO NOT PID SWAP THIS IF YOU DONT KNOW WHAT YOUR DOING
 export function ProductId() { return 0x7B17;} 
 // YOU CAN BRICK THESE MOTHERBOARDS RGB CONTROLLER WITH ONE WRONG PACKET

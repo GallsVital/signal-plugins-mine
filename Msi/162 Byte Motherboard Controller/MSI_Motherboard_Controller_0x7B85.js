@@ -1,7 +1,8 @@
 
 
 export function Name() { return "MSI B450 GAMING PRO CARBON AC (162 Byte)"; }
-export function VendorId() { return  0x1462; }
+export function VendorId() { return 0x1462; }
+export function Documentation(){ return "troubleshooting/msi"; }
 // DO NOT PID SWAP THIS IF YOU DONT KNOW WHAT YOUR DOING
 export function ProductId() { return 0x7B85;}
 // YOU CAN BRICK THESE MOTHERBOARDS RGB CONTROLLER WITH ONE WRONG PACKET

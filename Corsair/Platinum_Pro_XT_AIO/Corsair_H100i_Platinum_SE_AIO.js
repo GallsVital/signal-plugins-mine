@@ -55,6 +55,8 @@ export function ControllableParameters(){
 	];
 }
 export function DefaultComponentBrand() { return "Corsair";}
+export function Documentation(){ return "troubleshooting/corsair"; }
+
 
 const DeviceMaxLedLimit = 32;
 

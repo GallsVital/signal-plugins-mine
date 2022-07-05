@@ -48,6 +48,7 @@ function CalculateCrc(report) {
 
 export function Name() { return "Razer Mouse Bungee V3"; }
 export function VendorId() { return 0x1532; }
+export function Documentation(){ return "troubleshooting/razer"; }
 export function ProductId() { return 0x0F1D; }
 export function Publisher() { return "WhirlwindFX"; }
 export function Size() { return [6, 6]; }

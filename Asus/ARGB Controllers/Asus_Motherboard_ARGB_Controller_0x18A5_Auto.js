@@ -16,6 +16,8 @@ export function ControllableParameters(){
 	];
 }
 
+export function Documentation(){ return "troubleshooting/asus"; }
+
 //Channel Name, Led Limit
 const ChannelArray = [
 	["Channel 1", 120],

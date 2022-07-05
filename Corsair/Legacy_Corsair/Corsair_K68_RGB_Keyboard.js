@@ -15,6 +15,7 @@ export function ControllableParameters(){
 
 	];
 }
+export function Documentation(){ return "troubleshooting/corsair"; }
 
 function hexToRgb(hex) {
 	let result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);

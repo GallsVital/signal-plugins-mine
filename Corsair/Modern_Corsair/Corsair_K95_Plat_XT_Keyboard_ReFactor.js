@@ -14,6 +14,8 @@ export function ControllableParameters(){
 
 	];
 }
+export function Documentation(){ return "troubleshooting/corsair"; }
+
 export function LedNames() { return vKeyNames; }
 export function LedPositions() { return vKeyPositions; }
 export function Validate(endpoint) {

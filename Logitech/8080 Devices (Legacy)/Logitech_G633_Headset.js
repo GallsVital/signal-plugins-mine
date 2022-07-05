@@ -1,5 +1,6 @@
 export function Name() { return "Logitech G633 Headset"; }
-export function VendorId() { return 0x046D; }
+export function VendorId() { return 0x046d; }
+export function Documentation(){ return "troubleshooting/logitech"; }
 export function ProductId() { return 0x0A5C;}
 export function Publisher() { return "turulix"; }
 export function Size() { return [3, 3]; }

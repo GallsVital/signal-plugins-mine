@@ -1,5 +1,6 @@
 export function Name() { return "SteelSeries Arctis 5"; }
 export function VendorId() { return 0x1038; }
+export function Documentation(){ return "troubleshooting/steelseries"; }
 export function ProductId() { return 0x12AA; }
 export function Publisher() { return "WhirlwindFX"; }
 export function Size() { return [3, 2]; }

@@ -28,6 +28,7 @@ export function SupportsSubdevices(){ return true; }
 const DeviceMaxLedLimit = 204;
 export function LacksOnBoardLeds(){ return true;}
 export function DefaultComponentBrand() { return "Corsair";}
+export function Documentation(){ return "troubleshooting/corsair"; }
 
 //Channel Name, Led Limit
 let ChannelArray = [

@@ -11,6 +11,8 @@ export function ControllableParameters(){
 	];
 }
 
+export function Documentation(){ return "troubleshooting/corsair"; }
+
 export function Initialize() {
 	sendReportString("03 0F 01", 32);
 	sendReportString("03 10 01", 32);

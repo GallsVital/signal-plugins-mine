@@ -1,5 +1,6 @@
 export function Name() { return "NZXT Lift"; }
 export function VendorId() { return 0x1E71; }
+export function Documentation(){ return "troubleshooting/nzxt"; }
 export function ProductId() { return 0x2100; }
 export function Publisher() { return "WhirlwindFX"; }
 export function Size() { return [3, 4]; }

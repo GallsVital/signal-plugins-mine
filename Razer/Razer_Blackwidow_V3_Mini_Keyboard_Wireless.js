@@ -48,6 +48,7 @@ function CalculateCrc(report) {
 
 export function Name() { return "Razer Blackwidow V3 Mini"; }
 export function VendorId() { return 0x1532; }
+export function Documentation(){ return "troubleshooting/razer"; }
 export function ProductId() { return 0x0271; }
 export function Publisher() { return "WhirlwindFX"; }
 export function Size() { return [16, 6]; }

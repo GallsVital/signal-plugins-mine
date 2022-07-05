@@ -14,6 +14,8 @@ export function ControllableParameters(){
 		{"property":"forcedColor", "group":"lighting", "label":"Forced Color", "min":"0", "max":"360", "type":"color", "default":"009bde"},
 	];
 }
+export function Documentation(){ return "troubleshooting/corsair"; }
+
 let endpointVal;
 let savedStartUpValue = true;
 

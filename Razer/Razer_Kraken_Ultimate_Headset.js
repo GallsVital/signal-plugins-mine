@@ -13,6 +13,7 @@ function CalculateCrc(report) {
 
 export function Name() { return "Razer Kraken Ultimate Edition"; }
 export function VendorId() { return 0x1532; }
+export function Documentation(){ return "troubleshooting/razer"; }
 export function ProductId() { return 0x0527; }
 export function Publisher() { return "WhirlwindFX"; }
 export function Size() { return [2, 2]; }

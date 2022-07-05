@@ -1,5 +1,6 @@
 export function Name() { return "Razer Deathadder Essential"; }
 export function VendorId() { return 0x1532; }
+export function Documentation(){ return "troubleshooting/razer"; }
 export function ProductId() { return 0x0098; }
 export function Publisher() { return "WhirlwindFX"; }
 export function Size() { return [3, 3]; }

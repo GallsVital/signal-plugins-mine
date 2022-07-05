@@ -1,5 +1,6 @@
 export function Name() { return "Cooler Master A-RGB LED Small Controller"; }
-export function VendorId() { return 0x2516;}
+export function VendorId() { return 0x2516; }
+export function Documentation(){ return "troubleshooting/coolermaster"; }
 export function ProductId() { return 0x1000;}
 export function Publisher() { return "FeuerSturm"; }
 export function Size() { return [1, 1]; }

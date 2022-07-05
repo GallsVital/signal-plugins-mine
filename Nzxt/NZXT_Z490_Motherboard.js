@@ -94,6 +94,7 @@ const Custom = {
 
 export function Name() { return "NZXT Z490"; }
 export function VendorId() { return   0x1E71; }
+export function Documentation(){ return "troubleshooting/nzxt"; }
 export function ProductId() { return   0x200A; }
 export function Publisher() { return "WhirlwindFx"; }
 export function Size() { return [1, 1]; }

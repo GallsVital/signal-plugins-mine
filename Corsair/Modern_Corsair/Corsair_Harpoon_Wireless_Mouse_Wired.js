@@ -27,6 +27,8 @@ export function ControllableParameters(){
 	];
 }
 
+export function Documentation(){ return "troubleshooting/corsair"; }
+
 
 let savedDpi1;
 let vLedNames = ["Dpi Zone", "Logo Zone", ];

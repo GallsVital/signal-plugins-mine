@@ -2,6 +2,7 @@ export function Name() { return "EVGA X17 Mouse"; }
 export function VendorId() { return 0x3842; }
 export function ProductId() { return 0x240D; }
 export function Publisher() { return "WhirlwindFX"; }
+export function Documentation(){ return "troubleshooting/evga"; }
 export function Size() { return [4, 4]; }
 export function DefaultPosition(){return [240,120]}
 export function DefaultScale(){return 8.0}

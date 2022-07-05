@@ -1,5 +1,6 @@
 export function Name() { return "Logitech G19"; }
 export function VendorId() { return 0x046d; }
+export function Documentation(){ return "troubleshooting/logitech"; }
 export function ProductId() { return 0xc229; }
 export function Publisher() { return "HarD#9835"; }
 export function Size() { return [24, 9]; }

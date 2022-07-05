@@ -54,6 +54,9 @@ export function ControllableParameters(){
 		{"property":"FanSpeed",  "group":"", "label":"Fan Speed", "type":"combobox", "values":["Quiet", "Balanced", "Extreme"], "default":"Balanced"},
 	];
 }
+export function DefaultComponentBrand() { return "Corsair";}
+export function Documentation(){ return "troubleshooting/corsair"; }
+
 const DeviceMaxLedLimit = 32;
 
 //Channel Name, Led Limit

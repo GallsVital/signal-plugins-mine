@@ -1,5 +1,6 @@
 export function Name() { return "NZXT Kraken X2"; }
-export function VendorId() { return 0x1e71; }
+export function VendorId() { return 0x1E71; }
+export function Documentation(){ return "troubleshooting/nzxt"; }
 export function ProductId() { return 0x170E; }
 export function Publisher() { return "WhirlwindFX"; }
 export function Size() { return [9,9]; }

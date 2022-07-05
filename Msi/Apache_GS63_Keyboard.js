@@ -2,7 +2,7 @@ export function Name() { return "MSI GS63 Keyboard"; }
 export function VendorId() { return 0x1770; }
 export function ProductId() { return 0xff00; }
 export function Publisher() { return "WhirlwindFX"; }
-
+export function Documentation(){ return "troubleshooting/logitech"; }
 
 export function Size() {
 	return [9, 3];

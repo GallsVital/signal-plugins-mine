@@ -16,6 +16,8 @@ export function ControllableParameters(){
 	];
 }
 
+export function Documentation(){ return "troubleshooting/corsair"; }
+
 let vLedNames = ["Left Cans", "Right Can"];
 
 let vLedPositions = [

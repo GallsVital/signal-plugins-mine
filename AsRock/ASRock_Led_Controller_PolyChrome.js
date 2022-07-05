@@ -1,6 +1,7 @@
 export function Name() { return "ASRock LED Controller"; }
 export function VendorId() { return  0x26CE; }
 export function ProductId() { return 0x01A2;} // 0x01A2 Experimental
+export function Documentation(){ return "troubleshooting/asrock"; }
 export function Publisher() { return "WhirlwindFX"; }
 export function Size() { return [3, 3]; }
 export function Type() { return "Hid"; }

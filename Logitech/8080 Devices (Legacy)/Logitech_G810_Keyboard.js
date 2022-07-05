@@ -1,5 +1,6 @@
 export function Name() { return "Logitech G810"; }
 export function VendorId() { return 0x046d; }
+export function Documentation(){ return "troubleshooting/logitech"; }
 export function ProductId() { return 0xc331; }
 export function Publisher() { return "WhirlwindFX"; }
 export function Size() { return [24, 9]; }

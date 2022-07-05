@@ -48,6 +48,7 @@ function CalculateCrc(report) {
 
 export function Name() { return "Razer Naga Lefthanded"; }
 export function VendorId() { return 0x1532; }
+export function Documentation(){ return "troubleshooting/razer"; }
 export function ProductId() { return 0x008D; }
 export function Publisher() { return "Krenath"; }
 export function Size() { return [3, 3]; }

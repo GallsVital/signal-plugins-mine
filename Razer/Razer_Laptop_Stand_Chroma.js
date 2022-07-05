@@ -48,6 +48,7 @@ function CalculateCrc(report) {
 
 export function Name() { return "Razer Laptop Stand Chroma"; }
 export function VendorId() { return 0x1532; }
+export function Documentation(){ return "troubleshooting/razer"; }
 export function ProductId() { return 0x0f0D; }
 export function Publisher() { return "WhirlwindFX"; }
 export function Size() { return [15, 1]; }

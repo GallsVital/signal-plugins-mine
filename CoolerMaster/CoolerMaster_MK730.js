@@ -1,5 +1,6 @@
 export function Name() { return "CoolerMaster MK730"; }
 export function VendorId() { return 0x2516; }
+export function Documentation(){ return "troubleshooting/coolermaster"; }
 export function ProductId() { return 0x008F; }
 export function Publisher() { return "WhirlwindFX"; }
 export function Size() { return [19, 7]; }

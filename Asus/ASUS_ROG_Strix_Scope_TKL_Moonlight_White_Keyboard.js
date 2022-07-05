@@ -1,5 +1,6 @@
 export function Name() { return "ASUS ROG Strix Scope NX TKL Moonlight White"; }
 export function VendorId() { return 0x0B05; }
+export function Documentation(){ return "troubleshooting/asus"; }
 export function ProductId() { return 0x19D0; }
 export function Publisher() { return "WhirlwindFX"; }
 export function Size() { return [17, 7] }

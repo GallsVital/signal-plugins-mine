@@ -14,6 +14,7 @@ export function ControllableParameters(){
 		{"property":"layout", "group":"", "label":"Keyboard Layout", "type":"combobox", "values":["ANSI", "ISO"], "default":"ANSI"},
 	];
 }
+export function Documentation(){ return "troubleshooting/corsair"; }
 
 function hexToRgb(hex) {
 	let result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);

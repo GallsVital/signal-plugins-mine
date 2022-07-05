@@ -56,6 +56,7 @@ function CalculateCrc(report) {
 
 export function Name() { return "Razer Blackwidow Ultimate 2013/2014"; }
 export function VendorId() { return 0x1532; }
+export function Documentation(){ return "troubleshooting/razer"; }
 export function ProductId() { return 0x011A; }
 export function Publisher() { return "BlackSwan"; }
 export function Size() { return [10, 10]; }

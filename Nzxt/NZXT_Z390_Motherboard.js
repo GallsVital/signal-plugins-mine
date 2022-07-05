@@ -1,5 +1,6 @@
 export function Name() { return "NZXT Z390"; }
 export function VendorId() { return   0x1E71; }
+export function Documentation(){ return "troubleshooting/nzxt"; }
 export function ProductId() { return   0x2005; }
 export function Publisher() { return "ViperLord"; }
 export function Size() { return [1, 1]; }

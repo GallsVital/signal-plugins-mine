@@ -1,5 +1,6 @@
 export function Name() { return "Cooler Master MP860 Mouse Pad"; }
 export function VendorId() { return 0x2516; }
+export function Documentation(){ return "troubleshooting/coolermaster"; }
 export function ProductId() { return 0x006D; }
 export function Publisher() { return "WhirlwindFX"; }
 export function Size() { return [6, 6]; }

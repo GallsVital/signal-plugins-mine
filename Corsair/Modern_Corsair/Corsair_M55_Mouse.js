@@ -17,6 +17,8 @@ export function ControllableParameters(){
 	];
 }
 
+export function Documentation(){ return "troubleshooting/corsair"; }
+
 let savedDpi1;
 let vLedNames = ["DPI Zone", "Logo Zone"];
 let vLedPositions = [[1, 0], [1, 1]];

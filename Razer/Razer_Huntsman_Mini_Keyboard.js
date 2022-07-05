@@ -48,6 +48,7 @@ function CalculateCrc(report) {
 
 export function Name() { return "Razer Huntsman Mini"; }
 export function VendorId() { return 0x1532; }
+export function Documentation(){ return "troubleshooting/razer"; }
 export function ProductId() { return 0x0257; }
 export function Publisher() { return "WhirlwindFX"; }
 export function Size() { return [17, 6]; }

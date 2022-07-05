@@ -1,5 +1,6 @@
 export function Name() { return "SteelSeries Sensi Ten"; }
 export function VendorId() { return 0x1038; }
+export function Documentation(){ return "troubleshooting/steelseries"; }
 export function ProductId() { return 0x1832; }
 export function Publisher() { return "WhirlwindFX"; }
 export function Size() { return [3, 3]; }

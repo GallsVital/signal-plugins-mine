@@ -1,5 +1,6 @@
 export function Name() { return "CoolerMaster CK552 V2"; }
 export function VendorId() { return 0x2516; }
+export function Documentation(){ return "troubleshooting/coolermaster"; }
 export function ProductId() { return 0x007f; }
 export function Publisher() { return "WhirlwindFX"; }
 export function Size() { return [21, 6]; }

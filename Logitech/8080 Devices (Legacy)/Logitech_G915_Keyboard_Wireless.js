@@ -1,5 +1,6 @@
 export function Name() { return "Logitech G915 Wireless Mode"; }
 export function VendorId() { return 0x046d; }
+export function Documentation(){ return "troubleshooting/logitech"; }
 export function ProductId() { return 0xC541; }//0xC541
 export function Publisher() { return "WhirlwindFX"; }
 export function Size() { return [24, 9]; }

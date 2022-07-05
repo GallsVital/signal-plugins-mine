@@ -1,5 +1,6 @@
 export function Name() { return "Logitech G815 Lightsync"; }
 export function VendorId() { return 0x046d; }
+export function Documentation(){ return "troubleshooting/logitech"; }
 export function ProductId() { return 0xc33f; }
 export function Publisher() { return "WhirlwindFX"; } // Fixed by FreeBlack
 

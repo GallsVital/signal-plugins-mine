@@ -28,6 +28,8 @@ const CORSAIR_SOFTWARE_MODE = 0x02;
 
 export function SupportsSubdevices(){ return true; }
 export function DefaultComponentBrand() { return "Corsair";}
+export function Documentation(){ return "troubleshooting/corsair"; }
+
 const DeviceMaxLedLimit = 204;
 //Channel Name, Led Limit
 let ChannelArray = [

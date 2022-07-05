@@ -1,5 +1,6 @@
 export function Name() { return "SteelSeries Rival 3"; }
 export function VendorId() { return 0x1038; }
+export function Documentation(){ return "troubleshooting/steelseries"; }
 export function ProductId() { return 0x184C; }
 export function Publisher() { return "Rafee"; }
 export function Size() { return [4, 4]; }

@@ -8,6 +8,7 @@ let vLeds = [
 
 export function Name() { return "Razer Naga Chroma"; }
 export function VendorId() { return 0x1532; }
+export function Documentation(){ return "troubleshooting/razer"; }
 export function ProductId() { return 0x0053; }
 export function Publisher() { return "Kratheus"; }
 export function Size() { return [3, 3]; }

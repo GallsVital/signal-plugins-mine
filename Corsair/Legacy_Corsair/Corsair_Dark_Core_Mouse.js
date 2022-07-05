@@ -26,6 +26,8 @@ export function ControllableParameters(){
 		{"property":"dpi1", "group":"mouse", "label":"DPI", "type":"number", "min":"200", "max":"16000", "default":"800"},
 	];
 }
+export function Documentation(){ return "troubleshooting/corsair"; }
+
 let savedDpi1;
 
 function hexToRgb(hex) {

@@ -2,6 +2,7 @@ export function Name() { return "EVGA Z15 Keyboard"; }
 export function VendorId() { return 0x3842; }
 export function ProductId() { return 0x2608; }
 export function Publisher() { return "WhirlwindFX"; }
+export function Documentation(){ return "troubleshooting/evga"; }
 export function Size() { return [21, 6]; }
 export function DefaultPosition(){return [240, 120];}
 export function DefaultScale(){return 8.0;}

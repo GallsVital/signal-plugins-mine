@@ -11,6 +11,7 @@ export function Name() { return "Logitech G600 Mouse"; }
 export function VendorId() { return  0x046D; } //
 export function ProductId() { return 0xC24A; } //
 export function Publisher() { return "WhirlwindFX"; }
+export function Documentation(){ return "troubleshooting/logitech"; }
 export function Size() { return [3, 3]; }
 export function DefaultPosition() {return [225, 120]; }
 export function DefaultScale(){return 15.0;}

@@ -1,5 +1,6 @@
 export function Name() { return "Logitech Powerplay Dongle"; }
 export function VendorId() { return 0x046d; }
+export function Documentation(){ return "troubleshooting/logitech"; }
 export function ProductId() { return 0xC53A; }
 export function Publisher() { return "WhirlwindFX"; }
 export function Size() { return [3, 3]; }

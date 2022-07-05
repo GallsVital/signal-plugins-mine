@@ -27,6 +27,8 @@ export function ControllableParameters(){
 	];
 }
 
+export function Documentation(){ return "troubleshooting/corsair"; }
+
 let savedDpi1;
 let vLedNames = ["Logo", "Scroll Zone", "Front Zone", "Dpi Zone Low", "Dpi Zone Mid", "Dpi Zone High"];
 

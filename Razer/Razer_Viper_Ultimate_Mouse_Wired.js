@@ -57,6 +57,7 @@ function CalculateCrc(report) {
 
 export function Name() { return "Razer Viper Ultimate Wired"; }
 export function VendorId() { return 0x1532; }
+export function Documentation(){ return "troubleshooting/razer"; }
 export function ProductId() { return 0x007A; }
 export function Publisher() { return "WhirlwindFX"; }
 export function Size() { return [10, 10]; }

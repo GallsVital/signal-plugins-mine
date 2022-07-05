@@ -1,5 +1,6 @@
 export function Name() { return "Logitech G410 Atlas Spectrum"; }
 export function VendorId() { return 0x046d; }
+export function Documentation(){ return "troubleshooting/logitech"; }
 export function ProductId() { return 0xc330; } //C330
 export function Publisher() { return "TheDongster"; }
 export function Size() { return [24, 9]; }

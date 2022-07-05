@@ -1,5 +1,6 @@
 export function Name() { return "Asus Zephyrus M15"; }
-export function VendorId() { return 0x0b05; }
+export function VendorId() { return 0x0B05; }
+export function Documentation(){ return "troubleshooting/asus"; }
 export function ProductId() { return 0x1866; }
 export function Publisher() { return "WhirlwindFX"; }
 export function Size() { return [2, 2]; }

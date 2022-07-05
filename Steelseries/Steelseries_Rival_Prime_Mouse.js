@@ -1,5 +1,6 @@
 export function Name() { return "SteelSeries Rival Prime"; }
 export function VendorId() { return 0x1038; }
+export function Documentation(){ return "troubleshooting/steelseries"; }
 export function ProductId() { return 0x182E; }
 export function Publisher() { return "WhirlwindFX"; }
 export function Size() { return [4, 4]; }

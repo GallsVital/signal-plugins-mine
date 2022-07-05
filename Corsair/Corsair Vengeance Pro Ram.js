@@ -1,5 +1,6 @@
 export function Name() { return "Corsair Vengenace Pro Ram"; }
 export function Publisher() { return "WhirlwindFX"; }
+export function Documentation(){ return "troubleshooting/corsair"; }
 
 export function Type() { return "SMBUS"; }
 

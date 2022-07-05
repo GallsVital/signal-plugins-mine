@@ -1,5 +1,6 @@
 export function Name() { return "Logitech G513 Lightsync"; }
 export function VendorId() { return 0x046d; }
+export function Documentation(){ return "troubleshooting/logitech"; }
 export function ProductId() { return 0xc33c; }
 export function Publisher() { return "WhirlwindFX"; }
 export function Size() { return [21, 6]; }

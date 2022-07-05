@@ -48,6 +48,7 @@ function CalculateCrc(report) {
 
 export function Name() { return "Razer Basilisk Ultimate"; }
 export function VendorId() { return 0x1532; }
+export function Documentation(){ return "troubleshooting/razer"; }
 export function ProductId() { return 0x0088; }
 export function Publisher() { return "WhirlwindFX"; }
 export function Size() { return [7, 13]; }

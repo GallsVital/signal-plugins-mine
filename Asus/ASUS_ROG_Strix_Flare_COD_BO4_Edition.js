@@ -1,5 +1,6 @@
 export function Name() { return "ASUS ROG Strix Flare COD BO4 Edition"; }
 export function VendorId() { return 0x0B05; }
+export function Documentation(){ return "troubleshooting/asus"; }
 export function ProductId() { return 0x18af; }
 export function Publisher() { return "WhirlwindFX"; }
 export function Size() { return [22, 6]; }

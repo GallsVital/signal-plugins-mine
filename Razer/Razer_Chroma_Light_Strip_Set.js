@@ -1,5 +1,6 @@
 export function Name() { return "Razer Chroma Light Strip Set"; }
 export function VendorId() { return 0x1532; }
+export function Documentation(){ return "troubleshooting/razer"; }
 export function ProductId() { return 0x0F2C; }
 export function Publisher() { return "FeuerSturm"; }
 export function Size() { return [1, 1]; }

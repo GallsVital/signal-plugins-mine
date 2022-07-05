@@ -1,5 +1,6 @@
 export function Name() { return "MSI Mystic Light Controller"; }
-export function VendorId() { return  0x1462; }
+export function VendorId() { return 0x1462; }
+export function Documentation(){ return "troubleshooting/msi"; }
 // DO NOT PID SWAP THIS IF YOU DONT KNOW WHAT YOUR DOING
 export function ProductId() { return 0x7D07;}
 // YOU CAN BRICK THESE MOTHERBOARDS RGB CONTROLLER WITH ONE WRONG PACKET

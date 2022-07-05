@@ -1,5 +1,6 @@
 export function Name() { return "NZXT Function MiniTKL"; }
 export function VendorId() { return 0x1E71; }
+export function Documentation(){ return "troubleshooting/nzxt"; }
 export function ProductId() { return 0x2105; }
 export function Publisher() { return "WhirlwindFX"; }
 export function Size() { return [10, 10]; }

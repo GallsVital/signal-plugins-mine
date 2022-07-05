@@ -3,6 +3,7 @@ export function Name() { return DeviceName; }
 export function VendorId() { return  0x048D; }
 export function ProductId() { return 0x8297;}
 export function Publisher() { return "WhirlwindFX"; }
+export function Documentation(){ return "troubleshooting/gigabyte"; }
 export function Size() { return [10, 10]; }
 export function Type() { return "Hid"; }
 export function DefaultPosition(){return [0, 0];}

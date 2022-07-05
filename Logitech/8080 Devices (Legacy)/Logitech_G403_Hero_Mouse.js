@@ -1,5 +1,6 @@
 export function Name() { return "Logitech G403 Hero"; }
 export function VendorId() { return 0x046d; }
+export function Documentation(){ return "troubleshooting/logitech"; }
 export function ProductId() { return 0xC08F; }
 export function Publisher() { return "WhirlwindFX"; }
 export function Size() { return [3, 3]; }
