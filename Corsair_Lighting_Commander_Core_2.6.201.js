@@ -78,20 +78,21 @@ const MAX_FAN_COUNT = 7;
 const DevFirmwareVersion = "2.6.201";
 
 class ModernCorsairProtocol{
+	constructor() {
+		this.command = 0x08;
 
-	static command = 0x08;
+		this.set = 0x01;
+		this.get = 0x02;
+		this.closeEndpoint = 0x05;
+		this.write = 0x06;
+		this.stream = 0x07;
+		this.read = 0x08;
+		this.checkEndpoint = 0x09;
+		this.setEndpoint = 0x0D;
 
-	static set = 0x01;
-	static get = 0x02;
-	static closeEndpoint = 0x05;
-	static write = 0x06;
-	static stream = 0x07;
-	static read = 0x08;
-	static checkEndpoint = 0x09;
-	static setEndpoint = 0x0D;
-
-	static property = {
-		pollingRate: 0x01,
+		this.property = {
+			pollingRate: 0x01,
+		};
 	}
 }
 let Corsair = ModernCorsairProtocol();
