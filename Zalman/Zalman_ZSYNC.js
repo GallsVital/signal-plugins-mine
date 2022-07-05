@@ -28,14 +28,14 @@ const DeviceMaxLedLimit = 192;
 
 //Channel Name, Led Limit
 let ChannelArray = [
-	["Channel 1", 24],
-	["Channel 2", 24],
-	["Channel 3", 24],
-	["Channel 4", 24],
-	["Channel 5", 24],
-	["Channel 6", 24],
-	["Channel 7", 24],
-	["Channel 8", 24],
+	["Channel 1", 40],
+	["Channel 2", 40],
+	["Channel 3", 40],
+	["Channel 4", 40],
+	["Channel 5", 40],
+	["Channel 6", 40],
+	["Channel 7", 40],
+	["Channel 8", 40],
 ];
 
 function SetupChannels(){
