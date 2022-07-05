@@ -112,9 +112,7 @@ function SendChannel(Channel, shutdown = false) {
 	}else if(componentChannel.shouldPulseColors()){
 
 		ChannelLedCount = 120;
-
-		let pulseColor = device.getChannelPulseColor(ChannelArray[Channel][0], ChannelLedCount);
-		ColorData = device.createColorArray(pulseColor, ChannelLedCount, "Seperate");
+		ColorData = componentChannel.getPulse(ChannelLedCount, "Seperate");
 
 	}else{
 		ColorData = componentChannel.getColors("Seperate");
