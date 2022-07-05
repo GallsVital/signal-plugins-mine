@@ -50,7 +50,7 @@ export function Name() { return "Razer Huntsman Elite"; }
 export function VendorId() { return 0x1532; }
 export function ProductId() { return 0x0226; }
 export function Publisher() { return "WhirlwindFX"; }
-export function Size() { return [23, 9]; }
+export function Size() { return [24, 9]; }
 export function Type() { return "Hid"; }
 export function DefaultPosition(){return [10, 100];}
 const DESIRED_HEIGHT = 85;
