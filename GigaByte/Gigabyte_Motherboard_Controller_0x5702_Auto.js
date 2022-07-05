@@ -375,7 +375,6 @@ function UpdateARGBChannels(Channel, shutdown = false) {
 		ChannelLedCount = 80;
 
 		let pulseColor = device.getChannelPulseColor(ChannelArray[Channel][0]);
-		device.log(pulseColor);
 
 		RGBData = device.createColorArray(pulseColor, ChannelLedCount, "Inline", RGBconfig);
 
