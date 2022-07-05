@@ -138,10 +138,11 @@ export function Initialize() {
 	Corsair_Get_Firmware();
 
 	GetFanSettings();
-	
+
 	SetFanLedCount();
 
 }
+
 function Corsair_Get_Firmware(){
 	let data = Corsair_GetPacket(CORSAIR_FIRMWARE);
 
@@ -321,44 +322,39 @@ function SendColorData() {
 	}
 }
 
-function GetColors() {
+function Get4PinColors(){
+	let ChannelLedCount = device.channel(ChannelArray[0][0]).LedCount();
 
 	let ChannelData = [];
-	let RGBData = [];
-
-	// Channel 1, 3 Pin Strips
-	let ChannelLedCount = device.channel(ChannelArray[1][0]).LedCount();
 
 	if(LightingMode  === "Forced") {
 		ChannelData = device.createColorArray(forcedColor, ChannelLedCount, "Inline");
 
-	} else if(device.getLedCount() === 0) {
-		ChannelLedCount = 36 * 3;
 
-		let pulseColor = device.getChannelPulseColor(ChannelArray[1][0], ChannelLedCount);
-		ChannelData = device.createColorArray(pulseColor, ChannelLedCount, "Inline");
-
-	} else {
-		let components = device.channel(ChannelArray[1][0]).getComponentNames();
+	}else if(device.channel(ChannelArray[0][0]).overrideColors){
+		let components = device.channel(ChannelArray[0][0]).getComponentNames();
 
 		for(let i = 0; i < components.length; i++) {
-			let ComponentColors = device.channel(ChannelArray[1][0]).getComponentColors(components[i], "Inline");
-			RGBData = RGBData.concat(ComponentColors);
+			// Each fan group is set to 34 Leds long, Each Component Must take up that many LEDs
+			for(let j = 0; j < 34; j++) {
+				ChannelData.push(0);
+				ChannelData.push(128);
+				ChannelData.push(0);
+			}
 		}
-	}
 
-	RGBData = RGBData.concat(ChannelData);
+		for(let j = 0; j < device.channel(ChannelArray[0][0]).overrideCount; j++) {
+			ChannelData.push(0);
+			ChannelData.push(0);
+			ChannelData.push(128);
+		}
 
-	// Add 4 Pin Fan Ports to the end
-	ChannelLedCount = device.channel(ChannelArray[0][0]).LedCount();
+		while(ChannelData.length < 34*6*3){
+			ChannelData.push(0);
+		}
 
-	ChannelData = [];
-
-	if(LightingMode  === "Forced") {
-		ChannelData = device.createColorArray(forcedColor, ChannelLedCount, "Inline");
-
-	} else if(device.getLedCount() === 0) {
-		ChannelLedCount = 36 * 3;
+	} else if(device.channel(ChannelArray[0][0]).shouldPulseColors()) {
+		ChannelLedCount = 34 * 3;
 
 		let pulseColor = device.getChannelPulseColor(ChannelArray[0][0], ChannelLedCount);
 		ChannelData = device.createColorArray(pulseColor, ChannelLedCount, "Inline");
@@ -378,7 +374,62 @@ function GetColors() {
 		}
 	}
 
+	return ChannelData;
+}
+
+function GetColors() {
+
+	let ChannelData = [];
+	let RGBData = [];
+
+	// Channel 1, 3 Pin Strips
+	let ChannelLedCount = device.channel(ChannelArray[1][0]).LedCount();
+
+	if(LightingMode  === "Forced") {
+		ChannelData = device.createColorArray(forcedColor, ChannelLedCount, "Inline");
+
+	}else if(device.channel(ChannelArray[0][0]).overrideColors){
+		let components = device.channel(ChannelArray[0][0]).getComponentNames();
+
+		for(let i = 0; i < components.length; i++) {
+			// Each fan group is set to 34 Leds long, Each Component Must take up that many LEDs
+			for(let j = 0; j < 34; j++) {
+				ChannelData.push(0);
+				ChannelData.push(128);
+				ChannelData.push(0);
+			}
+		}
+
+		for(let j = 0; j < device.channel(ChannelArray[0][0]).overrideCount; j++) {
+			ChannelData.push(0);
+			ChannelData.push(0);
+			ChannelData.push(128);
+		}
+
+		while(ChannelData.length < 34*6*3){
+			ChannelData.push(0);
+		}
+
+
+	} else if(device.channel(ChannelArray[1][0]).shouldPulseColors()) {
+		ChannelLedCount = 34 * 3;
+
+		let pulseColor = device.getChannelPulseColor(ChannelArray[1][0], ChannelLedCount);
+		ChannelData = device.createColorArray(pulseColor, ChannelLedCount, "Inline");
+
+	} else {
+		let components = device.channel(ChannelArray[1][0]).getComponentNames();
+
+		for(let i = 0; i < components.length; i++) {
+			let ComponentColors = device.channel(ChannelArray[1][0]).getComponentColors(components[i], "Inline");
+			RGBData = RGBData.concat(ComponentColors);
+		}
+	}
+
 	RGBData = RGBData.concat(ChannelData);
+
+	// Add 4 Pin Fan Ports to the end
+	RGBData = RGBData.concat(Get4PinColors());
 
 	return RGBData;
 }
