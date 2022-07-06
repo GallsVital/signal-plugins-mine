@@ -120,6 +120,7 @@ let innerRGBData;
 let outerRGBData;
 let fanledcount;
 let fancount;
+let outerring = 0;
 
 const channelArray =  [Channel_1_Controller, Channel_2_Controller, Channel_3_Controller, Channel_4_Controller];
 const PACKET_START =  [0x00, 0x43, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x01];
@@ -157,14 +158,14 @@ export function Render() //I don't care how jank it is, it works.
 		PollFans();
 	}
 
-	if(!savedMoboPassthrough) {
-		var outerringcount = sendChannels();
+	if(moboSync == false) {
+		sendChannels();
 	}
 
 	sendControlPacket(channelArray[Commitloop].commitOuter, PACKET_COMMIT, 16);
 	Commitloop++;
 
-	if(Commitloop == outerringcount)//Current Commit loop. Works better for smoothness of inner rings. Current detection is POC.
+	if(Commitloop == outerring)//Current Commit loop. Works better for smoothness of inner rings. Current detection is POC.
 	{
 		Commitloop = 0;
 	}
@@ -193,15 +194,13 @@ function isChannelActive(channelIdx) {
 	return channelArray[channelIdx].count > 0;
 }
 
-let outerring;
-
 function sendChannels() {
 	outerring = 0;
-
 	for(let Channel = 0; Channel < 4;Channel++) {
 		if (isChannelActive(Channel)) {
 			fanledcount = 0;
 			fancount = 0;
+			outerring++
 
 			let ChannelLedCount = device.channel(ChannelArray[Channel][0]).LedCount();
 			ChannelRGBData = getChannelColors(Channel, ChannelLedCount);
@@ -216,6 +215,7 @@ function sendChannels() {
 			fancount = fancount-1;
 
 			if (device.channel(ChannelArray[Channel][0]).LedCount() != 0) {
+				
 				for (let fan = 0; fan < (fancount); fan++) {
 					innerRGBData = ChannelRGBData.splice(0, 8 * 3);
 					sendControlPacket(channelArray[Channel].innerAction[fan], innerRGBData, 24);
@@ -228,22 +228,19 @@ function sendChannels() {
 				sendControlPacket(channelArray[Channel].commitInner, PACKET_COMMIT, 16);
 			}
 
-			outerring++;
 		}
 	}
 
-	return(outerring);
 }
 
 function  getChannelColors(Channel, ledcount, shutdown = false) {
 
 	let RGBData = [];
-	let componentChannel = device.channel(ChannelArray[Channel][0]);
 
 	if(LightingMode === "Forced") {
 		RGBData = device.createColorArray(forcedColor, ledcount, "Inline", "RBG");
 
-	} else if(componentChannel.shouldPulseColors()) {
+	} else if(device.getLedCount() == 0) {
 		ledcount = 80;
 
 		let pulseColor = device.getChannelPulseColor(ChannelArray[Channel][0], ledcount);
