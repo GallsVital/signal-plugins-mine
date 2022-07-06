@@ -1,7 +1,7 @@
 {
-    "ProductName": "Lian Li UniFan",
-    "DisplayName": "Lian Li UniFan - 16 LED",
-    "Brand" : "Lian Li",
+    "ProductName": "LianLi UniFan",
+    "DisplayName": "LianLi UniFan - 16 LED",
+    "Brand" : "LianLi",
     "Type" : "Fan",
     "LedCount" : 16,
     "Width": 16,

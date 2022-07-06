@@ -792,8 +792,13 @@ export function GetBatteryCharge()
 	}
 	else if(BattID != 0)
 	{
-    let [voltage,state] = LogitechGetBatteryVoltage(BattID);
-    return GetApproximateBatteryPercentage(voltage);
+          let [voltage,state] = LogitechGetBatteryVoltage(BattID);
+	  
+	  if (state === 0) { battery.setBatteryState(1); }
+          else if (state === 128) { battery.setBatteryState(2); }
+          else if (state === 144) { battery.setBatteryState(5); }
+
+          return GetApproximateBatteryPercentage(voltage);
 	}
 }
 
@@ -804,7 +809,7 @@ function LogitechGetUnifiedBatteryPercentage()
 	let BatteryArray = Logitech_Long_Get();
 	device.log(BatteryArray);
 	let BatteryPercentage = (BatteryArray[0])
-    let BatteryStatus = BatteryArray[2];
+        let BatteryStatus = BatteryArray[2];
 
 	device.log("Battery Percentage: " + BatteryPercentage);
 	device.log("Battery Status: " + StatusDict[BatteryStatus]);
@@ -817,7 +822,7 @@ function LogitechGetBatteryVoltage()// 10 06 00 //returns 15 13 3 //10 06 01 //L
 	let data = [BattID, 0x00, 0x10];
 	let BatteryArray = Logitech_Long_Set(0x01, data);
 	let BatteryVoltage = (BatteryArray[0] << 8) + BatteryArray[1];
-    let BatteryStatus = BatteryArray[2];
+        let BatteryStatus = BatteryArray[2];
 
 	device.log("Battery Voltage: " + BatteryVoltage);
 	device.log("Battery Status: " + StatusDict[BatteryStatus]);
