@@ -64,6 +64,7 @@ export function Shutdown()
 function SendChannel(Channel,shutdown = false)
 {
 	var ChannelLedCount = device.channel(ChannelArray[Channel][0]).ledCount > ChannelArray[Channel][1] ? ChannelArray[Channel][1] : device.channel(ChannelArray[Channel][0]).ledCount;
+	let componentChannel = device.channel(ChannelArray[Channel][0]);
 
 	var RGBData = [];
 	if(shutdown)
