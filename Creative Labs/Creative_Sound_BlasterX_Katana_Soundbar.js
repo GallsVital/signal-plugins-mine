@@ -2,6 +2,7 @@ export function Name() { return "Sound BlasterX Katana"; }
 export function VendorId() { return 0x041E; }
 export function ProductId() { return 0x3247; }
 export function Publisher() { return "WhirlwindFX"; }
+export function Documentation() { return "troubleshooting/creative-labs"; }
 export function Size() { return [100, 5]; }
 export function Type() { return "Hid"; }
 export function DefaultPosition(){return [10, 100];}

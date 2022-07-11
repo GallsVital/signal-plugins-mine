@@ -359,7 +359,8 @@ function SetMotherboardName(){
 
 function UpdateARGBChannels(Channel, shutdown = false) {
 	let ChannelLedCount = device.channel(ChannelArray[Channel][0]).LedCount();
-
+	let componentChannel = device.channel(ChannelArray[Channel][0]);
+	
 	if(device.getLedCount() !== CurrentLedCount){
 		CurrentLedCount = device.getLedCount();
 		SetLedCounts();
@@ -369,7 +370,7 @@ function UpdateARGBChannels(Channel, shutdown = false) {
 	if(LightingMode  === "Forced"){
 		RGBData = device.createColorArray(forcedColor, ChannelLedCount, "Inline", RGBconfig);
 
-	}else if(device.getLedCount() === 0){
+	}else if(componentChannel.shouldPulseColors()){
 		ChannelLedCount = 40;
 
 		let pulseColor = device.getChannelPulseColor(ChannelArray[Channel][0], ChannelLedCount);
