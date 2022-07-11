@@ -200,15 +200,16 @@ function GetColors() {
 		TotalLedCount += 29; // Led count for the pump is always 29
 	}
 
+	let componentChannel = device.channel(ChannelArray[0][0]);
+	let ChannelLedCount = componentChannel.LedCount();
 
-	let ChannelLedCount = device.channel(ChannelArray[0][0]).LedCount();
 	let ColorData = [];
 
 	if(LightingMode  === "Forced") {
 		ColorData = device.createColorArray(forcedColor, ChannelLedCount, "Inline");
 
-	} else if(device.getLedCount() === 0) {
-		ChannelLedCount = 34 * 4;
+	} else if(componentChannel.shouldPulseColors()) {
+		ChannelLedCount = 34 * 6;
 
 		let pulseColor = device.getChannelPulseColor(ChannelArray[0][0], ChannelLedCount);
 		ColorData = device.createColorArray(pulseColor, ChannelLedCount, "Inline");
@@ -216,15 +217,28 @@ function GetColors() {
 	} else {
 		let components = device.channel(ChannelArray[0][0]).getComponentNames();
 		ChannelLedCount = components.length * 34;
-
 		for(let i = 0; i < components.length; i++) {
-			let ComponentColors = device.channel(ChannelArray[0][0]).getComponentColors(components[i], "Inline");
+			let ComponentColors;
 
-			for(let j = ComponentColors.length; j < 34 * 3; j++) {
-				ComponentColors.push(0);
+			// Each fan group is set to 34 Leds long, Each Component Must take up that many LEDs
+
+			if(!componentChannel.overrideColors){
+				ComponentColors = componentChannel.getComponentColors(components[i], "Inline");
+
+				for(let j = ComponentColors.length; j < 34 * 3; j++) {
+					ComponentColors.push(0);
+				}
+
+			}else{
+				ComponentColors = [];
+				for(let j = 0; j < 34; j++) {
+					ComponentColors.push(0);
+					ComponentColors.push(128);
+					ComponentColors.push(0);
+				}
 			}
 
-			RGBData = RGBData.concat(ComponentColors);
+			ColorData = ColorData.concat(ComponentColors);
 		}
 	}
 

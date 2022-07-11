@@ -324,6 +324,7 @@ function SendColorData() {
 
 function Get4PinColors(){
 	let ChannelLedCount = device.channel(ChannelArray[0][0]).LedCount();
+	let componentChannel = device.channel(ChannelArray[0][0]);
 
 	let ChannelData = [];
 
@@ -340,11 +341,24 @@ function Get4PinColors(){
 		let components = device.channel(ChannelArray[0][0]).getComponentNames();
 
 		for(let i = 0; i < components.length; i++) {
-			let ComponentColors = device.channel(ChannelArray[0][0]).getComponentColors(components[i], "Inline");
-
+			
+			let ComponentColors;
 			// Each fan group is set to 34 Leds long, Each Component Must take up that many LEDs
-			for(let j = ComponentColors.length; j < 34 * 3; j++) {
-				ComponentColors.push(0);
+			if(!componentChannel.overrideColors){
+				ComponentColors = device.channel(ChannelArray[0][0]).getComponentColors(components[i], "Inline");
+
+
+				for(let j = ComponentColors.length; j < 34 * 3; j++) {
+					ComponentColors.push(0);
+				}
+
+			}else{
+				ComponentColors = [];
+				for(let j = 0; j < 34; j++) {
+					ComponentColors.push(0);
+					ComponentColors.push(128);
+					ComponentColors.push(0);
+				}
 			}
 
 			ChannelData = ChannelData.concat(ComponentColors);
