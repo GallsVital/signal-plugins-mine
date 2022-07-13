@@ -1,9 +1,8 @@
 ﻿export function Name() { return "Cooler Master Gen2 LED Controller A1"; }
 export function VendorId() { return 0x2516; }
-export function Documentation(){ return "troubleshooting/coolermaster"; }
-export function Documentation(){ return "troubleshooting/coolermaster"; }
 export function ProductId() { return 0x0173;}
 export function Publisher() { return "FeuerSturm"; }
+export function Documentation(){ return "troubleshooting/coolermaster"; }
 export function Size() { return [1, 1]; }
 export function DefaultPosition(){return [1, 1];}
 export function DefaultScale(){return 1.0;}
@@ -96,7 +95,7 @@ export function Shutdown() {
 
 function SendChannel(Channel, shutdown = false, GEN2 = false) {
 	let ChannelLedCount = device.channel(ChannelArray[Channel]).ledCount;
-	let componentChannel = device.channel(ChannelArray[Channel][0]);
+	let componentChannel = device.channel(ChannelArray[Channel]);
 
 	let RGBData = [];
 
@@ -113,7 +112,7 @@ function SendChannel(Channel, shutdown = false, GEN2 = false) {
 		RGBData = device.channel(ChannelArray[Channel]).getColors("Inline");
 	}
 
-	if(!GEN2 || componentChannel.shouldPulseColors()) {
+	if(!GEN2 || device.getLedCount() === 0) {
 		for(var Packets = 0; Packets <= 2; Packets++) {
 			var packet = [];
 			packet[0] = 0x00;
