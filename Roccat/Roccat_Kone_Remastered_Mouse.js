@@ -194,7 +194,7 @@ export function Shutdown() {
 
 
 export function Validate(endpoint) {
-	return endpoint.interface === 0;
+	return endpoint.interface === 0  && endpoint.usage_page === 0x000b;
 }
 
 

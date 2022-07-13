@@ -1,6 +1,6 @@
 export function Name() { return "Roccat Kone"; }
 export function VendorId() { return 0x1e7d; }
-export function ProductId() { return 0x2e27;} //Enabling Dpi Control makes it work?
+export function ProductId() { return 0x2e27;}
 export function Publisher() { return "WhirlwindFX"; }
 export function Size() { return [7, 7]; }
 export function DefaultPosition() {return [225, 120]; }
@@ -17,8 +17,6 @@ export function ControllableParameters(){
 		{"property":"dpi4", "group":"mouse", "label":"DPI 4", "step":"50", "type":"number", "min":"200", "max":"16000", "default":"2000"},
 		{"property":"dpi5", "group":"mouse", "label":"DPI 5", "step":"50", "type":"number", "min":"200", "max":"16000", "default":"3200"},
 		{"property":"pollingrate", "group":"mouse", "label":"Polling Rate", "type":"combobox", "values":["125Hz", "250Hz", "500Hz", "1000Hz"], "default":"500Hz"},
-
-
 	];
 }
 let savedDpi1;
@@ -34,6 +32,7 @@ let vKeys = [
 	5, 6, 7, 8,
 	9, 10
 ];
+
 let vLedNames = [
 	"Scroll Wheel",
 	"Left Led 1", "Left Led 2", "Left Led 3", "Left Led 4", "Right Led 1", "Right Led 2", "Right Led 3", "Right Led 4", "Left Led 5", "Right Led 5"
@@ -84,7 +83,6 @@ const PollingDict = {
 	"250Hz": 0xB7,
 	"500Hz": 0xB8,
 	"1000Hz": 0xB9,
-
 };
 
 
@@ -194,7 +192,7 @@ export function Shutdown() {
 
 
 export function Validate(endpoint) {
-	return endpoint.interface === 0;
+	return endpoint.interface === 0 && endpoint.usage_page === 0x000b;
 }
 
 
