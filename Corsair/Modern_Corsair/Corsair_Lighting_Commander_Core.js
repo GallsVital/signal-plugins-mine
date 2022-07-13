@@ -20,6 +20,7 @@ export function LedPositions() { return vKeyPositions; }
 
 export function SupportsSubdevices() { return true; }
 export function DefaultComponentBrand() { return "Corsair"; }
+export function Documentation(){ return "troubleshooting/corsair"; }
 export function SystemResumeDelay() { return 9000; }
 export function Validate(endpoint) {
 	return endpoint.interface === 0;

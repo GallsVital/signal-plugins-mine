@@ -19,6 +19,7 @@ export function LedPositions() { return vKeyPositions; }
 
 export function SupportsSubdevices() { return true; }
 export function DefaultComponentBrand() { return "Corsair"; }
+export function Documentation(){ return "troubleshooting/corsair"; }
 export function SystemResumeDelay() { return 9000; }
 export function Validate(endpoint) {
 	return endpoint.interface === 0;
@@ -341,7 +342,7 @@ function Get4PinColors(){
 		let components = device.channel(ChannelArray[0][0]).getComponentNames();
 
 		for(let i = 0; i < components.length; i++) {
-			
+
 			let ComponentColors;
 			// Each fan group is set to 34 Leds long, Each Component Must take up that many LEDs
 			if(!componentChannel.overrideColors){
