@@ -1,6 +1,7 @@
 export function Name() { return "Roccat Kova Aimo"; }
 export function VendorId() { return 0x1e7d; }
 export function ProductId() { return 0x2CF1; }
+export function Documentation(){ return "troubleshooting/roccat"; }
 export function Publisher() { return "WhirlwindFX"; }
 export function Size() { return [3, 4]; }
 export function DefaultPosition(){return [240, 120];}

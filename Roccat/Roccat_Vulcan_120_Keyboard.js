@@ -1,6 +1,7 @@
 export function Name() { return "Roccat Vulcan 120"; }
 export function VendorId() { return 0x1e7d; }
 export function ProductId() { return 0x3098; }
+export function Documentation(){ return "troubleshooting/roccat"; }
 export function Publisher() { return "WhirlwindFX"; }
 export function Size() { return [24, 8]; }
 export function DefaultPosition(){return [10, 100];}

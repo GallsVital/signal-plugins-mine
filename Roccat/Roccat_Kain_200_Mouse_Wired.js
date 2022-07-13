@@ -1,6 +1,7 @@
 export function Name() { return "Roccat Kain 200"; }
 export function VendorId() { return 0x1e7d; }
 export function ProductId() { return 0x2D5F; }
+export function Documentation(){ return "troubleshooting/roccat"; }
 export function Publisher() { return "WhirlwindFX"; }
 export function Size() { return [3, 3]; }
 export function DefaultPosition() {return [225, 120]; }

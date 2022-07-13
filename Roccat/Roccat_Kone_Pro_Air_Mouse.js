@@ -1,6 +1,7 @@
 export function Name() { return "Roccat Kone Pro Air"; }
 export function VendorId() { return 0x1e7d; }
 export function ProductId() { return 0x2c8E; }
+export function Documentation(){ return "troubleshooting/roccat"; }
 export function Publisher() { return "WhirlwindFX"; }
 export function Size() { return [3, 3]; }
 export function DefaultPosition(){return [240, 120];}

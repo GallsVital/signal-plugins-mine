@@ -1,6 +1,7 @@
 export function Name() { return "Roccat Vulcan TKL"; }
 export function VendorId() { return 0x1e7d; }
 export function ProductId() { return 0x2fee; }
+export function Documentation(){ return "troubleshooting/roccat"; }
 export function Publisher() { return "WhirlwindFX"; }
 export function Size() { return [17, 7]; }
 export function DefaultPosition() {return [75, 70]; }

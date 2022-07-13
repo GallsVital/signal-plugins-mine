@@ -1,6 +1,7 @@
 export function Name() { return "Roccat Magma"; }
 export function VendorId() { return 0x1e7d;}
 export function ProductId() { return 0x3124;}
+export function Documentation(){ return "troubleshooting/roccat"; }
 export function Publisher() { return "FeuerSturm"; }
 export function Size() { return [10, 2]; }
 export function DefaultPosition(){return [48, 100];}

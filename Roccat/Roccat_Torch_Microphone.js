@@ -1,6 +1,7 @@
 export function Name() { return "Roccat Torch"; }
 export function VendorId() { return 0x1e7d; }
 export function ProductId() { return 0x3a56; }
+export function Documentation(){ return "troubleshooting/roccat"; }
 export function Publisher() { return "WhirlwindFX"; }
 export function Size() { return [11, 5]; }
 export function DefaultPosition() {return [225,120]; }

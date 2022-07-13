@@ -1,6 +1,7 @@
 export function Name() { return "Roccat Vulcan Pro"; }
 export function VendorId() { return 0x1e7d; }
 export function ProductId() { return 0x30F7; }
+export function Documentation(){ return "troubleshooting/roccat"; }
 export function Publisher() { return "WhirlwindFX"; }
 export function Size() { return [24, 8]; }
 export function DefaultPosition(){return [10, 100];}

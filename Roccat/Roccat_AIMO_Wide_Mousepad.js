@@ -1,6 +1,7 @@
 export function Name() { return "Roccat AIMO Pad Wide"; }
 export function VendorId() { return 0x1e7d; }
 export function ProductId() { return 0x343B; }
+export function Documentation(){ return "troubleshooting/roccat"; }
 export function Publisher() { return "WhirlwindFX"; }
 export function Size() { return [2, 2]; }
 export function DefaultPosition() {return [75, 70]; }
