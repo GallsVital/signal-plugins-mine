@@ -19,6 +19,7 @@ export function ControllableParameters(){
 		{"property":"dpi5", "group":"mouse", "label":"DPI 5","step":"50", "type":"number","min":"200", "max":"25600","default":"2000"},
 		{"property":"dpi6", "group":"mouse", "label":"Sniper Button DPI","step":"50", "type":"number","min":"200", "max":"25600","default":"400"},
 		{"property":"DpiLight", "group":"lighting", "label":"DPI Light Always On","type":"boolean","default": "true"},
+		{"property":"Charging", "group":"", "label":"Powerplay Charging","type":"boolean","default": "true"},
 		{"property":"OnboardState", "group":"", "label":"Onboard Button Mode","type":"boolean","default": "false"},
 		{"property":"DPIRollover", "group":"mouse", "label":"DPI Stage Rollover","type":"boolean","default": "false"},
 		{"property":"pollingrate", "group":"mouse", "label":"Polling Rate","type":"combobox", "values":[ "1000","500", "250", "100" ], "default":"1000"},
@@ -29,11 +30,21 @@ var Hero = false;
 var DeviceId;
 var TransactionId;
 var deviceName;
+var InfoID;
 var RGBFeatureID;
 var PollingRateID;
 var ButtonSpyID;
+var DisableKeysID;
+var GKeyID;
+var MKeyID;
+var MRID;
+var ChargingControlID;
+var KeyboardLayout2ID;
+var PersistentRemappableActionID;
 var LEDCtrlID;
 var DpiID;
+var PowerChargingControlID;
+var PowerRGBFeatureID;
 var BattID = 0;
 var UnifiedBattID;
 var Sniper;
@@ -43,6 +54,7 @@ var OnBoardState;
 var DPIStage = 1;
 var savedPollTimer = Date.now();
 var PollModeInternal = 15000;
+var battindicator = false;
 
 var vLedNames = ["Primary Zone", "Logo Zone"];
 var vLedPositions = [ [0,1],[0,2] ];
@@ -54,26 +66,6 @@ const LongMessage = 0x11;
 const SoftwareMode = 0x02;
 const HardwareMode = 0x01;
 const ConnectionMode = WIRELESS;
-
-const Powerplay_Mat = 
-{
-    mapping : 
-	[
-     0
-    ],
-       
-	positioning : 
-	[
-     [0,0]
-    ],
-
-    displayName: "PowerPlay MousePad",
-    ledCount : 1,
-    width: 3,
-    height: 3,
-    image: Image()
-}
-
 
 const DPIStageDict =
 {
@@ -95,6 +87,25 @@ const deviceIdMap =
 "4087" : "Logitech G903 Hero",    
 "4079" : "Logitech GPro Wireless",     
 "4093" : "Logitech GPro X Superlight"     
+}
+
+const Powerplay_Mat = 
+{
+    mapping : 
+	[
+     0
+    ],
+       
+	positioning : 
+	[
+     [0,0]
+    ],
+
+    displayName: "PowerPlay MousePad",
+    ledCount : 1,
+    width: 3,
+    height: 3,
+    image: Image()
 }
 
 const LogitechBatteryVoltageDict = 
@@ -216,7 +227,10 @@ export function Initialize()
 {
     device.flush()
 	
+    device.addFeature("battery");
+
 	GrabIds();//Grab all of our ID's of value
+	GrabPowerPlayIds();
 
     let data = [0x80, 0x00, 0x00, 0x01]//Enable Hid++ Notifications
     Logitech_Short_Set(data, WIRED)
@@ -233,7 +247,8 @@ export function Initialize()
 
     SetOnBoardState(OnboardState);
 	DetectOnBoardState();
-    GetBatteryCharge();
+    battery.setBatteryLevel(GetBatteryCharge());
+
 	ButtonSpySet();
 		if(Hero == true)
     	{
@@ -269,7 +284,8 @@ function PollBattery()
         return
     	}
     savedPollTimer = Date.now();
-	GetBatteryCharge();
+	var bc = GetBatteryCharge();
+battery.setBatteryLevel(bc);
 }
 
 export function Render()
@@ -283,6 +299,7 @@ export function Render()
 		}
 
 	PollBattery();
+
 	sendMousePad();
 }
 
@@ -389,6 +406,29 @@ export function onpollingrateChanged()
 	setPollingRate();
 }
 
+export function GetBatteryCharge()
+{
+	if(UnifiedBattID != 0)
+	{
+		LogitechGetUnifiedBatteryPercentage()
+	}
+	else if(BattID != 0)
+	{
+          let [voltage,state] = LogitechGetBatteryVoltage(BattID);
+	  
+	  if (state === 0) { battery.setBatteryState(1); }
+          else if (state === 128) { battery.setBatteryState(2); }
+          else if (state === 144) { battery.setBatteryState(5); }
+
+          return GetApproximateBatteryPercentage(voltage);
+	}
+}
+
+export function onChargingChanged()
+{
+	LogitechChargingControl();
+}
+
 function SetDPILights(dpilightid)
 {
 	if(Hero == true)
@@ -440,8 +480,8 @@ const mouseButtonDict =
 	"button4" : "Backward",
 	"button5" : "Forward",
 	"button6" : "Sniper",
-	"button7" : "DPI_UP",
-	"button8" : "DPI_Down",
+	"button7" : "DPI_Down",
+	"button8" : "DPI_UP",
 	"button9" : "Top"	
 },
 
@@ -453,8 +493,8 @@ const mouseButtonDict =
 	"button4" : "Backward",
 	"button5" : "Forward",
 	"button6" : "Sniper",
-	"button7" : "DPI_UP",
-	"button8" : "DPI_Down",
+	"button7" : "DPI_Down",
+	"button8" : "DPI_UP",
 	"button9" : "Top"
 },
 
@@ -466,8 +506,8 @@ const mouseButtonDict =
 	"button4" : "Backward",
 	"button5" : "Forward",
 	"button6" : "Sniper",
-	"button7" : "DPI_UP",
-	"button8" : "DPI_Down",
+	"button7" : "DPI_Down",
+	"button8" : "DPI_UP",
 	"button9" : "Top"
 },
 
@@ -784,22 +824,17 @@ function Logitech_FeatureID_Get(page)
   return Logitech_Long_Set(ConnectionMode, [0x00,0x00].concat(page))[0];
 }
 
-export function GetBatteryCharge()
+function Logitech_Powerplay_FeatureID_Get(page)
 {
-	if(UnifiedBattID != 0)
-	{
-		LogitechGetUnifiedBatteryPercentage()
-	}
-	else if(BattID != 0)
-	{
-          let [voltage,state] = LogitechGetBatteryVoltage(BattID);
-	  
-	  if (state === 0) { battery.setBatteryState(1); }
-          else if (state === 128) { battery.setBatteryState(2); }
-          else if (state === 144) { battery.setBatteryState(5); }
+	return Logitech_Long_Set(0x07, [0x00,0x00].concat(page))[0];
+}
 
-          return GetApproximateBatteryPercentage(voltage);
-	}
+function LogitechChargingControl()
+{
+	device.set_endpoint(2, 0x0001, 0xff00); // Short Message Endpoint 
+
+	let packet = [ShortMessage, 0x07, PowerChargingControlID, 0x10, Charging];
+	device.write(packet,7);
 }
 
 function LogitechGetUnifiedBatteryPercentage()
@@ -886,7 +921,10 @@ function setPollingRate()
 function SetDirectMode()
 {
  	device.set_endpoint(2, 0x0001, 0xff00); 
- 	let packet = [ShortMessage, ConnectionMode, RGBFeatureID, 0x80, 0x01, 0x01];//0x80 is register set. 0x01 is the first register, and the second 0x01 is true.
+ 	let packet = [ShortMessage, ConnectionMode, RGBFeatureID, 0x80, 0x01, 0x01];
+ 	device.write(packet, 7);
+
+	packet = [ShortMessage, ConnectionMode, PowerRGBFeatureID, 0x80, 0x01, 0x01];
  	device.write(packet, 7);
 
 	 if(OnBoardState == true)
@@ -989,8 +1027,8 @@ function sendMousePad(shutdown = false)
     var packet = [];
     packet[0x00] = 0x11;
     packet[0x01] = 0x07;
-    packet[0x02] = 0x0b;
-    packet[0x03] = 0x3E;
+    packet[0x02] = PowerRGBFeatureID;
+    packet[0x03] = 0x30;//0xC0? 0x70
     packet[0x04] = 0x00;
     packet[0x05] = 0x01;
 
@@ -1051,6 +1089,13 @@ function GrabIds()
 		{
 		device.log("Device Reset ID: " + ResetID);
 		}
+
+	const FriendlyNamePage = [0x00,0x07];
+	var FriendlyNameID = Logitech_FeatureID_Get(FriendlyNamePage);
+		if(FriendlyNameID !== 0)
+		{
+		device.log("Device Friendly Name ID: " + FriendlyNameID);
+		}
 	
 	const BatteryPage = [0x10,0x01];
 	BattID = Logitech_FeatureID_Get(BatteryPage);
@@ -1086,6 +1131,13 @@ function GrabIds()
 		{
 		device.log("DPI ID: " + DpiID);	
 		}
+
+	const ChargingControlPage = [0x10,0x10];
+	ChargingControlID = Logitech_FeatureID_Get(ChargingControlPage);
+		if(ChargingControlID !== 0)
+		{
+		device.log("Charging Control ID: " + ChargingControlID);	
+		}
 	
 	const PollingRatePage = [0x80,0x60];
 	var PollingRateID = Logitech_FeatureID_Get(PollingRatePage);
@@ -1115,7 +1167,83 @@ function GrabIds()
 		device.log("ReportRateID: " + ReportRateID);
 		}
 	
-	
+	const EncryptionPage = [0x41,0x00]; //0x00
+	var EncryptionID = Logitech_FeatureID_Get(EncryptionPage);
+		if(EncryptionID !== 0)
+		{
+		device.log("Encryption ID: " + EncryptionID);
+		}
+
+	const KeyboardLayout2Page = [0x45,0x40]; //0x00
+	var KeyboardLayout2ID = Logitech_FeatureID_Get(KeyboardLayout2Page);
+		if(KeyboardLayout2ID !== 0)
+		{
+		device.log("Keyboard Layout 2 ID: " + KeyboardLayout2ID);
+		}
+
+	const PersistentRemappableActionPage = [0x1b,0xc0]; //0x00
+	PersistentRemappableActionID = Logitech_FeatureID_Get(PersistentRemappableActionPage);
+		if(PersistentRemappableActionID !== 0)
+		{
+		device.log("Persistent Remappable Action ID: " + PersistentRemappableActionID);
+		}
+
+	const ReprogControlsV4Page = [0x1b,0x04]; //0x00
+	var ReprogControlsV4ID = Logitech_FeatureID_Get(ReprogControlsV4Page);
+		if(ReprogControlsV4ID !== 0)
+		{
+		device.log("Reprogram Controls V4 ID: " + ReprogControlsV4ID);
+		}
+
+	const DisableKeysPage = [0x45,0x22]; 
+	DisableKeysID = Logitech_FeatureID_Get(DisableKeysPage);
+		if(DisableKeysID !== 0)
+		{
+		device.log("Disable Keys ID: " + DisableKeysID);
+		}
+
+	const GKeyPage = [0x80,0x10]; //0x00 //2a 01 short
+	GKeyID = Logitech_FeatureID_Get(GKeyPage);
+		if(GKeyID !== 0)
+		{
+		device.log("GKey ID: " + GKeyID);
+		}
+
+	const MKeyPage = [0x80,0x20]; //0x01 0x01 //2a 01 short
+	MKeyID = Logitech_FeatureID_Get(MKeyPage);
+		if(MKeyID !== 0)
+		{
+		device.log("MKey ID: " + MKeyID);
+		}
+
+	const MRPage = [0x80,0x30];
+	MRID = Logitech_FeatureID_Get(MRPage);
+		if(MRID !== 0)
+		{
+		device.log("MR ID: " + MRID);
+		}
+
+	const BrightnessControlPage = [0x80,0x40]; //0x00
+	var BrightnessControlID = Logitech_FeatureID_Get(BrightnessControlPage);
+		if(BrightnessControlID !== 0)
+		{
+		device.log("Brightness Control ID: " + BrightnessControlID);
+		}
+
+	const HostsInfoPage = [0x18,0x15]; //0x00
+	var HostsInfoID = Logitech_FeatureID_Get(HostsInfoPage);
+		if(HostsInfoID !== 0)
+		{
+		device.log("Hosts Info ID: " + HostsInfoID);
+		}
+
+	const ChangeHostsPage = [0x18,0x14]; 
+	var ChangeHostsID = Logitech_FeatureID_Get(ChangeHostsPage);
+		if(ChangeHostsID !== 0)
+		{
+		device.log("Change Host ID: " + ChangeHostsID);
+		}
+
 	const PerKeyLightingPage = [0x80,0x80];
 	var PerKeyLightingID = Logitech_FeatureID_Get(PerKeyLightingPage);
 		if(PerKeyLightingID !== 0)
@@ -1145,6 +1273,215 @@ function GrabIds()
 		if(RGBFeatureID != 0)
 		{
 		device.log("RGB Control ID : " + RGBFeatureID);
+		}
+}
+
+function GrabPowerPlayIds()
+{
+	const InfoPage = [0x00,0x03];
+	var PowerInfoID = Logitech_Powerplay_FeatureID_Get(InfoPage);
+		if(PowerInfoID !== 0)
+		{
+		device.log("Power Device Info ID: " + PowerInfoID);
+		}
+	
+	const NamePage = [0x00,0x05];
+	var PowerNameID = Logitech_Powerplay_FeatureID_Get(NamePage);
+		if(PowerNameID !== 0)
+		{
+		device.log("Power Device Name ID: " + PowerNameID);
+		}
+	
+	const ResetPage = [0x00,0x20];
+	var PowerResetID = Logitech_Powerplay_FeatureID_Get(ResetPage);
+		if(PowerResetID !== 0)
+		{
+		device.log("Power Device Reset ID: " + PowerResetID);
+		}
+
+	const FriendlyNamePage = [0x00,0x07];
+	var PowerFriendlyNameID = Logitech_Powerplay_FeatureID_Get(FriendlyNamePage);
+		if(PowerFriendlyNameID !== 0)
+		{
+		device.log("Power Device Friendly Name ID: " + PowerFriendlyNameID);
+		}
+	
+	const BatteryPage = [0x10,0x01];
+	var PowerBattID = Logitech_Powerplay_FeatureID_Get(BatteryPage);
+		if(PowerBattID !== 0)
+		{
+		device.log("Power Battery ID: " + PowerBattID);	
+		}
+	
+	const UnifiedBatteryPage = [0x10,0x04];
+	var PowerUnifiedBattID = Logitech_Powerplay_FeatureID_Get(UnifiedBatteryPage);
+		if(PowerUnifiedBattID !== 0)
+		{
+		device.log("Power Unified Battery ID: " + PowerUnifiedBattID);	
+		}
+	
+	const LEDCtrlPage = [0x13,0x00];
+	var PowerLEDCtrlID = Logitech_Powerplay_FeatureID_Get(LEDCtrlPage);
+		if(LEDCtrlID !== 0)
+		{
+		device.log("Power Led Control ID: " + PowerLEDCtrlID);
+		}
+	
+	const WirelessStatusPage = [0x1D,0x4B];
+	var PowerWirelessStatusID = Logitech_Powerplay_FeatureID_Get(WirelessStatusPage);
+		if(PowerWirelessStatusID !== 0)
+		{
+		device.log("Power Wireless Status ID: " + PowerWirelessStatusID);
+		}
+	
+	const DPIPage = [0x22,0x01];
+	var PowerDpiID = Logitech_Powerplay_FeatureID_Get(DPIPage);
+		if(PowerDpiID !== 0)
+		{
+		device.log("PowerDPI ID: " + PowerDpiID);	
+		}
+
+	const ChargingControlPage = [0x10,0x10];
+	PowerChargingControlID = Logitech_Powerplay_FeatureID_Get(ChargingControlPage);
+		if(PowerChargingControlID !== 0)
+		{
+		device.log("Power Charging Control ID: " + PowerChargingControlID);	
+		}
+	
+	const PollingRatePage = [0x80,0x60];
+	var PowerPollingRateID = Logitech_Powerplay_FeatureID_Get(PollingRatePage);
+		if(PowerPollingRateID !== 0)
+		{
+		device.log("Power Polling Rate ID: " + PowerPollingRateID);	
+		}
+	
+	const OnboardProfilePage = [0x81,0x00];
+	var PowerOnboardID = Logitech_Powerplay_FeatureID_Get(OnboardProfilePage);
+		if(PowerOnboardID !== 0)
+		{
+		device.log("Power Onboard Profiles ID: " + PowerOnboardID);
+		}
+	
+	const ButtonSpyPage = [0x81,0x10];
+	var PowerButtonSpyID = Logitech_Powerplay_FeatureID_Get(ButtonSpyPage);
+		if(PowerButtonSpyID !== 0)
+		{
+		device.log("Power Button Spy ID: " + PowerButtonSpyID);
+		}
+	
+	const ReportRatePage = [0x80,0x60];
+	var PowerReportRateID = Logitech_Powerplay_FeatureID_Get(ReportRatePage);
+		if(PowerReportRateID !== 0)
+		{
+		device.log("Power ReportRateID: " + PowerReportRateID);
+		}
+	
+	const EncryptionPage = [0x41,0x00]; //0x00
+	var PowerEncryptionID = Logitech_Powerplay_FeatureID_Get(EncryptionPage);
+		if(PowerEncryptionID !== 0)
+		{
+		device.log("Power Encryption ID: " + PowerEncryptionID);
+		}
+
+	const KeyboardLayout2Page = [0x45,0x40]; //0x00
+	var PowerKeyboardLayout2ID = Logitech_Powerplay_FeatureID_Get(KeyboardLayout2Page);
+		if(PowerKeyboardLayout2ID !== 0)
+		{
+		device.log("Power Keyboard Layout 2 ID: " + PowerKeyboardLayout2ID);
+		}
+
+	const PersistentRemappableActionPage = [0x1b,0xc0]; //0x00
+	var PowerPersistentRemappableActionID = Logitech_Powerplay_FeatureID_Get(PersistentRemappableActionPage);
+		if(PowerPersistentRemappableActionID !== 0)
+		{
+		device.log("Power Persistent Remappable Action ID: " + PowerPersistentRemappableActionID);
+		}
+
+	const ReprogControlsV4Page = [0x1b,0x04]; //0x00
+	var PowerReprogControlsV4ID = Logitech_Powerplay_FeatureID_Get(ReprogControlsV4Page);
+		if(PowerReprogControlsV4ID !== 0)
+		{
+		device.log("Power Reprogram Controls V4 ID: " + PowerReprogControlsV4ID);
+		}
+
+	const DisableKeysPage = [0x45,0x22]; 
+	var PowerDisableKeysID = Logitech_Powerplay_FeatureID_Get(DisableKeysPage);
+		if(PowerDisableKeysID !== 0)
+		{
+		device.log("Power Disable Keys ID: " + PowerDisableKeysID);
+		}
+
+	const GKeyPage = [0x80,0x10]; //0x00 //2a 01 short
+	var PowerGKeyID = Logitech_Powerplay_FeatureID_Get(GKeyPage);
+		if(PowerGKeyID !== 0)
+		{
+		device.log("Power GKey ID: " + PowerGKeyID);
+		}
+
+	const MKeyPage = [0x80,0x20]; //0x01 0x01 //2a 01 short
+	var PowerMKeyID = Logitech_Powerplay_FeatureID_Get(MKeyPage);
+		if(PowerMKeyID !== 0)
+		{
+		device.log("Power MKey ID: " + PowerMKeyID);
+		}
+
+	const MRPage = [0x80,0x30];
+	var PowerMRID = Logitech_Powerplay_FeatureID_Get(MRPage);
+		if(PowerMRID !== 0)
+		{
+		device.log("Power MR ID: " + PowerMRID);
+		}
+
+	const BrightnessControlPage = [0x80,0x40]; //0x00
+	var PowerBrightnessControlID = Logitech_Powerplay_FeatureID_Get(BrightnessControlPage);
+		if(PowerBrightnessControlID !== 0)
+		{
+		device.log("Power Brightness Control ID: " + PowerBrightnessControlID);
+		}
+
+	const HostsInfoPage = [0x18,0x15]; //0x00
+	var PowerHostsInfoID = Logitech_Powerplay_FeatureID_Get(HostsInfoPage);
+		if(PowerHostsInfoID !== 0)
+		{
+		device.log("Power Hosts Info ID: " + PowerHostsInfoID);
+		}
+
+	const ChangeHostsPage = [0x18,0x14]; 
+	var PowerChangeHostsID = Logitech_Powerplay_FeatureID_Get(ChangeHostsPage);
+		if(PowerChangeHostsID !== 0)
+		{
+		device.log("Power Change Host ID: " + PowerChangeHostsID);
+		}
+
+	const PerKeyLightingPage = [0x80,0x80];
+	var PowerPerKeyLightingID = Logitech_Powerplay_FeatureID_Get(PerKeyLightingPage);
+		if(PowerPerKeyLightingID !== 0)
+		{
+		device.log("Power PerKeyLightingID: " + PowerPerKeyLightingID);
+		}
+	
+	const PerKeyLightingV2Page = [0x80,0x81];
+	var PowerPerKeyLightingV2ID = Logitech_Powerplay_FeatureID_Get(PerKeyLightingV2Page);
+	if(PowerPerKeyLightingV2ID !== 0)
+	{
+	device.log("Power PerKeyLightingV2ID: " + PowerPerKeyLightingID);
+	}
+	
+	const RGB8070Page = [0x80,0x70];
+	PowerRGBFeatureID = Logitech_Powerplay_FeatureID_Get(RGB8070Page);
+		if(RGBFeatureID === 0)
+		{
+		const RGB8071Page = [0x80,0x71];
+		PowerRGBFeatureID = Logitech_Powerplay_FeatureID_Get(RGB8071Page);
+			if(PowerRGBFeatureID != 0)
+			{
+			Hero = true;
+			device.log("Hero Mouse Found");
+			}
+		}
+		if(PowerRGBFeatureID != 0)
+		{
+		device.log("Power RGB Control ID : " + PowerRGBFeatureID);
 		}
 }
 
