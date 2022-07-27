@@ -9,14 +9,16 @@
     },
     "globals": {
         "module": "readonly",
-        "device": "readonly"
+        "device": "readonly", 
+        "bus": "readonly",
+        "battery": "readonly"
     },
     "rules": {
         "semi":"warn",
-        "consistent-return": "warn",
+        //"consistent-return": "warn",
         "curly":"warn",
         "no-console": "error",
-        "no-var": "warn",
+        "no-var": "error",
         "no-useless-return":"warn",
         "brace-style": ["warn","1tbs", { "allowSingleLine": true }],
         "indent": ["warn","tab"],
@@ -25,9 +27,10 @@
         "no-trailing-spaces":"warn",
         "max-len":["off",150],
         "no-multiple-empty-lines": ["warn",{ "max": 2 }],
-        "no-undef":["warn"],
+        "no-undef":["error"],
         "eqeqeq": "warn",
-        "no-cond-assign":"warn",
+        "no-cond-assign":"error",
+        "complexity": ["error",{"max":10}],
         "padding-line-between-statements": [
             "warn",
             { "blankLine": "never", "prev": ["for","if","while"], "next": "*" },
