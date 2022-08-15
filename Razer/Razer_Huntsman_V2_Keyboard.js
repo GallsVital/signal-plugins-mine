@@ -55,8 +55,6 @@ export function Render() {
 	SendPacket(3);
 	SendPacket(4);
 	SendPacket(5);
-
-	Apply();
 }
 
 
@@ -67,8 +65,6 @@ export function Shutdown() {
 	SendPacket(3, true);
 	SendPacket(4, true);
 	SendPacket(5, true);
-
-	Apply();
 
 }
 
@@ -104,26 +100,6 @@ function SendPacket(idx, shutdown = false) {
 		packet[iLedIdx+1] = col[1];
 		packet[iLedIdx+2] = col[2];
 	}
-
-	packet[89] = CalculateCrc(packet);
-
-	device.send_report(packet, 91);
-}
-
-function Apply() {
-	let packet = []; //new Array(91).fill(0);
-	packet[0] = 0x00;
-	packet[1] = 0x00;
-	packet[2] = 0x1F;
-	packet[3] = 0x00;
-	packet[4] = 0x00;
-	packet[5] = 0x00;
-	packet[6] = 0x08;
-	packet[7] = 0x0F;
-	packet[8] = 0x03;
-	packet[14] = 0xcc;
-	packet[15] = 0x60;
-	packet[16] = 0xff;
 
 	packet[89] = CalculateCrc(packet);
 

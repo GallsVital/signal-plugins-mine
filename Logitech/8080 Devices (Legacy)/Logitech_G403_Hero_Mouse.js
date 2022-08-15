@@ -39,7 +39,7 @@ export function Initialize() {
 
 	}
 
-	SetDirectMode(true);
+	SetDirectMode();
 
 }
 
@@ -58,10 +58,6 @@ function setDpi(dpi){
 	packet[6] = dpi%256;
 	device.write(packet, 7);
 
-
-}
-
-function Apply() {
 
 }
 
@@ -119,7 +115,7 @@ export function Shutdown() {
 }
 
 function SetDirectMode(direct){
-	let packet = [0x10, 0x01, FeatureId, 0x80, direct, direct];
+	let packet = [0x10, 0xff, FeatureId, 0x80, 0x01, 0x01];
 	device.write(packet, 7);
 }
 
