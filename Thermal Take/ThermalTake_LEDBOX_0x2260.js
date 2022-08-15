@@ -12,7 +12,6 @@ export function ControllableParameters(){
 		{"property":"LightingMode", "group":"lighting", "label":"Lighting Mode", "type":"combobox", "values":["Canvas", "Forced"], "default":"Canvas"},
 		{"property":"forcedColor", "group":"lighting", "label":"Forced Color", "min":"0", "max":"360", "type":"color", "default":"009bde"},
 		{"property":"CustomSize", "group":"", "label":"Custom Strip Size", "type":"number", "min":"1", "max":"80", "default":"10"},
-		{"property":"FanSpeedPercent", "group":"", "label":"Fan Speed Percent", "type":"number", "min":"20", "max":"100", "default":"60"},
 
 	];
 }
@@ -31,6 +30,8 @@ let ChannelArray = [
 	["Channel 5", 54],
 
 ];
+
+let ConnectedFans = [];
 
 function SetupChannels(){
 	device.SetLedLimit(DeviceMaxLedLimit);
@@ -65,7 +66,8 @@ export function Initialize() {
 
 	let packet = [0x00, 0xFE, 0x33];
 	device.read(packet, 193);
-
+	
+	BurstFans();
 }
 
 function sendPacketString(string, size){
@@ -76,7 +78,7 @@ function sendPacketString(string, size){
 		packet[i] = parseInt(data[i], 16);//.toString(16)
 	}
 
-	device.send_report(packet, size);
+	device.write(packet, size);
 }
 
 function Sendchannel(Channel, shutdown = false) {
@@ -102,18 +104,12 @@ function Sendchannel(Channel, shutdown = false) {
 }
 
 export function Render() {
-	for(let channel = 0; channel < 5; channel++){
+	for(let channel = 0; channel < 5; channel++)
+	{
 		Sendchannel(channel);
 	}
 
-	if(savedFanSpeed != FanSpeedPercent){
-		setFanRPM();
-	}
-	// if(Date.now() - LastFanCheck > 5000){
-	//     LastFanCheck = Date.now()
-	//     readFanRPM();
-	// }
-
+	PollFans();
 }
 
 function sendDirectPacket(LEDCount, Channel, data){
@@ -128,44 +124,89 @@ function sendDirectPacket(LEDCount, Channel, data){
 
 	device.write(packet, 193);
 	device.read(packet, 64);
+	device.pause(1);
 }
-let savedFanSpeed;
-let LastFanCheck = Date.now();
 
-function setFanRPM(){
-	savedFanSpeed = FanSpeedPercent;
+var savedPollFanTimer = Date.now();
+var PollModeInternal = 3000;
 
-	for(let channel = 1;channel <= 5;channel++){
+function PollFans(){
+	//Break if were not ready to poll
+	if (Date.now() - savedPollFanTimer < PollModeInternal) {
+		return;
+	}
+
+	savedPollFanTimer = Date.now();
+
+	if(device.fanControlDisabled()){
+		return;
+	}
+
+	for(let fan = 0; fan < 5; fan++){
+		let rpm = readFanRPM(fan);
+		device.log(`Fan ${fan}: ${rpm}rpm`);
+
+		if(rpm > 0  && !ConnectedFans.includes(`Fan ${fan}`)){
+			ConnectedFans.push(`Fan ${fan}`);
+			device.createFanControl(`Fan ${fan}`);
+		}
+
+		if(ConnectedFans.includes(`Fan ${fan}`))
+		{
+			device.setRPM(`Fan ${fan}`, rpm);
+
+			let newSpeed = device.getNormalizedFanlevel(`Fan ${fan}`) * 100;
+			SetFanPercent(fan, newSpeed);
+		}
+	}
+}
+
+
+function BurstFans(){
+	if(device.fanControlDisabled()){
+		return;
+	}
+
+	device.log("Bursting Fans for RPM based Detection");
+
+	for(let Channel = 0; Channel < 5; Channel++)
+	{
+		SetFanPercent(Channel, 75);
+	}
+}
+
+
+function SetFanPercent(channel, FanSpeedPercent)
+{
 		let packet = [];
 		packet[0] = 0x00;
 		packet[1] = 0x32;
 		packet[2] = 0x51;
-		packet[3] = channel;
+		packet[3] = channel + 1;
 		packet[4] = 0x01;
 		packet[5] = FanSpeedPercent;
 		device.write(packet, 193);
 		device.read(packet, 64);
-	}
 }
 
-function readFanRPM(){
+function readFanRPM(channel)
+{
 	let FanData = [];
 
-	for(let channel = 1;channel <= 5;channel++){
 		let packet = [];
 		packet[0] = 0x00;
 		packet[1] = 0x33;
 		packet[2] = 0x51;
-		packet[3] = channel;
+		packet[3] = channel + 1;
 		device.write(packet, 193);
 		packet = device.read(packet, 64);
 
 		let RPM = (packet[7] << 8) + packet[6];
 		//device.log(parseInt((packet[7] << 8) + packet[6],16))
 		FanData.push(`Fan ${channel} ${RPM}`);
-	}
 
 	device.log(FanData);
+	return RPM;
 }
 
 export function Shutdown() {
