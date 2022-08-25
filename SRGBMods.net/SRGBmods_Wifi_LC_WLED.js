@@ -2,21 +2,23 @@ export function Name() { return "SRGBmods Wifi LC - WLED"; }
 export function VendorId() { return 0x16D0; }
 export function ProductId() { return 0x113B; }
 export function Publisher() { return "FeuerSturm"; }
-export function Size() { return [1,1]; }
-export function DefaultPosition(){return [0,0]}
-export function DefaultScale(){return 1.0}
+export function Documentation() { return "gettingstarted/srgbmods-net-info"; }
+export function Size() { return [1, 1]; }
+export function DefaultPosition(){return [0, 0];}
+export function DefaultScale(){return 1.0;}
 export function Type() { return "Hid"; }
 export function SupportsSubdevices(){ return true; }
-export function ControllableParameters(){
+export function ControllableParameters()
+{
 	return [
-		{"property":"shutdownColor", "label":"Shutdown Color","min":"0","max":"360","type":"color","default":"000000"},
-		{"property":"LightingMode", "label":"Lighting Mode", "type":"combobox", "values":["Canvas","Forced"], "default":"Canvas"},
-		{"property":"forcedColor", "label":"Forced Color","min":"0","max":"360","type":"color","default":"009bde"},
+		{"property":"shutdownColor", "label":"Shutdown Color", "min":"0", "max":"360", "type":"color", "default":"000000"},
+		{"property":"LightingMode", "label":"Lighting Mode", "type":"combobox", "values":["Canvas", "Forced"], "default":"Canvas"},
+		{"property":"forcedColor", "label":"Forced Color", "min":"0", "max":"360", "type":"color", "default":"009bde"},
 	];
 }
 
 const DeviceMaxLedLimit = 600;
-var ChannelArray = [
+let ChannelArray = [
 	["Channel 1", 300],
 	["Channel 2", 300],
 ];
@@ -24,9 +26,10 @@ var ChannelArray = [
 function SetupChannels()
 {
 	device.SetLedLimit(DeviceMaxLedLimit);
+
 	for(let i = 0; i < ChannelArray.length; i++)
 	{
-		device.addChannel(ChannelArray[i][0],ChannelArray[i][1]);
+		device.addChannel(ChannelArray[i][0], ChannelArray[i][1]);
 	}
 }
 
@@ -46,7 +49,7 @@ export function LedPositions()
 
 export function Initialize()
 {
-	SetupChannels()
+	SetupChannels();
 }
 
 export function Shutdown()
@@ -55,44 +58,47 @@ export function Shutdown()
 	{
 		SendChannel(i, true);
 	}
+
 	device.pause(1);
 }
 
-function SendChannel(Channel,shutdown = false)
+function SendChannel(Channel, shutdown = false)
 {
-	var ChannelLedCount = device.channel(ChannelArray[Channel][0]).ledCount > ChannelArray[Channel][1] ? ChannelArray[Channel][1] : device.channel(ChannelArray[Channel][0]).ledCount;
+	let ChannelLedCount = device.channel(ChannelArray[Channel][0]).ledCount > ChannelArray[Channel][1] ? ChannelArray[Channel][1] : device.channel(ChannelArray[Channel][0]).ledCount;
 
-	var RGBData = [];
+	let RGBData = [];
+
 	if(shutdown)
 	{
 		RGBData = device.createColorArray(shutdownColor, ChannelLedCount, "Inline");
 	}
-	else if(LightingMode == "Forced")
+	else if(LightingMode === "Forced")
 	{
 		RGBData = device.createColorArray(forcedColor, ChannelLedCount, "Inline");
 	}
-	else if(device.getLedCount() == 0)
+	else if(device.getLedCount() === 0)
 	{
 		ChannelLedCount = 90;
-		var pulseColor = device.getChannelPulseColor(ChannelArray[Channel][0], ChannelLedCount);
+
+		let pulseColor = device.getChannelPulseColor(ChannelArray[Channel][0], ChannelLedCount);
 		RGBData = device.createColorArray(pulseColor, ChannelLedCount, "Inline");
 	}
 	else
 	{
 		RGBData = device.channel(ChannelArray[Channel][0]).getColors("Inline");
 	}
-	
-	var NumPackets = Math.ceil(ChannelLedCount / MaxLedsInPacket);
-	
-	for(var CurrPacket = 1; CurrPacket <= NumPackets; CurrPacket++)
+
+	let NumPackets = Math.ceil(ChannelLedCount / MaxLedsInPacket);
+
+	for(let CurrPacket = 1; CurrPacket <= NumPackets; CurrPacket++)
 	{
-		var packet = [];
+		let packet = [];
 		packet[0] = 0x00;
 		packet[1] = CurrPacket;
 		packet[2] = 0xFF;
 		packet[3] = NumPackets;
 		packet[4] = Channel + 1;
-		packet = packet.concat(RGBData.splice(0,60));
+		packet = packet.concat(RGBData.splice(0, 60));
 		device.write(packet, 65);
 	}
 }
@@ -103,6 +109,7 @@ export function Render()
 	{
 		SendChannel(i);
 	}
+
 	device.pause(1);
 }
 
