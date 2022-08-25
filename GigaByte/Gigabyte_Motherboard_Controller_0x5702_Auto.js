@@ -403,9 +403,17 @@ function SetLedCounts(){
 
 	//Set Led Counts for ARGB headers
 	let Channel1Leds = device.channel(ChannelArray[0][0]).LedCount();
-	let Channel2Leds = device.channel(ChannelArray[1][0]).LedCount();
+	let Channel1Enum = Get_Led_Def(Channel1Leds);
 
-	let LedMask = (Get_Led_Def(Channel1Leds) | Get_Led_Def(Channel2Leds) << 4);
+	let Channel2Leds = device.channel(ChannelArray[1][0]).LedCount();
+	let Channel2Enum = Get_Led_Def(Channel2Leds);
+
+	let LedMask = (Channel1Enum | (Channel2Enum << 4));
+
+	device.log(`Channel 1 Led Counts: ${Channel1Leds} [${Channel1Enum}]`, {toFile: true});
+	device.log(`Channel 2 Led Counts: ${Channel2Leds} [${Channel2Enum}]`, {toFile: true});
+	device.log(`Led Enum Mask: ${LedMask}`, {toFile: true});
+
 	let packet = [GIGABYTE_COMMAND, GIGABYTE_COMMAND_ARGBLEDCOUNTS, LedMask];
 
 	device.send_report(packet, 64);

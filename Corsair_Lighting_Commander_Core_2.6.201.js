@@ -1,4 +1,4 @@
-export function Name() { return "Corsair Commander Core"; }
+export function Name() { return "Corsair Commander Core 2.6.201 Firmware"; }
 export function VendorId() { return 0x1b1c; }
 //export function ProductId() { return 0x0C1C; }
 export function Publisher() { return "WhirlwindFX"; }
