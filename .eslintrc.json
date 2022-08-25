@@ -30,6 +30,12 @@
         "no-undef":["error"],
         "eqeqeq": "warn",
         "no-cond-assign":"error",
+        //"no-use-before-define": "error",
+        "block-scoped-var":"warn",
+        "no-else-return":"warn",
+        "no-eval":"error",
+        "prefer-const":"warn",
+        "yoda":["warn", "never", { "onlyEquality": true }],
         "complexity": ["error",{"max":10}],
         "padding-line-between-statements": [
             "warn",
