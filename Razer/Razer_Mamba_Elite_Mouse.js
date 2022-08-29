@@ -1,51 +1,3 @@
-function GetReport(cmd_class, cmd_id, size) {
-	let report = new Array(91).fill(0);
-
-	report[0] = 0;
-
-	// Status.
-	report[1] = 0x00;
-
-	// Transaction ID.
-	report[2] = 0xFF;
-
-	// Remaining packets.
-	report[3] = 0x00;
-	report[4] = 0x00;
-
-	// Protocol type.
-	report[5] = 0x00;
-
-	// Data size.
-	report[6] = size;
-
-	// Command class.
-	report[7] = cmd_class;
-
-	// Command id.
-	report[8] = cmd_id;
-
-	//report[8-87] = data;
-
-	//report[89] = crc;
-
-	//report[89] = reserved;
-
-	return report;
-}
-
-
-function CalculateCrc(report) {
-	let iCrc = 0;
-
-	for (let iIdx = 3; iIdx < 89; iIdx++) {
-		iCrc ^= report[iIdx];
-	}
-
-	return iCrc;
-}
-
-
 export function Name() { return "Razer Mamba Elite"; }
 export function VendorId() { return 0x1532; }
 export function Documentation(){ return "troubleshooting/razer"; }
@@ -59,22 +11,20 @@ export function ControllableParameters(){
 	return [
 		{"property":"shutdownColor", "group":"lighting", "label":"Shutdown Color", "min":"0", "max":"360", "type":"color", "default":"009bde"},
 		{"property":"LightingMode", "group":"lighting", "label":"Lighting Mode", "type":"combobox", "values":["Canvas", "Forced"], "default":"Canvas"},
-		{"property":"forcedColor", "group":"lighting", "label":"Forced Color", "min":"0", "max":"360", "type":"color", "default":"009bde"},
 		{"property":"DpiControl", "group":"mouse", "label":"Enable Dpi Control", "type":"boolean", "default":"false"},
-		{"property":"dpi1", "group":"mouse", "label":"DPI", "step":"50", "type":"number", "min":"200", "max":"12400", "default":"800"},
+		{"property":"DPIRollover", "group":"mouse", "label":"DPI Stage Rollover","type":"boolean","default": "false"},
+		{"property":"OnboardDPI", "group":"mouse", "label":"Save DPI to Onboard Storage","type":"boolean","default": "false"},
+		{"property":"dpiStages", "group":"mouse", "label":"Number of DPI Stages","step":"1", "type":"number","min":"1", "max":"5","default":"5"},
+		{"property":"dpi1", "group":"mouse", "label":"DPI 1","step":"50", "type":"number","min":"200", "max":"16000","default":"400"},
+		{"property":"dpi2", "group":"mouse", "label":"DPI 2","step":"50", "type":"number","min":"200", "max":"16000","default":"800"},
+		{"property":"dpi3", "group":"mouse", "label":"DPI 3","step":"50", "type":"number","min":"200", "max":"16000","default":"1200"},
+		{"property":"dpi4", "group":"mouse", "label":"DPI 4","step":"50", "type":"number","min":"200", "max":"16000","default":"1600"},
+		{"property":"dpi5", "group":"mouse", "label":"DPI 5","step":"50", "type":"number","min":"200", "max":"16000","default":"2000"},
+		{"property":"pollingRate", "group":"mouse", "label":"Polling Rate","type":"combobox", "values":[ "1000","500", "125" ], "default":"1000"},
 	];
 }
-let savedDpi1;
 
-function hexToRgb(hex) {
-	let result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
-	let colors = [];
-	colors[0] = parseInt(result[1], 16);
-	colors[1] = parseInt(result[2], 16);
-	colors[2] = parseInt(result[3], 16);
-
-	return colors;
-}
+const transactionID = 0x1f;
 
 let vLedNames = ["ScrollWheel", "Logo",
 	"SideBarLeft1", "SideBarLeft2", "SideBarLeft3", "SideBarLeft4", "SideBarLeft5", "SideBarLeft6", "SideBarLeft7", "SideBarLeft8", "SideBarLeft9",
@@ -92,185 +42,336 @@ export function LedPositions() {
 	return vLedPositions;
 }
 
-function EnableSoftwareControl() {
-	let report = GetReport(0x0F, 0x03, 0x47);
+export function Initialize()
+{
+	device.set_endpoint(0,0x0002,0x0001);
 
-	report[2] = 0x3F; // transaction id.
+	getDeviceMode();
+	getDeviceFirmwareVersion();
+	getDeviceSerial();
 
-	report[11] = 0; // row index.
-
-	report[13] = 15; // led count.
-
-	report[89] = CalculateCrc(report);
-
-
-	device.send_report(report, 91);
-}
-
-
-function ReturnToHardwareControl() {
-
-}
-
-
-function sendReportString(string, size){
-	let packet= [];
-	let data = string.split(' ');
-
-	for(let i = 0; i < data.length; i++){
-		packet[parseInt(i, 16)] =parseInt(data[i], 16);//.toString(16)
+	if(DpiControl)
+	{
+		DPIStageControl();
 	}
 
-	device.send_report(packet, size);
+	setDevicePollingRate();
 }
-export function Initialize() {
-	let packet = [];
-	packet[0] = 0x00;
-	packet[1] = 0x00;
-	packet[2] = 0x1F;
-	packet[3] = 0x00;
-	packet[4] = 0x00;
-	packet[5] = 0x00;
-	packet[6] = 0x06;
-	packet[7] = 0x0F;
-	packet[8] = 0x02;
-	packet[9] = 0x00;
-	packet[10] = 0x00;
-	packet[11] = 0x08;
-	packet[12] = 0x01;
-	packet[13] = 0x01;
 
-	packet[89] = CalculateCrc(packet);
-	device.send_report(packet, 91);
+export function Render() 
+{
+	setDeviceColor();
+	detectInputs();
+}
 
+export function Shutdown() 
+{
+	setDeviceMode(0x00);
+}
 
-	if(DpiControl) {
-		setDPIRazer(dpi1);
+export function onDpiControlChanged()
+{
+	if(DpiControl)
+	{
+	DPIStageControl();
+	}
+	else
+	{
+	setDeviceMode(0x00);
+	}
+}
+
+export function ondpiStagesChanged()
+{
+	if(DpiControl)
+	{
+	DPIStageControl();
+	}
+}
+
+export function ondpi1Changed()
+{
+	if(DpiControl)
+	{
+	DPIStageControl(true,1);
+	}
+}
+
+export function ondpi2Changed()
+{
+	if(DpiControl)
+	{
+	DPIStageControl(true,2);
+	}
+}
+
+export function ondpi3Changed()
+{
+	if(DpiControl)
+	{
+	DPIStageControl(true,3);
+	}
+}
+
+export function ondpi4Changed()
+{
+	if(DpiControl)
+	{
+	DPIStageControl(true,4);
+	}
+}
+
+export function ondpi5Changed()
+{
+	if(DpiControl)
+	{
+	DPIStageControl(true,5);
+	}
+}
+
+export function onOnboardDPIChanged()
+{
+	getDeviceMode();
+	DPIStageControl();
+}
+
+export function onpollingRateChanged()
+{
+	setDevicePollingRate();
+}
+
+function packetSend(packet,length) //Wrapper for always including our CRC
+{
+	let packetToSend = packet;
+	packetToSend[89] = CalculateCrc(packet);
+	device.send_report(packetToSend,length)
+}
+
+function CalculateCrc(report) 
+{
+	let iCrc = 0;
+
+	for (let iIdx = 3; iIdx < 89; iIdx++) 
+	{
+		iCrc ^= report[iIdx];
 	}
 
-
+	return iCrc;
 }
 
-function setDPIRazer(dpi){
-	savedDpi1 = dpi;
+function getDeviceMode()
+{
+	let packet = [0x00,0x00,transactionID,0x00,0x00,0x00,0x02,0x00,0x84];
+	packetSend(packet,91);
 
-	let packet = [];
-	packet[0] = 0x00;
-	packet[1] = 0x00;
-	packet[2] = 0x1F;
-	packet[3] = 0x00;
-	packet[4] = 0x00;
-	packet[5] = 0x00;
-	packet[6] = 0x07;
-	packet[7] = 0x04;
-	packet[8] = 0x05;
-	packet[9] = 0x00;
-	packet[10] = Math.floor(dpi/256);
-	packet[11] = dpi%256;
-	packet[12] = Math.floor(dpi/256);
-	packet[13] = dpi%256;
-	packet[89] = CalculateCrc(packet);
-
-	device.send_report(packet, 91);
+	let returnpacket = device.get_report(packet,91);
+	returnpacket = device.get_report(packet,91);
+	let deviceMode = returnpacket[9];
+	device.log("Current Device Mode: " + deviceMode);
+	if(OnboardDPI && deviceMode !== 0x00)
+	{
+		setDeviceMode(0x00);
+	}
+	else if(OnboardDPI === false)
+	{
+		setDeviceMode(0x03);
+	}
 }
 
-function SendPacket(shutdown = false){
+function setDeviceMode(mode)
+{
+	let packet = [0x00,0x00,transactionID,0x00,0x00,0x00,0x02,0x00,0x04,mode];
+	packetSend(packet,91)
+	let returnpacket = device.get_report(packet,91);
+	returnpacket = device.get_report(packet,91);
+}
 
+function getDeviceSerial()
+{
+	let packet = [0x00,0x00,transactionID,0x00,0x00,0x00,0x16,0x00,0x82];
+	packetSend(packet,91);
 
-	let packet = [];
-	packet[0] = 0x00;
-	packet[1] = 0x00;
-	packet[2] = 0x1F;
-	packet[3] = 0x00;
-	packet[4] = 0x00;
-	packet[5] = 0x00;
-	packet[6] = 0x41;
-	packet[7] = 0x0F;
-	packet[8] = 0x03;
-	packet[13] = 0x13;
+	let returnpacket = device.get_report(packet,91);
+	returnpacket = device.get_report(packet,91);
+	let Serialpacket = returnpacket.slice(9,24);
+	let SerialString = String.fromCharCode(...Serialpacket)
+	device.log("Device Serial: " + SerialString);
+}
 
+function getDeviceFirmwareVersion()
+{
+	let packet = [0x00,0x00,transactionID,0x00,0x00,0x00,0x02,0x00,0x81];
+	packetSend(packet,91);
 
-	for(let iIdx = 0; iIdx < vLedPositions.length; iIdx++){
+	let returnpacket = device.get_report(packet,91);
+	returnpacket = device.get_report(packet,91);
+	let FirmwareByte1 = returnpacket[9];
+	let FirmwareByte2 = returnpacket[10];
+	device.log("Firmware Version: " + FirmwareByte1 + "." + FirmwareByte2);
+}
 
+function setDevicePollingRate()
+{
+	let packet = [0x00, 0x00, transactionID, 0x00, 0x00, 0x00, 0x01, 0x00, 0x05, 1000/pollingRate];
+	packetSend(packet,91);
+}
+
+function setDeviceColor(shutdown = false)
+{
+	let packet = [0x00,0x00,transactionID,0x00,0x00,0x00,0x41,0x0F,0x03,0x00,0x00,0x00,0x00,0x13];
+
+	for(let iIdx = 0; iIdx < vLedPositions.length; iIdx++)
+	{
 		let iPxX = vLedPositions[iIdx][0];
 		let iPxY = vLedPositions[iIdx][1];
 		var col;
 
-		if(shutdown){
+		if(shutdown)
+		{
 			col = hexToRgb(shutdownColor);
-		}else if (LightingMode === "Forced") {
+		}
+		else if (LightingMode === "Forced") 
+		{
 			col = hexToRgb(forcedColor);
-		}else{
+		}
+		else
+		{
 			col = device.color(iPxX, iPxY);
 		}
-
 		let iLedIdx = (iIdx*3) + 14;
 		packet[iLedIdx] = col[0];
 		packet[iLedIdx+1] = col[1];
 		packet[iLedIdx+2] = col[2];
 	}
 
-	packet[89] = CalculateCrc(packet);
-
-	device.send_report(packet, 91);
+	packetSend(packet, 91);
 }
 
+const DPIStageDict =
+{
+	1:  function(){ return dpi1; },
+	2:  function(){ return dpi2; },
+	3:  function(){ return dpi3; },
+	4:  function(){ return dpi4; },
+	5:  function(){ return dpi5; }
+}
 
-function Apply() {
-	let packet = []; //new Array(91).fill(0);
-	packet[0] = 0x00;
-	packet[1] = 0x00;
-	packet[2] = 0x3F;
-	packet[3] = 0x00;
-	packet[4] = 0x00;
-	packet[5] = 0x00;
-	packet[6] = 0x0C;
-	packet[7] = 0x0F;
-	packet[8] = 0x02;
-	packet[11] = 0x08;
+let DPIStage = 1;
 
-	packet[89] = CalculateCrc(packet);
+function DPIStageControl(override, stage)
+{
+	if(override === true)
+	{
+	DPIStage = stage;
+	}
 
-	device.send_report(packet, 91);
-	device.pause(1); // We need a pause here (between packets), otherwise the ornata can't keep up.
+	if(DPIStage > dpiStages)
+    {
+        DPIStage = (DPIRollover ? 1 : dpiStages);
+    }
+	if(DPIStage < 1)
+	{
+		DPIStage = (DPIRollover ? dpiStages : 1);
+	}
+
+	if(DpiControl)
+	{		
+		OnboardDPI ? setDeviceDPI(DPIStage) : setDeviceSoftwareDPI(DPIStageDict[DPIStage]());
+	}
+
+	device.log(DPIStage);
 
 }
 
+function setDeviceSoftwareDPI(dpi)
+{
+	let packet = [0x00, 0x00, 0x1F, 0x00, 0x00, 0x00, 0x07, 0x04, 0x05, 0x01, Math.floor(dpi/256), dpi%256, Math.floor(dpi/256), dpi%256];
+	packetSend(packet,91);
+	device.pause(20);
+}
 
-export function Render() {
-	SendPacket();
+function setDeviceDPI(stage)
+{
+	let packet = [0x00,0x00,transactionID,0x00,0x00,0x00,0x26,0x04,0x06,0x01,stage,dpiStages,0x00];
+	
+	packet[13] = Math.floor(dpi1/256); 
+	packet[14] = dpi1%256;
+	packet[15] = Math.floor(dpi1/256);
+	packet[16] = dpi1%256;
+	packet[17] = 0x00;
+	packet[18] = 0x00;
+	packet[19] = 0x01;
+	packet[20] = Math.floor(dpi2/256);
+	packet[21] = dpi2%256;
+	packet[22] = Math.floor(dpi2/256);
+	packet[23] = dpi2%256;
+	packet[24] = 0x00;
+	packet[25] = 0x00;
+	packet[26] = 0x02;
+	packet[27] = Math.floor(dpi3/256);
+	packet[28] = dpi3%256;
+	packet[29] = Math.floor(dpi3/256);
+	packet[30] = dpi3%256;
+	packet[31] = 0x00;
+	packet[32] = 0x00;
+	packet[33] = 0x03;
+	packet[34] = Math.floor(dpi4/256);
+	packet[35] = dpi4%256;
+	packet[36] = Math.floor(dpi4/256);
+	packet[37] = dpi4%256;
+	packet[38] = 0x00;
+	packet[39] = 0x00;
+	packet[40] = 0x04;
+	packet[41] = Math.floor(dpi5/256);
+	packet[42] = dpi5%256;
+	packet[43] = Math.floor(dpi5/256);
+	packet[44] = dpi5%256;
+	
+	packetSend(packet,91);
+	device.pause(50);
+}
 
-	if(DpiControl) {
-		setDPIRazer(dpi1);
+function detectInputs()
+{
+	device.set_endpoint(1,0x0000,0x0001);
+	let packet = device.read([0x00],16);
+	processInputs(packet);
+	device.set_endpoint(0,0x0002,0x0001);
+}
+
+function processInputs(packet) 
+{
+	if(packet[0] === 0x04 && packet[1] === 0x20)
+	{
+		device.log("DPI Up");
+		device.set_endpoint(0,0x0002,0x0001);
+		DPIStage++
+		DPIStageControl();
+	}
+
+	if(packet[0] === 0x04 && packet[1] === 0x21)
+	{
+		device.log("DPI Down");
+		device.set_endpoint(0,0x0002,0x0001);
+		DPIStage--
+		DPIStageControl();
 	}
 }
 
+function hexToRgb(hex) 
+{
+	let result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+	let colors = [];
+	colors[0] = parseInt(result[1], 16);
+	colors[1] = parseInt(result[2], 16);
+	colors[2] = parseInt(result[3], 16);
 
-export function Shutdown() {
-	SendPacket(true);
-
-	let packet = [];
-	packet[0] = 0x00;
-	packet[1] = 0x00;
-	packet[2] = 0x1F;
-	packet[3] = 0x00;
-	packet[4] = 0x00;
-	packet[5] = 0x00;
-	packet[6] = 0x06;
-	packet[7] = 0x0F;
-	packet[8] = 0x02;
-	packet[9] = 0x01;
-	packet[10] = 0x00;
-	packet[11] = 0x03;
-	packet[12] = 0x00;
-	packet[13] = 0x028;
-
-	packet[89] = CalculateCrc(packet);
-	device.send_report(packet, 91);
+	return colors;
 }
 
-export function Validate(endpoint) {
-	return endpoint.interface === 0 && endpoint.usage === 0x0002;
+export function Validate(endpoint) 
+{
+	return endpoint.interface === 0 && endpoint.usage === 0x0002 || endpoint.interface === 1 && endpoint.usage === 0x0000;
 }
 
 export function Image() {

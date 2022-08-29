@@ -7,7 +7,7 @@ export function Size() { return [24, 9]; }
 export function Type() { return "Hid"; }
 export function DefaultPosition() {return [75, 70]; }
 export function DefaultScale(){return 8.0;}
-export function ControllableParameters(){
+export function ControllableParameters(){
 	return [
 		{"property":"shutdownColor", "group":"lighting", "label":"Shutdown Color", "min":"0", "max":"360", "type":"color", "default":"009bde"},
 		{"property":"LightingMode", "group":"lighting", "label":"Lighting Mode", "type":"combobox", "values":["Canvas", "Forced"], "default":"Canvas"},
@@ -105,37 +105,6 @@ function SendPacket(idx, shutdown = false) {
 
 	device.send_report(packet, 91);
 }
-
-function GetReport(cmd_class, cmd_id, size) {
-	let report = new Array(91).fill(0);
-
-	report[0] = 0;
-
-	// Status.
-	report[1] = 0x00;
-
-	// Transaction ID.
-	report[2] = 0xFF;
-
-	// Remaining packets.
-	report[3] = 0x00;
-	report[4] = 0x00;
-
-	// Protocol type.
-	report[5] = 0x00;
-
-	// Data size.
-	report[6] = size;
-
-	// Command class.
-	report[7] = cmd_class;
-
-	// Command id.
-	report[8] = cmd_id;
-
-	return report;
-}
-
 
 function CalculateCrc(report) {
 	let iCrc = 0;

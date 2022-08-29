@@ -1,7 +1,7 @@
-export function Name() { return "Razer Deathadder V2"; }
+export function Name() { return "Razer Deathadder Essential"; }
 export function VendorId() { return 0x1532; }
 export function Documentation(){ return "troubleshooting/razer"; }
-export function ProductId() { return 0x0084; }
+export function ProductId() { return 0x006E; }
 export function Publisher() { return "WhirlwindFX"; }
 export function Size() { return [3, 3]; }
 export function Type() { return "Hid"; }
@@ -16,35 +16,27 @@ export function ControllableParameters(){
 		{"property":"DPIRollover", "group":"mouse", "label":"DPI Stage Rollover","type":"boolean","default": "false"},
 		{"property":"OnboardDPI", "group":"mouse", "label":"Save DPI to Onboard Storage","type":"boolean","default": "false"},
 		{"property":"dpiStages", "group":"mouse", "label":"Number of DPI Stages","step":"1", "type":"number","min":"1", "max":"5","default":"5"},
-		{"property":"dpi1", "group":"mouse", "label":"DPI 1","step":"50", "type":"number","min":"200", "max":"20000","default":"400"},
-		{"property":"dpi2", "group":"mouse", "label":"DPI 2","step":"50", "type":"number","min":"200", "max":"20000","default":"800"},
-		{"property":"dpi3", "group":"mouse", "label":"DPI 3","step":"50", "type":"number","min":"200", "max":"20000","default":"1200"},
-		{"property":"dpi4", "group":"mouse", "label":"DPI 4","step":"50", "type":"number","min":"200", "max":"20000","default":"1600"},
-		{"property":"dpi5", "group":"mouse", "label":"DPI 5","step":"50", "type":"number","min":"200", "max":"20000","default":"2000"},
-		{"property":"pollingRate", "group":"mouse", "label":"Polling Rate","type":"combobox", "values":[ "1000","500", "125" ], "default":"1000"},
-		{"property":"liftOffDistance", "group":"mouse", "label":"Lift Off Distance (MM)","step":"1", "type":"number","min":"1", "max":"3","default":"1"},
-		{"property":"asymmetricLOD", "group":"mouse", "label":"Asymmetric Lift Off Distance", "type":"boolean", "default":"false"},
+		{"property":"dpi1", "group":"mouse", "label":"DPI 1","step":"50", "type":"number","min":"200", "max":"6400","default":"400"},
+		{"property":"dpi2", "group":"mouse", "label":"DPI 2","step":"50", "type":"number","min":"200", "max":"6400","default":"800"},
+		{"property":"dpi3", "group":"mouse", "label":"DPI 3","step":"50", "type":"number","min":"200", "max":"6400","default":"1200"},
+		{"property":"dpi4", "group":"mouse", "label":"DPI 4","step":"50", "type":"number","min":"200", "max":"6400","default":"1600"},
+		{"property":"dpi5", "group":"mouse", "label":"DPI 5","step":"50", "type":"number","min":"200", "max":"6400","default":"2000"},
+		{"property":"pollingRate", "group":"mouse", "label":"Polling Rate","type":"combobox", "values":[ "1000","500", "100" ], "default":"1000"},
 	];
 }
 
 let transactionID = 0x1f;
 
-let vLedNames = ["ScrollWheel", "Logo"];
-let vLedPositions = [ [1, 0], [1, 2] ];
+export function LacksOnBoardLeds() {return true;}
 
-export function LedNames() 
-{
-	return vLedNames;
+export function onBrightnessChanged() {
+	device.log(`Brightness is now set to: ${device.getBrightness()}`);
 }
 
-export function LedPositions() 
-{
-	return vLedPositions;
-}
-
-export function Initialize() 
+export function Initialize()
 {
 	device.set_endpoint(0,0x0002,0x0001);
+
 	getDeviceMode();
 	getDeviceFirmwareVersion();
 	getDeviceSerial();
@@ -55,12 +47,11 @@ export function Initialize()
 	}
 
 	setDevicePollingRate();
-	setDeviceLOD();
 }
 
 export function Render() 
 {
-	setDeviceColor();
+	setDeviceBrightness();
 	detectInputs();
 }
 
@@ -93,7 +84,7 @@ export function ondpi1Changed()
 {
 	if(DpiControl)
 	{
-	DPIStageControl();
+	DPIStageControl(true,1);
 	}
 }
 
@@ -101,7 +92,7 @@ export function ondpi2Changed()
 {
 	if(DpiControl)
 	{
-	DPIStageControl();
+	DPIStageControl(true,2);
 	}
 }
 
@@ -109,7 +100,7 @@ export function ondpi3Changed()
 {
 	if(DpiControl)
 	{
-	DPIStageControl();
+	DPIStageControl(true,3);
 	}
 }
 
@@ -117,7 +108,7 @@ export function ondpi4Changed()
 {
 	if(DpiControl)
 	{
-	DPIStageControl();
+	DPIStageControl(true,4);
 	}
 }
 
@@ -125,7 +116,7 @@ export function ondpi5Changed()
 {
 	if(DpiControl)
 	{
-	DPIStageControl();
+	DPIStageControl(true,5);
 	}
 }
 
@@ -140,16 +131,6 @@ export function onpollingRateChanged()
 	setDevicePollingRate();
 }
 
-export function onasymmetricLODChanged()
-{
-	setDeviceLOD();
-}
-
-export function onliftOffDistanceChanged()
-{
-	setDeviceLOD();
-}
-
 function packetSend(packet,length) //Wrapper for always including our CRC
 {
 	let packetToSend = packet;
@@ -157,7 +138,7 @@ function packetSend(packet,length) //Wrapper for always including our CRC
 	device.send_report(packetToSend,length)
 }
 
-function CalculateCrc(report) //CRC
+function CalculateCrc(report) 
 {
 	let iCrc = 0;
 
@@ -182,7 +163,7 @@ function getDeviceMode()
 	{
 		setDeviceMode(0x00);
 	}
-	else if(OnboardDPI === false && deviceMode !== 0x03)
+	else if(OnboardDPI === false)
 	{
 		setDeviceMode(0x03);
 	}
@@ -203,9 +184,7 @@ function getDeviceSerial()
 
 	let returnpacket = device.get_report(packet,91);
 	returnpacket = device.get_report(packet,91);
-	let Serialpacket = returnpacket.slice(9,24);
-	let SerialString = String.fromCharCode(...Serialpacket)
-	device.log("Device Serial: " + SerialString);
+	device.log(returnpacket);
 }
 
 function getDeviceFirmwareVersion()
@@ -226,41 +205,10 @@ function setDevicePollingRate()
 	packetSend(packet,91);
 }
 
-function setDeviceLOD()
+function setDeviceBrightness()
 {
-	let packet = [0x00, 0x00, transactionID, 0x00, 0x00, 0x00, 0x04, 0x0b, 0x0b, 0x00, 0x04, (asymmetricLOD ? 0x02 : 0x01), (liftOffDistance - 1)];
+	let packet = [0x00, 0x00, 0x1F, 0x00, 0x00, 0x00, 0x03, 0x0f, 0x04, 0x01, 0x00,device.getBrightness()];
 	packetSend(packet,91);
-}
-
-function setDeviceColor(shutdown = false)
-{
-	let packet = [0x00,0x00,transactionID,0x00,0x00,0x00,0x41,0x0F,0x03,0x00,0x00,0x00,0x00,0x13];
-
-	for(let iIdx = 0; iIdx < vLedPositions.length; iIdx++)
-	{
-		let iPxX = vLedPositions[iIdx][0];
-		let iPxY = vLedPositions[iIdx][1];
-		var col;
-
-		if(shutdown)
-		{
-			col = hexToRgb(shutdownColor);
-		}
-		else if (LightingMode === "Forced") 
-		{
-			col = hexToRgb(forcedColor);
-		}
-		else
-		{
-			col = device.color(iPxX, iPxY);
-		}
-		let iLedIdx = (iIdx*3) + 14;
-		packet[iLedIdx] = col[0];
-		packet[iLedIdx+1] = col[1];
-		packet[iLedIdx+2] = col[2];
-	}
-
-	packetSend(packet, 91);
 }
 
 const DPIStageDict =
@@ -274,8 +222,12 @@ const DPIStageDict =
 
 let DPIStage = 1;
 
-function DPIStageControl()
+function DPIStageControl(override, stage)
 {
+	if(override === true)
+	{
+	DPIStage = stage;
+	}
 
 	if(DPIStage > dpiStages)
     {
@@ -286,12 +238,13 @@ function DPIStageControl()
 		DPIStage = (DPIRollover ? dpiStages : 1);
 	}
 
+	if(DpiControl)
+	{		
+		OnboardDPI ? setDeviceDPI(DPIStage) : setDeviceSoftwareDPI(DPIStageDict[DPIStage]());
+	}
+
 	device.log(DPIStage);
 
-	if(DpiControl)
-	{
-    OnboardDPI ? setDeviceDPI() : setDeviceSoftwareDPI(DPIStageDict[DPIStage]());
-	}
 }
 
 function setDeviceSoftwareDPI(dpi)
@@ -300,14 +253,14 @@ function setDeviceSoftwareDPI(dpi)
 	packetSend(packet,91);
 }
 
-function setDeviceDPI()
+function setDeviceDPI(stage)
 {
-	let packet = [0x00,0x00,transactionID,0x00,0x00,0x00,0x26,0x04,0x06,0x01,DPIStage,dpiStages,0x00];
+	let packet = [0x00,0x00,transactionID,0x00,0x00,0x00,0x26,0x04,0x06,0x01,stage,dpiStages,0x00];
 	
-	packet[13] = dpi1%256; 
-	packet[14] = Math.floor(dpi1/256);
-	packet[15] = dpi1%256;
-	packet[16] = Math.floor(dpi1/256);
+	packet[13] = Math.floor(dpi1/256); 
+	packet[14] = dpi1%256;
+	packet[15] = Math.floor(dpi1/256);
+	packet[16] = dpi1%256;
 	packet[17] = 0x00;
 	packet[18] = 0x00;
 	packet[19] = 0x01;
@@ -338,34 +291,19 @@ function setDeviceDPI()
 	packet[44] = dpi5%256;
 	
 	packetSend(packet,91);
+	device.pause(50);
 }
 
 function detectInputs()
 {
 	device.set_endpoint(1,0x0000,0x0001);
-	let packet = device.read([0x00],16,5);
+	let packet = device.read([0x00],16);
 	processInputs(packet);
 	device.set_endpoint(0,0x0002,0x0001);
 }
 
-function processInputs(packet) //Detect which plate is installed. Currently Unused.
+function processInputs(packet) 
 {
-
-	if(packet[0] === 0x05 && packet[1] === 0x0e && packet[2] === 0x01)
-	{
-		device.log("2 Button Plate Installed")
-	}
-
-	if(packet[0] === 0x05 && packet[1] === 0x0e && packet[2] === 0x02)
-	{
-		device.log("6 Button Plate Installed")
-	}
-
-	if(packet[0] === 0x05 && packet[1] === 0x0e && packet[2] === 0x03)
-	{
-		device.log("12 Button Macropad Installed")
-	}
-
 	if(packet[0] === 0x04 && packet[1] === 0x20)
 	{
 		device.log("DPI Up");
@@ -381,17 +319,6 @@ function processInputs(packet) //Detect which plate is installed. Currently Unus
 		DPIStage--
 		DPIStageControl();
 	}
-}
-
-function hexToRgb(hex) 
-{
-	let result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
-	let colors = [];
-	colors[0] = parseInt(result[1], 16);
-	colors[1] = parseInt(result[2], 16);
-	colors[2] = parseInt(result[3], 16);
-
-	return colors;
 }
 
 export function Validate(endpoint) 

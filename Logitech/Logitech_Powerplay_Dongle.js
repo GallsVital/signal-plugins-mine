@@ -12,6 +12,7 @@ export function ControllableParameters(){
         {"property":"LightingMode", "group":"lighting", "label":"Lighting Mode", "type":"combobox", "values":["Canvas","Forced"], "default":"Canvas"},
         {"property":"forcedColor", "group":"lighting", "label":"Forced Color","min":"0","max":"360","type":"color","default":"009bde"},
         {"property":"DpiControl", "group":"mouse", "label":"Enable Dpi Control","type":"boolean","default":"false"},
+		{"property":"dpistages", "group":"mouse", "label":"Number of DPI Stages","step":"1", "type":"number","min":"1", "max":"5","default":"5"},
         {"property":"dpi1", "group":"mouse", "label":"DPI 1","step":"50", "type":"number","min":"200", "max":"25600","default":"400"},
 		{"property":"dpi2", "group":"mouse", "label":"DPI 2","step":"50", "type":"number","min":"200", "max":"25600","default":"800"},
 		{"property":"dpi3", "group":"mouse", "label":"DPI 3","step":"50", "type":"number","min":"200", "max":"25600","default":"1200"},
@@ -19,7 +20,6 @@ export function ControllableParameters(){
 		{"property":"dpi5", "group":"mouse", "label":"DPI 5","step":"50", "type":"number","min":"200", "max":"25600","default":"2000"},
 		{"property":"dpi6", "group":"mouse", "label":"Sniper Button DPI","step":"50", "type":"number","min":"200", "max":"25600","default":"400"},
 		{"property":"DpiLight", "group":"lighting", "label":"DPI Light Always On","type":"boolean","default": "true"},
-		{"property":"Charging", "group":"", "label":"Powerplay Charging","type":"boolean","default": "true"},
 		{"property":"OnboardState", "group":"", "label":"Onboard Button Mode","type":"boolean","default": "false"},
 		{"property":"DPIRollover", "group":"mouse", "label":"DPI Stage Rollover","type":"boolean","default": "false"},
 		{"property":"pollingrate", "group":"mouse", "label":"Polling Rate","type":"combobox", "values":[ "1000","500", "250", "100" ], "default":"1000"},
@@ -31,7 +31,9 @@ var DeviceId;
 var TransactionId;
 var deviceName;
 var InfoID;
+var NameID;
 var RGBFeatureID;
+var PowerRGBFeatureID;
 var PollingRateID;
 var ButtonSpyID;
 var DisableKeysID;
@@ -39,12 +41,12 @@ var GKeyID;
 var MKeyID;
 var MRID;
 var ChargingControlID;
+var PowerChargingControlID;
 var KeyboardLayout2ID;
 var PersistentRemappableActionID;
 var LEDCtrlID;
+var dpilightid;
 var DpiID;
-var PowerChargingControlID;
-var PowerRGBFeatureID;
 var BattID = 0;
 var UnifiedBattID;
 var Sniper;
@@ -54,10 +56,9 @@ var OnBoardState;
 var DPIStage = 1;
 var savedPollTimer = Date.now();
 var PollModeInternal = 15000;
-var battindicator = false;
 
-var vLedNames = ["Primary Zone", "Logo Zone"];
-var vLedPositions = [ [0,1],[0,2] ];
+const vLedNames = ["Primary Zone", "Logo Zone"];
+const vLedPositions = [ [0,1],[0,2] ];
 
 const WIRED = 0xFF;
 const WIRELESS = 0x01;
@@ -66,6 +67,11 @@ const LongMessage = 0x11;
 const SoftwareMode = 0x02;
 const HardwareMode = 0x01;
 const ConnectionMode = WIRELESS;
+//Change these for lightspeed vs standard mice.
+const EndpointByte1 = 2;
+const ShortMessageEndpointByte = 0x0001;
+const LongMessageEndpointByte = 0x0002;
+const EndpointByte3 = 0xff00;
 
 const DPIStageDict =
 {
@@ -224,13 +230,11 @@ export function LedPositions()
 }
 
 export function Initialize()
-{
-    device.flush()
-	
-    device.addFeature("battery");
-
+{	
 	GrabIds();//Grab all of our ID's of value
-	GrabPowerPlayIds();
+	GrabPowerPlayIds(); 
+	Powerplayinit();
+	getDeviceName();
 
     let data = [0x80, 0x00, 0x00, 0x01]//Enable Hid++ Notifications
     Logitech_Short_Set(data, WIRED)
@@ -246,31 +250,31 @@ export function Initialize()
     device.log(`Device Name: ${deviceName}`);
 
     SetOnBoardState(OnboardState);
-	DetectOnBoardState();
+
+	device.addFeature("battery");
+
     battery.setBatteryLevel(GetBatteryCharge());
 
 	ButtonSpySet();
-		if(Hero == true)
-    	{
+	if(Hero == true)
+    {
 		SetHeroDirectMode();
 		SetHeroDpiLightAlwaysOn(DpiLight);
-    	}
-		else
-		{
+    }
+	else
+	{
 		SetDirectMode();
 		SetDpiLightAlwaysOn(DpiLight)
-		}
-		if(DpiControl)
-		{
-		setDpi(DPIStageDict[DPIStage]());
-		SetDPILights(DPIStage);
-		}
-		else
-		{
-		SetDPILights(3);
-		}
+	}
+	if(DpiControl)
+	{
+		DPIStageControl();
+	}
+	else
+	{
+		SetDPILights(3); //Fallback to set DPILights to full
+	}
 
-	//Create Mouse Pad Sub Device
 	device.createSubdevice("PowerPlayMat"); 
 	device.setSubdeviceName("PowerPlayMat",`${Powerplay_Mat.displayName}`);
 	device.setSubdeviceImage("PowerPlayMat", Powerplay_Mat.image);
@@ -299,7 +303,6 @@ export function Render()
 		}
 
 	PollBattery();
-
 	sendMousePad();
 }
 
@@ -326,8 +329,7 @@ export function onDpiControlChanged()
 {
 	if(DpiControl)
 	{
-	setDpi(DPIStageDict[DPIStage]());
-	SetDPILights(DPIStage);
+		DPIStageControl();
 	}
 }
 
@@ -335,8 +337,7 @@ export function ondpi1Changed()
 {
 	if(DpiControl)
 	{
-	setDpi(DPIStageDict[DPIStage]());
-	SetDPILights(DPIStage);
+		DPIStageControl(1,1);
 	}
 }
 
@@ -344,8 +345,7 @@ export function ondpi2Changed()
 {
 	if(DpiControl)
 	{
-	setDpi(DPIStageDict[DPIStage]());
-	SetDPILights(DPIStage);
+		DPIStageControl(1,2);
 	}
 }
 
@@ -353,16 +353,14 @@ export function ondpi3Changed()
 {
 	if(DpiControl)
 	{
-	setDpi(DPIStageDict[DPIStage]());
-	SetDPILights(DPIStage);
+		DPIStageControl(1,3);
 	}
 }
 export function ondpi4Changed()
 {
 	if(DpiControl)
 	{
-	setDpi(DPIStageDict[DPIStage]());
-	SetDPILights(DPIStage);
+		DPIStageControl(1,4);
 	}
 }
 
@@ -370,8 +368,7 @@ export function ondpi5Changed()
 {
 	if(DpiControl)
 	{
-	setDpi(DPIStageDict[DPIStage]());
-	SetDPILights(DPIStage);
+		DPIStageControl(1,5);
 	}
 }
 
@@ -379,10 +376,10 @@ export function ondpi6Changed()
 {
 	if(DpiControl)
 	{
-	setDpi(DPIStageDict[DPIStage]());
-	SetDPILights(DPIStage);
+		DPIStageControl(1,6);
 	}
 }
+
 
 export function onOnboardStateChanged()
 {
@@ -392,7 +389,7 @@ export function onOnboardStateChanged()
 	{
 		if(Hero == false)
 		{
-		SetDirectMode();
+		SetDirectMode(); //Resets LEDs
 		}
 		else
 		{
@@ -424,35 +421,137 @@ export function GetBatteryCharge()
 	}
 }
 
-export function onChargingChanged()
+function Powerplayinit()
 {
-	LogitechChargingControl();
+	device.set_endpoint(2, 0x0001, 0xff00);
+	var packet = [0x10,0x07,0x0b,0x10];//RGB Info iirc
+	device.write(packet,7);
+
+	device.set_endpoint(2, 0x0002, 0xff00);
+	packet = [0x11,0x07,0x0b,0x20];//RGB
+	device.write(packet,20);
+	packet = [0x11,0x07,0x0b,0x20,0x00,0x01];//RGB Registers?
+	device.write(packet,20);
+	packet = [0x11,0x07,0x0b,0x20,0x00,0x02];//RGB
+	device.write(packet,20);
+	packet = [0x11,0x07,0x0b,0x20,0x00,0x03];//RGB
+
+	device.set_endpoint(2, 0x0001, 0xff00);
+	packet = [0x10,0x07,0x0b,0xCE];//RGB Also woah 0xC is super far out of normal bounds
+	device.write(packet,7);
+	packet = [0x10,0x07,0x0b,0x70];//RGB Power junk
+	device.write(packet,7);
+	packet = [0x10,0x07,0x0b,0x80,0x01,0x01];//RGB Enable!
+	device.write(packet,7);
+	packet = [0x10,0x07,0x0b,0xCE];//RGB Also woah 0xC is super far out of normal bounds
+	device.write(packet,7);
+	packet = [0x10,0x07,0x0b,0x40,0x00,0x01];
+	device.write(packet,7);
+
+	device.set_endpoint(2, 0x0002, 0xff00);
+	packet = [0x11,0x07,0x0b,0x30,0x00,0x01,0x00,0x00,0x00,0x02];
+	device.write(packet,7);
+
+	device.pause(1000); //wait a second for device to reinit in software mode
 }
 
-function SetDPILights(dpilightid)
+const devicetypedict = 
+{
+	0 : "Keyboard",
+	1 : "Remote Control",
+	2 : "Numpad",
+	3 : "Mouse",
+	4 : "Trackpad",
+	5 : "Trackball",
+	6 : "Presenter",
+	7 : "Reciever",
+	8 : "Headset",
+	9 : "Webcam",
+	10 : "Steering Wheel",
+	11 : "Joystick",
+	12 : "Gamepad",
+	13 : "Dock",
+	14 : "Speaker",
+	15 : "Microphone",
+	16 : "Illumination Light",
+	17 : "Programmable Controller",
+	18 : "Car Sim Pedals",
+	19 : "Adapter"
+}
+
+function getDeviceName()
+{
+	clearLongReadBuffer();
+	clearShortReadBuffer();
+	device.set_endpoint(EndpointByte1, ShortMessageEndpointByte, EndpointByte3);
+
+	let namepacket = [ShortMessage, ConnectionMode, NameID, 0x10];
+	device.write(namepacket,7);
+	
+	device.set_endpoint(EndpointByte1, LongMessageEndpointByte, EndpointByte3);
+	let namereturnpacket = device.read([0x00],20);
+	let namepart1 = namereturnpacket.slice(4,20);
+	
+
+	device.set_endpoint(EndpointByte1, ShortMessageEndpointByte, EndpointByte3);
+
+	let namepacket2 = [ShortMessage, ConnectionMode, NameID, 0x10, 0x10];
+	device.write(namepacket2,7);
+	
+	device.set_endpoint(EndpointByte1, LongMessageEndpointByte, EndpointByte3);
+	let namereturnpacket2 = device.read([0x00],20);
+	let namepart2 = namereturnpacket2.slice(4,20);
+
+	device.set_endpoint(EndpointByte1, ShortMessageEndpointByte, EndpointByte3);
+
+	let namepacket3 = [ShortMessage, ConnectionMode, NameID, 0x10, 0x20];
+	device.write(namepacket3,7);
+	
+	device.set_endpoint(EndpointByte1, LongMessageEndpointByte, EndpointByte3);
+	let namereturnpacket3 = device.read([0x00],20);
+	let namepart3 = namereturnpacket3.slice(4,20);
+
+	let deviceName = namepart1.concat(namepart2.concat(namepart3));
+	deviceName = String.fromCharCode(...deviceName);
+	device.log("Device Name: " + deviceName);
+
+	device.set_endpoint(EndpointByte1, ShortMessageEndpointByte, EndpointByte3);
+
+	let typepacket = [ShortMessage, ConnectionMode, NameID, 0x20];
+	device.write(typepacket,7);
+	
+	device.set_endpoint(EndpointByte1, LongMessageEndpointByte, EndpointByte3);
+	let typereturnpacket = device.read([0x00],20);
+	let deviceType = typereturnpacket[4];
+	device.log("Device Type: " + devicetypedict[deviceType]);
+}
+
+function SetDPILights(stage)
 {
 	if(Hero == true)
 	{
-	device.set_endpoint(2, 0x0001, 0xff00);
-	let packet = [ShortMessage, ConnectionMode, RGBFeatureID, 0x20, 0x00, dpilightid, 0x00];
+	device.set_endpoint(EndpointByte1, ShortMessageEndpointByte, EndpointByte3);
+
+	let packet = [ShortMessage, ConnectionMode, RGBFeatureID, 0x20, 0x00, stage, 0x00];
 	device.write(packet, 7);
 	}
 	else
 	{
-	device.set_endpoint(2, 0x0002, 0xff00); 
-	let packet = [LongMessage, ConnectionMode, LEDCtrlID, 0x50, 0x01, 0x00, 0x02, 0x00, dpilightid ];
+	device.set_endpoint(EndpointByte1, LongMessageEndpointByte, EndpointByte3); 
+
+	let packet = [LongMessage, ConnectionMode, LEDCtrlID, 0x50, 0x01, 0x00, 0x02, 0x00, stage ];
 	device.write(packet, 20);
 	}
 }
 
 function ButtonSpySet()
 {
-	device.set_endpoint(2, 0x0001, 0xff00);
+	device.set_endpoint(EndpointByte1, ShortMessageEndpointByte, EndpointByte3);
 	let packet = [ShortMessage, ConnectionMode, ButtonSpyID, 0x00, 0x00, 0x00, 0x00];
 	device.write(packet,7);
 	packet = [ShortMessage, ConnectionMode, ButtonSpyID, 0x10, 0x00, 0x00, 0x00];
 	device.write(packet,7);
-	device.set_endpoint(2, 0x0002, 0xff00);
+	device.set_endpoint(EndpointByte1, LongMessageEndpointByte, EndpointByte3);
 
 	if(OnboardState == false)
 	{
@@ -461,7 +560,7 @@ function ButtonSpySet()
 	}
 	else
 	{
-	device.set_endpoint(2, 0x0001, 0xff00);
+	device.set_endpoint(EndpointByte1, ShortMessageEndpointByte, EndpointByte3);
 	packet = [ShortMessage, ConnectionMode, ButtonSpyID, 0x20,]; //Relinquishes control from button spy
 	device.write(packet,7);
 	}
@@ -580,37 +679,46 @@ const mouseButtonDict =
 
 function DetectInputs()
 {
-	device.set_endpoint(2, 0x0002, 0xff00);
+	device.set_endpoint(EndpointByte1, LongMessageEndpointByte, EndpointByte3);
 		do
     	{
     	let packet = [];
-    	packet = device.readTimeout([0x00],9, 2);
+    	packet = device.read([0x00],9, 2);
     	let input = ProcessInputs(packet);
 		
 		if(input == "DPI_UP")
 		{
+			if(DpiControl)
+			{
 			DPIStage++;
 			DPIStageControl();
+			}
 		}
 		if(input == "DPI_Down")
 		{
+			if(DpiControl)
+			{
 			DPIStage--;
 			DPIStageControl();	
+			}
 		}
 		if(input == "Sniper")
 		{		
+			if(DpiControl)
+			{
 			Sniper = true;
 			setDpi(dpi6);
 			SetDPILights(1);
+			}
 		}
 
     	}
     	while(device.getLastReadSize() > 0)
 
-	device.set_endpoint(2, 0x0001, 0xff00);
+	device.set_endpoint(EndpointByte1, ShortMessageEndpointByte, EndpointByte3);
 	do
 	{
-	let packet = device.readTimeout([0x00],7, 10);
+	let packet = device.read([0x00],7, 10);
 
 		if(packet[0] == ShortMessage && packet[1] == ConnectionMode && packet[2] == 0x41 && packet[3] == 0x0C && packet[6] == 0x40)
 		{
@@ -623,7 +731,7 @@ function DetectInputs()
 
 function ProcessInputs(packet)
 {
-	if(packet[0] == LongMessage && packet[1] == 0x01 && packet[2] == ButtonSpyID)
+	if(packet[0] == LongMessage && packet[1] == ConnectionMode && packet[2] == ButtonSpyID)
 	{
     	if(packet[4] == 0x01)
 		{
@@ -682,6 +790,7 @@ function ProcessInputs(packet)
 		return mouseButtonDict[DeviceId]["button8"];
 
 		}
+
 		if(packet[5] == 0x00 && Sniper == true)
 		{
 		device.log("Sniper Button Depressed");
@@ -689,8 +798,7 @@ function ProcessInputs(packet)
 		
 		if(DpiControl)
 		{
-		setDpi(DPIStageDict[DPIStage]());
-		SetDPILights(DPIStage);
+			DPIStageControl();
 		}
 		
 		}
@@ -705,92 +813,69 @@ function ProcessInputs(packet)
 	}
 }
 
-function DetectOnBoardState()
-{
-    device.set_endpoint(2, 0x0001, 0xff00); // Short Message Endpoint
-
-    var packet = [];
-    packet[0] = ShortMessage;
-    packet[1] = ConnectionMode;
-    packet[2] = OnboardID;
-    packet[3] = 0x20;
-    
-    device.write(packet, 7);
-
-	device.set_endpoint(2, 0x0002, 0xff00);
-	packet = device.read(packet,20);
-	var OnBoardState = packet[4];
-	device.log("Onboard State: " + OnBoardState);
-    device.pause(1); 
-}
-
 function SetOnBoardState(OnboardState)
 {
-    device.set_endpoint(2, 0x0001, 0xff00); // Short Message Endpoint
+    device.set_endpoint(EndpointByte1, ShortMessageEndpointByte, EndpointByte3); // Short Message Endpoint
 
-    var packet = [];
-    packet[0] = ShortMessage;
-    packet[1] = ConnectionMode;
-    packet[2] = OnboardID;
-    packet[3] = 0x10;
-	if(OnboardState == true)
-	{
-    packet[4] = HardwareMode;
-	}
-	else
-	{
-	packet[4] = SoftwareMode
-	}
+    let packet = [ShortMessage, ConnectionMode, OnboardID, 0x10, (OnboardState ? HardwareMode : SoftwareMode)];
     device.write(packet, 7);
 
-	device.set_endpoint(2, 0x0002, 0xff00);
+	device.set_endpoint(EndpointByte1, LongMessageEndpointByte, EndpointByte3);
 	packet = device.read(packet,20);
 	device.log("Onboard State Set to : " + OnboardState);
     device.pause(1); 
 }
 
-function DPIStageControl()
+function DPIStageControl(override,stage)
 {
+	if(override === 1)
+	{
+		DPIStage = stage;
+	}
 
-		if(DPIStage == 6)
-    	{
-        DPIStage = (DPIRollover ? 1 : 5);
-    	}
-		if(DPIStage == 0)
-		{
-		DPIStage = (DPIRollover ? 5 : 1);
-		}
-	device.log(DPIStage);
+	if(DPIStage > dpistages)
+    {
+        DPIStage = (DPIRollover ? 1 : dpistages);
+    }
+	if(DPIStage < 1)
+	{
+		DPIStage = (DPIRollover ? dpistages : 1);
+	}
+	
+	if(DpiControl)
+	{
     setDpi(DPIStageDict[DPIStage]());
     SetDPILights(DPIStage);
+	}
+	device.log(DPIStage);
 }
 
 function clearShortReadBuffer()
 {
-    device.set_endpoint(2, 0x0001, 0xff00); // Short Message Endpoint 
+    device.set_endpoint(EndpointByte1, ShortMessageEndpointByte, EndpointByte3); // Short Message Endpoint 
     device.read([ShortMessage,0x01],7);
-    	while(device.getLastReadSize() > 0)
-		{
+    while(device.getLastReadSize() > 0)
+	{
         device.read([ShortMessage,0xFF],7);
-    	}
+    }
 }
 
 function clearLongReadBuffer()
 {
-    device.set_endpoint(2, 0x0002, 0xff00); // Lighting IF 
+    device.set_endpoint(EndpointByte1, LongMessageEndpointByte, EndpointByte3); // Long Message Endpoint
     device.read([LongMessage,0x01],20);
-    	while(device.getLastReadSize() > 0)
-		{
+    while(device.getLastReadSize() > 0)
+	{
         device.read([ShortMessage,0x01],20);
-    	}
+    }
 }
 
 function Logitech_Short_Set(data, Mode)
 {
-    device.set_endpoint(2, 0x0001, 0xff00); // Short Message Endpoint 
+    device.set_endpoint(EndpointByte1, ShortMessageEndpointByte, EndpointByte3); // Short Message Endpoint 
     clearShortReadBuffer();
     var packet = [ShortMessage,Mode];
-    data  = data || [ 0x80, 0x00, 0x00, 0x00];
+    data  = data || [0x00, 0x00, 0x00];
     packet = packet.concat(data);
     device.write(packet, 7);
     packet = device.read(packet,7);
@@ -800,7 +885,7 @@ function Logitech_Short_Set(data, Mode)
 
 function Logitech_Long_Set(Mode, data)
 {
-    device.set_endpoint(2, 0x0002, 0xff00); // Lighting IF 
+    device.set_endpoint(EndpointByte1, LongMessageEndpointByte, EndpointByte3); // Lighting IF 
 	clearLongReadBuffer();
     var packet = [LongMessage,Mode];
     data = data || [0x00, 0x00, 0x00];
@@ -813,7 +898,7 @@ function Logitech_Long_Set(Mode, data)
 
 function Logitech_Long_Get()
 {
-	device.set_endpoint(2, 0x0002, 0xff00); // Lighting IF 
+	device.set_endpoint(EndpointByte1, LongMessageEndpointByte, EndpointByte3); // Lighting IF 
 	let packet = device.read([0x00],20)
 
 	return packet.slice(4,7);
@@ -826,25 +911,16 @@ function Logitech_FeatureID_Get(page)
 
 function Logitech_Powerplay_FeatureID_Get(page)
 {
-	return Logitech_Long_Set(0x07, [0x00,0x00].concat(page))[0];
-}
-
-function LogitechChargingControl()
-{
-	device.set_endpoint(2, 0x0001, 0xff00); // Short Message Endpoint 
-
-	let packet = [ShortMessage, 0x07, PowerChargingControlID, 0x10, Charging];
-	device.write(packet,7);
+  return Logitech_Long_Set(0x07, [0x00,0x00].concat(page))[0];
 }
 
 function LogitechGetUnifiedBatteryPercentage()
 {
 	let data = [UnifiedBattID, 0x10];
-	Logitech_Short_Set(data, 0x01);
+	Logitech_Short_Set(data, ConnectionMode);
 	let BatteryArray = Logitech_Long_Get();
-	device.log(BatteryArray);
 	let BatteryPercentage = (BatteryArray[0])
-        let BatteryStatus = BatteryArray[2];
+    let BatteryStatus = BatteryArray[2];
 
 	device.log("Battery Percentage: " + BatteryPercentage);
 	device.log("Battery Status: " + StatusDict[BatteryStatus]);
@@ -852,12 +928,12 @@ function LogitechGetUnifiedBatteryPercentage()
 }
 
 
-function LogitechGetBatteryVoltage()// 10 06 00 //returns 15 13 3 //10 06 01 //Literally returns 1
+function LogitechGetBatteryVoltage()
 {
 	let data = [BattID, 0x00, 0x10];
-	let BatteryArray = Logitech_Long_Set(0x01, data);
+	let BatteryArray = Logitech_Long_Set(ConnectionMode, data);
 	let BatteryVoltage = (BatteryArray[0] << 8) + BatteryArray[1];
-        let BatteryStatus = BatteryArray[2];
+    let BatteryStatus = BatteryArray[2];
 
 	device.log("Battery Voltage: " + BatteryVoltage);
 	device.log("Battery Status: " + StatusDict[BatteryStatus]);
@@ -888,87 +964,70 @@ function GetApproximateBatteryPercentage(BatteryVoltage)//This needs hit with a 
 
 function setDpi(dpi)
 {
-    device.set_endpoint(2, 0x0001, 0xff00); // Short Message Endpoint 
+    device.set_endpoint(EndpointByte1, ShortMessageEndpointByte, EndpointByte3); // Short Message Endpoint 
 
-    var packet = [];
-    packet[0] = ShortMessage;
-    packet[1] = ConnectionMode;
-    packet[2] = DpiID;
-    packet[3] = 0x30;
-    packet[4] = 0x00;
-    packet[5] = Math.floor(dpi/256);
-    packet[6] = dpi%256;
-	
+    let packet = [ShortMessage, ConnectionMode, DpiID, 0x30, 0x00, Math.floor(dpi/256), dpi%256];	
     device.write(packet, 7);
-    device.pause(1); //This is here because I was having issues with the device applying the dpi consistenly
+    device.pause(1);
 }
 
 function setPollingRate()
 {
-    device.set_endpoint(2, 0x0001, 0xff00); // Short Message Endpoint
+    device.set_endpoint(EndpointByte1, ShortMessageEndpointByte, EndpointByte3); // Short Message Endpoint
 
-    var packet = [];
-    packet[0] = ShortMessage;
-    packet[1] = ConnectionMode;
-    packet[2] = PollingRateID; 
-    packet[3] = 0x20;
-    packet[4] = 1000/pollingrate; 
-	
+    let packet = [ShortMessage, ConnectionMode, PollingRateID, 0x20, 1000/pollingrate];
     device.write(packet, 7);
     device.pause(1); 
 }
 
 function SetDirectMode()
 {
- 	device.set_endpoint(2, 0x0001, 0xff00); 
+ 	device.set_endpoint(EndpointByte1, ShortMessageEndpointByte, EndpointByte3); 
  	let packet = [ShortMessage, ConnectionMode, RGBFeatureID, 0x80, 0x01, 0x01];
  	device.write(packet, 7);
 
-	packet = [ShortMessage, ConnectionMode, PowerRGBFeatureID, 0x80, 0x01, 0x01];
- 	device.write(packet, 7);
-
-	 if(OnBoardState == true)
-	 {
+	if(OnBoardState == true)
+	{
 	 packet = [ShortMessage, ConnectionMode, LEDCtrlID, 0x30, 0x00];//Software Mode for LED number
 	 device.write(packet, 7);
-	 }
+	}
 	else
 	{
-	packet = [ShortMessage, ConnectionMode, LEDCtrlID, 0x30, 0x01];//Software Mode for LED number
+	packet = [ShortMessage, ConnectionMode, LEDCtrlID, 0x30, 0x01];//Software Mode for DPI LED Count
  	device.write(packet, 7);
 	}
 }
 
-function SetDpiLightAlwaysOn(DpiLight)//Fun fact: this is making use of the led control Feature ID //NOTE TO SELF: IF THIS WAS BROKEN YOU CHANGED 0x7C to 0x70
+function SetDpiLightAlwaysOn(DpiLight)
 {
 
-    device.set_endpoint(2, 0x0001, 0xff00); // Short Message Endpoint 
+    device.set_endpoint(EndpointByte1, ShortMessageEndpointByte, EndpointByte3); // Short Message Endpoint 
     var packet = [ShortMessage, ConnectionMode, 0x08, 0x070, 0x01, (DpiLight ? 0x02 : 0x04) ,0x00];//0x07 is unknown
     device.write(packet, 7);
 
-    device.set_endpoint(2, 0x0002, 0xff00); // Lighting IF    
-    packet = [LongMessage, ConnectionMode, 0x08, 0x05E, 0x01,0x00,0x02, 0x00, 0x02];//0x50 is set led state
+    device.set_endpoint(EndpointByte1, LongMessageEndpointByte, EndpointByte3);  
+    packet = [LongMessage, ConnectionMode, 0x08, 0x050, 0x01,0x00,0x02, 0x00, 0x02];
     device.write(packet, 20);
 
-    device.set_endpoint(2, 0x0001, 0xff00); // Short Message Endpoint //0x60 should be grabbing config from nvram
-    packet = [ShortMessage, ConnectionMode, 0x08, 0x06E, 0x01];
+    device.set_endpoint(EndpointByte1, ShortMessageEndpointByte, EndpointByte3); 
+    packet = [ShortMessage, ConnectionMode, 0x08, 0x060, 0x01];
     device.write(packet, 7);
 }
 
 function SetHeroDirectMode()
 {
- 	device.set_endpoint(2, 0x0001, 0xff00); 
+ 	device.set_endpoint(EndpointByte1, ShortMessageEndpointByte, EndpointByte3); 
  	let packet = [ShortMessage, ConnectionMode, RGBFeatureID, 0x50, 0x01, 0x03, 0x05];
  	device.write(packet, 7);
 }
 
-function SetHeroDpiLightAlwaysOn(DpiLight)//Hero Light Control is handled under the regular 8071 Page, rather than a separate LED Page. Hence it using a different means to handle DPI Light Settings.
+function SetHeroDpiLightAlwaysOn(DpiLight)
 {
-    device.set_endpoint(2, 0x0002, 0xff00);  
+    device.set_endpoint(EndpointByte1, LongMessageEndpointByte, EndpointByte3);  
     var packet = [LongMessage, ConnectionMode, RGBFeatureID, 0x30, 0x01, 0x00 ,0x08, (DpiLight ? 0x04 : 0x02), 0x07];
     device.write(packet, 20);
 
-    device.set_endpoint(2, 0x0001, 0xff00);    
+    device.set_endpoint(EndpointByte1, ShortMessageEndpointByte, EndpointByte3);    
     packet = [ShortMessage, ConnectionMode, RGBFeatureID, 0x20, 0x00, 0x03, 0x00];
     device.write(packet, 7);
 
@@ -978,39 +1037,34 @@ function SetHeroDpiLightAlwaysOn(DpiLight)//Hero Light Control is handled under 
 
 function sendZone(zone, shutdown = false)
 {
-    device.set_endpoint(2, 0x0002, 0xff00);  
-    var packet = [];
-    packet[0] = LongMessage;
-    packet[1] = ConnectionMode;
-    packet[2] = RGBFeatureID;
-    packet[3] = (Hero ? 0x10 : 0x30 );
-    packet[4] = zone;
-    packet[5] = 0x01;
+    device.set_endpoint(EndpointByte1, LongMessageEndpointByte, EndpointByte3);  
+    let packet = [LongMessage, ConnectionMode, RGBFeatureID, (Hero ? 0x10 : 0x30 ), zone, 0x01];
 
-    var iX = vLedPositions[zone][0];
-    var iY = vLedPositions[zone][1];
+    let iX = vLedPositions[zone][0];
+    let iY = vLedPositions[zone][1];
     var color;
-        if(shutdown)
-		{
-         color = hexToRgb(shutdownColor);
-        }
-		else if (LightingMode == "Forced")
-		{
-         color = hexToRgb(forcedColor);
-        }
-		else
-		{
-         color = device.color(iX, iY);
-        }
+
+    if(shutdown)
+	{
+        color = hexToRgb(shutdownColor);
+    }
+	else if (LightingMode == "Forced")
+	{
+        color = hexToRgb(forcedColor);
+    }
+	else
+	{
+        color = device.color(iX, iY);
+    }
     packet[6] = color[0];
     packet[7] = color[1];
     packet[8] = color[2];
     packet[9] = (Hero ? 0x00 :0x02);
 
-		if(DeviceId == "4067" || DeviceId == "4070" || DeviceId == "4086" || DeviceId == "4087") 
-		{
+	if(DeviceId == "4067" || DeviceId == "4070" || DeviceId == "4086" || DeviceId == "4087") 
+	{
      	 packet[16] = 0x01;
-		}
+	}
 
     device.write(packet, 20);
 
@@ -1024,16 +1078,10 @@ function sendMousePad(shutdown = false)
 {
     device.set_endpoint(2, 0x0002, 0xff00); // Lighting IF    
 
-    var packet = [];
-    packet[0x00] = 0x11;
-    packet[0x01] = 0x07;
-    packet[0x02] = PowerRGBFeatureID;
-    packet[0x03] = 0x30;//0xC0? 0x70
-    packet[0x04] = 0x00;
-    packet[0x05] = 0x01;
+    let packet = [LongMessage, 0x07, PowerRGBFeatureID, 0x30, 0x00, 0x01];
 
-    var iX = Powerplay_Mat.positioning[0][0];
-    var iY = Powerplay_Mat.positioning[0][1];
+    let iX = Powerplay_Mat.positioning[0][0];
+    let iY = Powerplay_Mat.positioning[0][1];
     var color;
         if(shutdown)
 		{
@@ -1050,20 +1098,16 @@ function sendMousePad(shutdown = false)
     packet[0x06] = color[0];
     packet[0x07] = color[1];
     packet[0x08] = color[2];
-
+	packet[0x09] = 0x02;
     device.write(packet, 20);
     device.pause(1);
 }
 
 function Apply()
 {
-    device.set_endpoint(2, 0x0001, 0xff00); // Short Message Endpoint    
-    var packet = [];
-    packet[0x00] = ShortMessage;
-    packet[0x01] = ConnectionMode;
-    packet[0x02] = 0x00;//Was 0x0B if you broke it.
-    packet[0x03] = 0x20;
-    packet[0x04] = 0x01;
+    device.set_endpoint(EndpointByte1, ShortMessageEndpointByte, EndpointByte3); // Short Message Endpoint
+	  
+    let packet = [ShortMessage, ConnectionMode, 0x00, 0x20, 0x01];
     device.write(packet, 7);
 }
 
@@ -1077,7 +1121,7 @@ function GrabIds()
 		}
 	
 	const NamePage = [0x00,0x05];
-	var NameID = Logitech_FeatureID_Get(NamePage);
+	NameID = Logitech_FeatureID_Get(NamePage);
 		if(NameID !== 0)
 		{
 		device.log("Device Name ID: " + NameID);
@@ -1159,36 +1203,29 @@ function GrabIds()
 		{
 		device.log("Button Spy ID: " + ButtonSpyID);
 		}
-	
-	const ReportRatePage = [0x80,0x60];
-	var ReportRateID = Logitech_FeatureID_Get(ReportRatePage);
-		if(ReportRateID !== 0)
-		{
-		device.log("ReportRateID: " + ReportRateID);
-		}
-	
-	const EncryptionPage = [0x41,0x00]; //0x00
+		
+	const EncryptionPage = [0x41,0x00]; 
 	var EncryptionID = Logitech_FeatureID_Get(EncryptionPage);
 		if(EncryptionID !== 0)
 		{
 		device.log("Encryption ID: " + EncryptionID);
 		}
 
-	const KeyboardLayout2Page = [0x45,0x40]; //0x00
+	const KeyboardLayout2Page = [0x45,0x40]; 
 	var KeyboardLayout2ID = Logitech_FeatureID_Get(KeyboardLayout2Page);
 		if(KeyboardLayout2ID !== 0)
 		{
 		device.log("Keyboard Layout 2 ID: " + KeyboardLayout2ID);
 		}
 
-	const PersistentRemappableActionPage = [0x1b,0xc0]; //0x00
+	const PersistentRemappableActionPage = [0x1b,0xc0]; 
 	PersistentRemappableActionID = Logitech_FeatureID_Get(PersistentRemappableActionPage);
 		if(PersistentRemappableActionID !== 0)
 		{
 		device.log("Persistent Remappable Action ID: " + PersistentRemappableActionID);
 		}
 
-	const ReprogControlsV4Page = [0x1b,0x04]; //0x00
+	const ReprogControlsV4Page = [0x1b,0x04]; 
 	var ReprogControlsV4ID = Logitech_FeatureID_Get(ReprogControlsV4Page);
 		if(ReprogControlsV4ID !== 0)
 		{
@@ -1202,14 +1239,14 @@ function GrabIds()
 		device.log("Disable Keys ID: " + DisableKeysID);
 		}
 
-	const GKeyPage = [0x80,0x10]; //0x00 //2a 01 short
+	const GKeyPage = [0x80,0x10]; 
 	GKeyID = Logitech_FeatureID_Get(GKeyPage);
 		if(GKeyID !== 0)
 		{
 		device.log("GKey ID: " + GKeyID);
 		}
 
-	const MKeyPage = [0x80,0x20]; //0x01 0x01 //2a 01 short
+	const MKeyPage = [0x80,0x20]; 
 	MKeyID = Logitech_FeatureID_Get(MKeyPage);
 		if(MKeyID !== 0)
 		{
@@ -1223,14 +1260,14 @@ function GrabIds()
 		device.log("MR ID: " + MRID);
 		}
 
-	const BrightnessControlPage = [0x80,0x40]; //0x00
+	const BrightnessControlPage = [0x80,0x40]; 
 	var BrightnessControlID = Logitech_FeatureID_Get(BrightnessControlPage);
 		if(BrightnessControlID !== 0)
 		{
 		device.log("Brightness Control ID: " + BrightnessControlID);
 		}
 
-	const HostsInfoPage = [0x18,0x15]; //0x00
+	const HostsInfoPage = [0x18,0x15]; 
 	var HostsInfoID = Logitech_FeatureID_Get(HostsInfoPage);
 		if(HostsInfoID !== 0)
 		{
@@ -1291,55 +1328,6 @@ function GrabPowerPlayIds()
 		{
 		device.log("Power Device Name ID: " + PowerNameID);
 		}
-	
-	const ResetPage = [0x00,0x20];
-	var PowerResetID = Logitech_Powerplay_FeatureID_Get(ResetPage);
-		if(PowerResetID !== 0)
-		{
-		device.log("Power Device Reset ID: " + PowerResetID);
-		}
-
-	const FriendlyNamePage = [0x00,0x07];
-	var PowerFriendlyNameID = Logitech_Powerplay_FeatureID_Get(FriendlyNamePage);
-		if(PowerFriendlyNameID !== 0)
-		{
-		device.log("Power Device Friendly Name ID: " + PowerFriendlyNameID);
-		}
-	
-	const BatteryPage = [0x10,0x01];
-	var PowerBattID = Logitech_Powerplay_FeatureID_Get(BatteryPage);
-		if(PowerBattID !== 0)
-		{
-		device.log("Power Battery ID: " + PowerBattID);	
-		}
-	
-	const UnifiedBatteryPage = [0x10,0x04];
-	var PowerUnifiedBattID = Logitech_Powerplay_FeatureID_Get(UnifiedBatteryPage);
-		if(PowerUnifiedBattID !== 0)
-		{
-		device.log("Power Unified Battery ID: " + PowerUnifiedBattID);	
-		}
-	
-	const LEDCtrlPage = [0x13,0x00];
-	var PowerLEDCtrlID = Logitech_Powerplay_FeatureID_Get(LEDCtrlPage);
-		if(LEDCtrlID !== 0)
-		{
-		device.log("Power Led Control ID: " + PowerLEDCtrlID);
-		}
-	
-	const WirelessStatusPage = [0x1D,0x4B];
-	var PowerWirelessStatusID = Logitech_Powerplay_FeatureID_Get(WirelessStatusPage);
-		if(PowerWirelessStatusID !== 0)
-		{
-		device.log("Power Wireless Status ID: " + PowerWirelessStatusID);
-		}
-	
-	const DPIPage = [0x22,0x01];
-	var PowerDpiID = Logitech_Powerplay_FeatureID_Get(DPIPage);
-		if(PowerDpiID !== 0)
-		{
-		device.log("PowerDPI ID: " + PowerDpiID);	
-		}
 
 	const ChargingControlPage = [0x10,0x10];
 	PowerChargingControlID = Logitech_Powerplay_FeatureID_Get(ChargingControlPage);
@@ -1348,124 +1336,12 @@ function GrabPowerPlayIds()
 		device.log("Power Charging Control ID: " + PowerChargingControlID);	
 		}
 	
-	const PollingRatePage = [0x80,0x60];
-	var PowerPollingRateID = Logitech_Powerplay_FeatureID_Get(PollingRatePage);
-		if(PowerPollingRateID !== 0)
-		{
-		device.log("Power Polling Rate ID: " + PowerPollingRateID);	
-		}
-	
 	const OnboardProfilePage = [0x81,0x00];
 	var PowerOnboardID = Logitech_Powerplay_FeatureID_Get(OnboardProfilePage);
 		if(PowerOnboardID !== 0)
 		{
 		device.log("Power Onboard Profiles ID: " + PowerOnboardID);
 		}
-	
-	const ButtonSpyPage = [0x81,0x10];
-	var PowerButtonSpyID = Logitech_Powerplay_FeatureID_Get(ButtonSpyPage);
-		if(PowerButtonSpyID !== 0)
-		{
-		device.log("Power Button Spy ID: " + PowerButtonSpyID);
-		}
-	
-	const ReportRatePage = [0x80,0x60];
-	var PowerReportRateID = Logitech_Powerplay_FeatureID_Get(ReportRatePage);
-		if(PowerReportRateID !== 0)
-		{
-		device.log("Power ReportRateID: " + PowerReportRateID);
-		}
-	
-	const EncryptionPage = [0x41,0x00]; //0x00
-	var PowerEncryptionID = Logitech_Powerplay_FeatureID_Get(EncryptionPage);
-		if(PowerEncryptionID !== 0)
-		{
-		device.log("Power Encryption ID: " + PowerEncryptionID);
-		}
-
-	const KeyboardLayout2Page = [0x45,0x40]; //0x00
-	var PowerKeyboardLayout2ID = Logitech_Powerplay_FeatureID_Get(KeyboardLayout2Page);
-		if(PowerKeyboardLayout2ID !== 0)
-		{
-		device.log("Power Keyboard Layout 2 ID: " + PowerKeyboardLayout2ID);
-		}
-
-	const PersistentRemappableActionPage = [0x1b,0xc0]; //0x00
-	var PowerPersistentRemappableActionID = Logitech_Powerplay_FeatureID_Get(PersistentRemappableActionPage);
-		if(PowerPersistentRemappableActionID !== 0)
-		{
-		device.log("Power Persistent Remappable Action ID: " + PowerPersistentRemappableActionID);
-		}
-
-	const ReprogControlsV4Page = [0x1b,0x04]; //0x00
-	var PowerReprogControlsV4ID = Logitech_Powerplay_FeatureID_Get(ReprogControlsV4Page);
-		if(PowerReprogControlsV4ID !== 0)
-		{
-		device.log("Power Reprogram Controls V4 ID: " + PowerReprogControlsV4ID);
-		}
-
-	const DisableKeysPage = [0x45,0x22]; 
-	var PowerDisableKeysID = Logitech_Powerplay_FeatureID_Get(DisableKeysPage);
-		if(PowerDisableKeysID !== 0)
-		{
-		device.log("Power Disable Keys ID: " + PowerDisableKeysID);
-		}
-
-	const GKeyPage = [0x80,0x10]; //0x00 //2a 01 short
-	var PowerGKeyID = Logitech_Powerplay_FeatureID_Get(GKeyPage);
-		if(PowerGKeyID !== 0)
-		{
-		device.log("Power GKey ID: " + PowerGKeyID);
-		}
-
-	const MKeyPage = [0x80,0x20]; //0x01 0x01 //2a 01 short
-	var PowerMKeyID = Logitech_Powerplay_FeatureID_Get(MKeyPage);
-		if(PowerMKeyID !== 0)
-		{
-		device.log("Power MKey ID: " + PowerMKeyID);
-		}
-
-	const MRPage = [0x80,0x30];
-	var PowerMRID = Logitech_Powerplay_FeatureID_Get(MRPage);
-		if(PowerMRID !== 0)
-		{
-		device.log("Power MR ID: " + PowerMRID);
-		}
-
-	const BrightnessControlPage = [0x80,0x40]; //0x00
-	var PowerBrightnessControlID = Logitech_Powerplay_FeatureID_Get(BrightnessControlPage);
-		if(PowerBrightnessControlID !== 0)
-		{
-		device.log("Power Brightness Control ID: " + PowerBrightnessControlID);
-		}
-
-	const HostsInfoPage = [0x18,0x15]; //0x00
-	var PowerHostsInfoID = Logitech_Powerplay_FeatureID_Get(HostsInfoPage);
-		if(PowerHostsInfoID !== 0)
-		{
-		device.log("Power Hosts Info ID: " + PowerHostsInfoID);
-		}
-
-	const ChangeHostsPage = [0x18,0x14]; 
-	var PowerChangeHostsID = Logitech_Powerplay_FeatureID_Get(ChangeHostsPage);
-		if(PowerChangeHostsID !== 0)
-		{
-		device.log("Power Change Host ID: " + PowerChangeHostsID);
-		}
-
-	const PerKeyLightingPage = [0x80,0x80];
-	var PowerPerKeyLightingID = Logitech_Powerplay_FeatureID_Get(PerKeyLightingPage);
-		if(PowerPerKeyLightingID !== 0)
-		{
-		device.log("Power PerKeyLightingID: " + PowerPerKeyLightingID);
-		}
-	
-	const PerKeyLightingV2Page = [0x80,0x81];
-	var PowerPerKeyLightingV2ID = Logitech_Powerplay_FeatureID_Get(PerKeyLightingV2Page);
-	if(PowerPerKeyLightingV2ID !== 0)
-	{
-	device.log("Power PerKeyLightingV2ID: " + PowerPerKeyLightingID);
-	}
 	
 	const RGB8070Page = [0x80,0x70];
 	PowerRGBFeatureID = Logitech_Powerplay_FeatureID_Get(RGB8070Page);
@@ -1487,8 +1363,8 @@ function GrabPowerPlayIds()
 
 export function Validate(endpoint)
 {
-    return endpoint.interface === 2 && endpoint.usage === 0x0002 && endpoint.usage_page === 0xff00
-     || endpoint.interface === 2 && endpoint.usage === 0x0001 && endpoint.usage_page === 0xff00;
+    return endpoint.interface === EndpointByte1 && endpoint.usage === LongMessageEndpointByte && endpoint.usage_page === EndpointByte3
+     || endpoint.interface === EndpointByte1 && endpoint.usage === ShortMessageEndpointByte && endpoint.usage_page === EndpointByte3;
 }
 function hexToRgb(hex) 
 {
