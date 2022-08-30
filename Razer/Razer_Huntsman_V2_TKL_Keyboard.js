@@ -7,7 +7,7 @@ export function Size() { return [24, 9]; }
 export function Type() { return "Hid"; }
 export function DefaultPosition() {return [75, 70]; }
 export function DefaultScale(){return 8.0;}
-export function ControllableParameters(){
+export function ControllableParameters(){
 	return [
 		{"property":"shutdownColor", "group":"lighting", "label":"Shutdown Color", "min":"0", "max":"360", "type":"color", "default":"009bde"},
 		{"property":"LightingMode", "group":"lighting", "label":"Lighting Mode", "type":"combobox", "values":["Canvas", "Forced"], "default":"Canvas"},
@@ -48,31 +48,29 @@ export function Initialize() {
 
 }
 
-export function Render() {
+export function Render() 
+{
 	SendPacket(0);
 	SendPacket(1);
 	SendPacket(2);
 	SendPacket(3);
 	SendPacket(4);
 	SendPacket(5);
-
-	Apply();
 }
 
 
-export function Shutdown() {
+export function Shutdown() 
+{
 	SendPacket(0, true);
 	SendPacket(1, true);
 	SendPacket(2, true);
 	SendPacket(3, true);
 	SendPacket(4, true);
 	SendPacket(5, true);
-
-	Apply();
-
 }
 
-function SendPacket(idx, shutdown = false) {
+function SendPacket(idx, shutdown = false) 
+{
 	let packet = [];
 	packet[0] = 0x00;
 	packet[1] = 0x00;
@@ -110,58 +108,8 @@ function SendPacket(idx, shutdown = false) {
 	device.send_report(packet, 91);
 }
 
-function Apply() {
-	let packet = []; //new Array(91).fill(0);
-	packet[0] = 0x00;
-	packet[1] = 0x00;
-	packet[2] = 0x1F;
-	packet[3] = 0x00;
-	packet[4] = 0x00;
-	packet[5] = 0x00;
-	packet[6] = 0x08;
-	packet[7] = 0x0F;
-	packet[8] = 0x03;
-	packet[14] = 0xcc;
-	packet[15] = 0x60;
-	packet[16] = 0xff;
-
-	packet[89] = CalculateCrc(packet);
-
-	device.send_report(packet, 91);
-}
-
-function GetReport(cmd_class, cmd_id, size) {
-	let report = new Array(91).fill(0);
-
-	report[0] = 0;
-
-	// Status.
-	report[1] = 0x00;
-
-	// Transaction ID.
-	report[2] = 0xFF;
-
-	// Remaining packets.
-	report[3] = 0x00;
-	report[4] = 0x00;
-
-	// Protocol type.
-	report[5] = 0x00;
-
-	// Data size.
-	report[6] = size;
-
-	// Command class.
-	report[7] = cmd_class;
-
-	// Command id.
-	report[8] = cmd_id;
-
-	return report;
-}
-
-
-function CalculateCrc(report) {
+function CalculateCrc(report) 
+{
 	let iCrc = 0;
 
 	for (let iIdx = 3; iIdx < 89; iIdx++) {

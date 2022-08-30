@@ -254,7 +254,7 @@ function  SetARGBHeaderLeds(shutdown = false){
 }
 var configPacket = initialPacket.slice();
 export function Render() {
-	if(CheckPacketLength() != 186){
+	if(CheckPacketLength() != 185){
 		device.log("PACKET LENGTH ERROR. ABORTING RENDERING");
 
 		return;
