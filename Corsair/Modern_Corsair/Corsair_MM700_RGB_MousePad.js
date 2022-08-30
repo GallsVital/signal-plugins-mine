@@ -1,6 +1,7 @@
 export function Name() { return "Corsair MM700 RGB"; }
 export function VendorId() { return 0x1b1c; }
 export function ProductId() { return 0x1B9B; }
+export function Documentation(){ return "troubleshooting/corsair"; }
 export function Publisher() { return "WhirlwindFX"; }
 export function Size() { return [5, 3]; }
 export function DefaultPosition(){return [240, 120];}
@@ -14,7 +15,6 @@ export function ControllableParameters(){
 	];
 }
 
-export function Documentation(){ return "troubleshooting/corsair"; }
 
 function hexToRgb(hex) {
 	let result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
