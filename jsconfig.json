@@ -10,7 +10,7 @@
 		"strictNullChecks": true,
 		"strictFunctionTypes": true,
 		"declarationMap": true,
-		"typeRoots": ["."]
+		"typeRoots": ["types/"]
 	},
 	"include": [
 		"."
