@@ -1,87 +1,83 @@
+import {ModernCorsairProtocol} from "../ModernCorsairProtocol.js";
 export function Name() { return "Corsair Dark Core RGB Pro SE Wired Mode"; }
 export function VendorId() { return 0x1b1c; }
 export function ProductId() { return  0x1B7E; }
+export function Documentation(){ return "troubleshooting/corsair"; }
 export function Publisher() { return "WhirlwindFX"; }
 export function Size() { return [7, 7]; }
 export function DefaultPosition(){return [225, 120];}
 export function DefaultScale(){return 7.0;}
+/* global
+LightingMode:readonly
+forcedColor:readonly
+SettingControl:readonly
+dpi1:readonly
+PollRate:readonly
+AngleSnap:readonly
+SleepMode:readonly
+SleepModeTime:readonly
+*/
 export function ControllableParameters(){
 	return [
 		{ property: "LightingMode", "group":"lighting", label: "Lighting Mode", type: "combobox", values: ["Canvas", "Forced"], default: "Canvas" },
 		{ property: "forcedColor", "group":"lighting", label: "Forced Color", min: "0", max: "360", type: "color", default: "#009bde" },
 		{ property: "SettingControl", "group":"mouse", label: "Enable Setting Control", type: "boolean", default: "false" },
 		{ property: "dpi1", "group":"mouse", label: "DPI", step: "50", type: "number", min: "200", max: "18000", default: "800" },
-		//{ property: "PollRate", label: "Poll Rate", type: "combobox", values: ["1", "2", "3", "4", "5"], default: "3" },
+		//{ property: "PollRate", "group":"mouse", label: "Poll Rate", type: "combobox", values: ["125hz", "250hz", "500hz", "1000hz", "2000hz"], default: "1000hz" },
 		{ property: "AngleSnap", "group":"mouse", label: "Angle Snapping", type: "boolean", default: "0" },
 		{ property: "SleepMode", label: "Sleep Mode", type: "boolean", default: "1" },
 		{ property: "SleepModeTime", label: "Sleep After x Minutes", type: "combobox", values: [5, 10, 15, 30, 60], default: 10 },
 	];
 }
+const Corsair = new ModernCorsairProtocol();
+const Developer_Firmware_Version = "5.0.41";
 
-export function LacksOnBoardLeds() { return true; }
-
-// Command Ids
-const CORSAIR_WRITE = 0x01;
-const CORSAIR_READ = 0x02;
-const CORSAIR_WIRED = 0x08;
-const CORSAIR_WIRELESS = 0x09;
-
-const CORSAIR_COMMAND = CORSAIR_WIRED;
-const CORSAIR_ENDPOINT = 0x0d;
-// Endpoint Ids
-const CORSAIR_POLL_RATE = 0x01;
-const CORSAIR_BRIGHTNESS = 0x02;
-const CORSAIR_MODE = 0x03;
-const CORSAIR_ANGLE_SNAP = 0x07;
-const CORSAIR_VID = 0x11;
-const CORSAIR_PID = 0x12;
-
-const CORSAIR_BATTERY_LEVEL = 0x0f;
-const CORSAIR_BATTERY_STATUS = 0x10;
-
-const CORSAIR_DPI_X = 0x21;
-const CORSAIR_DPI_Y = 0x22;
-
-const CORSAIR_IDLE_MODE = 0x0d;
-const CORSAIR_IDLE_TIMEOUT = 0x37;
-
-// Constants
-const CORSAIR_LIGHTING_ENDPOINT = 1;
-const CORSAIR_HARDWARE_MODE = 1;
-const CORSAIR_SOFTWARE_MODE = 2;
-
-const Mode_Dictionary = {
-	1: "Software",
-	2: "Hardware",
-	0: "Error/Idle",
-};
-const PollingRate_Dictionary = {
-	1: "125",
-	2: "250",
-	3: "500",
-	4: "1000",
-	5: "2000",
-	125: "1",
-	250: "2",
-	500: "3",
-	1000: "4",
-	2000: "5",
+class LedKey{
+	/**
+ * Creates an instance of LedKey.
+ * @param {string} Name
+ * @param {number} Index
+ * @typedef {number} X - Description of index 0...
+ * @typedef {number} Y - Description of index 1...
+ * @typedef {[X, Y]} LedPosition
+ * @param {LedPosition} Position
+ * @param {number=} ScanCode
+ * @memberof LedKey
+ */
+	constructor(Name, Index, Position, ScanCode){
+		this.Name = Name;
+		this.Index = Index;
+		this.Position = Position;
+	}
 };
 
 const Leds = [
-	{ name: "Scroll Wheel", position: [3, 0] },
-	{ name: "Side Led 1", position: [0, 1] },
-	{ name: "Side Led 2", position: [0, 2] },
-	{ name: "Side Led 3", position: [0, 3] },
-	{ name: "Side Led 4", position: [0, 4] },
-	{ name: "Side Led 5", position: [0, 5] },
-	{ name: "Logo", position: [3, 5] },
-	{ name: "Right Side Led", position: [5, 5] },
-	{ name: "Dpi Indicator 1", position: [2, 0] },
-	{ name: "Dpi Indicator 2", position: [1, 0] },
-	{ name: "Dpi Indicator 3", position: [0, 0] },
-	{ name: "Battery Indicator", position: [3, 1] },
+	new LedKey("Scroll Wheel", 0, [3, 0], ),
+	new LedKey("Side Led 1", 1, [0, 1], ),
+	new LedKey("Side Led 2", 2, [0, 2], ),
+	new LedKey("Side Led 3", 3, [0, 3], ),
+	new LedKey("Side Led 4", 4, [0, 4], ),
+	new LedKey("Side Led 5", 5, [0, 5], ),
+	new LedKey("Logo", 6, [3, 5], ),
+	new LedKey("Right Side Led", 7, [5, 5], ),
+	new LedKey("Dpi Indicator 1", 8, [2, 0], ),
+	new LedKey("Dpi Indicator 2", 9, [1, 0], ),
+	new LedKey("Dpi Indicator 3", 10, [0, 0], ),
+	new LedKey("Battery Indicator", 11, [3, 1], ),
 ];
+
+const KeyMapping = {
+	1: "Left Click",
+	2: "Right Click",
+	3: "Middle Click",
+	4: "Forward",
+	5: "Back",
+	6: "Dpi Stage Up",
+	7: "Dpi Stage Down",
+	8: "Profile Switch",
+	9: "Scroll Up",
+	10: "Scroll Down"
+};
 
 // Kept for posterity
 // var vLedNames = ["Scroll Wheel",
@@ -98,99 +94,255 @@ const Leds = [
 
 
 export function LedNames() {
-	let LedNames = [];
+	const LedNames = [];
 	Leds.forEach((led) => {
-		LedNames.push(led.name);
+		LedNames.push(led.Name);
 	});
 
 	return LedNames;
 }
 
 export function LedPositions() {
-	let LedPositions = [];
+	const LedPositions = [];
 	Leds.forEach((led) => {
-		LedPositions.push(led.position);
+		LedPositions.push(led.Position);
 	});
 
 	return LedPositions;
 }
 
+export function Validate(endpoint) {
 
-// Corsair Protocol Abstractions
-function Corsair_Get(index) {
-	let packet = [0x00, CORSAIR_COMMAND, CORSAIR_READ, index, 0x00];
-	device.flush();
-	device.write(packet, 65);
-	packet = device.read(packet, 65);
-
-	return packet[4] | ((packet[5] << 8) | (packet[6] << 16));
+	return (endpoint.interface === 1 && endpoint.usage === 0x001 && endpoint.usage_page === 0xFF42) ||
+	(endpoint.interface === 2 && endpoint.usage === 0x002 && endpoint.usage_page === 0xFF42);
 }
 
-function Corsair_Set(index, value) {
-	let packet = [0x00, CORSAIR_COMMAND, CORSAIR_WRITE, index, 0x00, value & 0xff, (value >> 8) & 0xff, (value >> 16) & 0xff];
-	device.write(packet, 65);
-	device.read(packet, 65);
-	packet = device.read(packet, 65);
+// Separating Device Init from SignalRGB Init.
+function InitializeDevice(){
+	device.set_endpoint(0x01, 0x01, 0xFF42);
 
-	if (packet[3] == 3) {
-		device.log(`Set Packet Error`);
-	}
-}
+	Corsair.FindBufferLength();
+	Corsair.SetMode(Corsair.softwareMode);
+	Corsair.OpenHandle(Corsair.Handles.Lighting, Corsair.Endpoints.Lighting);
 
-function Corsair_Open_Endpoint(endpoint) {
-	let packet = [0x00, CORSAIR_COMMAND, CORSAIR_ENDPOINT, 0x00, endpoint];
-	device.write(packet, 65);
-	packet = device.read(packet, 65);
-
-	if (packet[3] == 3) {
-		device.log(`Open Endpoint Error`);
-	}
-}
-
-function EnableSoftwareControl() {
-	Corsair_Set(CORSAIR_MODE, CORSAIR_SOFTWARE_MODE);
-	device.log(`Mode is Now ${Corsair_Get(CORSAIR_MODE)}`);
-	Corsair_Open_Endpoint(CORSAIR_LIGHTING_ENDPOINT);
-}
-
-
-function ReturnToHardwareControl() {
-	Corsair_Set(CORSAIR_MODE, CORSAIR_HARDWARE_MODE);
-	device.log(`Mode is Now ${Corsair_Get(CORSAIR_MODE)}`);
-}
-
-
-export function Initialize() {
-	device.flush();
-
-	if(Corsair_Get(CORSAIR_MODE) == CORSAIR_HARDWARE_MODE){
-		EnableSoftwareControl();
-	}
-
-	device.log(`Poll Rate is ${Corsair_Get(CORSAIR_POLL_RATE)}`);
-	device.log(`Angle Snap is ${Corsair_Get(CORSAIR_ANGLE_SNAP)}`);
-	device.log(`Vid is ${Corsair_Get(CORSAIR_VID).toString(16)}`);
-	device.log(`Pid is ${Corsair_Get(CORSAIR_PID).toString(16)}`);
-	device.log(`Battery Level is ${GetBatteryCharge()}%`);
-	device.log(`Battery Status is ${GetBatteryStatus()}`);
-	device.log(`DPI x is ${Corsair_Get(CORSAIR_DPI_X)}`);
-	device.log(`DPI y is ${Corsair_Get(CORSAIR_DPI_Y)}`);
-	device.log(`Brightness is ${Corsair_Get(CORSAIR_BRIGHTNESS)}`);
-	device.log(`DPI Profile is ${Corsair_Get(0x1e)}`);
-	device.log(`DPI Mask is ${Corsair_Get(0x1f)}`);
-
-	device.log(`Idle Mode is ${Corsair_Get(CORSAIR_IDLE_MODE)}`);
-	device.log(`Idle Timeout is ${Corsair_Get(CORSAIR_IDLE_TIMEOUT) / 60 / 1000} Minutes`);
+	FetchMouseSettings(); // Purely Logging
+	PollDeviceBattery();
 
 	VerifyMouseSettings();
 
-	if (Corsair_Get(CORSAIR_BRIGHTNESS) != 1000) {
-		setbrightness(1000);
+	// Best Practice is to always set the devices hardware brightness to max.
+	// SignalRGB will handle brightness internally so HW brightness causes issues.
+	Corsair.SetHWBrightness(1000);
+
+	Corsair.KeyCount = 8;
+
+	Corsair.SetKeyStates(true);
+
+	Corsair.SetSingleKey(0x04, false);
+	Corsair.SetSingleKey(0x05, false);
+	Corsair.SetSingleKey(0x04, true);
+}
+
+export function Initialize() {
+	device.addFeature("Battery");
+
+	InitializeDevice();
+
+	ErrorTest();
+
+}
+
+function PollDeviceState(){
+	// Corsair Pings every 52 Seconds
+	const PollInterval = 52000;
+
+	if(Date.now() - PollDeviceState.lastPollTime < PollInterval) {
+		return;
+	}
+
+	if(Corsair.PingDevice()){
+		device.log(`Device Ping Successful!`);
+	}else{
+		device.log(`Device Ping Failed!`);
+	}
+
+
+	PollDeviceState.lastPollTime = Date.now();
+}
+
+
+function PollDeviceBattery(){
+	const PollInterval = 5000;
+
+	if(Date.now() - PollDeviceBattery.lastPollTime < PollInterval) {
+		return;
+	}
+
+	const [BatteryLevel, ChargeState] = Corsair.FetchBatteryStatus();
+	device.log(`Battery Level is [${BatteryLevel/10}%]`);
+	device.log(`Battery Status is [${Corsair.ChargingStates[ChargeState]}]`);
+
+	battery.setBatteryLevel(BatteryLevel / 10);
+	battery.setBatteryState(ChargeState);
+
+	PollDeviceBattery.lastPollTime = Date.now();
+}
+
+
+function PollDeviceMode(){
+	const PollInterval = 5000;
+
+	if(Date.now() - PollDeviceMode.lastPollTime < PollInterval) {
+		return;
+	}
+
+	const CurrentDeviceMode = Corsair.FetchProperty("Mode");
+	device.log(`Current Device Mode: [${Corsair.ModeNames[CurrentDeviceMode]}]`);
+
+	if(CurrentDeviceMode !== Corsair.Modes.Software){
+		device.log("Found device in Hardware Mode! Attempting to Reinitialize.");
+		InitializeDevice();
+	}
+
+	PollDeviceMode.lastPollTime = Date.now();
+}
+
+export function Render() {
+	//Clear read buffer
+	do{
+		device.read([0x00], 65, 3);
+	}while(device.getLastReadSize() > 0);
+
+	SendLighting();
+
+	ReadKeyInputs();
+
+	PollDeviceState();
+	PollDeviceMode();
+	PollDeviceBattery();
+}
+
+export function Shutdown() {
+	Corsair.SetMode(Corsair.hardwareMode);
+}
+
+function ReadKeyInputs(){
+	device.set_endpoint(0x02, 0x02, 0xFF42);
+
+	// The 2ms Read timeout here costs us 2 FPS
+	// The Process time is negligible
+
+	//let start = Date.now();
+
+	do{
+		const data = device.read([0x00], Corsair.DeviceBufferSize, 2); // Read Key Event
+
+		if(data[2]){
+			ProcessInput(data);
+		}
+
+	}while(device.getLastReadSize() > 0);
+
+	//device.log(`Process Key Events took [${Date.now() - start}ms]`)
+
+	device.set_endpoint(0x01, 0x01, 0xFF42);
+}
+
+function ProcessInput(InputData){
+
+	if(InputData[2] === 2){
+		// I doubt we'll ever have over 32 bytes (256 Keys) of bit flags.
+		const PressedKeys = Convert_To_16Bit(InputData.slice(3, 35));
+		const KeyPressDiff = PressedKeys - ReadKeyInputs.lastKeyState; // Get the Change in Pressed Keys compared to the last event;
+		const wasPressed = KeyPressDiff > 0; // negative values indicate the key is no longer pressed.
+
+		const binaryString = KeyPressDiff.toString(2); // Convert to binary string;
+		const ChangedKeyID = Math.abs(binaryString.length - binaryString.indexOf("1")); // The set bit is the changed key ID. Note: This is read right to left.
+
+		if(KeyMapping.hasOwnProperty(ChangedKeyID)){
+			device.log(`Pressed Keys Changed! [${KeyMapping[ChangedKeyID]}, ${decimalToHex(ChangedKeyID, 2)}], [${wasPressed ? "Pressed" : "Released"}]`);
+		}
+
+		ReadKeyInputs.lastKeyState = PressedKeys; // bind current state to the function. Mimics cpp static keyword.
 	}
 }
+
+
+function ErrorTest(){
+	//Corsair.FetchTemperatures(); // Error Test, Endpoint is unsupported by this mouse.
+	//Corsair.ReadProperty(Corsair.Properties.layout); // Error Test, Property is unsupported by this mouse
+	//Corsair.SetProperty(Corsair.Properties.vid, 10); // Error Test, Property is read only.
+	//Corsair.SetProperty(Corsair.Properties.brightness, 5000); // Error Test, Setting out of range value.
+}
+
+
+function FetchMouseSettings(){
+	device.log(`Poll Rate is [${Corsair.PollingRates[Corsair.FetchProperty("Polling Rate")]}]`);
+	device.log(`Max Poll Rate is [${Corsair.PollingRates[Corsair.FetchProperty("Max Polling Rate")]}]`);
+	device.log(`Angle Snap is [${Corsair.FetchProperty("Angle Snapping") ? "Enabled" : "Disabled"}]`);
+	device.log(`Vid is [${decimalToHex(Corsair.FetchProperty("Vendor Id"), 4)}]`);
+	device.log(`Pid is [${decimalToHex(Corsair.FetchProperty("Product Id"), 4)}]`);
+
+	device.log(`DPI X is [${Corsair.FetchProperty("DPI X")}]`);
+	device.log(`DPI Y is [${Corsair.FetchProperty("DPI Y")}]`);
+
+	device.log(`Brightness is [${Corsair.FetchProperty("HW Brightness")/10}%]`);
+
+	device.log(`DPI Profile is [${Corsair.FetchProperty("DPI Profile")}]`);
+	//device.log(`DPI Mask is ${Corsair.FetchProperty(Corsair.property.dpiMask)}`);
+
+	device.log(`Idle Mode is [${Corsair.FetchProperty("Idle Mode") ? "Enabled" : "Disabled"}]`);
+	device.log(`Idle Timeout is [${Corsair.FetchProperty("Idle Mode Timeout") / 60 / 1000} Minutes]`);
+
+	Corsair.FetchFirmware();
+	device.log(`Developed On Firmware Version: [${Developer_Firmware_Version}]`);
+
+}
+
 //Verify Mouse Settings on Toggle Enabled
 export function onSettingControlChanged() {
 	VerifyMouseSettings();
+}
+
+
+export function ondpi1Changed() {
+	if (!SettingControl) {
+		return;
+	}
+
+	Corsair.SetDPI(dpi1);
+}
+
+export function onSleepModeChanged() {
+	if (!SettingControl) {
+		return;
+	}
+
+	Corsair.CheckAndSetProperty("Idle Mode", SleepMode);
+
+}
+
+export function onSleepModeTimeChanged() {
+	if (!SettingControl) {
+		return;
+	}
+
+	Corsair.CheckAndSetProperty("Idle Mode Timeout", parseInt(SleepModeTime) * 60 * 1000);
+	device.log(`Sleep Timeout is now ${Corsair.FetchProperty(Corsair.Properties.idleModeTimeout) / 60 / 1000} Minutes`);
+}
+
+export function onAngleSnapChanged() {
+	if (!SettingControl) {
+		return;
+	}
+
+	Corsair.CheckAndSetProperty("Angle Snapping", AngleSnap);
+}
+
+
+// Polling Rate Functions
+export function onPollRateChanged() {
+	setPollRate(PollRate);
 }
 
 function VerifyMouseSettings() {
@@ -198,129 +350,48 @@ function VerifyMouseSettings() {
 		return;
 	}
 
-	if (Corsair_Get(CORSAIR_ANGLE_SNAP) != AngleSnap) {
-		setAngleSnap(AngleSnap);
-	}
+	Corsair.SetAngleSnapping(AngleSnap);
 
-	if (Corsair_Get(CORSAIR_DPI_X) != dpi1) {
-		setDpi(dpi1);
-	}
+	Corsair.SetDPI(dpi1);
 
-	if (Corsair_Get(CORSAIR_IDLE_MODE) != SleepMode || Corsair_Get(CORSAIR_IDLE_TIMEOUT) / 60 / 1000 != SleepModeTime) {
-		setSleepMode(SleepMode, SleepModeTime);
-	}
+	Corsair.CheckAndSetProperty("Idle Mode", SleepMode);
+	Corsair.CheckAndSetProperty("Idle Mode Timeout", parseInt(SleepModeTime) * 60 * 1000);
 }
 
-// Battery Functions
-export function GetBatteryCharge() {
-	return Corsair_Get(CORSAIR_BATTERY_LEVEL) / 10;
-}
-const BatteryStatusMap = {
-	0 : 1,
-	1 : 2,
-	2 : 2,
-	3 : 2
-};
-
-export function GetBatteryStatus() {
-	return BatteryStatusMap[Corsair_Get(CORSAIR_BATTERY_STATUS)];
-}
-
-// DPI Functions
-export function ondpi1Changed() {
-	setDpi(dpi1);
-}
-
-function setDpi(dpi) {
-	if (!SettingControl) {
-		return;
-	}
-
-	device.log(`Setting Dpi to ${dpi}`);
-	Corsair_Set(CORSAIR_DPI_X, dpi);
-	Corsair_Set(CORSAIR_DPI_Y, dpi);
-
-	device.log(`DPI x is now ${Corsair_Get(CORSAIR_DPI_X)}`);
-	device.log(`DPI y is now ${Corsair_Get(CORSAIR_DPI_Y)}`);
-}
-
-// Sleep Mode Functions
-export function onSleepModeChanged() {
-	setSleepMode(SleepMode, SleepModeTime);
-}
-
-export function onSleepModeTimeChanged() {
-	setSleepMode(SleepMode, SleepModeTime);
-}
-
-function setSleepMode(SleepMode, SleepModeTime) {
-	if (!SettingControl) {
-		return;
-	}
-
-	device.log(`Setting Sleep Mode to ${SleepMode}`);
-	Corsair_Set(CORSAIR_IDLE_MODE, SleepMode);
-	device.log(`Sleep Mode is now ${Corsair_Get(CORSAIR_IDLE_MODE)}`);
-
-	device.log(`Setting Sleep Timeout to ${SleepModeTime} Minutes`);
-	Corsair_Set(CORSAIR_IDLE_TIMEOUT, parseInt(SleepModeTime) * 60 * 1000);
-	device.log(`Sleep Timeout is now ${Corsair_Get(CORSAIR_IDLE_TIMEOUT) / 60 / 1000} Minutes`);
-}
-
-// Angle Snap Functions
-export function onAngleSnapChanged() {
-	setAngleSnap(AngleSnap);
-}
-
-function setAngleSnap(angleSnap) {
-	if (!SettingControl) {
-		return;
-	}
-
-	device.log(`Setting Angle Snapping to ${angleSnap}`);
-	Corsair_Set(CORSAIR_ANGLE_SNAP, angleSnap);
-	device.log(`Angle Snapping is now ${Corsair_Get(CORSAIR_ANGLE_SNAP)}`);
-}
-
-// Polling Rate Functions
-export function onPollRateChanged() {
-	setPollRate(PollRate);
-}
-
+// Setting Polling Rate causes the device to disconnect and reconnect.
+// This happens quickly enough that SignalRGB misses the hot-plug event
+// We'll need to manually re-grab new Hid Handles after this.
+// This Also resets the current Software DPI
+// TODO - Add that functionality.
 function setPollRate(pollRate) {
 	if (!SettingControl) {
 		return;
 	}
+	const pollingRateId = Corsair.PollingRateNames[pollRate];
 
-	device.log(`Setting Polling Rate to ${pollRate}`);
+	device.log(`Setting Polling Rate to [${pollRate}, ${pollingRateId}]`);
 
-	Corsair_Set(CORSAIR_POLL_RATE, pollRate);
+	const CurrentValue = Corsair.FetchProperty("Polling Rate");
+
+	if(CurrentValue != pollingRateId){
+		device.log(`Device "Polling Rate" is currently [${CurrentValue}]. Desired Value is [${pollingRateId}]. Setting Property!`);
+
+		Corsair.SetProperty("Polling Rate", pollingRateId);
+
+		const NewValue = Corsair.FetchProperty("Polling Rate");
+		device.log(`Device Polling Rate is now [${NewValue}]`);
+	}
+
+
 	device.pause(300);
-	device.log(`Polling Rate is now ${Corsair_Get(CORSAIR_POLL_RATE)}`);
+	device.log(`Polling Rate is now ${Corsair.PollingRates[Corsair.FetchProperty("Polling Rate")]}`);
 }
 
-function setbrightness(Brightness) {
-	Corsair_Set(CORSAIR_BRIGHTNESS, Brightness);
-	device.log(`Brightness is now ${Corsair_Get(CORSAIR_BRIGHTNESS)}`);
-}
-
-export function Render() {
-	sendColors();
-
-}
-
-
-function sendColors(){
-
-	let packet = [];
-	packet[0x00]   = 0x00;
-	packet[0x01]   = CORSAIR_COMMAND;
-	packet[0x02]   = 0x06;
-	packet[0x03]   = 0x00;
-	packet[0x04]   = 0x24;
-	packet[0x05]   = 0x00;
-	packet[0x06]   = 0x00;
-	packet[0x07]   = 0x00;
+function SendLighting(){
+	/** @type {number[]} */
+	const packet = [];
+	//Each channel is spaced by 12 indexes
+	const LedChannelSpacing = 12;
 
 	//Normal LEDs //3 dpi indicators //battery light
 	//FF FF FF FF FF FF FF FF 00 00 00 00
@@ -329,33 +400,56 @@ function sendColors(){
 	//00 00 00 00 00 00 00 00 00 00 00 00
 	//00 00 00 00 00 00 00 00 00 00 00 80
 
-	Leds.forEach((led, index) => {
+	
+	for(let iLedIdx = 0; iLedIdx < Leds.length; iLedIdx++){
+		const Led = Leds[iLedIdx];
 		let col;
 
 		if (LightingMode === "Forced") {
 			col = device.createColorArray(forcedColor, 1, "Inline");
-		} else {
-			col = device.color(...led.position);
+		}else{
+			col = device.color(...Led.Position);
 		}
+		
+		packet[Led.Index] = col[0];
+		packet[Led.Index + LedChannelSpacing] = col[1];
+		packet[Led.Index + LedChannelSpacing * 2] = col[3];
 
-		// Offset Colors by 8 indexs, Each channel is spaced by 12 indexes
-		packet[8 + index] = col[0];
-		packet[8 + index + 12] = col[1];
-		packet[8 + index + 12 * 2] = col[2];
-	});
-
-	device.write(packet, 65);
-	device.read(packet, 65);
-}
-
-export function Validate(endpoint) {
-	return endpoint.interface === 1;
-}
-
-export function Shutdown() {
-	if(Corsair_Get(CORSAIR_MODE) == CORSAIR_SOFTWARE_MODE){
-		ReturnToHardwareControl();
 	}
+
+	Corsair.SendRGBData(packet);
+}
+
+function Convert_To_16Bit(values) {
+	let returnValue = 0;
+
+	for(let i = 0; i < values.length; i++) {
+		returnValue += values[i] << (8 * i);
+	}
+
+	return returnValue;
+}
+
+function Convert_From_16Bit(value, LittleEndian = false) {
+	const returnValue = [];
+
+	while(value > 0){
+		returnValue.push(value & 0xFF);
+		value = value >> 8;
+	}
+
+	return LittleEndian ? returnValue : returnValue.reverse();
+}
+
+function decimalToHex(d, padding) {
+	let hex = Number(d).toString(16);
+	padding = typeof (padding) === "undefined" || padding === null ? padding = 2 : padding;
+
+	while (hex.length < padding) {
+		hex = "0" + hex;
+	}
+
+	return "0x" + hex;
 }
 
 export function Image() {

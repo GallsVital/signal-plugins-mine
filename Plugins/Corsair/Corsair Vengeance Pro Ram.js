@@ -3,7 +3,7 @@ export function Publisher() { return "WhirlwindFX"; }
 export function Documentation(){ return "troubleshooting/corsair"; }
 
 export function Type() { return "SMBUS"; }
-
+asd
 export function Scan(bus) {
   
   var addys = [0x58, 0x59, 0x5A, 0x5B, 0x5C, 0x5D, 0x5E, 0x5F];
