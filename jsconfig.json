@@ -1,0 +1,22 @@
+{
+	"compilerOptions": {
+		"module": "ESNext",
+		"moduleResolution": "Node",
+		"target": "ES2020",
+		"allowJs": true,
+		"checkJs": true,
+		"declaration": true,
+		"outDir": "dist",
+		"strictNullChecks": true,
+		"strictFunctionTypes": true,
+		"declarationMap": true,
+		"typeRoots": ["."]
+	},
+	"include": [
+		"."
+	],
+	"exclude": [
+		"**/node_modules/*",
+		"**/docs/*",
+	]
+}

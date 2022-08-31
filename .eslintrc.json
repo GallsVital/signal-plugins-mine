@@ -1,12 +1,24 @@
 {
     "parserOptions": {
+        "parser": "@typescript-eslint/parser",
         "ecmaVersion": "latest",
         "sourceType": "module",
         "ecmaFeatures": {
             "jsx": false
         },
-        "extends": "eslint:recommended"
+        "extends": [
+            "eslint:recommended",
+            "plugin:@typescript-eslint/eslint-recommended",
+            "plugin:@typescript-eslint/recommended",
+            "plugin:unicorn/recommended"
+            
+        ]
     },
+    "plugins": [
+        "@typescript-eslint",
+        "write-good-comments",
+        "unicorn"
+    ],
     "globals": {
         "module": "readonly",
         "device": "readonly", 
@@ -14,6 +26,7 @@
         "battery": "readonly"
     },
     "rules": {
+        "write-good-comments/write-good-comments": "warn",
         "semi":"warn",
         //"consistent-return": "warn",
         "curly":"warn",

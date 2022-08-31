@@ -1,0 +1,33 @@
+{
+    "tags": {
+        "allowUnknownTags": true
+    },
+    "source": {
+        "include": ["types/"],
+        "exclude": ["./node_modules", "./docs"],
+        "includePattern": "\\.(jsx|js|ts|tsx|d.ts)$"
+    },
+    "plugins": [
+        "node_modules/better-docs/typescript",
+        "node_modules/better-docs/typedef-import",
+        "plugins/markdown"
+    ],
+    "opts": {
+        "encoding": "utf8",
+        "destination": "docs/",
+        "recurse": true,
+        "verbose": true,
+        "template": "node_modules/better-docs"
+    },
+    "templates": {
+        "better-docs": {
+              "name": "SignalRGB Plugins"  
+        },
+        "search": true,
+        "default": {
+          "staticFiles": {
+            "include": []
+          }
+      }
+    }
+  }
