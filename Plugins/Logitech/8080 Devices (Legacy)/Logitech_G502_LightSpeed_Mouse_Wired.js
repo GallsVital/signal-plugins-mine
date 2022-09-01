@@ -212,6 +212,7 @@ export function LedPositions()
 
 export function Initialize()
 {	
+	device.addFeature("battery");
 	GrabIds();//Grab all of our ID's of value
 
     let data = [0x80, 0x00, 0x00, 0x01]//Enable Hid++ Notifications
@@ -230,8 +231,6 @@ export function Initialize()
     device.log(`Device Name: ${deviceName}`);
 
     SetOnBoardState(OnboardState);
-
-	device.addFeature("battery");
 
     battery.setBatteryLevel(GetBatteryCharge());
 
