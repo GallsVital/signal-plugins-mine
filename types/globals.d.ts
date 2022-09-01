@@ -316,5 +316,7 @@ declare class Device{
 	public getBrightness(): number
 
 	public addFeature(FeatureName: DeviceFeature): void
+	
+	public getMotherboardName(): string
 }
 

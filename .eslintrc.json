@@ -10,14 +10,12 @@
             "eslint:recommended",
             "plugin:@typescript-eslint/eslint-recommended",
             "plugin:@typescript-eslint/recommended",
-            "plugin:unicorn/recommended"
             
         ]
     },
     "plugins": [
         "@typescript-eslint",
         "write-good-comments",
-        "unicorn"
     ],
     "globals": {
         "device": "readonly", 

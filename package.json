@@ -6,7 +6,6 @@
 		"@typescript-eslint/parser": "^5.36.1",
 		"better-docs": "^2.7.2",
 		"eslint": "~8.23.0",
-		"eslint-plugin-unicorn": "^43.0.2",
 		"eslint-plugin-write-good-comments": "^0.1.4",
 		"jsdoc": "^3.6.11",
 		"typescript": "^4.8.2"
