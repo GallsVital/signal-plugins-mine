@@ -56,6 +56,7 @@ export function LedPositions()
 export function Initialize() 
 {
     ClearReadBuffer();
+    checkFirmwareType();
     versionQMK();
     versionSignalRGBProtocol();
     uniqueIdentifier();
@@ -72,7 +73,8 @@ export function Shutdown()
     effectDisable();
 }
 
-function ClearReadBuffer(timeout = 10){
+function ClearReadBuffer(timeout = 10)
+{
     let count = 0;
     let readCounts = [];
     device.flush();
@@ -85,11 +87,31 @@ function ClearReadBuffer(timeout = 10){
     //device.log(`Read Count ${count}: ${readCounts} Bytes`)
 }
 
+function checkFirmwareType()
+{
+    let packet = [];
+    packet[0] = 0x00;
+    packet[1] = 0x28;
+
+    device.write(packet, 32);
+
+    let returnpacket = device.read(packet,32);
+    let FirmwareTypeByte = returnpacket[2];
+
+    if(FirmwareTypeByte !== 1 || FirmwareTypeByte !== 2)
+    {
+        device.notify("Unsupported Firmware: ", "Click Show Console, and then click on troubleshooting for your keyboard to find out more.", 0)
+    }
+
+    device.log("Firmware Type: " + FirmwareTypeByte);
+    device.pause(30);
+}
+
 function versionQMK() //Check the version of QMK Firmware that the keyboard is running
 {
     var packet = [];
     packet[0] = 0x00;
-    packet[1] = 0x01;
+    packet[1] = 0x21;
 
     device.write(packet, 32);
     packet = device.read(packet,32);
@@ -104,7 +126,7 @@ function versionSignalRGBProtocol() //Grab the version of the SignalRGB Protocol
 {
     var packet = [];
     packet[0] = 0x00;
-    packet[1] = 0x02;
+    packet[1] = 0x22;
 
     device.write(packet, 32);
     packet = device.read(packet,32);
@@ -119,7 +141,7 @@ function uniqueIdentifier() //Grab the unique identifier for this keyboard model
 {
     var packet = [];
     packet[0] = 0x00;
-    packet[1] = 0x03;
+    packet[1] = 0x23;
 
     device.write(packet, 32);
     packet = device.read(packet,32);
@@ -134,7 +156,7 @@ function effectEnable() //Enable the SignalRGB Effect Mode
 {
     let packet = [];
     packet[0] = 0x00;
-    packet[1] = 0x05;
+    packet[1] = 0x25;
 
     device.write(packet,32);
     device.pause(30);
@@ -144,7 +166,7 @@ function effectDisable() //Revert to Hardware Mode
 {
     let packet = [];
     packet[0] = 0x00;
-    packet[1] = 0x06;
+    packet[1] = 0x26;
 
     device.write(packet,32);  
 }
@@ -190,7 +212,7 @@ function sendColors()
 	let packet = [];
     let offset = index * 9;
 	packet[0] = 0x00;
-	packet[1] = 0x04;
+	packet[1] = 0x24;
 	packet[2] = offset;
 	packet[3] = 0x09;
 	packet = packet.concat(rgbdata.splice(0, 27));
