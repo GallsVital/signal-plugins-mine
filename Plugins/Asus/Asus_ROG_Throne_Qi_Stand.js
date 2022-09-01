@@ -1,8 +1,8 @@
 export function Name() { return "Asus Throne QI"; }
 export function VendorId() { return 0x0B05; }
-export function ProductId() { return 0x18C4; }
+export function ProductId() { return 0x18C5; }
 export function Publisher() { return "WhirlwindFX"; }
-export function Size() { return [1, 1]; }
+export function Size() { return [18, 1]; }
 export function DefaultPosition(){return [10, 100]; }
 export function DefaultScale(){return 8.0;}
 export function ControllableParameters()
