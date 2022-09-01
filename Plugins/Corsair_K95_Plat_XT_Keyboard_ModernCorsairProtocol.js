@@ -20,6 +20,7 @@ export function Documentation(){ return "troubleshooting/corsair"; }
 export function LedNames() { return vKeyNames; }
 export function LedPositions() { return vKeyPositions; }
 
+/** @param {HidEndpoint} endpoint */
 export function Validate(endpoint) {
 	return (endpoint.interface === 1 && endpoint.usage === 0x001 && endpoint.usage_page === 0xFF42) ||
 	(endpoint.interface === 2 && endpoint.usage === 0x002 && endpoint.usage_page === 0xFF42);

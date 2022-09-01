@@ -1,4 +1,4 @@
-import {ModernCorsairProtocol} from "../../../ModernCorsairProtocol.js";
+import {ModernCorsairProtocol} from "../ModernCorsairProtocol.js";
 export function Name() { return "Corsair Commander Core XT"; }
 export function VendorId() { return 0x1b1c; }
 export function ProductId() { return 0x0C2A; }
@@ -48,7 +48,7 @@ let savedLedCount;
 
 //Channel Name, Led Limit
 /** @type {[string, number][]}  */
-const ChannelArray = [
+let ChannelArray = [
 	["4 pin Ports", 204],
 	["3 Pin Lighting Channel", 128],
 ];
@@ -67,14 +67,7 @@ const Device_Write_Length = 1025;
 const Device_Read_Length = 1025;
 const DeviceMaxLedLimit = 264;
 
-// Protocol Constants
-const CORSAIR_COMMAND = 0x08;
-
 const DevFirmwareVersion = "1.3.54";
-
-const CORSAIR_LIGHTING_ENDPOINT_INDEX = 0;
-
-
 
 export function Initialize() {
 	Corsair.FindBufferLength();
@@ -89,7 +82,7 @@ export function Initialize() {
 	SetupChannels();
 	device.log(`Vid is [${decimalToHex(Corsair.FetchProperty(Corsair.Properties.vid), 4)}]`);
 	device.log(`Pid is [${decimalToHex(Corsair.FetchProperty(Corsair.Properties.pid), 4)}]`);
-	
+
 	Corsair.FetchFirmware();
 	device.log(`Developed on Firmware [${DevFirmwareVersion}]`);
 
@@ -186,9 +179,7 @@ function SendCoolingData() {
 	];
 
 	for(let fan = 0; fan < ConnectedFans.length; fan++) {
-		let fanLevel = (device.getNormalizedFanlevel(FanControllerArray[ConnectedFans[fan]]) * 100).toFixed(0);
-		device.log(device.getNormalizedFanlevel(FanControllerArray[ConnectedFans[fan]]));
-		device.log(device.getFanlevel(FanControllerArray[ConnectedFans[fan]]));
+		let fanLevel = (device.getFanlevel(FanControllerArray[ConnectedFans[fan]]));
 		device.log(`Setting Fan ${ConnectedFans[fan] + 1} Level to ${fanLevel}%`);
 		CoolingData[5 + ConnectedFans[fan] * 4] = fanLevel;
 	}
@@ -204,13 +195,12 @@ function GetTemps() {
 	}
 
 	for(let i = 0; i < TempData.length; i++) {
-		let temperature = TempData[i]
+		const temperature = TempData[i];
 
 		device.log(`Temp ${i+1} is ${temperature}C`);
 	}
 	
 }
-
 
 function SendColorData() {
 	let ChannelLedCount = device.channel(ChannelArray[1][0]).LedCount();
