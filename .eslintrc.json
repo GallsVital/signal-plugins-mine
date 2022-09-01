@@ -9,21 +9,18 @@
         "extends": [
             "eslint:recommended",
             "plugin:@typescript-eslint/eslint-recommended",
-            "plugin:@typescript-eslint/recommended",
-            
+            "plugin:@typescript-eslint/recommended"
         ]
     },
     "plugins": [
-        "@typescript-eslint",
-        "write-good-comments",
-    ],
+        "@typescript-eslint"
+        ],
     "globals": {
         "device": "readonly", 
         "bus": "readonly",
         "battery": "readonly"
     },
     "rules": {
-        "write-good-comments/write-good-comments": "warn",
         "semi":"warn",
         //"consistent-return": "warn",
         "curly":"warn",

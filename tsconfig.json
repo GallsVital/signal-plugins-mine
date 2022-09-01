@@ -1,8 +1,8 @@
 {
 	"compilerOptions": {
-		"module": "ESNext",
+		"module": "CommonJS",
 		"moduleResolution": "Node",
-		"target": "ES2020",
+		"target": "ES6",
 		"allowJs": true,
 		"checkJs": true,
 		"declaration": true,
@@ -10,13 +10,14 @@
 		"strictNullChecks": true,
 		"strictFunctionTypes": true,
 		"declarationMap": true,
-		"typeRoots": ["types/"]
+		"typeRoots": ["./types"],
+		"disableSizeLimit": true // Plugin images being base64 breaks Typescript checking in the project. 20mb filesize limit by default
 	},
-	"include": [
-		"."
-	],
+
 	"exclude": [
+		"node_modules",
 		"**/node_modules/*",
-		"**/docs/*",
+		"docs",
+		"**/docs/*"
 	]
 }

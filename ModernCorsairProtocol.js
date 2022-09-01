@@ -33,7 +33,8 @@ function decimalToHex(d, padding) {
 }
 
 function getKeyByValue(object, value) {
-	let Key = Object.keys(object).find(key => object[key] === value);
+	const Key = Object.keys(object).find(key => object[key] === value);
+
 	return parseInt(Key);
 }
 /**
@@ -43,7 +44,7 @@ function getKeyByValue(object, value) {
  * @typedef {String} PropertyName
  */
 
- const BragiPropertyNames = /** @type {const} */([
+const BragiPropertyNames = /** @type {const} */([
 	"Polling Rate",
 	"HW Brightness",
 	"Mode",
@@ -67,7 +68,7 @@ function getKeyByValue(object, value) {
 /**
  * Protocol Library for Corsair's Modern Protocol. (BRAGI)
  * @class ModernCorsairProtocol
- * 
+ *
  */
 export class ModernCorsairProtocol{
 	constructor() {
@@ -127,7 +128,7 @@ export class ModernCorsairProtocol{
 			firmware:0x13,
 			/** Device BootLoader Firmware PropertyID. [READONLY] */
 			BootLoaderFirmware: 0x14,
-			/** Device Wireless Chip Firmware PropertyID. [READONLY] 
+			/** Device Wireless Chip Firmware PropertyID. [READONLY]
 			 * @readonly
 			*/
 			WirelessChipFirmware: 0x15,
@@ -174,7 +175,7 @@ export class ModernCorsairProtocol{
 		/**
 		 * Contains the EndpointId's of all known Endpoints. These handle advanced device functions like Lighting and Fan Control.
 		 * To manually interact with these you must open a Handle to the Endpoint first using OpenHandle(HandleId, EndpointId).
-		 * 
+		 *
 		 * Helper Functions to interact with these exist as the following:
 		 * - WriteEndpoint(HandleId, EndpointId, CommandId)
 		 * - ReadEndpoint(HandleId, EndpointId, CommandId)
@@ -217,12 +218,12 @@ export class ModernCorsairProtocol{
 			Hardware: 0x01,
 			Software: 0x02,
 		};
-		
+
 		/** This Object maps device ModeId's to a human readable name string. */
 		this.ModeNames = {
 			0x01: "Hardware",
 			0x02: "Software"
-		}
+		};
 
 		this.ResponseIds = {
 			firmware: 0x02,
@@ -238,9 +239,9 @@ export class ModernCorsairProtocol{
 		 * Contains the Handle's of useable device Handles. These are used to open internal device Endpoints for advanced functions like Lighting and Fan Control.
 		 * Each HandleId can only be open for one EndpointId at a time, and must be closed before the EndpointId can be changed.
 		 * For best practice all non-lighting Handles should be closed immediately after you are done interacting with it.
-		 * 
+		 *
 		 * Auxiliary (0x02) Should only be needed in very specific cases.
-		 * 
+		 *
 		 * Helper Functions to interact with these exist as the following:
 		 * - OpenHandle(HandleId, EndpointId)
 		 * - CloseHandle(HandleId)
@@ -301,7 +302,7 @@ export class ModernCorsairProtocol{
 	}
 	/**
 	 * This Function sends a device Ping request and returns if the ping was successful.
-	 * 
+	 *
 	 * This function doesn't seem to affect the devices functionality, but iCUE pings all BRAGI devices every 52 seconds.
 	 * @returns {boolean} - Boolean representing Ping Success
 	 */
@@ -381,7 +382,8 @@ export class ModernCorsairProtocol{
 	 * @param {number} DPI Desired DPI value to be set.
 	 */
 	SetDPI(DPI){
-		let CurrentDPI = this.FetchProperty("DPI X");
+		const CurrentDPI = this.FetchProperty("DPI X");
+
 		if(CurrentDPI !== DPI){
 
 			device.log(`Current device DPI is [${CurrentDPI}], Desired value is [${DPI}]. Setting DPI!`);
@@ -404,9 +406,9 @@ export class ModernCorsairProtocol{
 		return [BatteryLevel, ChargingState];
 	}
 	/**
-	 * 
+	 *
 	 * @param {number[]} Data - Data packet read from the device.
-	 * @param {string} Context - String representing the calling location. 
+	 * @param {string} Context - String representing the calling location.
 	 * @returns {number} - An Error Code if the Data packet contained an error, otherwise 0.
 	 */
 	CheckError(Data, Context){
@@ -467,9 +469,11 @@ export class ModernCorsairProtocol{
 
 			const NewValue = this.FetchProperty(PropertyId);
 			device.log(`Device ${this.PropertyNames[PropertyId]} is now [${NewValue}]`);
+
 			return NewValue === Value;
 		}
-		return true
+
+		return true;
 	}
 
 	/**
@@ -479,10 +483,11 @@ export class ModernCorsairProtocol{
 	 */
 	FetchProperty(PropertyId) {
 		if(typeof PropertyId === "string"){
-			PropertyId = getKeyByValue(this.PropertyNames, PropertyId)
+			PropertyId = getKeyByValue(this.PropertyNames, PropertyId);
 		}
 
 		const data = this.ReadProperty(PropertyId);
+
 		// Don't return error codes.
 		if(!Array.isArray(data)){
 			return -1;
@@ -499,12 +504,13 @@ export class ModernCorsairProtocol{
 	 */
 	SetProperty(PropertyId, Value) {
 		if(typeof PropertyId === "string"){
-			PropertyId = getKeyByValue(this.PropertyNames, PropertyId)
+			PropertyId = getKeyByValue(this.PropertyNames, PropertyId);
 		}
 
 		let packet = [0x00, this.CommandMode, this.setProperty, PropertyId, 0x00, (Value & 0xFF), (Value >> 8 & 0xFF), (Value >> 16 & 0xFF)];
 		device.write(packet, this.DeviceBufferSize);
 		packet = device.read(packet, this.DeviceBufferSize);
+
 		const ErrorCode = this.CheckError(packet, `SetProperty`);
 
 		if(ErrorCode === 1){
@@ -602,12 +608,13 @@ export class ModernCorsairProtocol{
 		device.write(packet, this.DeviceBufferSize);
 		packet = device.read(packet, this.DeviceBufferSize);
 
-		const hasError = packet[3] == 0;
+		const hasError = packet[3] === 0;
+
 		return hasError;
 	}
 	/**
-	 * Performs a Check Command on the HandleId given and returns the packet from the device. 
-	 * This function will return an Error Code if the Handle is not open. 
+	 * Performs a Check Command on the HandleId given and returns the packet from the device.
+	 * This function will return an Error Code if the Handle is not open.
 	 * The Format of the returned packet is currently not understood.
 	 * @param {number} Handle - HandleId to perform the check on.
 	 * @returns The packet read from the device on success. Otherwise and Error Code.
@@ -618,17 +625,19 @@ export class ModernCorsairProtocol{
 		packet = device.read(packet, this.DeviceBufferSize);
 
 		const ErrorCode = this.CheckError(packet, `CheckHandle`);
+
 		if(ErrorCode){
 			this.CloseHandle(Handle);
 			device.log(`Failed to check Handle [${this.HandleNames[Handle]}, ${decimalToHex(Handle, 2)}]. Did you open it?`);
-			return ErrorCode
+
+			return ErrorCode;
 		}
 
 		return packet;
 	}
 	/**
-	 * This Helper Function will Open, Read, and Close a device Handle for the Endpoint given. 
-	 * If the read packet does not contain the ResponseId given the packet will be reread up to 4 times. 
+	 * This Helper Function will Open, Read, and Close a device Handle for the Endpoint given.
+	 * If the read packet does not contain the ResponseId given the packet will be reread up to 4 times.
 	 * The HandleId given MUST not already be in use elsewhere.
 	 * @param {number} Handle - HandleId to be used.
 	 * @param {number} Endpoint - EndpointId to be read from
@@ -636,16 +645,20 @@ export class ModernCorsairProtocol{
 	 * @returns The entire packet read from the device.
 	 */
 	ReadEndpoint(Handle, Endpoint, Command) {
-		let isHandleOpen = this.IsHandleOpen(Handle);
+		const isHandleOpen = this.IsHandleOpen(Handle);
+
 		if(isHandleOpen){
-			device.log(`CorsairProtocol: Handle is already open: [${this.HandleNames[Handle]}, ${decimalToHex(Handle, 2)}]. Aborting ReadEndpoint operation.`)
+			device.log(`CorsairProtocol: Handle is already open: [${this.HandleNames[Handle]}, ${decimalToHex(Handle, 2)}]. Aborting ReadEndpoint operation.`);
+
 			return;
 		}
 
-		let ErrorCode = this.OpenHandle(Handle, Endpoint);
+		const ErrorCode = this.OpenHandle(Handle, Endpoint);
+
 		if(ErrorCode){
 			this.CloseHandle(Handle);
-			device.log(`CorsairProtocol: Failed to open Device Handle [${this.HandleNames[Handle]}, ${decimalToHex(Handle, 2)}]. Aborting ReadEndpoint operation.`)
+			device.log(`CorsairProtocol: Failed to open Device Handle [${this.HandleNames[Handle]}, ${decimalToHex(Handle, 2)}]. Aborting ReadEndpoint operation.`);
+
 			return ErrorCode;
 		}
 
@@ -672,31 +685,35 @@ export class ModernCorsairProtocol{
 		return Data;
 	}
 	/**
-	 * This Helper Function will Open, Write to, and Close a device Handle for the Endpoint given. 
+	 * This Helper Function will Open, Write to, and Close a device Handle for the Endpoint given.
 	 * The HandleId given MUST not already be in use elsewhere.
-	 * 
+	 *
 	 * This function will handle setting the header data expected by the device. If the Data Array Length provided doesn't match what the device's endpoint is expecting the operation will Error.
-	 * 
+	 *
 	 * @param {number} Handle - HandleId to be used.
 	 * @param {number} Endpoint - EndpointId to be written too.
 	 * @param {number[]} Data - Data to be written to the Endpoint.
 	 */
 	WriteEndpoint(Handle, Endpoint, Data) {
-		let isHandleOpen = this.IsHandleOpen(Handle);
+		const isHandleOpen = this.IsHandleOpen(Handle);
+
 		if(isHandleOpen){
-			device.log(`CorsairProtocol: Handle is already open: [${this.HandleNames[Handle]}, ${decimalToHex(Handle, 2)}]. Aborting WriteEndpoint operation.`)
+			device.log(`CorsairProtocol: Handle is already open: [${this.HandleNames[Handle]}, ${decimalToHex(Handle, 2)}]. Aborting WriteEndpoint operation.`);
+
 			return;
 		}
 
-		let ErrorCode = this.OpenHandle(Handle, Endpoint)
+		let ErrorCode = this.OpenHandle(Handle, Endpoint);
+
 		if(ErrorCode){
-			device.log(`CorsairProtocol: Failed to open Device Handle [${this.HandleNames[Handle]}, ${decimalToHex(Handle, 2)}]. Aborting WriteEndpoint operation.`)
+			device.log(`CorsairProtocol: Failed to open Device Handle [${this.HandleNames[Handle]}, ${decimalToHex(Handle, 2)}]. Aborting WriteEndpoint operation.`);
+
 			return ErrorCode;
 		}
 
 		let packet = [0x00, this.CommandMode, this.writeEndpoint, Handle, Data.length & 0xff, (Data.length >> 8) & 0xFF, 0x00, 0x00];
 		packet.push(...Data);
-		
+
 		device.write(packet, this.DeviceBufferSize);
 		device.read([0x00], this.DeviceBufferSize);
 
@@ -709,16 +726,17 @@ export class ModernCorsairProtocol{
 		}
 
 		this.CloseHandle(Handle);
-		return ErrorCode
+
+		return ErrorCode;
 	}
 	/**
 	 * This Helper Function to write RGB data to the device. This function will split the data into as many packets as needed and do multiple WriteEndpoints(Handle, Endpoint, Data) based on the DeviceBufferSize set.
-	 * 
+	 *
 	 * This function expects the Lighting HandleId (0x00) to already be open.
-	 * 
+	 *
 	 * This function will handle setting the header data expected by the device. If the RGBData Array Length provided doesn't match what the devices Lighting Endpoint expects this command will Error.
-	 * 
-	 * @param {number[]} RGBData - RGBData to be written to the device in a RRRGGGBBB(Lighting Endpoint 0x01) or RGBRGBRGB(LightingController Endpoint 0x22) format. 
+	 *
+	 * @param {number[]} RGBData - RGBData to be written to the device in a RRRGGGBBB(Lighting Endpoint 0x01) or RGBRGBRGB(LightingController Endpoint 0x22) format.
 	 */
 	SendRGBData(RGBData){
 		const InitialHeaderSize = 8;
@@ -731,7 +749,7 @@ export class ModernCorsairProtocol{
 		}
 
 		let TotalBytes = RGBData.length;
-		let InitialPacketSize = this.DeviceBufferSize - InitialHeaderSize;
+		const InitialPacketSize = this.DeviceBufferSize - InitialHeaderSize;
 
 		this.WriteLighting(RGBData.length, RGBData.splice(0, InitialPacketSize));
 
@@ -739,7 +757,7 @@ export class ModernCorsairProtocol{
 		BytesSent += InitialPacketSize;
 
 		while(TotalBytes > 0){
-			let BytesToSend = Math.min(this.DeviceBufferSize - HeaderSize, TotalBytes);
+			const BytesToSend = Math.min(this.DeviceBufferSize - HeaderSize, TotalBytes);
 			this.StreamLighting(RGBData.splice(0, BytesToSend));
 
 			TotalBytes -= BytesToSend;
@@ -749,7 +767,7 @@ export class ModernCorsairProtocol{
 
 	WriteLighting(LedCount, RGBData){
 
-		let packet = [];
+		const packet = [];
 		packet[0x00] = 0x00;
 		packet[0x01] = this.CommandMode;
 		packet[0x02] = this.writeEndpoint;
@@ -770,7 +788,7 @@ export class ModernCorsairProtocol{
 
 	StreamLighting(RGBData) {
 
-		let packet = [];
+		const packet = [];
 		packet[0x00] = 0x00;
 		packet[0x01] = this.CommandMode;
 		packet[0x02] = this.streamEndpoint;
@@ -786,7 +804,7 @@ export class ModernCorsairProtocol{
 
 	/**
 	 * Helper Function to Fetch and Set the devices HW mode. This function will close all currently open Handles on the device to ensure a clean slate and to prevent issues interacting with the device.
-	 * Closing Handles in this function leads to iCUE not being able to function anymore. 
+	 * Closing Handles in this function leads to iCUE not being able to function anymore.
 	 * @param {number} Mode ModeId to be checks against and set on the device.
 	 */
 	SetMode(Mode){
@@ -844,14 +862,18 @@ export class ModernCorsairProtocol{
 
 	FetchFanRPM() {
 		device.log("CorsairProtocol: Reading Fan RPM's.");
+
 		if(device.fanControlDisabled()) {
 			device.log("Fan Control is Disabled! Are you sure you want to try this?");
+
 			return [];
 		}
 
 		const data = this.ReadEndpoint(this.Handles.Background, this.Endpoints.FanRPM, 0x06);
+
 		if(!data){
 			device.log(`CorsairProtocol: Failed To Read Fan RPM's.`);
+
 			return [];
 		}
 
@@ -861,7 +883,7 @@ export class ModernCorsairProtocol{
 			device.log("Failed to get Fan RPM's", {toFile: true});
 		}
 		const fanCount = data[6];
-		device.log(`CorsairProtocol: Device Reported [${fanCount}] Fan RPM's`)
+		device.log(`CorsairProtocol: Device Reported [${fanCount}] Fan RPM's`);
 
 
 		const fanSpeeds = data.slice(7, 7 + 2 * fanCount);
@@ -881,12 +903,15 @@ export class ModernCorsairProtocol{
 
 		if(device.fanControlDisabled()) {
 			device.log("Fan Control is Disabled! Are you sure you want to try this?");
+
 			return [];
 		}
 
 		const data = this.ReadEndpoint(this.Handles.Background, this.Endpoints.FanStates, 0x09);
+
 		if(!data){
 			device.log(`CorsairProtocol: Failed To Read Fan States.`);
+
 			return [];
 		}
 
@@ -897,7 +922,8 @@ export class ModernCorsairProtocol{
 		}
 
 		const FanCount = data[6];
-		device.log(`CorsairProtocol: Device Reported [${FanCount}] Fans`)
+		device.log(`CorsairProtocol: Device Reported [${FanCount}] Fans`);
+
 		const FanData = data.slice(7, 7 + FanCount);
 
 		return FanData;
@@ -927,8 +953,10 @@ export class ModernCorsairProtocol{
 		device.log(`CorsairProtocol: Reading Temp Data.`);
 
 		const data = this.ReadEndpoint(this.Handles.Background, this.Endpoints.TemperatureData, 0x16);
+
 		if(!data){
 			device.log(`CorsairProtocol: Failed To Read Temp Data.`);
+
 			return [];
 		}
 
@@ -936,7 +964,7 @@ export class ModernCorsairProtocol{
 
 		if(data[4] === this.ResponseIds.temperatureData && data[5] === 0) {
 			const ProbeCount = data[6];
-			device.log(`CorsairProtocol: Device Reported [${ProbeCount}] Temperature Probes`)
+			device.log(`CorsairProtocol: Device Reported [${ProbeCount}] Temperature Probes`);
 
 			const TempValues = data.slice(7, 7 + 3 * ProbeCount);
 
@@ -950,4 +978,6 @@ export class ModernCorsairProtocol{
 
 		return ProbeTemps;
 	}
-};
+}
+
+;

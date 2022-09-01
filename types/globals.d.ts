@@ -10,7 +10,7 @@ declare type ChannelId = string;
 declare interface LogOptions{
 	toFile?: boolean
 	Hex?: boolean
-};
+}
 declare type DeviceFeature = "Battery";
 declare type hexToRgb = (HexString: string) => ColorArray;
 
@@ -19,7 +19,7 @@ declare interface HidEndpoint{
 	usage: number
 	usage_page: number
 	collection?: number
-};
+}
 declare type AlertPriority = 0 | 1;
 declare type AlertId = string;
 declare type MessageId = string;
@@ -49,7 +49,7 @@ declare class ComponentChannel{
 	 * @param ArrayOrder The output arrays format.
 	 * @param ColorOrder The R,G,B order of the output array.
 	 */
-	public getColors(ArrayOrder: ArrayOrder, ColorOrder: ColorOrder): number[] | number[number[]]
+	public getColors(ArrayOrder: ArrayOrder, ColorOrder: ColorOrder): number[] | number[][]
 
 	/**
 	 * this function returns a boolean on if this device channel should be 'pulsing'. This can be requested due to no Components being selected, or if the onboarding Component Setup UI is being shown.
@@ -58,7 +58,7 @@ declare class ComponentChannel{
 	 * @returns boolean on if this ComponentChannel should force pulse.
 	 */
 	public shouldPulseColors(): boolean
-};
+}
 
 declare const device: Device;
 declare class Device{

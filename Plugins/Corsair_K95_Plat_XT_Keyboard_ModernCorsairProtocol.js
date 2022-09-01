@@ -1,21 +1,26 @@
-import {ModernCorsairProtocol} from "../ModernCorsairProtocol.js";
+import { ModernCorsairProtocol } from "../ModernCorsairProtocol.js";
 export function Name() { return "Corsair K95 Plat XT"; }
 export function VendorId() { return 0x1b1c; }
 export function ProductId() { return 0x1B89; }
 export function Publisher() { return "WhirlwindFX"; }
 export function Size() { return [25, 8]; }
-export function DefaultPosition(){return [10, 100];}
+export function DefaultPosition() { return [10, 100]; }
 const DESIRED_HEIGHT = 85;
-export function DefaultScale(){return Math.floor(DESIRED_HEIGHT/Size()[1]);}
-export function ControllableParameters(){
+export function DefaultScale() { return Math.floor(DESIRED_HEIGHT / Size()[1]); }
+/* global
+shutdownColor:readonly
+LightingMode:readonly
+forcedColor:readonly
+*/
+export function ControllableParameters() {
 	return [
-		{"property":"shutdownColor", "group":"lighting", "label":"Shutdown Color", "min":"0", "max":"360", "type":"color", "default":"009bde"},
-		{"property":"LightingMode", "group":"lighting", "label":"Lighting Mode", "type":"combobox", "values":["Canvas", "Forced"], "default":"Canvas"},
-		{"property":"forcedColor", "group":"lighting", "label":"Forced Color", "min":"0", "max":"360", "type":"color", "default":"009bde"},
+		{ "property": "shutdownColor", "group": "lighting", "label": "Shutdown Color", "min": "0", "max": "360", "type": "color", "default": "009bde" },
+		{ "property": "LightingMode", "group": "lighting", "label": "Lighting Mode", "type": "combobox", "values": ["Canvas", "Forced"], "default": "Canvas" },
+		{ "property": "forcedColor", "group": "lighting", "label": "Forced Color", "min": "0", "max": "360", "type": "color", "default": "009bde" },
 	];
 }
 
-export function Documentation(){ return "troubleshooting/corsair"; }
+export function Documentation() { return "troubleshooting/corsair"; }
 
 export function LedNames() { return vKeyNames; }
 export function LedPositions() { return vKeyPositions; }
@@ -23,7 +28,7 @@ export function LedPositions() { return vKeyPositions; }
 /** @param {HidEndpoint} endpoint */
 export function Validate(endpoint) {
 	return (endpoint.interface === 1 && endpoint.usage === 0x001 && endpoint.usage_page === 0xFF42) ||
-	(endpoint.interface === 2 && endpoint.usage === 0x002 && endpoint.usage_page === 0xFF42);
+		(endpoint.interface === 2 && endpoint.usage === 0x002 && endpoint.usage_page === 0xFF42);
 }
 
 const Corsair = new ModernCorsairProtocol();
@@ -46,15 +51,15 @@ const Developer_Firmware_Version = "4.22.30";
 // 	96, 46
 // ];
 
-class LedKey{
-	constructor(Name, Index, Position, ScanCode){
+class LedKey {
+	constructor(Name, Index, Position, ScanCode) {
 		this.Name = Name;
 		this.Index = Index;
-		this.Position = Position
+		this.Position = Position;
 	}
 };
 
-let Keys = [
+const Keys = [
 	new LedKey("A", 4, [2, 4], "INSERT MACRO/ VK KEY EVENT HERE"),
 	new LedKey("B", 5, [2, 4], "INSERT MACRO/ VK KEY EVENT HERE"),
 	new LedKey("C", 6, [2, 4], "INSERT MACRO/ VK KEY EVENT HERE"),
@@ -93,56 +98,57 @@ let Keys = [
 	new LedKey("0", 39, [2, 4], "INSERT MACRO/ VK KEY EVENT HERE"),
 ];
 
-let KeyHashMap = {}
+const KeyHashMap = {};
 
-function BuildLedHashMap(){
-	for(let i = 0; i < Keys.length; i++){
-		let Led = Keys[i];
+function BuildLedHashMap() {
+	for (let i = 0; i < Keys.length; i++) {
+		const Led = Keys[i];
 		KeyHashMap[Led.Index] = Led;
 	}
 }
+
 BuildLedHashMap();
 
-let vKeys = [
+const vKeys = [
 	137, 138, 139, 140, 141, 142, 143, 144, 145, 146, 147, 148, 149, 150, 151, 152, 153, 154, 155,
 
-	128, 113, 114,     																   102, 
-	131, 41, 58, 59, 60, 61, 62, 63, 64, 65, 66, 67, 68, 69,            70, 71, 72,    123, 126, 124, 125,
-	132, 53, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 45, 46, 42,        73, 74, 75,    83, 84, 85, 86,
-	133, 43, 20, 26,  8, 21, 23, 28, 24, 12, 18, 19, 47, 48, 49, 76,    77, 78, 95,    96, 97, 87,
-	134, 57, 4, 22, 7, 9, 10, 11, 13, 14, 15, 51, 52, 			 40,                   92, 93, 94, 
-	135, 106, 29, 27,  6,  25,  5, 17, 16, 54, 55, 56,           110,       82, 	   89, 90, 91, 88,
-	136, 105, 108, 107,           44,             111, 112, 101, 109, 	80, 81, 79,    98, 99, 
-	100, 50 
+	128, 113, 114, 102,
+	131, 41, 58, 59, 60, 61, 62, 63, 64, 65, 66, 67, 68, 69, 70, 71, 72, 123, 126, 124, 125,
+	132, 53, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 45, 46, 42, 73, 74, 75, 83, 84, 85, 86,
+	133, 43, 20, 26, 8, 21, 23, 28, 24, 12, 18, 19, 47, 48, 49, 76, 77, 78, 95, 96, 97, 87,
+	134, 57, 4, 22, 7, 9, 10, 11, 13, 14, 15, 51, 52, 40, 92, 93, 94,
+	135, 106, 29, 27, 6, 25, 5, 17, 16, 54, 55, 56, 110, 82, 89, 90, 91, 88,
+	136, 105, 108, 107, 44, 111, 112, 101, 109, 80, 81, 79, 98, 99,
+	100, 50
 ];
 
-let vKeyPositions = [
+const vKeyPositions = [
 	[0, 0], [2, 0], [3, 0], [4, 0], [5, 0], [6, 0], [7, 0], [8, 0], [9, 0], [11, 0], [12, 0], [13, 0], [14, 0], [16, 0], [17, 0], [18, 0], [19, 0], [20, 0], [21, 0],
 
-	[4, 0], [5, 0], [6, 0],                                                                                               [18, 0],
-	[0, 1],  [1, 1],    [3, 1], [4, 1], [5, 1], [6, 1],     [7, 1], [8, 1], [9, 1], [10, 1],   [12, 1], [13, 1], [14, 1], [15, 1],  [15, 1], [16, 1], [17, 1],        [18, 1], [19, 1], [20, 1], [21, 1],
-	[0, 2],  [1, 2], [2, 2], [3, 2], [4, 2], [5, 2], [6, 2], [7, 2], [8, 2], [9, 2], [10, 2], [11, 2], [12, 2], [13, 2], [14, 2],   [15, 2], [16, 2], [17, 2],   [18, 2], [19, 2], [20, 2], [21, 2],
-	[0, 3],  [1, 3], [2, 3], [3, 3], [4, 3], [5, 3], [6, 3], [7, 3], [8, 3], [9, 3], [10, 3], [11, 3], [12, 3], [13, 3], [14, 3],   [15, 3], [16, 3], [17, 3],   [18, 3], [19, 3], [20, 3], [21, 3],
-	[0, 4],  [1, 4], [2, 4], [3, 4], [4, 4], [5, 4], [6, 4], [7, 4], [8, 4], [9, 4], [10, 4], [11, 4], [12, 4],         [14, 4],                             [18, 4], [19, 4], [20, 4],
-	[0, 5],  [1, 5],     [3, 5], [4, 5], [5, 5], [6, 5], [7, 5], [8, 5], [9, 5], [10, 5], [11, 5], [12, 5],            [14, 5],           [16, 5],           [18, 5], [19, 5], [20, 5], [21, 5],
-	[0, 6],  [1, 6], [2, 6], [3, 6],                      [7, 6],                       [11, 6], [12, 6], [13, 6], [14, 6],   [15, 6], [16, 6], [17, 6],   [18, 6],        [20, 6],
+	[4, 0], [5, 0], [6, 0], [18, 0],
+	[0, 1], [1, 1], [3, 1], [4, 1], [5, 1], [6, 1], [7, 1], [8, 1], [9, 1], [10, 1], [12, 1], [13, 1], [14, 1], [15, 1], [15, 1], [16, 1], [17, 1], [18, 1], [19, 1], [20, 1], [21, 1],
+	[0, 2], [1, 2], [2, 2], [3, 2], [4, 2], [5, 2], [6, 2], [7, 2], [8, 2], [9, 2], [10, 2], [11, 2], [12, 2], [13, 2], [14, 2], [15, 2], [16, 2], [17, 2], [18, 2], [19, 2], [20, 2], [21, 2],
+	[0, 3], [1, 3], [2, 3], [3, 3], [4, 3], [5, 3], [6, 3], [7, 3], [8, 3], [9, 3], [10, 3], [11, 3], [12, 3], [13, 3], [14, 3], [15, 3], [16, 3], [17, 3], [18, 3], [19, 3], [20, 3], [21, 3],
+	[0, 4], [1, 4], [2, 4], [3, 4], [4, 4], [5, 4], [6, 4], [7, 4], [8, 4], [9, 4], [10, 4], [11, 4], [12, 4], [14, 4], [18, 4], [19, 4], [20, 4],
+	[0, 5], [1, 5], [3, 5], [4, 5], [5, 5], [6, 5], [7, 5], [8, 5], [9, 5], [10, 5], [11, 5], [12, 5], [14, 5], [16, 5], [18, 5], [19, 5], [20, 5], [21, 5],
+	[0, 6], [1, 6], [2, 6], [3, 6], [7, 6], [11, 6], [12, 6], [13, 6], [14, 6], [15, 6], [16, 6], [17, 6], [18, 6], [20, 6],
 
 	//ISO
 	[2, 5], [13, 4]
 ];
 
 
-let vKeyNames = [
+const vKeyNames = [
 	"lightBar1", "lightBar2", "lightBar3", "lightBar4", "lightBar5", "lightBar6", "lightBar7", "lightBar8", "lightBar9", "lightBar10", "lightBar11", "lightBar12", "lightBar13", "lightBar14",
 	"lightBar15", "lightBar16", "lightBar17", "lightBar18", "lightBar19",
 
-	"Profile", "Brightness", "Lock",                                                                                                                                       "Mute",
-	"G1", "Esc", "F1", "F2", "F3", "F4", "F5", "F6", "F7", "F8", "F9", "F10", "F11", "F12",        "Print Screen", "Scroll Lock", "Pause Break",   "MediaStop", "MediaRewind", "MediaPlayPause", "MediaFastForward",
-	"G2", "`", "1", "2", "3", "4", "5", "6", "7", "8", "9", "0", "-_", "=+", "Backspace",                        "Insert", "Home", "Page Up",       "NumLock", "Num /", "Num *", "Num -",  //21
-	"G3", "Tab", "Q", "W", "E", "R", "T", "Y", "U", "I", "O", "P", "[", "]", "\\",                               "Del", "End", "Page Down",         "Num 7", "Num 8", "Num 9", "Num +",    //21
-	"G4", "CapsLock", "A", "S", "D", "F", "G", "H", "J", "K", "L", ";", "'", "Enter",                                                              "Num 4", "Num 5", "Num 6",             //16
-	"G5", "Left Shift", "Z", "X", "C", "V", "B", "N", "M", ",", ".", "/", "Right Shift",                                  "Up Arrow",               "Num 1", "Num 2", "Num 3", "Num Enter", //17
-	"G6", "Left Ctrl", "Left Win", "Left Alt", "Space", "Right Alt", "Fn", "Menu", "Right Ctrl",  "Left Arrow", "Down Arrow", "Right Arrow", "Num 0", "Num .",                       //13
+	"Profile", "Brightness", "Lock", "Mute",
+	"G1", "Esc", "F1", "F2", "F3", "F4", "F5", "F6", "F7", "F8", "F9", "F10", "F11", "F12", "Print Screen", "Scroll Lock", "Pause Break", "MediaStop", "MediaRewind", "MediaPlayPause", "MediaFastForward",
+	"G2", "`", "1", "2", "3", "4", "5", "6", "7", "8", "9", "0", "-_", "=+", "Backspace", "Insert", "Home", "Page Up", "NumLock", "Num /", "Num *", "Num -",  //21
+	"G3", "Tab", "Q", "W", "E", "R", "T", "Y", "U", "I", "O", "P", "[", "]", "\\", "Del", "End", "Page Down", "Num 7", "Num 8", "Num 9", "Num +",    //21
+	"G4", "CapsLock", "A", "S", "D", "F", "G", "H", "J", "K", "L", ";", "'", "Enter", "Num 4", "Num 5", "Num 6",             //16
+	"G5", "Left Shift", "Z", "X", "C", "V", "B", "N", "M", ",", ".", "/", "Right Shift", "Up Arrow", "Num 1", "Num 2", "Num 3", "Num Enter", //17
+	"G6", "Left Ctrl", "Left Win", "Left Alt", "Space", "Right Alt", "Fn", "Menu", "Right Ctrl", "Left Arrow", "Down Arrow", "Right Arrow", "Num 0", "Num .",                       //13
 	//ISO
 	"ISO #", "ISO <"
 ];
@@ -164,13 +170,12 @@ export function Initialize() {
 	FetchDeviceSettings();
 }
 
-function InitializeDevice(){
+function InitializeDevice() {
 	device.set_endpoint(0x01, 0x01, 0xFF42);
 
 	Corsair.FindBufferLength();
 	Corsair.SetMode(Corsair.Modes.Software);
 	Corsair.OpenHandle(Corsair.Handles.Lighting, Corsair.Endpoints.Lighting);
-
 
 	Corsair.FetchFirmware();
 	device.log(`Developed On Firmware Version: [${Developer_Firmware_Version}]`);
@@ -179,7 +184,7 @@ function InitializeDevice(){
 
 }
 
-function FetchDeviceSettings(){
+function FetchDeviceSettings() {
 	device.log(`Vid is [${decimalToHex(Corsair.FetchProperty("Vendor Id"), 4)}]`);
 	device.log(`Pid is [${decimalToHex(Corsair.FetchProperty("Product Id"), 4)}]`);
 
@@ -197,35 +202,36 @@ export function Render() {
 	PollDeviceMode();
 }
 
-function PollDeviceState(){
+function PollDeviceState() {
 	// Corsair Pings every 52 Seconds
 	const PollInterval = 52000;
 
-	if(Date.now() - PollDeviceState.lastPollTime < PollInterval) {
+	if (Date.now() - PollDeviceState.lastPollTime < PollInterval) {
 		return;
 	}
 
-	if(Corsair.PingDevice()){
+	if (Corsair.PingDevice()) {
 		device.log(`Device Ping Successful!`);
-	}else{
+	} else {
 		device.log(`Device Ping Failed!`);
 	}
 
 	PollDeviceState.lastPollTime = Date.now();
 }
 
-function PollDeviceMode(){
+function PollDeviceMode() {
 	const PollInterval = 5000;
 
-	if(Date.now() - PollDeviceMode.lastPollTime < PollInterval) {
+	if (Date.now() - PollDeviceMode.lastPollTime < PollInterval) {
 		return;
 	}
 
-	let CurrentDeviceMode = Corsair.FetchProperty("Mode")
+	const CurrentDeviceMode = Corsair.FetchProperty("Mode");
 
 	device.log(`Current Device Mode: [${Corsair.ModeNames[CurrentDeviceMode]}]`);
-	if(CurrentDeviceMode !== Corsair.Modes.Software){
-		device.log("Found device in Hardware Mode! Attempting to Reinitialize.")
+
+	if (CurrentDeviceMode !== Corsair.Modes.Software) {
+		device.log("Found device in Hardware Mode! Attempting to Reinitialize.");
 		InitializeDevice();
 	}
 
@@ -239,15 +245,15 @@ export function Shutdown() {
 
 }
 
-function UpdateRGB(shutdown = false){
+function UpdateRGB(shutdown = false) {
 
-	let RGBData = GetColors(shutdown);
+	const RGBData = GetColors(shutdown);
 
 	Corsair.SendRGBData(RGBData);
 
 }
 
-function GetColors(shutdown = false){
+function GetColors(shutdown = false) {
 	const Device_LedCount = 156; // Used for Protocol Specific Commands
 
 	// let RGBData = new Array(Device_LedCount * 3).fill(0);
@@ -273,28 +279,29 @@ function GetColors(shutdown = false){
 	// return RGBData;
 
 
-	let RGBData = new Array(Device_LedCount * 3).fill(0);
+	const RGBData = new Array(Device_LedCount * 3).fill(0);
 
-	for(let iIdx = 0; iIdx < Keys.length; iIdx++) {
-		let Led = Keys[iIdx];
+	for (let iIdx = 0; iIdx < Keys.length; iIdx++) {
+		const Led = Keys[iIdx];
 
-		let iPxX = Led.Position[0];
-		let iPxY = Led.Position[1];
+		const iPxX = Led.Position[0];
+		const iPxY = Led.Position[1];
 		let col;
 
-		if(shutdown){
+		if (shutdown) {
 			col = hexToRgb(shutdownColor);
-		}else if (LightingMode  === "Forced") {
+		} else if (LightingMode === "Forced") {
 			col = hexToRgb(forcedColor);
-		}else{
+		} else {
 			col = device.color(iPxX, iPxY);
 		}
 
 		RGBData[Led.Index] = col[0];
-		RGBData[Led.Index +  Device_LedCount] = col[1];
-		RGBData[Led.Index +  Device_LedCount * 2] = col[2];
+		RGBData[Led.Index + Device_LedCount] = col[1];
+		RGBData[Led.Index + Device_LedCount * 2] = col[2];
 
 	}
+
 	return RGBData;
 
 }
@@ -336,7 +343,7 @@ const KeyMapping = {
 	0x26: "8",
 	0x27: "9",
 	0x28: "0",
-	0x29: "Enter",	
+	0x29: "Enter",
 	0x2A: "ESC",
 	0x2B: "Backspace",
 	0x2C: "Tab",
@@ -425,21 +432,21 @@ const KeyMapping = {
 
 };
 
-function ReadKeyInputs(){
+function ReadKeyInputs() {
 	device.set_endpoint(0x02, 0x02, 0xFF42);
 	// The 2ms Read timeout here costs us 2 FPS
 	// The Process time is negligible
 
 	//let start = Date.now();
 
-	do{
+	do {
 		const data = device.read([0x00], Corsair.DeviceBufferSize, 2); // Read Key Event
 
-		if(data[2]){
+		if (data[2]) {
 			ProcessInput(data);
 		}
 
-	}while(device.getLastReadSize() > 0);
+	} while (device.getLastReadSize() > 0);
 
 	//device.log(`Process Key Events took [${Date.now() - start}ms]`)
 
@@ -447,39 +454,39 @@ function ReadKeyInputs(){
 }
 
 
-function ProcessInput(InputData){
-	if(!ReadKeyInputs.lastKeyState){
+function ProcessInput(InputData) {
+	if (!ReadKeyInputs.lastKeyState) {
 		ReadKeyInputs.lastKeyState = new Array(8).fill(0);
 	}
 
-	if(InputData[2] === 2){
+	if (InputData[2] === 2) {
 		const KeyData = InputData.slice(3, 35);
-		let KeyIdOffset = 0
+		let KeyIdOffset = 0;
 
-		for(let i = 0; i < 32; i += 4){
+		for (let i = 0; i < 32; i += 4) {
 
-			const PressedKeys = Convert_To_16Bit(KeyData.splice(0,4));
+			const PressedKeys = Convert_To_16Bit(KeyData.splice(0, 4));
 			const KeyPressDiff = PressedKeys - ReadKeyInputs.lastKeyState[i]; // Get the Change in Pressed Keys compared to the last event;
 
-			if(KeyPressDiff != 0){
+			if (KeyPressDiff != 0) {
 				const wasPressed = KeyPressDiff > 0; // negative values indicate the key is no longer pressed.
 				const binaryString = KeyPressDiff.toString(2); // Convert to binary string;
 				const ChangedKeyID = Math.abs(binaryString.length - binaryString.indexOf(1)) + KeyIdOffset; // The set bit is the changed key ID. Note: This is read right to left.
-				
-				if(KeyHashMap.hasOwnProperty(ChangedKeyID)){
-					device.log(KeyHashMap[ChangedKeyID - 1].Name)
+
+				if (KeyHashMap.hasOwnProperty(ChangedKeyID)) {
+					device.log(KeyHashMap[ChangedKeyID - 1].Name);
 				}
 
-				if(KeyMapping.hasOwnProperty(ChangedKeyID)){
+				if (KeyMapping.hasOwnProperty(ChangedKeyID)) {
 					device.log(`Pressed Keys Changed! [${KeyMapping[ChangedKeyID]}, ${decimalToHex(ChangedKeyID, 2)}], [${wasPressed ? "Pressed" : "Released"}]`);
-				}else{
+				} else {
 					//device.log(`Pressed Keys Changed! [${ChangedKeyID}, ${decimalToHex(ChangedKeyID, 2)}], [${wasPressed ? "Pressed" : "Released"}]`);
 				}
 			}
 
 			ReadKeyInputs.lastKeyState[i] = PressedKeys; // bind current state to the function. Mimics cpp static keyword.
 
-			KeyIdOffset += 32
+			KeyIdOffset += 32;
 
 		}
 	}
@@ -489,7 +496,7 @@ function ProcessInput(InputData){
 function Convert_To_16Bit(values) {
 	let returnValue = 0;
 
-	for(let i = 0; i < values.length; i++) {
+	for (let i = 0; i < values.length; i++) {
 		returnValue += values[i] << (8 * i);
 	}
 
@@ -499,7 +506,7 @@ function Convert_To_16Bit(values) {
 function Convert_From_16Bit(value, LittleEndian = false) {
 	const returnValue = [];
 
-	while(value > 0){
+	while (value > 0) {
 		returnValue.push(value & 0xFF);
 		value = value >> 8;
 	}
@@ -516,11 +523,11 @@ function decimalToHex(d, padding) {
 	}
 
 	return "0x" + hex;
-} 
+}
 
 function hexToRgb(hex) {
-	let result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
-	let colors = [];
+	const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+	const colors = [];
 	colors[0] = parseInt(result[1], 16);
 	colors[1] = parseInt(result[2], 16);
 	colors[2] = parseInt(result[3], 16);
