@@ -8,5 +8,5 @@ eslint:
 
   script:
     - apk add --update npm
-    - npm i
-    - node_modules/eslint/bin/eslint.js . --quiet
+    - npm install
+    - node_modules/eslint/bin/eslint.js ./Plugins --quiet
