@@ -3,6 +3,7 @@ export function Name() { return "Corsair K95 Plat XT"; }
 export function VendorId() { return 0x1b1c; }
 export function ProductId() { return 0x1B89; }
 export function Publisher() { return "WhirlwindFX"; }
+export function Documentation() { return "troubleshooting/corsair"; }
 export function Size() { return [25, 8]; }
 export function DefaultPosition() { return [10, 100]; }
 const DESIRED_HEIGHT = 85;
@@ -19,9 +20,6 @@ export function ControllableParameters() {
 		{ "property": "forcedColor", "group": "lighting", "label": "Forced Color", "min": "0", "max": "360", "type": "color", "default": "009bde" },
 	];
 }
-
-export function Documentation() { return "troubleshooting/corsair"; }
-
 export function LedNames() { return vKeyNames; }
 export function LedPositions() { return vKeyPositions; }
 
@@ -492,7 +490,7 @@ function ProcessInput(InputData) {
 			if (KeyPressDiff != 0) {
 				const wasPressed = KeyPressDiff > 0; // negative values indicate the key is no longer pressed.
 				const binaryString = KeyPressDiff.toString(2); // Convert to binary string;
-				const ChangedKeyID = Math.abs(binaryString.length - binaryString.indexOf(1)) + KeyIdOffset; // The set bit is the changed key ID. Note: This is read right to left.
+				const ChangedKeyID = Math.abs(binaryString.length - binaryString.indexOf("1")) + KeyIdOffset; // The set bit is the changed key ID. Note: This is read right to left.
 
 				if (KeyHashMap.hasOwnProperty(ChangedKeyID)) {
 					device.log(KeyHashMap[ChangedKeyID - 1].Name);
@@ -549,9 +547,12 @@ function decimalToHex(d, padding) {
 function hexToRgb(hex) {
 	const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
 	const colors = [];
-	colors[0] = parseInt(result[1], 16);
-	colors[1] = parseInt(result[2], 16);
-	colors[2] = parseInt(result[3], 16);
+
+	if(result){
+		colors[0] = parseInt(result[1], 16);
+		colors[1] = parseInt(result[2], 16);
+		colors[2] = parseInt(result[3], 16);
+	}
 
 	return colors;
 }

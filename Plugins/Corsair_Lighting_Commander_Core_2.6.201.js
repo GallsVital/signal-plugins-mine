@@ -95,7 +95,7 @@ class ModernCorsairProtocol{
 		};
 	}
 }
-let Corsair = ModernCorsairProtocol();
+let Corsair = new ModernCorsairProtocol();
 
 // Protocol Constants
 const CORSAIR_COMMAND = 0x08;

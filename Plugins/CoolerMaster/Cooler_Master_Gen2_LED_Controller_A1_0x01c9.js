@@ -6,7 +6,7 @@ export function Documentation(){ return "troubleshooting/coolermaster"; }
 export function Size() { return [1, 1]; }
 export function DefaultPosition(){return [1, 1];}
 export function DefaultScale(){return 1.0;}
-export function ControllableParameters(){
+export function ControllableParameters(){
 	return [
 		{"property":"shutdownColor", "group":"lighting", "label":"Shutdown Color", "min":"0", "max":"360", "type":"color", "default":"009bde"},
 		{"property":"LightingMode", "group":"lighting", "label":"Lighting Mode", "type":"combobox", "values":["Canvas", "Forced"], "default":"Canvas"},
