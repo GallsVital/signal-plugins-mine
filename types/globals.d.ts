@@ -309,14 +309,19 @@ declare class Device{
 	public color(X: number, Y: number): ColorArray
 
 	/**
-	 * returns the devices current brightness level in SignalRGB. This value is already applied to device.color() and similar functions.
+	 * Returns the devices current brightness level in SignalRGB. This value is already applied to device.color() and similar functions.
 	 * @see {@link https://docs.signalrgb.com/plugins/utilities#devicegetbrightness SignalRGB Documentation}
 	 * @return Current Software Brightness in the range 0-100
 	 */
 	public getBrightness(): number
-
+	
 	public addFeature(FeatureName: DeviceFeature): void
 	
+	/**
+	 * Returns the WMI name of the System's motherboard. 
+	 * @see {@link https://docs.signalrgb.com/plugins/utilities#devicegetbrightness SignalRGB Documentation}
+	 * @returns The Systems motherboard name.
+	 */
 	public getMotherboardName(): string
 }
 
