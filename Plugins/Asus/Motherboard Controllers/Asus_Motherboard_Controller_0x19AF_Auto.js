@@ -378,7 +378,7 @@ function FetchConfigTable(){
 
 	let data = device.read([0x00], Device_Read_Length);
 
-	if(data[1] = ASUS_RESPONSE_CONFIGTABLE){
+	if(data[1] === ASUS_RESPONSE_CONFIGTABLE){
 		DeviceInfo.ConfigTable = data;
 		device.log("Config Table", {toFile: true});
 

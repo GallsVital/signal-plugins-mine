@@ -155,12 +155,12 @@ function setDpi(dpi){
 	device.log(`DPI y is now ${Corsair_Get(CORSAIR_DPI_Y)}`);
 }
 
-let savedPollRate;
+// let savedPollRate;
 
-function setPollRate(){
-	savedPollRate = PollRate;
-	Corsair_Set(CORSAIR_POLL_RATE, PollRate);
-}
+// function setPollRate(){
+// 	savedPollRate = PollRate;
+// 	Corsair_Set(CORSAIR_POLL_RATE, PollRate);
+// }
 
 function setbrightness(Brightness){
 	Corsair_Set(CORSAIR_BRIGHTNESS, Brightness);

@@ -128,28 +128,6 @@ export function Validate(endpoint) {
 }
 
 export function Shutdown() {
-	let packet = [];
-	packet[0x00]   = 0x00;
-	packet[0x01]   = CORSAIR_COMMAND_WRITE;
-	packet[0x02]   = CORSAIR_PROPERTY_SUBMIT_MOUSE_COLOR;
-	packet[0x03]   = 0x03;
-	packet[0x04]   = 0x01;
-
-	let zoneId = [2, 6, 1];
-
-	// Single zone - apply to mouse.
-	for(let zone_idx = 0; zone_idx < vLedPositions.length; zone_idx++) {
-		let iX = vLedPositions[zone_idx][0];
-		let iY = vLedPositions[zone_idx][1];
-		let col = device.color(iX, iY);
-		packet[(zone_idx * 4) + 5] = zoneId[zone_idx];
-		packet[(zone_idx * 4) + 6] = 255;
-		packet[(zone_idx * 4) + 7] = 0;
-		packet[(zone_idx * 4) + 8] = 0;
-	}
-
-	device.write(packet, 65);
-
 	ReturnToHardwareControl();
 }
 

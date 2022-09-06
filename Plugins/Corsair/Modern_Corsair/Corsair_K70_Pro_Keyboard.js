@@ -670,6 +670,16 @@ function Convert_From_16Bit(value, LittleEndian = false) {
 	return LittleEndian ? returnValue : returnValue.reverse();
 }
 
+function Convert_To_16Bit(values) {
+	let returnValue = 0;
+
+	for (let i = 0; i < values.length; i++) {
+		returnValue += values[i] << (8 * i);
+	}
+
+	return returnValue;
+}
+
 function hexToRgb(hex) {
 	let result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
 	let colors = [];
