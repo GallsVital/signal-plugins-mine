@@ -1,11 +1,11 @@
 image: node
 
-stage:
- - lint
+stages:
+  - lint
 
 eslint:
- stage: lint
+  stage: lint
 
- script:
+  script:
     - npm i eslint
     - node_modules/eslint/bin/eslint.js .
