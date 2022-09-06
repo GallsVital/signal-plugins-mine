@@ -25,7 +25,7 @@
         //"consistent-return": "warn",
         "curly":"warn",
         "no-console": "error",
-        "no-var": "error",
+        "no-var": "warn",
         "no-useless-return":"warn",
         "brace-style": ["warn","1tbs", { "allowSingleLine": true }],
         "indent": ["warn","tab"],
@@ -43,7 +43,7 @@
         "no-eval":"error",
         "prefer-const":"warn",
         "yoda":["warn", "never", { "onlyEquality": true }],
-        "complexity": ["error",{"max":10}],
+        "complexity": ["warn",{"max":10}],
         "padding-line-between-statements": [
             "warn",
             { "blankLine": "never", "prev": ["for","if","while"], "next": "*" },
@@ -61,7 +61,6 @@
             { "blankLine": "any", "prev": "*", "next": "export" },
             { "blankLine": "always", "prev": "expression", "next": ["block-like"] },
             { "blankLine": "always", "prev": "*", "next": "return" }
-
         ],
         "no-restricted-syntax": [
             "error",
