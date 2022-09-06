@@ -12,7 +12,6 @@ LightingMode:readonly
 forcedColor:readonly
 SettingControl:readonly
 dpi1:readonly
-PollRate:readonly
 AngleSnap:readonly
 SleepMode:readonly
 SleepModeTime:readonly

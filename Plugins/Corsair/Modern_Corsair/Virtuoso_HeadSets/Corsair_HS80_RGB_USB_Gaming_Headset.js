@@ -6,6 +6,14 @@ export function Size() { return [1,2]; }
 export function DefaultPosition(){return [10, 100]; }
 export function DefaultScale(){return 25.0}
 export function Type() { return "Hid"; }
+/* global
+LightingMode:readonly
+forcedColor:readonly
+micLedMode:readonly
+micLedDefState:readonly
+micColorOn:readonly
+micColorOff:readonly
+*/
 export function ControllableParameters() {
 	return [
 		{"property":"LightingMode", "group":"lighting", "label":"Lighting Mode", "type":"combobox", "values":["Canvas", "Forced"], "default":"Canvas"},

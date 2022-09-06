@@ -1,3 +1,8 @@
+/* global
+conversion_mode:readonly
+minimum_brightness:readonly
+maximum_brightness:readonly
+*/
 export function ControllableParameters() {
 	return [
 		{ "property": "conversion_mode", "label": "Color To Brightness", "type": "combobox", "default": "Mean Intensity", "values": ["Mean Intensity", "Red Intensity", "Green Intensity", "Blue Intensity"] },

@@ -47,6 +47,11 @@ export function Publisher() { return "WhirlwindFX"; }
 export function Size() { return [5, 5]; }
 export function DefaultPosition(){return [165, 60];}
 export function DefaultScale(){return 6.0;}
+/* global
+LightingMode:readonly
+forcedColor:readonly
+FanSpeed:readonly
+*/
 export function ControllableParameters(){
 	return [
 		{"property":"LightingMode", "group":"lighting", "label":"Lighting Mode", "type":"combobox", "values":["Canvas", "Forced"], "default":"Canvas"},

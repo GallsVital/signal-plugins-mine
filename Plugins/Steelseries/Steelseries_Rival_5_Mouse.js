@@ -6,6 +6,13 @@ export function Publisher() { return "WhirlwindFX"; }
 export function Size() { return [7, 7]; }
 export function DefaultPosition() {return [225, 120]; }
 export function DefaultScale(){return 7.0;}
+/* global
+shutdownColor:readonly
+LightingMode:readonly
+forcedColor:readonly
+DpiControl:readonly
+dpi1:readonly
+*/
 export function ControllableParameters() {
 	return [
 		{"property":"shutdownColor", "group":"lighting", "label":"Shutdown Color", "min":"0", "max":"360", "type":"color", "default":"009bde"},

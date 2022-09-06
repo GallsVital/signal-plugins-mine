@@ -6,6 +6,11 @@ export function Publisher() { return "vermis"; }
 export function Size() { return [7,8]; }
 export function DefaultPosition() {return [180,100]; }
 export function DefaultScale(){return 8.0}
+/* global
+shutdownColor:readonly
+LightingMode:readonly
+forcedColor:readonly
+*/
 export function ControllableParameters(){
     return [
         {"property":"shutdownColor", "group":"lighting", "label":"Shutdown Color","min":"0","max":"360","type":"color","default":"009bde"},

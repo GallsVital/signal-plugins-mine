@@ -6,6 +6,10 @@ export function Publisher() { return "WhirlwindFX"; }
 export function Size() { return [3, 3]; }
 export function DefaultPosition() {return [225, 120]; }
 export function DefaultScale(){return 15.0;}
+/* global
+DpiControl:readonly
+dpi1:readonly
+*/
 export function ControllableParameters(){
 	return [
 		{"property":"DpiControl", "group":"mouse", "label":"Enable Dpi Control", "type":"boolean", "default":"false"},

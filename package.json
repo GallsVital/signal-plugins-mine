@@ -1,6 +1,7 @@
 {
 	"name": "signalrgb-plugins",
 	"version": "1.0.0",
+	"type": "module",
 	"devDependencies": {
 		"@typescript-eslint/eslint-plugin": "^5.36.1",
 		"@typescript-eslint/parser": "^5.36.1",
@@ -10,7 +11,9 @@
 		"typescript": "^4.8.2"
 	},
 	"scripts": {
-		"lint": "eslint . ",
+		"lint": "eslint ./Plugins ",
+		"lint:addGlobals": "node ./AddGlobalVariableComments.js",
+		"lint:ci": "eslint ./Plugins --quiet",
 		"docs": "jsdoc -c jsdoc.json",
 		"SAVED": "npx -p typescript tsc ModernCorsairProtocol.js --declaration --allowJs --emitDeclarationOnly --outDir types"
 	}

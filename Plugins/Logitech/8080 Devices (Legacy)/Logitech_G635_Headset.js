@@ -6,6 +6,12 @@ export function Publisher() { return "TheDongster"; }
 export function Size() { return [2, 2]; }
 export function DefaultPosition(){return [145, 85];}
 export function DefaultScale(){return 10.0;}
+/* global
+shutdownColor:readonly
+LightingMode:readonly
+forcedColor:readonly
+sideTone:readonly
+*/
 export function ControllableParameters(){
 	return [
 		{"property":"shutdownColor", "group":"lighting", "label":"Shutdown Color", "min":"0", "max":"360", "type":"color", "default":"009bde"},

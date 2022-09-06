@@ -3,6 +3,11 @@ export function VendorId() { return 0x1b1c; }
 export function ProductId() { return 0x1D04; }
 export function Publisher() { return "WhirlwindFX"; }
 export function Size() { return [40, 3]; }
+/* global
+shutdownColor:readonly
+LightingMode:readonly
+forcedColor:readonly
+*/
 export function ControllableParameters(){
 	return [
 		{"property":"shutdownColor", "group":"lighting", "label":"Shutdown Color", "min":"0", "max":"360", "type":"color", "default":"009bde"},

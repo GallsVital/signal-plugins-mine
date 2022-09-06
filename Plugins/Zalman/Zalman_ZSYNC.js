@@ -5,6 +5,10 @@ export function Publisher() { return "Vermis"; } // Based on Lighting Node Pro p
 export function Size() { return [1, 1]; }
 export function DefaultPosition(){return [0, 0];}
 export function DefaultScale(){return 1.0;}
+/* global
+LightingMode:readonly
+forcedColor:readonly
+*/
 export function ControllableParameters(){
 	return [
 		{"property":"LightingMode", "group":"lighting", "label":"Lighting Mode", "type":"combobox", "values":["Canvas", "Forced"], "default":"Canvas"},

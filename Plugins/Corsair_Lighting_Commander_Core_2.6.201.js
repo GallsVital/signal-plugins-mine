@@ -5,7 +5,12 @@ export function Publisher() { return "WhirlwindFX"; }
 export function Size() { return [1, 1]; }
 export function DefaultPosition() { return [0, 0]; }
 export function DefaultScale() { return 1.0; }
-/* global LightingMode:readonly pumpToggle:readonly forcedColor:readonly cpuCooler:readonly*/
+/* global
+LightingMode:readonly
+forcedColor:readonly
+pumpToggle:readonly
+cpuCooler:readonly
+*/
 export function ControllableParameters() {
 	return [
 		{ "property": "LightingMode", "label": "Lighting Mode", "type": "combobox", "values": ["Canvas", "Forced"], "default": "Canvas" },
