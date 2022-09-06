@@ -1,11 +1,11 @@
-image: node
+image: alpine:latest
 
 stages:
-  - lint
+  - linter
 
-eslint:
+linter:
   stage: lint
 
   script:
-    - npm i eslint
-    - node_modules/eslint/bin/eslint.js .
+    - npm i
+    - node_modules/eslint/bin/eslint.js . --quiet
