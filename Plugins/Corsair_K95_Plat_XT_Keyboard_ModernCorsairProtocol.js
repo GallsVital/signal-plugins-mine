@@ -96,6 +96,26 @@ const Keys = [
 	new LedKey("8", 37, [2, 4], "INSERT MACRO/ VK KEY EVENT HERE"),
 	new LedKey("9", 38, [2, 4], "INSERT MACRO/ VK KEY EVENT HERE"),
 	new LedKey("0", 39, [2, 4], "INSERT MACRO/ VK KEY EVENT HERE"),
+	new LedKey("Enter", 40, [2, 4], "INSERT MACRO/ VK KEY EVENT HERE"),
+	new LedKey("Esc", 41, [2, 4], "INSERT MACRO/ VK KEY EVENT HERE"),
+	new LedKey("Backspace", 42, [2, 4], "INSERT MACRO/ VK KEY EVENT HERE"),
+	new LedKey("Tab", 43, [2, 4], "INSERT MACRO/ VK KEY EVENT HERE"),
+	new LedKey("Space", 44, [2, 4], "INSERT MACRO/ VK KEY EVENT HERE"),
+	new LedKey("-_", 45, [2, 4], "INSERT MACRO/ VK KEY EVENT HERE"),
+	new LedKey("=+", 46, [2, 4], "INSERT MACRO/ VK KEY EVENT HERE"),
+	new LedKey("[", 47, [2, 4], "INSERT MACRO/ VK KEY EVENT HERE"),
+	new LedKey("]", 48, [2, 4], "INSERT MACRO/ VK KEY EVENT HERE"),
+	new LedKey("\\", 49, [2, 4], "INSERT MACRO/ VK KEY EVENT HERE"),
+	new LedKey("ISO <", 50, [2, 4], "INSERT MACRO/ VK KEY EVENT HERE"),
+	new LedKey(";", 51, [2, 4], "INSERT MACRO/ VK KEY EVENT HERE"),
+	new LedKey("\'", 52, [2, 4], "INSERT MACRO/ VK KEY EVENT HERE"),
+	new LedKey("\`", 53, [2, 4], "INSERT MACRO/ VK KEY EVENT HERE"),
+	new LedKey("<", 54, [2, 4], "INSERT MACRO/ VK KEY EVENT HERE"),
+	new LedKey(">", 55, [2, 4], "INSERT MACRO/ VK KEY EVENT HERE"),
+	new LedKey("/?", 56, [2, 4], "INSERT MACRO/ VK KEY EVENT HERE"),
+	new LedKey("Capslock", 57, [2, 4], "INSERT MACRO/ VK KEY EVENT HERE"),
+	new LedKey("F1", 58, [2, 4], "INSERT MACRO/ VK KEY EVENT HERE"),
+
 ];
 
 const KeyHashMap = {};
@@ -200,6 +220,7 @@ export function Render() {
 
 	PollDeviceState();
 	PollDeviceMode();
+
 }
 
 function PollDeviceState() {
