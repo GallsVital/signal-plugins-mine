@@ -45,32 +45,42 @@ function sendColor(shutdown = false)
 	packet[2] = 0x06;
 	packet[4] = 0x09;
 
-	for(let iIdx = 0; iIdx < vLedPositions.length; iIdx++)
+	if(shutdown)
 	{
-		if(iIdx == 1 && micLedMode == "MicState")
+		packet[2] = 0x01;
+		packet[3] = 0x02;
+		packet[4] = 0x00;
+		device.write(packet, 64);
+	}
+	else
+	{
+		for(let iIdx = 0; iIdx < vLedPositions.length; iIdx++)
 		{
-			mxPxColor = hexToRgb(micState == 0 ? micColorOff : micColorOn);
-		}
-		else
-		{
-			let iPxX = vLedPositions[iIdx][0];
-			let iPxY = vLedPositions[iIdx][1];
-
-			if (LightingMode === "Forced")
+			if(iIdx == 1 && micLedMode == "MicState")
 			{
-				mxPxColor = hexToRgb(forcedColor);
+				mxPxColor = hexToRgb(micState == 0 ? micColorOff : micColorOn);
 			}
 			else
 			{
-				mxPxColor = device.color(iPxX, iPxY);
+				let iPxX = vLedPositions[iIdx][0];
+				let iPxY = vLedPositions[iIdx][1];
+
+				if (LightingMode === "Forced")
+				{
+					mxPxColor = hexToRgb(forcedColor);
+				}
+				else
+				{
+					mxPxColor = device.color(iPxX, iPxY);
+				}
 			}
+				
+			packet[(iIdx*2)+8] = mxPxColor[0];
+			packet[(iIdx*2)+11] = mxPxColor[1];
+			packet[(iIdx*2)+14] = mxPxColor[2];
 		}
-			
-		packet[(iIdx*2)+8] = mxPxColor[0];
-		packet[(iIdx*2)+11] = mxPxColor[1];
-		packet[(iIdx*2)+14] = mxPxColor[2];
+		device.write(packet, 64);
 	}
-	device.write(packet, 64);
 }
 
 export function Initialize() 
@@ -133,6 +143,7 @@ function readDevice()
 
 export function Shutdown() 
 {
+	sendColor(true);
 	let packet = new Array(64).fill(0x00);
 	packet[0] = 0x02;
 	packet[1] = headsetMode;

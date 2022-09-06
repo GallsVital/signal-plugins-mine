@@ -1,6 +1,7 @@
 export function Name() { return "Corsair K60 Pro SE"; }
 export function VendorId() { return 0x1b1c; }
 export function ProductId() { return 0x1B8D; }
+export function Documentation(){ return "troubleshooting/corsair"; }
 export function Publisher() { return "WhirlwindFX"; }
 export function Size() { return [24, 8]; }
 export function DefaultPosition(){return [10, 100];}
@@ -14,8 +15,6 @@ export function ControllableParameters(){
 
 	];
 }
-
-export function Documentation(){ return "troubleshooting/corsair"; }
 
 function hexToRgb(hex) {
 	let result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
@@ -44,7 +43,6 @@ export function Initialize() {
 	sendPacketString("00 08 0D 00 01", 65);          //critical - no idea
 }
 
-
 export function Shutdown() {
 	let packet = [];
 
@@ -57,7 +55,6 @@ export function Shutdown() {
 	device.write(packet, 65);
 
 }
-
 
 // This is an array of key indexes for setting colors in our render array, indexed left to right, row top to bottom.
 let vKeys = [
@@ -72,16 +69,15 @@ let vKeys = [
 	96, 46
 ];
 
-
 // This array must be the same length as vKeys[], and represents the pixel color position in our pixel matrix that we reference.  For example,
 // item at index 3 [9,0] represents the corsair logo, and the render routine will grab its color from [9,0].
 let vKeyPositions = [
-	[1, 1],    [3, 1], [4, 1], [5, 1], [6, 1],     [7, 1], [8, 1], [9, 1], [10, 1],   [12, 1], [13, 1], [14, 1], [15, 1],  [15, 1], [16, 1], [17, 1],     //[18,1], [19,1],[20,1], [21,1],
+	[1, 1],         [3, 1], [4, 1], [5, 1], [6, 1], [7, 1], [8, 1], [9, 1], [10, 1], [11, 1], [12, 1], [13, 1], [14, 1],   [15, 1], [16, 1], [17, 1],     //[18,1], [19,1],[20,1], [21,1],
 	[1, 2], [2, 2], [3, 2], [4, 2], [5, 2], [6, 2], [7, 2], [8, 2], [9, 2], [10, 2], [11, 2], [12, 2], [13, 2], [14, 2],   [15, 2], [16, 2], [17, 2],   [18, 2], [19, 2], [20, 2], [21, 2],
 	[1, 3], [2, 3], [3, 3], [4, 3], [5, 3], [6, 3], [7, 3], [8, 3], [9, 3], [10, 3], [11, 3], [12, 3], [13, 3], [14, 3],   [15, 3], [16, 3], [17, 3],   [18, 3], [19, 3], [20, 3], [21, 3],
-	[1, 4], [2, 4], [3, 4], [4, 4], [5, 4], [6, 4], [7, 4], [8, 4], [9, 4], [10, 4], [11, 4], [12, 4],         [14, 4],                             [18, 4], [19, 4], [20, 4],
-	[1, 5],     [3, 5], [4, 5], [5, 5], [6, 5], [7, 5], [8, 5], [9, 5], [10, 5], [11, 5], [12, 5],            [14, 5],           [16, 5],           [18, 5], [19, 5], [20, 5], [21, 5],
-	[1, 6], [2, 6], [3, 6],                      [7, 6],                       [11, 6], [12, 6], [13, 6], [14, 6],   [15, 6], [16, 6], [17, 6],   [18, 6],        [20, 6],
+	[1, 4], [2, 4], [3, 4], [4, 4], [5, 4], [6, 4], [7, 4], [8, 4], [9, 4], [10, 4], [11, 4], [12, 4],         [14, 4],                                 [18, 4], [19, 4], [20, 4],
+	[1, 5],     [3, 5], [4, 5], [5, 5], [6, 5], [7, 5], [8, 5], [9, 5], [10, 5], [11, 5], [12, 5],            [14, 5],           [16, 5],               [18, 5], [19, 5], [20, 5], [21, 5],
+	[1, 6], [2, 6], [3, 6],                      [7, 6],                       [11, 6], [12, 6], [13, 6], [14, 6],   [15, 6], [16, 6], [17, 6],          [18, 6],         [20, 6],
 
 	//ISO
 	[2, 5], [13, 4]

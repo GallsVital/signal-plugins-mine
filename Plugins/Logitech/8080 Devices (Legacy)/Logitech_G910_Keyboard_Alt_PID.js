@@ -64,14 +64,129 @@ export function LedPositions() {
 }
 
 
-export function Initialize() {
-	// Media and G-Keys - set to white.
-	//NewPacket(104,4);
-	//NewPacket(108,4);
-	//NewPacket(112,2);
-	//NewApply();
+export function Initialize() 
+{
+    GKeySetup();
+    MKeySetup();
 }
 
+function GKeySetup()//Controls software modes for the G and M keys
+{
+	device.set_endpoint(1, 0x0602, 0xff43); // System IF
+	var packet = [0x11, 0xFF, 0x08, 0x00]; //Info
+	device.write(packet,20);
+
+	packet = [0x11, 0xFF, 0x08, 0x20, 0x01]; //Software Enable Flag for GKeys and Mkeys
+	device.write(packet,20);
+}
+
+function MKeySetup()//LED Control for the Mkey lights
+{
+	
+	var packet = [0x11, 0xFF, 0x09, 0x00]; //Probably Info
+	device.write(packet,20);
+
+	packet = [0x11, 0xFF, 0x09, 0x10, 0x00]; //Led Number Flag in binary
+    device.write(packet,20);
+}
+
+function detectinputs()
+{
+    do
+    {
+    let packet = [];
+    packet = device.read([0x00],9, 2);
+    let input = processinputs(packet)
+    }
+    while(device.getLastReadSize() > 0)
+}
+
+function processinputs(packet)
+{
+    if(packet[0] == 0x11 && packet[1] == 0xff && packet[2] == 0x08)//G-Key Packet
+	{
+        if(packet[4] == 0x01)
+        {
+            device.log("G1 Pressed");
+            return "G1";
+        }
+
+        if(packet[4] == 0x02)
+        {
+            device.log("G2 Pressed");
+            return "G2";   
+        }
+
+        if(packet[4] == 0x04)
+        {
+            device.log("G3 Pressed");
+            return "G3";   
+        }
+
+        if(packet[4] == 0x08)
+        {
+            device.log("G4 Pressed");
+            return "G4";   
+        }
+
+        if(packet[4] == 0x10)
+        {
+            device.log("G5 Pressed");
+            return "G5";   
+        }
+
+        if(packet[4] == 0x20)
+        {
+            device.log("G6 Pressed");
+            return "G6"; 
+        }
+     
+        if(packet[4] == 0x40)
+        {
+            device.log("G7 Pressed");
+            return "G7"; 
+        }
+
+        if(packet[4] == 0x80)
+        {
+            device.log("G8 Pressed");
+            return "G8"; 
+        }
+
+        if(packet[5] == 0x01)
+        {
+            device.log("G9 Pressed");
+            return "G9"; 
+        }
+    }
+
+    if(packet[0] == 0x11 && packet[1] == 0xff && packet[2] == 0x09)//G-Key Packet
+	{
+        if(packet[4] == 0x01)
+        {
+            device.log("M1 Pressed");
+            return "M1";
+        }
+
+        if(packet[4] == 0x02)
+        {
+            device.log("M2 Pressed");
+            return "M2";   
+        }
+
+        if(packet[4] == 0x04)
+        {
+            device.log("M3 Pressed");
+            return "M3";   
+        }
+    }
+
+    if(packet[0] == 0x11 && packet[1] == 0xff && packet[2] == 0x0a && packet[4] == 0x01)//G-Key Packet
+	{
+        device.log("MR Pressed");
+        return "MR";   
+    }
+}
 
 function Apply() {
 	let packet = [];
@@ -83,6 +198,7 @@ function Apply() {
 
 	device.set_endpoint(1, 0x0602, 0xff43); // System IF
 	device.write(packet, 20);
+	device.pause(1);
 }
 
 function SendGkeys(shutdown = false) {
@@ -160,53 +276,6 @@ function SendLogoZones(shutdown = false){
 	device.pause(1);
 }
 
-function hexToRgb(hex) {
-	let result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
-	let colors = [];
-	colors[0] = parseInt(result[1], 16);
-	colors[1] = parseInt(result[2], 16);
-	colors[2] = parseInt(result[3], 16);
-
-	return colors;
-}
-
-function SendZonePacket(startIdx, count, zone, shutdown = false) {
-	let packet = [];
-	packet[0] = 0x12;
-	packet[1] = 0xFF;
-	packet[2] = 0x0C;
-	packet[3] = 0x3D;
-	packet[4] = 0x00;
-	packet[5] = zone;
-	packet[6] = 0x00;
-	packet[7] = count; // led count
-
-	for(let iIdx = 0; iIdx < count; iIdx++){
-		let iLedIdx = (iIdx * 4) + 8;
-		let iKeyIdx = startIdx + iIdx;
-		let iKeyPosX = vLedPositions[iKeyIdx][0];
-		let iKeyPosY = vLedPositions[iKeyIdx][1];
-		var color;
-
-		if(shutdown){
-			color = hexToRgb(shutdownColor);
-		}else if (LightingMode === "Forced") {
-			color = hexToRgb(forcedColor);
-		}else{
-			color = device.color(iKeyPosY, iKeyPosX);
-		}
-
-		packet[iLedIdx] = vKeymap[iKeyIdx];
-		packet[iLedIdx+1] = color[0];
-		packet[iLedIdx+2] = color[1];
-		packet[iLedIdx+3] = color[2];
-	}
-
-	device.set_endpoint(1, 0x0604, 0xff43); // Lighting IF
-	device.write(packet, 64);
-	device.pause(1);
-}
-
 function SendPacket(startIdx, count, shutdown = false) {
 	let packet = [];
 	packet[0] = 0x12;
@@ -244,45 +313,8 @@ function SendPacket(startIdx, count, shutdown = false) {
 	device.pause(1);
 }
 
-export function NewApply() {
-	let packet = [];
-
-	packet[0] = 0x11;
-	packet[1] = 0xFF;
-	packet[2] = 0x10;
-	packet[3] = 0x7E;
-
-	device.set_endpoint(1, 0x0602, 0xff43); // System IF
-	device.write(packet, 20);
-}
-
-function NewPacket(startIdx, count) {
-	let packet = [];
-
-	packet[0] = 0x11;
-	packet[1] = 0xFF;
-	packet[2] = 0x10;
-	packet[3] = 0x1E;
-
-	for(let iIdx = 0; iIdx < count; iIdx++){
-		let iLedIdx = (iIdx * 4) + 4;
-		let iKeyIdx = startIdx + iIdx;
-		let iKeyPosX = vLedPositions[iKeyIdx][0];
-		let iKeyPosY = vLedPositions[iKeyIdx][1];
-		let col = device.color(iKeyPosX, iKeyPosY);
-		packet[iLedIdx] = vKeymap[iKeyIdx];
-		packet[iLedIdx+1] = 200; //col[0];
-		packet[iLedIdx+2] = 200; //col[1];
-		packet[iLedIdx+3] = 200; //col[2];
-	}
-
-	device.set_endpoint(1, 0x0602, 0xff43); // System IF
-	device.write(packet, 20);
-	device.pause(1);
-}
-
-
-export function Render() {
+export function Render() 
+{
 	SendPacket(0, 14);
 	SendPacket(14, 14);
 	SendPacket(28, 14);
@@ -294,6 +326,8 @@ export function Render() {
 	SendGkeys();
 	SendLogoZones();
 	Apply();
+    detectinputs();
+	device.pause(5);
 }
 
 
@@ -311,6 +345,15 @@ export function Shutdown() {
 	Apply();
 }
 
+function hexToRgb(hex) {
+	let result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+	let colors = [];
+	colors[0] = parseInt(result[1], 16);
+	colors[1] = parseInt(result[2], 16);
+	colors[2] = parseInt(result[3], 16);
+
+	return colors;
+}
 
 export function Validate(endpoint) {
 	return (endpoint.interface === 1 && endpoint.usage === 0x0602) ||
