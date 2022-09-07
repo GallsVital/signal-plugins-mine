@@ -11,6 +11,7 @@
 		"eslint": "~8.23.0",
 		"eslint-plugin-jest": "^27.0.1",
 		"jest": "^29.0.2",
+		"jest-junit": "^14.0.1",
 		"jsdoc": "^3.6.11",
 		"typescript": "^4.8.2"
 	},
@@ -20,6 +21,7 @@
 		"lint:addGlobals": "node ./AddGlobalComments.js",
 		"lint:checkGlobals": "node ./AddGlobalComments.js --dryrun",
 		"test": "jest ./Plugins --collectCoverage",
+		"test:ci": "jest ./Plugins --ci --reporters=default --reporters=jest-junit",
 		"test:loadable": "node ./ValidatePlugins.js",
 		"docs": "jsdoc -c jsdoc.json",
 		"SAVED": "npx -p typescript tsc ModernCorsairProtocol.js --declaration --allowJs --emitDeclarationOnly --outDir types"
