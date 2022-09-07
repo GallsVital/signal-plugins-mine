@@ -37,6 +37,7 @@ async function CheckPluginFile(PluginPath){
 
 	// Checking if the file loads without an error.
 	const pluginModule = await import(filePathUrl);
+	// Add Checks here
 
 }
 

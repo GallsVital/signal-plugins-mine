@@ -22,7 +22,7 @@
 		"lint:checkGlobals": "node ./AddGlobalComments.js --dryrun",
 		"test": "jest ./Plugins --collectCoverage",
 		"test:ci": "jest ./Plugins --ci --reporters=default --reporters=jest-junit",
-		"test:loadable": "node ./ValidatePlugins.js",
+		"test:validate": "node ./ValidatePlugins.js",
 		"docs": "jsdoc -c jsdoc.json",
 		"SAVED": "npx -p typescript tsc ModernCorsairProtocol.js --declaration --allowJs --emitDeclarationOnly --outDir types"
 	},
@@ -36,8 +36,8 @@
 		"outputDirectory": ".",
 		"outputName": "junit.xml",
 		"uniqueOutputName": "false",
-		"classNameTemplate": "{classname}-{title}",
-		"titleTemplate": "{classname}-{title}",
+		"classNameTemplate": "{classname}",
+		"titleTemplate": "{title}",
 		"ancestorSeparator": " › "
 	  }
 }

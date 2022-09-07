@@ -32,7 +32,7 @@ validate:
   script:
     #- apk add --update npm
     #- npm install
-    - npm run test:loadable
+    - npm run test:validate
 
 unit test:
   stage: unit test

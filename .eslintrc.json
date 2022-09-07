@@ -63,7 +63,6 @@
             { "blankLine": "any", "prev": "*", "next": ["let","var","const"] },
             { "blankLine": "always", "prev": "expression", "next": ["let","var","const"] },
 
-
             { "blankLine": "never", "prev": ["*","export","block-like"], "next": "export" },
             { "blankLine": "any", "prev": "*", "next": "export" },
             { "blankLine": "always", "prev": "expression", "next": ["block-like"] },
@@ -77,5 +76,13 @@
             }
         ]
     
-    }
+    },
+    "overrides": [
+        {
+          "files": ["./**/*.test.js"],
+          "rules": {
+            "no-console": "off"
+          }
+        }
+    ]
 }
