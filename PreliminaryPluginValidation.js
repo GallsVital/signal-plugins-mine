@@ -4,6 +4,7 @@ import * as url from 'url';
 
 const DirectoryName = "Plugins";
 
+
 ScanPlugins();
 
 async function ScanPlugins(){
@@ -25,7 +26,9 @@ async function ScanPlugins(){
 
 	console.log(`[${ErroredFiles}] file(s) had errors that prevented module loading.`);
 
-	return ErroredFiles > 0;
+	if(ErroredFiles > 0){
+		process.exit(1);
+	}
 }
 
 async function loadPlugin(PluginPath){
@@ -34,7 +37,7 @@ async function loadPlugin(PluginPath){
 	const pluginModule = await import(filePathUrl);
 
 	// Just checking if the file loads without an error.
-	return;
+
 }
 
 
