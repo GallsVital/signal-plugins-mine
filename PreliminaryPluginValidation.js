@@ -23,11 +23,10 @@ async function ScanPlugins(){
 		}
 	}
 
-	console.log(`[${ErroredFiles}] file(s) had errors that prevented module loading.`);
-
-	// if(ErroredFiles > 0){
-	// 	throw new Error(`[${ErroredFiles}] file(s) had errors that prevented module loading.`);
-	// }
+	// Force Pipeline Failure
+	if(ErroredFiles > 0){
+		throw new Error(`[${ErroredFiles}] file(s) had errors that prevented module loading.`);
+	}
 }
 
 async function loadPlugin(PluginPath){
