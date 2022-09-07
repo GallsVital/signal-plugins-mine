@@ -3,8 +3,7 @@ image: alpine:latest
 stages:
   - lint
   - validate
-  - test
-  - status
+  - unit test
   
 # Cache modules in between jobs
 cache:
@@ -35,7 +34,7 @@ validate:
     #- npm install
     - npm run test:loadable
 
-test:
+unit test:
   stage: test
   when: always
 
