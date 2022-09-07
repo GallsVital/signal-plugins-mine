@@ -11,7 +11,7 @@
 		"typescript": "^4.8.2"
 	},
 	"scripts": {
-		"lint": "node node_modules/eslint/bin/eslint.js ./Plugins ",
+		"lint": "node node_modules/eslint/bin/eslint.js ./Plugins",
 		"lint:addGlobals": "node ./AddGlobalVariableComments.js",
 		"lint:ci":  "node node_modules/eslint/bin/eslint.js ./Plugins --quiet",
 		"test:loadable": "node ./PreliminaryPluginValidation.js",

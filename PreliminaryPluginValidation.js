@@ -2,7 +2,7 @@ import fs from 'fs';
 import path from 'path';
 import * as url from 'url';
 
-const DirectoryName = ".\\Plugins";
+const DirectoryName = "Plugins";
 
 ScanPlugins();
 
