@@ -2,6 +2,7 @@ image: alpine:latest
 
 stages:
   - lint
+  - test
 
 eslint:
   stage: lint
@@ -9,4 +10,12 @@ eslint:
   script:
     - apk add --update npm
     - npm install
-    - node_modules/eslint/bin/eslint.js ./Plugins --quiet
+    - npm run lint:ci
+
+validate:
+  stage: test
+  
+  script:
+    - apk add --update npm
+    - npm install
+    - npm run test:loadable

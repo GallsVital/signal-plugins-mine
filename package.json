@@ -11,9 +11,10 @@
 		"typescript": "^4.8.2"
 	},
 	"scripts": {
-		"lint": "eslint ./Plugins ",
+		"lint": "node node_modules/eslint/bin/eslint.js ./Plugins ",
 		"lint:addGlobals": "node ./AddGlobalVariableComments.js",
-		"lint:ci": "eslint ./Plugins --quiet",
+		"lint:ci":  "node node_modules/eslint/bin/eslint.js ./Plugins --quiet",
+		"test:loadable": "node ./PreliminaryPluginValidation.js",
 		"docs": "jsdoc -c jsdoc.json",
 		"SAVED": "npx -p typescript tsc ModernCorsairProtocol.js --declaration --allowJs --emitDeclarationOnly --outDir types"
 	}
