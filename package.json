@@ -30,5 +30,15 @@
 		"transform": {
 			"^.+\\.[t|j]sx?$": "babel-jest"
 		}
-	}
+	},
+	"jest-junit": {
+		"suiteName": "Unit Tests",
+		"outputDirectory": ".",
+		"outputName": "junit.xml",
+		"uniqueOutputName": "false",
+		"classNameTemplate": "{classname}-{title}",
+		"titleTemplate": "{classname}-{title}",
+		"ancestorSeparator": " › ",
+		"usePathForSuiteName": "true"
+	  }
 }
