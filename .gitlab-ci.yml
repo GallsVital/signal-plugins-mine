@@ -2,20 +2,52 @@ image: alpine:latest
 
 stages:
   - lint
+  - validate
   - test
+  - status
+  
+# Cache modules in between jobs
+cache:
+  key: 
+    files:
+      - package-lock.json
+  paths:
+    - .npm/
+
+before_script:
+  - apk add --update npm
+  - npm ci --cache .npm --prefer-offline
 
 eslint:
   stage: lint
+  allow_failure: true
 
   script:
-    - apk add --update npm
-    - npm install
+    #- apk add --update npm
+    #- npm install
     - npm run lint:ci
 
 validate:
-  stage: test
-  
+  stage: validate
+  allow_failure: true
+
   script:
-    - apk add --update npm
-    - npm install
+    #- apk add --update npm
+    #- npm install
     - npm run test:loadable
+
+test:
+  stage: test
+  allow_failure: true
+  script:
+    #- apk add --update npm
+    #- npm install
+    - npm run test
+
+
+fail_pipeline:
+  stage: status
+  image: bash
+  script:
+    - exit 1
+  when: on_failure

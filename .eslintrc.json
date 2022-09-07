@@ -13,9 +13,11 @@
         ]
     },
     "plugins": [
-        "@typescript-eslint"
+        "@typescript-eslint",
+        "jest"
         ],
     "globals": {
+        "module": "writable",
         "device": "readonly", 
         "bus": "readonly",
         "battery": "readonly"

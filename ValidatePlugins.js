@@ -8,14 +8,14 @@ const DirectoryName = "Plugins";
 ScanPlugins();
 
 async function ScanPlugins(){
-	const PluginFiles = getAllFiles(DirectoryName);
+	const PluginFiles = getAllFilePaths(DirectoryName);
 	let ErroredFiles = 0;
 
 	for(let iIdx = 0; iIdx < PluginFiles.length; iIdx++){
 		const plugin = PluginFiles.at(iIdx);
 
 		try{
-			await loadPlugin(plugin);
+			await CheckPluginFile(plugin);
 		}catch(e){
 			console.log(plugin);
 			console.log(e);
@@ -31,26 +31,26 @@ async function ScanPlugins(){
 	}
 }
 
-async function loadPlugin(PluginPath){
+async function CheckPluginFile(PluginPath){
 
 	const filePathUrl = url.pathToFileURL(PluginPath);
-	const pluginModule = await import(filePathUrl);
 
-	// Just checking if the file loads without an error.
+	// Checking if the file loads without an error.
+	const pluginModule = await import(filePathUrl);
 
 }
 
-
-function getAllFiles(dirPath, arrayOfFiles) {
+function getAllFilePaths(dirPath, arrayOfFiles = []) {
 	const files = fs.readdirSync(dirPath);
-
-	arrayOfFiles = arrayOfFiles || [];
 
 	files.forEach(function(file) {
 		if (fs.statSync(dirPath + "/" + file).isDirectory()) {
-			arrayOfFiles = getAllFiles(dirPath + "/" + file, arrayOfFiles);
+			arrayOfFiles = getAllFilePaths(dirPath + "/" + file, arrayOfFiles);
 		} else {
-			arrayOfFiles.push(path.join(url.fileURLToPath(new URL('.', import.meta.url)), dirPath, "/", file));
+			// Ignore test files
+			if(!file.endsWith("test.js")){
+				arrayOfFiles.push(path.join(url.fileURLToPath(new URL('.', import.meta.url)), dirPath, "/", file));
+			}
 		}
 	});
 

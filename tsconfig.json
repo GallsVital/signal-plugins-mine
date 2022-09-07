@@ -10,8 +10,8 @@
 		"strictNullChecks": true,
 		"strictFunctionTypes": true,
 		"declarationMap": true,
-		"typeRoots": ["./types"],
-		"disableSizeLimit": true // Plugin images being base64 breaks Typescript checking in the project. 20mb filesize limit by default
+		"typeRoots": ["./types", "./node_modules/@types"],
+		"disableSizeLimit": true, // Plugin images being base64 breaks Typescript checking in the project. 20mb filesize limit by default
 	},
 
 	"exclude": [

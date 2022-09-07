@@ -3,19 +3,29 @@
 	"version": "1.0.0",
 	"type": "module",
 	"devDependencies": {
+		"@babel/preset-env": "^7.19.0",
+		"@types/jest": "^29.0.0",
 		"@typescript-eslint/eslint-plugin": "^5.36.1",
 		"@typescript-eslint/parser": "^5.36.1",
 		"better-docs": "^2.7.2",
 		"eslint": "~8.23.0",
+		"jest": "^29.0.2",
 		"jsdoc": "^3.6.11",
 		"typescript": "^4.8.2"
 	},
 	"scripts": {
 		"lint": "node node_modules/eslint/bin/eslint.js ./Plugins",
-		"lint:addGlobals": "node ./AddGlobalVariableComments.js",
-		"lint:ci":  "node node_modules/eslint/bin/eslint.js ./Plugins --quiet",
-		"test:loadable": "node ./PreliminaryPluginValidation.js",
+		"lint:ci": "node node_modules/eslint/bin/eslint.js ./Plugins --quiet",
+		"lint:addGlobals": "node ./AddGlobalComments.js",
+		"lint:checkGlobals": "node ./AddGlobalComments.js --dryrun",
+		"test": "jest ./Plugins --collectCoverage",
+		"test:loadable": "node ./ValidatePlugins.js",
 		"docs": "jsdoc -c jsdoc.json",
 		"SAVED": "npx -p typescript tsc ModernCorsairProtocol.js --declaration --allowJs --emitDeclarationOnly --outDir types"
+	},
+	"jest": {
+		"transform": {
+			"^.+\\.[t|j]sx?$": "babel-jest"
+		}
 	}
 }

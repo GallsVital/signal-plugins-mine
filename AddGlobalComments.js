@@ -2,6 +2,18 @@
 import fs from 'fs';
 import path from 'path';
 import * as url from 'url';
+import { argv } from 'node:process';
+
+let dryrun = false;
+
+argv.forEach((val, index) => {
+	console.log(`${index}: ${val}`);
+	switch(val){
+		case("--dryrun"):{
+			dryrun = true;
+		}
+	}
+  });
 
 const DirectoryName = ".\\Plugins";
 
@@ -24,13 +36,21 @@ const getAllFiles = function(dirPath, arrayOfFiles) {
 export async function ScanPlugins(){
 	const PluginFiles = getAllFiles(DirectoryName);
 	let ChangedFiles = 0;
+
 	for(let iIdx = 0; iIdx < PluginFiles.length; iIdx++){
 		const plugin = PluginFiles.at(iIdx);
-		//console.log(plugin);
 
-		ChangedFiles += await loadPlugin(plugin);
+		//console.log(plugin);
+		try{
+			ChangedFiles += await loadPlugin(plugin);
+		}catch(e){
+			console.log(e);
+		}
 	}
-	console.log(`Changed [${ChangedFiles}] files.`)
+
+	console.log(`Changed [${ChangedFiles}] files${dryrun ? " if this wasn't a dry run." : "."}`);
+
+
 }
 
 async function loadPlugin(PluginPath){
@@ -61,27 +81,31 @@ async function loadPlugin(PluginPath){
 	let dataString = myBuffer.toString();
 
 	const [start, end] = FindCommentPosition(dataString);
+
 	if(!CheckCurrentComment(dataString, commentString, start, end)){
 		console.log("Current Comment doesn't match the expected. Removing it.");
 		dataString = RemoveRange(dataString, start, end);
+	}else{
+		return 0;
 	}
 
 
 	const insert = FindInsertStart(dataString);
 	dataString = InsertAtLocation(dataString, commentString, insert);
 
-	//fs.writeFileSync("output.js", dataString);
-	fs.writeFileSync(PluginPath, dataString);
+	if(!dryrun){
+		//fs.writeFileSync("output.js", dataString);
+		fs.writeFileSync(PluginPath, dataString);
+	}
 
 	return 1;
-	//console.log(commentString);
 }
 
 function CheckCurrentComment(dataString, commentString, start, end){
 	if(start === -1 || end === -1){
 		console.log(`Globals comment does not exist. Skipping Check of current Comment.`);
 
-		return dataString;
+		return false;
 	}
 
 	const CurrentComment = dataString.substr(start, end-start+3);
@@ -121,6 +145,7 @@ function FindCommentPosition(dataString){
 function RemoveRange(dataString, start, end){
 	if(start === -1 || end === -1){
 		console.log(`Globals comment does not exist. Skipping Removal.`);
+
 		return dataString;
 	}
 
