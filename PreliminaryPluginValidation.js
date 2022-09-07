@@ -23,10 +23,9 @@ async function ScanPlugins(){
 		}
 	}
 
-	// Force Pipeline Failure
-	if(ErroredFiles > 0){
-		throw new Error(`[${ErroredFiles}] file(s) had errors that prevented module loading.`);
-	}
+	console.log(`[${ErroredFiles}] file(s) had errors that prevented module loading.`);
+
+	return ErroredFiles > 0;
 }
 
 async function loadPlugin(PluginPath){
