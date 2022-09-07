@@ -20,7 +20,7 @@ before_script:
 
 eslint:
   stage: lint
-  allow_failure: true
+  when: always
 
   script:
     #- apk add --update npm
@@ -29,8 +29,7 @@ eslint:
 
 validate:
   stage: validate
-  allow_failure: true
-
+  when: always
   script:
     #- apk add --update npm
     #- npm install
@@ -38,16 +37,9 @@ validate:
 
 test:
   stage: test
-  allow_failure: true
+  when: always
+
   script:
     #- apk add --update npm
     #- npm install
     - npm run test
-
-
-fail_pipeline:
-  stage: status
-  image: bash
-  script:
-    - exit 1
-  when: on_failure
