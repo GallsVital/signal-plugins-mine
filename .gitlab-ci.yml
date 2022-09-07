@@ -10,7 +10,7 @@ eslint:
   script:
     - apk add --update npm
     - npm install
-    - npm run lint:ci
+
 
 validate:
   stage: test
