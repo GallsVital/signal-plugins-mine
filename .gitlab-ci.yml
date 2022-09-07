@@ -35,7 +35,7 @@ validate:
     - npm run test:loadable
 
 unit test:
-  stage: test
+  stage: unit test
   when: always
 
   script:
