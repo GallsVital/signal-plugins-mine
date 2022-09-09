@@ -49,12 +49,6 @@ describe("Corsair K95 Plat XT ModernCorsairProtocol", () => {
 			expect(colors).toEqual(expectedColors);
 		});
 
-		it("Expected Failure", () => {
-			const pluginfile = require("./Corsair_K95_Plat_XT_Keyboard_ModernCorsairProtocol.js");
-
-			const colors = pluginfile.GetColors();
-			expect(colors).toEqual([]);
-		});
 	});
 
 });
