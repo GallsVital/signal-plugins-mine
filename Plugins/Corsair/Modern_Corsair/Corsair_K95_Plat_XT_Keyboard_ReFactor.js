@@ -361,7 +361,7 @@ function Corsair_SetValue(endpoint, value) {
 	let packet = [0x00, CORSAIR_COMMAND, CORSAIR_COMMAND_SET, endpoint, 0x00, (value & 0xFF), (value >> 8 & 0xFF)];
 	device.write(packet, Device_Write_Length);
 	packet = device.read(packet, Device_Read_Length);
-	device.readTimeout([0x00], Device_Read_Length, 10);
+	device.read([0x00], Device_Read_Length, 10);
 
 	Corsair_Check_Error(packet, "Set Packet");
 

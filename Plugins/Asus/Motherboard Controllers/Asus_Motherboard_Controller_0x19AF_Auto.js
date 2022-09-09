@@ -484,7 +484,7 @@ function ClearReadBuffer(timeout = 10){
 	device.flush();
 
 	while(device.getLastReadSize() > 0){
-		device.readTimeout([0x00], Device_Read_Length, timeout);
+		device.read([0x00], Device_Read_Length, timeout);
 		count++;
 		readCounts.push(device.getLastReadSize());
 	}

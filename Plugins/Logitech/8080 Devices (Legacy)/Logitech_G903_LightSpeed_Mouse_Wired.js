@@ -652,7 +652,7 @@ function DetectInputs()
 		do
     	{
     	let packet = [];
-    	packet = device.readTimeout([0x00],9, 2);
+    	packet = device.read([0x00],9, 2);
     	let input = ProcessInputs(packet);
 		
 		if(input == "DPI_UP")
@@ -687,7 +687,7 @@ function DetectInputs()
 	device.set_endpoint(EndpointByte1, ShortMessageEndpointByte, EndpointByte3);
 	do
 	{
-	let packet = device.readTimeout([0x00],7, 10);
+	let packet = device.read([0x00],7, 10);
 
 		if(packet[0] == ShortMessage && packet[1] == ConnectionMode && packet[2] == 0x41 && packet[3] == 0x0C && packet[6] == 0x40)
 		{

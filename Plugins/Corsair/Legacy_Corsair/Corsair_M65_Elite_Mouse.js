@@ -199,7 +199,7 @@ function DPIChecks()
     do
     {
     var packet = [];
-    packet = device.readTimeout([0x00],64, 5);
+    packet = device.read([0x00],64, 5);
     DPIStageCycle(packet);
     }
     while(device.getLastReadSize() > 0)

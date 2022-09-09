@@ -179,7 +179,7 @@ let NZXT = new NZXTSmartDevice2();
 function ReadAllPackets(){
 
 	do {
-		let packet = device.readTimeout([0x0], 64, 2);
+		let packet = device.read([0x0], 64, 2);
 
 		if(packet[0] === 0x11 && packet[1] === 0x01){
 			let Firmware = `${packet[0x11]}.${packet[0x12]}.${packet[0x13]}`

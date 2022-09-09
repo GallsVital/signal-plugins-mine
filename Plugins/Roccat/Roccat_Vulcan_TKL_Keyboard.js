@@ -105,7 +105,7 @@ export function Shutdown() {
 
 // function fnCheck()//For now this is an unused mode change handler. If users using the fx keys becomes an issue we can implement this.
 // {
-// 	let packet = device.readTimeout([0x00],65,10)
+// 	let packet = device.read([0x00],65,10)
 
 // 	if(packet[1] == 0x03 && packet[3] == 0xfb && packet[4] == 0x77)
 // 	{
