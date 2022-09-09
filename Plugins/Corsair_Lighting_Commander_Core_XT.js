@@ -28,7 +28,7 @@ export function Validate(endpoint) {
 }
 let vKeyNames = [];
 let vKeyPositions = [];
-const Corsair = ModernCorsairProtocol();
+const Corsair = new ModernCorsairProtocol();
 
 function SetupChannels() {
 	device.SetLedLimit(DeviceMaxLedLimit);

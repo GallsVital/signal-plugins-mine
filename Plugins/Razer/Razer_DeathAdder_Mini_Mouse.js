@@ -225,7 +225,7 @@ function setDPIRazer(dpi){
 	packet[12] = 0x00;
 	packet[13] = Math.floor(usableDpi/256);
 	packet[14] = usableDpi%256;
-	packet[15] = Math.floor(dpusableDpii/256);
+	packet[15] = Math.floor(usableDpi/256);
 	packet[16] = usableDpi%256;
 	packet[89] = CalculateCrc(packet);
 	device.send_report(packet, 91);

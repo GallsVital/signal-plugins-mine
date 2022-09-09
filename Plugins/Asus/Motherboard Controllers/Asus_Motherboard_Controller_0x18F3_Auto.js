@@ -467,7 +467,6 @@ function FetchFirmwareVersion(){
 
 
 // Helper Functions
-
 function hexToRgb(hex) {
 	let result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
 	let colors = [];
@@ -484,7 +483,7 @@ function ClearReadBuffer(timeout = 10){
 	device.flush();
 
 	while(device.getLastReadSize() > 0){
-		device.readTimeout([0x00], Device_Read_Length, timeout);
+		device.read([0x00], Device_Read_Length, timeout);
 		count++;
 		readCounts.push(device.getLastReadSize());
 	}

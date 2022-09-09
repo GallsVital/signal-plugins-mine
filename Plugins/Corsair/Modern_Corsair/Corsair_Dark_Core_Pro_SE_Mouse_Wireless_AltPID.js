@@ -81,21 +81,21 @@ export function Initialize() {
 
 let savedDpi1;
 
-function setDpi(dpi){
-	savedDpi1 = dpi;
-	Corsair_Set(CORSAIR_DPI_X, savedDpi1);
-	Corsair_Set(CORSAIR_DPI_Y, savedDpi1);
+// function setDpi(dpi){
+// 	savedDpi1 = dpi;
+// 	Corsair_Set(CORSAIR_DPI_X, savedDpi1);
+// 	Corsair_Set(CORSAIR_DPI_Y, savedDpi1);
 
-	device.log(`DPI x is now ${Corsair_Get(CORSAIR_DPI_X)}`);
-	device.log(`DPI y is now ${Corsair_Get(CORSAIR_DPI_Y)}`);
-}
+// 	device.log(`DPI x is now ${Corsair_Get(CORSAIR_DPI_X)}`);
+// 	device.log(`DPI y is now ${Corsair_Get(CORSAIR_DPI_Y)}`);
+// }
 
 export function Render() {
 	sendColors();
 
-	if(dpi1 != savedDpi1) {
-		setDpi(dpi1);
-	}
+	// if(dpi1 != savedDpi1) {
+	// 	setDpi(dpi1);
+	// }
 }
 
 function sendColors(shutdown = false){

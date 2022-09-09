@@ -14,12 +14,33 @@ declare interface LogOptions{
 declare type DeviceFeature = "Battery";
 declare type hexToRgb = (HexString: string) => ColorArray;
 
+declare type ControllableParametersType = () => Parameter[];
+
+declare type Parameter = ParameterBase | ComboboxParameter | ColorParameter
+declare interface ParameterBase{
+	property: string
+	group?: string
+	label: string
+	default: string
+	type: "color" | "combobox"
+}
+
+declare interface ColorParameter extends ParameterBase{
+	min: string
+	max: string
+	type: "color"
+}
+declare interface ComboboxParameter extends ParameterBase{
+	values: string[]
+	type: "combobox"
+}
 declare interface HidEndpoint{
 	interface: number
 	usage: number
 	usage_page: number
 	collection?: number
 }
+
 declare type AlertPriority = 0 | 1;
 declare type AlertId = string;
 declare type MessageId = string;

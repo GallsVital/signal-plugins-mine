@@ -340,9 +340,9 @@ export function onAngleSnapChanged() {
 
 
 // Polling Rate Functions
-export function onPollRateChanged() {
-	setPollRate(PollRate);
-}
+// export function onPollRateChanged() {
+// 	setPollRate(PollRate);
+// }
 
 function VerifyMouseSettings() {
 	if (!SettingControl) {

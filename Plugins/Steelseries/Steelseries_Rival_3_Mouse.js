@@ -34,7 +34,7 @@ let vLedPositions = [
 let savedDpi1;
 
 export function Initialize() {
-
+	let packet = []
 	packet[0x00] = 0x00;
 	packet[0x01] = 0x09;
 	device.write(packet, 69);

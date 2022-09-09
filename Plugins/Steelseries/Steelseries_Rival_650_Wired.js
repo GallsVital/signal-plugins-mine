@@ -24,14 +24,14 @@ export function ControllableParameters(){
 		{"property":"send_delay1", "label":"RGB Packet Delay", "step":"1", "type":"number", "min":"0", "max":"200", "default":"60", "tooltip":"Time in milliseconds in between rgb updates. Lower delay increases smoothness, but also increases chance of mouse locking up."}
 	];
 }
-export function DeviceMessages() { 
+export function DeviceMessages() {
 	return [
-	{property: "Limited Frame Rate", message:"Limited Frame Rate", tooltip: "This device’s firmware is limited to a slower refresh rate then other devices. Adjusting RGB Packet Delay may help, but may also increase instability"},
+		{property: "Limited Frame Rate", message:"Limited Frame Rate", tooltip: "This device's firmware is limited to a slower refresh rate then other devices. Adjusting RGB Packet Delay may help, but may also increase instability"},
 	];
 }
 
 
-let vLedNames =
+const vLedNames =
 [
 	"Scroll", "Logo",
 	"Left1", "Right1",
@@ -40,7 +40,7 @@ let vLedNames =
 ];
 
 //Zones go 0 through 7
-let vLedPositions =
+const vLedPositions =
 [
 	[3, 0], [3, 6],
 	[2, 2], [4, 2],
@@ -83,10 +83,9 @@ export function ondpi1Changed() {
 }
 
 function SendColorPacket(Position, shutdown = false) {
-	let packet = [];
-	let iPxX = Position[0];
-	let iPxY = Position[1];
-	var color;
+	const packet = [];
+	const iPxX = Position[0];
+	const iPxY = Position[1];
 	var color;
 
 	if(shutdown){
@@ -122,7 +121,7 @@ function SendColorPacket(Position, shutdown = false) {
 }
 
 function sendZoneIdPacket(zoneId) {
-	let packet = [];
+	const packet = [];
 	packet[0x00] = 0x00;
 	packet[0x01] = 0x05;
 	packet[0x03] = 16 + zoneId;
@@ -133,8 +132,7 @@ function sendZoneIdPacket(zoneId) {
 }
 
 function setDpi(channel, dpi) {
-	let packet = [];
-	savedDpi1 = dpi1;
+	const packet = [];
 
 	packet[0] = 0x00;
 	packet[1] = 0x15;
@@ -148,8 +146,8 @@ export function Validate(endpoint) {
 }
 
 function hexToRgb(hex) {
-	let result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
-	let colors = [];
+	const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+	const colors = [];
 	colors[0] = parseInt(result[1], 16);
 	colors[1] = parseInt(result[2], 16);
 	colors[2] = parseInt(result[3], 16);

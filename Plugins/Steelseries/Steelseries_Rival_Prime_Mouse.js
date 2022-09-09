@@ -44,12 +44,10 @@ export function Initialize() {
 	//packet[0x00] = 0x00;
 	//packet[0x01] = 0x09;
 	//device.write(packet, 69)
-	if(PollControl) {
-		setPollingRate(pollingrate1);
-	}
 
-	    if(DpiControl) {
+	if(DpiControl) {
 		setDpi(dpi1);
+		setPollingRate(pollingrate1);
 	}
 }
 
@@ -68,15 +66,15 @@ export function Shutdown() {
 }
 
 function SendColorPacket(shutdown = false) {
-	let packet = [];
+	const packet = [];
 	packet[0x00] = 0x00;
 	packet[0x01] = 0x62;
 	packet[0x02] = 0x01;
 
 
 	for(let iIdx = 0; iIdx < 1; iIdx++){
-		let iPxX = vLedPositions[iIdx][0];
-		let iPxY = vLedPositions[iIdx][1];
+		const iPxX = vLedPositions[iIdx][0];
+		const iPxY = vLedPositions[iIdx][1];
 		var color;
 
 		if(shutdown) {
@@ -104,7 +102,7 @@ function SendColorPacket(shutdown = false) {
 function setDpi(dpi) {
 	savedDpi1 = dpi1;
 
-	let packet = [];
+	const packet = [];
 	packet[0x00] = 0x00;
 	packet[0x01] = 0x61;
 	packet[0x02] = 0x01;
@@ -118,7 +116,7 @@ function setDpi(dpi) {
 function setPollingRate(pollingrate) {
 	savedPollingRate1 = pollingrate1;
 
-	let packet = [];
+	const packet = [];
 	packet[0x00] = 0x00;
 	packet[0x01] = 0x5D;
 	packet[0x02] = (pollingrate);
@@ -129,8 +127,8 @@ function setPollingRate(pollingrate) {
 }
 
 function hexToRgb(hex) {
-	let result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
-	let colors = [];
+	const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+	const colors = [];
 	colors[0] = parseInt(result[1], 16);
 	colors[1] = parseInt(result[2], 16);
 	colors[2] = parseInt(result[3], 16);
