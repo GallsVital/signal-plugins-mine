@@ -15,7 +15,10 @@ argv.forEach((val, index) => {
 	}
   });
 
-const DirectoryName = ".\\Plugins";
+const CurrentDirectoryURL = new URL('.', import.meta.url);
+const DirectoryName = path.join(url.fileURLToPath(CurrentDirectoryURL), "..", "Plugins");
+
+//const DirectoryName = "..\\Plugins";
 
 const getAllFiles = function(dirPath, arrayOfFiles) {
 	const files = fs.readdirSync(dirPath);
@@ -26,7 +29,7 @@ const getAllFiles = function(dirPath, arrayOfFiles) {
 		if (fs.statSync(dirPath + "/" + file).isDirectory()) {
 			arrayOfFiles = getAllFiles(dirPath + "/" + file, arrayOfFiles);
 		} else {
-			arrayOfFiles.push(path.join(url.fileURLToPath(new URL('.', import.meta.url)), dirPath, "/", file));
+			arrayOfFiles.push(path.join(dirPath, "/", file));
 		}
 	});
 

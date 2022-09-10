@@ -2,8 +2,8 @@ import fs from 'fs';
 import path from 'path';
 import * as url from 'url';
 
-const DirectoryName = "Plugins";
-
+const CurrentDirectoryURL = new URL('.', import.meta.url);
+const DirectoryName = path.join(url.fileURLToPath(CurrentDirectoryURL), "..", "Plugins");
 
 ScanPlugins();
 
@@ -50,7 +50,7 @@ function getAllFilePaths(dirPath, arrayOfFiles = []) {
 		} else {
 			// Ignore test files
 			if(!file.endsWith("test.js")){
-				arrayOfFiles.push(path.join(url.fileURLToPath(new URL('.', import.meta.url)), dirPath, "/", file));
+				arrayOfFiles.push(path.join(dirPath, "/", file));
 			}
 		}
 	});
