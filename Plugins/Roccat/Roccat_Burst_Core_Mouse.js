@@ -132,8 +132,8 @@ function setDpi() {
 	SettingReport[24] =   0x00;
 	SettingReport[25] =    (dpi5/50)%256;
 	SettingReport[26] =   0x00;
-	SettingReport[27] = anglesnapping;
-	SettingReport[29] = PollingDict[PollingRate];
+	SettingReport[27] = angleSnapping;
+	SettingReport[29] = PollingDict[pollingrate];
 	SettingReport[33] = timeoutlength;
 	SettingReport[34] = timeout ? 0x00 : 0xff;
 	device.send_report(SettingReport, 63);

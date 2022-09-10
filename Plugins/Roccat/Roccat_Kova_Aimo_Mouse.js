@@ -109,7 +109,7 @@ function setDpi() {
 	packet[10] = (dpi4/50)%256;
 	packet[11] = (dpi5/50)%256;
 	packet[12] = 0x00;
-	packet[13] = PollingDict[PollingRate];
+	packet[13] = PollingDict[pollingrate];
 	packet[14] = 0x00;
 	packet[15] = 0x8c;
 	packet[16] = 0x00;

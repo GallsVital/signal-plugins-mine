@@ -126,8 +126,8 @@ function Setup() {
 	packet[3] = 0x14;
 	packet[4] = 0x00;
 	packet[5] = 0x01;
-	packet[6] = PollingDict[PollingRate];
-	packet[7] = anglesnapping;
+	packet[6] = PollingDict[pollingrate];
+	packet[7] = angleSnapping;
 	packet[8] = 0x00;
 	packet[9] = (dpi1/50)%256;
 	packet[10] = Math.floor(dpi1/50/256);

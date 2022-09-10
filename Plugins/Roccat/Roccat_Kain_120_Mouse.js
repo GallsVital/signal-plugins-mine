@@ -96,7 +96,7 @@ function setDpi(){
 	savedDpi3 = dpi3;
 	savedDpi4 = dpi4;
 	savedDpi5 = dpi5;
-	savedPollingRate = PollingDict[PollingRate];
+	savedPollingRate = PollingDict[pollingrate];
 	//Set X dpi 1-5
 	SettingReport[7] =    (dpi1/50)%256;
 	SettingReport[8] =   Math.floor(dpi1/50/256);
@@ -179,7 +179,7 @@ export function Render() {
         savedDpi3 != dpi3 ||
         savedDpi4 != dpi4 ||
         savedDpi5 != dpi5 ||
-        savedPollingRate != PollingDict[PollingRate]) &&
+        savedPollingRate != PollingDict[pollingrate]) &&
         DpiControl){
 		setDpi();
 	}

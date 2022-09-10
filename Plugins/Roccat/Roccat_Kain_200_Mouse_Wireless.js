@@ -56,6 +56,16 @@ export function Shutdown() {
 	sendZone(true);
 }
 
+const BatteryDict =
+{
+	"71" : 100,
+	"64" : 80,
+	"65" : 60,
+	"66" : 40,
+	"67" : 20,
+	"68" : 0
+};
+
 function Batterylevel() {
 
 	let packet = [];

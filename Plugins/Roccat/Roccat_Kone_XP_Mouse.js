@@ -193,8 +193,8 @@ function Setup() {
 	SettingReport[15] =    (dpi5/50)%256;
 	SettingReport[16] =   Math.floor(dpi5/50/256);
 
-	SettingReport[27] = anglesnapping;
-	SettingReport[29] = PollingDict[PollingRate];
+	SettingReport[27] = angleSnapping;
+	SettingReport[29] = PollingDict[pollingrate];
 	SettingReport[34] = (timeout ? 0x00 : 0xff);
 	SettingReport[33] = timeoutlength;
 

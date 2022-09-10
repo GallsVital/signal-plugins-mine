@@ -229,7 +229,7 @@ export function Shutdown() {
 
 export function Validate(endpoint) {
 	return (endpoint.interface === 1 && endpoint.usage === 0x0602) ||
-           (endpoint.interface === 1 && endpoint.usage === 0x0604) || True;
+           (endpoint.interface === 1 && endpoint.usage === 0x0604);
 }
 
 export function Image() {
