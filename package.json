@@ -18,11 +18,11 @@
 	"scripts": {
 		"lint": "node node_modules/eslint/bin/eslint.js ./Plugins",
 		"lint:ci": "node node_modules/eslint/bin/eslint.js ./Plugins --quiet",
-		"lint:addGlobals": "node ./AddGlobalComments.js",
-		"lint:checkGlobals": "node ./AddGlobalComments.js --dryrun",
+		"lint:addGlobals": "node ./Scripts/AddGlobalComments.js",
+		"lint:checkGlobals": "node ./Scripts/AddGlobalComments.js --dryrun",
 		"test": "jest ./Plugins --collectCoverage",
 		"test:ci": "jest ./Plugins --ci --reporters=default --reporters=jest-junit",
-		"test:validate": "node ./ValidatePlugins.js",
+		"test:validate": "node ./Scripts/ValidatePlugins.js",
 		"docs": "jsdoc -c jsdoc.json",
 		"SAVED": "npx -p typescript tsc ModernCorsairProtocol.js --declaration --allowJs --emitDeclarationOnly --outDir types"
 	},
