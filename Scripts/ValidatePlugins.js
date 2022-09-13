@@ -2,6 +2,7 @@ import fs from 'fs';
 import path from 'path';
 import * as url from 'url';
 
+// @ts-ignore
 const CurrentDirectoryURL = new URL('.', import.meta.url);
 const DirectoryName = path.join(url.fileURLToPath(CurrentDirectoryURL), "..", "Plugins");
 
@@ -36,6 +37,7 @@ async function CheckPluginFile(PluginPath){
 	const filePathUrl = url.pathToFileURL(PluginPath);
 
 	// Checking if the file loads without an error.
+	// @ts-ignore
 	const pluginModule = await import(filePathUrl);
 	// Add Checks here
 

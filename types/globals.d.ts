@@ -1,5 +1,3 @@
-
-
 /**
  * 3 index tuple representing the [R, G, B] color value of a specific point on the Effects Canvas.
  */
@@ -7,22 +5,36 @@ declare type ColorArray = readonly [number, number, number];
 declare type LedPosition =  [number, number];
 declare type ChannelId = string;
 
+declare type NameExport = () => string;
+declare type VendorIdExport = () => number;
+declare type ProductIdExport = () => number;
+declare type DocumentationExport = () => string;
+declare type PublisherExport = () => string;
+declare type SizeExport = () => [Width: number, Height: number];
+declare type DefaultPositionExport = () => [X: number, Y: number];
+declare type DefaultScaleExport = () => number;
+declare type LedNamesExport = () => string[];
+declare type LedPositionsExport = () => LedPosition[];
+declare type ConflictingProcessesExport = () => string[];
+declare type ControllableParametersExport = () => Parameter[];
+declare type ValidateExport = (Endpoint: HidEndpoint) => boolean;
+
 declare interface LogOptions{
 	toFile?: boolean
 	Hex?: boolean
 }
+
 declare type DeviceFeature = "Battery";
 declare type hexToRgb = (HexString: string) => ColorArray;
 
-declare type ControllableParametersType = () => Parameter[];
 
-declare type Parameter = ParameterBase | ComboboxParameter | ColorParameter
+declare type Parameter = ComboboxParameter | ColorParameter | NumberParameter | TextParameter | BooleanParameter | HueParameter
 declare interface ParameterBase{
 	property: string
 	group?: string
 	label: string
 	default: string
-	type: "color" | "combobox"
+	type: "color" | "combobox" | "number" | "boolean" | "textfield" | "hue"
 }
 
 declare interface ColorParameter extends ParameterBase{
@@ -30,10 +42,28 @@ declare interface ColorParameter extends ParameterBase{
 	max: string
 	type: "color"
 }
+declare interface NumberParameter extends ParameterBase{
+	min: string
+	max: string
+	type: "number"
+}
 declare interface ComboboxParameter extends ParameterBase{
 	values: string[]
 	type: "combobox"
 }
+declare interface BooleanParameter extends ParameterBase{
+	type: "boolean"
+}
+declare interface TextParameter extends ParameterBase{
+	filter: string
+	type: "textfield"
+}
+declare interface HueParameter extends ParameterBase{
+	min: string
+	max: string
+	type: "hue"
+}
+
 declare interface HidEndpoint{
 	interface: number
 	usage: number

@@ -977,5 +977,3 @@ export class ModernCorsairProtocol{
 		return ProbeTemps;
 	}
 }
-
-;

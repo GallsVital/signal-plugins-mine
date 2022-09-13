@@ -15,6 +15,7 @@ argv.forEach((val, index) => {
 	}
   });
 
+// @ts-ignore
 const CurrentDirectoryURL = new URL('.', import.meta.url);
 const DirectoryName = path.join(url.fileURLToPath(CurrentDirectoryURL), "..", "Plugins");
 
@@ -59,6 +60,7 @@ export async function ScanPlugins(){
 async function loadPlugin(PluginPath){
 
 	const filePathUrl = url.pathToFileURL(PluginPath);
+	// @ts-ignore
 	const pluginModule = await import(filePathUrl);
 	console.log(`\nChecking Plugin at path: [${PluginPath}]`);
 
