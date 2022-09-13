@@ -5,71 +5,16 @@ declare type ColorArray = readonly [number, number, number];
 declare type LedPosition =  [number, number];
 declare type ChannelId = string;
 
-declare type NameExport = () => string;
-declare type VendorIdExport = () => number;
-declare type ProductIdExport = () => number;
-declare type DocumentationExport = () => string;
-declare type PublisherExport = () => string;
-declare type SizeExport = () => [Width: number, Height: number];
-declare type DefaultPositionExport = () => [X: number, Y: number];
-declare type DefaultScaleExport = () => number;
-declare type LedNamesExport = () => string[];
-declare type LedPositionsExport = () => LedPosition[];
-declare type ConflictingProcessesExport = () => string[];
-declare type ControllableParametersExport = () => Parameter[];
-declare type ValidateExport = (Endpoint: HidEndpoint) => boolean;
 
 declare interface LogOptions{
 	toFile?: boolean
 	Hex?: boolean
 }
+declare type ImageFormat = "JPEG" | "PNG" | "BMP"
 
 declare type DeviceFeature = "Battery";
 declare type hexToRgb = (HexString: string) => ColorArray;
 
-
-declare type Parameter = ComboboxParameter | ColorParameter | NumberParameter | TextParameter | BooleanParameter | HueParameter
-declare interface ParameterBase{
-	property: string
-	group?: string
-	label: string
-	default: string
-	type: "color" | "combobox" | "number" | "boolean" | "textfield" | "hue"
-}
-
-declare interface ColorParameter extends ParameterBase{
-	min: string
-	max: string
-	type: "color"
-}
-declare interface NumberParameter extends ParameterBase{
-	min: string
-	max: string
-	type: "number"
-}
-declare interface ComboboxParameter extends ParameterBase{
-	values: string[]
-	type: "combobox"
-}
-declare interface BooleanParameter extends ParameterBase{
-	type: "boolean"
-}
-declare interface TextParameter extends ParameterBase{
-	filter: string
-	type: "textfield"
-}
-declare interface HueParameter extends ParameterBase{
-	min: string
-	max: string
-	type: "hue"
-}
-
-declare interface HidEndpoint{
-	interface: number
-	usage: number
-	usage_page: number
-	collection?: number
-}
 
 declare type AlertPriority = 0 | 1;
 declare type AlertId = string;
@@ -366,6 +311,10 @@ declare class Device{
 	 */
 	public getBrightness(): number
 	
+	/**
+	 * Enables use of a backend SignalRGB feature. This is the entry point to adding the global interaction object.
+	 * @param FeatureName String name of the feature to be enabled.
+	 */
 	public addFeature(FeatureName: DeviceFeature): void
 	
 	/**
@@ -374,5 +323,28 @@ declare class Device{
 	 * @returns The Systems motherboard name.
 	 */
 	public getMotherboardName(): string
+
+	/**
+	 * This function will take a section of the devices Pixel Buffer and convert it into an image format. 
+	 * @param X X coordinate within the devices Pixel Buffer to be used as the top left corner of the captured area.
+	 * @param Y Y coordinate within the devices Pixel Buffer to be used as the top left corner of the captured area.
+	 * @param Width Width of the area to be captured. This must fit between the X coordinate and the device's max width
+	 * @param Height Height of the area to be captured. This must fit between the Y coordinate and the device's max Height
+	 * @param ImageWidth Width of the output Image
+	 * @param ImageHeight Height of the output Image
+	 * @param ImageFormat Image Format to be output
+	 * @returns The Image's data saved into an array
+	 */
+	public getImageBuffer(X: number, Y: number, Width: number, Height: number, ImageWidth: number, ImageHeight: number, ImageFormat: ImageFormat): number[]
+
+	/**
+	 * Takes a Hex String color and returns a image buffer.
+	 * @param HexString Hex String Color to be used.
+	 * @param ImageWidth Width of the output Image
+	 * @param ImageHeight Height of the output Image
+	 * @param ImageFormat Image Format to be output
+	 * @returns The Image's data saved into an array
+	 */
+	public ConvertColorToImageBuffer(HexString: string, ImageWidth: number, ImageHeight: number, ImageFormat: ImageFormat): number[]
 }
 
