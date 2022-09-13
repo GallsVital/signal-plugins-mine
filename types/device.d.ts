@@ -214,11 +214,16 @@ declare class Device{
 	 * @param AlertId AlertId to be removed.
 	 */
 	public denotify(AlertId: AlertId): void
-
+	
+	/** @deprecated */
 	public repollName(): void
-	public setName(Name: string): void
+	/** @deprecated*/
 	public repollLeds(): void
+	/** @deprecated*/
 	public repollSize(): void
+
+	public setName(Name: string): void
+	public setControllableLeds(LedNames: string[], LedPositions: LedPosition[]): void
 	public setSize(Size: number[]): void
 
 	/**

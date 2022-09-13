@@ -74,6 +74,17 @@
             {
                 "selector": "MemberExpression[object.name = 'device'][property.name='readTimeout']", 
                 "message": "device.readTimeout() is deprecated and should not be used. Instead use device.read()"
+            },            {
+                "selector": "MemberExpression[object.name = 'device'][property.name='repollName']", 
+                "message": "device.repollName() is deprecated and should not be used. Instead use device.setName()"
+            },
+            {
+                "selector": "MemberExpression[object.name = 'device'][property.name='repollLeds']", 
+                "message": "device.repollLeds() is deprecated and should not be used. Instead use device.setControllableLeds()"
+            },
+            {
+                "selector": "MemberExpression[object.name = 'device'][property.name='repollSize']", 
+                "message": "device.repollSize() is deprecated and should not be used. Instead use device.setSize()"
             }
         ]
     
