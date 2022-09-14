@@ -18,7 +18,27 @@ argv.forEach((val, index) => {
 const project = new Project();
 let ChangedComments = 0;
 
-const PluginPath = "Plugins\\Corsair_K95_Plat_XT_Keyboard_ModernCorsairProtocol.js";
+const FunctionTypes = {
+	"Name" : "NameExport",
+	"DefaultScale": "DefaultScaleExport",
+	"LedNames": "LedNamesExport",
+	"LedPositions": "LedPositionsExport",
+	"VendorId": "VendorIdExport",
+	"ProductId": "ProductIdExport",
+	"Publisher": "PublisherExport",
+	"Documentation": "DocumentationExport",
+	"Size": "SizeExport",
+	"DefaultPosition": "DefaultPositionExport",
+	"ConflictingProcesses": "ConflictingProcessesExport",
+	"ControllableParameters": "ControllableParametersExport",
+	"Validate": "ValidateExport",
+	"Scan" : "ScanExport"
+};
+
+
+//const PluginPath = "Plugins\\Corsair_K95_Plat_XT_Keyboard_ModernCorsairProtocol.js";
+const PluginPath = "Plugins\\Corsair_Dominator_Ram.js";
+
 ProcessPlugin(PluginPath);
 
 function ProcessPlugin(PluginPath){
@@ -49,21 +69,7 @@ function InitPlugin(PluginPath){
 	return pluginFile;
 }
 
-const FunctionTypes = {
-	"Name" : "NameExport",
-	"DefaultScale": "DefaultScaleExport",
-	"LedNames": "LedNamesExport",
-	"LedPositions": "LedPositionsExport",
-	"VendorId": "VendorIdExport",
-	"ProductId": "ProductIdExport",
-	"Publisher": "PublisherExport",
-	"Documentation": "DocumentationExport",
-	"Size": "SizeExport",
-	"DefaultPosition": "DefaultPositionExport",
-	"ConflictingProcesses": "ConflictingProcessesExport",
-	"ControllableParameters": "ControllableParametersExport",
-	"Validate": "ValidateExport",
-};
+
 
 
 function AddFunctionTypeComment(pluginFile, FunctionName, FunctionType){

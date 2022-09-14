@@ -37,12 +37,6 @@ function getKeyByValue(object, value) {
 
 	return parseInt(Key);
 }
-/**
- * @typedef {Number} PropertyId
- */
-/**
- * @typedef {String} PropertyName
- */
 
 const BragiPropertyNames = /** @type {const} */([
 	"Polling Rate",
@@ -64,11 +58,14 @@ const BragiPropertyNames = /** @type {const} */([
 	"Max Polling Rate",
 ]);
 
+/**
+ * @typedef {String} PropertyName
+ * @typedef {Number} PropertyId
+ */
 
 /**
  * Protocol Library for Corsair's Modern Protocol. (BRAGI)
  * @class ModernCorsairProtocol
- *
  */
 export class ModernCorsairProtocol{
 	constructor() {

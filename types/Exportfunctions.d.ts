@@ -11,7 +11,7 @@ declare type LedPositionsExport = () => LedPosition[];
 declare type ConflictingProcessesExport = () => string[];
 declare type ControllableParametersExport = () => Parameter[];
 declare type ValidateExport = (Endpoint: HidEndpoint) => boolean;
-
+declare type ScanExport = (bus: Bus) => number[]
 
 declare interface HidEndpoint{
 	interface: number
