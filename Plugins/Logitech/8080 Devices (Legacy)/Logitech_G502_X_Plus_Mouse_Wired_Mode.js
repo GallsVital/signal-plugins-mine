@@ -1,7 +1,7 @@
-export function Name() { return "Logitech G903 LightSpeed Wired Mode"; }
+export function Name() { return "Logitech G520 X Plus Wired Mode"; }
 export function VendorId() { return 0x046d; }
 export function Documentation(){ return "troubleshooting/logitech"; }
-export function ProductId() { return 0xC091; }
+export function ProductId() { return 0xC095; }
 export function Publisher() { return "WhirlwindFX"; }
 export function Size() { return [3, 3]; }
 export function DefaultPosition(){return [240,120]}
@@ -20,7 +20,7 @@ export function ControllableParameters()
 		{"property":"dpi4", "group":"mouse", "label":"DPI 4","step":"50", "type":"number","min":"200", "max":"25600","default":"1600"},
 		{"property":"dpi5", "group":"mouse", "label":"DPI 5","step":"50", "type":"number","min":"200", "max":"25600","default":"2000"},
 		{"property":"dpi6", "group":"mouse", "label":"Sniper Button DPI","step":"50", "type":"number","min":"200", "max":"25600","default":"400"},
-		{"property":"DpiLight", "group":"lighting", "label":"DPI Light Always On","type":"boolean","default": "true"},
+        {"property":"DpiLight", "group":"lighting", "label":"DPI Light Always On","type":"boolean","default": "true"},
 		{"property":"OnboardState", "group":"", "label":"Onboard Button Mode","type":"boolean","default": "false"},
 		{"property":"DPIRollover", "group":"mouse", "label":"DPI Stage Rollover","type":"boolean","default": "false"},
 		{"property":"pollingrate", "group":"mouse", "label":"Polling Rate","type":"combobox", "values":[ "1000","500", "250", "100" ], "default":"1000"},
@@ -692,21 +692,21 @@ function hexToRgb(hex)
 
 		 this.ProductIDs =
 		 {
-			"c082" : "G403 Prodigy",
-			"c083" : "G403",
-			"c084" : "G203 Prodigy",
-			"c085" : "GPro Wired",
-			"c088" : "GPro Wireless",
-			"c08b" : "G502 Hero",
-			"c08d" : "G502 Lightspeed",
-			"c08f" : "G403 Hero",
-			"c090" : "G703",
-			"c091" : "G903",
-			"c092" : "G203 Lightsync",
-			"c094" : "GPro X Superlight",
-			"c095" : "G502 X Plus",
-			"c332" : "G502",
-		 };
+			c082 : "G403 Prodigy",
+			c083 : "G403",
+			c084 : "G203 Prodigy",
+			c085 : "GPro Wired",
+			c088 : "GPro Wireless",
+			c08b : "G502 Hero",
+			c08d : "G502 Lightspeed",
+			c08f : "G403 Hero",
+			c090 : "G703",
+			c091 : "G903",
+			c092 : "G203 Lightsync",
+			c094 : "GPro X Superlight",
+			c095 : "G502 X Plus",
+			c332 : "G502",
+		 }
 	 
 		 this.VoltageArray = 
 		 [ 
@@ -1103,43 +1103,36 @@ function hexToRgb(hex)
 		this.SendShortMessage(DeviceInfoPacket);
 		device.pause(10);
 		let DeviceInfoResponsePacket = this.Long_Get();
-		let TotalEntities = DeviceInfoResponsePacket[0];
 		let UniqueIdentifier = DeviceInfoResponsePacket.slice(1,5);
 		let Transport1 = DeviceInfoResponsePacket[7].toString(16) + DeviceInfoResponsePacket[8].toString(16);
 		let Transport2 = DeviceInfoResponsePacket[9].toString(16) + DeviceInfoResponsePacket[10].toString(16);
 		let Transport3 = DeviceInfoResponsePacket[11].toString(16) + DeviceInfoResponsePacket[12].toString(16);
 		let SerialNumberSupport = DeviceInfoResponsePacket[14];
-		device.log("Total Entities: " + TotalEntities);
+		device.log("Total Entities: " + DeviceInfoResponsePacket[0]);
 		device.log("Unique Device Identifier: " + UniqueIdentifier);
 		device.log("Transport 1 Model ID: " + Transport1);
 		device.log("Transport 2 Model ID: " + Transport2);
 		device.log("Transport 3 Model ID: " + Transport3);
 		device.log("Serial Number Support:" + SerialNumberSupport);
 		
-		for(let entityIDX = 0; entityIDX < Math.max(TotalEntities,3); entityIDX++)
-		{
-			let FirmwareInfoPacket = [this.FeatureIDs.DeviceInfoID, 0x10, entityIDX];
-	 		this.SendShortMessage(FirmwareInfoPacket);
-			device.pause(10);
-	 		let FirmwareResponsePacket = this.Long_Get();
-			let FirmwareType = FirmwareResponsePacket[0];
-			let FirmwarePrefix = String.fromCharCode(...FirmwareResponsePacket.slice(1,4));
-			let FirmwareName = FirmwareResponsePacket[4];
-			let FirmwareRevision = FirmwareResponsePacket[5];
-			let FirmwareBuild = FirmwareResponsePacket.slice(6,8);
-			let ActiveFirmwareFlag = FirmwareResponsePacket[8];
-			let TransportPID = FirmwareResponsePacket[9].toString(16) + FirmwareResponsePacket[10].toString(16);
-		if(FirmwareType == 0)
-			{
-				device.log("Firmware Type: " + this.FirmwareType[FirmwareType]);
-				device.log("Firmware Prefix: " + FirmwarePrefix + + FirmwareName);
-				device.log("Firmware Revision: " + FirmwareRevision);
-				device.log("Firmware Build: " + FirmwareBuild);
-				device.log("Active Firmware Flag: " + ActiveFirmwareFlag);
-				device.log("Transport ID: " + TransportPID);
-				return TransportPID;
-			}
-		}
+		let FirmwareInfoPacket = [this.FeatureIDs.DeviceInfoID, 0x10, 0x01];
+	 	this.SendShortMessage(FirmwareInfoPacket);
+		device.pause(10);
+	 	let FirmwareResponsePacket = this.Long_Get();
+		let FirmwareType = FirmwareResponsePacket[0];
+		let FirmwarePrefix = String.fromCharCode(...FirmwareResponsePacket.slice(1,4));
+		let FirmwareName = FirmwareResponsePacket[4];
+		let FirmwareRevision = FirmwareResponsePacket[5];
+		let FirmwareBuild = FirmwareResponsePacket.slice(6,8);
+		let ActiveFirmwareFlag = FirmwareResponsePacket[8];
+		let TransportPID = FirmwareResponsePacket[9].toString(16) + FirmwareResponsePacket[10].toString(16);
+		device.log("Firmware Type: " + this.FirmwareType[FirmwareType]);
+		device.log("Firmware Prefix: " + FirmwarePrefix + + FirmwareName);
+		device.log("Firmware Revision: " + FirmwareRevision);
+		device.log("Firmware Build: " + FirmwareBuild);
+		device.log("Active Firmware Flag: " + ActiveFirmwareFlag);
+		device.log("Transport ID: " + TransportPID);
+		return TransportPID;
 	 }
 
 	 getDeviceName()

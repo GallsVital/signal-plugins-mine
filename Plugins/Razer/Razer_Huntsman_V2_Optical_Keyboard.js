@@ -1,52 +1,4 @@
-function GetReport(cmd_class, cmd_id, size) {
-	let report = new Array(91).fill(0);
-
-	report[0] = 0;
-
-	// Status.
-	report[1] = 0x00;
-
-	// Transaction ID.
-	report[2] = 0xFF;
-
-	// Remaining packets.
-	report[3] = 0x00;
-	report[4] = 0x00;
-
-	// Protocol type.
-	report[5] = 0x00;
-
-	// Data size.
-	report[6] = size;
-
-	// Command class.
-	report[7] = cmd_class;
-
-	// Command id.
-	report[8] = cmd_id;
-
-	//report[8-87] = data;
-
-	//report[89] = crc;
-
-	//report[89] = reserved;
-
-	return report;
-}
-
-
-function CalculateCrc(report) {
-	let iCrc = 0;
-
-	for (let iIdx = 3; iIdx < 89; iIdx++) {
-		iCrc ^= report[iIdx];
-	}
-
-	return iCrc;
-}
-
-
-export function Name() { return "Razer Huntsman V2"; }
+export function Name() { return "Razer Huntsman V2 Analog"; }
 export function VendorId() { return 0x1532; }
 export function Documentation(){ return "troubleshooting/razer"; }
 export function ProductId() { return 0x0266; }
@@ -55,7 +7,7 @@ export function Size() { return [24, 9]; }
 export function Type() { return "Hid"; }
 export function DefaultPosition() {return [75, 70]; }
 export function DefaultScale(){return 8.0;}
-export function ControllableParameters(){
+export function ControllableParameters(){
 	return [
 		{"property":"shutdownColor", "group":"lighting", "label":"Shutdown Color", "min":"0", "max":"360", "type":"color", "default":"009bde"},
 		{"property":"LightingMode", "group":"lighting", "label":"Lighting Mode", "type":"combobox", "values":["Canvas", "Forced"], "default":"Canvas"},
@@ -129,152 +81,60 @@ function hexToRgb(hex) {
 	return colors;
 }
 
-export function LedNames() {
+export function LedNames() 
+{
 	return vLedNames;
 }
 
-export function LedPositions() {
+export function LedPositions() 
+{
 	return vLedPositions;
 }
 
 
-export function Initialize() {
+export function Initialize() 
+{
 
 }
-let LightbarKeyMap = [
-	0
-];
-let LightbarPosMap = [
-	//top
-	[0, 0], [1, 0], [2, 0], [3, 0], [4, 0], [6, 0], [7, 0], [8, 0], [10, 0], [11, 0], [13, 0], [14, 0], [15, 0], [17, 0], [18, 0], [21, 0],
-	[0, 2],                                                                                                 [22, 2],
-	[0, 3],                                                                                                 [22, 3],
-	[0, 4],                                                                                                 [22, 4],
-	[0, 6], [1, 6], [2, 6], [3, 6], [4, 6], [6, 6], [7, 6], [8, 6], [10, 6], [11, 6], [13, 6], [14, 6], [15, 6], [17, 6], [18, 6], [21, 6],
 
-	//bottom left
-	[0, 6], [0, 7],
-	//bottom
-	[0, 8], [1, 8], [2, 8], [3, 8], [4, 8], [5, 8], [6, 8], [7, 8], [8, 8], [9, 8], [10, 8], [11, 8], [12, 8], [14, 8], [15, 8], [17, 8],
+export function Render() 
+{
+	SendColors();
+}
 
-	[18, 8], [20, 8], [21, 8], [22, 8],
 
-];
+export function Shutdown() 
+{
+	SendColors(true);
+}
 
-function sendLightbar(idx, shutdown = false){
-	let packet = [];
-	packet[0] = 0x00;
-	packet[1] = 0x00;
-	packet[2] = 0x3F;
-	packet[3] = 0x00;
-	packet[4] = 0x00;
-	packet[5] = 0x00;
-	packet[6] = 0x4A;
-	packet[7] = 0x0F;
-	packet[8] = 0x03;
-	packet[11] = idx+6;
-	packet[13] = 0x16;
+function packetSend(packet,length) //Wrapper for always including our CRC
+{
+	let packetToSend = packet;
+	packetToSend[89] = CalculateCrc(packet);
+	device.send_report(packetToSend,length)
+}
 
-	let count;
+function CalculateCrc(report) 
+{
+	let iCrc = 0;
 
-	if(idx === 2){
-		count = 20;
-	}else{
-		count = 19;
+	for (let iIdx = 3; iIdx < 89; iIdx++) 
+	{
+		iCrc ^= report[iIdx];
 	}
 
-	for(let iIdx = 0; iIdx < count; iIdx++){
-		var col;
-
-		if(shutdown){
-			col = hexToRgb(shutdownColor);
-		}else if (LightingMode === "Forced") {
-			col = hexToRgb(forcedColor);
-		}else{
-			let position = LightbarPosMap[iIdx + idx*20];
-			col = device.color(position[0], position[1]);
-		}
-
-		let iLedIdx = (iIdx*3) + 14;
-		packet[iLedIdx] = col[0];
-		packet[iLedIdx+1] = col[1];
-		packet[iLedIdx+2] = col[2];
-
-	}
-
-	packet[89] = CalculateCrc(packet);
-
-	device.send_report(packet, 91);
-	device.pause(1); // We need a pause here (between packets), otherwise the ornata can't keep up.
-
+	return iCrc;
 }
 
-function SendPacket(idx, shutdown = false) {
-	let packet = [];
-	packet[0] = 0x00;
-	packet[1] = 0x00;
-	packet[2] = 0x1F;
-	packet[3] = 0x00;
-	packet[4] = 0x00;
-	packet[5] = 0x00;
-	packet[6] = 0x4A;
-	packet[7] = 0x0F;
-	packet[8] = 0x03;
-	packet[11] = idx;
-	packet[13] = 0x16;
-
-
-	for(let iIdx = 0; iIdx < 24; iIdx++){
-
-		var col;
-
-		if(shutdown){
-			col = hexToRgb(shutdownColor);
-		}else if (LightingMode === "Forced") {
-			col = hexToRgb(forcedColor);
-		}else{
-
-			col = device.color(iIdx, idx);
-		}
-
-		let iLedIdx = (iIdx*3) + 14;
-		packet[iLedIdx] = col[0];
-		packet[iLedIdx+1] = col[1];
-		packet[iLedIdx+2] = col[2];
-	}
-
-	packet[89] = CalculateCrc(packet);
-
-	device.send_report(packet, 91);
-	device.pause(1); // We need a pause here (between packets), otherwise the ornata can't keep up.
-
-}
-
-
-function Apply() {
-	let packet = []; //new Array(91).fill(0);
-	packet[0] = 0x00;
-	packet[1] = 0x00;
-	packet[2] = 0x3F;
-	packet[3] = 0x00;
-	packet[4] = 0x00;
-	packet[5] = 0x00;
-	packet[6] = 0x0C;
-	packet[7] = 0x0F;
-	packet[8] = 0x02;
-	packet[11] = 0x08;
-
-	packet[89] = CalculateCrc(packet);
-
-	device.send_report(packet, 91);
-}
-
-function SendColors(shutdown = false){
+function SendColors(shutdown = false)
+{
 
 	let RGBData = new Array(586).fill(0);
 	let TotalLedCount = 0;
 
-	for(let iIdx = 0; iIdx < vKeymap.length; iIdx++) {
+	for(let iIdx = 0; iIdx < vKeymap.length; iIdx++) 
+	{
 		let iPxX = vLedPositions[iIdx][0];
 		let iPxY = vLedPositions[iIdx][1];
 		var color;
@@ -296,8 +156,8 @@ function SendColors(shutdown = false){
 	let sentLeds = 0;
 	let PacketCount = 0;
 
-	for(let i = 0; i < Object.keys(RowDict).length ;i++){
-
+	for(let i = 0; i < Object.keys(RowDict).length ;i++)
+	{
 		let LedsToSend = RowDict[PacketCount];
 
 		let packet = [];
@@ -314,47 +174,12 @@ function SendColors(shutdown = false){
 		packet[13] = 0x16;
 		packet = packet.concat(RGBData.splice(0, LedsToSend*3));
 
-		device.send_report(packet, 91);
-
+		packetSend(packet,91);
 	}
 }
 
-
-export function Render() {
-	SendColors();
-
-
-	//SendPacket(0);
-	//SendPacket(1);
-	//SendPacket(2);
-	//SendPacket(3);
-	//SendPacket(4);
-	//SendPacket(5);
-	//sendLightbar(0);
-	//sendLightbar(1);
-	//sendLightbar(2);
-
-	Apply();
-
-}
-
-
-export function Shutdown() {
-	SendPacket(0, true);
-	SendPacket(1, true);
-	SendPacket(2, true);
-	SendPacket(3, true);
-	SendPacket(4, true);
-	SendPacket(5, true);
-	SendPacket(6, true);
-	SendPacket(7, true);
-	SendPacket(8, true);
-
-	Apply();
-
-}
-
-export function Validate(endpoint) {
+export function Validate(endpoint) 
+{
 	return endpoint.interface === 3;
 }
 
