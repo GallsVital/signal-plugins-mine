@@ -5,6 +5,11 @@ export function Publisher() { return "FeuerSturm"; }
 export function Size() { return [5, 6]; }
 export function DefaultPosition(){return [100, 100];}
 export function DefaultScale(){return 10.0;}
+/* global
+shutdownColor:readonly
+LightingMode:readonly
+forcedColor:readonly
+*/
 export function ControllableParameters(){
 	return [
 		{"property":"shutdownColor", "group":"lighting", "label":"Shutdown Color", "min":"0", "max":"360", "type":"color", "default":"009bde"},

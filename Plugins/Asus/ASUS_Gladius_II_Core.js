@@ -6,6 +6,11 @@ export function Publisher() { return "vermis"; }
 export function Size() { return [7,8]; }
 export function DefaultPosition() {return [180,100]; }
 export function DefaultScale(){return 8.0}
+/* global
+shutdownColor:readonly
+LightingMode:readonly
+forcedColor:readonly
+*/
 export function ControllableParameters(){
     return [
         {"property":"shutdownColor", "group":"lighting", "label":"Shutdown Color","min":"0","max":"360","type":"color","default":"009bde"},
@@ -129,25 +134,26 @@ function sendColors(zone, shutdown = false){
 
         device.write(packet,65);
 }
-function sendMouseSettings(){
-    savedDpi1 = dpi1;
-    savedDpi2 = dpi2;
-    savedDpi3 = dpi3;
-    savedDpi4 = dpi4;
-    savedAngleSnapping = angleSnapping;
-    savedPollingRate = pollingDict[mousePolling];
-    savedMouseResponse = responseDict[mouseResponse];
 
-    sendPacketString(`00 51 31 06 00 ${savedAngleSnapping ? "01" : "00"}`,65);
-    sendPacketString(`00 51 31 04 00 ${savedPollingRate.toString(16)}`,65);
-    sendPacketString(`00 51 31 05 00 ${savedMouseResponse.toString(16)}`,65);
-    sendPacketString(`00 51 31 00 00 ${(savedDpi1/100 + 1).toString(16)}`,65);
-    sendPacketString(`00 51 31 01 00 ${(savedDpi2/100 + 1).toString(16)}`,65);
-    sendPacketString(`00 51 31 02 00 ${(savedDpi3/100 + 1).toString(16)}`,65);
-    sendPacketString(`00 51 31 03 00 ${(savedDpi4/100 + 1).toString(16)}`,65);
-    sendPacketString(`00 50 03 03`,65);
+// function sendMouseSettings(){
+//     savedDpi1 = dpi1;
+//     savedDpi2 = dpi2;
+//     savedDpi3 = dpi3;
+//     savedDpi4 = dpi4;
+//     savedAngleSnapping = angleSnapping;
+//     savedPollingRate = pollingDict[mousePolling];
+//     savedMouseResponse = responseDict[mouseResponse];
 
-}
+//     sendPacketString(`00 51 31 06 00 ${savedAngleSnapping ? "01" : "00"}`,65);
+//     sendPacketString(`00 51 31 04 00 ${savedPollingRate.toString(16)}`,65);
+//     sendPacketString(`00 51 31 05 00 ${savedMouseResponse.toString(16)}`,65);
+//     sendPacketString(`00 51 31 00 00 ${(savedDpi1/100 + 1).toString(16)}`,65);
+//     sendPacketString(`00 51 31 01 00 ${(savedDpi2/100 + 1).toString(16)}`,65);
+//     sendPacketString(`00 51 31 02 00 ${(savedDpi3/100 + 1).toString(16)}`,65);
+//     sendPacketString(`00 51 31 03 00 ${(savedDpi4/100 + 1).toString(16)}`,65);
+//     sendPacketString(`00 50 03 03`,65);
+
+// }
 
 export function Validate(endpoint)
 {

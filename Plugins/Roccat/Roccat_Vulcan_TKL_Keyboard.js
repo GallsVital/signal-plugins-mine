@@ -6,6 +6,11 @@ export function Publisher() { return "WhirlwindFX"; }
 export function Size() { return [17, 7]; }
 export function DefaultPosition() {return [75, 70]; }
 export function DefaultScale() {return 8.0; }
+/* global
+shutdownColor:readonly
+LightingMode:readonly
+forcedColor:readonly
+*/
 export function ControllableParameters(){
 	return [
 		{"property":"shutdownColor", "group":"lighting", "label":"Shutdown Color", "min":"0", "max":"360", "type":"color", "default":"009bde"},
@@ -98,26 +103,26 @@ export function Shutdown() {
 
 }
 
-function fnCheck()//For now this is an unused mode change handler. If users using the fx keys becomes an issue we can implement this.
-{
-	let packet = device.readTimeout([0x00],65,10)
+// function fnCheck()//For now this is an unused mode change handler. If users using the fx keys becomes an issue we can implement this.
+// {
+// 	let packet = device.read([0x00],65,10)
 
-	if(packet[1] == 0x03 && packet[3] == 0xfb && packet[4] == 0x77)
-	{
-	fnstate = packet[5];
-	}
+// 	if(packet[1] == 0x03 && packet[3] == 0xfb && packet[4] == 0x77)
+// 	{
+// 	fnstate = packet[5];
+// 	}
 
-	if(packet[1] == 0x03 && packet[3] == 0xfb && packet[4] == 0x6d)
-	{
-	leftstate = packet[5];
-	}
+// 	if(packet[1] == 0x03 && packet[3] == 0xfb && packet[4] == 0x6d)
+// 	{
+// 	leftstate = packet[5];
+// 	}
 
-	if(packet[1] == 0x03 && packet[3] == 0xfb && packet[4] == 0x7d)
-	{
-	rightstate = packet[5];
-	}
+// 	if(packet[1] == 0x03 && packet[3] == 0xfb && packet[4] == 0x7d)
+// 	{
+// 	rightstate = packet[5];
+// 	}
 	
-}
+// }
 
 function sendColors(shutdown = false){
 

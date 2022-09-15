@@ -4,8 +4,13 @@ export function ProductId() { return 0xA102;}//0xA100; }
 export function Publisher() { return "WhirlwindFX"; }
 export function Size() { return [1, 1]; }
 export function Type(){return "hybrid";}
-
-;
+/* global
+shutdownColor:readonly
+LightingMode:readonly
+forcedColor:readonly
+moboSync:readonly
+FanMode:readonly
+*/
 export function ControllableParameters(){
 	return [
 		{"property":"shutdownColor", "label":"Shutdown Color", "min":"0", "max":"360", "type":"color", "default":"009bde"},

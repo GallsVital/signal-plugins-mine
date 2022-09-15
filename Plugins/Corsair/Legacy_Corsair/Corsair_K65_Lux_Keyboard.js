@@ -7,6 +7,14 @@ export function DefaultPosition(){return [10, 100];}
 const DESIRED_HEIGHT = 85;
 export function DefaultScale(){return Math.floor(DESIRED_HEIGHT/Size()[1]);}
 
+/* global
+endpointUsed:readonly
+shutdownColor:readonly
+LightingMode:readonly
+forcedColor:readonly
+DpiControl:readonly
+dpi1:readonly
+*/
 export function ControllableParameters(){
 	return [
 		{"property":"endpointUsed", "group":"", "label":"Endpoint Selection", "type":"combobox", "values":["Endpoint 1", "Endpoint 2", ], "default":"Endpoint 1"},

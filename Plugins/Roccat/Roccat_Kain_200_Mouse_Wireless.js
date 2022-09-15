@@ -6,6 +6,11 @@ export function Publisher() { return "WhirlwindFX"; }
 export function Size() { return [3, 3]; }
 export function DefaultPosition() {return [225, 120]; }
 export function DefaultScale(){return 15.0;}
+/* global
+shutdownColor:readonly
+LightingMode:readonly
+forcedColor:readonly
+*/
 export function ControllableParameters(){
 	return [
 		{"property":"shutdownColor", "group":"lighting", "label":"Shutdown Color", "min":"0", "max":"360", "type":"color", "default":"009bde"},
@@ -50,6 +55,16 @@ export function Render() {
 export function Shutdown() {
 	sendZone(true);
 }
+
+const BatteryDict =
+{
+	"71" : 100,
+	"64" : 80,
+	"65" : 60,
+	"66" : 40,
+	"67" : 20,
+	"68" : 0
+};
 
 function Batterylevel() {
 

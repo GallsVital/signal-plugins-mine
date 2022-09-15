@@ -6,6 +6,23 @@ export function Publisher() { return "WhirlwindFX"; }
 export function Size() { return [3, 3]; }
 export function DefaultPosition() {return [225, 120]; }
 export function DefaultScale(){return 15.0;}
+/* global
+shutdownColor:readonly
+LightingMode:readonly
+forcedColor:readonly
+DpiControl:readonly
+dpistages:readonly
+dpi1:readonly
+dpi2:readonly
+dpi3:readonly
+dpi4:readonly
+dpi5:readonly
+dpi6:readonly
+DpiLight:readonly
+OnboardState:readonly
+DPIRollover:readonly
+pollingrate:readonly
+*/
 export function ControllableParameters(){
     return [
         {"property":"shutdownColor", "group":"lighting", "label":"Shutdown Color","min":"0","max":"360","type":"color","default":"009bde"},
@@ -629,7 +646,7 @@ function DetectInputs()
 		do
     	{
     	let packet = [];
-    	packet = device.readTimeout([0x00],9, 2);
+    	packet = device.read([0x00],9, 2);
     	let input = ProcessInputs(packet);
 		
 		if(input == "DPI_UP")
@@ -664,7 +681,7 @@ function DetectInputs()
 	device.set_endpoint(EndpointByte1, ShortMessageEndpointByte, EndpointByte3);
 	do
 	{
-	let packet = device.readTimeout([0x00],7, 10);
+	let packet = device.read([0x00],7, 10);
 
 		if(packet[0] == ShortMessage && packet[1] == ConnectionMode && packet[2] == 0x41 && packet[3] == 0x0C && packet[6] == 0x40)
 		{

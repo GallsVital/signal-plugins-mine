@@ -1,0 +1,50 @@
+image: alpine:latest
+
+stages:
+  - lint
+  - validate
+  - unit test
+  
+# Cache modules in between jobs
+cache:
+  key: 
+    files:
+      - package-lock.json
+  paths:
+    - .npm/
+
+before_script:
+  - apk add --update npm
+  - npm ci --cache .npm --prefer-offline
+
+eslint:
+  stage: lint
+  when: always
+
+  script:
+    #- apk add --update npm
+    #- npm install
+    - npm run lint:ci
+
+validate:
+  stage: validate
+  when: always
+  script:
+    #- apk add --update npm
+    #- npm install
+    - npm run test:validate
+
+unit test:
+  stage: unit test
+  when: always
+
+  script:
+    #- apk add --update npm
+    #- npm install
+    - npm run test:ci
+
+  artifacts:
+    when: always
+    reports:
+      junit:
+        - junit.xml

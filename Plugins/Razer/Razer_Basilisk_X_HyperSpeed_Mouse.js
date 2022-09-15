@@ -55,6 +55,10 @@ export function Size() { return [10, 10]; }
 export function DefaultPosition() {return [225, 120]; }
 export function DefaultScale(){return 5.0;}
 export function Type() { return "Hid"; }
+/* global
+DpiControl:readonly
+dpi1:readonly
+*/
 export function ControllableParameters(){
 	return [
 		{"property":"DpiControl", "group":"mouse", "label":"Enable Dpi Control", "type":"boolean", "default":"false"},

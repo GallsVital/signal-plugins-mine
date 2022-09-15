@@ -47,6 +47,11 @@ export function Publisher() { return "WhirlwindFX"; }
 export function Size() { return [5, 5]; }
 export function DefaultPosition(){return [165, 60];}
 export function DefaultScale(){return 6.0;}
+/* global
+LightingMode:readonly
+forcedColor:readonly
+FanSpeed:readonly
+*/
 export function ControllableParameters(){
 	return [
 		{"property":"LightingMode", "group":"lighting", "label":"Lighting Mode", "type":"combobox", "values":["Canvas", "Forced"], "default":"Canvas"},
@@ -233,7 +238,7 @@ function hexToRgb(hex) {
 	return colors;
 }
 
-function sendColor(shutdown = false){
+function sendColor(){
 
 	let RGBdata = [];
 	let TotalLedCount = 0;
@@ -244,9 +249,7 @@ function sendColor(shutdown = false){
 		let iPxY = vLedPos[iIdx][1];
 		var col;
 
-		if(shutdown){
-			col = hexToRgb(shutdownColor);
-		}else if (LightingMode === "Forced") {
+		if (LightingMode === "Forced") {
 			col = hexToRgb(forcedColor);
 		}else{
 			col = device.color(iPxX, iPxY);

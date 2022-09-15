@@ -7,6 +7,11 @@ export function Size() { return [18, 7]; }
 export function DefaultPosition(){return [10, 100];}
 const DESIRED_HEIGHT = 85;
 export function DefaultScale(){return Math.floor(DESIRED_HEIGHT/Size()[1]);}
+/* global
+shutdownColor:readonly
+LightingMode:readonly
+forcedColor:readonly
+*/
 export function ControllableParameters(){
 	return [
 		{"property":"shutdownColor", "group":"lighting", "label":"Shutdown Color", "min":"0", "max":"360", "type":"color", "default":"009bde"},
@@ -224,7 +229,7 @@ export function Shutdown() {
 
 export function Validate(endpoint) {
 	return (endpoint.interface === 1 && endpoint.usage === 0x0602) ||
-           (endpoint.interface === 1 && endpoint.usage === 0x0604) || True;
+           (endpoint.interface === 1 && endpoint.usage === 0x0604);
 }
 
 export function Image() {

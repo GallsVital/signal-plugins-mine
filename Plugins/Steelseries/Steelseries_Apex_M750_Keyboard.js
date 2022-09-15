@@ -7,6 +7,11 @@ export function Size() { return [21, 6]; }
 export function DefaultPosition(){return [10, 100];}
 const DESIRED_HEIGHT = 85;
 export function DefaultScale(){return Math.floor(DESIRED_HEIGHT/Size()[1]);}
+/* global
+shutdownColor:readonly
+LightingMode:readonly
+forcedColor:readonly
+*/
 export function ControllableParameters(){
 	return [
 		{"property":"shutdownColor", "group":"lighting", "label":"Shutdown Color", "min":"0", "max":"360", "type":"color", "default":"009bde"},
@@ -52,22 +57,22 @@ export function Initialize() {
 	packet[0x05] = 0x00;
 	packet[0x06] = 0x85;
 	device.send_report(packet, 513);
-	buf[0x00] = 0x00;
-	buf[0x01] = 0x00;
-	buf[0x02] = 0x00;
-	buf[0x03] = 0x00;
-	buf[0x04] = 0x03;
-	buf[0x05] = 0x01;
-	buf[0x06] = 0x00;
-	buf[0x07] = 0xff;
+	packet[0x00] = 0x00;
+	packet[0x01] = 0x00;
+	packet[0x02] = 0x00;
+	packet[0x03] = 0x00;
+	packet[0x04] = 0x03;
+	packet[0x05] = 0x01;
+	packet[0x06] = 0x00;
+	packet[0x07] = 0xff;
 	device.send_report(packet, 513);
-	buf[0x00] = 0x00;
-	buf[0x01] = 0x00;
-	buf[0x02] = 0x00;
-	buf[0x03] = 0x00;
-	buf[0x04] = 0x01;
-	buf[0x05] = 0x00;
-	buf[0x06] = 0x85;
+	packet[0x00] = 0x00;
+	packet[0x01] = 0x00;
+	packet[0x02] = 0x00;
+	packet[0x03] = 0x00;
+	packet[0x04] = 0x01;
+	packet[0x05] = 0x00;
+	packet[0x06] = 0x85;
 	device.send_report(packet, 513);
 }
 

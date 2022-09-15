@@ -7,6 +7,28 @@ export function Size() { return [6, 7]; }
 export function Type() { return "Hid"; }
 export function DefaultPosition() {return [225, 120]; }
 export function DefaultScale(){return 8.0;}
+/* global
+shutdownColor:readonly
+LightingMode:readonly
+forcedColor:readonly
+SleepMode:readonly
+LowPower:readonly
+DpiControl:readonly
+DPIRollover:readonly
+OnboardDPI:readonly
+dpiStages:readonly
+dpi1:readonly
+dpi2:readonly
+dpi3:readonly
+dpi4:readonly
+dpi5:readonly
+pollingRate:readonly
+liftOffDistance:readonly
+asymmetricLOD:readonly
+ScrollMode:readonly
+ScrollAccel:readonly
+SmartReel:readonly
+*/
 export function ControllableParameters()
 {
 	return [

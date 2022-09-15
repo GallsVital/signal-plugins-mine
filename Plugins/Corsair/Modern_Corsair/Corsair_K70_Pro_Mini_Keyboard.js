@@ -6,6 +6,12 @@ export function Size() { return [22, 8]; }
 export function DefaultPosition(){return [10, 100];}
 const DESIRED_HEIGHT = 85;
 export function DefaultScale(){return Math.floor(DESIRED_HEIGHT/Size()[1]);}
+/* global
+startupMode:readonly
+shutdownColor:readonly
+LightingMode:readonly
+forcedColor:readonly
+*/
 export function ControllableParameters(){
 	return [
 		{"property":"startupMode",  "group":"", "label":"Start Up Mode", "type":"boolean", "default":"true"},

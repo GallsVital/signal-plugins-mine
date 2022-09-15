@@ -12,7 +12,6 @@ LightingMode:readonly
 forcedColor:readonly
 SettingControl:readonly
 dpi1:readonly
-PollRate:readonly
 AngleSnap:readonly
 SleepMode:readonly
 SleepModeTime:readonly
@@ -341,9 +340,9 @@ export function onAngleSnapChanged() {
 
 
 // Polling Rate Functions
-export function onPollRateChanged() {
-	setPollRate(PollRate);
-}
+// export function onPollRateChanged() {
+// 	setPollRate(PollRate);
+// }
 
 function VerifyMouseSettings() {
 	if (!SettingControl) {

@@ -7,6 +7,12 @@ export function Size() { return [10,3]; }
 export function Type() { return "Hid"; }
 export function DefaultPosition(){return [90,100];}
 export function DefaultScale(){return 20.0;}
+/* global
+shutdownColor:readonly
+LightingMode:readonly
+forcedColor:readonly
+ShutdownBehavior:readonly
+*/
 export function ControllableParameters(){
 	return [
 		{"property":"shutdownColor", "group":"lighting", "label":"Shutdown Color", "min":"0", "max":"360", "type":"color", "default":"009bde"},

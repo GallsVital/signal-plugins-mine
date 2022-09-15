@@ -8,6 +8,36 @@ export function Size() { return [22, 14]; }
 export function Type() { return "Hid"; }
 export function DefaultPosition(){return [0, 0];}
 export function DefaultScale(){return 1.0;}
+/* global
+shutdownColor:readonly
+LightingMode:readonly
+forcedColor:readonly
+Zone1Color:readonly
+Zone1Mode:readonly
+Zone1Speed:readonly
+Zone2Color:readonly
+Zone2Mode:readonly
+Zone2Speed:readonly
+Zone3Color:readonly
+Zone3Mode:readonly
+Zone3Speed:readonly
+Zone4Color:readonly
+Zone4Mode:readonly
+Zone4Speed:readonly
+Zone5Color:readonly
+Zone5Mode:readonly
+Zone5Speed:readonly
+Zone6Color:readonly
+Zone6Mode:readonly
+Zone6Speed:readonly
+Zone7Color:readonly
+Zone7Mode:readonly
+Zone7Speed:readonly
+Zone8Color:readonly
+Zone8Mode:readonly
+Zone8Speed:readonly
+ARGBMode:readonly
+*/
 export function ControllableParameters()
 {
 	return [
