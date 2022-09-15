@@ -54,14 +54,15 @@ export function Shutdown() {
 /** @param {Bus} bus */
 export function Scan(bus) {
 
-	const PossibleAddresses = [0x58, 0x58, 0x59, 0x5A, 0x5B, 0x5C, 0x5D, 0x5E, 0x5F];
+	const PossibleAddresses = [0x58, 0x59, 0x5A, 0x5B, 0x5C, 0x5D, 0x5E, 0x5F];
 	const FoundAddresses = [];
 
-  	for (const address of PossibleAddresses) {
 	  // Skip any non AMD / INTEL Busses
 	  if (!bus.IsSystemBus()) {
-		  continue;
-	  }
+		return [];
+	}
+
+  	for (const address of PossibleAddresses) {
 
 	  // Skip any address that fails a quick write
 	  if (bus.WriteQuick(address) !== 0){
@@ -136,6 +137,7 @@ function CreateLeds(){
 function SendColors(shutdown = false){
 
 	const RGBData = [];
+
 	//Fetch Colors
 	for(let iIdx = 0; iIdx < vLedPositions.length; iIdx++){
 		const PacketOffset = iIdx * 3;
@@ -252,6 +254,7 @@ export class CorsairDominatorProtocol{
 
 		this.Config.Model = this.Models[ModelId];
 	}
+
 	/**
 	 * Sends the given RGB data to the device.
 	 * @param {number[]} RGBData RGB array containing 'RGBRGBRGB' style colors. Array cannot be larger then 36 bytes.
@@ -268,9 +271,10 @@ export class CorsairDominatorProtocol{
 		bus.WriteBlock(this.Registers.DirectRGB, 32, packet.splice(0, 32));
 		bus.WriteBlock(this.Registers.DirectRGB + 1, 6, packet.splice(0, 6));
 	}
+
 	/**
-	 * calculates a CRC code for the given array. 
-	 * @param {number[]} data 
+	 * calculates a CRC code for the given array.
+	 * @param {number[]} data
 	 */
 	CalculateCRC(data){
 		let iCrc = 0;
