@@ -1,7 +1,7 @@
-export function Name() { return "ThermalTake LedBox"; }
+export function Name() { return "TT Floe Riing Controller"; }
 export function VendorId() { return 0x264A; }
-export function ProductId() { return 0x2261; }
-export function Publisher() { return "WhirlwindFX"; }
+export function ProductId() { return 0x1fa6; }
+export function Publisher() { return "ChrisAdkins/WhirlwindFX"; }
 export function Size() { return [1, 1]; }
 export function Type() { return "Hid"; }
 export function DefaultPosition(){return [0, 0];}
@@ -15,6 +15,7 @@ export function ControllableParameters(){
 }
 const vLedNames = [];
 const vLedPositions = [];
+let ConnectedFans = [];
 
 export function SupportsSubdevices(){ return true; }
 const DeviceMaxLedLimit = 54 * 5 ;
@@ -28,8 +29,6 @@ let ChannelArray = [
 	["Channel 5", 54],
 
 ];
-
-let ConnectedFans = [];
 
 function SetupChannels(){
 	device.SetLedLimit(DeviceMaxLedLimit);
@@ -55,8 +54,9 @@ export function Initialize()
 
 	device.write([0x00, 0xFE, 0x33], 193);
 	device.read([0x00, 0xFE, 0x33], 193);
-	
+
 	BurstFans();
+
 }
 
 function Sendchannel(Channel) 
@@ -73,7 +73,7 @@ function Sendchannel(Channel)
 	}
 	else if(componentChannel.shouldPulseColors())
 	{
-		ChannelLedCount = 54;
+		ChannelLedCount = 40;
 
 		let pulseColor = device.getChannelPulseColor(ChannelArray[Channel][0], ChannelLedCount);
 		RGBData = device.createColorArray(pulseColor, ChannelLedCount, "Inline", "GRB");
@@ -93,19 +93,17 @@ export function Render()
 	{
 		Sendchannel(channel);
 	}
-
 	PollFans();
 }
 
 function sendDirectPacket(Channel, data)
 {
 
-	let packet = [0x00, 0x32, 0x52, Channel + 1, 0x24];
+	let packet = [0x00, 0x32, 0x52, Channel + 1, 0x18];
 	packet.push(...data);
 
-	device.write(packet, 193);
+	device.write(packet, 64);
 	device.read(packet, 64);
-	device.pause(1);
 }
 
 function clearReadBuffer()
@@ -156,8 +154,7 @@ function PollFans(){
 }
 
 
-function BurstFans()
-{
+function BurstFans(){
 	if(device.fanControlDisabled())
 	{
 		return;
@@ -174,21 +171,21 @@ function BurstFans()
 
 function SetFanPercent(channel, FanSpeedPercent)
 {
-	let packet = [0x00, 0x32, 0x51, channel + 1, 0x01, FanSpeedPercent];
-	device.write(packet, 193);
-	device.read(packet, 64);
+		let packet = [0x00, 0x32, 0x51, channel + 1, 0x01, FanSpeedPercent];
+		device.write(packet, 65);
+		device.read(packet, 64);
 }
 
 function readFanRPM(channel)
 {
 	let FanData = [];
 
-	let packet = [0x00, 0x33, 0x51, channel + 1];
-	device.write(packet, 193);
-	let returnpacket = device.read(packet, 64);
+		let packet = [0x00, 0x33, 0x51, channel + 1];
+		device.write(packet, 65);
+		packet = device.read(packet, 64);
 
-	let RPM = (returnpacket[7] << 8) + returnpacket[6];
-	FanData.push(`Fan ${channel} ${RPM}`);
+		let RPM = (packet[7] << 8) + packet[6];
+		FanData.push(`Fan ${channel} ${RPM}`);
 
 	return RPM;
 }
@@ -201,7 +198,6 @@ export function Shutdown()
 export function Validate(endpoint) 
 {
 	return endpoint.interface === -1;
-
 }
 
 export function Image() 
