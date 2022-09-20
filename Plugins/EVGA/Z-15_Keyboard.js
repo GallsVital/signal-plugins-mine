@@ -4,8 +4,8 @@ export function ProductId() { return 0x2608; }
 export function Publisher() { return "WhirlwindFX"; }
 export function Documentation(){ return "troubleshooting/evga"; }
 export function Size() { return [21, 6]; }
-export function DefaultPosition(){return [240, 120];}
-export function DefaultScale(){return 8.0;}
+export function DefaultPosition(){return [30, 115];}
+export function DefaultScale(){return 13.0;}
 /* global
 shutdownColor:readonly
 LightingMode:readonly
