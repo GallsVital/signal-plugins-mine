@@ -5,6 +5,13 @@ export function Publisher() { return "WhirlwindFX"; }
 export function Size() { return [7, 7]; }
 export function DefaultPosition(){return [225, 120];}
 export function DefaultScale(){return 7.0;}
+/* global
+shutdownColor:readonly
+LightingMode:readonly
+forcedColor:readonly
+DpiControl:readonly
+dpi1:readonly
+*/
 export function ControllableParameters(){
 	return [
 		{"property":"shutdownColor", "group":"lighting", "label":"Shutdown Color", "min":"0", "max":"360", "type":"color", "default":"009bde"},
@@ -76,21 +83,21 @@ export function Initialize() {
 
 let savedDpi1;
 
-function setDpi(dpi){
-	savedDpi1 = dpi;
-	Corsair_Set(CORSAIR_DPI_X, savedDpi1);
-	Corsair_Set(CORSAIR_DPI_Y, savedDpi1);
+// function setDpi(dpi){
+// 	savedDpi1 = dpi;
+// 	Corsair_Set(CORSAIR_DPI_X, savedDpi1);
+// 	Corsair_Set(CORSAIR_DPI_Y, savedDpi1);
 
-	device.log(`DPI x is now ${Corsair_Get(CORSAIR_DPI_X)}`);
-	device.log(`DPI y is now ${Corsair_Get(CORSAIR_DPI_Y)}`);
-}
+// 	device.log(`DPI x is now ${Corsair_Get(CORSAIR_DPI_X)}`);
+// 	device.log(`DPI y is now ${Corsair_Get(CORSAIR_DPI_Y)}`);
+// }
 
 export function Render() {
 	sendColors();
 
-	if(dpi1 != savedDpi1) {
-		setDpi(dpi1);
-	}
+	// if(dpi1 != savedDpi1) {
+	// 	setDpi(dpi1);
+	// }
 }
 
 function sendColors(shutdown = false){

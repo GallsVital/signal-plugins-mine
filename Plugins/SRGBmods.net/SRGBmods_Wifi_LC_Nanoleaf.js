@@ -9,6 +9,12 @@ export function DefaultScale(){return 1.0}
 export function Type() { return "Hid"; }
 export function SupportsSubdevices(){ return true; }
 export function DefaultComponentBrand() { return "Nanoleaf"}
+/* global
+UpdateRate:readonly
+shutdownColor:readonly
+LightingMode:readonly
+forcedColor:readonly
+*/
 export function ControllableParameters(){
 	return [
 		{"property":"UpdateRate", "label":"Update rate", "type":"combobox", "values":["10fps","30fps"], "default":"10fps", "tooltip":"Not all Nanoleaf panels support more than 10fps!"},

@@ -20,6 +20,22 @@ export function Size()
 export function DefaultPosition(){return [10, 100];}
 const DESIRED_HEIGHT = 85;
 export function DefaultScale(){return Math.floor(DESIRED_HEIGHT/Size()[1]);}
+/* global
+shutdownColor:readonly
+LightingMode:readonly
+forcedColor:readonly
+DpiControl:readonly
+dpi1:readonly
+dpi2:readonly
+dpi3:readonly
+dpi4:readonly
+dpi5:readonly
+dpi6:readonly
+DpiLight:readonly
+OnboardState:readonly
+DPIRollover:readonly
+pollingrate:readonly
+*/
 export function ControllableParameters(){
     return [
         {"property":"shutdownColor", "group":"lighting", "label":"Shutdown Color","min":"0","max":"360","type":"color","default":"009bde"},

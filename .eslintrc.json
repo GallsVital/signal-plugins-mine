@@ -9,13 +9,21 @@
         "extends": [
             "eslint:recommended",
             "plugin:@typescript-eslint/eslint-recommended",
-            "plugin:@typescript-eslint/recommended"
+            "plugin:@typescript-eslint/recommended",
+            "plugin:jest/recommended",
+            "plugin:@typescript-eslint/recommended-requiring-type-checking"
         ]
     },
     "plugins": [
-        "@typescript-eslint"
+        "@typescript-eslint",
+        "jest"
         ],
+    "env": {
+        "jest/globals": true,
+        "node": true
+    },
     "globals": {
+        "module": "writable",
         "device": "readonly", 
         "bus": "readonly",
         "battery": "readonly"
@@ -56,7 +64,6 @@
             { "blankLine": "any", "prev": "*", "next": ["let","var","const"] },
             { "blankLine": "always", "prev": "expression", "next": ["let","var","const"] },
 
-
             { "blankLine": "never", "prev": ["*","export","block-like"], "next": "export" },
             { "blankLine": "any", "prev": "*", "next": "export" },
             { "blankLine": "always", "prev": "expression", "next": ["block-like"] },
@@ -67,8 +74,30 @@
             {
                 "selector": "MemberExpression[object.name = 'device'][property.name='readTimeout']", 
                 "message": "device.readTimeout() is deprecated and should not be used. Instead use device.read()"
+            },            {
+                "selector": "MemberExpression[object.name = 'device'][property.name='repollName']", 
+                "message": "device.repollName() is deprecated and should not be used. Instead use device.setName()"
+            },
+            {
+                "selector": "MemberExpression[object.name = 'device'][property.name='repollLeds']", 
+                "message": "device.repollLeds() is deprecated and should not be used. Instead use device.setControllableLeds()"
+            },
+            {
+                "selector": "MemberExpression[object.name = 'device'][property.name='repollSize']", 
+                "message": "device.repollSize() is deprecated and should not be used. Instead use device.setSize()"
             }
         ]
     
-    }
+    },
+    "overrides": [
+        {
+          "files": [
+            "./**/*.test.js", 
+            "./Scripts/*"
+        ],
+          "rules": {
+            "no-console": "off"
+          }
+        }
+    ]
 }

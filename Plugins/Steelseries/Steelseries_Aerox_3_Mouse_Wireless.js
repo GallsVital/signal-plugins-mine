@@ -6,6 +6,9 @@ export function Publisher() { return "WhirlwindFX"; }
 export function Size() { return [3, 3]; }
 export function DefaultPosition() {return [225, 120]; }
 export function DefaultScale(){return 15.0;}
+/* global
+shutdownColor:readonly
+*/
 export function ControllableParameters(){
 	return [
 		{"property":"shutdownColor", "group":"lighting", "label":"Shutdown Color", "min":"0", "max":"360", "type":"color", "default":"009bde"},
@@ -88,19 +91,19 @@ export function Render() {
 
 }
 
-function setDpi(dpi){
-	savedDpi1 = dpi1;
+// function setDpi(dpi){
+// 	savedDpi1 = dpi1;
 
-	let packet = [];
-	packet[0] = 0x00;
-	packet[1] = 0x2D;
-	packet[2] = 0x01;
-	packet[3] = 0;
-	packet[4] = (dpi/50);
-	//device.write(packet, 65);
+// 	let packet = [];
+// 	packet[0] = 0x00;
+// 	packet[1] = 0x2D;
+// 	packet[2] = 0x01;
+// 	packet[3] = 0;
+// 	packet[4] = (dpi/50);
+// 	//device.write(packet, 65);
 
 
-}
+// }
 
 function hexToRgb(hex) {
 	let result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);

@@ -35,6 +35,7 @@ let CurrentLedCount;
 let vLedNames = [];
 let vLedPositions = [];
 let ActiveZones = [];
+let Z790MA_Mode = false;
 
 const DeviceMaxLedLimit = 240;
 const DevicePerChannelLedLimit = 120;
@@ -206,6 +207,19 @@ const MotherboardConfigs = {
 			0x24: ["12V Header 2", HeaderConfiguration]
 		}
 	},
+	"Z790 AORUS MASTER": {
+		ARGB:{
+			"5v ARGB Header 1": 0x58,
+			"5v ARGB Header 2": 0x59,
+		},
+		Mainboard:{
+			// 0x20: ["Back IO", MainboardConfiguration],
+			// 0x21: ["12 Header 1", HeaderConfiguration],
+			// 0x22: ["Back IO 2", MainboardConfiguration],
+			// 0x23: ["South Bridge", MainboardConfiguration],
+			// 0x24: ["12V Header 2", HeaderConfiguration]
+		}
+	},
 };
 
 function CreateZone(ZoneId, ZoneName, ZoneConfig){
@@ -256,26 +270,106 @@ export function Initialize() {
 
 	InitializeZones();
 
-	SetupChannels();
+	if(!Z790MA_Mode){
+		SetupChannels();
+	}else{
+		device.setName("Gigabyte Z790 AORUS MASTER IO Panel")
+		CreateZ790IOPanel(Z790MA_Mode);
+				// let packet = [0xcc, 0x20, 0x01, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x01, 0x46, 0x00, 0xff, 0x00, 0xce];
+		// device.send_report(packet, 64);
+		// let packet2 = [0xcc, 0x24, 0x10, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x01, 0x5a]
+		// device.send_report(packet2, 64);
+
+		// SetDirectHeaderMode();
+
+		// let packet3 = [0xcc, 0x25, 0x20, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0xFF, 0xFF, 0xFF]
+		// device.send_report(packet3, 64);
+		// let packet4 = [0xcc, 0x26, 0x40, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x01, 0x5a]
+		// device.send_report(packet4, 64);
+	}
+
 
 	device.pause(30);
 }
 
+const Z790_IO_Panel = 
+{
+    mapping : 
+	[
+     0,1,2,3,4,5,6,7,8,9,10,11
+    ],
+       
+	positioning : 
+	[
+     [0,11],[1,10],[2,9],[3,8],[4,7],[5,6],[6,5],
+	 
+	 [5,4],[4,3],[5,2],[6,1],[7,0]
+    ],
+	names: ["Led 1", "Led 2", "Led 3", "Led 4", "Led 5", "Led 6", "Led 7", "Led 8", "Led 9", "Led 10", "Led 11", "Led 12"],
+    displayName: "Z790 Aorus Master IO Panel",
+    ledCount : 12,
+    width: 12,
+    height: 12,
+    image: "",
+}
+
+function CreateZ790IOPanel(Enable){
+	if(Enable){
+		device.createSubdevice("Z790IOPanel"); 
+		device.setSubdeviceName("Z790IOPanel",`${Z790_IO_Panel.displayName}`);
+		device.setSubdeviceImage("Z790IOPanel", Z790_IO_Panel.image);
+		device.setSubdeviceSize("Z790IOPanel",Z790_IO_Panel.width,Z790_IO_Panel.height)
+		device.setSubdeviceLeds("Z790IOPanel", Z790_IO_Panel.names, Z790_IO_Panel.positioning)
+	}else{
+		device.removeSubdevice("Z790IOPanel")
+	}
+}
+
+function SendSubdeviceAsARGBchannel(SubdeviceId, SubdeviceConfig, ChannelId){
+	let RGBData = []
+
+	for(let iIdx = 0 ; iIdx < SubdeviceConfig.positioning.length; iIdx++){
+		let Led = SubdeviceConfig.positioning[iIdx];
+		let col;
+
+		if (LightingMode  === "Forced") {
+			col = hexToRgb(forcedColor);
+		}else{
+			col = device.subdeviceColor(SubdeviceId, Led[0], Led[1]);
+		}
+
+		RGBData.push(col[RGBConfigs[RGBconfig][0]]);
+		RGBData.push(col[RGBConfigs[RGBconfig][1]]);
+		RGBData.push(col[RGBConfigs[RGBconfig][2]]);
+
+	}
+
+	StreamDirectColors(RGBData, RGBData.length / 3, ChannelId);
+}
 export function onForceAllZonesActiveChanged(){
-	InitializeZones();
+		InitializeZones();
 }
 
 export function Render() {
-	UpdateActiveZones();
+	if(Z790MA_Mode){
+		for(let i = 0x20; i < 0x28;i++){
+			sendColorPacket(i, [0, 0, 0]);
+			sendCommit();
+		}
+		SendSubdeviceAsARGBchannel("Z790IOPanel", Z790_IO_Panel, 0x58);
+	}else{
+		UpdateActiveZones();
 
-	for(let channel = 0; channel < vDLED_Zones.length; channel++){
-		UpdateARGBChannels(channel);
+		for(let channel = 0; channel < vDLED_Zones.length; channel++){
+			UpdateARGBChannels(channel);
+		}
 	}
+
 }
 
 
 export function Shutdown() {
-	device.removeMessage("firmware test");
+	//device.removeMessage("firmware test");
 
 }
 
@@ -494,6 +588,11 @@ function RequestConfig(){
 	 for(let i = 0; i < config.length; i = i + 8){
 	 	device.log(config.slice(i, i+8), {toFile: true});
 	 }
+
+	if(description.includes("IT5702-Z790MA")){
+		device.log(`Z790MA Board detected. Swapping Protocol Type`);
+		Z790MA_Mode = true;
+	}
 }
 
 

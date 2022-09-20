@@ -4,16 +4,27 @@ export function ProductId() { return 0xA100;}//0xA100; }
 export function Publisher() { return "WhirlwindFX"; }
 export function Size() { return [1, 1]; }
 export function Type(){return "rawusb"};
+/* global
+shutdownColor:readonly
+LightingMode:readonly
+forcedColor:readonly
+moboSync:readonly
+Channel1Count:readonly
+Channel2Count:readonly
+Channel3Count:readonly
+Channel4Count:readonly
+FanMode:readonly
+*/
 export function ControllableParameters(){
     return [
     {"property":"shutdownColor", "group":"lighting", "label":"Shutdown Color","min":"0","max":"360","type":"color","default":"009bde"},
     {"property":"LightingMode", "group":"lighting", "label":"Lighting Mode", "type":"combobox", "values":["Canvas","Forced"], "default":"Canvas"},
     {"property":"forcedColor", "group":"lighting", "label":"Forced Color","min":"0","max":"360","type":"color","default":"009bde"},
     {"property":"moboSync", "group":"", "label":"Enable Passthrough Control","type":"boolean","default":"false"},
-    {"property":"Channel1Count", "label":"Channel 1 Fan count","type":"combobox","values":["0","1","2","3","4"],"default":"0"},
-    {"property":"Channel2Count", "label":"Channel 2 Fan count","type":"combobox","values":["0","1","2","3","4"],"default":"0"},
-    {"property":"Channel3Count", "label":"Channel 3 Fan count","type":"combobox","values":["0","1","2","3","4"],"default":"0"},
-    {"property":"Channel4Count", "label":"Channel 4 Fan count","type":"combobox","values":["0","1","2","3","4"],"default":"0"},
+    // {"property":"Channel1Count", "label":"Channel 1 Fan count","type":"combobox","values":["0","1","2","3","4"],"default":"0"},
+    // {"property":"Channel2Count", "label":"Channel 2 Fan count","type":"combobox","values":["0","1","2","3","4"],"default":"0"},
+    // {"property":"Channel3Count", "label":"Channel 3 Fan count","type":"combobox","values":["0","1","2","3","4"],"default":"0"},
+    // {"property":"Channel4Count", "label":"Channel 4 Fan count","type":"combobox","values":["0","1","2","3","4"],"default":"0"},
 	{"property":"FanMode", "group":"", "label":"Fan Speed Mode","type":"combobox","values":["SignalRGB","Motherboard PWM"],"default":"SignalRGB"},
     //{"property":"targetRPM", "group":"", "label":"Fan RPM", "step":"50","type":"number","min":"800", "max":"1900","default":"1300"},
     //{"property":"FanMode", "group":"", "label":"Fan Speed Mode","type":"combobox","values":["Manual","PWM"],"default":"PWM"},
@@ -339,16 +350,16 @@ function sendControlPacket(index,data,length)
         device.pause(1)
 }
 
-function sendCommit()
-{
-    var packet = [0x01];
-    //                  iType, iRequest, iValue, iReqIdx, pBuf, iLen, iTimeout 
-    device.control_transfer(0x40,0x80,0,COMMIT_ADDRESS,packet,1,1000);
+// function sendCommit()
+// {
+//     var packet = [0x01];
+//     //                  iType, iRequest, iValue, iReqIdx, pBuf, iLen, iTimeout 
+//     device.control_transfer(0x40,0x80,0,COMMIT_ADDRESS,packet,1,1000);
 
-    // if you have more then 4 or so fans they start to miss commands without this delay or the 'filler' packets. 
-    // adding this to a toggle may be a solution for large numbers of fans
-    device.pause(1) 
-}
+//     // if you have more then 4 or so fans they start to miss commands without this delay or the 'filler' packets. 
+//     // adding this to a toggle may be a solution for large numbers of fans
+//     device.pause(1) 
+// }
 
 function hexToRgb(hex) 
 {

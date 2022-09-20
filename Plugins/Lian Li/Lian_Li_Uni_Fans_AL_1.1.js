@@ -4,8 +4,13 @@ export function ProductId() { return 0xA101;}//0xA100; }
 export function Publisher() { return "WhirlwindFX"; }
 export function Size() { return [1, 1]; }
 export function Type(){return "rawusb";}
-
-;
+/* global
+shutdownColor:readonly
+LightingMode:readonly
+forcedColor:readonly
+moboSync:readonly
+FanMode:readonly
+*/
 export function ControllableParameters(){
 	return [
 		{"property":"shutdownColor", "group":"lighting", "label":"Shutdown Color", "min":"0", "max":"360", "type":"color", "default":"009bde"},

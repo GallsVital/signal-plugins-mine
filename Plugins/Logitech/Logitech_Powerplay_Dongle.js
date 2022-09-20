@@ -16,8 +16,29 @@ export function Size()
 }
 export function DefaultPosition(){return [240,120]}
 export function DefaultScale(){return 8.0}
+<<<<<<< HEAD
 export function ControllableParameters()
 {
+=======
+/* global
+shutdownColor:readonly
+LightingMode:readonly
+forcedColor:readonly
+DpiControl:readonly
+dpistages:readonly
+dpi1:readonly
+dpi2:readonly
+dpi3:readonly
+dpi4:readonly
+dpi5:readonly
+dpi6:readonly
+DpiLight:readonly
+OnboardState:readonly
+DPIRollover:readonly
+pollingrate:readonly
+*/
+export function ControllableParameters(){
+>>>>>>> 42f57d082cf67330f8c3b3e3d66eb646aad4e508
     return [
         {"property":"shutdownColor", "group":"lighting", "label":"Shutdown Color","min":"0","max":"360","type":"color","default":"009bde"},
         {"property":"LightingMode", "group":"lighting", "label":"Lighting Mode", "type":"combobox", "values":["Canvas","Forced"], "default":"Canvas"},

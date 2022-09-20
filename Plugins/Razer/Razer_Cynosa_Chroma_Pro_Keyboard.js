@@ -26,6 +26,11 @@ export function DefaultScale() {
 export function Type() {
     return "Hid";
 }
+/* global
+shutdownColor:readonly
+LightingMode:readonly
+forcedColor:readonly
+*/
 export function ControllableParameters() {
     return [{
         "property": "shutdownColor",

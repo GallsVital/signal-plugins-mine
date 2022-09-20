@@ -6,6 +6,11 @@ export function Publisher() { return "WhirlwindFX"; }
 export function Size() { return [4,4]; }
 export function DefaultPosition(){return [165,60]}
 export function DefaultScale(){return 7.0}
+/* global
+shutdownColor:readonly
+LightingMode:readonly
+forcedColor:readonly
+*/
 export function ControllableParameters(){
     return [
         {"property":"shutdownColor", "group":"lighting", "label":"Shutdown Color","min":"0", "max":"360","type":"color","default":"009bde"},
@@ -131,7 +136,7 @@ function getStatus()//This gets temp, pump, and fan status.
 
     do //I give this a 5% chance of success lol.
     {
-        let packet = device.readTimeout([0x0], 64, 10);
+        let packet = device.read([0x0], 64, 10);
 
         if(packet[0] == 0x75 && packet[1] == 0x01)
         {

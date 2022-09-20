@@ -55,6 +55,13 @@ export function Size() { return [3, 3]; }
 export function Type() { return "Hid"; }
 export function DefaultPosition() {return [225, 120]; }
 export function DefaultScale(){return 15.0;}
+/* global
+shutdownColor:readonly
+LightingMode:readonly
+forcedColor:readonly
+DpiControl:readonly
+dpi1:readonly
+*/
 export function ControllableParameters(){
 	return [
 		{"property":"shutdownColor", "group":"lighting", "label":"Shutdown Color", "min":"0", "max":"360", "type":"color", "default":"009bde"},
@@ -218,7 +225,7 @@ function setDPIRazer(dpi){
 	packet[12] = 0x00;
 	packet[13] = Math.floor(usableDpi/256);
 	packet[14] = usableDpi%256;
-	packet[15] = Math.floor(dpusableDpii/256);
+	packet[15] = Math.floor(usableDpi/256);
 	packet[16] = usableDpi%256;
 	packet[89] = CalculateCrc(packet);
 	device.send_report(packet, 91);

@@ -6,6 +6,11 @@ export function Documentation(){ return "troubleshooting/evga"; }
 export function Size() { return [24, 9]; }
 export function DefaultPosition(){return [240, 120];}
 export function DefaultScale(){return 8.0;}
+/* global
+shutdownColor:readonly
+LightingMode:readonly
+forcedColor:readonly
+*/
 export function ControllableParameters(){
 	return [
 		{"property":"shutdownColor", "group":"lighting", "label":"Shutdown Color", "min":"0", "max":"360", "type":"color", "default":"009bde"},

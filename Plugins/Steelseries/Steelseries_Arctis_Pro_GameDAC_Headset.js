@@ -6,6 +6,23 @@ export function Publisher() { return "WhirlwindFX"; }
 export function Size() { return [3,2]; }
 export function DefaultPosition(){return [145,85]}
 export function DefaultScale(){return 10.0}
+/* global
+shutdownColor:readonly
+LightingMode:readonly
+forcedColor:readonly
+OLEDTimeout:readonly
+OLEDBrightness:readonly
+Sidetone:readonly
+MicVolume:readonly
+Surround:readonly
+EQ:readonly
+Gain:readonly
+Mode:readonly
+VolumeGame:readonly
+VolumeChat:readonly
+VolumeAux:readonly
+VolumeMic:readonly
+*/
 export function ControllableParameters(){
     return [
         {"property":"shutdownColor", "group":"lighting", "label":"Shutdown Color","min":"0","max":"360","type":"color","default":"009bde"},

@@ -6,6 +6,14 @@ export function Publisher() { return "Lightvortex"; }
 export function Size() { return [3, 3]; }
 export function DefaultPosition(){return [240, 120];}
 export function DefaultScale(){return 4.0;}
+/* global
+Ledoff:readonly
+shutdownColor:readonly
+LightingMode:readonly
+forcedColor:readonly
+DpiControl:readonly
+dpi1:readonly
+*/
 export function ControllableParameters(){
 	return [
 		{"property":"Ledoff", "group":"", "label":"Disable Led", "type":"boolean", "default":"false"},

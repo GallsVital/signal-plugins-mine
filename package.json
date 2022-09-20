@@ -1,17 +1,44 @@
 {
 	"name": "signalrgb-plugins",
 	"version": "1.0.0",
+	"type": "module",
 	"devDependencies": {
+		"@babel/preset-env": "^7.19.0",
+		"@types/jest": "^29.0.0",
 		"@typescript-eslint/eslint-plugin": "^5.36.1",
 		"@typescript-eslint/parser": "^5.36.1",
 		"better-docs": "^2.7.2",
 		"eslint": "~8.23.0",
+		"eslint-plugin-jest": "^27.0.1",
+		"jest": "^29.0.2",
+		"jest-junit": "^14.0.1",
 		"jsdoc": "^3.6.11",
+		"ts-morph": "^16.0.0",
 		"typescript": "^4.8.2"
 	},
 	"scripts": {
-		"lint": "eslint . ",
+		"lint": "node node_modules/eslint/bin/eslint.js ./Plugins",
+		"lint:ci": "node node_modules/eslint/bin/eslint.js ./Plugins --quiet",
+		"lint:addGlobals": "node ./Scripts/AddGlobalComments.js",
+		"lint:checkGlobals": "node ./Scripts/AddGlobalComments.js --dryrun",
+		"test": "jest ./Plugins --collectCoverage",
+		"test:ci": "jest ./Plugins --ci --reporters=default --reporters=jest-junit",
+		"test:validate": "node ./Scripts/ValidatePlugins.js",
 		"docs": "jsdoc -c jsdoc.json",
 		"SAVED": "npx -p typescript tsc ModernCorsairProtocol.js --declaration --allowJs --emitDeclarationOnly --outDir types"
+	},
+	"jest": {
+		"transform": {
+			"^.+\\.[t|j]sx?$": "babel-jest"
+		}
+	},
+	"jest-junit": {
+		"suiteName": "Unit Tests",
+		"outputDirectory": ".",
+		"outputName": "junit.xml",
+		"uniqueOutputName": "false",
+		"classNameTemplate": "{classname}",
+		"titleTemplate": "{title}",
+		"ancestorSeparator": " › "
 	}
 }

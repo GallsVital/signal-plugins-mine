@@ -5,6 +5,11 @@ export function Publisher() { return "WhirlwindFX"; }
 export function Size() { return [1, 1]; }
 export function DefaultPosition(){return [0, 0];}
 export function DefaultScale(){return 1.0;}
+/* global
+shutdownColor:readonly
+LightingMode:readonly
+forcedColor:readonly
+*/
 export function ControllableParameters(){
 	return [
 		{"property":"shutdownColor", "group":"lighting", "label":"Shutdown Color", "min":"0", "max":"360", "type":"color", "default":"009bde"},
@@ -233,7 +238,7 @@ function PollFans(){
 	}
 
 	do {
-		let packet = device.readTimeout([0x0], 64, 10);
+		let packet = device.read([0x0], 64, 10);
 
 		if(packet[0] == 0x67 && packet[1] == 0x02){
 

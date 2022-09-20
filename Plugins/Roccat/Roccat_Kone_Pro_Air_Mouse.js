@@ -6,6 +6,22 @@ export function Publisher() { return "WhirlwindFX"; }
 export function Size() { return [3, 3]; }
 export function DefaultPosition(){return [240, 120];}
 export function DefaultScale(){return 8.0;}
+/* global
+shutdownColor:readonly
+LightingMode:readonly
+forcedColor:readonly
+DpiControl:readonly
+dpi1:readonly
+dpi2:readonly
+dpi3:readonly
+dpi4:readonly
+dpi5:readonly
+pollingrate:readonly
+angleSnapping:readonly
+lod:readonly
+debounce:readonly
+timeoutlength:readonly
+*/
 export function ControllableParameters(){
 	return [
 		{"property":"shutdownColor", "group":"lighting", "label":"Shutdown Color", "min":"0", "max":"360", "type":"color", "default":"009bde"},
@@ -110,8 +126,8 @@ function Setup() {
 	packet[3] = 0x14;
 	packet[4] = 0x00;
 	packet[5] = 0x01;
-	packet[6] = PollingDict[PollingRate];
-	packet[7] = anglesnapping;
+	packet[6] = PollingDict[pollingrate];
+	packet[7] = angleSnapping;
 	packet[8] = 0x00;
 	packet[9] = (dpi1/50)%256;
 	packet[10] = Math.floor(dpi1/50/256);

@@ -7,6 +7,11 @@ export function Size() { return [100, 5]; }
 export function Type() { return "Hid"; }
 export function DefaultPosition(){return [10, 100];}
 export function DefaultScale(){return 2.0;}
+/* global
+shutdownColor:readonly
+LightingMode:readonly
+forcedColor:readonly
+*/
 export function ControllableParameters()
 {
 	return [

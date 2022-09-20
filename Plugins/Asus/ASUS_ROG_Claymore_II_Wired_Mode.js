@@ -7,6 +7,12 @@ export function Size() { return [21, 7]; }
 export function DefaultPosition(){return [10, 100];}
 const DESIRED_HEIGHT = 85;
 export function DefaultScale(){return Math.floor(DESIRED_HEIGHT/Size()[1]);}
+/* global
+shutdownColor:readonly
+LightingMode:readonly
+forcedColor:readonly
+layout:readonly
+*/
 export function ControllableParameters(){
 	return [
 		{"property":"shutdownColor", "group":"lighting", "label":"Shutdown Color", "min":"0", "max":"360", "type":"color", "default":"009bde"},

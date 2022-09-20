@@ -5,6 +5,11 @@ export function Publisher() { return "WhirlwindFX"; }
 export function Size() { return [18, 1]; }
 export function DefaultPosition(){return [10, 100]; }
 export function DefaultScale(){return 8.0;}
+/* global
+shutdownColor:readonly
+LightingMode:readonly
+forcedColor:readonly
+*/
 export function ControllableParameters()
 {
 	return [

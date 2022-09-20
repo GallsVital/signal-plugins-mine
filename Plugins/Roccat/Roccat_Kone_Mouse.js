@@ -6,6 +6,18 @@ export function Publisher() { return "WhirlwindFX"; }
 export function Size() { return [7, 7]; }
 export function DefaultPosition() {return [225, 120]; }
 export function DefaultScale(){return 7.0;}
+/* global
+shutdownColor:readonly
+LightingMode:readonly
+forcedColor:readonly
+DpiControl:readonly
+dpi1:readonly
+dpi2:readonly
+dpi3:readonly
+dpi4:readonly
+dpi5:readonly
+pollingrate:readonly
+*/
 export function ControllableParameters(){
 	return [
 		{"property":"shutdownColor", "group":"lighting", "label":"Shutdown Color", "min":"0", "max":"360", "type":"color", "default":"009bde"},
@@ -93,7 +105,7 @@ function setDpi(){
 	savedDpi3 = dpi3;
 	savedDpi4 = dpi4;
 	savedDpi5 = dpi5;
-	savedPollingRate = PollingDict[PollingRate];
+	savedPollingRate = PollingDict[pollingrate];
 	//Set X dpi 1-5
 	SettingReport[6] =    (dpi1/50)%256;
 	SettingReport[7] =   Math.floor(dpi1/50/256);
@@ -177,7 +189,7 @@ export function Render() {
         savedDpi3 != dpi3 ||
         savedDpi4 != dpi4 ||
         savedDpi5 != dpi5 ||
-        savedPollingRate != PollingDict[PollingRate]) &&
+        savedPollingRate != PollingDict[pollingrate]) &&
         DpiControl){
 		setDpi();
 	}

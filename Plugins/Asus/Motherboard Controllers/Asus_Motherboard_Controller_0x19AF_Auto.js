@@ -6,6 +6,15 @@ export function Size() { return [device_width, 1]; }
 export function Type() { return "Hid"; }
 export function DefaultPosition(){return [120, 80];}
 export function DefaultScale(){return 8.0;}
+/* global
+shutdownColor:readonly
+LightingMode:readonly
+forcedColor:readonly
+Mainboardconfig:readonly
+Headerconfig:readonly
+RGBconfig:readonly
+disableRGBHeaders:readonly
+*/
 export function ControllableParameters(){
 	return [
 		{"property":"shutdownColor", "group":"lighting", "label":"Shutdown Color", "min":"0", "max":"360", "type":"color", "default":"009bde"},
@@ -369,7 +378,7 @@ function FetchConfigTable(){
 
 	let data = device.read([0x00], Device_Read_Length);
 
-	if(data[1] = ASUS_RESPONSE_CONFIGTABLE){
+	if(data[1] === ASUS_RESPONSE_CONFIGTABLE){
 		DeviceInfo.ConfigTable = data;
 		device.log("Config Table", {toFile: true});
 
@@ -475,7 +484,7 @@ function ClearReadBuffer(timeout = 10){
 	device.flush();
 
 	while(device.getLastReadSize() > 0){
-		device.readTimeout([0x00], Device_Read_Length, timeout);
+		device.read([0x00], Device_Read_Length, timeout);
 		count++;
 		readCounts.push(device.getLastReadSize());
 	}

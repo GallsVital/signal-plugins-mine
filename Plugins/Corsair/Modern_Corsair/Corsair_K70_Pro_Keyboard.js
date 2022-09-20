@@ -6,6 +6,11 @@ export function Size() { return [22, 7]; }
 export function DefaultPosition(){return [10, 100];}
 const DESIRED_HEIGHT = 85;
 export function DefaultScale(){return Math.floor(DESIRED_HEIGHT/Size()[1]);}
+/* global
+shutdownColor:readonly
+LightingMode:readonly
+forcedColor:readonly
+*/
 export function ControllableParameters(){
 	return [
 		{"property":"shutdownColor", "label":"Shutdown Color", "min":"0", "max":"360", "type":"color", "default":"009bde"},
@@ -663,6 +668,16 @@ function Convert_From_16Bit(value, LittleEndian = false) {
 	}
 
 	return LittleEndian ? returnValue : returnValue.reverse();
+}
+
+function Convert_To_16Bit(values) {
+	let returnValue = 0;
+
+	for (let i = 0; i < values.length; i++) {
+		returnValue += values[i] << (8 * i);
+	}
+
+	return returnValue;
 }
 
 function hexToRgb(hex) {

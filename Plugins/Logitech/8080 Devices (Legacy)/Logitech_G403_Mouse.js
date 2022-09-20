@@ -6,6 +6,21 @@ export function Publisher() { return "WhirlwindFX"; }
 export function Size() { return [3, 3]; }
 export function DefaultPosition() {return [225, 120]; }
 export function DefaultScale(){return 15.0;}
+/* global
+shutdownColor:readonly
+LightingMode:readonly
+forcedColor:readonly
+DpiControl:readonly
+dpistages:readonly
+dpi1:readonly
+dpi2:readonly
+dpi3:readonly
+dpi4:readonly
+dpi5:readonly
+OnboardState:readonly
+DPIRollover:readonly
+pollingrate:readonly
+*/
 export function ControllableParameters(){
     return [
         {"property":"shutdownColor", "group":"lighting", "label":"Shutdown Color","min":"0","max":"360","type":"color","default":"009bde"},
@@ -224,7 +239,11 @@ function DetectInputs()
 		do
     	{
     	let packet = [];
+<<<<<<< HEAD
     	packet = device.read([0x00],9, 5);
+=======
+    	packet = device.read([0x00],9, 2);
+>>>>>>> 42f57d082cf67330f8c3b3e3d66eb646aad4e508
     	let input = ProcessInputs(packet);
 		
 		if(input == "DPI_UP")
@@ -252,7 +271,11 @@ function DetectInputs()
 
 	do
 	{
+<<<<<<< HEAD
 	let packet = device.read([0x00],7, 3);
+=======
+	let packet = device.read([0x00],7, 10);
+>>>>>>> 42f57d082cf67330f8c3b3e3d66eb646aad4e508
 
 		if(packet[0] == Logitech.ShortMessage && packet[1] == Logitech.ConnectionMode && packet[2] == 0x41 && packet[3] == 0x0C && packet[6] == 0x40)
 		{

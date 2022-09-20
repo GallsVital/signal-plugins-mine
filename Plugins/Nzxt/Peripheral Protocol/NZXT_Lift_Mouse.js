@@ -6,6 +6,17 @@ export function Publisher() { return "WhirlwindFX"; }
 export function Size() { return [3, 4]; }
 export function DefaultPosition(){return [240,120]}
 export function DefaultScale(){return 8.0}
+/* global
+shutdownColor:readonly
+LightingMode:readonly
+forcedColor:readonly
+dpi1:readonly
+dpi2:readonly
+dpi3:readonly
+dpi4:readonly
+LOD:readonly
+pollingrate:readonly
+*/
 export function ControllableParameters(){
     return [
         {"property":"shutdownColor", "group":"lighting", "label":"Shutdown Color","min":"0","max":"360","type":"color","default":"009bde"},
@@ -91,7 +102,7 @@ function SaveDPIToFlash()
     packet[0x01]   = 0x8C;
     packet[0x02]   = 0x00;
     packet[0x03]   = 0x93;
-    packet[0x04]   = (Pollingrate ? 0x01 : 0x00); 
+    packet[0x04]   = (pollingrate ? 0x01 : 0x00); 
     packet[0x05] = (LOD ? 0x00 : 0x01); 
     packet[0x06] = 0x04; 
     packet[0x07] = 0x02;
@@ -127,7 +138,7 @@ function SetDpi()
         packet[0x01]   = 0x8b;
         packet[0x02]   = 0x00;
         packet[0x03]   = 0x96;
-        packet[0x04]   = (Pollingrate ? 0x01 : 0x00); 
+        packet[0x04]   = (pollingrate ? 0x01 : 0x00); 
         packet[0x05] = (LOD ? 0x00 : 0x01); 
         packet[0x06] = 0x04; 
         packet[0x07] = 0x02;

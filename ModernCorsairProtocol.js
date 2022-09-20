@@ -37,12 +37,6 @@ function getKeyByValue(object, value) {
 
 	return parseInt(Key);
 }
-/**
- * @typedef {Number} PropertyId
- */
-/**
- * @typedef {String} PropertyName
- */
 
 const BragiPropertyNames = /** @type {const} */([
 	"Polling Rate",
@@ -64,11 +58,14 @@ const BragiPropertyNames = /** @type {const} */([
 	"Max Polling Rate",
 ]);
 
+/**
+ * @typedef {String} PropertyName
+ * @typedef {Number} PropertyId
+ */
 
 /**
  * Protocol Library for Corsair's Modern Protocol. (BRAGI)
  * @class ModernCorsairProtocol
- *
  */
 export class ModernCorsairProtocol{
 	constructor() {
@@ -128,9 +125,7 @@ export class ModernCorsairProtocol{
 			firmware:0x13,
 			/** Device BootLoader Firmware PropertyID. [READONLY] */
 			BootLoaderFirmware: 0x14,
-			/** Device Wireless Chip Firmware PropertyID. [READONLY]
-			 * @readonly
-			*/
+			/** Device Wireless Chip Firmware PropertyID. [READONLY] */
 			WirelessChipFirmware: 0x15,
 			/** Device Current DPI Profile Index PropertyID. Dark Core Pro SE uses a 0-3 Range.*/
 			dpiProfile: 0x1E,
@@ -979,5 +974,3 @@ export class ModernCorsairProtocol{
 		return ProbeTemps;
 	}
 }
-
-;
