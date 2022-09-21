@@ -5,10 +5,6 @@ export function Publisher() { return "WhirlwindFX"; }
 export function Size() { return [3, 3]; }
 export function DefaultPosition(){return [240,120]}
 export function DefaultScale(){return 8.0}
-<<<<<<< HEAD
-export function ControllableParameters()
-{
-=======
 /* global
 shutdownColor:readonly
 LightingMode:readonly
@@ -26,8 +22,8 @@ OnboardState:readonly
 DPIRollover:readonly
 pollingrate:readonly
 */
-export function ControllableParameters(){
->>>>>>> 42f57d082cf67330f8c3b3e3d66eb646aad4e508
+export function ControllableParameters()
+{
     return [
         {"property":"shutdownColor", "group":"lighting", "label":"Shutdown Color","min":"0","max":"360","type":"color","default":"009bde"},
         {"property":"LightingMode", "group":"lighting", "label":"Lighting Mode", "type":"combobox", "values":["Canvas","Forced"], "default":"Canvas"},
@@ -1301,7 +1297,8 @@ function hexToRgb(hex)
 		 }
 	 else
 		 {
-		 let ButtonPacket = [this.FeatureIDs.ButtonSpyID, 0x40, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08, 0x08, 0x0a, 0x0b, 0x0c];
+		 //let ButtonPacket = [this.FeatureIDs.ButtonSpyID, 0x40, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08, 0x08, 0x0a, 0x0b, 0x0c];
+		 let ButtonPacket = [this.FeatureIDs.ButtonSpyID, 0x40];
 		 this.SendLongMessage(ButtonPacket);
 		 }
 	 }

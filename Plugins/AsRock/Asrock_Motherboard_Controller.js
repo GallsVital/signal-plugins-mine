@@ -1,4 +1,3 @@
-
 export function Name() { return "Asrock Motherboard"; }
 export function VendorId() { return   0x26CE; }
 export function ProductId() { return  0x01A2; }
@@ -85,7 +84,7 @@ export function ControllableParameters()
 			"values":["Off", "Static", "Breathing", "Strobe", "Spectrum Cycle", "Wave", "Spring", "Stack", "Cram", "Scan", "Neon", "Water", "Rainbow"], "default":"Static"},
 		{"property":"Zone8Speed", "group":"lighing", "label":"Audio Speed", "type":"number", "min":"0", "max":"255", "default":"80"},
 
-        {"property":"ARGBMode", "group":"lighting", "label":"SignalRGB Support","type":"boolean","default": "false"},
+        {"property":"ARGBMode", "group":"lighting", "label":"SignalRGB Support","type":"boolean","default": "true"},
 	];
 }
 
@@ -368,6 +367,10 @@ const vPCBLEDs =
     "Underglow LED 9",
     "Underglow LED 10",
     "UnderGlow LED 11",
+    "UnderGlow LED 12",
+    "UnderGlow LED 13",
+    "UnderGlow LED 14",
+    "UnderGlow LED 15",
 ]
 
 const vPCHPositions =
