@@ -101,11 +101,16 @@ function CheckForHyperFuryRam(bus, addr){
 }
 
 function SetMode(){
-    bus.WriteByte(0x08, 0x53);
-    bus.WriteByte(0x0b, 0x01);
+    bus.WriteByte(0x08, 0x53); // start Command
+    bus.WriteByte(0x0b, 0x00);
     bus.WriteByte(0x09, 0x10);
     bus.WriteByte(0x27, 0x02);
-    bus.WriteByte(0x08, 0x44);
+
+    bus.WriteByte(0x0C, 0x01);
+    bus.WriteByte(0x18, 0x18);
+    bus.WriteByte(0x20, 0x50);
+
+    bus.WriteByte(0x08, 0x44); // End Command
 }
 
 
