@@ -2,22 +2,13 @@ export function Name() { return "MSI Mystic Light Controller"; }
 export function VendorId() { return 0x1462; }
 export function Documentation(){ return "troubleshooting/msi"; }
 // DO NOT PID SWAP THIS IF YOU DONT KNOW WHAT YOUR DOING
-export function ProductId() { return 0x7C95;}
+export function ProductId() { return 0x7D53;}
 // YOU CAN BRICK THESE MOTHERBOARDS RGB CONTROLLER WITH ONE WRONG PACKET
 export function Publisher() { return "WhirlwindFX"; }
 export function Size() { return [10, 1]; }
 export function Type() { return "Hid"; }
 export function DefaultPosition(){return [0, 0];}
 export function DefaultScale(){return 8.0;}
-/* global
-shutdownColor:readonly
-LightingMode:readonly
-forcedColor:readonly
-OnboardLEDs:readonly
-RGBHeaders:readonly
-CorsairHeaders:readonly
-perledsupport:readonly
-*/
 export function ControllableParameters(){
 	return [
 		{"property":"shutdownColor", "group":"lighting", "label":"Shutdown Color", "min":"0", "max":"360", "type":"color", "default":"009bde"},
@@ -240,22 +231,16 @@ export function LedPositions()
 export function Initialize() 
 {
 	CheckPacketLength();
-	
+	SetupChannels(); //Create Component Channels
 	PerLEDInit(); //Turn on Per LED Mode
 	CreateLEDs(); //Create all of our LEDs
 	if(perledsupport != true)
 	{
-		DeleteChannels();
 		createJPipeLEDs();
 		CreateARGBHeaders();
 		CreateLEDs();
 		createCorsairLEDs();
 	}
-	else
-	{
-		SetupChannels(); //Create Component Channels
-	}
-	
 }
 
 export function Render() 
@@ -602,12 +587,10 @@ function isperled() //Checks per led based upon whether that's what's in the buf
 	let returnpacket = device.read(packet,64);
 	device.log(returnpacket);
 }
-
 function PerLEDInit()
 {
 	device.send_report(perledpacket,185);
 }
-
 var OnboardLEDData = [];
 var RGBHeaderData = [];
 
@@ -668,14 +651,6 @@ function SetupChannels()
 	for(let i = 0; i < ChannelArray.length; i++) 
 	{
 		device.addChannel(ChannelArray[i][0], ChannelArray[i][1]);
-	}
-}
-
-function DeleteChannels() 
-{
-	for(let i = 0; i < ChannelArray.length; i++) 
-	{
-		device.removeChannel(ChannelArray[i][0], ChannelArray[i][1]);
 	}
 }
 

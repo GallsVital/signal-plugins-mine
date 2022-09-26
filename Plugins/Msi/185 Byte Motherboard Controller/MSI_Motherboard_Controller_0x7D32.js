@@ -2,50 +2,42 @@ export function Name() { return "MSI Mystic Light Controller"; }
 export function VendorId() { return 0x1462; }
 export function Documentation(){ return "troubleshooting/msi"; }
 // DO NOT PID SWAP THIS IF YOU DONT KNOW WHAT YOUR DOING
-export function ProductId() { return 0x7C36;}
+export function ProductId() { return 0x7D32;}
 // YOU CAN BRICK THESE MOTHERBOARDS RGB CONTROLLER WITH ONE WRONG PACKET
 export function Publisher() { return "WhirlwindFX"; }
 export function Size() { return [10, 1]; }
 export function Type() { return "Hid"; }
 export function DefaultPosition(){return [0, 0];}
 export function DefaultScale(){return 8.0;}
-/* global
-shutdownColor:readonly
-LightingMode:readonly
-forcedColor:readonly
-*/
 export function ControllableParameters(){
 	return [
 		{"property":"shutdownColor", "group":"lighting", "label":"Shutdown Color", "min":"0", "max":"360", "type":"color", "default":"009bde"},
 		{"property":"LightingMode", "group":"lighting", "label":"Lighting Mode", "type":"combobox", "values":["Canvas", "Forced"], "default":"Canvas"},
 		{"property":"forcedColor", "group":"lighting", "label":"Forced Color", "min":"0", "max":"360", "type":"color", "default":"009bde"},
+		{"property":"OnboardLEDs", "group":"lighting", "label":"Number of Onboard LEDs","step":"1", "type":"number","min":"0", "max":"20","default":"6"},
+		{"property":"RGBHeaders", "group":"lighting", "label":"Number of 12 Volt RGB Headers","step":"1", "type":"number","min":"0", "max":"2","default":"0"},
+		{"property":"perledsupport", "group":"", "label":"Per Led Support","type":"boolean","default": "false"},
 	];
 }
-export function ConflictingProcesses(){
+export function ConflictingProcesses()
+{
 	return ["LedKeeper.exe", "Dragon Center", "DCv2.exe", "LightKeeperService.exe", "LightKeeperService2.exe" ];
 }
+
 let ParentDeviceName = "Mystic Light Controller";
 
-function hexToRgb(hex) {
-	let result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
-	let colors = [];
-	colors[0] = parseInt(result[1], 16);
-	colors[1] = parseInt(result[2], 16);
-	colors[2] = parseInt(result[3], 16);
+export function SupportsSubdevices(){ return true; }
 
-	return colors;
-}
+const DeviceMaxLedLimit = 120;
 
-let vLedNames = [
-	"Mainboard Led 1", "Mainboard Led 2", "Mainboard Led 3", "Mainboard Led 4", "Mainboard Led 5",
-	"Mainboard Led 6", "Mainboard Led 7", "Mainboard Led 8", "Mainboard Led 9", "Mainboard Led 10",
+//Channel Name, Led Limit
+var ChannelArray = 
+[
+	["JRainbow 1", 40],
+	["JRainbow 2", 40],
+	["JRainbow 3", 40],
 ];
-let vLedPositions = [
-	[0, 0], [1, 0], [2, 0], [3, 0], [4, 0], [5, 0], [6, 0], [7, 0], [8, 0], [9, 0]
-];
-let vLedMap = [
-	0, 1, 2, 3, 4, 5, 6, 7, 8, 9
-];
+
 const initialPacket = [
 	0x52,
 	0x01, 0xFF, 0x00, 0x00, 0x28, 0xFF, 0x00, 0x00, 0x00, 0x00,
@@ -68,6 +60,45 @@ const initialPacket = [
 	0x01, 0xFF, 0x00, 0x00, 0x28, 0xFF, 0x00, 0x00, 0x00, 0x00,
 	0x00
 ];
+
+const perledpacket = 
+[	
+	0x52,//enable, r,g,b, options, r,g,b,sync,seperator 
+	0x01, 0x00, 0x00, 0x00, 0x08, 0x00, 0x00, 0x00, 0x80, 0x00, //JRGB1
+	0x01, 0x00, 0x00, 0x00, 0x2a, 0x00, 0x00, 0x00, 0x80, 0x00, //JPipe1
+	0x01, 0x00, 0x00, 0x00, 0x2a, 0x00, 0x00, 0x00, 0x80, 0x00, //JPipe2
+	0x01, 0x00, 0x00, 0x00, 0x08, 0x00, 0x00, 0x00, 0x80, 0x00, 0x28, //JRainbow1 //Extra Byte determines number of leds
+	0x01, 0x00, 0x00, 0x00, 0x08, 0x00, 0x00, 0x00, 0x80, 0x00, 0x28, //JRainbow2
+	0x01, 0x00, 0x00, 0x00, 0x08, 0x00, 0x00, 0x00, 0x80, 0x00, 0x28, //JRainbow3 or Corsair? 0x01, 0x00, 0x00, 0x00, 0x28, 0x00, 0x00, 0x00, 0x82, 0x00, 0x78,
+	0x01, 0x00, 0x00, 0x00, 0x28, 0x00, 0x00, 0x00, 0x80, 0x00, //JCorsair other?
+	0x25, 0x00, 0x00, 0x00, 0xa9, 0x00, 0x00, 0x00, 0x9f, 0x00, //JOnboard1
+	0x01, 0x00, 0x00, 0x00, 0x28, 0x00, 0x00, 0x00, 0x80, 0x00, //JOnboard2
+	0x01, 0x00, 0x00, 0x00, 0x28, 0x00, 0x00, 0x00, 0x80, 0x00, //JOnboard3
+	0x01, 0x00, 0x00, 0x00, 0x28, 0x00, 0x00, 0x00, 0x80, 0x00, //JOnboard4
+	0x01, 0x00, 0x00, 0x00, 0x28, 0x00, 0x00, 0x00, 0x80, 0x00, //JOnboard5
+	0x01, 0x00, 0x00, 0x00, 0x28, 0x00, 0x00, 0x00, 0x80, 0x00, //JOnboard6
+	0x01, 0x00, 0x00, 0x00, 0x28, 0x00, 0x00, 0x00, 0x80, 0x00, //JOnboard7
+	0x01, 0x00, 0x00, 0x00, 0x28, 0x00, 0x00, 0x00, 0x80, 0x00, //JOnboard8
+	0x01, 0x00, 0x00, 0x00, 0x28, 0x00, 0x00, 0x00, 0x80, 0x00, //JOnboard9
+	0x01, 0x00, 0x00, 0x00, 0x28, 0x00, 0x00, 0x00, 0x80, 0x00, //JOnboard10
+	0x01, 0x00, 0x00, 0x00, 0x2a, 0x00, 0x00, 0x00, 0x80, 0x00, //JRGB2
+	0x00 //Save Flag
+];
+
+const vZoneLedNames = 
+[
+	"Mainboard Led 1", "Mainboard Led 2", "Mainboard Led 3", "Mainboard Led 4", "Mainboard Led 5",
+	"Mainboard Led 6", "Mainboard Led 7", "Mainboard Led 8", "Mainboard Led 9", "Mainboard Led 10",
+];
+
+const vZoneLedPositions = [ [0, 0], [1, 0], [2, 0], [3, 0], [4, 0], [5, 0], [6, 0], [7, 0], [8, 0], [9, 0] ];
+
+const vZoneLedMap = [ 0, 1, 2, 3, 4, 5, 6, 7, 8, 9 ];
+
+const vLedNames = [ ];
+const vLedPositions = [ ];
+const PipeLEDArray = [ "Pipe LED 1", "Pipe LED 2" ];
+const RGBHeaderArray = [ "12v RGB Header 1", "12v RGB Header 2" ];
 
 const MSI_185_HEADER_OFFSET     = 0x00;
 const MSI_185_JRGB1_OFFSET      = 0x01;
@@ -112,7 +143,6 @@ const JPipeDict = [
 	MSI_185_JPIPE1_OFFSET,
 	MSI_185_JPIPE2_OFFSET
 ];
-
 const HeaderDict = [
 	MSI_185_JRGB1_OFFSET,
 	MSI_185_JRGB2_OFFSET
@@ -121,91 +151,201 @@ const ARGBHeaderDict = [
 	MSI_185_RAINBOW1_OFFSET,
 	MSI_185_RAINBOW2_OFFSET
 ];
-let JPipeHeaderArray = [
-	"jPipe Header 1",
-	"jPipe Header 2",
-];
+
+const CorsairDict = [
+	MSI_185_CORSAIR_OFFSET,
+	MSI_185_CORSAIR_BACKUP_OFFSET
+]
 
 let HeaderArray = [
 	"12v RGB Header 1",
 	"12v RGB Header 2",
 ];
+
+let CorsairArray = [
+	"Corsair",
+	"Corsair Outer",
+];
+
 let ARGBHeaderArray = [
 	"5v ARGB Header 1",
 	"5v ARGB Header 2",
 ];
-export function LedNames() {
+
+let JPipeHeaderArray = [
+	"Jpipe Led 1",
+	"Jpipe Led 2"
+];
+
+var PerLedSupport = false;
+
+const OnboardLEDArray = 
+[
+	"Mainboard Led 1", 
+	"Mainboard Led 2", 
+	"Mainboard Led 3", 
+	"Mainboard Led 4", 
+	"Mainboard Led 5",
+	"Mainboard Led 6", 
+	"Mainboard Led 7", 
+	"Mainboard Led 8", 
+	"Mainboard Led 9", 
+	"Mainboard Led 10",
+	"Mainboard Led 11",
+	"Mainboard Led 12",
+	"Mainboard Led 13",
+	"Mainboard Led 14",
+	"Mainboard Led 15",
+	"Mainboard Led 16",
+	"Mainboard Led 17",
+	"Mainboard Led 18",
+	"Mainboard Led 19",
+	"Mainboard Led 20"
+];
+
+export function LedNames() 
+{
+	if(PerLedSupport == true)
+	{
 	return vLedNames;
-}
-
-export function LedPositions() {
-	return vLedPositions;
-}
-
-function CheckPacketLength(){
-	let packet = [0x52];
-	packet = device.get_report(packet, 200);
-
-	return device.getLastReadSize();
-
-}
-
-function getZoneSlice(packet, zone, length = Zone_Length){
-	return packet.slice(zone, zone + length);
-}
-
-function SetZoneColor(packet, zone, colors){
-	//device.log(`Setting zone ${zone}`)
-	//device.log(getZoneSlice(packet, zone))
-	packet[zone + Zone_RED_Offset] = colors[0];
-	packet[zone + Zone_GREEN_Offset] = colors[1];
-	packet[zone + Zone_BLUE_Offset] = colors[2];
-	//device.log(getZoneSlice(packet, zone))
-}
-
-function LogPacket(packet){
-	device.log(`-----------------------------------`);
-	device.log(getZoneSlice(packet, MSI_185_HEADER_OFFSET, 1));
-	device.log(getZoneSlice(packet, MSI_185_JRGB1_OFFSET));
-	device.log(getZoneSlice(packet, MSI_185_JPIPE1_OFFSET));
-	device.log(getZoneSlice(packet, MSI_185_JPIPE2_OFFSET));
-	device.log(getZoneSlice(packet, MSI_185_RAINBOW1_OFFSET, 11));
-	device.log(getZoneSlice(packet, MSI_185_RAINBOW2_OFFSET, 11));
-	device.log(getZoneSlice(packet, MSI_185_CORSAIR_OFFSET, 11));
-	device.log(getZoneSlice(packet, MSI_185_CORSAIR_BACKUP_OFFSET));
-	device.log(getZoneSlice(packet, MSI_185_MAINBOARD_1_OFFSET));
-	device.log(getZoneSlice(packet, MSI_185_MAINBOARD_2_OFFSET));
-	device.log(getZoneSlice(packet, MSI_185_MAINBOARD_3_OFFSET));
-	device.log(getZoneSlice(packet, MSI_185_MAINBOARD_4_OFFSET));
-	device.log(getZoneSlice(packet, MSI_185_MAINBOARD_5_OFFSET));
-	device.log(getZoneSlice(packet, MSI_185_MAINBOARD_6_OFFSET));
-	device.log(getZoneSlice(packet, MSI_185_MAINBOARD_7_OFFSET));
-	device.log(getZoneSlice(packet, MSI_185_MAINBOARD_8_OFFSET));
-	device.log(getZoneSlice(packet, MSI_185_MAINBOARD_9_OFFSET));
-	device.log(getZoneSlice(packet, MSI_185_MAINBOARD_10_OFFSET));
-	device.log(getZoneSlice(packet, MSI_185_JRGB2_OFFSET));
-	device.log(getZoneSlice(packet, MSI_185_SAVE_FLAG, 1));
-
-}
-export function Initialize() {
-	CheckPacketLength();
-	CreateRGBHeaders();
-	CreateARGBHeaders();
-	CreateJPipeHeaders();
-}
-
-function CreateRGBHeaders(){
-	for(let header = 0; header < 2;header++){
-		//"Ch1 | Port 1"
-		device.createSubdevice(HeaderArray[header]);
-		// Parent Device + Sub device Name + Ports
-		device.setSubdeviceName(HeaderArray[header], `${ParentDeviceName} - ${HeaderArray[header]}`);
-		device.setSubdeviceImage(HeaderArray[header], Placeholder());
-		device.setSubdeviceSize(HeaderArray[header], 3, 3);
+	}
+	else
+	{
+	return vZoneLedNames;
 	}
 }
 
-function CreateARGBHeaders(){
+export function LedPositions() 
+{
+	if(PerLedSupport == true)
+	{
+	return vLedPositions;
+	}
+	else
+	{
+	return vZoneLedPositions;
+	}
+}
+
+export function Initialize() 
+{
+	CheckPacketLength();
+	SetupChannels(); //Create Component Channels
+	PerLEDInit(); //Turn on Per LED Mode
+	CreateLEDs(); //Create all of our LEDs
+	if(perledsupport != true)
+	{
+		createJPipeLEDs();
+		CreateARGBHeaders();
+		CreateLEDs();
+		createCorsairLEDs();
+	}
+}
+
+export function Render() 
+{
+	if(perledsupport == true || PerLedSupport == true)
+	{
+		sendARGB();
+	}
+	else
+	{
+		if(CheckPacketLength() != 185)
+		{
+			device.log("PACKET LENGTH ERROR. ABORTING RENDERING");
+	
+			return;
+		}
+		SetMainboardLeds();
+
+		SetRGBHeaderLeds();
+	
+		SetARGBHeaderLeds();
+
+		SetCorsairLeds();
+
+		SetJPipeHeaderLeds();
+	
+		device.send_report(configPacket, 185);
+	}
+}
+
+export function Shutdown() 
+{
+
+}
+
+export function onperledsupportChanged()
+{
+	device.repollLeds();
+	Initialize();
+}
+
+export function onOnboardLEDsChanged()
+{
+	if(perledsupport == true)
+	{
+	CreateLEDs();
+	}
+}
+
+export function onPipeLEDsChanged()
+{
+	if(perledsupport == true)
+	{
+	CreateLEDs();
+	}
+}
+
+export function onRGBHeadersChanged()
+{
+	if(perledsupport == true)
+	{
+	CreateLEDs();
+	}
+}
+
+function createCorsairLEDs()
+{
+	for(let CorsairHeaders = 0; CorsairHeaders < 2;CorsairHeaders++)
+	{
+		device.removeSubdevice(CorsairArray[CorsairHeaders]);
+	}
+	for(let CorsairHeaders = 0; CorsairHeaders < 2;CorsairHeaders++)
+	{
+		device.createSubdevice(CorsairArray[CorsairHeaders]);
+		// Parent Device + Sub device Name + Ports
+		device.setSubdeviceName(CorsairArray[CorsairHeaders], `${ParentDeviceName} - ${CorsairArray[CorsairHeaders]}`);
+		device.setSubdeviceImage(CorsairArray[CorsairHeaders], Placeholder());
+		device.setSubdeviceSize(CorsairArray[CorsairHeaders], 3, 3);
+	}
+}
+
+function createJPipeLEDs()
+{
+	for(let PipeNumber = 0; PipeNumber < 2;PipeNumber++)
+	{
+		device.removeSubdevice(JPipeHeaderArray[PipeNumber]);
+	}
+	for(let PipeNumber = 0; PipeNumber < 2;PipeNumber++)
+	{
+		device.createSubdevice(JPipeHeaderArray[PipeNumber]);
+		// Parent Device + Sub device Name + Ports
+		device.setSubdeviceName(JPipeHeaderArray[PipeNumber], `${ParentDeviceName} - ${JPipeHeaderArray[PipeNumber]}`);
+		device.setSubdeviceImage(JPipeHeaderArray[PipeNumber], Placeholder());
+		device.setSubdeviceSize(JPipeHeaderArray[PipeNumber], 3, 3);
+	}
+}
+
+function CreateARGBHeaders()
+{
+
+	for(let header = 0; header < 2;header++)
+	{
+		device.removeSubdevice(ARGBHeaderArray[header]);
+	}
+	if(perledsupport != true)
+	{
 	for(let header = 0; header < 2;header++){
 		//"Ch1 | Port 1"
 		device.createSubdevice(ARGBHeaderArray[header]);
@@ -214,23 +354,33 @@ function CreateARGBHeaders(){
 		device.setSubdeviceImage(ARGBHeaderArray[header], Placeholder());
 		device.setSubdeviceSize(ARGBHeaderArray[header], 3, 3);
 	}
-}
-
-function CreateJPipeHeaders(){
-	for(let header = 0; header < 2;header++){
-		//"Ch1 | Port 1"
-		device.createSubdevice(JPipeHeaderArray[header]);
-		// Parent Device + Sub device Name + Ports
-		device.setSubdeviceName(JPipeHeaderArray[header], `${ParentDeviceName} - ${JPipeHeaderArray[header]}`);
-		device.setSubdeviceImage(JPipeHeaderArray[header], Placeholder());
-		device.setSubdeviceSize(JPipeHeaderArray[header], 3, 3);
 	}
 }
 
-function SetMainboardLeds(shutdown = false) {
-	for(let iIdx = 0; iIdx < vLedMap.length; iIdx++) {
-		let iPxX = vLedPositions[iIdx][0];
-		let iPxY = vLedPositions[iIdx][1];
+function CheckPacketLength()
+{
+	let packet = [0x52];
+	packet = device.get_report(packet, 200);
+
+	return device.getLastReadSize();
+
+}
+
+function SetZoneColor(packet, zone, colors)
+{
+	//device.log(`Setting zone ${zone}`)
+	//device.log(getZoneSlice(packet, zone))
+	packet[zone + Zone_RED_Offset] = colors[0];
+	packet[zone + Zone_GREEN_Offset] = colors[1];
+	packet[zone + Zone_BLUE_Offset] = colors[2];
+	//device.log(getZoneSlice(packet, zone))
+}
+
+function SetMainboardLeds(shutdown = false) 
+{
+	for(let iIdx = 0; iIdx < vZoneLedMap.length; iIdx++) {
+		let iPxX = vZoneLedPositions[iIdx][0];
+		let iPxY = vZoneLedPositions[iIdx][1];
 		var col;
 
 		if(shutdown){
@@ -245,7 +395,25 @@ function SetMainboardLeds(shutdown = false) {
 	}
 }
 
-function SetRGBHeaderLeds(shutdown = false){
+function SetCorsairLeds(shutdown = false) 
+{
+	for(let iIdx = 0; iIdx < CorsairArray.length; iIdx++) {
+		var col;
+
+		if(shutdown){
+			col = hexToRgb(shutdownColor);
+		}else if (LightingMode === "Forced") {
+			col = hexToRgb(forcedColor);
+		}else{
+			col = device.subdeviceColor(CorsairArray[iIdx], 1, 1);
+		}
+
+		SetZoneColor(configPacket, CorsairDict[iIdx], col);
+	}
+}
+
+function SetRGBHeaderLeds(shutdown = false)
+{
 
 	for(let iIdx = 0; iIdx < HeaderArray.length; iIdx++) {
 		var col;
@@ -295,44 +463,184 @@ function  SetJPipeHeaderLeds(shutdown = false){
 }
 
 var configPacket = initialPacket.slice();
-export function Render() {
-	if(CheckPacketLength() != 185){
-		device.log("PACKET LENGTH ERROR. ABORTING RENDERING");
 
-		return;
+function CreateLEDs()
+{
+	for(let OnboardNumber = 0; OnboardNumber < 15;OnboardNumber++)
+	{
+		device.removeSubdevice(OnboardLEDArray[OnboardNumber]);
+	}
+	for(let OnboardNumber = 0; OnboardNumber < OnboardLEDs;OnboardNumber++)
+	{
+		device.createSubdevice(OnboardLEDArray[OnboardNumber]);
+		// Parent Device + Sub device Name + Ports
+		device.setSubdeviceName(OnboardLEDArray[OnboardNumber], `${ParentDeviceName} - ${OnboardLEDArray[OnboardNumber]}`);
+		device.setSubdeviceImage(OnboardLEDArray[OnboardNumber], Placeholder());
+		device.setSubdeviceSize(OnboardLEDArray[OnboardNumber], 3, 3);
+	}
+	
+	for(let RGBHeaderNumber = 0; RGBHeaderNumber < 2;RGBHeaderNumber++)
+	{
+		device.removeSubdevice(RGBHeaderArray[RGBHeaderNumber]);
+	}
+	for(let RGBHeaderNumber = 0; RGBHeaderNumber < RGBHeaders;RGBHeaderNumber++)
+	{
+		device.createSubdevice(RGBHeaderArray[RGBHeaderNumber]);
+		// Parent Device + Sub device Name + Ports
+		device.setSubdeviceName(RGBHeaderArray[RGBHeaderNumber], `${ParentDeviceName} - ${RGBHeaderArray[RGBHeaderNumber]}`);
+		device.setSubdeviceImage(RGBHeaderArray[RGBHeaderNumber], Placeholder());
+		device.setSubdeviceSize(RGBHeaderArray[RGBHeaderNumber], 3, 3);
+	}
+	
+}
+
+function GrabOnboardLEDs(iIdx, shutdown = false)
+{
+	var col;
+
+	if(shutdown)
+	{
+		col = hexToRgb(shutdownColor);
+	}
+	else if (LightingMode == "Forced") 
+	{
+		col = hexToRgb(forcedColor);
+	}
+	else
+	{
+		col = device.subdeviceColor(OnboardLEDArray[iIdx], 1, 1);
+	}
+	return col;
+}
+
+function GrabRGBHeaders(iIdx, shutdown = false)
+{
+	var col;
+
+	if(shutdown)
+	{
+		col = hexToRgb(shutdownColor);
+	}
+	else if (LightingMode == "Forced") 
+	{
+		col = hexToRgb(forcedColor);
+	}
+	else
+	{
+		col = device.subdeviceColor(RGBHeaderArray[iIdx], 1, 1);
+	}
+	return col;
+}
+
+function grabRGBData(Channel)
+{
+    let ChannelLedCount = device.channel(ChannelArray[Channel][0]).ledCount;
+	let componentChannel = device.channel(ChannelArray[Channel][0]);
+
+	let RGBData = [];
+
+	if(LightingMode === "Forced"){
+		RGBData = device.createColorArray(forcedColor, ChannelLedCount, "Inline");
+
+	}else if(componentChannel.shouldPulseColors())
+    {
+		ChannelLedCount = 40;
+
+		let pulseColor = device.getChannelPulseColor(ChannelArray[Channel][0], ChannelLedCount);
+		RGBData = device.createColorArray(pulseColor, ChannelLedCount, "Inline");
+
+	}else{
+		RGBData = device.channel(ChannelArray[Channel][0]).getColors("Inline");
 	}
 
-	SetMainboardLeds();
-
-	SetRGBHeaderLeds();
-
-	SetARGBHeaderLeds();
-
-	SetJPipeHeaderLeds();
-
-	//LogPacket(configPacket)
-
-	device.send_report(configPacket, 185);
+    return RGBData.concat(new Array(120 - RGBData.length).fill(0));
 }
 
-
-export function Shutdown() {
-
+function isperled() //Checks per led based upon whether that's what's in the buffer?
+{
+	let packet = [0x53];
+	let returnpacket = device.read(packet,64);
+	device.log(returnpacket);
 }
 
-function sendPacketString(string, size){
-	let packet= [];
-	let data = string.split(' ');
+function PerLEDInit()
+{
+	device.send_report(perledpacket,185);
+}
 
-	for(let i = 0; i < data.length; i++){
-		packet[i] = parseInt(data[i], 16);
+var OnboardLEDData = [];
+var RGBHeaderData = [];
+
+function grabLEDs()
+{
+	OnboardLEDData = [];
+	RGBHeaderData = [];
+
+	for(let iIdx = 0; iIdx < OnboardLEDs; iIdx++) 
+	{
+		OnboardLEDData.push(...GrabOnboardLEDs(iIdx));
 	}
-
-	device.write(packet, size);
+	for(let iIdx = 0; iIdx < RGBHeaders; iIdx++) 
+	{
+		RGBHeaderData.push(...GrabRGBHeaders(iIdx));
+	}
 }
-export function Validate(endpoint) {
+
+function sendARGB()
+{
+	grabLEDs();
+
+	let JRainbow1RGBData = grabRGBData(0);
+	let JRainbow2RGBData = grabRGBData(1);
+	let JRainbow3RGBData = grabRGBData(2);
+
+	let packet = [];
+	packet[0] = 0x53;
+	packet[1] = 0x25;
+	packet[2] = 0x06;
+	packet[3] = 0x00;
+	packet[4] = 0x00;
+	packet.push(...OnboardLEDData.splice(0,3*OnboardLEDs));//This can be anywhere from 0 to 42
+	packet.push(...RGBHeaderData.splice(0,3*RGBHeaders));
+	packet.push(...JRainbow1RGBData.splice(0,120));
+	packet.push(...JRainbow2RGBData.splice(0,120));
+	packet.push(...JRainbow3RGBData.splice(0,120));
+
+	device.send_report(packet,725);
+}
+
+function hexToRgb(hex) 
+{
+	let result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+	let colors = [];
+	colors[0] = parseInt(result[1], 16);
+	colors[1] = parseInt(result[2], 16);
+	colors[2] = parseInt(result[3], 16);
+
+	return colors;
+}
+
+function SetupChannels() 
+{
+	device.SetLedLimit(DeviceMaxLedLimit);
+
+	for(let i = 0; i < ChannelArray.length; i++) 
+	{
+		device.addChannel(ChannelArray[i][0], ChannelArray[i][1]);
+	}
+}
+
+function DeleteChannels() 
+{
+	for(let i = 0; i < ChannelArray.length; i++) 
+	{
+		device.removeChannel(ChannelArray[i][0], ChannelArray[i][1]);
+	}
+}
+
+export function Validate(endpoint) 
+{
 	return endpoint.interface === 2 | -1;
-
 }
 
 export function Image() {
