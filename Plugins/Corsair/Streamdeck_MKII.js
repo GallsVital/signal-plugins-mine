@@ -1,7 +1,7 @@
 /* eslint-disable brace-style */
 export function Name() { return "Elgato Streamdeck"; }
 export function VendorId() { return 0x0fd9; }
-export function ProductId() { return 0x006d; }
+export function ProductId() { return 0x0080; }
 export function Publisher() { return "WhirlwindFX"; }
 export function Size() { return [5, 3]; }
 export function DefaultPosition(){return [240, 120];}
@@ -42,6 +42,11 @@ export function Initialize()
 export function Render()
 {
 	colorgrabber();
+}
+
+export function onbrightnessChanged()
+{
+	setBrightness();
 }
 
 function makeHexString(ColorArray)

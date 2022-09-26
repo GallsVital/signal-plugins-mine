@@ -244,7 +244,7 @@ function DetectInputs()
 		do
     	{
     	let packet = [];
-    	packet = device.read([0x00],9, 5);
+    	packet = device.read([0x00],9, 10);
     	let input = ProcessInputs(packet);
 		
 		if(input == "DPI_UP")
@@ -269,100 +269,110 @@ function DetectInputs()
 
     	}
     	while(device.getLastReadSize() > 0)
+}
 
-	do
-	{
-	let packet = device.read([0x00],7, 3);
-
-		if(packet[0] == Logitech.ShortMessage && packet[1] == Logitech.ConnectionMode && packet[2] == 0x41 && packet[3] == 0x0C && packet[6] == 0x40)
-		{
-		device.log("Mouse Going to Sleep");
-		return Sleep = true;
-		}
+function PrintBitmask16(byte)
+{
+	var sOut = ""
+	for(var idx = 15; idx >= 0; idx--){
+		var msk = byte >> idx;
+		if (msk & 0x01) sOut += "1";
+		else sOut += "0";
 	}
-	while(device.getLastReadSize() > 0)
+	device.log(sOut);
 }
 
 function ProcessInputs(packet)
 {
 	if(packet[0] == Logitech.LongMessage && packet[1] == Logitech.ConnectionMode && packet[2] == Logitech.FeatureIDs.ButtonSpyID)
 	{
+		var value = packet[4];
+	value <<= 8;
+	value |= packet[5]
+	PrintBitmask16(value);
     	if(packet[4] == 0x01)
 		{
-		device.log(Logitech.ButtonMaps[Logitech.Config.MouseBodyStyle]["button7"]);
-		return Logitech.ButtonMaps[Logitech.Config.MouseBodyStyle]["button7"];
+			device.log(Logitech.ButtonMaps[Logitech.Config.MouseBodyStyle]["button7"]);
+			return Logitech.ButtonMaps[Logitech.Config.MouseBodyStyle]["button7"];
 		}
+
 		if(packet[4] == 0x02)
 		{
-		device.log(Logitech.ButtonMaps[Logitech.Config.MouseBodyStyle]["button10"]);
-		return Logitech.ButtonMaps[Logitech.Config.MouseBodyStyle]["button10"];
+			device.log(Logitech.ButtonMaps[Logitech.Config.MouseBodyStyle]["button10"]);
+			return Logitech.ButtonMaps[Logitech.Config.MouseBodyStyle]["button10"];
 		}
+
     	if(packet[4] == 0x04)
 		{
-		device.log(Logitech.ButtonMaps[Logitech.Config.MouseBodyStyle]["button11"]);
-		return Logitech.ButtonMaps[Logitech.Config.MouseBodyStyle]["button11"];
+			device.log(Logitech.ButtonMaps[Logitech.Config.MouseBodyStyle]["button11"]);
+			return Logitech.ButtonMaps[Logitech.Config.MouseBodyStyle]["button11"];
 		}
+
 		if(packet[5] == 0x01)
 		{
-		device.log(Logitech.ButtonMaps[Logitech.Config.MouseBodyStyle]["button1"]);
-		return Logitech.ButtonMaps[Logitech.Config.MouseBodyStyle]["button1"];
+			device.log(Logitech.ButtonMaps[Logitech.Config.MouseBodyStyle]["button1"]);
+			return Logitech.ButtonMaps[Logitech.Config.MouseBodyStyle]["button1"];
 		}
+
     	if(packet[5] == 0x02)
 		{
-		device.log(Logitech.ButtonMaps[Logitech.Config.MouseBodyStyle]["button2"]);
-		return Logitech.ButtonMaps[Logitech.Config.MouseBodyStyle]["button2"];
+			device.log(Logitech.ButtonMaps[Logitech.Config.MouseBodyStyle]["button2"]);
+			return Logitech.ButtonMaps[Logitech.Config.MouseBodyStyle]["button2"];
 		}
+
 		if(packet[5] == 0x04)
 		{
-		device.log(Logitech.ButtonMaps[Logitech.Config.MouseBodyStyle]["button3"]);
-		return Logitech.ButtonMaps[Logitech.Config.MouseBodyStyle]["button3"];
+			device.log(Logitech.ButtonMaps[Logitech.Config.MouseBodyStyle]["button3"]);
+			return Logitech.ButtonMaps[Logitech.Config.MouseBodyStyle]["button3"];
 		}
+
 		if(packet[5] == 0x08)
 		{
-		device.log(Logitech.ButtonMaps[Logitech.Config.MouseBodyStyle]["button4"]);
-		return Logitech.ButtonMaps[Logitech.Config.MouseBodyStyle]["button4"];
+			device.log(Logitech.ButtonMaps[Logitech.Config.MouseBodyStyle]["button4"]);
+			return Logitech.ButtonMaps[Logitech.Config.MouseBodyStyle]["button4"];
 		}
+
 		if(packet[5] == 0x10)
 		{
-		device.log(Logitech.ButtonMaps[Logitech.Config.MouseBodyStyle]["button5"]);
-		return Logitech.ButtonMaps[Logitech.Config.MouseBodyStyle]["button5"];
+			device.log(Logitech.ButtonMaps[Logitech.Config.MouseBodyStyle]["button5"]);
+			return Logitech.ButtonMaps[Logitech.Config.MouseBodyStyle]["button5"];
 		}
+
 		if(packet[5] == 0x20)
 		{
-		device.log(Logitech.ButtonMaps[Logitech.Config.MouseBodyStyle]["button6"]);
-		return Logitech.ButtonMaps[Logitech.Config.MouseBodyStyle]["button6"];
+			device.log(Logitech.ButtonMaps[Logitech.Config.MouseBodyStyle]["button6"]);
+			return Logitech.ButtonMaps[Logitech.Config.MouseBodyStyle]["button6"];
 		}
+
 		if(packet[5] == 0x40)
 		{
-		device.log(Logitech.ButtonMaps[Logitech.Config.MouseBodyStyle]["button9"]);
-		return Logitech.ButtonMaps[Logitech.Config.MouseBodyStyle]["button9"];
+			device.log(Logitech.ButtonMaps[Logitech.Config.MouseBodyStyle]["button9"]);
+			return Logitech.ButtonMaps[Logitech.Config.MouseBodyStyle]["button9"];
 		}
+
 		if(packet[5] == 0x80)
 		{
-		device.log(Logitech.ButtonMaps[Logitech.Config.MouseBodyStyle]["button8"]);
-	 
-		return Logitech.ButtonMaps[Logitech.Config.MouseBodyStyle]["button8"];
-
+			device.log(Logitech.ButtonMaps[Logitech.Config.MouseBodyStyle]["button8"]);
+			return Logitech.ButtonMaps[Logitech.Config.MouseBodyStyle]["button8"];
 		}
+
 		if(packet[5] == 0x00 && Sniper == true)
 		{
-		device.log("Sniper Button Depressed");
-		Sniper = false;
+			device.log("Sniper Button Depressed");
+			Sniper = false;
 		
-		if(DpiControl)
-		{
-		Logitech.setDpi(DPIStageDict[DPIStage]());
-		Logitech.SetDPILights(DPIStage);
+			if(DpiControl)
+			{
+				Logitech.setDpi(DPIStageDict[DPIStage]());
+				Logitech.SetDPILights(DPIStage);
+			}
 		}
 	}
-
 	if(packet[0] == Logitech.LongMessage && packet[1] == Logitech.ConnectionMode && packet[2] == 0x06 && packet[3] == 0x00 && packet[6] == 0x00)
 	{
-	device.log("Waking From Sleep");
-	device.pause(5000); //Wait five seconds before Handoff. Allows device boot time.
-	Initialize();
-	return Sleep = false;
-	}
+		device.log("Waking From Sleep");
+		device.pause(5000); //Wait five seconds before Handoff. Allows device boot time.
+		Initialize();
 	}
 }
 
