@@ -6,6 +6,12 @@ export function Size() { return [1, 1]; }
 export function Type() { return "Hid"; }
 export function DefaultPosition(){ return [0, 0]; }
 export function DefaultScale(){ return 1.0; }
+/* global
+monitorSelected:readonly
+shutdownColor:readonly
+LightingMode:readonly
+forcedColor:readonly
+*/
 export function ControllableParameters() {
     return [
 		{ "property":"monitorSelected", "group":"", "label":"Monitor Selected", "type":"combobox", "values":["MAG272CR", "MAG272CQR", "MAG273R2", "MAG274QRFQD", "MAG301CR2" ], "default":"MAG274QRFQD" },

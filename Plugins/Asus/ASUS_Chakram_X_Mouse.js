@@ -6,6 +6,11 @@ export function Documentation(){ return "troubleshooting/asus"; }
 export function Size() { return [3, 4]; }
 export function DefaultPosition() {return [225, 120]; }
 export function DefaultScale(){return 10.0;}
+/* global
+shutdownColor:readonly
+LightingMode:readonly
+forcedColor:readonly
+*/
 export function ControllableParameters(){
 	return [
 		{"property":"shutdownColor", "group":"lighting", "label":"Shutdown Color", "min":"0", "max":"360", "type":"color", "default":"009bde"},

@@ -25,6 +25,7 @@ shutdownColor:readonly
 LightingMode:readonly
 forcedColor:readonly
 DpiControl:readonly
+dpistages:readonly
 dpi1:readonly
 dpi2:readonly
 dpi3:readonly

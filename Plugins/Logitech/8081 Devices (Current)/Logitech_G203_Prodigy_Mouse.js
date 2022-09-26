@@ -11,7 +11,17 @@ shutdownColor:readonly
 LightingMode:readonly
 forcedColor:readonly
 DpiControl:readonly
+dpistages:readonly
 dpi1:readonly
+dpi2:readonly
+dpi3:readonly
+dpi4:readonly
+dpi5:readonly
+dpi6:readonly
+DpiLight:readonly
+OnboardState:readonly
+DPIRollover:readonly
+pollingrate:readonly
 */
 export function ControllableParameters(){
 	return [
