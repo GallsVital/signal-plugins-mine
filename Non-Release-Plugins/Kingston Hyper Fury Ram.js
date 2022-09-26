@@ -93,7 +93,8 @@ function CheckForHyperFuryRam(bus, addr){
         let iRet3 = bus.ReadByte(SubAddresses[1], 0x27)
         bus.log(`Address [${SubAddresses[1]}], Reg 27: ${iRet3}`)
 
-        return iRet1 === iRet2 && iRet2 == iRet3 && iRet3 == 120;
+		let ExpectedValues = [120, 220];
+		return ExpectedValues.includes(iRet1) && ExpectedValues.includes(iRet2) && ExpectedValues.includes(iRet3);
     }
 
     return false;
@@ -145,7 +146,13 @@ function WriteRGBData(RGBData){
 	
     for(let i = 0; i < RGBData.length; i++){
 		if(RGBData[i] != OldRGBData[i]){
-        	bus.WriteByte(0x50 + i, RGBData[i]);
+			let returnCode = bus.WriteByte(0x50 + i, RGBData[i]);
+			let retryCount = 4;
+			while(returnCode != 0 && retryCount > 0){
+				retryCount -= 1;
+				device.pause(1);
+				returnCode = bus.WriteByte(0x50 + i, RGBData[i]);
+			}
 		}
     }
 
