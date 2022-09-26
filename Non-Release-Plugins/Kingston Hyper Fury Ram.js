@@ -133,6 +133,7 @@ function SendColors(shutdown = false){
  	}
     WriteRGBData(RGBData);
 }
+
 let OldRGBData = []
 function WriteRGBData(RGBData){
 	let start = Date.now();
@@ -143,7 +144,7 @@ function WriteRGBData(RGBData){
     bus.WriteByte(0x27, 0x02);
 	
     for(let i = 0; i < RGBData.length; i++){
-		if(RGBData[i] != OldRGBData[i] && Math.abs(RGBData[i] - OldRGBData[i]) > 20){
+		if(RGBData[i] != OldRGBData[i]){
         	bus.WriteByte(0x50 + i, RGBData[i]);
 		}
     }
