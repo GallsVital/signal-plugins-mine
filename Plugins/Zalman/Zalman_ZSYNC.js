@@ -120,7 +120,7 @@ function SendChannel(Channel) {
 
 	//Stream RGB Data
 	let ledsSent = 0;
-	ChannelLedCount = ChannelLedCount >= 24 ? 24 : ChannelLedCount;
+	ChannelLedCount = ChannelLedCount >= 40 ? 40 : ChannelLedCount;
 
 	while(ChannelLedCount > 0){
 		let ledsToSend = ChannelLedCount >= 50 ? 50 : ChannelLedCount;

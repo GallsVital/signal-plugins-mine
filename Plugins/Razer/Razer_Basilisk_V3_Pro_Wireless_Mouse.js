@@ -35,7 +35,7 @@ export function ControllableParameters()
 		{"property":"shutdownColor", "group":"lighting", "label":"Shutdown Color", "min":"0", "max":"360", "type":"color", "default":"009bde"},
 		{"property":"LightingMode", "group":"lighting", "label":"Lighting Mode", "type":"combobox", "values":["Canvas", "Forced"], "default":"Canvas"},
 		{"property":"forcedColor", "group":"lighting", "label":"Forced Color", "min":"0", "max":"360", "type":"color", "default":"009bde"},
-		{"property":"SleepMode", "group":"lighting", "label":"Wireless Power Saving","step":"60", "type":"number","min":"60", "max":"900","default":"300", "tooltip":"Enter sleep mode if idle for (seconds)"},
+		{"property":"SleepMode", "group":"lighting", "label":"Wireless Power Saving","step":"1", "type":"number","min":"1", "max":"15","default":"5", "tooltip":"Enter sleep mode if idle for (minutes)"},
 		{"property":"LowPower", "group":"lighting", "label":"Low Power Mode","step":"5", "type":"number","min":"5", "max":"100","default":"30", "tooltip":"When wireless, enter Low Power Mode if the battery level is below (%)"},
 		{"property":"DpiControl", "group":"mouse", "label":"Enable Dpi Control", "type":"boolean", "default":"false"},
 		{"property":"DPIRollover", "group":"mouse", "label":"DPI Stage Rollover","type":"boolean","default": "false"},
@@ -56,6 +56,8 @@ export function ControllableParameters()
 }
 
 let transactionID = 0x1f;
+let savedPollTimer = Date.now();
+let PollModeInternal = 60000;
 
 let vLedNames = ["Logo", "Scrollwheel", "UnderLeft1", "UnderLeft2", "UnderLeft3", "UnderLeft4", "UnderLeft5", "UnderBottom", "UnderRight1", "UnderRight2", "UnderRight3", "UnderRight4", "UnderRight5"];
 
@@ -74,8 +76,11 @@ export function LedPositions()
 export function Initialize()
 {
 	device.set_endpoint(0,0x0002,0x0001);
+	device.addFeature("battery");
 
 	getDeviceMode();
+	getDeviceBatteryStatus();
+	getDeviceChargingStatus();
 	getDeviceFirmwareVersion();
 	getDeviceSerial();
 
@@ -96,7 +101,8 @@ export function Initialize()
 export function Render() 
 {
 	setDeviceColor();
-
+	
+	getDeviceBatteryStatus();
 	detectInputs();
 }
 
@@ -234,7 +240,7 @@ function getDeviceMode()
 {
 	let packet = [0x00,0x00,transactionID,0x00,0x00,0x00,0x02,0x00,0x84];
 	packetSend(packet,91);
-
+	device.pause(10);
 	let returnpacket = device.get_report(packet,91);
 	returnpacket = device.get_report(packet,91);
 	let deviceMode = returnpacket[9];
@@ -257,11 +263,51 @@ function setDeviceMode(mode)
 	returnpacket = device.get_report(packet,91);
 }
 
+function getDeviceChargingStatus()
+{
+	let packet = [0x00,0x00,transactionID,0x00,0x00,0x00,0x02,0x07,0x84];
+	packetSend(packet,91);
+	device.pause(9);
+	let returnpacket = device.get_report(packet,91);
+	returnpacket = device.get_report(packet,91);
+	let batteryStatus = returnpacket[10];
+	device.log("Charging Status: " + batteryStatus);
+	return batteryStatus+1;
+}
+
+function getDeviceBatteryLevel()
+{
+	let packet = [0x00,0x00,transactionID,0x00,0x00,0x00,0x02,0x07,0x80];
+	packetSend(packet,91);
+	device.pause(9);
+	let returnpacket = device.get_report(packet,91);
+	returnpacket = device.get_report(packet,91);
+	let batteryLevel = Math.floor(((returnpacket[10])*100)/255);
+	device.log("Device Battery Level: " + batteryLevel);
+
+	return batteryLevel;
+}
+
+function getDeviceBatteryStatus()
+{
+	if (Date.now() - savedPollTimer < PollModeInternal) 
+    {
+        return
+    }
+    savedPollTimer = Date.now();
+
+	let battstatus = getDeviceChargingStatus();
+	let battlevel = getDeviceBatteryLevel();
+
+	battery.setBatteryState(battstatus)
+	battery.setBatteryLevel(battlevel);
+}
+
 function getDeviceSerial()
 {
 	let packet = [0x00,0x00,transactionID,0x00,0x00,0x00,0x16,0x00,0x82];
 	packetSend(packet,91);
-
+	device.pause(9);
 	let returnpacket = device.get_report(packet,91);
 	returnpacket = device.get_report(packet,91);
 	let Serialpacket = returnpacket.slice(9,24);
@@ -273,7 +319,7 @@ function getDeviceFirmwareVersion()
 {
 	let packet = [0x00,0x00,transactionID,0x00,0x00,0x00,0x02,0x00,0x81];
 	packetSend(packet,91);
-
+	device.pause(9);
 	let returnpacket = device.get_report(packet,91);
 	returnpacket = device.get_report(packet,91);
 	let FirmwareByte1 = returnpacket[9];
@@ -319,10 +365,16 @@ function setDeviceSmartReel()
 
 function setDeviceSleepMode()
 {
-	let packet = [0x00, 0x00, transactionID, 0x00, 0x00, 0x00, 0x02, 0x07, 0x03, Math.floor(SleepMode/256), SleepMode%256];
+	let packet = [0x00, 0x00, transactionID, 0x00, 0x00, 0x00, 0x02, 0x07, 0x03, Math.floor((SleepMode*60)/256), (SleepMode*60)%256];
 	packetSend(packet,91);
 	device.pause(1);
 	packetSend(packet,91);
+	device.pause(1)
+	let returnpacket = device.get_report(packet,91);
+	returnpacket = device.get_report(packet,91);
+	let SleepModeByte1 = returnpacket[9];
+	let SleepModeByte2 = returnpacket[10];
+	device.log("Sleep Mode set to: " + parseInt ("0"+SleepModeByte1.toString(16).slice(-2) + ("00"+SleepModeByte2.toString(16)).slice(-2), 16)/60 + " minutes");
 }
 
 function setDeviceLowPower()
