@@ -1121,7 +1121,7 @@ function hexToRgb(hex)
 	 data  = data || [0x00, 0x00, 0x00];
 	 packet.push(...data);
 	 device.write(packet, 7);
-	 device.pause(1);
+	 device.pause(5);
 	 packet = device.read(packet,7);
  
 	 return packet.slice(3,7);
@@ -1134,7 +1134,7 @@ function hexToRgb(hex)
 	 data  = data || [0x00, 0x00, 0x00];
 	 packet.push(...data);
 	 device.write(packet, 7);
-	 device.pause(1);
+	 device.pause(5);
 	 packet = device.read(packet,7);
  
 	 return packet.slice(3,7);
@@ -1157,6 +1157,7 @@ function hexToRgb(hex)
 	 data = data || [0x00, 0x00, 0x00];
 	 packet.push(...data);
 	 device.write(packet, 20);
+	 device.pause(5);
 	 packet = device.read(packet,20);
 	 
 	 return packet.slice(4,20);
