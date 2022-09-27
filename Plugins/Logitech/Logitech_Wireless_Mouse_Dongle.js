@@ -1033,7 +1033,7 @@ function hexToRgb(hex)
 	 data  = data || [0x00, 0x00, 0x00];
 	 packet.push(...data);
 	 device.write(packet, 7);
-	 device.pause(1);
+	 device.pause(5);
 	 packet = device.read(packet,7);
  
 	 return packet.slice(3,7);
@@ -1046,7 +1046,7 @@ function hexToRgb(hex)
 	 data  = data || [0x00, 0x00, 0x00];
 	 packet.push(...data);
 	 device.write(packet, 7);
-	 device.pause(1);
+	 device.pause(5);
 	 packet = device.read(packet,7);
  
 	 return packet.slice(3,7);
@@ -1069,6 +1069,7 @@ function hexToRgb(hex)
 	 data = data || [0x00, 0x00, 0x00];
 	 packet.push(...data);
 	 device.write(packet, 20);
+	 device.pause(5);
 	 packet = device.read(packet,20);
 	 
 	 return packet.slice(4,20);
@@ -1307,8 +1308,8 @@ function hexToRgb(hex)
 		 }
 	 else
 		 {
-		 //let ButtonPacket = [this.FeatureIDs.ButtonSpyID, 0x40, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08, 0x08, 0x0a, 0x0b, 0x0c];
-		 let ButtonPacket = [this.FeatureIDs.ButtonSpyID, 0x40];
+		 let ButtonPacket = [this.FeatureIDs.ButtonSpyID, 0x40, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08, 0x08, 0x0a, 0x0b, 0x0c];
+		 //let ButtonPacket = [this.FeatureIDs.ButtonSpyID, 0x40];
 		 this.SendLongMessage(ButtonPacket);
 		 }
 	 }
