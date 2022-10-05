@@ -13,7 +13,7 @@ export function ControllableParameters()
 		{"property":"LightingMode", "group":"lighting", "label":"Lighting Mode", "type":"combobox", "values":["Canvas", "Forced"], "default":"Canvas"},
 		{"property":"forcedColor", "group":"lighting", "label":"Forced Color", "min":"0", "max":"360", "type":"color", "default":"009bde"},
 		{"property":"SettingControl", "group":"mouse", "label":"Enable Setting Control", "type":"boolean", "default":"false"},
-		{"property":"angleSnapping", "group":"mouse", "label":"angle snapping", "type":"boolean", "default":"false"},
+		{"property":"angleSnapping", "group":"mouse", "label":"Angle snapping", "type":"boolean", "default":"false"},
 		{"property":"mousePolling", "group":"mouse", "label":"Polling Rate", "type":"combobox", "values":["125Hz", "250Hz", "500Hz", "1000Hz"], "default":"500Hz"},
         {"property":"sleepTimeout", "group":"mouse", "label":"Sleep Mode Timeout (Minutes)", "type":"combobox", "values":["1", "2", "3", "5", "10", "Never"], "default":"5"},
         {"property":"lowPowerPercentage", "group":"mouse", "label":"Low Battery Warning Percentage", "type":"combobox", "values":["Never", "10%", "15%", "20%", "25%", "30%"], "default":"20%"},
@@ -69,11 +69,8 @@ export function LedPositions()
 
 export function Initialize() 
 {
-	if(SettingControl)
-    {
-		sendMouseSettings();
-        sendLightingSettings();
-	}
+	sendMouseSettings();
+    sendLightingSettings();
 	directLightingMode();
 }
 
@@ -85,6 +82,42 @@ export function Render()
 export function Shutdown() 
 {
     sendColors(true);
+}
+
+export function ondpi1Changed()
+{
+	sendMouseSettings();
+}
+
+export function ondpi2Changed()
+{
+	sendMouseSettings();
+}
+
+export function ondpi3Changed()
+{
+	sendMouseSettings();
+}
+
+export function ondpi4Changed()
+{
+	sendMouseSettings();
+}
+
+export function onmousePollingChanged()
+{
+	sendMouseSettings();
+}
+
+export function onangleSnappingChanged()
+{
+	sendMouseSettings();
+}
+
+export function onSettingControlChanged()
+{
+	sendMouseSettings();
+	sendLightingSettings();
 }
 
 function directLightingMode()
@@ -156,22 +189,27 @@ function sendColorsFlash(shutdown = false)
 
 function sendMouseSettings()
 {
-	sendPacketString(`00 51 31 06 00 ${angleSnapping ? "01" : "00"}`, 65);
-	sendPacketString(`00 51 31 04 00 ${pollingDict[mousePolling].toString(16)}`, 65);
-	sendPacketString(`00 51 31 00 00 ${(dpi1/100 + 1).toString(16)}`, 65);
-	sendPacketString(`00 51 31 01 00 ${(dpi2/100 + 1).toString(16)}`, 65);
-	sendPacketString(`00 51 31 02 00 ${(dpi3/100 + 1).toString(16)}`, 65);
-	sendPacketString(`00 51 31 03 00 ${(dpi4/100 + 1).toString(16)}`, 65);
-	sendPacketString(`00 50 03 03`, 65);
-
+	if(SettingControl)
+    {
+	device.write([0x00, 0x51, 0x31, 0x06, 0x00, angleSnapping ? 0x01 : 0x00], 65);
+	device.write([0x00, 0x51, 0x31, 0x04, 0x00, pollingDict[mousePolling]], 65);
+	device.write([0x00, 0x51, 0x31, 0x00, 0x00, (dpi1/100 + 1)], 65);
+	device.write([0x00, 0x51, 0x31, 0x01, 0x00, (dpi2/100 + 1)], 65);
+	device.write([0x00, 0x51, 0x31, 0x02, 0x00, (dpi3/100 + 1)], 65);
+	device.write([0x00, 0x51, 0x31, 0x03, 0x00, (dpi4/100 + 1)], 65);
+	device.write([0x00, 0x50, 0x03, 0x03], 65);
+	}
 }
 
 function sendLightingSettings()
 {
+	if(SettingControl)
+    {
     let lightingSettingsPacket = [0x00, 0x51, 0x37, 0x00, 0x00, sleepModeDict[sleepTimeout], 0x00, lowPowerPercentageDict[lowPowerPercentage]];
     device.write(lightingSettingsPacket, 65);
     let applyPacket = [0x00, 0x50, 0x03];
     device.write(applyPacket, 65);
+	}
 }
 
 function hexToRgb(hex) 
@@ -188,18 +226,6 @@ function hexToRgb(hex)
 export function Validate(endpoint) 
 {
 	return endpoint.interface === 0;
-}
-
-function sendPacketString(string, size){
-
-	let packet= [];
-	let data = string.split(' ');
-
-	for(let i = 0; i < data.length; i++){
-		packet[i] =parseInt(data[i], 16);//.toString(16)
-	}
-
-	device.write(packet, size);
 }
 
 export function Image() {

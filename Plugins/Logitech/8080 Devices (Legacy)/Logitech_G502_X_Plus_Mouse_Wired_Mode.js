@@ -3,11 +3,27 @@ export function VendorId() { return 0x046d; }
 export function Documentation(){ return "troubleshooting/logitech"; }
 export function ProductId() { return 0xC095; }
 export function Publisher() { return "WhirlwindFX"; }
-export function Size() { return [3, 3]; }
+export function Size() { return [7, 3]; }
 export function DefaultPosition(){return [240,120]}
 export function DefaultScale(){return 8.0}
-export function ControllableParameters()
-{
+/* global
+shutdownColor:readonly
+LightingMode:readonly
+forcedColor:readonly
+DpiControl:readonly
+dpistages:readonly
+dpi1:readonly
+dpi2:readonly
+dpi3:readonly
+dpi4:readonly
+dpi5:readonly
+dpi6:readonly
+DpiLight:readonly
+OnboardState:readonly
+DPIRollover:readonly
+pollingrate:readonly
+*/
+export function ControllableParameters(){
     return [
         {"property":"shutdownColor", "group":"lighting", "label":"Shutdown Color","min":"0","max":"360","type":"color","default":"009bde"},
         {"property":"LightingMode", "group":"lighting", "label":"Lighting Mode", "type":"combobox", "values":["Canvas","Forced"], "default":"Canvas"},
@@ -20,7 +36,7 @@ export function ControllableParameters()
 		{"property":"dpi4", "group":"mouse", "label":"DPI 4","step":"50", "type":"number","min":"200", "max":"25600","default":"1600"},
 		{"property":"dpi5", "group":"mouse", "label":"DPI 5","step":"50", "type":"number","min":"200", "max":"25600","default":"2000"},
 		{"property":"dpi6", "group":"mouse", "label":"Sniper Button DPI","step":"50", "type":"number","min":"200", "max":"25600","default":"400"},
-        {"property":"DpiLight", "group":"lighting", "label":"DPI Light Always On","type":"boolean","default": "true"},
+		{"property":"DpiLight", "group":"lighting", "label":"DPI Light Always On","type":"boolean","default": "true"},
 		{"property":"OnboardState", "group":"", "label":"Onboard Button Mode","type":"boolean","default": "false"},
 		{"property":"DPIRollover", "group":"mouse", "label":"DPI Stage Rollover","type":"boolean","default": "false"},
 		{"property":"pollingrate", "group":"mouse", "label":"Polling Rate","type":"combobox", "values":[ "1000","500", "250", "100" ], "default":"1000"},
@@ -29,7 +45,6 @@ export function ControllableParameters()
 
 var deviceName;
 var Sniper;
-var Sleep = false;
 var DPIStage = 1;
 var savedPollTimer = Date.now();
 var PollModeInternal = 15000;
@@ -120,6 +135,9 @@ export function Initialize()
 		Logitech.SetDPILights(3); //Fallback to set DPILights to full
 	}
 
+	device.repollLeds();
+	device.repollSize();
+
 	if(Logitech.Config.HasBattery)
 	{
 		device.addFeature("battery");
@@ -132,12 +150,8 @@ export function Initialize()
 export function Render()
 {
 	DetectInputs();
-
-	if(Sleep == false)
-	{	
-		grabColors();
-		PollBattery();
-	}
+	grabColors();
+	PollBattery();
 }
 
 export function Shutdown()
@@ -244,7 +258,7 @@ function DetectInputs()
 			if(DpiControl)
 			{
 			Sniper = true;
-			Logitech.setDpi(dpi6);
+			Logitech.setDpi(dpi6, 1);
 			Logitech.SetDPILights(1);
 			}
 		}
@@ -345,7 +359,7 @@ function ProcessInputs(packet)
 		
 			if(DpiControl)
 			{
-				Logitech.setDpi(DPIStageDict[DPIStage]());
+				Logitech.setDpi(DPIStageDict[DPIStage](), DPIStage);
 				Logitech.SetDPILights(DPIStage);
 			}
 		}
@@ -376,7 +390,8 @@ function DPIStageControl(override,stage)
 	
 	if(DpiControl)
 	{
-    Logitech.setDpi(DPIStageDict[DPIStage]());
+		
+    Logitech.setDpi(DPIStageDict[DPIStage](), DPIStage);
 	Logitech.SetDPILights(DPIStage);
 	}
 	device.log(DPIStage);
@@ -702,21 +717,23 @@ function hexToRgb(hex)
 
 		 this.ProductIDs =
 		 {
-			c082 : "G403 Prodigy",
-			c083 : "G403",
-			c084 : "G203 Prodigy",
-			c085 : "GPro Wired",
-			c088 : "GPro Wireless",
-			c08b : "G502 Hero",
-			c08d : "G502 Lightspeed",
-			c08f : "G403 Hero",
-			c090 : "G703",
-			c091 : "G903",
-			c092 : "G203 Lightsync",
-			c094 : "GPro X Superlight",
-			c095 : "G502 X Plus",
-			c332 : "G502",
-		 }
+			"c081" : "G900",
+			"c082" : "G403 Prodigy",
+			"c083" : "G403",
+			"c084" : "G203 Prodigy",
+			"c085" : "GPro Wired",
+			"c088" : "GPro Wireless",
+			"c08b" : "G502 Hero",
+			"c08c" : "GPro Wired", //AltPid (╯°□°）╯︵ ┻━┻
+			"c08d" : "G502 Lightspeed",
+			"c08f" : "G403 Hero",
+			"c090" : "G703",
+			"c091" : "G903",
+			"c092" : "G203 Lightsync",
+			"c094" : "GPro X Superlight",
+			"c095" : "G502 X Plus",
+			"c332" : "G502",
+		 };
 	 
 		 this.VoltageArray = 
 		 [ 
@@ -906,67 +923,62 @@ function hexToRgb(hex)
 			break;
 
 		case "c084" :
+		case "c085" :
+		case "c08c" :
 			this.Config.LedNames = this.LEDNameDict["SingleZoneMouse"];
 			this.Config.LedPositions = this.LEDPositionDict["SingleZoneMouse"];
 			this.Config.MouseBodyStyle = "G200Body";
 			this.SetHasDPILights(false);
 			break;
 
-		 case "c082" :
-		 case "c083" :
-		 case "c08f" :
-		 case "c088" :
-		 case "c090" :
-			 this.Config.LedNames = this.LEDNameDict["TwoZoneMouse"];
-			 this.Config.LedPositions = this.LEDPositionDict["TwoZoneMouse"];
-			 this.Config.MouseBodyStyle = "G200Body";
-			 this.SetHasDPILights(false);
-			 break;
+		case "c082" :
+		case "c083" :
+		case "c08f" :
+		case "c088" :
+		case "c090" :
+			this.Config.LedNames = this.LEDNameDict["TwoZoneMouse"];
+			this.Config.LedPositions = this.LEDPositionDict["TwoZoneMouse"];
+			this.Config.MouseBodyStyle = "G200Body";
+			this.SetHasDPILights(false);
+			break;
  
-		 case "c08b":
-		 case "c08d":
-		 case "c332":
-			 this.Config.LedNames = this.LEDNameDict["TwoZoneMouse"];
-			 this.Config.LedPositions = this.LEDPositionDict["TwoZoneMouse"];
-			 this.Config.MouseBodyStyle = "G500Body";
-			 this.SetHasDPILights(true);
-			 break;
+		case "c08b":
+		case "c08d":
+		case "c332":
+			this.Config.LedNames = this.LEDNameDict["TwoZoneMouse"];
+			this.Config.LedPositions = this.LEDPositionDict["TwoZoneMouse"];
+			this.Config.MouseBodyStyle = "G500Body";
+			this.SetHasDPILights(true);
+			break;
+ 
+		case "c081" :
+		case "c091":
+			this.Config.LedNames = this.LEDNameDict["TwoZoneMouse"];
+			this.Config.LedPositions = this.LEDPositionDict["TwoZoneMouse"];
+			this.Config.MouseBodyStyle = "G900Body";
+			this.SetHasDPILights(true);
+			break;
+ 
+		case "c095":
+			this.Config.LedNames = this.LEDNameDict["G502XPlus"];
+			this.Config.LedPositions = this.LEDPositionDict["G502XPlus"];
+			this.Config.MouseBodyStyle = "G502XPlusBody";
+			this.SetHasDPILights(false);
+			break;
 
-		case "c085" :
+		case "c094":
+			this.Config.LedNames = this.LEDNameDict["Null"];
+			this.Config.LedPositions = this.LEDPositionDict["Null"];
+			this.Config.MouseBodyStyle = "G200Body";
+			this.SetHasDPILights(false);
+ 
+		default:
 			this.Config.LedNames = this.LEDNameDict["TwoZoneMouse"];
 			this.Config.LedPositions = this.LEDPositionDict["TwoZoneMouse"];
 			this.Config.MouseBodyStyle = "G200Body";
 			this.SetHasDPILights(true);
 			break;
- 
-		 case "c091":
-			 this.Config.LedNames = this.LEDNameDict["TwoZoneMouse"];
-			 this.Config.LedPositions = this.LEDPositionDict["TwoZoneMouse"];
-			 this.Config.MouseBodyStyle = "G900Body";
-			 this.SetHasDPILights(true);
-			 break;
- 
-		 case "c095":
-			this.Config.LedNames = this.LEDNameDict["G502XPlus"];
-			this.Config.LedPositions = this.LEDPositionDict["G502XPlus"];
-			 this.Config.MouseBodyStyle = "G502XPlusBody";
-			 this.SetHasDPILights(false);
-			 break;
-
-		 case "c094":
-			this.Config.LedNames = this.LEDNameDict["Null"];
-			this.Config.LedPositions = this.LEDPositionDict["Null"];
-			 this.Config.MouseBodyStyle = "G200Body";
-			 this.SetHasDPILights(false);
- 
-		 default:
-			 this.Config.LedNames = this.LEDNameDict["TwoZoneMouse"];
-			 this.Config.LedPositions = this.LEDPositionDict["TwoZoneMouse"];
-			 this.Config.MouseBodyStyle = "G200Body";
-			 this.SetHasDPILights(true);
-			 break;
- 
-		 }
+		}
  
 	 }
  
@@ -1018,7 +1030,7 @@ function hexToRgb(hex)
 	 data  = data || [0x00, 0x00, 0x00];
 	 packet.push(...data);
 	 device.write(packet, 7);
-	 device.pause(1);
+	 device.pause(5);
 	 packet = device.read(packet,7);
  
 	 return packet.slice(3,7);
@@ -1031,7 +1043,7 @@ function hexToRgb(hex)
 	 data  = data || [0x00, 0x00, 0x00];
 	 packet.push(...data);
 	 device.write(packet, 7);
-	 device.pause(1);
+	 device.pause(5);
 	 packet = device.read(packet,7);
  
 	 return packet.slice(3,7);
@@ -1054,6 +1066,7 @@ function hexToRgb(hex)
 	 data = data || [0x00, 0x00, 0x00];
 	 packet.push(...data);
 	 device.write(packet, 20);
+	 device.pause(5);
 	 packet = device.read(packet,20);
 	 
 	 return packet.slice(4,20);
@@ -1113,36 +1126,43 @@ function hexToRgb(hex)
 		this.SendShortMessage(DeviceInfoPacket);
 		device.pause(10);
 		let DeviceInfoResponsePacket = this.Long_Get();
+		let TotalEntities = DeviceInfoResponsePacket[0];
 		let UniqueIdentifier = DeviceInfoResponsePacket.slice(1,5);
 		let Transport1 = DeviceInfoResponsePacket[7].toString(16) + DeviceInfoResponsePacket[8].toString(16);
 		let Transport2 = DeviceInfoResponsePacket[9].toString(16) + DeviceInfoResponsePacket[10].toString(16);
 		let Transport3 = DeviceInfoResponsePacket[11].toString(16) + DeviceInfoResponsePacket[12].toString(16);
 		let SerialNumberSupport = DeviceInfoResponsePacket[14];
-		device.log("Total Entities: " + DeviceInfoResponsePacket[0]);
+		device.log("Total Entities: " + TotalEntities);
 		device.log("Unique Device Identifier: " + UniqueIdentifier);
 		device.log("Transport 1 Model ID: " + Transport1);
 		device.log("Transport 2 Model ID: " + Transport2);
 		device.log("Transport 3 Model ID: " + Transport3);
 		device.log("Serial Number Support:" + SerialNumberSupport);
 		
-		let FirmwareInfoPacket = [this.FeatureIDs.DeviceInfoID, 0x10, 0x01];
-	 	this.SendShortMessage(FirmwareInfoPacket);
-		device.pause(10);
-	 	let FirmwareResponsePacket = this.Long_Get();
-		let FirmwareType = FirmwareResponsePacket[0];
-		let FirmwarePrefix = String.fromCharCode(...FirmwareResponsePacket.slice(1,4));
-		let FirmwareName = FirmwareResponsePacket[4];
-		let FirmwareRevision = FirmwareResponsePacket[5];
-		let FirmwareBuild = FirmwareResponsePacket.slice(6,8);
-		let ActiveFirmwareFlag = FirmwareResponsePacket[8];
-		let TransportPID = FirmwareResponsePacket[9].toString(16) + FirmwareResponsePacket[10].toString(16);
-		device.log("Firmware Type: " + this.FirmwareType[FirmwareType]);
-		device.log("Firmware Prefix: " + FirmwarePrefix + + FirmwareName);
-		device.log("Firmware Revision: " + FirmwareRevision);
-		device.log("Firmware Build: " + FirmwareBuild);
-		device.log("Active Firmware Flag: " + ActiveFirmwareFlag);
-		device.log("Transport ID: " + TransportPID);
-		return TransportPID;
+		for(let entityIDX = 0; entityIDX < Math.max(TotalEntities,3); entityIDX++)
+		{
+			let FirmwareInfoPacket = [this.FeatureIDs.DeviceInfoID, 0x10, entityIDX];
+	 		this.SendShortMessage(FirmwareInfoPacket);
+			device.pause(10);
+	 		let FirmwareResponsePacket = this.Long_Get();
+			let FirmwareType = FirmwareResponsePacket[0];
+			let FirmwarePrefix = String.fromCharCode(...FirmwareResponsePacket.slice(1,4));
+			let FirmwareName = FirmwareResponsePacket[4];
+			let FirmwareRevision = FirmwareResponsePacket[5];
+			let FirmwareBuild = FirmwareResponsePacket.slice(6,8);
+			let ActiveFirmwareFlag = FirmwareResponsePacket[8];
+			let TransportPID = FirmwareResponsePacket[9].toString(16) + FirmwareResponsePacket[10].toString(16);
+		if(FirmwareType == 0)
+			{
+				device.log("Firmware Type: " + this.FirmwareType[FirmwareType]);
+				device.log("Firmware Prefix: " + FirmwarePrefix + + FirmwareName);
+				device.log("Firmware Revision: " + FirmwareRevision);
+				device.log("Firmware Build: " + FirmwareBuild);
+				device.log("Active Firmware Flag: " + ActiveFirmwareFlag);
+				device.log("Transport ID: " + TransportPID);
+				return TransportPID;
+			}
+		}
 	 }
 
 	 getDeviceName()
@@ -1237,10 +1257,10 @@ function hexToRgb(hex)
 	 return this.PercentageLookupTable[nearestVoltageBand]
 	 }
  
-	 setDpi(dpi)
+	 setDpi(dpi, stage)
 	 {
-	 let packet = [this.FeatureIDs.DPIID, 0x30, 0x00, Math.floor(dpi/256), dpi%256];
-	 this.SendShortMessage(packet);
+	 let packet = [this.FeatureIDs.DPIID, 0x30, 0x00, Math.floor(dpi/256), dpi%256, stage]; //Oh there's actually a stage flag?
+	 this.SendLongMessageNoResponse(packet);
 	 }
  
 	 SetDPILights(stage)
