@@ -3,7 +3,7 @@ export function VendorId() { return 0x1e7d; }
 export function ProductId() { return 0x3a56; }
 export function Documentation(){ return "troubleshooting/roccat"; }
 export function Publisher() { return "WhirlwindFX"; }
-export function Size() { return [11, 5]; }
+export function Size() { return [1, 1]; }
 export function DefaultPosition() {return [225,120]; }
 export function DefaultScale(){return 15.0}
 /* global

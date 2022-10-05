@@ -2,7 +2,7 @@ export function Name() { return "MSI Mystic Light Controller"; }
 export function VendorId() { return 0x1462; }
 export function Documentation(){ return "troubleshooting/msi"; }
 // DO NOT PID SWAP THIS IF YOU DONT KNOW WHAT YOUR DOING
-export function ProductId() { return 0x7D07;}
+export function ProductId() { return 0x7C95;}
 // YOU CAN BRICK THESE MOTHERBOARDS RGB CONTROLLER WITH ONE WRONG PACKET
 export function Publisher() { return "WhirlwindFX"; }
 export function Size() { return [10, 1]; }
@@ -162,29 +162,13 @@ const ARGBHeaderDict = [
 	MSI_185_RAINBOW2_OFFSET
 ];
 
-const CorsairDict = [
-	MSI_185_CORSAIR_OFFSET,
-	MSI_185_CORSAIR_BACKUP_OFFSET
-]
-
 let HeaderArray = [
 	"12v RGB Header 1",
 	"12v RGB Header 2",
 ];
-
-let CorsairArray = [
-	"Corsair",
-	"Corsair Outer",
-];
-
 let ARGBHeaderArray = [
 	"5v ARGB Header 1",
 	"5v ARGB Header 2",
-];
-
-let JPipeHeaderArray = [
-	"Jpipe Led 1",
-	"Jpipe Led 2"
 ];
 
 var PerLedSupport = false;
@@ -240,22 +224,16 @@ export function LedPositions()
 export function Initialize() 
 {
 	CheckPacketLength();
-	
+	SetupChannels(); //Create Component Channels
 	PerLEDInit(); //Turn on Per LED Mode
 	CreateLEDs(); //Create all of our LEDs
 	if(perledsupport != true)
 	{
-		DeleteChannels();
 		createJPipeLEDs();
 		CreateARGBHeaders();
 		CreateLEDs();
 		createCorsairLEDs();
 	}
-	else
-	{
-		SetupChannels(); //Create Component Channels
-	}
-	
 }
 
 export function Render() 
@@ -266,7 +244,7 @@ export function Render()
 	}
 	else
 	{
-		if(CheckPacketLength() != 185)
+		if(CheckPacketLength() != 186)
 		{
 			device.log("PACKET LENGTH ERROR. ABORTING RENDERING");
 	
@@ -277,8 +255,6 @@ export function Render()
 		SetRGBHeaderLeds();
 	
 		SetARGBHeaderLeds();
-
-		SetCorsairLeds();
 
 		SetJPipeHeaderLeds();
 	
@@ -318,22 +294,6 @@ export function onRGBHeadersChanged()
 	if(perledsupport == true)
 	{
 	CreateLEDs();
-	}
-}
-
-function createCorsairLEDs()
-{
-	for(let CorsairHeaders = 0; CorsairHeaders < 2;CorsairHeaders++)
-	{
-		device.removeSubdevice(CorsairArray[CorsairHeaders]);
-	}
-	for(let CorsairHeaders = 0; CorsairHeaders < 2;CorsairHeaders++)
-	{
-		device.createSubdevice(CorsairArray[CorsairHeaders]);
-		// Parent Device + Sub device Name + Ports
-		device.setSubdeviceName(CorsairArray[CorsairHeaders], `${ParentDeviceName} - ${CorsairArray[CorsairHeaders]}`);
-		device.setSubdeviceImage(CorsairArray[CorsairHeaders], Placeholder());
-		device.setSubdeviceSize(CorsairArray[CorsairHeaders], 3, 3);
 	}
 }
 
@@ -408,23 +368,6 @@ function SetMainboardLeds(shutdown = false)
 		}
 
 		SetZoneColor(configPacket, mainboardDict[iIdx], col);
-	}
-}
-
-function SetCorsairLeds(shutdown = false) 
-{
-	for(let iIdx = 0; iIdx < CorsairArray.length; iIdx++) {
-		var col;
-
-		if(shutdown){
-			col = hexToRgb(shutdownColor);
-		}else if (LightingMode === "Forced") {
-			col = hexToRgb(forcedColor);
-		}else{
-			col = device.subdeviceColor(CorsairArray[iIdx], 1, 1);
-		}
-
-		SetZoneColor(configPacket, CorsairDict[iIdx], col);
 	}
 }
 
@@ -602,12 +545,10 @@ function isperled() //Checks per led based upon whether that's what's in the buf
 	let returnpacket = device.read(packet,64);
 	device.log(returnpacket);
 }
-
 function PerLEDInit()
 {
 	device.send_report(perledpacket,185);
 }
-
 var OnboardLEDData = [];
 var RGBHeaderData = [];
 
@@ -668,14 +609,6 @@ function SetupChannels()
 	for(let i = 0; i < ChannelArray.length; i++) 
 	{
 		device.addChannel(ChannelArray[i][0], ChannelArray[i][1]);
-	}
-}
-
-function DeleteChannels() 
-{
-	for(let i = 0; i < ChannelArray.length; i++) 
-	{
-		device.removeChannel(ChannelArray[i][0], ChannelArray[i][1]);
 	}
 }
 

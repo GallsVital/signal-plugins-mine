@@ -10,6 +10,7 @@ export function DefaultScale(){return 8.0;}
 shutdownColor:readonly
 LightingMode:readonly
 forcedColor:readonly
+CustomSize:readonly
 */
 export function ControllableParameters(){
 	return [

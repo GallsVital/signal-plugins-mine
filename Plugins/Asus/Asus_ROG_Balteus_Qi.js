@@ -74,7 +74,7 @@ function sendZone(shutdown = false) {
 }
 
 export function Validate(endpoint) {
-	return endpoint.interface === -1;
+	return endpoint.interface === -1 && endpoint.usage === 0x0001;
 }
 
 function hexToRgb(hex) {

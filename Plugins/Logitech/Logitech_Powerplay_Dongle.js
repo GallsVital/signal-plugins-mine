@@ -322,7 +322,7 @@ function DetectInputs()
 			if(DpiControl)
 			{
 			Sniper = true;
-			Logitech.setDpi(dpi6);
+			Logitech.setDpi(dpi6, 1);
 			Logitech.SetDPILights(1);
 			}
 		}
@@ -423,7 +423,7 @@ function ProcessInputs(packet)
 		
 			if(DpiControl)
 			{
-				Logitech.setDpi(DPIStageDict[DPIStage]());
+				Logitech.setDpi(DPIStageDict[DPIStage](), DPIStage);
 				Logitech.SetDPILights(DPIStage);
 			}
 		}
@@ -454,7 +454,8 @@ function DPIStageControl(override,stage)
 	
 	if(DpiControl)
 	{
-    Logitech.setDpi(DPIStageDict[DPIStage]());
+		
+    Logitech.setDpi(DPIStageDict[DPIStage](), DPIStage);
 	Logitech.SetDPILights(DPIStage);
 	}
 	device.log(DPIStage);
@@ -805,12 +806,14 @@ function hexToRgb(hex)
 
 		 this.ProductIDs =
 		 {
+			"c081" : "G900",
 			"c082" : "G403 Prodigy",
 			"c083" : "G403",
 			"c084" : "G203 Prodigy",
 			"c085" : "GPro Wired",
 			"c088" : "GPro Wireless",
 			"c08b" : "G502 Hero",
+			"c08c" : "GPro Wired", //AltPid (╯°□°）╯︵ ┻━┻
 			"c08d" : "G502 Lightspeed",
 			"c08f" : "G403 Hero",
 			"c090" : "G703",
@@ -1009,67 +1012,62 @@ function hexToRgb(hex)
 			break;
 
 		case "c084" :
+		case "c085" :
+		case "c08c" :
 			this.Config.LedNames = this.LEDNameDict["SingleZoneMouse"];
 			this.Config.LedPositions = this.LEDPositionDict["SingleZoneMouse"];
 			this.Config.MouseBodyStyle = "G200Body";
 			this.SetHasDPILights(false);
 			break;
 
-		 case "c082" :
-		 case "c083" :
-		 case "c08f" :
-		 case "c088" :
-		 case "c090" :
-			 this.Config.LedNames = this.LEDNameDict["TwoZoneMouse"];
-			 this.Config.LedPositions = this.LEDPositionDict["TwoZoneMouse"];
-			 this.Config.MouseBodyStyle = "G200Body";
-			 this.SetHasDPILights(false);
-			 break;
+		case "c082" :
+		case "c083" :
+		case "c08f" :
+		case "c088" :
+		case "c090" :
+			this.Config.LedNames = this.LEDNameDict["TwoZoneMouse"];
+			this.Config.LedPositions = this.LEDPositionDict["TwoZoneMouse"];
+			this.Config.MouseBodyStyle = "G200Body";
+			this.SetHasDPILights(false);
+			break;
  
-		 case "c08b":
-		 case "c08d":
-		 case "c332":
-			 this.Config.LedNames = this.LEDNameDict["TwoZoneMouse"];
-			 this.Config.LedPositions = this.LEDPositionDict["TwoZoneMouse"];
-			 this.Config.MouseBodyStyle = "G500Body";
-			 this.SetHasDPILights(true);
-			 break;
+		case "c08b":
+		case "c08d":
+		case "c332":
+			this.Config.LedNames = this.LEDNameDict["TwoZoneMouse"];
+			this.Config.LedPositions = this.LEDPositionDict["TwoZoneMouse"];
+			this.Config.MouseBodyStyle = "G500Body";
+			this.SetHasDPILights(true);
+			break;
+ 
+		case "c081" :
+		case "c091":
+			this.Config.LedNames = this.LEDNameDict["TwoZoneMouse"];
+			this.Config.LedPositions = this.LEDPositionDict["TwoZoneMouse"];
+			this.Config.MouseBodyStyle = "G900Body";
+			this.SetHasDPILights(true);
+			break;
+ 
+		case "c095":
+			this.Config.LedNames = this.LEDNameDict["G502XPlus"];
+			this.Config.LedPositions = this.LEDPositionDict["G502XPlus"];
+			this.Config.MouseBodyStyle = "G502XPlusBody";
+			this.SetHasDPILights(false);
+			break;
 
-		case "c085" :
+		case "c094":
+			this.Config.LedNames = this.LEDNameDict["Null"];
+			this.Config.LedPositions = this.LEDPositionDict["Null"];
+			this.Config.MouseBodyStyle = "G200Body";
+			this.SetHasDPILights(false);
+ 
+		default:
 			this.Config.LedNames = this.LEDNameDict["TwoZoneMouse"];
 			this.Config.LedPositions = this.LEDPositionDict["TwoZoneMouse"];
 			this.Config.MouseBodyStyle = "G200Body";
 			this.SetHasDPILights(true);
 			break;
- 
-		 case "c091":
-			 this.Config.LedNames = this.LEDNameDict["TwoZoneMouse"];
-			 this.Config.LedPositions = this.LEDPositionDict["TwoZoneMouse"];
-			 this.Config.MouseBodyStyle = "G900Body";
-			 this.SetHasDPILights(true);
-			 break;
- 
-		 case "c095":
-			this.Config.LedNames = this.LEDNameDict["G502XPlus"];
-			this.Config.LedPositions = this.LEDPositionDict["G502XPlus"];
-			 this.Config.MouseBodyStyle = "G502XPlusBody";
-			 this.SetHasDPILights(false);
-			 break;
-
-		 case "c094":
-			this.Config.LedNames = this.LEDNameDict["Null"];
-			this.Config.LedPositions = this.LEDPositionDict["Null"];
-			 this.Config.MouseBodyStyle = "G200Body";
-			 this.SetHasDPILights(false);
- 
-		 default:
-			 this.Config.LedNames = this.LEDNameDict["TwoZoneMouse"];
-			 this.Config.LedPositions = this.LEDPositionDict["TwoZoneMouse"];
-			 this.Config.MouseBodyStyle = "G200Body";
-			 this.SetHasDPILights(true);
-			 break;
- 
-		 }
+		}
  
 	 }
  
@@ -1348,10 +1346,10 @@ function hexToRgb(hex)
 	 return this.PercentageLookupTable[nearestVoltageBand]
 	 }
  
-	 setDpi(dpi)
+	 setDpi(dpi, stage)
 	 {
-	 let packet = [this.FeatureIDs.DPIID, 0x30, 0x00, Math.floor(dpi/256), dpi%256];
-	 this.SendShortMessage(packet);
+	 let packet = [this.FeatureIDs.DPIID, 0x30, 0x00, Math.floor(dpi/256), dpi%256, stage]; //Oh there's actually a stage flag?
+	 this.SendLongMessageNoResponse(packet);
 	 }
  
 	 SetDPILights(stage)

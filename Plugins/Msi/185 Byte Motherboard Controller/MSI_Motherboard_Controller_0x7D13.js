@@ -240,22 +240,16 @@ export function LedPositions()
 export function Initialize() 
 {
 	CheckPacketLength();
-	
+	SetupChannels(); //Create Component Channels
 	PerLEDInit(); //Turn on Per LED Mode
 	CreateLEDs(); //Create all of our LEDs
 	if(perledsupport != true)
 	{
-		DeleteChannels();
 		createJPipeLEDs();
 		CreateARGBHeaders();
 		CreateLEDs();
 		createCorsairLEDs();
 	}
-	else
-	{
-		SetupChannels(); //Create Component Channels
-	}
-	
 }
 
 export function Render() 

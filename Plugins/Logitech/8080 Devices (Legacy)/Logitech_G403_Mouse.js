@@ -17,6 +17,7 @@ dpi2:readonly
 dpi3:readonly
 dpi4:readonly
 dpi5:readonly
+DpiLight:readonly
 OnboardState:readonly
 DPIRollover:readonly
 pollingrate:readonly

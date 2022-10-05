@@ -45,7 +45,9 @@ export function Initialize() {
 
 
 	sendReportString("0D 10 00 00 02 0B 45 00 00 00 00 00 00 00 00 00", 16);
+	device.pause(10);
 	sendReportString("0E 05 01 00 00", 5);
+	device.pause(10);
 }
 
 

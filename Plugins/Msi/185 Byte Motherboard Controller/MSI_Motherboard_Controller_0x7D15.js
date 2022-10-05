@@ -2,7 +2,7 @@ export function Name() { return "MSI Mystic Light Controller"; }
 export function VendorId() { return 0x1462; }
 export function Documentation(){ return "troubleshooting/msi"; }
 // DO NOT PID SWAP THIS IF YOU DONT KNOW WHAT YOUR DOING
-export function ProductId() { return 0x7D50;}
+export function ProductId() { return 0x7D15;}
 // YOU CAN BRICK THESE MOTHERBOARDS RGB CONTROLLER WITH ONE WRONG PACKET
 export function Publisher() { return "WhirlwindFX"; }
 export function Size() { return [10, 1]; }
@@ -596,10 +596,12 @@ function isperled() //Checks per led based upon whether that's what's in the buf
 	let returnpacket = device.read(packet,64);
 	device.log(returnpacket);
 }
+
 function PerLEDInit()
 {
 	device.send_report(perledpacket,185);
 }
+
 var OnboardLEDData = [];
 var RGBHeaderData = [];
 
@@ -660,6 +662,14 @@ function SetupChannels()
 	for(let i = 0; i < ChannelArray.length; i++) 
 	{
 		device.addChannel(ChannelArray[i][0], ChannelArray[i][1]);
+	}
+}
+
+function DeleteChannels() 
+{
+	for(let i = 0; i < ChannelArray.length; i++) 
+	{
+		device.removeChannel(ChannelArray[i][0], ChannelArray[i][1]);
 	}
 }
 

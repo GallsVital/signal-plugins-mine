@@ -9,10 +9,6 @@ shutdownColor:readonly
 LightingMode:readonly
 forcedColor:readonly
 moboSync:readonly
-Channel1Count:readonly
-Channel2Count:readonly
-Channel3Count:readonly
-Channel4Count:readonly
 FanMode:readonly
 */
 export function ControllableParameters(){

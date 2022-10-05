@@ -240,22 +240,16 @@ export function LedPositions()
 export function Initialize() 
 {
 	CheckPacketLength();
-	
+	SetupChannels(); //Create Component Channels
 	PerLEDInit(); //Turn on Per LED Mode
 	CreateLEDs(); //Create all of our LEDs
 	if(perledsupport != true)
 	{
-		DeleteChannels();
 		createJPipeLEDs();
 		CreateARGBHeaders();
 		CreateLEDs();
 		createCorsairLEDs();
 	}
-	else
-	{
-		SetupChannels(); //Create Component Channels
-	}
-	
 }
 
 export function Render() 
@@ -602,12 +596,10 @@ function isperled() //Checks per led based upon whether that's what's in the buf
 	let returnpacket = device.read(packet,64);
 	device.log(returnpacket);
 }
-
 function PerLEDInit()
 {
 	device.send_report(perledpacket,185);
 }
-
 var OnboardLEDData = [];
 var RGBHeaderData = [];
 
@@ -668,14 +660,6 @@ function SetupChannels()
 	for(let i = 0; i < ChannelArray.length; i++) 
 	{
 		device.addChannel(ChannelArray[i][0], ChannelArray[i][1]);
-	}
-}
-
-function DeleteChannels() 
-{
-	for(let i = 0; i < ChannelArray.length; i++) 
-	{
-		device.removeChannel(ChannelArray[i][0], ChannelArray[i][1]);
 	}
 }
 
