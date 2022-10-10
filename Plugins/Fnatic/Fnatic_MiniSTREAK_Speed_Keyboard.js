@@ -19,39 +19,9 @@ export function ControllableParameters(){
 	];
 }
 
-function hexToRgb(hex) {
-	let result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
-	let colors = [];
-	colors[0] = parseInt(result[1], 16);
-	colors[1] = parseInt(result[2], 16);
-	colors[2] = parseInt(result[3], 16);
-
-	return colors;
-}
-export function Initialize() {
-
-}
-
-function sendPacketString(string, size){
-
-	let packet= [];
-	let data = string.split(' ');
-
-	for(let i = 0; i < data.length; i++){
-		packet[parseInt(i, 16)] =parseInt(data[i], 16);//.toString(16)
-	}
-
-	device.write(packet, size);
-}
-
-export function Shutdown() {
-
-
-}
-
-let vKeys = [
+const vKeys = 
+[
 	103,                91, 97, 92,
-
 
 	1, 0,  7, 13, 19, 25,  31, 37, 43, 49, 55, 67, 73, 79,   90, 93, 98,
 	2,    8, 14, 20, 26, 32, 38, 44, 50, 56, 61, 62, 68, 80,   89, 94, 99,
@@ -61,10 +31,9 @@ let vKeys = [
 	6,   12, 18,     36,         60, 72, 78, 83,      84, 85, 86,
 
 	// 11 for iso? 76 for ISO?
-
 ];
 
-let vKeyNames = [
+const vKeyNames = [
 	"Logo 1",                                         "Mute Mic", "Game Mode", "Media Mute",
 	"Esc", "FN Lock", "F1", "F2", "F3", "F4", "F5", "F6", "F7", "F8", "F9", "F10", "F11", "F12",         "Print Screen", "Scroll Lock", "Pause Break",
 	"`", "1", "2", "3", "4", "5", "6", "7", "8", "9", "0", "-_", "=+", "Backspace",                        "Insert", "Home", "Page Up",
@@ -74,7 +43,7 @@ let vKeyNames = [
 	"Left Ctrl", "Left Win", "Left Alt", "Space", "Right Alt", "Fn", "Menu", "Right Ctrl",        "Left Arrow", "Down Arrow", "Right Arrow"
 ];
 
-let vKeyPositions = [
+const vKeyPositions = [
 
 	[8, 0],                                                  [14, 0], [15, 0],   [16, 0],
 	[0, 1], [1, 1], [2, 1], [3, 1], [4, 1], [5, 1], [6, 1], [7, 1], [8, 1], [9, 1],  [10, 1], [11, 1], [12, 1], [13, 1],   [14, 1], [15, 1], [16, 1],
@@ -87,34 +56,53 @@ let vKeyPositions = [
 
 ];
 
-
-export function LedNames() {
+export function LedNames() 
+{
 	return vKeyNames;
 }
 
-export function LedPositions() {
+export function LedPositions() 
+{
 	return vKeyPositions;
 }
 
-export function Render() {
+export function Initialize() 
+{
+
+}
+
+export function Render() 
+{
 	sendColors();
 }
 
-function sendColors(shutdown = false){
+export function Shutdown() 
+{
+
+}
+
+function sendColors(shutdown = false)
+{
 
 	let RGBData = new Array(144*3).fill(255);
 	let TotalLedCount = 0;
 
-	for(let iIdx = 0; iIdx < vKeys.length; iIdx++) {
+	for(let iIdx = 0; iIdx < vKeys.length; iIdx++) 
+	{
 		let iPxX = vKeyPositions[iIdx][0];
 		let iPxY = vKeyPositions[iIdx][1];
 		var mxPxColor;
 
-		if(shutdown){
+		if(shutdown)
+		{
 			mxPxColor = hexToRgb(shutdownColor);
-		}else if (LightingMode === "Forced") {
+		}
+		else if (LightingMode === "Forced") 
+		{
 			mxPxColor = hexToRgb(forcedColor);
-		}else{
+		}
+		else
+		{
 			mxPxColor = device.color(iPxX, iPxY);
 		}
 
@@ -126,47 +114,43 @@ function sendColors(shutdown = false){
 
 	let sentLeds = 0;
 	TotalLedCount = 106;
-	//SendStartPacket();
 
-	while(TotalLedCount > 0){
+	while(TotalLedCount > 0)
+	{
 		let Leds = TotalLedCount >= 19 ? 19 : TotalLedCount;
 
-		let packet = [];
-		packet[0] = 0x00;
-		packet[1] = 0x0F;
-		packet[2] = 0x40;
-		packet[3] = 0x1;
-		packet[4] = 0x00;
-		packet[5] = sentLeds;
-		packet[6] = sentLeds >> 8;
-		packet[7] = 0x00;
+		let packet = [0x00, 0x0F, 0x40, 0x01, 0x00, sentLeds, sentLeds >> 8, 0x00];
 
-		if(sentLeds == 0){
+		if(sentLeds == 0)
+		{
 			packet[8] = 0x0F;
 			packet[9] = 0x03;
-			packet = packet.concat(RGBData.splice(0, Leds*3-2));
-		}else{
-			packet = packet.concat(RGBData.splice(0, Leds*3));
+			packet.push(...RGBData.splice(0, Leds*3-2));
+		}
+		else
+		{
+			packet.push(...RGBData.splice(0, Leds*3));
 		}
 
 		TotalLedCount -= Leds;
 		sentLeds += Leds*3;
 		device.write(packet, 65);
-
 	}
-	//SendApplyPacket();
-
 }
 
-function SendStartPacket(){
-	sendPacketString("00 07 01 00 00 00 00 00 07", 65);
+function hexToRgb(hex) 
+{
+	let result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+	let colors = [];
+	colors[0] = parseInt(result[1], 16);
+	colors[1] = parseInt(result[2], 16);
+	colors[2] = parseInt(result[3], 16);
+
+	return colors;
 }
 
-function SendApplyPacket(){
-	sendPacketString("00 FE 01 00 00 00 00 00 FE", 65);
-
-}
-export function Validate(endpoint) {
+export function Validate(endpoint) 
+{
 	return endpoint.interface === 1;
 }
 

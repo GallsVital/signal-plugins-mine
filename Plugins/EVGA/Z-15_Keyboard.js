@@ -19,7 +19,7 @@ export function ControllableParameters(){
 	];
 }
 
-let vKeys =
+const vKeys =
 [
 	1,  2,  3,  4,  5,  6,  7,  8,  9,  10, 11, 12, 13,			14, 15, 16,	   18, 19, 20, 118,
 	22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35,		36, 37, 38,    39, 40, 41, 42,
@@ -29,7 +29,7 @@ let vKeys =
 
 	103, 104, 105,           106,         107, 108, 109, 110,	    111, 112, 113,   114, 115,
 ];
-let vKeyNames =
+const vKeyNames =
 [
 	"Esc",     "F1", "F2", "F3", "F4",   "F5", "F6", "F7", "F8",    "F9", "F10", "F11", "F12",  "Print Screen", "Scroll Lock", "Pause Break",   "Rewind", "Pause", "Skip", "Mute",
 	"`", "1",  "2", "3", "4", "5",  "6", "7", "8", "9", "0",  "-",   "+",  "Backspace",        "Insert",        "Home",     "Page Up",   "NumLock", "Num /", "Num *", "Num -",
@@ -41,7 +41,7 @@ let vKeyNames =
 
 ];
 
-let vKeyPositions =
+const vKeyPositions =
 [
 	[0, 0], [1, 0], [2, 0], [3, 0], [4, 0], [5, 0], [6, 0], [7, 0], [8, 0], [9, 0], [10, 0], [11, 0], [12, 0],  		[14, 0], [15, 0], [16, 0],  [17, 0], [18, 0], [19, 0], [20, 0],
 	[0, 1], [1, 1], [2, 1], [3, 1], [4, 1], [5, 1], [6, 1], [7, 1], [8, 1], [9, 1], [10, 1], [11, 1], [12, 1], [13, 1],  [14, 1], [15, 1], [16, 1],  [17, 1], [18, 1], [19, 1], [20, 1],
@@ -52,52 +52,54 @@ let vKeyPositions =
 ];
 
 
-export function LedNames() {
+export function LedNames() 
+{
 	return vKeyNames;
 }
 
-export function LedPositions() {
+export function LedPositions() 
+{
 	return vKeyPositions;
 }
 
-export function Initialize() {
-	sendZone();
-}
-
-export function Render() {
-	sendZone();
-	//Apply(1);
-	//Apply(2);
-}
-
-export function Shutdown() {
+export function Initialize() 
+{
 
 }
 
-function sendZone(shutdown = false) {
+export function Render() 
+{
+	sendPacket();
 
-	let packet = [];
-	//packet.fill(0xff);
-	//packet[0x00] = 0x00;
-	packet[0x00] = 0x06;
-	packet[0x01] = 0xEA;
-	packet[0x02] = 0x02;
-	packet[0x03] = 0x01;
-	packet[0x04] = 0x00;
-	packet[0x05] = 0x00;
-	packet[0x06] = 0x00;
-	packet[0x07] = 0x02;
+}
 
-	for(let iIdx = 0; iIdx < 108; iIdx++) {
+export function Shutdown() 
+{
+	sendPacket(true);
+}
+
+function sendPacket(shutdown = false) 
+{
+
+	let packet = [0x06, 0xEA, 0x02, 0x01, 0x00, 0x00, 0x00, 0x02];
+
+	for(let iIdx = 0; iIdx < vKeys.length; iIdx++) 
+	
+	{
 		let iPxX = vKeyPositions[iIdx][0];
 		let iPxY = vKeyPositions[iIdx][1];
 		var color;
 
-		if(shutdown) {
+		if(shutdown) 
+		{
 			color = hexToRgb(shutdownColor);
-		} else if (LightingMode === "Forced") {
+		} 
+		else if (LightingMode === "Forced") 
+		{
 			color = hexToRgb(forcedColor);
-		} else {
+		} 
+		else 
+		{
 			color = device.color(iPxX, iPxY);
 		}
 
@@ -107,31 +109,12 @@ function sendZone(shutdown = false) {
 		packet[vKeys[iIdx]*4 + 11] = color[2];
 	}
 
-	//packet[0x08] = CalculateCrc(packet);
-	//CalculateCrc(packet);
-	//device.log(packet[0x08], {toFile: true})
 	device.send_report(packet, 792);
 	device.pause(1);
 }
 
-function CalculateCrc(packet) {
-	let iCrc = 0;
-
-	for (let iIdx = 0; iIdx < 1; iIdx++) {
-		iCrc = packet[iIdx];
-
-	}
-
-	device.log(iCrc);
-
-	return iCrc;
-}
-
-export function Validate(endpoint) {
-	return endpoint.interface === 1 && endpoint.usage == 0x004b && endpoint.usage_page == 0x0008;
-}
-
-function hexToRgb(hex) {
+function hexToRgb(hex) 
+{
 	let result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
 	let colors = [];
 	colors[0] = parseInt(result[1], 16);
@@ -139,4 +122,9 @@ function hexToRgb(hex) {
 	colors[2] = parseInt(result[3], 16);
 
 	return colors;
+}
+
+export function Validate(endpoint) 
+{
+	return endpoint.interface === 1 && endpoint.usage == 0x004b && endpoint.usage_page == 0x0008;
 }
