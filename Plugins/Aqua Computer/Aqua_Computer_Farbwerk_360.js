@@ -22,7 +22,8 @@ export function ControllableParameters() {
 export function SupportsSubdevices(){ return true; }
 
 const DeviceMaxLedLimit = 360;
-let ChannelArray = [
+let ChannelArray = 
+[
 	["Channel 1", 90],
 	["Channel 2", 90],
 	["Channel 3", 90],
@@ -55,6 +56,15 @@ export function LedPositions()
 export function Initialize()
 {
 	SetupChannels();
+}
+
+export function Render()
+{
+	for(let i = 0; i < ChannelArray.length; i++)
+	{
+		SendChannel(i);
+		device.pause(1);
+	}
 }
 
 export function Shutdown()
@@ -112,15 +122,6 @@ function SendChannel(Channel, shutdown = false)
 	}
 
 	device.bulk_transfer(0x02, packet, 364);
-}
-
-export function Render()
-{
-	for(let i = 0; i < ChannelArray.length; i++)
-	{
-		SendChannel(i);
-		device.pause(1);
-	}
 }
 
 export function Image()
