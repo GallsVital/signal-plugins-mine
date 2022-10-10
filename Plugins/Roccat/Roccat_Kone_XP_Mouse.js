@@ -94,39 +94,66 @@ export function Shutdown() {
 }
 
 export function ondpi1Changed() {
+	if(DpiControl)
+	{
 	Setup();
+	}
 }
 
 export function ondpi2Changed() {
+	if(DpiControl)
+	{
 	Setup();
+	}
 }
 
 export function ondpi3Changed() {
+	if(DpiControl)
+	{
 	Setup();
+	}
 }
 
 export function ondpi4Changed() {
+	if(DpiControl)
+	{
 	Setup();
+	}
 }
 
 export function ondpi5Changed() {
+	if(DpiControl)
+	{
 	Setup();
+	}
 }
 
 export function onPollingRateChanged() {
+	if(DpiControl)
+	{
 	Setup();
+	}
 }
 
 export function onanglesnappingChanged() {
+	if(DpiControl)
+	{
 	Setup();
+	}
 }
 
 export function ontimeoutChanged() {
+	if(DpiControl)
+	{
 	Setup();
+	}
 }
 
 export function ontimeoutlengthChanged() {
+	if(DpiControl)
+	{
 	Setup();
+	}
 }
 
 export function ondebounceChanged() {
@@ -181,7 +208,8 @@ function SetLiftOffDistance() //also has its own function?
 
 }
 
-function Setup() {
+function Setup() 
+{
 	SettingReport[7] =    (dpi1/50)%256;
 	SettingReport[8] =   Math.floor(dpi1/50/256);
 	SettingReport[9] =    (dpi2/50)%256;

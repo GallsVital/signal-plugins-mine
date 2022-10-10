@@ -1,9 +1,9 @@
-export function Name() { return "Logitech G520 X Plus Wired Mode"; }
+export function Name() { return "Logitech G900 LightSpeed Wired Mode"; }
 export function VendorId() { return 0x046d; }
 export function Documentation(){ return "troubleshooting/logitech"; }
-export function ProductId() { return 0xC095; }
+export function ProductId() { return 0xC081; }
 export function Publisher() { return "WhirlwindFX"; }
-export function Size() { return [7, 3]; }
+export function Size() { return [3, 3]; }
 export function DefaultPosition(){return [240,120]}
 export function DefaultScale(){return 8.0}
 /* global
@@ -23,20 +23,19 @@ OnboardState:readonly
 DPIRollover:readonly
 pollingrate:readonly
 */
-export function ControllableParameters()
-{
+export function ControllableParameters(){
     return [
         {"property":"shutdownColor", "group":"lighting", "label":"Shutdown Color","min":"0","max":"360","type":"color","default":"009bde"},
         {"property":"LightingMode", "group":"lighting", "label":"Lighting Mode", "type":"combobox", "values":["Canvas","Forced"], "default":"Canvas"},
         {"property":"forcedColor", "group":"lighting", "label":"Forced Color","min":"0","max":"360","type":"color","default":"009bde"},
         {"property":"DpiControl", "group":"mouse", "label":"Enable Dpi Control","type":"boolean","default":"false"},
 		{"property":"dpistages", "group":"mouse", "label":"Number of DPI Stages","step":"1", "type":"number","min":"1", "max":"5","default":"5"},
-        {"property":"dpi1", "group":"mouse", "label":"DPI 1","step":"50", "type":"number","min":"200", "max":"25600","default":"400"},
-		{"property":"dpi2", "group":"mouse", "label":"DPI 2","step":"50", "type":"number","min":"200", "max":"25600","default":"800"},
-		{"property":"dpi3", "group":"mouse", "label":"DPI 3","step":"50", "type":"number","min":"200", "max":"25600","default":"1200"},
-		{"property":"dpi4", "group":"mouse", "label":"DPI 4","step":"50", "type":"number","min":"200", "max":"25600","default":"1600"},
-		{"property":"dpi5", "group":"mouse", "label":"DPI 5","step":"50", "type":"number","min":"200", "max":"25600","default":"2000"},
-		{"property":"dpi6", "group":"mouse", "label":"Sniper Button DPI","step":"50", "type":"number","min":"200", "max":"25600","default":"400"},
+        {"property":"dpi1", "group":"mouse", "label":"DPI 1","step":"50", "type":"number","min":"200", "max":"12000","default":"400"},
+		{"property":"dpi2", "group":"mouse", "label":"DPI 2","step":"50", "type":"number","min":"200", "max":"12000","default":"800"},
+		{"property":"dpi3", "group":"mouse", "label":"DPI 3","step":"50", "type":"number","min":"200", "max":"12000","default":"1200"},
+		{"property":"dpi4", "group":"mouse", "label":"DPI 4","step":"50", "type":"number","min":"200", "max":"12000","default":"1600"},
+		{"property":"dpi5", "group":"mouse", "label":"DPI 5","step":"50", "type":"number","min":"200", "max":"12000","default":"2000"},
+		{"property":"dpi6", "group":"mouse", "label":"Sniper Button DPI","step":"50", "type":"number","min":"200", "max":"12000","default":"400"},
 		{"property":"DpiLight", "group":"lighting", "label":"DPI Light Always On","type":"boolean","default": "true"},
 		{"property":"OnboardState", "group":"", "label":"Onboard Button Mode","type":"boolean","default": "false"},
 		{"property":"DPIRollover", "group":"mouse", "label":"DPI Stage Rollover","type":"boolean","default": "false"},
@@ -46,13 +45,14 @@ export function ControllableParameters()
 
 var deviceName;
 var Sniper;
+var Sleep = false;
 var DPIStage = 1;
 var savedPollTimer = Date.now();
 var PollModeInternal = 15000;
 
 const options = 
 {
-	Lightspeed : true
+	Lightspeed : false
 }
 
 const DPIStageDict =
@@ -136,9 +136,6 @@ export function Initialize()
 		Logitech.SetDPILights(3); //Fallback to set DPILights to full
 	}
 
-	device.repollLeds();
-	device.repollSize();
-
 	if(Logitech.Config.HasBattery)
 	{
 		device.addFeature("battery");
@@ -151,8 +148,12 @@ export function Initialize()
 export function Render()
 {
 	DetectInputs();
-	grabColors();
-	PollBattery();
+
+	if(Sleep == false)
+	{	
+		grabColors();
+		PollBattery();
+	}
 }
 
 export function Shutdown()
@@ -259,7 +260,7 @@ function DetectInputs()
 			if(DpiControl)
 			{
 			Sniper = true;
-			Logitech.setDpi(dpi6, 1);
+			Logitech.setDpi(dpi6);
 			Logitech.SetDPILights(1);
 			}
 		}
@@ -360,7 +361,7 @@ function ProcessInputs(packet)
 		
 			if(DpiControl)
 			{
-				Logitech.setDpi(DPIStageDict[DPIStage](), DPIStage);
+				Logitech.setDpi(DPIStageDict[DPIStage]());
 				Logitech.SetDPILights(DPIStage);
 			}
 		}
@@ -391,8 +392,7 @@ function DPIStageControl(override,stage)
 	
 	if(DpiControl)
 	{
-		
-    Logitech.setDpi(DPIStageDict[DPIStage](), DPIStage);
+    Logitech.setDpi(DPIStageDict[DPIStage]());
 	Logitech.SetDPILights(DPIStage);
 	}
 	device.log(DPIStage);
@@ -718,7 +718,7 @@ function hexToRgb(hex)
 
 		 this.ProductIDs =
 		 {
-			"c081" : "G900",
+            "c081" : "G900",
 			"c082" : "G403 Prodigy",
 			"c083" : "G403",
 			"c084" : "G203 Prodigy",
@@ -924,62 +924,68 @@ function hexToRgb(hex)
 			break;
 
 		case "c084" :
-		case "c085" :
-		case "c08c" :
 			this.Config.LedNames = this.LEDNameDict["SingleZoneMouse"];
 			this.Config.LedPositions = this.LEDPositionDict["SingleZoneMouse"];
 			this.Config.MouseBodyStyle = "G200Body";
 			this.SetHasDPILights(false);
 			break;
 
-		case "c082" :
-		case "c083" :
-		case "c08f" :
-		case "c088" :
-		case "c090" :
+		 case "c082" :
+		 case "c083" :
+		 case "c08f" :
+		 case "c088" :
+		 case "c090" :
+			 this.Config.LedNames = this.LEDNameDict["TwoZoneMouse"];
+			 this.Config.LedPositions = this.LEDPositionDict["TwoZoneMouse"];
+			 this.Config.MouseBodyStyle = "G200Body";
+			 this.SetHasDPILights(false);
+			 break;
+ 
+		 case "c08b":
+		 case "c08d":
+		 case "c332":
+			 this.Config.LedNames = this.LEDNameDict["TwoZoneMouse"];
+			 this.Config.LedPositions = this.LEDPositionDict["TwoZoneMouse"];
+			 this.Config.MouseBodyStyle = "G500Body";
+			 this.SetHasDPILights(true);
+			 break;
+
+		case "c085" :
 			this.Config.LedNames = this.LEDNameDict["TwoZoneMouse"];
 			this.Config.LedPositions = this.LEDPositionDict["TwoZoneMouse"];
 			this.Config.MouseBodyStyle = "G200Body";
-			this.SetHasDPILights(false);
-			break;
- 
-		case "c08b":
-		case "c08d":
-		case "c332":
-			this.Config.LedNames = this.LEDNameDict["TwoZoneMouse"];
-			this.Config.LedPositions = this.LEDPositionDict["TwoZoneMouse"];
-			this.Config.MouseBodyStyle = "G500Body";
 			this.SetHasDPILights(true);
 			break;
  
-		case "c081" :
-		case "c091":
-			this.Config.LedNames = this.LEDNameDict["TwoZoneMouse"];
-			this.Config.LedPositions = this.LEDPositionDict["TwoZoneMouse"];
-			this.Config.MouseBodyStyle = "G900Body";
-			this.SetHasDPILights(true);
-			break;
+         case "c081" :
+		 case "c091" :
+			 this.Config.LedNames = this.LEDNameDict["TwoZoneMouse"];
+			 this.Config.LedPositions = this.LEDPositionDict["TwoZoneMouse"];
+			 this.Config.MouseBodyStyle = "G900Body";
+			 this.SetHasDPILights(true);
+			 break;
  
-		case "c095":
+		 case "c095":
 			this.Config.LedNames = this.LEDNameDict["G502XPlus"];
 			this.Config.LedPositions = this.LEDPositionDict["G502XPlus"];
-			this.Config.MouseBodyStyle = "G502XPlusBody";
-			this.SetHasDPILights(false);
-			break;
+			 this.Config.MouseBodyStyle = "G502XPlusBody";
+			 this.SetHasDPILights(false);
+			 break;
 
-		case "c094":
+		 case "c094":
 			this.Config.LedNames = this.LEDNameDict["Null"];
 			this.Config.LedPositions = this.LEDPositionDict["Null"];
-			this.Config.MouseBodyStyle = "G200Body";
-			this.SetHasDPILights(false);
+			 this.Config.MouseBodyStyle = "G200Body";
+			 this.SetHasDPILights(false);
  
-		default:
-			this.Config.LedNames = this.LEDNameDict["TwoZoneMouse"];
-			this.Config.LedPositions = this.LEDPositionDict["TwoZoneMouse"];
-			this.Config.MouseBodyStyle = "G200Body";
-			this.SetHasDPILights(true);
-			break;
-		}
+		 default:
+			 this.Config.LedNames = this.LEDNameDict["TwoZoneMouse"];
+			 this.Config.LedPositions = this.LEDPositionDict["TwoZoneMouse"];
+			 this.Config.MouseBodyStyle = "G200Body";
+			 this.SetHasDPILights(true);
+			 break;
+ 
+		 }
  
 	 }
  
@@ -1031,7 +1037,7 @@ function hexToRgb(hex)
 	 data  = data || [0x00, 0x00, 0x00];
 	 packet.push(...data);
 	 device.write(packet, 7);
-	 device.pause(5);
+	 device.pause(1);
 	 packet = device.read(packet,7);
  
 	 return packet.slice(3,7);
@@ -1044,7 +1050,7 @@ function hexToRgb(hex)
 	 data  = data || [0x00, 0x00, 0x00];
 	 packet.push(...data);
 	 device.write(packet, 7);
-	 device.pause(5);
+	 device.pause(1);
 	 packet = device.read(packet,7);
  
 	 return packet.slice(3,7);
@@ -1067,7 +1073,6 @@ function hexToRgb(hex)
 	 data = data || [0x00, 0x00, 0x00];
 	 packet.push(...data);
 	 device.write(packet, 20);
-	 device.pause(5);
 	 packet = device.read(packet,20);
 	 
 	 return packet.slice(4,20);
@@ -1258,10 +1263,10 @@ function hexToRgb(hex)
 	 return this.PercentageLookupTable[nearestVoltageBand]
 	 }
  
-	 setDpi(dpi, stage)
+	 setDpi(dpi)
 	 {
-	 let packet = [this.FeatureIDs.DPIID, 0x30, 0x00, Math.floor(dpi/256), dpi%256, stage]; //Oh there's actually a stage flag?
-	 this.SendLongMessageNoResponse(packet);
+	 let packet = [this.FeatureIDs.DPIID, 0x30, 0x00, Math.floor(dpi/256), dpi%256];
+	 this.SendShortMessage(packet);
 	 }
  
 	 SetDPILights(stage)

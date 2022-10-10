@@ -184,22 +184,17 @@ export function Initialize()
 	{
 		device.log("Matching Device ID Found");
 		Logitech.SetDeviceID(CommunicationID);
+		Logitech.SetWirelessMouseType(Logitech.DeviceID);
 	}
 	else if(Logitech.ProductIDs.hasOwnProperty(CommunicationID))
 	{
 		device.log("Matching Product ID Found");
 		Logitech.SetProductID(CommunicationID);
+		Logitech.SetWiredMouseType(Logitech.ProductID)
 	}
 
 	Logitech.getDeviceName();
-	if(Logitech.DeviceID !== "0")
-	{
-	Logitech.SetWirelessMouseType(Logitech.DeviceID);
-	}
-	else
-	{
-	Logitech.SetWiredMouseType(Logitech.ProductID)
-	}
+
 	let DeviceID = Logitech.DeviceID || Logitech.ProductID
     deviceName = Logitech.DeviceIDs[Logitech.DeviceID] || Logitech.ProductIDs[Logitech.ProductID] || "UNKNOWN"
     device.log(`Device Id Found: ${DeviceID}`);
@@ -207,7 +202,7 @@ export function Initialize()
 
 	if(Logitech.Config.DeviceType == "Keyboard")
 	{
-		Logitech.GKeySetup();
+		Logitech.GKeySetup(); //Macro Hook-ins
 		Logitech.MKeySetup();
 	}
 	else
@@ -220,7 +215,7 @@ export function Initialize()
 
 	if(DpiControl)
 		{
-		Logitech.setDpi(DPIStageDict[DPIStage]());
+		Logitech.setDpi(DPIStageDict[DPIStage](), DPIStage);
 		Logitech.SetDPILights(DPIStage);	
 		}
 	else
@@ -390,7 +385,7 @@ function DetectInputs()
 			if(DpiControl)
 			{
 			Sniper = true;
-			Logitech.setDpi(dpi6);
+			Logitech.setDpi(dpi6, 1);
 			Logitech.SetDPILights(1);
 			}
 		}
@@ -491,7 +486,7 @@ function ProcessInputs(packet)
 		
 			if(DpiControl)
 			{
-				Logitech.setDpi(DPIStageDict[DPIStage]());
+				Logitech.setDpi(DPIStageDict[DPIStage](), DPIStage);
 				Logitech.SetDPILights(DPIStage);
 			}
 		}
@@ -522,7 +517,8 @@ function DPIStageControl(override,stage)
 	
 	if(DpiControl)
 	{
-    Logitech.setDpi(DPIStageDict[DPIStage]());
+		
+    Logitech.setDpi(DPIStageDict[DPIStage](), DPIStage);
 	Logitech.SetDPILights(DPIStage);
 	}
 	device.log(DPIStage);
@@ -1069,12 +1065,14 @@ function arrayEquals(a, b)
 
 		 this.ProductIDs =
 		 {
+			"c081" : "G900",
 			"c082" : "G403 Prodigy",
 			"c083" : "G403",
 			"c084" : "G203 Prodigy",
 			"c085" : "GPro Wired",
 			"c088" : "GPro Wireless",
 			"c08b" : "G502 Hero",
+			"c08c" : "GPro Wired", //AltPid (╯°□°）╯︵ ┻━┻
 			"c08d" : "G502 Lightspeed",
 			"c08f" : "G403 Hero",
 			"c090" : "G703",
@@ -1273,76 +1271,71 @@ function arrayEquals(a, b)
 			break;
 
 		case "c084" :
+		case "c085" :
+		case "c08c" :
 			this.Config.LedNames = this.LEDNameDict["SingleZoneMouse"];
 			this.Config.LedPositions = this.LEDPositionDict["SingleZoneMouse"];
 			this.Config.MouseBodyStyle = "G200Body";
 			this.SetHasDPILights(false);
 			break;
 
-		 case "c082" :
-		 case "c083" :
-		 case "c08f" :
-		 case "c088" :
-		 case "c090" :
-			 this.Config.LedNames = this.LEDNameDict["TwoZoneMouse"];
-			 this.Config.LedPositions = this.LEDPositionDict["TwoZoneMouse"];
-			 this.Config.MouseBodyStyle = "G200Body";
-			 this.SetHasDPILights(false);
-			 break;
+		case "c082" :
+		case "c083" :
+		case "c08f" :
+		case "c088" :
+		case "c090" :
+			this.Config.LedNames = this.LEDNameDict["TwoZoneMouse"];
+			this.Config.LedPositions = this.LEDPositionDict["TwoZoneMouse"];
+			this.Config.MouseBodyStyle = "G200Body";
+			this.SetHasDPILights(false);
+			break;
  
-		 case "c08b":
-		 case "c08d":
-		 case "c332":
-			 this.Config.LedNames = this.LEDNameDict["TwoZoneMouse"];
-			 this.Config.LedPositions = this.LEDPositionDict["TwoZoneMouse"];
-			 this.Config.MouseBodyStyle = "G500Body";
-			 this.SetHasDPILights(true);
-			 break;
+		case "c08b":
+		case "c08d":
+		case "c332":
+			this.Config.LedNames = this.LEDNameDict["TwoZoneMouse"];
+			this.Config.LedPositions = this.LEDPositionDict["TwoZoneMouse"];
+			this.Config.MouseBodyStyle = "G500Body";
+			this.SetHasDPILights(true);
+			break;
+ 
+		case "c081" :
+		case "c091":
+			this.Config.LedNames = this.LEDNameDict["TwoZoneMouse"];
+			this.Config.LedPositions = this.LEDPositionDict["TwoZoneMouse"];
+			this.Config.MouseBodyStyle = "G900Body";
+			this.SetHasDPILights(true);
+			break;
+ 
+		case "c095":
+			this.Config.LedNames = this.LEDNameDict["G502XPlus"];
+			this.Config.LedPositions = this.LEDPositionDict["G502XPlus"];
+			this.Config.MouseBodyStyle = "G502XPlusBody";
+			this.SetHasDPILights(false);
+			break;
 
-		case "c085" :
+		case "c094":
+			this.Config.LedNames = this.LEDNameDict["Null"];
+			this.Config.LedPositions = this.LEDPositionDict["Null"];
+			this.Config.MouseBodyStyle = "G200Body";
+			this.SetHasDPILights(false);
+ 
+		default:
 			this.Config.LedNames = this.LEDNameDict["TwoZoneMouse"];
 			this.Config.LedPositions = this.LEDPositionDict["TwoZoneMouse"];
 			this.Config.MouseBodyStyle = "G200Body";
 			this.SetHasDPILights(true);
 			break;
- 
-		 case "c091":
-			 this.Config.LedNames = this.LEDNameDict["TwoZoneMouse"];
-			 this.Config.LedPositions = this.LEDPositionDict["TwoZoneMouse"];
-			 this.Config.MouseBodyStyle = "G900Body";
-			 this.SetHasDPILights(true);
-			 break;
- 
-		 case "c095":
-			this.Config.LedNames = this.LEDNameDict["G502XPlus"];
-			this.Config.LedPositions = this.LEDPositionDict["G502XPlus"];
-			 this.Config.MouseBodyStyle = "G502XPlusBody";
-			 this.SetHasDPILights(false);
-			 break;
-
-		 case "c094":
-			this.Config.LedNames = this.LEDNameDict["Null"];
-			this.Config.LedPositions = this.LEDPositionDict["Null"];
-			 this.Config.MouseBodyStyle = "G200Body";
-			 this.SetHasDPILights(false);
- 
-		 default:
-			 this.Config.LedNames = this.LEDNameDict["TwoZoneMouse"];
-			 this.Config.LedPositions = this.LEDPositionDict["TwoZoneMouse"];
-			 this.Config.MouseBodyStyle = "G200Body";
-			 this.SetHasDPILights(true);
-			 break;
- 
-		 }
+		}
  
 	 }
  
 	 SetIsHeroProtocol()
 	 {
-		 if(this.FeatureIDs.RGB8071ID !== 0)
-		 {
-			 this.Config.IsHeroProtocol = true;
-		 }
+		if(this.FeatureIDs.RGB8071ID !== 0)
+		{
+			this.Config.IsHeroProtocol = true;
+		}
 	 }
 
 	 SetHasDPILights(HasDPILights)
@@ -1364,7 +1357,7 @@ function arrayEquals(a, b)
 	 device.read([this.ShortMessage,this.ConnectionMode],7);
 	 while(device.getLastReadSize() > 0)
 	 {
-		 device.read([this.ShortMessage,this.ConnectionMode],7); //THIS WAS HARDCODED AS 0xFF
+		 device.read([this.ShortMessage,this.ConnectionMode],7); //THIS WAS HARDCODED AS 0xFF, which means it probably never worked LOL.
 	 }
 	 }
  
@@ -1458,17 +1451,17 @@ function arrayEquals(a, b)
 		 this.clearLongReadBuffer();
 		 for (const property in this.FeaturePages) 
 		 {
-			 let packet = [0x00, 0x00, this.FeaturePages[property][0], this.FeaturePages[property][1]];
-			 let FeatureID = this.SendLongMessage(packet)[0]; //Grab first byte as that contains the FeatureID
-			 this.FeatureIDs[property+'ID'] = FeatureID;
-			 if(FeatureID !== 0 && FeatureID < 100)
-			 {
+			let packet = [0x00, 0x00, this.FeaturePages[property][0], this.FeaturePages[property][1]];
+			let FeatureID = this.SendLongMessage(packet)[0]; //Grab first byte as that contains the FeatureID
+			this.FeatureIDs[property+'ID'] = FeatureID;
+			if(FeatureID !== 0 && FeatureID < 100)
+			{
 			 	device.log(property + " FeatureID: " + this.FeatureIDs[property+'ID'])
-			 }
-			 else
-			 {
+			}
+			else
+			{
 				FeatureID = 0; //I'm not dealing with No Connect Edge Cases.
-			 }
+			}
 		 }
 		 this.SetIsHeroProtocol();
 	 }
@@ -1506,6 +1499,7 @@ function arrayEquals(a, b)
 			let FirmwareBuild = FirmwareResponsePacket.slice(6,8);
 			let ActiveFirmwareFlag = FirmwareResponsePacket[8];
 			let TransportPID = FirmwareResponsePacket[9].toString(16) + FirmwareResponsePacket[10].toString(16);
+
 		if(FirmwareType == 0)
 			{
 				device.log("Firmware Type: " + this.FirmwareType[FirmwareType]);
@@ -1611,10 +1605,10 @@ function arrayEquals(a, b)
 	 return this.PercentageLookupTable[nearestVoltageBand]
 	 }
  
-	 setDpi(dpi)
+	 setDpi(dpi, stage)
 	 {
-	 let packet = [this.FeatureIDs.DPIID, 0x30, 0x00, Math.floor(dpi/256), dpi%256];
-	 this.SendShortMessage(packet);
+	 let packet = [this.FeatureIDs.DPIID, 0x30, 0x00, Math.floor(dpi/256), dpi%256, stage]; //Oh there's actually a stage flag?
+	 this.SendLongMessageNoResponse(packet);
 	 }
  
 	 SetDPILights(stage)
