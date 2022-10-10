@@ -86,8 +86,6 @@ export function LedPositions()
 export function Initialize()
 {	
 	Logitech.SetConnectionMode(Logitech.WIRELESS);
-	Logitech.FetchIDs();
-	Logitech.SetHasBattery();
 
 	let data = [0x80, 0x00, 0x00, 0x01]//Enable Hid++ Notifications
     Logitech.SendShortWiredMessage(data);
@@ -95,34 +93,33 @@ export function Initialize()
     data = [0x80, 0x02, 0x02, 0x00]
     Logitech.SendShortWiredMessage(data);
 
+	Logitech.FetchIDs();
+	Logitech.SetHasBattery();
+
 	let CommunicationID = Logitech.FetchDeviceInfo();
 
 	if(CommunicationID === "00") //In case of poor detection, rerun.
 	{
 	CommunicationID = Logitech.FetchDeviceInfo();
 	}
-
+	let DeviceID = "0000";
 	if(Logitech.DeviceIDs.hasOwnProperty(CommunicationID))
 	{
 		device.log("Matching Device ID Found");
 		Logitech.SetDeviceID(CommunicationID);
+		Logitech.SetWirelessMouseType(Logitech.DeviceID);
+		DeviceID = Logitech.DeviceID;
 	}
 	else if(Logitech.ProductIDs.hasOwnProperty(CommunicationID))
 	{
 		device.log("Matching Product ID Found");
 		Logitech.SetProductID(CommunicationID);
+		Logitech.SetWiredMouseType(Logitech.ProductID);
+		DeviceID = Logitech.ProductID;
 	}
 
-	Logitech.getDeviceName();
-	if(Logitech.DeviceID !== "0")
-	{
-	Logitech.SetWirelessMouseType(Logitech.DeviceID);
-	}
-	else
-	{
-	Logitech.SetWiredMouseType(Logitech.ProductID)
-	}
-	let DeviceID = Logitech.DeviceID || Logitech.ProductID
+	Logitech.getDeviceName(); 
+	
     deviceName = Logitech.DeviceIDs[Logitech.DeviceID] || Logitech.ProductIDs[Logitech.ProductID] || "UNKNOWN"
     device.log(`Device Id Found: ${DeviceID}`);
     device.log(`Device Name: ${deviceName}`);

@@ -164,14 +164,15 @@ export function LedPositions()
 export function Initialize()
 {
 	Logitech.SetConnectionMode(Logitech.WIRELESS);
-	Logitech.FetchIDs();
-	Logitech.SetHasBattery();
-	
+
 	let data = [0x80, 0x00, 0x00, 0x01]//Enable Hid++ Notifications
     Logitech.SendShortWiredMessage(data);
 
     data = [0x80, 0x02, 0x02, 0x00]
     Logitech.SendShortWiredMessage(data);
+
+	Logitech.FetchIDs();
+	Logitech.SetHasBattery();
 
 	let CommunicationID = Logitech.FetchDeviceInfo();
 

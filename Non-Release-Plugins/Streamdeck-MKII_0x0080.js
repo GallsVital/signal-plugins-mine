@@ -132,7 +132,7 @@ function colorgrabber(shutdown=false)
 
 			let buttoncolor = makeHexString(color);
 
-			rgbdata = device.ConvertColorToImageBuffer(buttoncolor, 96, 96, "JPEG");
+			rgbdata = device.ConvertColorToImageBuffer(buttoncolor, 72, 72, "JPEG");
 
 			let RGBLength = rgbdata.length.toString(10);
 			let firstbyte = RGBLength[1] + RGBLength[2];
