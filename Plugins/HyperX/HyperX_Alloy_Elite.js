@@ -49,8 +49,8 @@ let vLedPositions =
 	[0, 7], [1, 7], [2, 7],                      [6, 7],                      [10, 7], [11, 7], [12, 7], [13, 7],    [14, 7], [15, 7], [16, 7],   [17, 7],         [19, 7],               // 13
 ];
 
-let vKeymap = [
-
+let vKeymap = 
+[
 	//Media Keys 115
 	168, 169, 170, 171,
 	//Light Bar
@@ -63,60 +63,66 @@ let vKeymap = [
 	7,    23, 39, 55, 71, 87,  103, 119, 135, 15, 31, 47,     34,                125, 141, 65,
 	8,    40, 56, 72, 88,  104, 120, 136, 16, 32,  48,     107,      139,       81, 97, 113, 144,
 	9, 25,  41,         73,                 121,     137,  17,  123,  19, 35, 51,  129,      145,
-
-
 ];
 
-export function Initialize() {
-
-}
-
-export function LedNames() {
+export function LedNames() 
+{
 	return vLedNames;
 }
 
-export function LedPositions() {
+export function LedPositions() 
+{
 	return vLedPositions;
 }
 
-export function Render() {
+export function Initialize() 
+{
+
+}
+
+export function Render() 
+{
 	sendColors();
 	SendBar();
 }
 
-export function Shutdown() {
+export function Shutdown() 
+{
 	sendColors(true);
 }
 
-function sendColorchannel(channel, data){
-	let packet = [];
-
-	packet[0x00] = 0x07;
-	packet[0x01] = 0x16;
-	packet[0x02] = channel;
-	packet[0x03] = 0xA0;
-	packet = packet.concat(data);
+function sendColorchannel(channel, data)
+{
+	let packet = [0x07, 0x16, channel, 0xA0];
+	packet.push(...data);
 
 	device.send_report(packet, 264);
-
+	device.pause(1);
 }
 
-function sendColors(shutdown = false) {
-//get color data
+function sendColors(shutdown = false) 
+{
+	//get color data
 	let red = new Array(106).fill(0);
 	let green = new Array(106).fill(0);
 	let blue = new Array(106).fill(0);
 
-	for(let iIdx = 0; iIdx < vKeymap.length; iIdx++) {
+	for(let iIdx = 0; iIdx < vKeymap.length; iIdx++) 
+	{
 		let iPxX = vLedPositions[iIdx][0];
 		let iPxY = vLedPositions[iIdx][1];
 		var color;
 
-		if(shutdown){
+		if(shutdown)
+		{
 			color = hexToRgb(shutdownColor);
-		}else if (LightingMode === "Forced") {
+		}
+		else if (LightingMode === "Forced") 
+		{
 			color = hexToRgb(forcedColor);
-		}else{
+		}
+		else
+		{
 			color = device.color(iPxX, iPxY);
 		}
 
@@ -126,10 +132,13 @@ function sendColors(shutdown = false) {
 	}
 
 	sendColorchannel(1, red);
-
+	device.pause(10);
 	sendColorchannel(2, green);
-
+	device.pause(10);
 	sendColorchannel(3, blue);
+	device.pause(10);
+
+	device.pause(10);
 
 }
 
@@ -139,22 +148,24 @@ let Bar_Blue = [ 0x72, 0x33, 0x73, 0x32, 0x39, 0x38, 0x68, 0x3A, 0x69, 0x2A, 0x6
 
 function SendBar(shutdown = false) //Sends Lightbar and Media Keys
 {
-	let packet = [];
-	packet[0x00] = 0x07;
-	packet[0x01] = 0x16;
-	packet[0x02] = 0x04;
-	packet[0x03] = 0x0A;
+	let packet = [0x07, 0x16, 0x04, 0x0A];
 
-	for(let iIdx = 0; iIdx < 22; iIdx++) {
+	for(let iIdx = 0; iIdx < 22; iIdx++) 
+	{
 		let iPxX = vLedPositions[iIdx][0];
 		let iPxY = vLedPositions[iIdx][1];
 		var color;
 
-		if(shutdown) {
+		if(shutdown) 
+		{
 			color = hexToRgb(shutdownColor);
-		} else if (LightingMode === "Forced") {
+		} 
+		else if (LightingMode === "Forced") 
+		{
 			color = hexToRgb(forcedColor);
-		} else {
+		} 
+		else 
+		{
 			color = device.color(iPxX, iPxY);
 		}
 
@@ -164,10 +175,11 @@ function SendBar(shutdown = false) //Sends Lightbar and Media Keys
 	}
 
 	device.send_report(packet, 264);
-	//device.pause(1);
+	device.pause(1);
 }
 
-function hexToRgb(hex) {
+function hexToRgb(hex) 
+{
 	let result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
 	let colors = [];
 	colors[0] = parseInt(result[1], 16);
@@ -177,8 +189,8 @@ function hexToRgb(hex) {
 	return colors;
 }
 
-export function Validate(endpoint) {
-
+export function Validate(endpoint) 
+{
 	return endpoint.interface === 2 && endpoint.usage === 1 && endpoint.usage_page === 0xff01;
 }
 
