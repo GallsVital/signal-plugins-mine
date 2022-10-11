@@ -9,6 +9,12 @@ export function DefaultScale(){return 15.0;}
 shutdownColor:readonly
 LightingMode:readonly
 forcedColor:readonly
+DpiControl:readonly
+dpi1:readonly
+dpi2:readonly
+dpi3:readonly
+dpi4:readonly
+dpi5:readonly
 */
 export function ControllableParameters(){
 	return [
