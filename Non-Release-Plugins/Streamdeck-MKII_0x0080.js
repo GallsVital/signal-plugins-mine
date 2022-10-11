@@ -3,7 +3,7 @@ export function VendorId() { return 0x0fd9; }
 export function ProductId() { return 0x0080; }
 export function Publisher() { return "WhirlwindFX"; }
 export function Documentation() { return "troubleshooting/corsair"; }
-export function Size() { return [5, 3]; }
+export function Size() { return [ButtonSize * RowWidth + 1, ButtonSize * ColHeight + 1]; }
 export function DefaultPosition(){return [240, 120];}
 export function DefaultScale(){return 8.0;}
 export function ControllableParameters(){
@@ -20,11 +20,15 @@ export function ControllableParameters(){
 let vLedNames = [ "LED 1", "LED 2", "LED 3", "LED 4", "LED 5", "LED 6", "LED 7", "LED 8", "LED 9", "LED 10", "LED 11", "LED 12", "LED 13", "LED 14", "LED 15" ];
 let vLedPositions =
 [
-	[4, 0], [3, 0], [2, 0], [1, 0], [0, 0],
-	[4, 1], [3, 1], [2, 1], [1, 1], [0, 1],
-	[4, 2], [3, 2], [2, 2], [1, 2], [0, 2]
+	[0, 0], [1, 0], [2, 0], [3, 0], [4, 0],
+	[0, 1], [1, 1], [2, 1], [3, 1], [4, 1],
+	[0, 2], [1, 2], [2, 2], [3, 2], [4, 2]
 ];
 let lastButtonRGB;
+
+const ButtonSize = 3;
+const RowWidth = 5;
+const ColHeight = 3;
 
 export function LedNames()
 {
@@ -104,7 +108,7 @@ function decimalToHex(d, padding)
 
 function colorgrabber(shutdown=false)
 {
-	for(let iIdx = 0; iIdx < 32; iIdx++)
+	for(let iIdx = 0; iIdx < 15; iIdx++)
 	{
 		let rgbdata = [];
 		let iPxX = vLedPositions[iIdx][0];
@@ -124,34 +128,27 @@ function colorgrabber(shutdown=false)
 			color = device.color(iPxX, iPxY);
 		}
 
-		if(lastButtonRGB[iIdx][0] !== color[0] || lastButtonRGB[iIdx][1] !== color[1] || lastButtonRGB[iIdx][2] !== color[2])
-		{
-			lastButtonRGB[iIdx][0] = color[0];
-			lastButtonRGB[iIdx][1] = color[1];
-			lastButtonRGB[iIdx][2] = color[2];
+		let iXoffset = (iIdx % 5) * ButtonSize;
+		let iYoffset = Math.floor(iIdx / 5) * ButtonSize;
 
-			let buttoncolor = makeHexString(color);
+		rgbdata = device.getImageBuffer(iXoffset, iYoffset, ButtonSize, ButtonSize, 72, 72, "JPEG");
 
-			rgbdata = device.ConvertColorToImageBuffer(buttoncolor, 96, 96, "JPEG");
-
-			let RGBLength = rgbdata.length.toString(10);
-			let firstbyte = RGBLength[1] + RGBLength[2];
-			let secondbyte = RGBLength[0];
-
-			sendZone(iIdx, firstbyte, secondbyte, rgbdata);
-		}
+		sendZone(iIdx, rgbdata);
+		
 	}
 }
 
-function sendZone(iIdx, firstbyte, secondbyte, rgbdata)
+function sendZone(iIdx, rgbdata)
 {
+	//device.log(`${rgbdata.length & 0xFF}:${ (rgbdata.length >> 8) & 0xFF}`);
+
 	let packet = [];
 	packet[0] = 0x02;
 	packet[1] = 0x07;
 	packet[2] = iIdx;
 	packet[3] = 0x01;
-	packet[4] = firstbyte;
-	packet[5] = secondbyte;
+	packet[4] = rgbdata.length & 0xFF;
+	packet[5] = (rgbdata.length >> 8) & 0xFF;
 	packet[6] = 0x00;
 	packet[7] = 0x00;
 
