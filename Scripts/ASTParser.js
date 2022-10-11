@@ -1,4 +1,4 @@
-import { Project } from "ts-morph";
+import { Project, NewLineKind } from "ts-morph";
 import { argv } from 'node:process';
 import { Console } from "node:console";
 import * as url from 'url';
@@ -8,20 +8,27 @@ import path from 'path';
 let dryrun = false;
 let AddComments = false;
 let AddTypes = false;
+let sortFunctions = false;
 
 argv.forEach((val, index) => {
 	console.log(`${index}: ${val}`);
 
 	switch(val){
-		case("--dryrun"):{
-			dryrun = true;
-		}
-		case("--comments"):{
-			AddComments = true;
-		}
-		case("--types"):{
-			AddTypes = true;
-		}
+	case("--dryrun"):{
+		dryrun = true;
+	}
+
+	case("--comments"):{
+		AddComments = true;
+	}
+
+	case("--types"):{
+		AddTypes = true;
+	}
+
+	case("--order"):{
+		sortFunctions = true;
+	}
 	}
 });
 
@@ -47,6 +54,23 @@ const FunctionTypes = {
 	"Scan" : "ScanExport"
 };
 
+const FunctionOrder = {
+	"Name": 1,
+	"VendorId": 2,
+	"ProductId": 3,
+	"Publisher": 4,
+	"Documentation": 5,
+	"Size": 6,
+	"DefaultPosition": 7,
+	"DefaultScale": 8,
+	"ControllableParameters": 9,
+	"LedNames": 10,
+	"LedPositions": 11,
+	"Validate": 12,
+	"Initialize": 13,
+	"Render": 14,
+	"Shutdown" : 15,
+};
 
 const PluginPath = "Plugins\\Corsair_K95_Plat_XT_Keyboard_ModernCorsairProtocol.js";
 //const PluginPath = "Plugins\\Corsair_Dominator_Ram.js";
@@ -73,14 +97,14 @@ function getAllFiles(dirPath, arrayOfFiles) {
 export async function ScanPlugins(){
 	const PluginFiles = getAllFiles(DirectoryName);
 	let ChangedFiles = 0;
-	let ChangedFileNames = [];
+	const ChangedFileNames = [];
 
 	for(let iIdx = 0; iIdx < PluginFiles.length; iIdx++){
 		const plugin = PluginFiles.at(iIdx);
 
-		//console.log(plugin);
 		try{
-			let ReturnValue = await ProcessPlugin(plugin);
+			const ReturnValue = await ProcessPlugin(plugin);
+
 			if(ReturnValue){
 				ChangedFileNames.push(plugin);
 				ChangedFiles++;
@@ -94,7 +118,6 @@ export async function ScanPlugins(){
 	console.log(ChangedFileNames);
 	console.log(`Changed [${ChangedFiles}] files${dryrun ? " if this wasn't a dry run." : "."}`);
 
-
 }
 
 async function ProcessPlugin(PluginPath){
@@ -107,14 +130,32 @@ async function ProcessPlugin(PluginPath){
 
 		return;
 	}
+
 	let iRet = 0;
+
 	if(AddComments){
 		iRet |= await InsertParametersComment(pluginFile, PluginPath);
 	}
 
+	// if(sortFunctions){
+	// 	for(const functionName in FunctionOrder){
+	// 		const Function = pluginFile.getFunction(functionName);
+			
+	// 		if(Function){
+	// 			if(Function.getChildIndex() != FunctionOrder[functionName]){
+	// 				console.log(`Function [${functionName}] is likely out of order! Should be at position [${FunctionOrder[functionName]} instead of [${Function.getChildIndex()}]]`)
+	// 			}
+	// 		}
+	// 	}
+	// }
+
 	// if(AddTypes){
 	// 	iRet |= InsertTypeComments(pluginFile);
 	// }
+
+	if(!dryrun){
+		pluginFile.save();
+	}
 
 	return iRet;
 }
@@ -126,8 +167,6 @@ function InitPlugin(PluginPath){
 
 	return pluginFile;
 }
-
-
 
 
 function AddFunctionTypeComment(pluginFile, FunctionName, FunctionType){
@@ -143,25 +182,28 @@ function AddFunctionTypeComment(pluginFile, FunctionName, FunctionType){
 			});
 		}
 	}
+
 	return 1;
 }
 
 function InsertTypeComments(pluginFile){
-	let iRet = 0
+	let iRet = 0;
+
 	for(const functionName in FunctionTypes){
 		iRet |= AddFunctionTypeComment(pluginFile, functionName, FunctionTypes[functionName]);
 	}
+
 	return iRet;
 }
 
 
 async function InsertParametersComment(pluginFile, PluginPath){
-	let currentComment = GetCurrentParameterComment(pluginFile);
+	const currentComment = GetCurrentParameterComment(pluginFile);
 
-	let parameters = await FetchControllableParameters(PluginPath);
+	const parameters = await FetchControllableParameters(PluginPath);
 
 	//console.log(parameters);
-	let neededComment = CreateGlobalsComment(parameters);
+	const neededComment = CreateGlobalsComment(parameters);
 
 	if(currentComment != neededComment){
 		console.log("ESLint Comment Invalid! \nFound:");
@@ -174,8 +216,10 @@ async function InsertParametersComment(pluginFile, PluginPath){
 
 		console.log("\nNew Comments:");
 		console.log(GetCurrentParameterComment(pluginFile));
+
 		return 1;
 	}
+
 	return 0;
 }
 
