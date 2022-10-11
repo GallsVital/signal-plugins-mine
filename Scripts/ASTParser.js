@@ -1,22 +1,34 @@
 import { Project } from "ts-morph";
 import { argv } from 'node:process';
 import { Console } from "node:console";
+import * as url from 'url';
+import fs from 'fs';
+import path from 'path';
 
 let dryrun = false;
+let AddComments = false;
+let AddTypes = false;
 
 argv.forEach((val, index) => {
 	console.log(`${index}: ${val}`);
 
 	switch(val){
-	case("--dryrun"):{
-		dryrun = true;
-	}
+		case("--dryrun"):{
+			dryrun = true;
+		}
+		case("--comments"):{
+			AddComments = true;
+		}
+		case("--types"):{
+			AddTypes = true;
+		}
 	}
 });
 
-
+// @ts-ignore
+const CurrentDirectoryURL = new URL('.', import.meta.url);
+const DirectoryName = path.join(url.fileURLToPath(CurrentDirectoryURL), "..", "Plugins");
 const project = new Project();
-let ChangedComments = 0;
 
 const FunctionTypes = {
 	"Name" : "NameExport",
@@ -36,12 +48,58 @@ const FunctionTypes = {
 };
 
 
-//const PluginPath = "Plugins\\Corsair_K95_Plat_XT_Keyboard_ModernCorsairProtocol.js";
-const PluginPath = "Plugins\\Corsair_Dominator_Ram.js";
+const PluginPath = "Plugins\\Corsair_K95_Plat_XT_Keyboard_ModernCorsairProtocol.js";
+//const PluginPath = "Plugins\\Corsair_Dominator_Ram.js";
 
-ProcessPlugin(PluginPath);
+//ProcessPlugin(PluginPath);
+ScanPlugins();
 
-function ProcessPlugin(PluginPath){
+function getAllFiles(dirPath, arrayOfFiles) {
+	const files = fs.readdirSync(dirPath);
+
+	arrayOfFiles = arrayOfFiles || [];
+
+	files.forEach(function(file) {
+		if (fs.statSync(dirPath + "/" + file).isDirectory()) {
+			arrayOfFiles = getAllFiles(dirPath + "/" + file, arrayOfFiles);
+		} else {
+			arrayOfFiles.push(path.join(dirPath, "/", file));
+		}
+	});
+
+	return arrayOfFiles;
+}
+
+export async function ScanPlugins(){
+	const PluginFiles = getAllFiles(DirectoryName);
+	let ChangedFiles = 0;
+	let ChangedFileNames = [];
+
+	for(let iIdx = 0; iIdx < PluginFiles.length; iIdx++){
+		const plugin = PluginFiles.at(iIdx);
+
+		//console.log(plugin);
+		try{
+			let ReturnValue = await ProcessPlugin(plugin);
+			if(ReturnValue){
+				ChangedFileNames.push(plugin);
+				ChangedFiles++;
+			}
+		}catch(e){
+			console.log(e);
+		}
+	}
+
+	console.log("File Paths Edited:");
+	console.log(ChangedFileNames);
+	console.log(`Changed [${ChangedFiles}] files${dryrun ? " if this wasn't a dry run." : "."}`);
+
+
+}
+
+async function ProcessPlugin(PluginPath){
+	console.log(` Plugin at Path: [${PluginPath}]`);
+
 	const pluginFile = InitPlugin(PluginPath);
 
 	if(!pluginFile){
@@ -49,16 +107,16 @@ function ProcessPlugin(PluginPath){
 
 		return;
 	}
-
-	InsertTypeComments(pluginFile);
-	InsertParametersComment(pluginFile);
-
-	if(!dryrun){
-		console.log(`Changed [${ChangedComments}] Comments!`);
-		pluginFile.save();
-	}else{
-		console.log(`Changed [${ChangedComments}] Comments if this wasn't a dry run!`);
+	let iRet = 0;
+	if(AddComments){
+		iRet |= await InsertParametersComment(pluginFile, PluginPath);
 	}
+
+	// if(AddTypes){
+	// 	iRet |= InsertTypeComments(pluginFile);
+	// }
+
+	return iRet;
 }
 
 function InitPlugin(PluginPath){
@@ -77,7 +135,6 @@ function AddFunctionTypeComment(pluginFile, FunctionName, FunctionType){
 
 	if(Function){
 		if(Function.getJsDocs().length === 0){
-			ChangedComments += 1;
 			Function.addJsDoc({
 				tags: [{
 					tagName: "type",
@@ -86,17 +143,40 @@ function AddFunctionTypeComment(pluginFile, FunctionName, FunctionType){
 			});
 		}
 	}
+	return 1;
 }
 
 function InsertTypeComments(pluginFile){
+	let iRet = 0
 	for(const functionName in FunctionTypes){
-		AddFunctionTypeComment(pluginFile, functionName, FunctionTypes[functionName]);
+		iRet |= AddFunctionTypeComment(pluginFile, functionName, FunctionTypes[functionName]);
 	}
+	return iRet;
 }
 
 
-function InsertParametersComment(pluginFile){
-	console.log(GetCurrentParameterComment(pluginFile));
+async function InsertParametersComment(pluginFile, PluginPath){
+	let currentComment = GetCurrentParameterComment(pluginFile);
+
+	let parameters = await FetchControllableParameters(PluginPath);
+
+	//console.log(parameters);
+	let neededComment = CreateGlobalsComment(parameters);
+
+	if(currentComment != neededComment){
+		console.log("ESLint Comment Invalid! \nFound:");
+		console.log(currentComment);
+		console.log("\nWanted:");
+		console.log(neededComment);
+
+		console.log("Replacing Current Comments");
+		SetControllableParametersComment(pluginFile, neededComment);
+
+		console.log("\nNew Comments:");
+		console.log(GetCurrentParameterComment(pluginFile));
+		return 1;
+	}
+	return 0;
 }
 
 // Get ESLint global comments if they exist.
@@ -112,4 +192,54 @@ function GetCurrentParameterComment(pluginFile){
 	}
 
 	return "";
+}
+
+function SetControllableParametersComment(pluginFile, Comment){
+	const test = pluginFile.getFunction("ControllableParameters");
+
+	if(test){
+		const comments = test.getLeadingCommentRanges()[0];
+
+		if(comments){
+			pluginFile.replaceText([comments.getPos(), comments.getEnd()], Comment);
+		}
+	}
+}
+
+function CreateGlobalsComment(parameters){
+	let globalsString = "/* global\n";
+
+	for(let i = 0; i < parameters.length; i ++){
+		if(parameters[i].property){
+			globalsString += parameters[i].property + ":readonly\n";
+		}
+	}
+
+	globalsString += "*/";
+
+	return globalsString;
+}
+
+async function FetchControllableParameters(pluginFile){
+	const filePathUrl = url.pathToFileURL(pluginFile);
+	// @ts-ignore
+	const pluginModule = await import(filePathUrl);
+	console.log(`\nChecking Plugin at path: [${pluginFile}]`);
+
+	if(!pluginModule.ControllableParameters){
+		console.log("ControllableParameters() does not exist. Cannot Add Global Variables.");
+
+		return 0;
+	}
+	let parameters;
+
+	try{
+		parameters = pluginModule.ControllableParameters();
+	}catch(e){
+		console.log(e);
+
+		return [];
+	}
+
+	return parameters;
 }
