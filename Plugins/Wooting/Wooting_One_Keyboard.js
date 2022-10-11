@@ -10,23 +10,14 @@ shutdownColor:readonly
 LightingMode:readonly
 forcedColor:readonly
 */
-export function ControllableParameters(){
+export function ControllableParameters()
+{
     return [
         {"property":"shutdownColor", "label":"Shutdown Color","min":"0","max":"360","type":"color","default":"009bde"},
         {"property":"LightingMode", "label":"Lighting Mode", "type":"combobox", "values":["Canvas","Forced"], "default":"Canvas"},
         {"property":"forcedColor", "label":"Forced Color","min":"0","max":"360","type":"color","default":"009bde"},
        
     ];
-}
-
-function hexToRgb(hex) {
-    var result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
-    var colors = [];
-    colors[0] = parseInt(result[1], 16);
-    colors[1] = parseInt(result[2], 16);
-    colors[2] = parseInt(result[3], 16);
-
-    return colors;
 }
 
 const vKeyNames = [
@@ -101,37 +92,49 @@ var rgb_buffer2_changed = false;
 var rgb_buffer3_changed = false;
 var rgb_buffer4_changed = false;
 
-export function Initialize() {
-	wooting_usb_send_feature(WOOTING_COLOR_INIT_COMMAND, 0, 0, 0, 0);
-}
-
-export function Shutdown() {
-	wooting_usb_send_feature(WOOTING_RESET_ALL_COMMAND, 0, 0, 0, 0);
-}
-
-export function LedNames() {
+export function LedNames() 
+{
     return vKeyNames;
 }
 
-export function LedPositions() {
+export function LedPositions() 
+{
     return vKeyPositions;
 }
 
-export function Render() {
+export function Initialize() 
+{
+	wooting_usb_send_feature(WOOTING_COLOR_INIT_COMMAND, 0, 0, 0, 0);
+}
+
+export function Render() 
+{
     sendColors();
 }
 
-function sendColors(shutdown = false) {
+export function Shutdown() 
+{
+	wooting_usb_send_feature(WOOTING_RESET_ALL_COMMAND, 0, 0, 0, 0);
+}
+
+function sendColors(shutdown = false) 
+{
 	let iPxX, iPxY, col;
-    for(var iIdx = 0; iIdx < vKeyPositions.length; iIdx++) {
+    for(var iIdx = 0; iIdx < vKeyPositions.length; iIdx++) 
+	{
         iPxX = vKeyPositions[iIdx][0];
         iPxY = vKeyPositions[iIdx][1];
 
-        if (shutdown) {
+        if (shutdown) 
+		{
             col = hexToRgb(shutdownColor);
-        } else if (LightingMode == "Forced") {
+        } 
+		else if (LightingMode == "Forced") 
+		{
             col = hexToRgb(forcedColor);
-        } else {
+        } 
+		else 
+		{
             col = device.color(iPxX, iPxY);
         }
 
@@ -139,10 +142,6 @@ function sendColors(shutdown = false) {
     }
 
 	wooting_rgb_array_update_keyboard();
-}
-
-export function Validate(endpoint) {
-    return endpoint.interface === 2 && endpoint.usage === 1;
 }
 
 function getCrc16ccitt(buffer, size) {
@@ -341,6 +340,22 @@ function wooting_rgb_array_change_single(row, column, red, green, blue) {
 	}
 
 	return true;
+}
+
+function hexToRgb(hex) 
+{
+    var result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+    var colors = [];
+    colors[0] = parseInt(result[1], 16);
+    colors[1] = parseInt(result[2], 16);
+    colors[2] = parseInt(result[3], 16);
+
+    return colors;
+}
+
+export function Validate(endpoint) 
+{
+    return endpoint.interface === 2 && endpoint.usage === 1;
 }
 
 export function Image() {

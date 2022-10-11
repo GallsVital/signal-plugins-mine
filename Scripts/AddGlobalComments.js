@@ -40,18 +40,25 @@ const getAllFiles = function(dirPath, arrayOfFiles) {
 export async function ScanPlugins(){
 	const PluginFiles = getAllFiles(DirectoryName);
 	let ChangedFiles = 0;
+	let ChangedFileNames = [];
 
 	for(let iIdx = 0; iIdx < PluginFiles.length; iIdx++){
 		const plugin = PluginFiles.at(iIdx);
 
 		//console.log(plugin);
 		try{
-			ChangedFiles += await loadPlugin(plugin);
+			let ReturnValue = await loadPlugin(plugin);
+			if(ReturnValue){
+				ChangedFileNames.push(plugin);
+				ChangedFiles++;
+			}
 		}catch(e){
 			console.log(e);
 		}
 	}
 
+	console.log("File Paths Edited:");
+	console.log(ChangedFileNames);
 	console.log(`Changed [${ChangedFiles}] files${dryrun ? " if this wasn't a dry run." : "."}`);
 
 
