@@ -15,7 +15,8 @@ shutdownColor:readonly
 LightingMode:readonly
 forcedColor:readonly
 */
-export function ControllableParameters(){
+export function ControllableParameters()
+{
 	return [
 		{"property":"UpdateRate", "label":"Update rate", "type":"combobox", "values":["10fps","30fps"], "default":"10fps", "tooltip":"Not all Nanoleaf panels support more than 10fps!"},
 		{"property":"shutdownColor", "label":"Shutdown Color","min":"0","max":"360","type":"color","default":"000000"},
@@ -25,9 +26,7 @@ export function ControllableParameters(){
 }
 
 const DeviceMaxLedLimit = 100;
-var ChannelArray = [
-	["Nanoleaf Panels", 100],
-];
+var ChannelArray = [ ["Nanoleaf Panels", 100] ];
 
 function SetupChannels()
 {
@@ -52,6 +51,12 @@ export function LedPositions()
 export function Initialize()
 {
 	SetupChannels()
+}
+
+export function Render()
+{
+	SendChannel(0);
+	device.pause(UpdateRate == "10fps" ? 75 : 3);
 }
 
 export function Shutdown()
@@ -87,21 +92,10 @@ function SendChannel(Channel,shutdown = false)
 	
 	for(var CurrPacket = 1; CurrPacket <= NumPackets; CurrPacket++)
 	{
-		var packet = [];
-		packet[0] = 0x00;
-		packet[1] = CurrPacket;
-		packet[2] = 0xEE;
-		packet[3] = NumPackets;
-		packet[4] = 0x01;
-		packet = packet.concat(RGBData.splice(0,60));
+		let packet = [0x00, CurrPacket, 0xEE, NumPackets, 0x01];
+		packet.push(...RGBData.splice(0,60));
 		device.write(packet, 65);
 	}
-}
-
-export function Render()
-{
-	SendChannel(0);
-	device.pause(UpdateRate == "10fps" ? 75 : 3);
 }
 
 export function Validate(endpoint)

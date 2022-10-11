@@ -46,19 +46,35 @@ let vKeyPositions =
 	[0, 4], [1, 4], [2, 4],               [5, 4],               [8, 4], [9, 4], [10, 4], 				  [13, 4],
 ];
 
-export function LedNames() {
+export function LedNames() 
+{
 	return vKeyNames;
 }
 
-export function LedPositions() {
+export function LedPositions() 
+{
 	return vKeyPositions;
 }
 
-export function Initialize() {
+export function Initialize() 
+{
 
 }
 
-function sendZonefake(zone) {
+export function Render() 
+{
+	SendPacket();
+	sendZonefake(6);
+	sendZonefake(7);
+}
+
+export function Shutdown() 
+{
+	//Do nothing. Keeb reverts to hardware mode when streaming is stopped.
+}
+
+function sendZonefake(zone) 
+{
 	let packet = [];
 	packet[0x00] = 0x0a;
 	packet[0x01] = 0x07;
@@ -67,7 +83,8 @@ function sendZonefake(zone) {
 	device.send_report(packet, 65);
 }
 
-function sendInitalPacket(data) {
+function sendInitalPacket(data) 
+{
 	let packet = [];
 
 	packet[0x00] = 0x0A;
@@ -80,7 +97,8 @@ function sendInitalPacket(data) {
 	device.send_report(packet, 65);
 }
 
-function StreamPacket(zone, data) {
+function StreamPacket(zone, data) 
+{
 	let packet = [];
 
 	packet[0x00] = 0x0a;
@@ -92,19 +110,26 @@ function StreamPacket(zone, data) {
 	device.pause(1);
 }
 
-function SendPacket(shutdown = false) {
+function SendPacket(shutdown = false) 
+{
 	let RGBData = new Array(425).fill(0);
 
-	for(let iIdx = 0; iIdx < vKeys.length; iIdx++) {
+	for(let iIdx = 0; iIdx < vKeys.length; iIdx++) 
+	{
 		let iPxX = vKeyPositions[iIdx][0];
 		let iPxY = vKeyPositions[iIdx][1];
 		var col;
 
-		if(shutdown) {
+		if(shutdown) 
+		{
 			col = hexToRgb(shutdownColor);
-		} else if (LightingMode === "Forced") {
+		} 
+		else if (LightingMode === "Forced") 
+		{
 			col = hexToRgb(forcedColor);
-		} else {
+		} 
+		else 
+		{
 			col = device.color(iPxX, iPxY);
 		}
 
@@ -121,21 +146,8 @@ function SendPacket(shutdown = false) {
 	device.pause(1);
 }
 
-export function Render() {
-	SendPacket();
-	sendZonefake(6);
-	sendZonefake(7);
-}
-
-export function Shutdown() {
-	//Do nothing. Keeb reverts to hardware mode when streaming is stopped.
-}
-
-export function Validate(endpoint) {
-	return endpoint.interface === 1 && endpoint.usage === 0x0001 && endpoint.usage_page === 0xff00 && endpoint.collection === 0x0005;
-}
-
-function hexToRgb(hex) {
+function hexToRgb(hex) 
+{
 	let result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
 	let colors = [];
 	colors[0] = parseInt(result[1], 16);
@@ -143,4 +155,9 @@ function hexToRgb(hex) {
 	colors[2] = parseInt(result[3], 16);
 
 	return colors;
+}
+
+export function Validate(endpoint) 
+{
+	return endpoint.interface === 1 && endpoint.usage === 0x0001 && endpoint.usage_page === 0xff00 && endpoint.collection === 0x0005;
 }
