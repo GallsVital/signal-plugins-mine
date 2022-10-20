@@ -11,7 +11,8 @@ shutdownColor:readonly
 LightingMode:readonly
 forcedColor:readonly
 */
-export function ControllableParameters(){
+export function ControllableParameters()
+{
     return [
         {"property":"shutdownColor", "group":"lighting", "label":"Shutdown Color","min":"0","max":"360","type":"color","default":"009bde"},
         {"property":"LightingMode", "group":"lighting", "label":"Lighting Mode", "type":"combobox", "values":["Canvas","Forced"], "default":"Canvas"},
@@ -19,9 +20,9 @@ export function ControllableParameters(){
     ];
 }
 
-var vLedNames = [ "Zone 1", "Zone 2", "Zone 3", "Zone 4", "Null", "Null", "Zone 5", "Zone 6", "Zone 7", "Zone 8" ]; //5 and 6 are Null. 
+let vLedNames = [ "Zone 1", "Zone 2", "Zone 3", "Zone 4", "Null", "Null", "Zone 5", "Zone 6", "Zone 7", "Zone 8" ]; //5 and 6 are Null. 
 
-var vLedPositions = [ [0,1],[1,1],[3,1],[4,1],[0,0],[0,0],[7,1],[6,1],[5,1],[2,1] ];
+let vLedPositions = [ [0,1],[1,1],[3,1],[4,1],[0,0],[0,0],[7,1],[6,1],[5,1],[2,1] ];
 
 export function LedNames()
 {
@@ -54,26 +55,13 @@ export function Shutdown()
 
 function Header()
 {
-    var packet = [];
-
-    
-    packet[0x00]           = 0x43;
-    packet[0x01]           = 0x81;
-    packet[0x02]           = 0x00;
-    packet[0x03]           = 0x84;
-
+    let packet = [0x43, 0x81, 0x00, 0x84];
     device.write(packet, 10);
 }
 
 function Header2()
 {
-    var packet = [];
-
-    packet[0x00]           = 0x43;
-    packet[0x01]           = 0x81;
-    packet[0x02]           = 0x00;
-    packet[0x03]           = 0x86;
-
+    let packet = [0x43, 0x81, 0x00, 0x86];
     device.write(packet, 10);
 }
 
@@ -86,11 +74,16 @@ function sendColorBurstOne(shutdown = false)
     var iX = vLedPositions[offset][0];
     var iY = vLedPositions[offset][1];
     var col;
-    if(shutdown){
+    if(shutdown)
+    {
         col = hexToRgb(shutdownColor)
-    }else if (LightingMode == "Forced") {
+    }
+    else if (LightingMode == "Forced") 
+    {
         col = hexToRgb(forcedColor)
-    }else{
+    }
+    else
+    {
         col = device.color(iX, iY);
     }
       
@@ -147,11 +140,16 @@ function sendColorBurstTwo(shutdown = false)
     var iX = vLedPositions[offset][0];
     var iY = vLedPositions[offset][1];
     var col;
-    if(shutdown){
+    if(shutdown)
+    {
         col = hexToRgb(shutdownColor)
-    }else if (LightingMode == "Forced") {
+    }
+    else if (LightingMode == "Forced") 
+    {
         col = hexToRgb(forcedColor)
-    }else{
+    }
+    else
+    {
         col = device.color(iX, iY);
     }
       
@@ -205,11 +203,16 @@ function sendColorBurstThree(shutdown = false)
     var iX = vLedPositions[offset][0];
     var iY = vLedPositions[offset][1];
     var col;
-    if(shutdown){
+    if(shutdown)
+    {
         col = hexToRgb(shutdownColor)
-    }else if (LightingMode == "Forced") {
+    }
+    else if (LightingMode == "Forced") 
+    {
         col = hexToRgb(forcedColor)
-    }else{
+    }
+    else
+    {
         col = device.color(iX, iY);
     }
       
@@ -275,11 +278,16 @@ function sendColorBurstFour(shutdown = false)
     var iX = vLedPositions[offset][0];
     var iY = vLedPositions[offset][1];
     var col;
-    if(shutdown){
+    if(shutdown)
+    {
         col = hexToRgb(shutdownColor)
-    }else if (LightingMode == "Forced") {
+    }
+    else if (LightingMode == "Forced") 
+    {
         col = hexToRgb(forcedColor)
-    }else{
+    }
+    else
+    {
         col = device.color(iX, iY);
     }
       
