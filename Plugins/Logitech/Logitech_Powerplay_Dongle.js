@@ -3,17 +3,7 @@ export function VendorId() { return 0x046d; }
 export function Documentation(){ return "troubleshooting/logitech"; }
 export function ProductId() { return 0xC53A; }
 export function Publisher() { return "WhirlwindFX"; }
-export function Size() 
-{
-	if(Logitech.DeviceID === "4099")
-	{
-		return [7,3];
-	}
-	 else
-	{
-		return [3, 3];
-	}
-}
+export function Size() { return [3, 3]; }
 export function DefaultPosition(){return [240,120]}
 export function DefaultScale(){return 8.0}
 /* global
@@ -33,7 +23,8 @@ OnboardState:readonly
 DPIRollover:readonly
 pollingrate:readonly
 */
-export function ControllableParameters(){
+export function ControllableParameters()
+{
     return [
         {"property":"shutdownColor", "group":"lighting", "label":"Shutdown Color","min":"0","max":"360","type":"color","default":"009bde"},
         {"property":"LightingMode", "group":"lighting", "label":"Lighting Mode", "type":"combobox", "values":["Canvas","Forced"], "default":"Canvas"},
@@ -56,6 +47,7 @@ export function ControllableParameters(){
 var deviceName;
 var Sniper;
 var DPIStage = 1;
+var DeviceConnected = false;
 var savedPollTimer = Date.now();
 var PollModeInternal = 15000;
 
@@ -99,75 +91,27 @@ export function Initialize()
 {	
 	Logitech.SetConnectionMode(Logitech.WIRELESS);
 
-	let data = [0x80, 0x00, 0x00, 0x01]//Enable Hid++ Notifications
-    Logitech.SendShortWiredMessage(data);
-
-    data = [0x80, 0x02, 0x02, 0x00]
-    Logitech.SendShortWiredMessage(data);
-
-	Logitech.FetchIDs();
-	Logitech.SetHasBattery();
-
-	Powerplayinit();
-
-	let CommunicationID = Logitech.FetchDeviceInfo();
-
-	if(CommunicationID === "00") //In case of poor detection, rerun.
+	DeviceConnected = connectionCheck();
+	if(DeviceConnected !== true)
 	{
-	CommunicationID = Logitech.FetchDeviceInfo();
+		return;
 	}
-
-	let DeviceID = "0000";
-	if(Logitech.DeviceIDs.hasOwnProperty(CommunicationID))
-	{
-		device.log("Matching Device ID Found");
-		Logitech.SetDeviceID(CommunicationID);
-		Logitech.SetWirelessMouseType(Logitech.DeviceID);
-		DeviceID = Logitech.DeviceID;
-	}
-	else if(Logitech.ProductIDs.hasOwnProperty(CommunicationID))
-	{
-		device.log("Matching Product ID Found");
-		Logitech.SetProductID(CommunicationID);
-		Logitech.SetWiredMouseType(Logitech.ProductID);
-		DeviceID = Logitech.ProductID;
-	}
-
-    deviceName = Logitech.DeviceIDs[Logitech.DeviceID] || Logitech.ProductIDs[Logitech.ProductID] || "UNKNOWN"
-    device.log(`Device Id Found: ${DeviceID}`);
-    device.log(`Device Name: ${deviceName}`);
-
-
-    Logitech.SetOnBoardState(OnboardState);
-	Logitech.ButtonSpySet(OnboardState);
-	Logitech.SetDirectMode(OnboardState);
-
-	Logitech.SetDpiLightAlwaysOn(DpiLight);
-
-	if(DpiControl)
-	{
-		Logitech.setDpi(DPIStageDict[DPIStage]());
-		Logitech.SetDPILights(DPIStage);	
-	}
-	else
-	{
-		Logitech.SetDPILights(3); //Fallback to set DPILights to full
-	}
-
-	device.repollLeds();
-	device.repollSize();
-
-	if(Logitech.Config.HasBattery)
-	{
-		device.addFeature("battery");
-		device.pause(1000);
-    	battery.setBatteryLevel(Logitech.GetBatteryCharge());
-	}
+	deviceInitialization();
 }
-
 
 export function Render()
 {
+	if(DeviceConnected !== true)
+	{
+		DeviceConnected = connectionCheck();
+		if(DeviceConnected)
+		{
+			deviceInitialization();
+			return;
+		}
+		device.pause(1000);
+		return;
+	}
 	DetectInputs();
 	grabColors();
 	PollBattery();
@@ -241,6 +185,82 @@ export function onpollingrateChanged()
 	Logitech.setPollingRate();
 }
 
+
+function deviceInitialization()
+{
+	Logitech.FetchIDs();
+	Logitech.SetHasBattery();
+
+	Powerplayinit();
+
+	let CommunicationID = Logitech.FetchDeviceInfo();
+
+	let DeviceID = "0000";
+	if(Logitech.DeviceIDs.hasOwnProperty(CommunicationID))
+	{
+		device.log("Matching Device ID Found");
+		Logitech.SetDeviceID(CommunicationID);
+		Logitech.SetWirelessMouseType(Logitech.DeviceID);
+		DeviceID = Logitech.DeviceID;
+		deviceName = Logitech.DeviceIDs[Logitech.DeviceID] || "UNKNOWN";
+	}
+	else if(Logitech.ProductIDs.hasOwnProperty(CommunicationID))
+	{
+		device.log("Matching Product ID Found");
+		Logitech.SetProductID(CommunicationID);
+		Logitech.SetWiredMouseType(Logitech.ProductID);
+		DeviceID = Logitech.ProductID;
+		deviceName = Logitech.ProductIDs[Logitech.ProductID] || "UNKNOWN";
+	}
+
+    device.log(`Device Id Found: ${DeviceID}`);
+    device.log(`Device Name: ${deviceName}`);
+
+    Logitech.SetOnBoardState(OnboardState);
+	Logitech.ButtonSpySet(OnboardState);
+	Logitech.SetDirectMode(OnboardState);
+
+	Logitech.SetDpiLightAlwaysOn(DpiLight);
+
+	if(DpiControl)
+	{
+		Logitech.setDpi(DPIStageDict[DPIStage]());
+		Logitech.SetDPILights(DPIStage);	
+	}
+	else
+	{
+		Logitech.SetDPILights(3); //Fallback to set DPILights to full
+	}
+	device.setSize(Logitech.Config.DeviceSize);
+	device.setControllableLeds(Logitech.Config.LedNames, Logitech.Config.LedPositions);
+
+	if(Logitech.Config.HasBattery)
+	{
+		device.addFeature("battery");
+		device.pause(1000);
+    	battery.setBatteryLevel(Logitech.GetBatteryCharge());
+	}
+}
+
+function connectionCheck()
+{
+	let data = [0x80, 0x00, 0x00, 0x01];//Enable Hid++ Notifications
+    Logitech.SendShortWiredMessage(data);
+
+    data = [0x80, 0x02, 0x02, 0x00]; //Fake Reconnect
+	let returndata = Logitech.SendShortWiredMessage(data);
+
+	if(returndata[1] === 34)
+	{
+		device.log("Attached Device Found");
+		let DeviceId = returndata[3].toString(16) + returndata[2].toString(16);
+		device.log("Attached DeviceID: " + DeviceId);
+		device.pause(100);
+		return true;
+	}
+	return false;
+}
+
 function PollBattery()
 {  
     	if (Date.now() - savedPollTimer < PollModeInternal) 
@@ -296,7 +316,6 @@ function Powerplayinit()
 
 function DetectInputs()
 {
-	
 		do
     	{
     	let packet = [];
@@ -424,7 +443,7 @@ function ProcessInputs(packet)
 			}
 		}
 	}
-	if(packet[0] == Logitech.LongMessage && packet[1] == Logitech.ConnectionMode && packet[2] == 0x06 && packet[3] == 0x00 && packet[6] == 0x00)
+	if(packet[0] == Logitech.LongMessage && packet[1] == Logitech.ConnectionMode && packet[2] == 0x04 && packet[3] == 0x00 && packet[5] == 0x01)
 	{
 		device.log("Waking From Sleep");
 		device.pause(5000); //Wait five seconds before Handoff. Allows device boot time.
@@ -541,7 +560,7 @@ function hexToRgb(hex)
  *
  */
 
- class LogitechProtocol
+class LogitechProtocol
  {
 	 constructor(options = {})
 	 {
@@ -601,13 +620,15 @@ function hexToRgb(hex)
 			 /** Variable for which body style a mouse has to properly register buttons to actions. */
 			 MouseBodyStyle : "G500 Body",
 			 /** Stored Array for LEDPositions */
-			 /** @type {number[][]} */
+			 /** @type {LedPosition[]} */
 			 LedPositions : [[0, 1], [0, 2]],
 			 /** Stored Array for LEDNames */
 			 /** @type {string[]} */
 			 LedNames : ["Primary Zone", "Logo Zone"],
+			 /**Variable for stored size of a device */
+			 DeviceSize : [3,3],
 			 /** Variable that represents if a device has multiple connection methods and which method it is connected by.  */
-			 CommunicationType : 0,
+			 CommunicationType : this.CommunicationType["SingleConnection"],
 			 /** Variable that represents which method a device is connected by. */
 			 ConnectionMode : 0,
 			 /** Variable for defining if a mouse supports the 8071 RGB Protocol. */
@@ -616,8 +637,6 @@ function hexToRgb(hex)
 			 HasDPILights : false,
 			 /** Variable for defining if a mouse supports battery status and level. */
 			 HasBattery : false,
- 
-			 CommunicationType : this.CommunicationType["SingleConnection"],
  
 			 DeviceName: "UNKNOWN",
 			 DeviceType: "-1"
@@ -651,13 +670,17 @@ function hexToRgb(hex)
 		 "407c" : "Logitech G915 Keyboard",
 		 "4099" : "Logitech G502 X Plus"
 		 };
- 
+ 		
 		 this.LEDPositionDict =
 		 {
 			 "Null": 				[],
+			 /** @type {LedPosition[]} */
 			 "SingleZoneMouse":		[ [0, 1] ],
+			 /** @type {LedPosition[]} */
 			 "TwoZoneMouse":		[ [0, 1], [0, 2] ],
+			 /** @type {LedPosition[]} */
 			 "ThreeZoneMouse":		[ [0, 1], [1, 2], [2, 1] ],
+			 /** @type {LedPosition[]} */
 			 "G502XPlus":			[ [6, 2], [6, 0], [0, 1], [1, 1], [5, 1], [4, 1], [3, 1], [2, 1] ],
 		 };
  
@@ -819,6 +842,20 @@ function hexToRgb(hex)
 			"c095" : "G502 X Plus",
 			"c332" : "G502",
 		 };
+
+		 this.ErrorCodes =
+		 {
+			0 : "NoError",
+			1 : "Unknown",
+			2 : "InvalidArgument",
+			3 : "OutOfRange",
+			4 : "HardwareError",
+			5 : "Internal",
+			6 : "InvalidFeatureIndex",
+			7 : "InvalidFunctionID",
+			8 : "Busy",
+			9 : "Unsupported"
+		 };
 	 
 		 this.VoltageArray = 
 		 [ 
@@ -960,6 +997,7 @@ function hexToRgb(hex)
 			 this.Config.LedPositions = this.LEDPositionDict["TwoZoneMouse"];
 			 this.Config.MouseBodyStyle = "G200Body";
 			 this.SetHasDPILights(false);
+			 this.SetDeviceSize([3,3]);
 			 break;
  
 		 case "407f":
@@ -967,6 +1005,7 @@ function hexToRgb(hex)
 			 this.Config.LedPositions = this.LEDPositionDict["TwoZoneMouse"];
 			 this.Config.MouseBodyStyle = "G500Body";
 			 this.SetHasDPILights(true);
+			 this.SetDeviceSize([3,3]);
 			 break;
  
 		 case "4053":
@@ -976,6 +1015,7 @@ function hexToRgb(hex)
 			 this.Config.LedPositions = this.LEDPositionDict["TwoZoneMouse"];
 			 this.Config.MouseBodyStyle = "G900Body";
 			 this.SetHasDPILights(true);
+			 this.SetDeviceSize([3,3]);
 			 break;
  
 		 case "4099":
@@ -983,6 +1023,7 @@ function hexToRgb(hex)
 			this.Config.LedPositions = this.LEDPositionDict["G502XPlus"];
 			 this.Config.MouseBodyStyle = "G502XPlusBody";
 			 this.SetHasDPILights(false);
+			 this.SetDeviceSize([7,3]);
 			 break;
  
 		 default:
@@ -990,8 +1031,8 @@ function hexToRgb(hex)
 			 this.Config.LedPositions = this.LEDPositionDict["TwoZoneMouse"];
 			 this.Config.MouseBodyStyle = "G500Body";
 			 this.SetHasDPILights(true);
+			 this.SetDeviceSize([3,3]);
 			 break;
- 
 		 }
  
 	 }
@@ -1004,6 +1045,7 @@ function hexToRgb(hex)
 			this.Config.LedNames = this.LEDNameDict["ThreeZoneMouse"];
 			this.Config.LedPositions = this.LEDPositionDict["ThreeZoneMouse"];
 			this.Config.MouseBodyStyle = "G200Body";
+			this.SetDeviceSize([3,3]);
 			this.SetHasDPILights(false);
 			break;
 
@@ -1014,6 +1056,7 @@ function hexToRgb(hex)
 			this.Config.LedPositions = this.LEDPositionDict["SingleZoneMouse"];
 			this.Config.MouseBodyStyle = "G200Body";
 			this.SetHasDPILights(false);
+			this.SetDeviceSize([3,3]);
 			break;
 
 		case "c082" :
@@ -1025,6 +1068,7 @@ function hexToRgb(hex)
 			this.Config.LedPositions = this.LEDPositionDict["TwoZoneMouse"];
 			this.Config.MouseBodyStyle = "G200Body";
 			this.SetHasDPILights(false);
+			this.SetDeviceSize([3,3]);
 			break;
  
 		case "c08b":
@@ -1034,6 +1078,7 @@ function hexToRgb(hex)
 			this.Config.LedPositions = this.LEDPositionDict["TwoZoneMouse"];
 			this.Config.MouseBodyStyle = "G500Body";
 			this.SetHasDPILights(true);
+			this.SetDeviceSize([3,3]);
 			break;
  
 		case "c081" :
@@ -1042,6 +1087,7 @@ function hexToRgb(hex)
 			this.Config.LedPositions = this.LEDPositionDict["TwoZoneMouse"];
 			this.Config.MouseBodyStyle = "G900Body";
 			this.SetHasDPILights(true);
+			this.SetDeviceSize([3,3]);
 			break;
  
 		case "c095":
@@ -1049,6 +1095,7 @@ function hexToRgb(hex)
 			this.Config.LedPositions = this.LEDPositionDict["G502XPlus"];
 			this.Config.MouseBodyStyle = "G502XPlusBody";
 			this.SetHasDPILights(false);
+			this.SetDeviceSize([7,3]);
 			break;
 
 		case "c094":
@@ -1056,12 +1103,14 @@ function hexToRgb(hex)
 			this.Config.LedPositions = this.LEDPositionDict["Null"];
 			this.Config.MouseBodyStyle = "G200Body";
 			this.SetHasDPILights(false);
+			this.SetDeviceSize([1,1]);
  
 		default:
 			this.Config.LedNames = this.LEDNameDict["TwoZoneMouse"];
 			this.Config.LedPositions = this.LEDPositionDict["TwoZoneMouse"];
 			this.Config.MouseBodyStyle = "G200Body";
 			this.SetHasDPILights(true);
+			this.SetDeviceSize([3,3]);
 			break;
 		}
  
@@ -1084,28 +1133,33 @@ function hexToRgb(hex)
 	 {
 		if(this.FeatureIDs.UnifiedBatteryID !== 0 || this.FeatureIDs.BatteryVoltageID !== 0)
 		{
-		this.Config.HasBattery = true;
+			this.Config.HasBattery = true;
 		}
+	}
+
+	SetDeviceSize(DeviceSize)
+	{
+		this.Config.DeviceSize = DeviceSize;
 	}
  
 	 clearShortReadBuffer()
 	 {
-	 device.set_endpoint(this.Config.CommunicationType, this.ShortMessageEndpointByte, this.EndpointByte3); // Short Message Endpoint 
-	 device.read([this.ShortMessage,this.ConnectionMode],7);
-	 while(device.getLastReadSize() > 0)
-	 {
-		 device.read([this.ShortMessage,this.ConnectionMode],7); //THIS WAS HARDCODED AS 0xFF
-	 }
+	 	device.set_endpoint(this.Config.CommunicationType, this.ShortMessageEndpointByte, this.EndpointByte3); // Short Message Endpoint 
+	 	device.read([this.ShortMessage,this.ConnectionMode],7, 10);
+	 	while(device.getLastReadSize() > 0)
+	 	{
+		 	device.read([this.ShortMessage,this.ConnectionMode],7, 10); //THIS WAS HARDCODED AS 0xFF
+	 	}
 	 }
  
 	 clearLongReadBuffer()
 	 {
-	 device.set_endpoint(this.Config.CommunicationType, this.LongMessageEndpointByte, this.EndpointByte3); // Long Message Endpoint
-	 device.read([this.LongMessage,this.ConnectionMode],10);
-	 while(device.getLastReadSize() > 0)
-	 {
-		 device.read([this.ShortMessage,this.ConnectionMode],20);
-	 }
+	 	device.set_endpoint(this.Config.CommunicationType, this.LongMessageEndpointByte, this.EndpointByte3); // Long Message Endpoint
+	 	device.read([this.LongMessage,this.ConnectionMode],20, 10);
+	 	while(device.getLastReadSize() > 0)
+	 	{
+		 	device.read([this.ShortMessage,this.ConnectionMode],20, 10);
+	 	}
 	 }
  
 	 SendShortWiredMessage(data)
@@ -1128,7 +1182,7 @@ function hexToRgb(hex)
 	 data  = data || [0x00, 0x00, 0x00];
 	 packet.push(...data);
 	 device.write(packet, 7);
-	 device.pause(5);
+
 	 packet = device.read(packet,7);
  
 	 return packet.slice(3,7);
@@ -1151,10 +1205,9 @@ function hexToRgb(hex)
 	 data = data || [0x00, 0x00, 0x00];
 	 packet.push(...data);
 	 device.write(packet, 20);
-	 device.pause(5);
-	 packet = device.read(packet,20);
+	 let returnData = device.read(packet,20);
 	 
-	 return packet.slice(4,20);
+	 return returnData.slice(4,20);
 	 }
  
 	 SendLongPowerPlayMessage(data)
@@ -1164,9 +1217,9 @@ function hexToRgb(hex)
 	 data = data || [0x00, 0x00, 0x00];
 	 packet.push(...data);
 	 device.write(packet, 20);
-	 packet = device.read(packet,20);
+	 let returnData = device.read(packet,20);
 	 
-	 return packet.slice(4,7);
+	 return returnData.slice(4,7);
 	 }
  
 	 Short_Get()
@@ -1192,6 +1245,7 @@ function hexToRgb(hex)
 			 let packet = [0x00, 0x00, this.FeaturePages[property][0], this.FeaturePages[property][1]];
 			 let FeatureID = this.SendLongMessage(packet)[0]; //Grab first byte as that contains the FeatureID
 			 this.FeatureIDs[property+'ID'] = FeatureID;
+			 device.pause(100);
 			 if(FeatureID !== 0 && FeatureID < 100)
 			 {
 			 	device.log(property + " FeatureID: " + this.FeatureIDs[property+'ID'])
