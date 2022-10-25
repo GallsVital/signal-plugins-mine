@@ -32,7 +32,8 @@ let ParentDeviceName = "Cooler Master ARGB Controller";
 export function SupportsSubdevices(){ return true; }
 const DeviceMaxLedLimit = 196;
 //Channel Name, Led Limit
-let ChannelArray = [
+let ChannelArray = 
+[
 	["Channel 1", 48],
 	["Channel 2", 48],
 	["Channel 3", 48],
@@ -42,28 +43,43 @@ let ChannelArray = [
 function SetupChannels(){
 	device.SetLedLimit(DeviceMaxLedLimit);
 
-	for(let i = 0; i < ChannelArray.length; i++){
+	for(let i = 0; i < ChannelArray.length; i++)
+	{
 		device.addChannel(ChannelArray[i][0], ChannelArray[i][1]);
 	}
 }
 
 
-function InitChannels(){
+function InitChannels()
+{
 	sendPacketString("00 80 17 02", 65);   //Init Custom Mode ARGB
 }
 
-export function Initialize() {
+export function Initialize() 
+{
 	SetupChannels();
 }
 
-export function Shutdown() {
+export function Shutdown() 
+{
 
 }
 
 const vKeyNames = [];
 const vKeyPositions = [];
 
-let RGBConfigs = {
+export function LedNames() 
+{
+	return vKeyNames;
+}
+
+export function LedPositions() 
+{
+	return vKeyPositions;
+}
+
+let RGBConfigs = 
+{
 	"RGB" : [0, 1, 2],
 	"RBG" : [0, 2, 1],
 	"BGR" : [2, 1, 0],
@@ -74,10 +90,12 @@ let RGBConfigs = {
 
 let savedMotherboardPass;
 
-function setMotherboardPass(){
+function setMotherboardPass()
+{
 	savedMotherboardPass = MotherboardPass;
 
-	if(savedMotherboardPass){
+	if(savedMotherboardPass)
+	{
 		sendPacketString("00 80 17 02", 65);
 		sendPacketString("00 80 01 02", 65);
 		sendPacketString("00 80 01 02", 65);
@@ -85,19 +103,12 @@ function setMotherboardPass(){
 		sendPacketString("00 80 01 02", 65);
 		sendPacketString("00 80 01 04 01", 65); //RGB header
 
-	}else{
+	}
+	else
+	{
 		sendPacketString("00 80 01 01", 65);
 
 	}
-}
-
-
-export function LedNames() {
-	return vKeyNames;
-}
-
-export function LedPositions() {
-	return vKeyPositions;
 }
 
 function SendChannel(Channel, shutdown = false) {

@@ -12,7 +12,8 @@ LightingMode:readonly
 forcedColor:readonly
 CustomSize:readonly
 */
-export function ControllableParameters(){
+export function ControllableParameters()
+{
 	return [
 		{"property":"shutdownColor", "group":"lighting", "label":"Shutdown Color", "min":"0", "max":"360", "type":"color", "default":"009bde"},
 		{"property":"LightingMode", "group":"lighting", "label":"Lighting Mode", "type":"combobox", "values":["Canvas", "Forced"], "default":"Canvas"},
@@ -27,7 +28,8 @@ export function SupportsSubdevices(){ return true; }
 const DeviceMaxLedLimit = 54 * 5 ;
 
 //Channel Name, Led Limit
-let ChannelArray = [
+let ChannelArray = 
+[
 	["Channel 1", 54],
 	["Channel 2", 54],
 	["Channel 3", 54],
@@ -38,10 +40,12 @@ let ChannelArray = [
 
 let ConnectedFans = [];
 
-function SetupChannels(){
+function SetupChannels()
+{
 	device.SetLedLimit(DeviceMaxLedLimit);
 
-	for(let i = 0; i < ChannelArray.length; i++){
+	for(let i = 0; i < ChannelArray.length; i++)
+	{
 		device.addChannel(ChannelArray[i][0], ChannelArray[i][1]);
 	}
 }
@@ -64,6 +68,21 @@ export function Initialize()
 	device.read([0x00, 0xFE, 0x33], 193);
 	
 	BurstFans();
+}
+
+export function Render() 
+{
+	for(let channel = 0; channel < 5; channel++)
+	{
+		Sendchannel(channel);
+	}
+
+	PollFans();
+}
+
+export function Shutdown() 
+{
+ //Device Reverts to Hardware Mode.
 }
 
 function Sendchannel(Channel) 
@@ -92,16 +111,6 @@ function Sendchannel(Channel)
 	}
 
 	sendDirectPacket(Channel, RGBData);
-}
-
-export function Render() 
-{
-	for(let channel = 0; channel < 5; channel++)
-	{
-		Sendchannel(channel);
-	}
-
-	PollFans();
 }
 
 function sendDirectPacket(Channel, data)
@@ -200,15 +209,9 @@ function readFanRPM(channel)
 	return RPM;
 }
 
-export function Shutdown() 
-{
-
-}
-
 export function Validate(endpoint) 
 {
 	return endpoint.interface === -1;
-
 }
 
 export function Image() 

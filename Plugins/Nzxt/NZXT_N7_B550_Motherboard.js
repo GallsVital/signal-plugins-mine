@@ -12,7 +12,8 @@ LightingMode:readonly
 forcedColor:readonly
 RGBconfig:readonly
 */
-export function ControllableParameters(){
+export function ControllableParameters()
+{
 	return [
 		{"property":"shutdownColor", "group":"lighting", "label":"Shutdown Color", "min":"0", "max":"360", "type":"color", "default":"009bde"},
 		{"property":"LightingMode", "group":"lighting", "label":"Lighting Mode", "type":"combobox", "values":["Canvas", "Forced"], "default":"Canvas"},
@@ -28,7 +29,7 @@ let ChannelArray =
 [
 	["NZXT Header 1", 40],
 	["NZXT Header 2", 40],
-	["ARGB Header 1", 40],
+	["ARGB Header 1", 40]
 ];
 
 let RGBConfigs = {
@@ -102,7 +103,6 @@ function grabRGBData(Channel)
 	if(LightingMode === "Forced")
     {
 		RGBData = device.createColorArray(forcedColor, ChannelLedCount, "Inline", "GRB");
-
 	}
     else if(componentChannel.shouldPulseColors())
     {
@@ -110,7 +110,6 @@ function grabRGBData(Channel)
 
 		let pulseColor = device.getChannelPulseColor(ChannelArray[Channel][0], ChannelLedCount);
 		RGBData = device.createColorArray(pulseColor, ChannelLedCount, "Inline", "GRB");
-
 	}
     else
     {
@@ -122,35 +121,42 @@ function grabRGBData(Channel)
 
 function StreamLightingPacketChannel(packetNumber, RGBData, channel) 
 {
-	let packet = [];
-	packet[0] = 0x22;
-	packet[1] = 0x10 | packetNumber;
-	packet[2] = 0x01 << channel;
-	packet[3] = 0x00;
-	packet = packet.concat(RGBData);
-
+	let packet = [0x22, 0x10 | packetNumber, 0x01 << channel, 0x00];
+	packet.push(...RGBData);
 	device.write(packet, 64);
 }
 
 function SubmitLightingColors(channel) 
 {
-	let packet = [];
-	packet[0] = 0x22;
-	packet[1] = 0xA0;
-	packet[2] = 1 << channel;
-	packet[3] = 0x00;
-	packet[4] = 0x01;
-	packet[5] = 0x00;
-	packet[6] = 0x00;
-	packet[7] = 0x28;//Was 28?
-	packet[8] = 0x00;
-	packet[9] = 0x00;
-	packet[10] = 0x80;
-	packet[11] = 0x00;
-	packet[12] = 0x32;
-	packet[13] = 0x00;
-	packet[14] = 0x00;
-	packet[15] = 0x01;
+	let packet = [0x22, 0xA0, 1 << channel, 0x00, 0x01, 0x00, 0x00, 0x28, 0x00, 0x00, 0x80, 0x00, 0x32, 0x00, 0x00, 0x01];
+	device.write(packet, 64);
+}
+
+function SendRGBHeader(shutdown = false)
+{
+	let packet = 
+	[
+		0x2A, 0x04, 0x08, 0x08, 0x00, 0x32, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x01, 0x00, 0x01, 0x03, 0x00, 0x00, 0x00, 0x00
+	];
+	let col;
+
+	if(shutdown)
+	{
+		col = hexToRgb(shutdownColor);
+	}
+	else if (LightingMode === "Forced") 
+	{
+		col = hexToRgb(forcedColor);
+	}
+	else
+	{
+		col = device.subdeviceColor("12v RGB Header", 1, 1);
+	}
+
+	packet[7] = col[RGBConfigs[RGBconfig][0]];
+	packet[8] = col[RGBConfigs[RGBconfig][1]];
+	packet[9] = col[RGBConfigs[RGBconfig][2]];
+
 	device.write(packet, 64);
 }
 
@@ -165,29 +171,8 @@ function hexToRgb(hex)
 	return colors;
 }
 
-function SendRGBHeader(shutdown = false){
-
-	let packet = [
-		0x2A, 0x04, 0x08, 0x08, 0x00, 0x32, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x01, 0x00, 0x01, 0x03, 0x00, 0x00, 0x00, 0x00
-	];
-	let col;
-
-	if(shutdown){
-		col = hexToRgb(shutdownColor);
-	}else if (LightingMode === "Forced") {
-		col = hexToRgb(forcedColor);
-	}else{
-		col = device.subdeviceColor("12v RGB Header", 1, 1);
-	}
-
-	packet[7] = col[RGBConfigs[RGBconfig][0]];
-	packet[8] = col[RGBConfigs[RGBconfig][1]];
-	packet[9] = col[RGBConfigs[RGBconfig][2]];
-
-	device.write(packet, 64);
-}
-
-export function Validate(endpoint) {
+export function Validate(endpoint) 
+{
 	return endpoint.interface === -1;
 }
 

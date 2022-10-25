@@ -23,9 +23,10 @@ export function ControllableParameters()
 }
 
 const DeviceMaxLedLimit = 1024;
-let ChannelArray = [
+let ChannelArray = 
+[
 	["Channel 1", 512],
-	["Channel 2", 512],
+	["Channel 2", 512]
 ];
 
 function SetupChannels()
@@ -58,6 +59,16 @@ export function Initialize()
 	packet[2] = 0x01;
 	device.write(packet, 65);
 	SetupChannels();
+}
+
+export function Render()
+{
+	for(let i = 0; i < ChannelArray.length; i++)
+	{
+		SendChannel(i);
+	}
+
+	device.pause(1);
 }
 
 export function Shutdown()
@@ -101,25 +112,10 @@ function SendChannel(Channel, shutdown = false)
 
 	for(let CurrPacket = 1; CurrPacket <= NumPackets; CurrPacket++)
 	{
-		let packet = [];
-		packet[0] = 0x00;
-		packet[1] = CurrPacket;
-		packet[2] = 0x00;
-		packet[3] = NumPackets;
-		packet[4] = Channel + 1;
-		packet = packet.concat(RGBData.splice(0, 60));
+		let packet = [0x00, CurrPacket, 0x00, NumPackets, Channel + 1];
+		packet.push(...RGBData.splice(0, 60));
 		device.write(packet, 65);
 	}
-}
-
-export function Render()
-{
-	for(let i = 0; i < ChannelArray.length; i++)
-	{
-		SendChannel(i);
-	}
-
-	device.pause(1);
 }
 
 export function Validate(endpoint)

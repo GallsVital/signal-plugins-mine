@@ -27,12 +27,13 @@ export function SupportsSubdevices(){ return true; }
 const DeviceMaxLedLimit = 270;
 
 //Channel Name, Led Limit
-let ChannelArray = [
+let ChannelArray = 
+[
 	["Channel 1", 54],
 	["Channel 2", 54],
 	["Channel 3", 54],
 	["Channel 4", 54],
-	["Channel 5", 54],
+	["Channel 5", 54]
 
 ];
 
@@ -67,6 +68,21 @@ export function Initialize()
 
 }
 
+export function Render()
+{
+	for(let channel = 0; channel < 5; channel++)
+	{
+		Sendchannel(channel);
+	}
+
+	PollFans();
+}
+
+export function Shutdown()
+{
+
+}
+
 function Sendchannel(Channel)
 {
 	let ChannelLedCount = device.channel(ChannelArray[Channel][0]).ledCount;
@@ -93,16 +109,6 @@ function Sendchannel(Channel)
 	}
 
 	sendDirectPacket(Channel, RGBData);
-}
-
-export function Render()
-{
-	for(let channel = 0; channel < 5; channel++)
-	{
-		Sendchannel(channel);
-	}
-
-	PollFans();
 }
 
 function sendDirectPacket(Channel, data)
@@ -202,11 +208,6 @@ function readFanRPM(channel)
 	FanData.push(`Fan ${channel} ${RPM}`);
 
 	return RPM;
-}
-
-export function Shutdown()
-{
-
 }
 
 export function Validate(endpoint)

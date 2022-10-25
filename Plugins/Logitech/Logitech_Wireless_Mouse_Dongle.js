@@ -2,17 +2,7 @@ export function Name() { return "Logitech Wireless Mouse Dongle"; }
 export function VendorId() { return 0x046d; }
 export function ProductId() { return 0xC539; }
 export function Publisher() { return "WhirlwindFX"; }
-export function Size() 
-{
-	if(Logitech.DeviceID === "4099")
-	{
-		return [7,3];
-	}
-	 else
-	{
-		return [3, 3];
-	}
-}
+export function Size() { return [3, 3]; }
 export function DefaultPosition(){return [240,120]}
 export function DefaultScale(){return 8.0}
 /* global
@@ -32,7 +22,8 @@ OnboardState:readonly
 DPIRollover:readonly
 pollingrate:readonly
 */
-export function ControllableParameters(){
+export function ControllableParameters()
+{
     return [
         {"property":"shutdownColor", "group":"lighting", "label":"Shutdown Color","min":"0","max":"360","type":"color","default":"009bde"},
         {"property":"LightingMode", "group":"lighting", "label":"Lighting Mode", "type":"combobox", "values":["Canvas","Forced"], "default":"Canvas"},
@@ -54,6 +45,7 @@ export function ControllableParameters(){
 
 var deviceName;
 var Sniper;
+var DeviceConnected = false;
 var DPIStage = 1;
 var savedPollTimer = Date.now();
 var PollModeInternal = 15000;
@@ -82,82 +74,32 @@ export function LedPositions()
     return Logitech.Config.LedPositions;
 }
 
-
 export function Initialize()
 {	
 	Logitech.SetConnectionMode(Logitech.WIRELESS);
-	Logitech.FetchIDs();
-	Logitech.SetHasBattery();
 
-	let data = [0x80, 0x00, 0x00, 0x01]//Enable Hid++ Notifications
-    Logitech.SendShortWiredMessage(data);
-
-    data = [0x80, 0x02, 0x02, 0x00]
-    Logitech.SendShortWiredMessage(data);
-
-	let CommunicationID = Logitech.FetchDeviceInfo();
-
-	if(CommunicationID === "00") //In case of poor detection, rerun.
+	DeviceConnected = connectionCheck();
+	if(DeviceConnected !== true)
 	{
-	CommunicationID = Logitech.FetchDeviceInfo();
+		return;
 	}
-
-	if(Logitech.DeviceIDs.hasOwnProperty(CommunicationID))
-	{
-		device.log("Matching Device ID Found");
-		Logitech.SetDeviceID(CommunicationID);
-	}
-	else if(Logitech.ProductIDs.hasOwnProperty(CommunicationID))
-	{
-		device.log("Matching Product ID Found");
-		Logitech.SetProductID(CommunicationID);
-	}
-
-	Logitech.getDeviceName();
-	if(Logitech.DeviceID !== "0")
-	{
-	Logitech.SetWirelessMouseType(Logitech.DeviceID);
-	}
-	else
-	{
-	Logitech.SetWiredMouseType(Logitech.ProductID)
-	}
-	let DeviceID = Logitech.DeviceID || Logitech.ProductID
-    deviceName = Logitech.DeviceIDs[Logitech.DeviceID] || Logitech.ProductIDs[Logitech.ProductID] || "UNKNOWN"
-    device.log(`Device Id Found: ${DeviceID}`);
-    device.log(`Device Name: ${deviceName}`);
-
-
-    Logitech.SetOnBoardState(OnboardState);
-	Logitech.ButtonSpySet(OnboardState);
-	Logitech.SetDirectMode(OnboardState);
-
-	Logitech.SetDpiLightAlwaysOn(DpiLight);
-
-	if(DpiControl)
-	{
-		Logitech.setDpi(DPIStageDict[DPIStage]());
-		Logitech.SetDPILights(DPIStage);	
-	}
-	else
-	{
-		Logitech.SetDPILights(3); //Fallback to set DPILights to full
-	}
-
-	device.repollLeds();
-	device.repollSize();
-
-	if(Logitech.Config.HasBattery)
-	{
-		device.addFeature("battery");
-		device.pause(1000);
-    	battery.setBatteryLevel(Logitech.GetBatteryCharge());
-	}
+	deviceInitialization();
 }
 
 
 export function Render()
 {
+	if(DeviceConnected !== true)
+	{
+		DeviceConnected = connectionCheck();
+		if(DeviceConnected)
+		{
+			deviceInitialization();
+			return;
+		}
+		device.pause(1000);
+		return;
+	}
 	DetectInputs();
 	grabColors();
 	PollBattery();
@@ -229,6 +171,79 @@ export function onpollingrateChanged()
 	Logitech.setPollingRate();
 }
 
+function deviceInitialization()
+{
+	Logitech.FetchIDs();
+	Logitech.SetHasBattery();
+
+	let CommunicationID = Logitech.FetchDeviceInfo();
+
+	let DeviceID = "0000";
+	if(Logitech.DeviceIDs.hasOwnProperty(CommunicationID))
+	{
+		device.log("Matching Device ID Found");
+		Logitech.SetDeviceID(CommunicationID);
+		Logitech.SetWirelessMouseType(Logitech.DeviceID);
+		DeviceID = Logitech.DeviceID;
+		deviceName = Logitech.DeviceIDs[Logitech.DeviceID] || "UNKNOWN";
+	}
+	else if(Logitech.ProductIDs.hasOwnProperty(CommunicationID))
+	{
+		device.log("Matching Product ID Found");
+		Logitech.SetProductID(CommunicationID);
+		Logitech.SetWiredMouseType(Logitech.ProductID);
+		DeviceID = Logitech.ProductID;
+		deviceName = Logitech.ProductIDs[Logitech.ProductID] || "UNKNOWN";
+	}
+
+    device.log(`Device Id Found: ${DeviceID}`);
+    device.log(`Device Name: ${deviceName}`);
+
+    Logitech.SetOnBoardState(OnboardState);
+	Logitech.ButtonSpySet(OnboardState);
+	Logitech.SetDirectMode(OnboardState);
+
+	Logitech.SetDpiLightAlwaysOn(DpiLight);
+
+	if(DpiControl)
+	{
+		Logitech.setDpi(DPIStageDict[DPIStage]());
+		Logitech.SetDPILights(DPIStage);	
+	}
+	else
+	{
+		Logitech.SetDPILights(3); //Fallback to set DPILights to full
+	}
+	device.setSize(Logitech.Config.DeviceSize);
+	device.setControllableLeds(Logitech.Config.LedNames, Logitech.Config.LedPositions);
+
+	if(Logitech.Config.HasBattery)
+	{
+		device.addFeature("battery");
+		device.pause(1000);
+    	battery.setBatteryLevel(Logitech.GetBatteryCharge());
+	}
+}
+
+function connectionCheck()
+{
+	let data = [0x80, 0x00, 0x00, 0x01];//Enable Hid++ Notifications
+    Logitech.SendShortWiredMessage(data);
+
+    data = [0x80, 0x02, 0x02, 0x00]; //Fake Reconnect
+	let returndata = Logitech.SendShortWiredMessage(data);
+
+	if(returndata[1] === 34)
+	{
+		device.log("Attached Device Found");
+		let DeviceId = returndata[3].toString(16) + returndata[2].toString(16);
+		device.log("Attached DeviceID: " + DeviceId);
+		device.pause(100);
+		return true;
+	}
+	return false;
+}
+
 function PollBattery()
 {  
     	if (Date.now() - savedPollTimer < PollModeInternal) 
@@ -249,7 +264,7 @@ function DetectInputs()
 		do
     	{
     	let packet = [];
-    	packet = device.read([0x00],9, 10);
+    	packet = device.read([0x00],20, 10);
     	let input = ProcessInputs(packet);
 		
 		if(input == "DPI_UP")
@@ -373,7 +388,7 @@ function ProcessInputs(packet)
 			}
 		}
 	}
-	if(packet[0] == Logitech.LongMessage && packet[1] == Logitech.ConnectionMode && packet[2] == 0x06 && packet[3] == 0x00 && packet[6] == 0x00)
+	if(packet[0] == Logitech.LongMessage && packet[1] == Logitech.ConnectionMode && packet[2] == 0x04 && packet[3] == 0x00 && packet[5] == 0x01)
 	{
 		device.log("Waking From Sleep");
 		device.pause(5000); //Wait five seconds before Handoff. Allows device boot time.
@@ -1052,7 +1067,7 @@ function hexToRgb(hex)
 	 data  = data || [0x00, 0x00, 0x00];
 	 packet.push(...data);
 	 device.write(packet, 7);
-	 device.pause(5);
+
 	 packet = device.read(packet,7);
  
 	 return packet.slice(3,7);
@@ -1075,7 +1090,7 @@ function hexToRgb(hex)
 	 data = data || [0x00, 0x00, 0x00];
 	 packet.push(...data);
 	 device.write(packet, 20);
-	 device.pause(5);
+
 	 packet = device.read(packet,20);
 	 
 	 return packet.slice(4,20);
