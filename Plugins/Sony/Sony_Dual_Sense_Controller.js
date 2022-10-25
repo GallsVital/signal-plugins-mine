@@ -43,27 +43,22 @@ export function Initialize()
 
 }
 
-export function Shutdown()
-{ 
-    sendColors(true);
-}
-
 export function Render() 
 {
 	sendColors();
 }
 
+export function Shutdown()
+{ 
+    sendColors(true);
+}
+
+
+
 function sendColors(shutdown = false)
 {
-    var packet = []
-    packet[0] = 0x02;
-    packet[1] = 0xfc;
-    packet[2] = 0xd7;
-    packet[6] = 0x44;
-    packet[7] = 0x40;
-    packet[8] = 0x7C;
-    packet[9] = 0x02;
-    packet[10] = 0x00;
+    let packet = [0x02, 0xfc, 0xd7, 0x44, 0x40, 0x7c, 0x02, 0x00]
+
     packet[11] = HapticsControl;//0x00 turns it off 0x01 is linear, 0x02 clicks
     packet[13] = RIntensity;//Right Trigger Toughness //13-18 There's 7 force vectors
     packet[14] = RIntensity; 
@@ -73,7 +68,7 @@ function sendColors(shutdown = false)
     packet[18] = RIntensity;
     packet[21] = RIntensity;//So many force vectors
     packet[22] = HapticsControl; //0x00 turns it off 0x01 is linear, 0x02 clicks
-    packet[23] = 0x00;
+
     packet[24] = LIntensity;//Left Trigger 24-29
     packet[25] = LIntensity;
     packet[26] = LIntensity;

@@ -2,30 +2,30 @@ export function Name() { return "Corsair Elite Cappelix LCD"; }
 export function VendorId() { return 0x1b1c; }
 export function ProductId() { return 0x0C39; }
 export function Publisher() { return "WhirlwindFX"; }
-export function Size() { return [10, 10]; }
+export function Size() { return [6, 6]; }
 export function DefaultPosition(){return [240, 120];}
-export function DefaultScale(){return 8.0;}
-/* global
-shutdownColor:readonly
-LightingMode:readonly
-forcedColor:readonly
-*/
-export function ControllableParameters(){
+export function DefaultScale(){return 1.0;}
+
+export function ControllableParameters()
+{
 	return [
-		{"property":"shutdownColor", "group":"lighting", "label":"Shutdown Color", "min":"0", "max":"360", "type":"color", "default":"009bde"},
-		{"property":"LightingMode", "group":"lighting", "label":"Lighting Mode", "type":"combobox", "values":["Canvas", "Forced"], "default":"Canvas"},
-		{"property":"forcedColor", "group":"lighting", "label":"Forced Color", "min":"0", "max":"360", "type":"color", "default":"009bde"},
+		{"property":"screenSize", "group":"", "label":"ScreenSize", "step":"1", "type":"number", "min":"1", "max":"210", "default":"5"},
 	];
 }
 
 export function Initialize()
 {
-
+	device.setSize([screenSize+1,screenSize+1]);
 }
 
 export function Render()
 {
 	colorgrabber();
+}
+
+export function onscreenSizeChanged()
+{
+	device.setSize([screenSize+1,screenSize+1]);
 }
 
 let vLedNames = [ "Device Wide" ];
@@ -42,148 +42,48 @@ export function LedPositions()
 	return vLedPositions;
 }
 
+let savedPollTimer = Date.now();
+let PollModeInternal = 40;
 
-
-function makeHexString(ColorArray)
+function colorgrabber()
 {
-    let hexstring = "#";
-    hexstring += decimalToHex(ColorArray[0], 2);
-    hexstring += decimalToHex(ColorArray[1], 2);
-    hexstring += decimalToHex(ColorArray[2], 2);
-    return hexstring;
-}
-
-function decimalToHex(d, padding) 
-{
-    let hex = Number(d).toString(16);
-    padding = typeof (padding) === "undefined" || padding === null ? padding = 2 : padding;
-
-    while (hex.length < padding) {
-        hex = "0" + hex;
-    }
-    return hex;
-    //return "0x" + hex;
-}
-
-function colorgrabber(shutdown=false)
-{
-	let rgbdata = [];
-	let iPxX = vLedPositions[0][0];
-	let iPxY = vLedPositions[0][1];
-	let color;
-	let finalPacket = 0;
-
-	if(shutdown)
+	if(Date.now() - savedPollTimer < PollModeInternal)
 	{
-		color = hexToRgb(shutdownColor);
+		return; //Break if we hit our render loop wrong
 	}
-	else if (LightingMode == "Forced")
-	{
-		color = hexToRgb(forcedColor);
-	}
-	else
-	{
-		color = device.color(iPxX, iPxY);
-	}
+	savedPollTimer = Date.now();
 
-	let buttoncolor = makeHexString(color);
-	//rgbdata = device.getImageBuffer(0, 0, 9, 9, 72, 72, "JPEG");
-	rgbdata = device.ConvertColorToImageBuffer(buttoncolor, 72, 72, "JPEG");
+	let RGBData = device.getImageBuffer(0, 0, screenSize, screenSize, {flipH: false, outputWidth: 192, outputHeight: 192, format: "JPEG"});
+	let BytesLeft = RGBData.length;
+	let packetsSent = 0;
 
-	for(var packetsSent = 0; packetsSent * 1016 < rgbdata.length; packetsSent++)
+	while(BytesLeft > 0)
 	{
-	let packetRGBDataLength = Math.min(1016, rgbdata.length)
-	if(packetRGBDataLength < 1016)
-	{
-		finalPacket = 0x01;
-	}
+		const BytesToSend = Math.min(1016, BytesLeft);
 
-		sendZone(packetRGBDataLength, rgbdata, packetsSent, finalPacket);
+		if(BytesToSend < 1016)
+		{
+			sendZone(BytesLeft, RGBData.splice(0,BytesLeft), packetsSent, 0x01);
+		}
+		else
+		{
+			sendZone(BytesToSend, RGBData.splice(0,BytesToSend), packetsSent, 0x00);
+		}
+		BytesLeft -= BytesToSend;
+		packetsSent++;
 	}
+	
 }
 
 function sendZone(packetRGBDataLength, rgbdata, packetsSent, finalPacket)
 {
-	let packet = [];
-	packet[0] = 0x02;
-	packet[1] = 0x05;
-	packet[2] = 0x40; 
-	packet[3] = finalPacket;
-	packet[4] = (packetsSent >> 8 & 0xFF);
-	packet[5] = (packetsSent & 0xFF);
-	packet[6] = (packetRGBDataLength >> 8 & 0xFF);
-	packet[7] = (packetRGBDataLength & 0xFF);
-	
-    packet = packet.concat(rgbdata.splice(0,1016));
+	let packet = [0x02, 0x05, 0x40, finalPacket, packetsSent, 0x00, (packetRGBDataLength >> 8 & 0xFF), (packetRGBDataLength & 0xFF)];
+	packet.push(...rgbdata);
 
     device.write(packet, 1024);
-	device.pause(3);
 }
-
-function sendZoneOriginal(firstbyte,secondbyte,rgbdata)
-{
-	let packet = [];
-	packet[0] = 0x02;
-	packet[1] = 0x05;
-	packet[2] = 0x40;
-	packet[3] = 0x01;
-	packet[4] = 0x00;
-	packet[5] = 0x00;
-	packet[6] = firstbyte;
-	packet[7] = secondbyte;
-	
-    packet = packet.concat(rgbdata.splice(0,1016));
-
-    device.write(packet, 1024);
-	device.pause(3);
-}
-
-function colorgrabberOriginal(shutdown=false)
-{
-	let rgbdata = [];
-	let iPxX = vKeyPositions[0][0];
-	let iPxY = vKeyPositions[0][1];
-	let color;
-
-	if(shutdown)
-	{
-		color = hexToRgb(shutdownColor);
-	}
-	else if (LightingMode == "Forced")
-	{
-		color = hexToRgb(forcedColor);
-	}
-	else
-	{
-		color = device.color(iPxX, iPxY);
-	}
-
-	//let rgbdata = device.getImageBuffer(0, 0, 9, 9, 72, 72, "JPEG");
-	let buttoncolor = makeHexString(color);
-	rgbdata = device.ConvertColorToJPEG(buttoncolor);
-	//device.log(rgbdata.length);
-
-	let RGBLength = rgbdata.length.toString(10);
-	let firstbyte = RGBLength[1] + RGBLength[2];
-	let secondbyte = RGBLength[0];
-
-	sendZone(firstbyte,secondbyte,rgbdata);
-}
-
-
 
 export function Validate(endpoint)
 {
 	return endpoint.interface === -1;
-}
-
-function hexToRgb(hex)
-{
-	var result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
-	var colors = [];
-	colors[0] = parseInt(result[1], 16);
-	colors[1] = parseInt(result[2], 16);
-	colors[2] = parseInt(result[3], 16);
-
-	return colors;
 }

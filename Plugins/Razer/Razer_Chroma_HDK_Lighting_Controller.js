@@ -115,7 +115,7 @@ function ReturnToHardwareControl(){
 function SendChannel(Channel, shutdown=false){
 	let ChannelLedCount = device.channel(ChannelArray[Channel].Name).ledCount;
 	let RGBData = [];
-	let componentChannel = device.channel(ChannelArray[Channel][0]);
+	let componentChannel = device.channel(ChannelArray[Channel].Name);
 
 	if(shutdown){
 		RGBData = device.createColorArray(shutdownColor, ChannelLedCount, "Inline");

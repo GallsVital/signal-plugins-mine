@@ -36,7 +36,8 @@ var Liquid_Temp;
 
 function SetupChannels(){
     device.SetLedLimit(DeviceMaxLedLimit);
-    for(let i = 0; i < ChannelArray.length; i++){
+    for(let i = 0; i < ChannelArray.length; i++)
+    {
         device.addChannel(ChannelArray[i][0],ChannelArray[i][1]);
     }
 }
@@ -47,15 +48,15 @@ export function Initialize()
     BurstFans();
 }
 
-export function Shutdown()
-{
-    sendchannel1Colors(0, true);
-}
- 
 export function Render()
 {      
     PollFans(); 
     sendchannel1Colors(0);
+}
+
+export function Shutdown()
+{
+    sendchannel1Colors(0, true);
 }
 
 var savedPollFanTimer = Date.now();
@@ -74,7 +75,6 @@ function PollFans()
     {
 		return;
 	}
-
         getStatus();//Grab all of our RPM's and make sure stuff is connected.
 
         let pump = 1;
@@ -85,12 +85,10 @@ function PollFans()
         {
             device.createFanControl(`Pump ${pump}`);
         }
-
             device.setRPM(`Pump ${pump}`, pumprpm)
                 
             let newSpeed = device.getNormalizedFanlevel(`Pump ${pump}`) * 100;
             setPumpSpeed(newSpeed)
-
 
         //We're leaving this here in case a user for some reason doesn't use the fan hub built into the Z series coolers.
         let fan = 1;
@@ -116,7 +114,8 @@ function BurstFans()
 {
     let BurstSpeed = 50;
 
-	if(device.fanControlDisabled()){
+	if(device.fanControlDisabled())
+    {
 		return;
 	}
 
@@ -127,14 +126,10 @@ function BurstFans()
 }
 
 function getStatus()//This gets temp, pump, and fan status.
-{
-    let packet = [];
-    packet[0] = 0x74;
-    packet[1] = 0x01;
-    
-    device.write(packet,64);
+{    
+    device.write([0x74, 0x01], 64);
 
-    do //I give this a 5% chance of success lol.
+    do
     {
         let packet = device.read([0x0], 64, 10);
 
@@ -156,16 +151,13 @@ function getStatus()//This gets temp, pump, and fan status.
 function SetFanSpeed(speed)//I'm leaving this as a separate function because the fans can do zero rpm
 {
 
-    var packet = [];
-    packet[0] = 0x72
-    packet[1] = 0x02;
-    packet[2] = 0x00
-    packet[3] = 0x00
-        for(var RPMBytes = 0; RPMBytes < 40; RPMBytes++)
-        {
+    let packet = [0x72, 0x02, 0x00, 0x00];
+
+    for(var RPMBytes = 0; RPMBytes < 40; RPMBytes++)
+    {
         let Offset = RPMBytes + 4;
         packet[Offset] = speed;
-        }
+    }
     device.log(`Setting Kraken Fans to ${Math.round(speed)}% `)
     device.write(packet,64); 
 }
@@ -173,55 +165,52 @@ function SetFanSpeed(speed)//I'm leaving this as a separate function because the
 function setPumpSpeed(speed)
 {
 
-    var packet = [];
-    packet[0] = 0x72
-    packet[1] = 0x01;
-    packet[2] = 0x00
-    packet[3] = 0x00
-        for(var RPMBytes = 0; RPMBytes < 40; RPMBytes++)
-        {
+    let packet = [0x72, 0x01, 0x00, 0x00];
+
+    for(var RPMBytes = 0; RPMBytes < 40; RPMBytes++)
+     {
         let Offset = RPMBytes + 4;
         packet[Offset] = Math.max(speed, MinimumSpeed);
-        }
+    }
     device.log(`Setting Kraken Pump to ${Math.round(speed)}% `)
     device.write(packet,64);
 }
 
-function StreamLightingPacketChanneled(count, data, channel){
+function StreamLightingPacketChanneled(count, data, channel)
+{
 
-    var packetNumber = 0
+    let packetNumber = 0
     let totalLedCount = count;
-    for(packetNumber = 0; packetNumber < 2; packetNumber++ ) {
-
+    for(packetNumber = 0; packetNumber < 2; packetNumber++ ) 
+    {
         var ledsToSend = totalLedCount >= 60 ? 60 : totalLedCount;
         totalLedCount -= ledsToSend;
 
-        var packet = [];
-        packet[0] = 0x22;
-        packet[1] = 0x10 | packetNumber;
-        packet[2] = 0x01 << channel;
-        packet[3] = 0x00;
-        packet = packet.concat(data.splice(0,ledsToSend));
+        let packet = [0x22, 0x10 | packetNumber, 0x01 << channel, 0x00];
+        packet.push(...data.splice(0,ledsToSend));
     
         device.write(packet,64);
     }
 }
 
-function sendchannel1Colors(Channel, shutdown = false){
-
+function sendchannel1Colors(Channel, shutdown = false)
+{
     let ChannelLedCount = device.channel(ChannelArray[Channel][0]).LedCount();
 	let componentChannel = device.channel(ChannelArray[Channel][0]);
 
     let RGBData = []
-    if(LightingMode == "Forced"){
+    if(LightingMode == "Forced")
+    {
         RGBData = device.createColorArray(forcedColor, ChannelLedCount, "Inline", "GRB");
-
-    }else if(componentChannel.shouldPulseColors()){
+    }
+    else if(componentChannel.shouldPulseColors())
+    {
         ChannelLedCount = 40;
         let pulseColor = device.getChannelPulseColor(ChannelArray[Channel][0], ChannelLedCount);
         RGBData = device.createColorArray(pulseColor, ChannelLedCount, "Inline", "GRB");
-
-    }else{
+    }
+    else
+    {
         RGBData = device.channel(ChannelArray[Channel][0]).getColors("Inline", "GRB");
     }
 
@@ -231,23 +220,7 @@ function sendchannel1Colors(Channel, shutdown = false){
 
 function SubmitLightingColors(channel)
 {
-    var packet = [];
-    packet[0] = 0x22;
-    packet[1] = 0xA0;
-    packet[2] = 1 << channel;
-    packet[3] = 0x00;
-    packet[4] = 0x01;
-    packet[5] = 0x00;
-    packet[6] = 0x00;
-    packet[7] = 0x28; //8?
-    packet[8] = 0x00;
-    packet[9] = 0x00;
-    packet[10] = 0x80;
-    packet[11] = 0x00;
-    packet[12] = 0x32;
-    packet[13] = 0x00;
-    packet[14] = 0x00;
-    packet[15] = 0x01;
+    let packet = [0x22, 0xA0, 1 << channel, 0x00, 0x01, 0x00, 0x00, 0x28, 0x00, 0x00, 0x80, 0x00, 0x32, 0x00, 0x00, 0x01];
     device.write(packet,64)
 }
 

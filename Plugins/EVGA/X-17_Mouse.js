@@ -19,8 +19,8 @@ export function ControllableParameters(){
     ];
 }
 
-var vLedNames = ["Front Left", "Front Right", "Scroll Wheel", "Logo", ]; 
-var vLedPositions = [ [1,0], [3,0], [2,1], [2,3] ];
+const vLedNames = ["Front Left", "Front Right", "Scroll Wheel", "Logo", ]; 
+const vLedPositions = [ [1,0], [3,0], [2,1], [2,3] ];
 
 export function LedNames()
 {
@@ -48,11 +48,7 @@ export function Render()
 
 function sendZone(zone, shutdown = false)
 {
-    var packet = []
-    packet[0x00] = 0x07;
-    packet[0x01] = 0xEA;
-    packet[0x02] = zone;
-    packet[0x03] = 0x02;
+    let packet = [0x07, 0xEA, zone, 0x02]
     
     for(var iIdx = 0; iIdx < 4; iIdx++)
 	{
@@ -82,30 +78,15 @@ function sendZone(zone, shutdown = false)
     packet[21] = 0x01;
     packet[22] = 0x01;
     packet[23] = 0x01;
-    packet[24] = 0x00;
-    packet[25] = 0x00;
+
     device.send_report(packet, 40);
     device.get_report(packet, 40);
 }
 
 function Apply(zone)
 {
-    var packet = []
-    packet[0x00] = 0x07;
-    packet[0x01] = 0xEA;
-    packet[0x02] = zone;
-    packet[0x03] = 0x01;
-    packet[0x04] = 0x01;
-    packet[0x05] = 0x01;
-    packet[0x06] = 0x01;
-    packet[0x07] = 0x01;
-
+    let packet = [0x07, 0xEA, zone, 0x01, 0x01, 0x01, 0x01, 0x01];
     device.send_report(packet,40);
-}
-
-export function Validate(endpoint)
-{
-    return endpoint.interface === 1 && endpoint.usage === 0x004b && endpoint.usage_page === 0x0008;
 }
 
 function hexToRgb(hex)
@@ -117,6 +98,11 @@ function hexToRgb(hex)
     colors[2] = parseInt(result[3], 16);
 
     return colors;
+}
+
+export function Validate(endpoint)
+{
+    return endpoint.interface === 1 && endpoint.usage === 0x004b && endpoint.usage_page === 0x0008;
 }
 
 export function Image()

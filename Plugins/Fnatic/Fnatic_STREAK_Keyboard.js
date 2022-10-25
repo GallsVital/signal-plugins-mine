@@ -19,39 +19,8 @@ export function ControllableParameters(){
 	];
 }
 
-function hexToRgb(hex) {
-	let result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
-	let colors = [];
-	colors[0] = parseInt(result[1], 16);
-	colors[1] = parseInt(result[2], 16);
-	colors[2] = parseInt(result[3], 16);
-
-	return colors;
-}
-export function Initialize() {
-
-}
-
-function sendPacketString(string, size){
-
-	let packet= [];
-	let data = string.split(' ');
-
-	for(let i = 0; i < data.length; i++){
-		packet[parseInt(i, 16)] =parseInt(data[i], 16);//.toString(16)
-	}
-
-	device.write(packet, size);
-}
-
-export function Shutdown() {
-
-
-}
-
-let vKeys = [
-
-
+const vKeys = 
+[
 	120,
 	1, 0,  7, 13, 19, 25,  31, 37, 43, 49, 55, 67, 73, 79,  90, 93, 98,    91, 97, 92, 118,
 	2,    8, 14, 20, 26, 32, 38, 44, 50, 56, 61, 62, 68, 80,   89, 94, 99,   100, 108, 109, 116,
@@ -59,12 +28,11 @@ let vKeys = [
 	4,   10, 16, 22, 28, 34, 40, 46, 52, 58, 64, 70, 76, 82,                 102, 106, 111,
 	5,    11, 17, 23, 29, 35, 41, 47, 53, 59, 65, 66, 77,          87,      103, 105, 112, 114,
 	6,   12, 18,     36,         60, 72, 78, 83,      84, 85, 86,   104,    113,
-
 	// 11 for iso? 82 for ISO?
-
 ];
 
-let vKeyNames = [
+const vKeyNames = 
+[
 	"Logo 1",
 	"Esc", "FN Lock", "F1", "F2", "F3", "F4", "F5", "F6", "F7", "F8", "F9", "F10", "F11", "F12",         "Print Screen", "Scroll Lock", "Pause Break",   "Mute Mic", "Game Mode", "Media Mute", "Audio Wheel",
 	"`", "1", "2", "3", "4", "5", "6", "7", "8", "9", "0", "-_", "=+", "Backspace",                        "Insert", "Home", "Page Up",                          "NumLock", "Num /", "Num *", "Num -",
@@ -74,8 +42,8 @@ let vKeyNames = [
 	"Left Ctrl", "Left Win", "Left Alt", "Space", "Right Alt", "Fn", "Menu", "Right Ctrl",        "Left Arrow", "Down Arrow", "Right Arrow",                "Num 0", "Num .",
 ];
 
-let vKeyPositions = [
-
+const vKeyPositions = 
+[
 	[8, 0],
 	[0, 1], [1, 1], [2, 1], [3, 1], [4, 1], [5, 1], [6, 1], [7, 1], [8, 1], [9, 1],  [10, 1], [11, 1], [12, 1], [13, 1],    [14, 1], [15, 1], [16, 1],  [17, 1], [18, 1], [19, 1], [20, 1],
 	[0, 2], [1, 2], [2, 2], [3, 2], [4, 2], [5, 2], [6, 2], [7, 2], [8, 2], [9, 2],  [10, 2], [11, 2], [12, 2], [13, 2],   [14, 2], [15, 2], [16, 2],  [17, 2], [18, 2], [19, 2], [20, 2],
@@ -85,34 +53,52 @@ let vKeyPositions = [
 	[0, 6], [1, 6], [2, 6],                      [6, 6],                       [10, 6], [11, 6], [12, 6], [13, 6],   [14, 6], [15, 6], [16, 6],  [17, 6], [18, 6],
 ];
 
-
-export function LedNames() {
+export function LedNames() 
+{
 	return vKeyNames;
 }
 
-export function LedPositions() {
+export function LedPositions() 
+{
 	return vKeyPositions;
 }
 
-export function Render() {
+export function Initialize() 
+{
+
+}
+
+export function Render() 
+{
 	sendColors();
 }
 
-function sendColors(shutdown = false){
+export function Shutdown() 
+{
+	sendColors(true);
+}
 
+function sendColors(shutdown = false)
+{
 	let RGBData = new Array(144*3).fill(255);
 	let TotalLedCount = 0;
 
-	for(let iIdx = 0; iIdx < vKeys.length; iIdx++) {
+	for(let iIdx = 0; iIdx < vKeys.length; iIdx++) 
+	{
 		let iPxX = vKeyPositions[iIdx][0];
 		let iPxY = vKeyPositions[iIdx][1];
 		var mxPxColor;
 
-		if(shutdown){
+		if(shutdown)
+		{
 			mxPxColor = hexToRgb(shutdownColor);
-		}else if (LightingMode === "Forced") {
+		}
+		else if (LightingMode === "Forced") 
+		{
 			mxPxColor = hexToRgb(forcedColor);
-		}else{
+		}
+		else
+		{
 			mxPxColor = device.color(iPxX, iPxY);
 		}
 
@@ -124,27 +110,22 @@ function sendColors(shutdown = false){
 
 	let sentLeds = 0;
 	TotalLedCount = 106 + 48;
-	//SendStartPacket();
 
-	while(TotalLedCount > 0){
+	while(TotalLedCount > 0)
+	{
 		let Leds = TotalLedCount >= 19 ? 19 : TotalLedCount;
 
-		let packet = [];
-		packet[0] = 0x00;
-		packet[1] = 0x0F;
-		packet[2] = 0x73;
-		packet[3] = 0x1;
-		packet[4] = 0x00;
-		packet[5] = sentLeds;
-		packet[6] = sentLeds >> 8;
-		packet[7] = 0x00;
+		let packet = [0x00, 0x0F, 0x73, 0x01, 0x00, sentLeds, sentLeds >> 8, 0x00];
 
-		if(sentLeds == 0){
+		if(sentLeds == 0)
+		{
 			packet[8] = 0x0F;
 			packet[9] = 0x03;
-			packet = packet.concat(RGBData.splice(0, Leds*3-2));
-		}else{
-			packet = packet.concat(RGBData.splice(0, Leds*3));
+			packet.push(...RGBData.splice(0, Leds*3-2));
+		}
+		else
+		{
+			packet.push(...RGBData.splice(0, Leds*3));
 		}
 
 		TotalLedCount -= Leds;
@@ -152,19 +133,21 @@ function sendColors(shutdown = false){
 		device.write(packet, 65);
 
 	}
-	//SendApplyPacket();
-
 }
 
-function SendStartPacket(){
-	sendPacketString("00 07 01 00 00 00 00 00 07", 65);
+function hexToRgb(hex) 
+{
+	let result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+	let colors = [];
+	colors[0] = parseInt(result[1], 16);
+	colors[1] = parseInt(result[2], 16);
+	colors[2] = parseInt(result[3], 16);
+
+	return colors;
 }
 
-function SendApplyPacket(){
-	sendPacketString("00 FE 01 00 00 00 00 00 FE", 65);
-
-}
-export function Validate(endpoint) {
+export function Validate(endpoint) 
+{
 	return endpoint.interface === 1;
 }
 
