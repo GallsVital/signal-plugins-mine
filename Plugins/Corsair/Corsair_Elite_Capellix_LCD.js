@@ -53,7 +53,7 @@ function colorgrabber()
 	}
 	savedPollTimer = Date.now();
 
-	let RGBData = device.getImageBuffer(0, 0, screenSize, screenSize, 192, 192, "JPEG");
+	let RGBData = device.getImageBuffer(0, 0, screenSize, screenSize, {flipH: false, outputWidth: 192, outputHeight: 192, format: "JPEG"});
 	let BytesLeft = RGBData.length;
 	let packetsSent = 0;
 

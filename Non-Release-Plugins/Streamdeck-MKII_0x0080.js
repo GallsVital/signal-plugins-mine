@@ -24,9 +24,8 @@ let vLedPositions =
 	[0, 1], [1, 1], [2, 1], [3, 1], [4, 1],
 	[0, 2], [1, 2], [2, 2], [3, 2], [4, 2]
 ];
-let lastButtonRGB;
 
-const ButtonSize = 3;
+const ButtonSize = 36;
 const RowWidth = 5;
 const ColHeight = 3;
 
@@ -42,7 +41,6 @@ export function LedPositions()
 
 export function Initialize()
 {
-	lastButtonRGB = Array.from(Array(32), () => Array(3).fill(0));
 	setBrightness();
 }
 
@@ -58,14 +56,8 @@ export function onhwresetdeviceChanged()
 
 function resetDevice()
 {
-	let packet = [];
-	packet[0] = 0x02;
-	device.write(packet, 1024);
-	let rpacket = [];
-	rpacket[0] = 0x03;
-	rpacket[1] = 0x02;
-	device.send_report(rpacket, 32);
-	//device.log("reseting device");
+	device.write([0x02], 1024);
+	device.send_report([0x03, 0x02], 32);
 	setBrightness();
 }
 
@@ -76,83 +68,46 @@ export function onhwbrightnessChanged()
 
 function setBrightness()
 {
-	let packet = [];
-	packet[0] = 0x03;
-	packet[1] = 0x08;
-	packet[2] = hwbrightness;
-	device.send_report(packet, 32);
+	device.send_report([0x03, 0x08, hwbrightness], 32);
 }
 
-function makeHexString(ColorArray)
-{
-	let hexstring = "#";
-	hexstring += decimalToHex(ColorArray[0], 2);
-	hexstring += decimalToHex(ColorArray[1], 2);
-	hexstring += decimalToHex(ColorArray[2], 2);
-
-	return hexstring;
-}
-
-function decimalToHex(d, padding)
-{
-	let hex = Number(d).toString(16);
-	padding = typeof (padding) === "undefined" || padding === null ? padding = 2 : padding;
-
-	while (hex.length < padding)
-	{
-		hex = "0" + hex;
-	}
-
-	return hex;
-}
-
-function colorgrabber(shutdown=false)
+function colorgrabber()
 {
 	for(let iIdx = 0; iIdx < 15; iIdx++)
 	{
-		let rgbdata = [];
-		let iPxX = vLedPositions[iIdx][0];
-		let iPxY = vLedPositions[iIdx][1];
-		let color;
-
-		if(shutdown)
-		{
-			color = hexToRgb(shutdownColor);
-		}
-		else if (LightingMode === "Forced")
-		{
-			color = hexToRgb(forcedColor);
-		}
-		else
-		{
-			color = device.color(iPxX, iPxY);
-		}
+		let RGBData = [];
 
 		let iXoffset = (iIdx % 5) * ButtonSize;
 		let iYoffset = Math.floor(iIdx / 5) * ButtonSize;
 
-		rgbdata = device.getImageBuffer(iXoffset, iYoffset, ButtonSize, ButtonSize, 72, 72, "JPEG");
+		RGBData = device.getImageBuffer(iXoffset, iYoffset, ButtonSize, ButtonSize,{flipH: true});
 
-		sendZone(iIdx, rgbdata);
 		
+		let BytesLeft = RGBData.length;
+		let packetsSent = 0;
+
+		while(BytesLeft > 0)
+		{
+			const BytesToSend = Math.min(1016, BytesLeft);
+
+			if(BytesToSend < 1016)
+			{
+				sendZone(BytesLeft, iIdx, RGBData.splice(0,BytesLeft), packetsSent, 0x01);
+			}
+			else
+			{
+				sendZone(BytesToSend, iIdx, RGBData.splice(0,BytesToSend), packetsSent, 0x00);
+			}
+			BytesLeft -= BytesToSend;
+			packetsSent++;
+		}
 	}
 }
 
-function sendZone(iIdx, rgbdata)
+function sendZone(packetLength, iIdx, rgbdata, packetsSent, finalPacket)
 {
-	//device.log(`${rgbdata.length & 0xFF}:${ (rgbdata.length >> 8) & 0xFF}`);
-
-	let packet = [];
-	packet[0] = 0x02;
-	packet[1] = 0x07;
-	packet[2] = iIdx;
-	packet[3] = 0x01;
-	packet[4] = rgbdata.length & 0xFF;
-	packet[5] = (rgbdata.length >> 8) & 0xFF;
-	packet[6] = 0x00;
-	packet[7] = 0x00;
-
-	packet = packet.concat(rgbdata.splice(0, 1016));
+	let packet = [0x02, 0x07, iIdx, finalPacket, packetLength & 0xFF, (packetLength >> 8) & 0xFF, packetsSent, 0x00];
+	packet.push(...rgbdata);
 
 	device.write(packet, 1024);
 }
@@ -160,15 +115,4 @@ function sendZone(iIdx, rgbdata)
 export function Validate(endpoint)
 {
 	return endpoint.interface === -1;
-}
-
-function hexToRgb(hex)
-{
-	let result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
-	let colors = [];
-	colors[0] = parseInt(result[1], 16);
-	colors[1] = parseInt(result[2], 16);
-	colors[2] = parseInt(result[3], 16);
-
-	return colors;
 }
