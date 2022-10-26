@@ -122,12 +122,12 @@ export function Initialize()
     ClearBuffer();
     if(ARGBMode == true)
     {
-    LEDConfig();
-    CreateRGBHeaders();
-	SetupChannels();
-    CreateIOShieldZone();
-    CreatePCBZone();
-    CreatePCHZone();
+        LEDConfig();
+        CreateRGBHeaders();
+	    SetupChannels();
+        CreateIOShieldZone();
+        CreatePCBZone();
+        CreatePCHZone();
     }
     else
     {
@@ -157,7 +157,7 @@ export function Render()
 {
     if(ARGBMode == true)
     {
-    SendRGB();
+        SendRGB();
     }
     else
     {
@@ -342,6 +342,10 @@ const vPCHLEDs =
     "Chroma Logo Strip Top Left LED 5",
     "Chroma Logo Strip Top LED 1",
     "Chroma Logo Strip Top LED 2",
+    "Chroma Logo Strip Top LED 3",
+    "Chroma Logo Strip Top LED 4",
+    "Chroma Logo Strip Top LED 5",
+    "Chroma Logo Strip Top LED 6",
 ]
 const vIOShieldLEDs =
 [
@@ -417,6 +421,10 @@ const vPCHPositions =
     [1,1],
     [1,1],
     [2,2],
+    [2,2],
+    [2,2],
+    [3,2],
+    [3,2],
     [3,2],
 ]
 
