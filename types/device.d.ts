@@ -1,6 +1,39 @@
 declare const device: Device;
-declare class Device{
 
+declare interface ImageBufferOptions{
+	/** 
+	 * @default 72
+	*/
+	outputWidth?: number
+	/** 
+	* @default 72
+	*/
+	outputHeight?: number
+	/** 
+	* @default "JPEG"
+	*/
+	format?: ImageFormat
+	/** 
+	* @default false
+	*/
+	flipH?: boolean
+	/** 
+	* @default false
+	*/
+	flipV?: boolean
+}
+
+
+declare class Device{
+	/**
+	 * returns the devices USB Vendor ID
+	 */
+	public vendorId(): number
+
+	/**
+	 * returns the devices USB Product ID
+	 */
+	public productId(): number
 	/**
  	* Performs a Hid Write on the device. 
 	* @remarks Device's using Hid Reports should use {@link device.send_report} instead.
@@ -277,12 +310,10 @@ declare class Device{
 	 * @param Y Y coordinate within the devices Pixel Buffer to be used as the top left corner of the captured area.
 	 * @param Width Width of the area to be captured. This must fit between the X coordinate and the device's max width
 	 * @param Height Height of the area to be captured. This must fit between the Y coordinate and the device's max Height
-	 * @param ImageWidth Width of the output Image
-	 * @param ImageHeight Height of the output Image
-	 * @param ImageFormat Image Format to be output
+	 * @param options optional {@link ImageBufferOptions ImageBufferOptions} settings object
 	 * @returns The Image's data saved into an array
 	 */
-	public getImageBuffer(X: number, Y: number, Width: number, Height: number, ImageWidth: number, ImageHeight: number, ImageFormat: ImageFormat): number[]
+	public getImageBuffer(X: number, Y: number, Width: number, Height: number, options?: ImageBufferOptions): number[]
 
 	/**
 	 * Takes a Hex String color and returns a image buffer.
