@@ -1,36 +1,3 @@
-const G560_Speaker_Right = {
-	mapping : [
-		0, 1
-	],
-	positioning : [
-		[0, 2], [2, 0]
-	],
-	LedNames : [
-		"Led 1", "Led 2",
-	],
-	displayName: "Right Speaker",
-	ledCount : 2,
-	width: 3,
-	height: 3,
-	image: RightSpeakerImage()
-};
-const G560_Speaker_Left = {
-	mapping : [
-		0, 1
-	],
-	positioning : [
-		[2, 0], [0, 2]
-	],
-	LedNames : [
-		"Led 1", "Led 2",
-	],
-	displayName: "Left Speaker",
-	ledCount : 2,
-	width: 3,
-	height: 3,
-	image: LeftSpeakerImage()
-};
-
 export function Name() { return "Logitech G560 Gaming Speakers"; }
 export function VendorId() { return 0x046d;} //0x046d; }
 export function ProductId() { return 0x0A78;}//0x0A78; }
@@ -44,26 +11,54 @@ shutdownColor:readonly
 LightingMode:readonly
 forcedColor:readonly
 */
-export function ControllableParameters(){
+export function ControllableParameters()
+{
 	return [
 		{"property":"shutdownColor", "group":"lighting", "label":"Shutdown Color", "min":"0", "max":"360", "type":"color", "default":"009bde"},
 		{"property":"LightingMode", "group":"lighting", "label":"Lighting Mode", "type":"combobox", "values":["Canvas", "Forced"], "default":"Canvas"},
 		{"property":"forcedColor", "group":"lighting", "label":"Forced Color", "min":"0", "max":"360", "type":"color", "default":"009bde"},
 	];
 }
+
+const G560_Speaker_Right = 
+{
+	mapping : [ 0, 1 ],
+	positioning : [ [0, 2], [2, 0] ],
+	LedNames : [ "Led 1", "Led 2" ],
+	displayName: "Right Speaker",
+	ledCount : 2,
+	width: 3,
+	height: 3,
+	image: RightSpeakerImage()
+};
+const G560_Speaker_Left = 
+{
+	mapping : [ 0, 1 ],
+	positioning : [ [2, 0], [0, 2] ],
+	LedNames : [ "Led 1", "Led 2" ],
+	displayName: "Left Speaker",
+	ledCount : 2,
+	width: 3,
+	height: 3,
+	image: LeftSpeakerImage()
+};
+
 let vLedNames = [];
 let vLedPositions = [];
 
-export function LedNames() {
+export function LedNames() 
+{
 	return vLedNames;
 }
 
-export function LedPositions() {
+export function LedPositions() 
+{
 	return vLedPositions;
 }
 
 
-export function Initialize() {
+export function Initialize() 
+{
 //Left Speaker
 	device.createSubdevice("Left Speaker");
 	// Parent Device + Sub device Name + Ports
@@ -85,7 +80,8 @@ export function Initialize() {
 }
 
 
-function sendZone(zone, shutdown = false){
+function sendZone(zone, shutdown = false) //TODO Come back and fix this. It would benefit from a class. Looks to be 8070? Possibly 8071. Also Should support EQ.
+{
 	let packet = [];
 	packet[0x00] = 0x11;
 	packet[0x01] = 0xFF;
@@ -122,15 +118,15 @@ function sendZone(zone, shutdown = false){
 
 	device.write(packet, 20);
 	device.read(packet, 20);
-	device.pause(2);
+	device.pause(3);
 }
 
-export function Render() {
+export function Render() 
+{
 	sendZone(0);
 	sendZone(1);
 	sendZone(2);
 	sendZone(3);
-
 }
 
 function hexToRgb(hex) {

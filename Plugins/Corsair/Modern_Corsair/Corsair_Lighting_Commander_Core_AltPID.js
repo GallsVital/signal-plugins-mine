@@ -1,6 +1,6 @@
 export function Name() { return "Corsair Commander Core"; }
 export function VendorId() { return 0x1b1c; }
-export function ProductId() { return 0x0C1C; }
+export function ProductId() { return 0x0C32; }
 export function Publisher() { return "WhirlwindFX"; }
 export function Size() { return [1, 1]; }
 export function DefaultPosition() { return [0, 0]; }
@@ -68,12 +68,12 @@ let FanControllerArray = [
 	"Fan 6",
 ];
 
-let Device_Write_Length = 1025;
-const Device_Read_Length = 1025;
+let Device_Write_Length = 65;
+const Device_Read_Length = 65;
 const DeviceMaxLedLimit = 233;
 
 
-const DevFirmwareVersion = "2.10.219";
+const DevFirmwareVersion = "2.0.17";
 
 const CommandDict = {
 	0x06: "Send Command",
@@ -116,8 +116,8 @@ export function Initialize() {
 	device.log(`Developed on Firmware ${DevFirmwareVersion}`);
 
 	// Any Firmware => 2.10.219 requires a different packet size
-	if(compareVersion(firmwareVersion, "2.10.219")){ //0x0C32 PID uses 2.0.17
-		Device_Write_Length = 97;
+	if(compareVersion(firmwareVersion, "2.0.17")){ //Firmware Version changed for this PID.
+		Device_Write_Length = 65;
 	}
 
 	Corsair.SetFanType();
