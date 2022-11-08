@@ -87,14 +87,14 @@ export function Initialize() {
 }
 
 export function Render() {
-	if(this.profile === undefined){
-		this.profile = new Profiler("UpdateColors");
-	}else{
-		this.profile.setStart();
-	}
+	// if(this.profile === undefined){
+	// 	this.profile = new Profiler("UpdateColors");
+	// }else{
+	// 	this.profile.setStart();
+	// }
 
 	UpdateColors();
-	this.profile.detailedReport();
+	//this.profile.detailedReport();
 }
 
 export function Shutdown() {

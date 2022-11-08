@@ -22,13 +22,13 @@ LightingMode:readonly
 forcedColor:readonly
 */
 
-let vLedNames = ["Led 12", "Led 11", "Led 10", "Led 9", "Led 8", "Led 7", "Led 6", "Led 5", "Led 4", "Led 3", "Led 2", "Led 1"];
-let vLedPositions = [
-    [0, 11], [0, 10], [0, 9], [0, 8], [0, 7], [0, 6], [0, 5], [0, 4], [0, 3], [0, 2], [0, 1], [0, 0]
+const vLedNames = ["Led 12", "Led 11", "Led 10", "Led 9", "Led 8", "Led 7", "Led 6", "Led 5", "Led 4", "Led 3", "Led 2", "Led 1"];
+const vLedPositions = [
+	[0, 11], [0, 10], [0, 9], [0, 8], [0, 7], [0, 6], [0, 5], [0, 4], [0, 3], [0, 2], [0, 1], [0, 0]
 ];
 
 export function Initialize() {
-    SetMode()
+	SetMode();
 }
 
 export function Render() {
@@ -38,21 +38,22 @@ export function Render() {
 export function Shutdown() {
 	//SendColors(true);
 }
-// Address pairs 
+// Address pairs
 // 51 -> 49 -> 61?
 // 53 -> 4B -> 63?
 export function Scan(bus) {
+	bus.log(JSON.stringify(bus));
 
 	const PossibleAddresses = [0x60, 0x61, 0x62, 0x63];
-	let FoundAddresses = [];
+	const FoundAddresses = [];
 
-  	for (let addr of PossibleAddresses) {
+  	for (const addr of PossibleAddresses) {
 	  // Skip any non AMD / INTEL Busses
 	  if (!bus.IsSystemBus()) {
 		  continue;
 	  }
 
-	  let validAddress = bus.WriteQuick(addr);
+	  const validAddress = bus.WriteQuick(addr);
 	  //bus.log(validAddress);
 
 	  // Skip any address that fails a quick write
@@ -69,54 +70,58 @@ export function Scan(bus) {
 	return FoundAddresses;
 }
 
-let AddressPairs = {
+const AddressPairs = {
 	0x60: [0x50, 0x48],
-    0x61: [0x51, 0x49],
+	0x61: [0x51, 0x49],
 	0x62: [0x52, 0x4A],
-    0x63: [0x53, 0x4B]
-}
+	0x63: [0x53, 0x4B]
+};
 
 function CheckForHyperFuryRam(bus, addr){
-    if(!AddressPairs.hasOwnProperty(addr)){
-        return false;
-    }
+	if(!AddressPairs.hasOwnProperty(addr)){
+		return false;
+	}
 
-    let SubAddresses = AddressPairs[addr];
+	const SubAddresses = AddressPairs[addr];
 
-    let iReturn = bus.ReadByte(SubAddresses[0], 0x31); // Value changes every time
-    bus.log(`Address [${SubAddresses[0]}], Reg 31: ${iReturn}`)
-    if(iReturn >= 0){
-        let iRet1 = bus.ReadByte(SubAddresses[1], 0x21)
-        bus.log(`Address [${SubAddresses[1]}], Reg 21: ${iRet1}`)
-        let iRet2 = bus.ReadByte(SubAddresses[1], 0x25)
-        bus.log(`Address [${SubAddresses[1]}], Reg 25: ${iRet2}`)
-        let iRet3 = bus.ReadByte(SubAddresses[1], 0x27)
-        bus.log(`Address [${SubAddresses[1]}], Reg 27: ${iRet3}`)
+	const iReturn = bus.ReadByte(SubAddresses[0], 0x31); // Value changes every time
+	bus.log(`Address [${SubAddresses[0]}], Reg 31: ${iReturn}`);
 
-		let ExpectedValues = [120, 220];
+	if(iReturn >= 0){
+		const iRet1 = bus.ReadByte(SubAddresses[1], 0x21);
+		bus.log(`Address [${SubAddresses[1]}], Reg 21: ${iRet1}`);
+
+		const iRet2 = bus.ReadByte(SubAddresses[1], 0x25);
+		bus.log(`Address [${SubAddresses[1]}], Reg 25: ${iRet2}`);
+
+		const iRet3 = bus.ReadByte(SubAddresses[1], 0x27);
+		bus.log(`Address [${SubAddresses[1]}], Reg 27: ${iRet3}`);
+
+		const ExpectedValues = [120, 180, 220];
+
 		return ExpectedValues.includes(iRet1) && ExpectedValues.includes(iRet2) && ExpectedValues.includes(iRet3);
-    }
+	}
 
-    return false;
+	return false;
 
 }
 
 function SetMode(){
-    bus.WriteByte(0x08, 0x53); // start Command
-    bus.WriteByte(0x0b, 0x00);
-    bus.WriteByte(0x09, 0x10);
-    bus.WriteByte(0x27, 0x02);
+	bus.WriteByte(0x08, 0x53); // start Command
+	bus.WriteByte(0x0b, 0x00);
+	bus.WriteByte(0x09, 0x10);
+	bus.WriteByte(0x27, 0x02);
 
-    bus.WriteByte(0x0C, 0x01);
-    bus.WriteByte(0x18, 0x18);
-    bus.WriteByte(0x20, 0x50);
+	bus.WriteByte(0x0C, 0x01);
+	bus.WriteByte(0x18, 0x18);
+	bus.WriteByte(0x20, 0x50);
 
-    bus.WriteByte(0x08, 0x44); // End Command
+	bus.WriteByte(0x08, 0x44); // End Command
 }
 
 
 function SendColors(shutdown = false){
-    let RGBData = [];
+	const RGBData = [];
 
 	//Fetch Colors
 	for(let iIdx = 0; iIdx < vLedPositions.length; iIdx++){
@@ -132,42 +137,48 @@ function SendColors(shutdown = false){
 
 		RGBData.push(...Color);
  	}
-    WriteRGBData(RGBData);
+
+	WriteRGBData(RGBData);
 }
 
-let OldRGBData = []
+let OldRGBData = [];
+
 function WriteRGBData(RGBData){
-	let start = Date.now();
+	const start = Date.now();
 
-    bus.WriteByte(0x08, 0x53);
-    bus.WriteByte(0x0b, 0x00);
-    bus.WriteByte(0x09, 0x10);
-    bus.WriteByte(0x27, 0x02);
-	
-    for(let i = 0; i < RGBData.length; i++){
+	bus.WriteByte(0x08, 0x53);
+	bus.WriteByte(0x0b, 0x00);
+	bus.WriteByte(0x09, 0x10);
+	bus.WriteByte(0x27, 0x02);
+
+	for(let i = 0; i < RGBData.length; i++){
 		if(RGBData[i] != OldRGBData[i]){
-			let returnCode = bus.WriteByte(0x50 + i, RGBData[i]);
-			let retryCount = 4;
-			while(returnCode != 0 && retryCount > 0){
-				retryCount -= 1;
-				device.pause(1);
-				returnCode = bus.WriteByte(0x50 + i, RGBData[i]);
-			}
-		}
-    }
+			const returnCode = bus.WriteByte(0x50 + i, RGBData[i]);
 
-    bus.WriteByte(0x08, 0x44);
+			if(returnCode == -1){
+				device.log("Failed To Write Byte!");
+			}
+			//let retryCount = 4;
+			// while(returnCode != 0 && retryCount > 0){
+			// 	retryCount -= 1;
+			// 	device.pause(1);
+			// 	returnCode = bus.WriteByte(0x50 + i, RGBData[i]);
+			// }
+		}
+	}
+
+	bus.WriteByte(0x08, 0x44);
 
 	OldRGBData = RGBData;
 
-	let end = Date.now();
-	device.log(`Frame Took ${end - start}ms!`)
+	const end = Date.now();
+	device.log(`Frame Took ${end - start}ms!`);
 }
 
 
 function hexToRgb(hex) {
-	let result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
-	let colors = [];
+	const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+	const colors = [];
 	colors[0] = parseInt(result[1], 16);
 	colors[1] = parseInt(result[2], 16);
 	colors[2] = parseInt(result[3], 16);
