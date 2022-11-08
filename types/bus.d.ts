@@ -26,7 +26,7 @@ declare class FreeAddressBus extends BusBase{
 	public ReadBlockBytes(Address: number, Register: number, Size: number, Data: number[]): [number, number[]]
 
 	public WriteBlock(Address: number, Register: number, Size: number, Data: number[]): [number, number[]]
-	public WriteBlockBytes(Address: number, Register: number, Size: number, Data: number[]): [number, number[]]
+	public WriteBlockWithoutRegister(Address: number, Size: number, Data: number[]): [number, number[]]
 	public WriteWord(Address: number, Register: number, Word: number): number
 	public WriteByte(Address: number, Register: number, Byte: number): number
 	public WriteQuick(Address: number): number
@@ -38,8 +38,10 @@ declare class FixedAddressBus extends BusBase{
 	public ReadBlockBytes(Register: number, Size: number, Data: number[]): [number, number[]]
 
 	public WriteBlock(Register: number, Size: number, Data: number[]): [number, number[]]
-	public WriteBlockBytes(Register: number, Size: number, Data: number[]): [number, number[]]
+	public WriteBlockWithoutRegister(Address: number, Size: number, Data: number[]): [number, number[]]
 	public WriteWord(Register: number, Word: number): number
 	public WriteByte(Register: number, Byte: number): number
 	public WriteQuick(Address: number): number
+
+	public GetAddress(): number
 }
