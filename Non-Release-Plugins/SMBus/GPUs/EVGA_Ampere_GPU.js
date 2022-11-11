@@ -255,7 +255,7 @@ class EVGAAmpereProtocol{
 	}
 
 	ReadCurrentModeData(){
-		const [ReturnCode, Data] = bus.ReadBlockBytes(this.Registers.CurrentMode, 10);
+		const [ReturnCode, Data] = bus.ReadBlockBytes(this.Registers.CurrentMode, 10, []);
 
 		if(ReturnCode < 0){
 			device.log(`Failed to read Current Modes. Error Code: [${ReturnCode}]`);
@@ -292,7 +292,7 @@ class EVGAAmpereProtocol{
 			0x00,
 		];
 
-		const ReturnCode = bus.WriteBlockBytes(this.Registers.CurrentMode, 10, packet);
+		const ReturnCode = bus.WriteBlock(this.Registers.CurrentMode, 10, packet);
 
 		if(ReturnCode < 0){
 			device.log(`Failed to write Current Modes. Error Code: [${ReturnCode}]`);
@@ -324,7 +324,7 @@ class EVGAAmpereProtocol{
 
 		packet[ZoneObject.offset + 1] = Mode;
 
-		const ReturnCode = bus.WriteBlockBytes(this.Registers.CurrentMode, 10, packet);
+		const ReturnCode = bus.WriteBlock(this.Registers.CurrentMode, 10, packet);
 
 		if(ReturnCode < 0){
 			device.log(`Failed to write Current Modes. Error Code: [${ReturnCode}]`);
@@ -343,7 +343,7 @@ class EVGAAmpereProtocol{
 			this.Config.Zones.BackLogo.mode,
 			this.Config.Zones.ARGBHeader.mode
 		];
-		const ReturnCode = bus.WriteBlockBytes(this.Registers.CurrentMode, 10, packet);
+		const ReturnCode = bus.WriteBlock(this.Registers.CurrentMode, 10, packet);
 
 		if(ReturnCode < 0){
 			device.log(`Failed to write Current Modes. Error Code: [${ReturnCode}]`);
@@ -352,17 +352,17 @@ class EVGAAmpereProtocol{
 	SetSoftwareControl(Enabled){
 		if(Enabled){
 			const packet = [0x04, 0xc6, 0xEB, 0xEA, 0x15];
-			bus.WriteBlockBytes(0xB2, 5, packet);
+			bus.WriteBlock(0xB2, 5, packet);
 
 			//packet = [0x07, 0x03, 0x00, 0x00, 0x00, 0x00, 0x00];
-			//bus.WriteBlockBytes(0x52, 8, packet);
+			//bus.WriteBlock(0x52, 8, packet);
 		}
 	}
 	WriteRGB(Zone, Color = []){
 		const packet = [0x04, 0x255];
 		packet.push(...Color);
 
-		bus.WriteBlockBytes(this.Registers.StaticColor + Zone.offset, 5, packet);
+		bus.WriteBlock(this.Registers.StaticColor + Zone.offset, 5, packet);
 	}
 
 };
