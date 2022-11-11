@@ -87,19 +87,22 @@ export function Initialize() {
 }
 
 export function Render() {
-	// if(this.profile === undefined){
-	// 	this.profile = new Profiler("UpdateColors");
-	// }else{
-	// 	this.profile.setStart();
-	// }
+	if(this.profile === undefined){
+		this.profile = new Profiler("UpdateColors");
+	}else{
+		this.profile.setStart();
+	}
 
 	UpdateColors();
-	//this.profile.detailedReport();
+	device.log(`Total Packets [${sentPackets + savedPackets}]. Checking RGB values saved us sending [${Math.floor(savedPackets/(savedPackets+sentPackets) * 100)}]% of them`)
+	device.log(`Saved: [${savedPackets}] Sent: [${sentPackets}]`);
+	this.profile.detailedReport();
 }
 
 export function Shutdown() {
 	UpdateColors(true);
 }
+
 
 function UpdateColors(shutdown = false){
 	const RedColors = [];
@@ -129,10 +132,12 @@ function UpdateColors(shutdown = false){
 
 }
 
+let sentPackets = 0;
+let savedPackets = 0;
+
 function CompareArrays(array1, array2){
 	return array1.length === array2.length &&
 	array1.every(function(value, index) { return value === array2[index];});
-
 }
 
 class Profiler{
@@ -275,20 +280,45 @@ class CrucialBallistix{
 	}
 
 	SendRGBData(RedData, GreenData, BlueData){
-		if(!CompareArrays(RedData, this.config.RedChannelData)){
-			this.Interface.WriteBlock(this.registers.RedColorChannel, RedData);
-			this.config.RedChannelData = RedData;
-		}
+		// let skippedPackets = 0;
 
-		if(!CompareArrays(GreenData, this.config.GreenChannelData)){
-			this.Interface.WriteBlock(this.registers.GreenColorChannel, GreenData);
-			this.config.GreenChannelData = GreenData;
-		}
+		// if(!CompareArrays(RedData, this.config.RedChannelData)){
+		// 	this.Interface.WriteBlock(this.registers.RedColorChannel, RedData);
+		// 	this.config.RedChannelData = RedData;
+		// 	sentPackets++;
+		// }else{
+		// 	skippedPackets++;
+		// 	savedPackets++;
+		// }
 
-		if(!CompareArrays(BlueData, this.config.BlueChannelData)){
-			this.Interface.WriteBlock(this.registers.BlueColorChannel, BlueData);
-			this.config.BlueChannelData = BlueData;
-		}
+		// if(!CompareArrays(GreenData, this.config.GreenChannelData)){
+		// 	this.Interface.WriteBlock(this.registers.GreenColorChannel, GreenData);
+		// 	this.config.GreenChannelData = GreenData;
+		// 	sentPackets++;
+		// }else{
+		// 	skippedPackets++;
+		// 	savedPackets++;
+		// }
+
+		// if(!CompareArrays(BlueData, this.config.BlueChannelData)){
+		// 	this.Interface.WriteBlock(this.registers.BlueColorChannel, BlueData);
+		// 	this.config.BlueChannelData = BlueData;
+		// 	sentPackets++;
+		// }else{
+		// 	skippedPackets++;
+		// 	savedPackets++;
+		// }
+
+		// if(skippedPackets){
+		// 	device.pause(3 * skippedPackets);
+		// }
+
+		this.Interface.WriteBlock(this.registers.RedColorChannel, RedData);
+
+		this.Interface.WriteBlock(this.registers.GreenColorChannel, GreenData);
+
+		this.Interface.WriteBlock(this.registers.BlueColorChannel, BlueData);
+
 	}
 
 	CheckForFreeAddresses() {
