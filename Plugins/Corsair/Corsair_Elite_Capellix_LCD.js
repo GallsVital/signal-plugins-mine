@@ -5,7 +5,9 @@ export function Publisher() { return "WhirlwindFX"; }
 export function Size() { return [6, 6]; }
 export function DefaultPosition(){return [240, 120];}
 export function DefaultScale(){return 1.0;}
-
+/* global
+screenSize:readonly
+*/
 export function ControllableParameters()
 {
 	return [

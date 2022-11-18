@@ -412,7 +412,7 @@ function SendLighting(){
 		
 		packet[Led.Index] = col[0];
 		packet[Led.Index + LedChannelSpacing] = col[1];
-		packet[Led.Index + LedChannelSpacing * 2] = col[3];
+		packet[Led.Index + LedChannelSpacing * 2] = col[2];
 
 	}
 
