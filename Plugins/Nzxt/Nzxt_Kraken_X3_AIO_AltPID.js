@@ -253,7 +253,7 @@ function PumpSetup(speed)
     
     do 
     {
-        let packet = device.readTimeout([0x0], 64, 10);
+        let packet = device.read([0x0], 64, 10);
 
         if(packet[0] == 0x75 && packet[1] == 0x02)
         {

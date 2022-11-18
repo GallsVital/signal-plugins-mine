@@ -8,6 +8,7 @@ export function DefaultScale(){return 15.0;}
 /* global
 shutdownColor:readonly
 LightingMode:readonly
+forcedColor:readonly
 SettingControl:readonly
 dpi1:readonly
 dpi2:readonly
