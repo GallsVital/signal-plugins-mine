@@ -35,10 +35,10 @@ export function ControllableParameters(){
 }
 
 let savedDpi1;
-let vLedNames = ["Logo", "Scroll Zone", "Front Zone", "Dpi Zone Low", "Dpi Zone Mid", "Dpi Zone High"];
+let vLedNames = ["Logo", "Scroll Zone", "Front Zone"];
 
 let vLedPositions = [
-	[3, 2], [3, 1], [3, 0], [0, 1], [1, 1], [2, 1]
+	[3, 2], [3, 1], [3, 0]
 ];
 
 export function LedNames() {
@@ -86,10 +86,9 @@ function sendColors(shutdown = false){
 	packet[0x06]   = 0x00;
 	packet[0x07]   = 0x00;
 
-	let red = [];
-	let green = [];
-	let blue = [];
-
+	let red = new Array(3).fill(0);
+	let green = new Array(3).fill(0);
+	let blue = new Array(3).fill(0);
 
 	for(let zone_idx = 0; zone_idx < vLedPositions.length; zone_idx++) {
 		let iX = vLedPositions[zone_idx][0];
