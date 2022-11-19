@@ -50,6 +50,7 @@
         "block-scoped-var":"warn",
         "no-else-return":"warn",
         "no-eval":"error",
+        "no-dupe-keys": "error",
         "prefer-const":"warn",
         "yoda":["warn", "never", { "onlyEquality": true }],
         "complexity": ["warn",{"max":10}],
