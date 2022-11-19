@@ -55,6 +55,8 @@
         "yoda":["warn", "never", { "onlyEquality": true }],
         "complexity": ["warn",{"max":10}],
         "no-return-assign": "error",
+        "no-constant-binary-expression": "error",
+        "for-direction": "error",
         "padding-line-between-statements": [
             "warn",
             { "blankLine": "never", "prev": ["for","if","while"], "next": "*" },
