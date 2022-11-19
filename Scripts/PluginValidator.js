@@ -1,5 +1,6 @@
 import fs from 'fs';
 import path from 'path';
+import { ParenthesizedExpression } from 'ts-morph';
 import * as url from 'url';
 
 function CheckThatLEDNameAndPositionLengthsMatch(Plugin, ReportErrorCallback){
@@ -51,6 +52,7 @@ class PluginValidator {
 			CheckAllLedPositionsAreWithinBounds,
 			CheckForGPUListDuplicates,
 		];
+		this.excludedFiles = [".test.js"];
 	}
 	AddPath(pathToAdd) {
 		const CurrentDirectoryURL = new URL('.', import.meta.url);
@@ -84,12 +86,24 @@ class PluginValidator {
 			process.exit(1);
 		}
 	}
+	#ShouldSkipPath(path){
+		for(const exclusion of this.excludedFiles){
+			if(path.includes(exclusion)){
+				return true;
+			}
+		}
 
+		return false;
+	}
 	*#walkDirectory(src) {
 		const files = fs.readdirSync(src, { withFileTypes: true });
 
 		for (const file of files) {
 			const AbsoluteFilePath = path.join(src, file.name);
+
+			if(this.#ShouldSkipPath(AbsoluteFilePath)){
+				continue;
+			}
 
 			if (file.isDirectory()) {
 				yield* this.#walkDirectory(AbsoluteFilePath);
