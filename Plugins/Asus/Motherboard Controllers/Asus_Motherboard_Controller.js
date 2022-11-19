@@ -1,8 +1,8 @@
-export function Name() { return DeviceName; }
+export function Name() { return "ASUS Aura Motherboard Controller"; }
 export function VendorId() { return  0x0B05; }
-export function ProductId() { return 0x18F3;}
+export function ProductId() { return [0x18F3, 0x19AF, 0x1939];}
 export function Publisher() { return "WhirlwindFX"; }
-export function Size() { return [device_width, 1]; }
+export function Size() { return [15, 1]; }
 export function Type() { return "Hid"; }
 export function DefaultPosition(){return [120, 80];}
 export function DefaultScale(){return 8.0;}
@@ -32,7 +32,7 @@ export function LedPositions(){ return vLedPositions; }
 export function Documentation(){ return "troubleshooting/asus"; }
 
 export function Validate(endpoint) {
-	return endpoint.interface === 2 | -1;
+	return endpoint.interface === 2;
 }
 
 export function ondisableRGBHeadersChanged(){
@@ -69,10 +69,8 @@ const RGBConfigs = {
 
 var ChannelArray = [];
 var HeaderArray = [];
-let DeviceName = "ASUS Aura Motherboard Controller";
 var vLedNames = [];
 var vLedPositions = [];
-var device_width = 15;
 
 // Device Constants
 const Device_ChannelLedLimit = 120;
@@ -102,12 +100,12 @@ const ASUS_MODE_DIRECT = 0xFF;
 // AULA3-AR42-0207 - 3 Mainboard, 1 ARGB, 2 12V - TUF GAMING X570-PRO (WI-FI)
 // AULA3-6K75-0207 - 3 Mainboard, 1 ARGB, 2 12V - TUF GAMING X570-PLUS
 
-let ConfigurationOverrides = {
-	"AULA3-AR32-0207":{MainboardCount: 3, ARGBChannelCount:3, RGBHeaderCount: 1} // THIS HAS A SPACE AT THE END?!?!?!
-
+const ConfigurationOverrides = {
+	"AULA3-AR32-0207":{MainboardCount: 3, ARGBChannelCount:3, RGBHeaderCount: 1}, // THIS HAS A SPACE AT THE END?!?!?!
+	"AULA3-AR42-0207":{MainboardCount: 3, ARGBChannelCount:1, RGBHeaderCount: 2}
 };
 
-let DeviceInfo = {
+const DeviceInfo = {
 	Model: "Unknown",
 	ConfigTable: [ASUS_COMMAND, ASUS_COMMAND_CONFIG],
 	MainChannelLedCount: 0,
@@ -123,7 +121,7 @@ export function Initialize() {
 	FetchFirmwareVersion();
 
 	// Read and parse the device's config table
-	let ValidConfig = FetchConfigTable();
+	const ValidConfig = FetchConfigTable();
 
 	if(ValidConfig){
 		ParseConfigTable();
@@ -164,11 +162,10 @@ export function Render() {
 }
 
 function SetMotherboardName(){
-	let MotherboardName = device.getMotherboardName();
+	const MotherboardName = device.getMotherboardName();
 
 	if(MotherboardName != "Unknown"){
-		DeviceName = `Asus ${MotherboardName} Controller`;
-		device.repollName();
+		device.setName(`Asus ${MotherboardName} Controller`);
 	}
 }
 
@@ -182,9 +179,8 @@ function CreateMainBoardLeds(){
 		vLedPositions.push([i, 0]);
 	}
 
-	device_width = DeviceInfo.MainChannelLedCount;
-	device.repollSize();
-	device.repollLeds();
+	device.setSize([DeviceInfo.MainChannelLedCount, 1]);
+	device.setControllableLeds(vLedNames, vLedPositions);
 }
 
 
@@ -198,7 +194,7 @@ function Create12vHeaders(){
 	HeaderArray = [];
 
 	for(let headerIdx = 0; headerIdx < DeviceInfo.RGBHeaderCount ;headerIdx++){
-		let HeaderName = `12V Header ${headerIdx + 1}`;
+		const HeaderName = `12V Header ${headerIdx + 1}`;
 		HeaderArray.push(HeaderName);
 
 		device.createSubdevice(HeaderName);
@@ -216,7 +212,7 @@ function SendMainBoardLeds(shutdown = false) {
 	let [RGBData, TotalLedCount] = FetchMainBoardColors(shutdown);
 
 	//Fetch 12v Header RGB Info
-	let [HeaderRGBData, HeaderLedCount] = Fetch12VHeaderColors(shutdown);
+	const [HeaderRGBData, HeaderLedCount] = Fetch12VHeaderColors(shutdown);
 
 	// Append 12v Header Info, Both are sent together with 12v Headers always at the end of the Mainboard LEDS
 	RGBData = RGBData.concat(HeaderRGBData);
@@ -228,12 +224,12 @@ function SendMainBoardLeds(shutdown = false) {
 
 
 function FetchMainBoardColors(shutdown = false){
-	let RGBData = [];
+	const RGBData = [];
 	let TotalLedCount = 0;
 
 	for(let iIdx = 0; iIdx < vLedPositions.length; iIdx++) {
-		let iPxX = vLedPositions[iIdx][0];
-		let iPxY = vLedPositions[iIdx][1];
+		const iPxX = vLedPositions[iIdx][0];
+		const iPxY = vLedPositions[iIdx][1];
 		var col;
 
 		if(shutdown){
@@ -256,7 +252,7 @@ function FetchMainBoardColors(shutdown = false){
 
 
 function Fetch12VHeaderColors(shutdown = false){
-	let RGBData = [];
+	const RGBData = [];
 	let TotalLedCount = 0;
 
 	for(let iIdx = 0; iIdx < DeviceInfo.RGBHeaderCount; iIdx++) {
@@ -282,7 +278,7 @@ function Fetch12VHeaderColors(shutdown = false){
 function SendARGBChannel(ChannelIdx, shutdown = false) {
 	//Fetch Colors
 	let ChannelLedCount = device.channel(ChannelArray[ChannelIdx][0]).LedCount();
-	let componentChannel = device.channel(ChannelArray[ChannelIdx][0]);
+	const componentChannel = device.channel(ChannelArray[ChannelIdx][0]);
 
 	let RGBData = [];
 
@@ -292,11 +288,11 @@ function SendARGBChannel(ChannelIdx, shutdown = false) {
 	}else if(componentChannel.shouldPulseColors()){
 		ChannelLedCount = Device_PulseLedCount;
 
-		let pulseColor = device.getChannelPulseColor(ChannelArray[ChannelIdx][0], ChannelLedCount);
-		RGBData = device.createColorArray(pulseColor, ChannelLedCount, "Inline",RGBconfig);
+		const pulseColor = device.getChannelPulseColor(ChannelArray[ChannelIdx][0], ChannelLedCount);
+		RGBData = device.createColorArray(pulseColor, ChannelLedCount, "Inline", RGBconfig);
 
 	}else{
-		RGBData = device.channel(ChannelArray[ChannelIdx][0]).getColors("Inline",RGBconfig);
+		RGBData = device.channel(ChannelArray[ChannelIdx][0]).getColors("Inline", RGBconfig);
 	}
 
 
@@ -309,7 +305,7 @@ function SendARGBChannel(ChannelIdx, shutdown = false) {
 function sendColorPacket(start, count, data){
 
 	//these mask's are awful to find out
-	let mask = (((1 << count) -1)<< start);
+	const mask = (((1 << count) -1)<< start);
 
 	let packet = [];
 	packet[0] = 0xEC;
@@ -324,7 +320,7 @@ function sendColorPacket(start, count, data){
 
 
 function sendCommit(){
-	let packet = [ASUS_COMMAND, 0x3f, 0x55];
+	const packet = [ASUS_COMMAND, 0x3f, 0x55];
 	device.write(packet, Device_Write_Length);
 }
 
@@ -336,7 +332,7 @@ function SetChannelModeDirect(ChannelIdx){
 		device.log(`Setting Channel ${ChannelIdx} to Direct Mode`);
 	}
 
-	let packet = [ASUS_COMMAND, ASUS_COMMAND_SETMODE, ChannelIdx, 0x00, 0x00, ASUS_MODE_DIRECT];
+	const packet = [ASUS_COMMAND, ASUS_COMMAND_SETMODE, ChannelIdx, 0x00, 0x00, ASUS_MODE_DIRECT];
 	device.write(packet, Device_Write_Length);
 }
 
@@ -347,7 +343,7 @@ function StreamDirectColors(ChannelIdx, RGBData, LedCount){
 
 	while(LedCount > 0){
 		// Gate Led count to max per packet size
-		let ledsToSend = Math.min(LedCount, Device_PacketLedLimit);
+		const ledsToSend = Math.min(LedCount, Device_PacketLedLimit);
 		LedCount -= ledsToSend;
 		//Set apply falg when we're out of LED's
 		isApplyPacket = LedCount == 0;
@@ -373,10 +369,10 @@ function SendDirectPacket(channel, start, count, data, apply){
 function FetchConfigTable(){
 	ClearReadBuffer();
 
-	let packet = [ASUS_COMMAND, ASUS_COMMAND_CONFIG];
+	const packet = [ASUS_COMMAND, ASUS_COMMAND_CONFIG];
 	device.write(packet, Device_Write_Length);
 
-	let data = device.read([0x00], Device_Read_Length);
+	const data = device.read([0x00], Device_Read_Length);
 
 	if(data[1] === ASUS_RESPONSE_CONFIGTABLE){
 		DeviceInfo.ConfigTable = data;
@@ -396,7 +392,7 @@ function FetchConfigTable(){
 
 function ParseConfigTable(){
 
-	for(let config in ConfigurationOverrides){
+	for(const config in ConfigurationOverrides){
 		if(DeviceInfo.Model.localeCompare(config) == 0){
 			LoadOverrideConfiguration(config);
 
@@ -424,7 +420,7 @@ function ParseConfigTable(){
 
 
 function LoadOverrideConfiguration(DeviceName){
-	let configuration = ConfigurationOverrides[DeviceName];
+	const configuration = ConfigurationOverrides[DeviceName];
 	device.log(`Using Config Override for Model: ${DeviceName}`, {toFile: true});
 
 	DeviceInfo.ARGBChannelCount = configuration.ARGBChannelCount;
@@ -442,10 +438,10 @@ function LoadOverrideConfiguration(DeviceName){
 function FetchFirmwareVersion(){
 	ClearReadBuffer();
 
-	let packet = [ASUS_COMMAND, ASUS_COMMAND_FIRMWARE];
+	const packet = [ASUS_COMMAND, ASUS_COMMAND_FIRMWARE];
 	device.write(packet, Device_Write_Length);
 
-	let data = device.read([0x00], Device_Read_Length);
+	const data = device.read([0x00], Device_Read_Length);
 
 	if(data[1] == ASUS_RESPONSE_FIRMWARE){
 		DeviceInfo.Model = "";
@@ -468,8 +464,8 @@ function FetchFirmwareVersion(){
 
 // Helper Functions
 function hexToRgb(hex) {
-	let result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
-	let colors = [];
+	const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+	const colors = [];
 	colors[0] = parseInt(result[1], 16);
 	colors[1] = parseInt(result[2], 16);
 	colors[2] = parseInt(result[3], 16);
@@ -479,7 +475,7 @@ function hexToRgb(hex) {
 
 function ClearReadBuffer(timeout = 10){
 	let count = 0;
-	let readCounts = [];
+	const readCounts = [];
 	device.flush();
 
 	while(device.getLastReadSize() > 0){
