@@ -31,7 +31,7 @@
     },
     "rules": {
         "semi":"warn",
-        //"consistent-return": "warn",
+        "consistent-return": "warn",
         "curly":"warn",
         "no-console": "error",
         "no-var": "warn",
@@ -46,7 +46,7 @@
         "no-undef":["error"],
         "eqeqeq": "warn",
         "no-cond-assign":"error",
-        //"no-use-before-define": "error",
+        //"no-use-before-define": ["error", {"functions": false}],
         "block-scoped-var":"warn",
         "no-else-return":"warn",
         "no-eval":"error",
@@ -54,6 +54,7 @@
         "prefer-const":"warn",
         "yoda":["warn", "never", { "onlyEquality": true }],
         "complexity": ["warn",{"max":10}],
+        "no-return-assign": "error",
         "padding-line-between-statements": [
             "warn",
             { "blankLine": "never", "prev": ["for","if","while"], "next": "*" },
