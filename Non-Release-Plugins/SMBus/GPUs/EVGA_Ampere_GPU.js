@@ -544,6 +544,7 @@ class EVGAAmpereIdentifier extends GPUIdentifier{
 	}
 }
 
+export function BrandGPUList(){ return new EVGAAmpereGPUList().devices; }
 
 class EVGAAmpereGPUList{
 	constructor(){

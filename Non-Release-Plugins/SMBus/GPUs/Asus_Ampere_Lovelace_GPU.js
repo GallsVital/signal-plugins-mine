@@ -419,7 +419,9 @@ class Asus_Ampere_Lovelace_IDs
 	}
 }
 
-const AsusID = new Asus_Ampere_Lovelace_IDs
+const AsusID = new Asus_Ampere_Lovelace_IDs();
+
+export function BrandGPUList(){ return Asus3000GPUIDs; }
 
 const Asus3000GPUIDs =
 [
