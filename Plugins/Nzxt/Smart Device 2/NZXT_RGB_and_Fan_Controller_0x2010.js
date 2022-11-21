@@ -206,7 +206,7 @@ function HandleFanPacket(data){
 		let mode = NZXT.FanModes[data[NZXT.offsetFanMode + fanId]];
 		let duty = data[NZXT.offsetFanDuty + fanId];
 
-		device.log(`Fan ${fanId}, Mode: ${mode}, ${duty}% Duty, ${rpm} rpm`, {toFile: true});
+		device.log(`Fan ${fanId}, Mode: ${mode}, ${duty}% Duty, ${rpm} rpm`);
 
 		if(rpm > 0 && !ConnectedFans.includes(`Fan ${fanId + 1}`)){
 			ConnectedFans.push(`Fan ${fanId + 1}`);

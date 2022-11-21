@@ -333,20 +333,20 @@ function connectionCheck()
 	return false;
 }
 
-function disablekeysbyusage()//Don't touch
-{
-	clearShortReadBuffer();
-	clearLongReadBuffer();
-	device.set_endpoint(2, 0x0001, 0xff00);
-	var packet = [ShortMessage, ConnectionMode, DisableKeysID, 0x00]; //Device type
-	device.write(packet,7);
-	device.set_endpoint(2, 0x0002, 0xff00);
-	let keydisablecapability = device.read([0x00],20);
-	device.log("Total number of keys to disable" + keydisablecapability);
+// function disablekeysbyusage()//Don't touch
+// {
+// 	clearShortReadBuffer();
+// 	clearLongReadBuffer();
+// 	device.set_endpoint(2, 0x0001, 0xff00);
+// 	var packet = [ShortMessage, ConnectionMode, DisableKeysID, 0x00]; //Device type
+// 	device.write(packet,7);
+// 	device.set_endpoint(2, 0x0002, 0xff00);
+// 	let keydisablecapability = device.read([0x00],20);
+// 	device.log("Total number of keys to disable" + keydisablecapability);
 
-	packet = [LongMessage, ConnectionMode, DisableKeysID, 0x10, 0x00]; //This disables keys in game mode. NO HID OUTPUT
-	device.write(packet,20);
-}
+// 	packet = [LongMessage, ConnectionMode, DisableKeysID, 0x10, 0x00]; //This disables keys in game mode. NO HID OUTPUT
+// 	device.write(packet,20);
+// }
 
 function PollBattery()
 {  
