@@ -18,7 +18,7 @@ export function ControllableParameters(){
 		{"property":"forcedColor", "group":"lighting", "label":"Forced Color", "min":"0", "max":"360", "type":"color", "default":"009bde"},
 	];
 }
-let ParentDeviceName = "NZXT Smart Device 2";
+const ParentDeviceName = "NZXT Smart Device 2";
 
 const vKeyNames = [];
 const vKeyPositions = [];
@@ -29,7 +29,7 @@ export function DefaultComponentBrand() { return "NZXT";}
 const DeviceMaxLedLimit = 80;
 
 //Channel Name, Led Limit
-let ChannelArray = [
+const ChannelArray = [
 	["Channel 1", 40],
 	["Channel 2", 40],
 ];
@@ -45,7 +45,7 @@ function SetupChannels(){
 function SetFanPollRate(seconds){
 	// Smart Device v2 Seems to 'tick' 3 times per second.
 	// This sets the device to report the fan speeds every 9 ticks, or 3 seconds
-	let pollRate = Math.round(seconds * 3);
+	const pollRate = Math.round(seconds * 3);
 
 	let packet = [0x60, 0x02, 0x01, 0xe8, pollRate, 0x01, 0xe8, pollRate];
 	device.write(packet, 64);
@@ -57,7 +57,7 @@ function SetFanPollRate(seconds){
 
 }
 
-let ConnectedFans = [];
+const ConnectedFans = [];
 
 function SetupFans(){
 	if(device.fanControlDisabled()){
@@ -78,7 +78,7 @@ export function Initialize() {
 }
 
 function RequestFirmware(){
-	 let packet = [0x10, 0x01];
+	 const packet = [0x10, 0x01];
 	 device.write(packet, 64);
 }
 
@@ -100,7 +100,7 @@ function StreamLightingPacketChanneled(packetNumber, count, data, channel) {
 }
 
 function SubmitLightingColors(channel) {
-	let packet = [];
+	const packet = [];
 	packet[0] = 0x22;
 	packet[1] = 0xA0;
 	packet[2] = 1 << channel;
@@ -130,7 +130,7 @@ export function LedPositions() {
 
 function SendChannel(Channel, shutdown = false) {
 	let ChannelLedCount = device.channel(ChannelArray[Channel][0]).LedCount();
-	let componentChannel = device.channel(ChannelArray[Channel][0]);
+	const componentChannel = device.channel(ChannelArray[Channel][0]);
 
 	let RGBData = [];
 
@@ -140,7 +140,7 @@ function SendChannel(Channel, shutdown = false) {
 	}else if(componentChannel.shouldPulseColors()){
 		ChannelLedCount = 40;
 
-		let pulseColor = device.getChannelPulseColor(ChannelArray[Channel][0], ChannelLedCount);
+		const pulseColor = device.getChannelPulseColor(ChannelArray[Channel][0], ChannelLedCount);
 		RGBData = device.createColorArray(pulseColor, ChannelLedCount, "Inline", "GRB");
 
 	}else{
@@ -151,7 +151,7 @@ function SendChannel(Channel, shutdown = false) {
 	ChannelLedCount = ChannelLedCount >= 120 ? 120 : ChannelLedCount;
 
 	while(ChannelLedCount > 0){
-		let ledsToSend = ChannelLedCount >= 20 ? 20 : ChannelLedCount;
+		const ledsToSend = ChannelLedCount >= 20 ? 20 : ChannelLedCount;
 		StreamLightingPacketChanneled(packetNumber, ledsToSend, RGBData.splice(0, ledsToSend * 3), Channel);
 
 		packetNumber += 1;
@@ -174,16 +174,16 @@ class NZXTSmartDevice2{
 		};
 	};
 };
-let NZXT = new NZXTSmartDevice2();
+const NZXT = new NZXTSmartDevice2();
 
 
 function ReadAllPackets(){
 
 	do {
-		let packet = device.read([0x0], 64, 2);
+		const packet = device.read([0x0], 64, 2);
 
 		if(packet[0] === 0x11 && packet[1] === 0x01){
-			let Firmware = `${packet[0x11]}.${packet[0x12]}.${packet[0x13]}`
+			const Firmware = `${packet[0x11]}.${packet[0x12]}.${packet[0x13]}`;
 			device.log(`Firmware Version: ${Firmware}`, {toFile: true});
 			device.log(`Developed On Firmware: 1.13.0`);
 		}
@@ -202,11 +202,11 @@ function HandleFanPacket(data){
 	}
 
 	for(let fanId = 0; fanId < 3;fanId++){
-		let rpm = data[NZXT.offsetFanRPM + fanId * 2] | (data[NZXT.offsetFanRPM + fanId * 2 + 1] << 8);
-		let mode = NZXT.FanModes[data[NZXT.offsetFanMode + fanId]];
-		let duty = data[NZXT.offsetFanDuty + fanId];
+		const rpm = data[NZXT.offsetFanRPM + fanId * 2] | (data[NZXT.offsetFanRPM + fanId * 2 + 1] << 8);
+		const mode = NZXT.FanModes[data[NZXT.offsetFanMode + fanId]];
+		const duty = data[NZXT.offsetFanDuty + fanId];
 
-		device.log(`Fan ${fanId}, Mode: ${mode}, ${duty}% Duty, ${rpm} rpm`, {toFile: true});
+		device.log(`Fan ${fanId}, Mode: ${mode}, ${duty}% Duty, ${rpm} rpm`);
 
 		if(rpm > 0 && !ConnectedFans.includes(`Fan ${fanId + 1}`)){
 			ConnectedFans.push(`Fan ${fanId + 1}`);
@@ -216,7 +216,7 @@ function HandleFanPacket(data){
 		if(ConnectedFans.includes(`Fan ${fanId + 1}`)){
 			device.setRPM(`Fan ${fanId + 1}`, rpm);
 
-			let newSpeed = device.getNormalizedFanlevel(`Fan ${fanId + 1}`) * 100;
+			const newSpeed = device.getNormalizedFanlevel(`Fan ${fanId + 1}`) * 100;
 			SetFanState(fanId, newSpeed);
 		}
 
@@ -224,7 +224,7 @@ function HandleFanPacket(data){
 }
 
 function SetFanState(FanId, PercentDuty){
-	let packet = [0x62, 0x01, (0x01 << FanId)];
+	const packet = [0x62, 0x01, (0x01 << FanId)];
 	packet[FanId + 3] = PercentDuty;
 	device.write(packet, 64);
 
