@@ -19,7 +19,7 @@ export function ControllableParameters() {
 		{ "property": "cpuCooler", "group": "", "label": "CPU Cooler", "type": "combobox", "values": ["Elite Capellix", "Elite LCD"], "default": "Elite Capellix" },
 	];
 }
-let ParentDeviceName = "Corsair Lighting Commander Core";
+const ParentDeviceName = "Corsair Lighting Commander Core";
 export function LedNames() { return vKeyNames; }
 export function LedPositions() { return vKeyPositions; }
 
@@ -32,10 +32,10 @@ export function Validate(endpoint) {
 }
 
 
-let vKeyNames = [];
-let vKeyPositions = [];
+const vKeyNames = [];
+const vKeyPositions = [];
 
-let deviceArray = [
+const deviceArray = [
 	"Elite Capellix Pump",
 ];
 
@@ -49,16 +49,16 @@ function SetupChannels() {
 }
 
 //Global Variables
-let ChannelArray = [
+const ChannelArray = [
 	["Channel 1", 233],
 ];
 let ConnectedFans = [];
 let savedPollFanTimer = Date.now();
-let PollModeInternal = 3000;
+const PollModeInternal = 3000;
 let PumpDevice;
-let PumpDeviceName = "Elite Capellix Pump";
+const PumpDeviceName = "Elite Capellix Pump";
 
-let FanControllerArray = [
+const FanControllerArray = [
 	"Pump",
 	"Fan 1",
 	"Fan 2",
@@ -79,7 +79,7 @@ const CommandDict = {
 	0x06: "Send Command",
 	0x0d: "Open Endpoint",
 	0x05: "Close Endpoint",
-	0x06: "Fan RPM",
+	//0x06: "Fan RPM",
 	0x09: "Fan Settings",
 	0x0F: "Led Settings"
 };
@@ -111,7 +111,7 @@ export function Initialize() {
 	device.log(`Vid is ${Corsair.FetchProperty(Corsair.property.vid)}`);
 	device.log(`Pid is ${Corsair.FetchProperty(Corsair.property.pid)}`);
 
-	let firmwareVersion = Corsair.FetchFirmware();
+	const firmwareVersion = Corsair.FetchFirmware();
 
 	device.log(`Developed on Firmware ${DevFirmwareVersion}`);
 
@@ -124,7 +124,7 @@ export function Initialize() {
 }
 
 function ConvertWordToBytes(word){
-	return {low: word & 0xFF, high: word >> 8}
+	return {low: word & 0xFF, high: word >> 8};
 }
 
 export function Shutdown() {
@@ -142,7 +142,7 @@ export function Render() {
 
 function UpdateRGB(shutdown = false){
 
-	let [RGBData, TotalLedCount] = GetColors(shutdown);
+	const [RGBData, TotalLedCount] = GetColors(shutdown);
 
 	Corsair.SendRGBData(RGBData, TotalLedCount, Device_Write_Length);
 }
@@ -187,7 +187,7 @@ function GetColors() {
 	if(PumpDevice !== null) {
 
 		for(let iIdx = 0; iIdx < PumpDevice.mapping.length; iIdx++) {
-			let [iPxX, iPxY] = PumpDevice.positioning[iIdx];
+			const [iPxX, iPxY] = PumpDevice.positioning[iIdx];
 			let mxPxColor;
 
 			//find colors
@@ -206,7 +206,7 @@ function GetColors() {
 		TotalLedCount += 29; // Led count for the pump is always 29
 	}
 
-	let componentChannel = device.channel(ChannelArray[0][0]);
+	const componentChannel = device.channel(ChannelArray[0][0]);
 	let ChannelLedCount = componentChannel.LedCount();
 
 	let ColorData = [];
@@ -217,12 +217,13 @@ function GetColors() {
 	} else if(componentChannel.shouldPulseColors()) {
 		ChannelLedCount = 34 * 6;
 
-		let pulseColor = device.getChannelPulseColor(ChannelArray[0][0], ChannelLedCount);
+		const pulseColor = device.getChannelPulseColor(ChannelArray[0][0], ChannelLedCount);
 		ColorData = device.createColorArray(pulseColor, ChannelLedCount, "Inline");
 
 	} else {
-		let components = device.channel(ChannelArray[0][0]).getComponentNames();
+		const components = device.channel(ChannelArray[0][0]).getComponentNames();
 		ChannelLedCount = components.length * 34;
+
 		for(let i = 0; i < components.length; i++) {
 			let ComponentColors;
 
@@ -237,6 +238,7 @@ function GetColors() {
 
 			}else{
 				ComponentColors = [];
+
 				for(let j = 0; j < 34; j++) {
 					ComponentColors.push(0);
 					ComponentColors.push(128);
@@ -267,7 +269,7 @@ function PollFans() {
 	}
 
 	if(ConnectedFans.length === 0){
-		let FanStates = Corsair.FetchFanStates();
+		const FanStates = Corsair.FetchFanStates();
 		ConnectedFans = [];
 		FanStates.every(function(state, iIdx){
 			if(state === Corsair.fanState.Initializing) {
@@ -288,7 +290,7 @@ function PollFans() {
 	}
 
 	// Read Fan RPM
-	let FanSpeeds = Corsair.FetchFanRPM();
+	const FanSpeeds = Corsair.FetchFanRPM();
 	FanSpeeds.forEach(function (rpm, iIdx) {
 		if(rpm > 0){
 			device.log(`${FanControllerArray[iIdx]} is running at ${rpm}rpm`);
@@ -298,7 +300,7 @@ function PollFans() {
 	});
 
 	// Read Temperature Probes
-	let Temperatures = Corsair.FetchTemperatures();
+	const Temperatures = Corsair.FetchTemperatures();
 	Temperatures.forEach(function (temp, iIdx) {
 		//device.log(`Temp ${iIdx + 1} is ${temp}C`);
 	});
@@ -312,7 +314,7 @@ function PollFans() {
 
 function SendCoolingdata() {
 
-	let CoolingData = [
+	const CoolingData = [
 		0x00, 0x08, 0x06, 0x01, 0x1F, 0x00, 0x00, 0x00, 0x07, 0x00, 0x07,
 		0x00, 0x00, 0x32, 0x00,
 		0x01, 0x00, 0x32, 0x00,
@@ -324,7 +326,7 @@ function SendCoolingdata() {
 	];
 
 	for(let fan = 0; fan < ConnectedFans.length; fan++) {
-		let fanLevel = (device.getNormalizedFanlevel(FanControllerArray[ConnectedFans[fan]]) * 100).toFixed(0);
+		const fanLevel = (device.getNormalizedFanlevel(FanControllerArray[ConnectedFans[fan]]) * 100).toFixed(0);
 		//device.log(`${FanControllerArray[ConnectedFans[fan]]} level set to ${fanLevel}%`);
 		CoolingData[13 + ConnectedFans[fan] * 4] = fanLevel;
 	}
@@ -416,20 +418,20 @@ class ModernCorsairProtocol{
 
 
 	FetchFirmware(){
-		let data = Corsair.ReadPacket(this.property.firmware);
+		const data = Corsair.ReadPacket(this.property.firmware);
 
 		if(this.CheckError(data, "FetchFirmware")){
 			return;
 		}
 
-		let firmwareString = `${data[4]}.${data[5]}.${data[6]}`;
+		const firmwareString = `${data[4]}.${data[5]}.${data[6]}`;
 		device.log(`Firmware Version: ${firmwareString}`);
 
 		return firmwareString;
 	}
 
 	CheckError(Data, Context){
-		let isError = Data[3] === 3;
+		const isError = Data[3] === 3;
 
 		if(isError){
 			device.log(`${Context} Packet Error!`);
@@ -524,7 +526,7 @@ class ModernCorsairProtocol{
 
 		device.write(Data, Device_Write_Length);
 
-		let packet = device.read([0x00], Device_Read_Length);
+		const packet = device.read([0x00], Device_Read_Length);
 
 		this.CheckError(packet, `WriteEndpoint(Endpoint, Index)`);
 
@@ -534,7 +536,7 @@ class ModernCorsairProtocol{
 	SendRGBData(RGBData, LedCount, PacketSize){
 		let BytesSent = 0;
 		let TotalBytes = LedCount * 3;
-		let BytesPerPacket = PacketSize - 4;
+		const BytesPerPacket = PacketSize - 4;
 
 		while(TotalBytes > 0){
 			let BytesToSend = Math.min(BytesPerPacket, TotalBytes);
@@ -572,7 +574,7 @@ class ModernCorsairProtocol{
 
 		device.write(packet, Device_Write_Length);
 
-		let response = device.read([0x00], Device_Read_Length);
+		const response = device.read([0x00], Device_Read_Length);
 
 		this.CheckError(response, "WriteLighting");
 	}
@@ -588,7 +590,7 @@ class ModernCorsairProtocol{
 
 		device.write(packet, Device_Write_Length);
 
-		let response = device.read([0x00], Device_Read_Length);
+		const response = device.read([0x00], Device_Read_Length);
 
 		this.CheckError(response, "StreamLighting");
 	}
@@ -607,7 +609,7 @@ class ModernCorsairProtocol{
 		}
 	}
 	SetHWBrightness(Brightness){
-		let HardwareBrightness = this.FetchProperty(this.property.brightness);
+		const HardwareBrightness = this.FetchProperty(this.property.brightness);
 
 		if(HardwareBrightness !== Brightness){
 			device.log(`Hardware Level Brightness is ${HardwareBrightness/10}%`);
@@ -618,18 +620,18 @@ class ModernCorsairProtocol{
 	}
 
 	FetchFanRPM() {
-		let data = Corsair.ReadEndpoint(this.endpoint.fanRpm, this.handles.background, 0x06);
-		let FanSpeeds = [];
+		const data = Corsair.ReadEndpoint(this.endpoint.fanRpm, this.handles.background, 0x06);
+		const FanSpeeds = [];
 
 		if(data[4] !== 6 && data[5] !== 0) {
 			device.log("Failed to get Fan RPM's", {toFile: true});
 		}
-		let fanCount = data[6];
-		let fanSpeeds = data.slice(7, 7 + 2 * fanCount);
+		const fanCount = data[6];
+		const fanSpeeds = data.slice(7, 7 + 2 * fanCount);
 
 		for(let i = 0; i < fanCount; i++) {
-			let fanData = fanSpeeds.splice(0, 2);
-			let fanRPM = fanData[0] + (fanData[1] << 8);
+			const fanData = fanSpeeds.splice(0, 2);
+			const fanRPM = fanData[0] + (fanData[1] << 8);
 
 			FanSpeeds[i] = fanRPM;
 		}
@@ -640,10 +642,11 @@ class ModernCorsairProtocol{
 
 		if(device.fanControlDisabled()) {
 			device.log("Fan Control Disabled");
+
 			return [];
 		}
 
-		let data = this.ReadEndpoint(this.endpoint.fanStates, this.handles.background, 0x09);
+		const data = this.ReadEndpoint(this.endpoint.fanStates, this.handles.background, 0x09);
 
 		if(data[4] !== 9 || data[5] !== 0) {
 			device.log("Failed to get Fan Settings", {toFile: true});
@@ -651,16 +654,16 @@ class ModernCorsairProtocol{
 			return [];
 		}
 
-		let FanCount = data[6];
-		let FanData = data.slice(7, 7 + FanCount);
+		const FanCount = data[6];
+		const FanData = data.slice(7, 7 + FanCount);
 
 		return FanData;
 	}
 
 	SetFanType() {
 		// Configure Fan Ports to use QL Fan size grouping. 34 Leds
-		let FanSettings = [0x00, 0x08, 0x06, 0x01, 0x11, 0x00, 0x00, 0x00, 0x0D, 0x00, 0x07];
-		let offset = 11;
+		const FanSettings = [0x00, 0x08, 0x06, 0x01, 0x11, 0x00, 0x00, 0x00, 0x0D, 0x00, 0x07];
+		const offset = 11;
 
 		for(let iIdx = 0; iIdx < 7; iIdx++) {
 			FanSettings[offset + iIdx * 2] = 0x01;
@@ -680,16 +683,16 @@ class ModernCorsairProtocol{
 	FetchTemperatures() {
 		//device.log(`Reading Temp Data`);
 
-		let data = Corsair.ReadEndpoint(this.endpoint.TemperatureData, this.handles.background, 0x16);
-		let ProbeTemps = [];
+		const data = Corsair.ReadEndpoint(this.endpoint.TemperatureData, this.handles.background, 0x16);
+		const ProbeTemps = [];
 
 		if(data[4] === Corsair.responses.temperatureData && data[5] === 0) {
-			let ProbeCount = data[6];
-			let TempValues = data.slice(7, 7 + 3 * ProbeCount);
+			const ProbeCount = data[6];
+			const TempValues = data.slice(7, 7 + 3 * ProbeCount);
 
 			for(let i = 0; i < data[6]; i++) {
-				let probe = TempValues.slice(i * 3 + 1, i * 3 + 3);
-				let temp = Convert_To_16Bit(probe) / 10;
+				const probe = TempValues.slice(i * 3 + 1, i * 3 + 3);
+				const temp = Convert_To_16Bit(probe) / 10;
 
 				ProbeTemps[i] = temp;
 			}
@@ -698,7 +701,7 @@ class ModernCorsairProtocol{
 		return ProbeTemps;
 	}
 };
-let Corsair = new ModernCorsairProtocol();
+const Corsair = new ModernCorsairProtocol();
 
 // Helper Functions
 
@@ -713,7 +716,7 @@ function Convert_To_16Bit(values) {
 }
 
 function Convert_From_16Bit(value, LittleEndian = false) {
-	let returnValue = [];
+	const returnValue = [];
 
 	while(value > 0){
 		returnValue.push(value & 0xFF);
@@ -724,8 +727,8 @@ function Convert_From_16Bit(value, LittleEndian = false) {
 }
 
 function hexToRgb(hex) {
-	let result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
-	let colors = [];
+	const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+	const colors = [];
 	colors[0] = parseInt(result[1], 16);
 	colors[1] = parseInt(result[2], 16);
 	colors[2] = parseInt(result[3], 16);
