@@ -36,7 +36,7 @@ validate:
     - npm run test:validate
 
 duplicate gpu check:
-  stage: Check For Duplicate GPUs
+  stage: duplicate gpu check
   when: always
   script:
     #- apk add --update npm
