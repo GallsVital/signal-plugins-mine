@@ -54,7 +54,7 @@ export function Shutdown() {
 /** @param {FreeAddressBus} bus */
 export function Scan(bus) {
 
-	const PossibleAddresses = [0x58, 0x59, 0x5A, 0x5B, 0x5C, 0x5D, 0x5E, 0x5F];
+	const PossibleAddresses = [0x18, 0x19, 0x1A, 0x1B, 0x58, 0x59, 0x5A, 0x5B, 0x5C, 0x5D, 0x5E, 0x5F];
 	const FoundAddresses = [];
 
 	  // Skip any non AMD / INTEL Busses
@@ -82,14 +82,14 @@ export function Scan(bus) {
 
 function CheckForDominatorRam(bus, address){
 	const vendorByte = bus.ReadByte(address, DominatorProtocol.Registers.Vender);
-	bus.log(`Address ${address} has Vendor Byte ${vendorByte}`);
+	bus.log(`Address ${address} has Vendor Byte ${vendorByte}`, {toFile: true});
 
 	if (vendorByte !== DominatorProtocol.VendorId){
 		return false;
 	}
 
 	const modelByte = bus.ReadByte(address, DominatorProtocol.Registers.Model);
-	bus.log(`Address ${address} has Model Byte ${modelByte}`);
+	bus.log(`Address ${address} has Model Byte ${modelByte}`, {toFile: true});
 
 	return DominatorProtocol.ModelIds.includes(modelByte);
 }
