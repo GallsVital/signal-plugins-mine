@@ -342,7 +342,7 @@ class Asus_Ampere_Lovelace_IDs
 {
 	constructor()
     {
-		this.RTX3050_STRIX_GAMING           = 0x8872;
+		this.RTX3050_STRIX_GAMING           = 0x8872; //0x2507
 
         this.RTX3060_STRIX_GAMING           = 0x8818;
         this.RTX3060_STRIX_GAMING_OC        = 0x87F3;
