@@ -42,7 +42,7 @@ export function Scan(bus) {
 	Ballistix = new CrucialBallistix(CrucialInterface);
 
 	const FoundAddresses = [];
-
+	const x = y;
 	// Crucial Ballistix Ram like Aura/ENE ram needs to have its address remapped by the first program that touches it.
 	// If we have a device on 0x27 then we need to attempt to remap them.
 	const iRet = bus.WriteQuick(0x27);
@@ -94,7 +94,7 @@ export function Render() {
 	}
 
 	UpdateColors();
-	device.log(`Total Packets [${sentPackets + savedPackets}]. Checking RGB values saved us sending [${Math.floor(savedPackets/(savedPackets+sentPackets) * 100)}]% of them`)
+	device.log(`Total Packets [${sentPackets + savedPackets}]. Checking RGB values saved us sending [${Math.floor(savedPackets/(savedPackets+sentPackets) * 100)}]% of them`);
 	device.log(`Saved: [${savedPackets}] Sent: [${sentPackets}]`);
 	this.profile.detailedReport();
 }
@@ -132,8 +132,8 @@ function UpdateColors(shutdown = false){
 
 }
 
-let sentPackets = 0;
-let savedPackets = 0;
+const sentPackets = 0;
+const savedPackets = 0;
 
 function CompareArrays(array1, array2){
 	return array1.length === array2.length &&
@@ -168,7 +168,7 @@ class Profiler{
 		// calculate the real average at a small number of values
 		// swap over to a quicker to calculate moving average when we hit 50 calls.
 		if(this.values.length < 50){
-			this.averageTime = this.values.reduce((a,b) => (a + b)) / this.values.length;
+			this.averageTime = this.values.reduce((a, b) => (a + b)) / this.values.length;
 		}else{
 			this.averageTime -= this.values.shift() / 50;
 			this.averageTime += elapsedTime / 50;
