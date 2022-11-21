@@ -1,5 +1,3 @@
-import { ConstructorDeclaration } from "ts-morph";
-
 export function Name() { return "Gigabyte Vision GPU"; }
 export function Publisher() { return "WhirlwindFX"; }
 export function Documentation(){ return "troubleshooting/gigabyte"; }
@@ -30,22 +28,28 @@ const vLedPositions = [[3, 1]];
 let GigabyteVision;
 
 /** @param {FreeAddressBus} bus */
-export function Scan(bus) {
+export function Scan(bus) 
+{
 	const FoundAddresses = [];
 	  // Skip any non AMD / INTEL Busses
-	  if (!bus.IsNvidiaBus()) {
+	if (!bus.IsNvidiaBus()) 
+	{
 		return [];
 	}
 
-	for(const GPU of new GigabyteVisionGPuList().devices){
-		if(CheckForIdMatch(bus, GPU)){
+	for(const GPU of new GigabyteVisionGPuList().devices)
+	{
+		if(CheckForIdMatch(bus, GPU))
+		{
 			// No Quick Write test on Nvidia
-			if(bus.ReadByteWithoutRegister(GPU.Address) < 0){
+			if(bus.ReadByteWithoutRegister(GPU.Address) < 0)
+			{
                 bus.log("failed read test!");
                 return [];
 			}
 
-			if(GigabyteVisionGpuCheck(bus, GPU)){
+			if(GigabyteVisionGpuCheck(bus, GPU))
+			{
 				bus.log(`Found Gigabyte Vision GPU! [${GPU.Name}]`);
 				FoundAddresses.push(GPU.Address);
 			}
@@ -55,24 +59,28 @@ export function Scan(bus) {
 	return FoundAddresses;
 }
 
-function CheckForIdMatch(bus, Gpu){
+function CheckForIdMatch(bus, Gpu)
+{
     return Gpu.Vendor === bus.Vendor() &&
     Gpu.SubVendor === bus.SubVendor() &&
     Gpu.Device === bus.Product() &&
     Gpu.SubDevice === bus.SubDevice();
 }
 
-function SetGPUNameFromBusIds(GPUList){
-	for(const GPU of GPUList){
-		if(CheckForIdMatch(bus, GPU)){
+function SetGPUNameFromBusIds(GPUList)
+{
+	for(const GPU of GPUList)
+	{
+		if(CheckForIdMatch(bus, GPU))
+		{
 			device.setName(GPU.Name);
 			break;
 		}
 	}
 }
 
-function GigabyteVisionGpuCheck(bus, GPU){
-
+function GigabyteVisionGpuCheck(bus, GPU)
+{
     const ValidReturnCodes = [0x10, 0x11, 0x12, 0x14];
     // 0x62 (Gaming OC) cards use a 8 byte write length.
     // GPU will softlock if this is wrong.
@@ -86,45 +94,43 @@ function GigabyteVisionGpuCheck(bus, GPU){
 	return Data[0] === 0xAB && ValidReturnCodes.includes(Data[1]);
 }
 
-export function Initialize() {
+export function Initialize() 
+{
 	GigabyteVision = new GigabyteVisionProtocol();
 	// We must do this before any other writes as a bad length will soft lock the GPU.
+	GigabyteVision.setMode(GigabyteVision.modes.static);
 	GigabyteVision.determineWriteLength();
-
 	SetGPUNameFromBusIds(new GigabyteVisionGPuList().devices);
 }
 
-export function Render() {
+export function Render() 
+{
 	SendRGB();
 
-	//PollHardwareModes();
-
-	// Mimic old Refresh Speed to not overload the bus.
 	device.pause(10);
-
-	//device.log(`Total Packets [${sentPackets + savedPackets}]. Checking RGB values saved us sending [${Math.floor(savedPackets/(savedPackets+sentPackets) * 100)}]% of them`)
-	//device.log(`Saved: [${savedPackets}] Sent: [${sentPackets}]`);
 }
 
 
-export function Shutdown() {
+export function Shutdown() 
+{
 	SendRGB(true);
 }
 
-function CompareArrays(array1, array2){
-	return array1.length === array2.length &&
-	array1.every(function(value, index) { return value === array2[index];});
-}
-
-function SendRGB(shutdown = false){
+function SendRGB(shutdown = false)
+{
 
 		let Color;
 
-		if(shutdown){
+		if(shutdown)
+		{
 			Color = hexToRgb(shutdownColor);
-		}else if(LightingMode === "Forced") {
+		}
+		else if(LightingMode === "Forced") 
+		{
 			Color = hexToRgb(forcedColor);
-		} else {
+		} 
+		else 
+		{
 			Color = device.color(...vLedPositions[0]);
 		}
 
@@ -132,7 +138,8 @@ function SendRGB(shutdown = false){
 }
 
 
-function hexToRgb(hex) {
+function hexToRgb(hex) 
+{
 	const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
 	const colors = [];
 	colors[0] = parseInt(result[1], 16);
@@ -142,54 +149,65 @@ function hexToRgb(hex) {
 	return colors;
 }
 
-class GigabyteVisionProtocol{
+class GigabyteVisionProtocol
+{
 	constructor(){
 
-		this.registers = {
+		this.registers = 
+		{
 			Initialization: 0xAB,
 			Mode: 0x88,
 			Color: 0x40,
 		};
-		this.modes = {
+		this.modes = 
+		{
 			static: 0x01,
 			breathing: 0x02,
 			flashing: 0x04,
 			dualFlash: 0x08,
 			specrum: 0x011,
 		};
-		this.config = {
+		this.config = 
+		{
 			writeLength : 0
 		};
 	}
 
-	determineWriteLength(bus){
-		this.config.writeLength = bus.Address() === 0x62 ? 8 : 4;
+	determineWriteLength(bus)
+	{
+		this.config.writeLength = bus.GetAddress() === 0x62 ? 8 : 4;
 	}
 
-	setMode(mode){
-		
+	setMode(mode)
+	{
 		let data = [this.registers.Mode, mode, 5, 0x63];
 
 		let iRet = this.WriteBlockSafe(data);
 
-		if(iRet < 0){
+		if(iRet < 0)
+		{
 			bus.log("Failed To Set Mode");
 			return;
 		}
 		bus.log(`Set Lighting Mode To [${mode}]`);
 	}
 
-	WriteRGB(RGBData){
-		if(RGBData.length > 3){
+	WriteRGB(RGBData)
+	{
+		if(RGBData.length > 3)
+		{
 			bus.log(`Invalid RGB Data Length. Expected 3, Got [${RGBData.length}]`);
 			return
 		}
 		let Data = [this.registers.Color];
+		Data.push(...RGBData);
 		this.WriteBlockSafe(Data);
 	}
 
-	WriteBlockSafe(Data){
-		if(this.config.writeLength === -1){
+	WriteBlockSafe(Data)
+	{
+		if(this.config.writeLength === -1)
+		{
 			bus.log("Invalid Write Length. Aborting Write Operation to Redetect...");
 			this.determineWriteLength();
 
@@ -201,8 +219,10 @@ class GigabyteVisionProtocol{
 
 }
 
-class NvidiaGPUDeviceIds {
-    constructor(){
+class NvidiaGPUDeviceIds 
+{
+    constructor()
+	{
         this.GTX1050TI       = 0x1C82;
         this.GTX1060         = 0x1C03;
         this.GTX1070         = 0x1B81;
@@ -242,13 +262,17 @@ class NvidiaGPUDeviceIds {
         this.RTX3080TI       = 0x2208;
         this.RTX3090         = 0x2204;
         this.RTX3090TI       = 0x2203;
+		this.RTX4080		 = 0x2704;
+		this.RTX4090		 = 0x2684;
     }
 };
 
 const Nvidia = new NvidiaGPUDeviceIds();
 
-class GigabyteVisionDeviceIds{
-	constructor(){
+class GigabyteVisionDeviceIds
+{
+	constructor()
+	{
 		this.GTX1050TI_G1_GAMING            = 0x372A;
 		this.GTX1060_G1_GAMING_OC           = 0x3739;
 		this.GTX1060_XTREME                 = 0x3776;
@@ -302,11 +326,14 @@ class GigabyteVisionDeviceIds{
 		this.RTX3080TI_GAMING_OC            = 0x4088;
 		this.RTX3090_GAMING_OC_24GB         = 0x4043;
 		this.RTX3080_12G_GAMING_OC          = 0x40A2;
+		this.RTX4080_EAGLE_OC_16GD			= 0x40BE;
 	}
 }
 
-class GPUIdentifier{
-	constructor(Vendor, SubVendor, Device, SubDevice, Address, Name, Model = ""){
+class GPUIdentifier
+{
+	constructor(Vendor, SubVendor, Device, SubDevice, Address, Name, Model = "")
+	{
 		this.Vendor = Vendor;
 		this.SubVendor = SubVendor;
 		this.Device = Device;
@@ -318,14 +345,18 @@ class GPUIdentifier{
 }
 
 //0x1458
-class GigabyteVisionIdentifier extends GPUIdentifier{
-    constructor(device, SubDevice, Address, Name){
+class GigabyteVisionIdentifier extends GPUIdentifier
+{
+    constructor(device, SubDevice, Address, Name)
+	{
 		super(0x10DE, 0x1458, device, SubDevice, Address, Name, "");
     }
 }
 
-class GigabyteVisionGPuList{
-	constructor(){
+class GigabyteVisionGPuList
+{
+	constructor()
+	{
 		const Nvidia = new NvidiaGPUDeviceIds();
 		const GigabyteVisionIds  = new GigabyteVisionDeviceIds();
 
@@ -371,6 +402,7 @@ class GigabyteVisionGPuList{
 			new GigabyteVisionIdentifier(Nvidia.RTX3080TI,      GigabyteVisionIds.RTX3080TI_GAMING_OC,           0x62, "GIGABYTE 3080Ti Gaming OC"),
 			new GigabyteVisionIdentifier(Nvidia.RTX3080TI,      GigabyteVisionIds.RTX3080TI_EAGLE,               0x63, "GIGABYTE 3080Ti Eagle"),
 			new GigabyteVisionIdentifier(Nvidia.RTX3080TI,      GigabyteVisionIds.RTX3080TI_EAGLE_OC,            0x63, "GIGABYTE 3080Ti Eagle OC"),
+			new GigabyteVisionIdentifier(Nvidia.RTX4080,        GigabyteVisionIds.RTX4080_EAGLE_OC_16GD,         0x71, "GIGABYTE 4080 Eagle OC"),
 		];
 	}
 }
