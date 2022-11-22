@@ -15,6 +15,12 @@
 		"declarationMap": true,
 		"typeRoots": ["./types", "./node_modules/@types"],
 		"disableSizeLimit": true, // Plugin images being base64 breaks Typescript checking in the project. 20mb filesize limit by default
+		"baseUrl": ".",
+		"paths": {
+			"@Mock/*": [
+				"./tests/*"
+			]
+		}
 	},
 
 	"exclude": [

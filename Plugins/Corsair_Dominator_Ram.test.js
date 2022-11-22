@@ -1,6 +1,5 @@
 const { CorsairDominatorProtocol } = require("./Corsair_Dominator_Ram");
-const { MockDevice} = require("../tests/MockDevice");
-const { MockBus} = require("../tests/MockBus");
+const { MockDevice, MockBus } = require("../tests/Mocks.js");
 
 const pluginPath = "./Corsair_Dominator_Ram.js";
 
