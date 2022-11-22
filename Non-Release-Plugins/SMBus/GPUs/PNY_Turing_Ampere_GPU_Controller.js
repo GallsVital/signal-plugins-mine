@@ -21,32 +21,32 @@ export function ControllableParameters()
 	];
 }
 
-let vLedNames = [ "GPU" ];
-let vLedPositions = [ [0,0]];
+const vLedNames = [ "GPU" ];
+const vLedPositions = [ [0, 0] ];
 
 /** @param {FreeAddressBus} bus */
-export function Scan(bus) 
+export function Scan(bus)
 {
 	const FoundAddresses = [];
 
 	  // Skip any non AMD / INTEL Busses
-	  if (!bus.IsNvidiaBus()) 
-      {
+	  if (!bus.IsNvidiaBus())
+	{
 		return [];
 	}
 
 	for(const PNYGPUID of PNYGPUIDs)
-    {
+	{
 		if(PNYGPUID.Vendor === bus.Vendor() &&
 		PNYGPUID.SubVendor === bus.SubVendor() &&
 		PNYGPUID.Device === bus.Product() &&
 		PNYGPUID.SubDevice === bus.SubDevice()
 		)
-        {
-				FoundAddresses.push(PNYGPUID.Address);
+		{
+			FoundAddresses.push(PNYGPUID.Address);
 		}
-        else
-        {
+		else
+		{
 			bus.log(`Expected Vendor [${PNYGPUID.Vendor}] got Vendor [${bus.Vendor()}]`);
 			bus.log(`Expected SubVender [${PNYGPUID.SubVendor}] got Vendor [${bus.SubVendor()}]`);
 			bus.log(`Expected Device [${PNYGPUID.Device}] got Vendor [${bus.Product()}]`);
@@ -57,32 +57,33 @@ export function Scan(bus)
 	return FoundAddresses;
 }
 
-export function Initialize() 
+export function Initialize()
 {
-    bus.WriteByte(PNYGPU.registers.Control, 0x00);
-    bus.WriteByte(PNYGPU.registers.Mode, 0x01);
-    bus.WriteByte(PNYGPU.registers.Brightness, 0x64);
+	bus.WriteByte(PNYGPU.registers.Control, 0x00);
+	bus.WriteByte(PNYGPU.registers.Mode, 0x01);
+	bus.WriteByte(PNYGPU.registers.Brightness, 0x64);
+	SetGPUNameFromBusIds();
 }
 
-export function Render() 
+export function Render()
 {
-    sendColors();
+	sendColors();
 }
 
-export function Shutdown() 
+export function Shutdown()
 {
 }
 
 function SetGPUNameFromBusIds()
 {
 	for(const PNYGPUID of PNYGPUIDs)
-    {
+	{
 		if(PNYGPUID.Vendor === bus.Vendor() &&
 		PNYGPUID.SubVendor === bus.SubVendor() &&
 		PNYGPUID.Device === bus.Product() &&
 		PNYGPUID.SubDevice === bus.SubDevice()
 		)
-        {
+		{
 			device.setName(PNYGPUID.Name);
 		}
 	}
@@ -90,47 +91,47 @@ function SetGPUNameFromBusIds()
 
 function sendColors(shutdown = false)
 {
-	let iPxX = vLedPositions[0][0];
-	let iPxY = vLedPositions[0][1];
-	var color;
+	const iPxX = vLedPositions[0][0];
+	const iPxY = vLedPositions[0][1];
+	let color;
 
-	if(shutdown) 
-    {
+	if(shutdown)
+	{
 		color = hexToRgb(shutdownColor);
-	} 
-    else if (LightingMode === "Forced") 
-    {
+	}
+	else if (LightingMode === "Forced")
+	{
 		color = hexToRgb(forcedColor);
-	} 
-    else 
-    {
+	}
+	else
+	{
 		color = device.color(iPxX, iPxY);
 	}
 
-    bus.WriteByte(PNYGPU.registers.R, color[0]);
-    bus.WriteByte(PNYGPU.registers.G, color[1]);
-    bus.WriteByte(PNYGPU.registers.B, color[2]);
+	bus.WriteByte(PNYGPU.registers.R, color[0]);
+	bus.WriteByte(PNYGPU.registers.G, color[1]);
+	bus.WriteByte(PNYGPU.registers.B, color[2]);
 }
 
 class PNYGPUController
 {
-    constructor()
-    {
-        this.registers =
+	constructor()
+	{
+		this.registers =
         {
-            Control    : 0xE0,
-            Mode       : 0x60,
-            R          : 0x6C,
-            G          : 0x6D,
-            B          : 0x6E,
-            Brightness : 0x6F
+        	Control    : 0xE0,
+        	Mode       : 0x60,
+        	R          : 0x6C,
+        	G          : 0x6D,
+        	B          : 0x6E,
+        	Brightness : 0x6F
         };
-    }
+	}
 
-    setDeviceMode(mode)
-    {
-        bus.WriteByte(this.registers.Mode, mode);
-    }
+	setDeviceMode(mode)
+	{
+		bus.WriteByte(this.registers.Mode, mode);
+	}
 }
 
 const PNYGPU = new PNYGPUController();
@@ -138,7 +139,7 @@ const PNYGPU = new PNYGPUController();
 class GPUIdentifier
 {
 	constructor(Vendor, SubVendor, Device, SubDevice, Address, Name, Model = "")
-    {
+	{
 		this.Vendor = Vendor;
 		this.SubVendor = SubVendor;
 		this.Device = Device;
@@ -152,17 +153,18 @@ class GPUIdentifier
 class PNYGPUIdentifier extends GPUIdentifier
 {
 	constructor(Device, SubDevice, Name, Model = "")
-    {
+	{
 		super(0x10DE, 0x196E, Device, SubDevice, 0x49, Name, Model);
 	}
 }
 
 const PNYGPUIDs =
 [
-    new PNYGPUIdentifier(0x2216, 0x138B, "PNY RTX 3080 XLR8"),
+	new PNYGPUIdentifier(0x2216, 0x138B, "PNY RTX 3080 XLR8"),
+	new PNYGPUIdentifier(0x2208, 0x1385, "PNY RTX 3080TI Revel"),
 ];
 
-function hexToRgb(hex) 
+function hexToRgb(hex)
 {
 	const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
 	const colors = [];
