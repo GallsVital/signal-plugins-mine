@@ -1313,19 +1313,19 @@ function hexToRgb(hex)
  
 	 GKeySetup()
 	 {
-	 let InfoPacket = [GKeyID, 0x00]; //Info
+	 let InfoPacket = [this.FeatureIDs.GKeyID, 0x00]; //Info
 	 this.SendShortMessage(InfoPacket);
  
-	 let SoftwareEnablePacket = [GKeyID, 0x20, 0x01]; //Software Enable Flag for GKeys and Mkeys
+	 let SoftwareEnablePacket = [this.FeatureIDs.GKeyID, 0x20, 0x01]; //Software Enable Flag for GKeys and Mkeys
 	 this.SendShortMessage(SoftwareEnablePacket)
 	 }
  
 	 MKeySetup()
 	 {
-	 let InfoPacket = [MKeyID, 0x00];
+	 let InfoPacket = [this.FeatureIDs.MKeyID, 0x00];
 	 this.SendShortMessage(InfoPacket);
  
-	 let SoftwareEnablePacket = [MKeyID, 0x10]; //Led Number Flag in binary
+	 let SoftwareEnablePacket = [this.FeatureIDs.MKeyID, 0x10]; //Led Number Flag in binary
 	 this.SendShortMessage(SoftwareEnablePacket);
 	 }
  

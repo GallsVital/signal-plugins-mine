@@ -104,12 +104,12 @@ export function Shutdown() {
 
 function setLEDCounts()
 {
-	for(Channel = 0; Channel <ChannelArray.length; Channel++)
+	for(let Channel = 0; Channel <ChannelArray.length; Channel++)
 	{
 		let initPacket = [0x00, 0x80, 0x06, 0x02, Channel+1, 0x08, 0x07];
 		let LEDCountPacket = [0x00, 0x80, 0x06, 0x02, Channel+1, 0x01, 0x3c];
-		device.write(initPacket);
-		device.write(LEDCountPacket);
+		device.write(initPacket, 65);
+		device.write(LEDCountPacket, 65);
 	}
 }
 

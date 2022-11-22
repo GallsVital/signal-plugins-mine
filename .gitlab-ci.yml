@@ -3,6 +3,7 @@ image: alpine:latest
 stages:
   - lint
   - validate
+  - duplicate gpu check
   - unit test
   
 # Cache modules in between jobs
@@ -33,6 +34,15 @@ validate:
     #- apk add --update npm
     #- npm install
     - npm run test:validate
+
+duplicate gpu check:
+  stage: duplicate gpu check
+  when: always
+  script:
+    #- apk add --update npm
+    #- npm install
+    - npm run test:CheckDuplicateGPU
+
 
 unit test:
   stage: unit test

@@ -100,42 +100,42 @@ function Apply() {
 	device.write(packet, 20);
 }
 
-function SendGkeys(shutdown = false) {
-	let packet = [];
-	packet[0] = 0x12;
-	packet[1] = 0xFF;
-	packet[2] = 0x0F;
-	packet[3] = 0x3F;
-	packet[4] = 0x00;
-	packet[5] = 4;
-	packet[6] = 0x00;
-	packet[7] = 9; // led count
+// function SendGkeys(shutdown = false) {
+// 	let packet = [];
+// 	packet[0] = 0x12;
+// 	packet[1] = 0xFF;
+// 	packet[2] = 0x0F;
+// 	packet[3] = 0x3F;
+// 	packet[4] = 0x00;
+// 	packet[5] = 4;
+// 	packet[6] = 0x00;
+// 	packet[7] = 9; // led count
 
-	for(let iIdx = 0; iIdx < vGkeyPositions.length; iIdx++){
-		let iLedIdx = (iIdx * 4) + 8;
-		let iKeyPosX = vGkeyPositions[iIdx][0];
-		let iKeyPosY = vGkeyPositions[iIdx][1];
-		var color;
+// 	for(let iIdx = 0; iIdx < vGkeyPositions.length; iIdx++){
+// 		let iLedIdx = (iIdx * 4) + 8;
+// 		let iKeyPosX = vGkeyPositions[iIdx][0];
+// 		let iKeyPosY = vGkeyPositions[iIdx][1];
+// 		var color;
 
-		if(shutdown){
-			color = hexToRgb(shutdownColor);
-		}else if (LightingMode === "Forced") {
-			color = hexToRgb(forcedColor);
-		}else{
-			color = device.color(iKeyPosX, iKeyPosY);
-		}
+// 		if(shutdown){
+// 			color = hexToRgb(shutdownColor);
+// 		}else if (LightingMode === "Forced") {
+// 			color = hexToRgb(forcedColor);
+// 		}else{
+// 			color = device.color(iKeyPosX, iKeyPosY);
+// 		}
 
-		packet[iLedIdx] = iIdx;
-		packet[iLedIdx+1] = color[0];
-		packet[iLedIdx+2] = color[1];
-		packet[iLedIdx+3] = color[2];
-	}
+// 		packet[iLedIdx] = iIdx;
+// 		packet[iLedIdx+1] = color[0];
+// 		packet[iLedIdx+2] = color[1];
+// 		packet[iLedIdx+3] = color[2];
+// 	}
 
 
-	device.set_endpoint(2, 0x0002, 0xff00); // Lighting IF
-	device.write(packet, 64);
-	device.pause(1);
-}
+// 	device.set_endpoint(2, 0x0002, 0xff00); // Lighting IF
+// 	device.write(packet, 64);
+// 	device.pause(1);
+// }
 
 function SendLogoZone(shutdown = false){
 	//1B 210 vLogoPositions

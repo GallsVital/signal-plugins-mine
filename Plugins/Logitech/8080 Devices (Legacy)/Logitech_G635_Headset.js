@@ -40,7 +40,7 @@ const LongMessage = 0x11;
 const ConnectionMode = WIRED;
 
 let vLedNames = ["Logo", "Light Strip"];
-let vLedPositions = [ [0, 2], [0, 1] ];
+let vLedPositions = [ [0, 1], [0, 0] ];
 
 export function LedNames() 
 {

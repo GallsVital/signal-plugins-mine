@@ -1,6 +1,7 @@
 import fs from 'fs';
 import path from 'path';
 import * as url from 'url';
+import DirectoryWalker from './DirectoryWalker.js';
 
 function CheckThatLEDNameAndPositionLengthsMatch(Plugin, ReportErrorCallback){
 	if(typeof Plugin.LedPositions === "undefined"){
@@ -46,6 +47,7 @@ class PluginValidator {
 		this.totalErrors = 0;
 		this.FilePathsWithErrors = new Map();
 		this.paths = [];
+		this.walker = new DirectoryWalker();
 		this.validators = [
 			CheckThatLEDNameAndPositionLengthsMatch,
 			CheckAllLedPositionsAreWithinBounds,
@@ -53,62 +55,24 @@ class PluginValidator {
 		];
 		this.excludedFiles = [".test.js"];
 	}
-	AddPath(pathToAdd) {
-		const CurrentDirectoryURL = new URL('.', import.meta.url);
-		const absolutePath = path.join(url.fileURLToPath(CurrentDirectoryURL), pathToAdd);
-
-		if (!this.paths.includes(absolutePath)) {
-			this.paths.push(absolutePath);
-		}
-	}
-
-	RemovePath(pathToRemove) {
-		this.paths = this.paths.filter(function (path) { path !== pathToRemove; });
-	}
 
 	async CheckAllPaths(paths = []) {
 		// Add any paths the user passed in during this call.
 		if (paths.length !== 0) {
 			for (const path of paths) {
-				this.AddPath(path);
+				this.walker.AddPath(path);
 			}
 		}
 
 		// Check each path in order.
-		for (const directory of this.paths) {
-			await this.CheckAllPluginsInDirectory(directory);
+		for (const path of this.walker.walkPaths(this.paths)) {
+			await this.ValidatePlugin(path);
 		}
 
 		// if we have any errors reported let's notify and exit with an error.
 		if (this.totalErrors > 0) {
 			console.log("\n", `[${this.totalErrors}] Errors across [${this.FilePathsWithErrors.size}] files.`);
 			process.exit(1);
-		}
-	}
-	#ShouldSkipPath(path){
-		for(const exclusion of this.excludedFiles){
-			if(path.includes(exclusion)){
-				return true;
-			}
-		}
-
-		return false;
-	}
-	*#walkDirectory(src) {
-		const files = fs.readdirSync(src, { withFileTypes: true });
-
-		for (const file of files) {
-			const AbsoluteFilePath = path.join(src, file.name);
-
-			if(this.#ShouldSkipPath(AbsoluteFilePath)){
-				continue;
-			}
-
-			if (file.isDirectory()) {
-				yield* this.#walkDirectory(AbsoluteFilePath);
-			} else {
-				yield url.pathToFileURL(AbsoluteFilePath).toString();
-			}
 		}
 	}
 
@@ -137,12 +101,6 @@ class PluginValidator {
 		this.FilePathsWithErrors.set(pluginPath, CurrentFailureList);
 
 		console.log("\t\t" + Error);
-	}
-
-	async CheckAllPluginsInDirectory(directory) {
-		for (const PluginPath of this.#walkDirectory(directory)) {
-			await this.ValidatePlugin(PluginPath);
-		}
 	}
 
 	async ValidatePlugin(PluginPath) {

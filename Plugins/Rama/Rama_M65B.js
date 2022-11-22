@@ -2,7 +2,7 @@ export function Name() { return "Rama Works M65-B"; }
 export function VendorId() { return 0x5241; }
 export function ProductId() { return 0x065B; }
 export function Publisher() { return "Rama Works"; }
-export function Size() { return [16, 6]; }
+export function Size() { return [17, 6]; }
 export function Type() { return "Hid"; }
 export function DefaultPosition(){return [10, 100];}
 const DESIRED_HEIGHT = 85;

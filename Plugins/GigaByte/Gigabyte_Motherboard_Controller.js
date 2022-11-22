@@ -1,7 +1,7 @@
 
-export function Name() { return DeviceName; }
+export function Name() { return "GIGABYTE Motherboard LED Controller"; }
 export function VendorId() { return  0x048D; }
-export function ProductId() { return 0x5702;}//0x5702
+export function ProductId() { return [0x5702, 0x8297];}
 export function Publisher() { return "WhirlwindFX"; }
 export function Documentation(){ return "troubleshooting/gigabyte"; }
 export function Size() { return [10, 10]; }
@@ -35,7 +35,6 @@ export function SupportsSubdevices(){ return true; }
 export function Validate(endpoint) {
 	return endpoint.interface === -1 && endpoint.usage === 0x00CC;
 }
-let DeviceName = "GIGABYTE Motherboard LED Controller";
 
 const ParentDeviceName = "Gigabyte Motherboard";
 let D_LED1_Count = 0;
@@ -454,8 +453,7 @@ function SetMotherboardName(){
 	let MotherboardName = device.getMotherboardName();
 
 	if(MotherboardName !== "Unknown"){
-		DeviceName = `Gigabyte ${MotherboardName} Controller`;
-		device.repollName();
+		device.setName(`Gigabyte ${MotherboardName} Controller`);
 	}
 }
 

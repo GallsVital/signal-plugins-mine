@@ -328,6 +328,7 @@ class ASUSLegacyDeviceIdentifier extends GPUIdentifier{
 		super(0x10DE, 0x1043, Device, SubDevice, Address, Name, Model);
 	}
 }
+export function BrandGPUList(){ return new ASUSLegacyGPUList().devices; }
 
 class ASUSLegacyGPUList{
 	constructor(){

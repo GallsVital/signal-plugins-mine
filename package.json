@@ -7,13 +7,14 @@
 		"@types/jest": "^29.0.0",
 		"@typescript-eslint/eslint-plugin": "^5.36.1",
 		"@typescript-eslint/parser": "^5.36.1",
-		"better-docs": "^2.7.2",
 		"chalk": "^5.1.2",
 		"eslint": "~8.23.0",
 		"eslint-plugin-jest": "^27.0.1",
+		"husky": "^8.0.2",
 		"jest": "^29.0.2",
 		"jest-junit": "^14.0.1",
 		"jsdoc": "^3.6.11",
+		"lint-staged": "^13.0.3",
 		"ts-morph": "^16.0.0",
 		"typescript": "^4.8.2"
 	},
@@ -25,8 +26,10 @@
 		"test": "jest ./Plugins --collectCoverage",
 		"test:ci": "jest ./Plugins --ci --reporters=default --reporters=jest-junit",
 		"test:validate": "node ./Scripts/ValidatePluginsScript.js ../Plugins",
+		"test:CheckDuplicateGPU": "node ./Scripts/GPUIdCollector.js",
 		"docs": "jsdoc -c jsdoc.json",
-		"SAVED": "npx -p typescript tsc ModernCorsairProtocol.js --declaration --allowJs --emitDeclarationOnly --outDir types"
+		"SAVED": "npx -p typescript tsc ModernCorsairProtocol.js --declaration --allowJs --emitDeclarationOnly --outDir types",
+		"prepare": "husky install"
 	},
 	"jest": {
 		"transform": {

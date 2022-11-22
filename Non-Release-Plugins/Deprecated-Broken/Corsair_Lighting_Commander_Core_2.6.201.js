@@ -140,7 +140,6 @@ const CommandDict = {
 	0x06: "Send Command",
 	0x0d: "Open Endpoint",
 	0x05: "Close Endpoint",
-	0x06: "Fan RPM",
 	0x09: "Fan Settings",
 	0x0F: "Led Settings"
 };
