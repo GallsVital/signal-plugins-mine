@@ -4,7 +4,7 @@
 	"type": "module",
 	"devDependencies": {
 		"@babel/preset-env": "^7.19.0",
-		"@types/jest": "^29.0.0",
+		"@types/jest": "^29.2.3",
 		"@typescript-eslint/eslint-plugin": "^5.36.1",
 		"@typescript-eslint/parser": "^5.36.1",
 		"chalk": "^5.1.2",
@@ -23,7 +23,7 @@
 		"lint:ci": "node node_modules/eslint/bin/eslint.js ./Plugins --quiet",
 		"lint:addGlobals": "node ./Scripts/ASTParser.js --comments",
 		"lint:checkGlobals": "node ./Scripts/ASTParser.js --comments --dryrun",
-		"test": "jest ./Plugins --collectCoverage",
+		"test": "jest ./Plugins --collectCoverage --coverageDirectory='coverage'",
 		"test:ci": "jest ./Plugins --ci --reporters=default --reporters=jest-junit",
 		"test:validate": "node ./Scripts/ValidatePluginsScript.js ../Plugins",
 		"test:CheckDuplicateGPU": "node ./Scripts/GPUIdCollector.js",

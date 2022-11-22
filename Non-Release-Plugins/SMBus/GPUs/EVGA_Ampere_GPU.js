@@ -43,7 +43,7 @@ export function Scan(bus) {
 	}
 
 	for(const GPU of new EVGAAmpereGPUList().devices){
-		if(CheckForIdMatch(bus, GPU)){
+		if(GPU.CheckForIdMatch(bus)){
 			// No Quick Write test on Nvidia
 
 			// This read fails after waking the system from sleep until the GPU gets written to atleast once.
@@ -62,16 +62,9 @@ export function Scan(bus) {
 	return FoundAddresses;
 }
 
-function CheckForIdMatch(bus, Gpu){
-	return Gpu.Vendor === bus.Vendor() &&
-    Gpu.SubVendor === bus.SubVendor() &&
-    Gpu.Device === bus.Product() &&
-    Gpu.SubDevice === bus.SubDevice();
-}
-
 function SetGPUNameFromBusIds(GPUList){
 	for(const GPU of GPUList){
-		if(CheckForIdMatch(bus, GPU)){
+		if(GPU.CheckForIdMatch(bus)){
 			device.setName(GPU.Name);
 			break;
 		}
@@ -532,6 +525,12 @@ class GPUIdentifier{
 	}
 	UID(){
 		return `${this.Vendor}:${this.SubVendor}:${this.Device}:${this.SubDevice}`;
+	}
+	CheckForIdMatch(bus){
+		return this.Vendor === bus.Vendor() &&
+		this.SubVendor === bus.SubVendor() &&
+		this.Device === bus.Product() &&
+		this.SubDevice === bus.SubDevice();
 	}
 }
 
