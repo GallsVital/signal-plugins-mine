@@ -124,8 +124,6 @@ export function Initialize()
 	Logitech.ButtonSpySet(OnboardState);
 	Logitech.SetDirectMode(OnboardState);
 
-	Logitech.SetDpiLightAlwaysOn(DpiLight);
-
 	if(DpiControl)
 	{
 		Logitech.setDpi(DPIStageDict[DPIStage]());
@@ -159,11 +157,6 @@ export function Render()
 export function Shutdown()
 {    
 	grabColors(true);
-}
-
-export function onDpiLightChanged()
-{
-	Logitech.SetDpiLightAlwaysOn(DpiLight);
 }
 
 export function onDpiControlChanged()

@@ -267,7 +267,6 @@ function DetectInputs()
 
     	}
     	while(device.getLastReadSize() > 0)
-
 }
 
 function ProcessInputs(packet)
@@ -341,15 +340,7 @@ function ProcessInputs(packet)
 		Logitech.setDpi(DPIStageDict[DPIStage]());
 		Logitech.SetDPILights(DPIStage);
 		}
-	}
-
-	if(packet[0] == Logitech.LongMessage && packet[1] == Logitech.ConnectionMode && packet[2] == 0x06 && packet[3] == 0x00 && packet[6] == 0x00)
-	{
-	device.log("Waking From Sleep");
-	device.pause(5000); //Wait five seconds before Handoff. Allows device boot time.
-	Initialize();
-	return Sleep = false;
-	}
+		}
 	}
 }
 
