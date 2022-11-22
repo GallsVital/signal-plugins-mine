@@ -11,21 +11,33 @@ export function DefaultScale(){return Math.floor(DESIRED_HEIGHT/Size()[1]);}
 shutdownColor:readonly
 LightingMode:readonly
 forcedColor:readonly
-layout:readonly
+SettingControl:readonly
+sleepTimeout:readonly
 */
 export function ControllableParameters(){
 	return [
 		{"property":"shutdownColor", "group":"lighting", "label":"Shutdown Color", "min":"0", "max":"360", "type":"color", "default":"009bde"},
 		{"property":"LightingMode", "group":"lighting", "label":"Lighting Mode", "type":"combobox", "values":["Canvas", "Forced"], "default":"Canvas"},
 		{"property":"forcedColor", "group":"lighting", "label":"Forced Color", "min":"0", "max":"360", "type":"color", "default":"009bde"},
-		{"property":"layout",  "group":"", "label":"Keyboard Layout", "type":"combobox", "values":["Right", "Left"], "default":"Right"},
+		{"property":"SettingControl", "group":"", "label":"Enable Setting Control", "type":"boolean", "default":"false"},
+		{"property":"sleepTimeout", "group":"", "label":"Sleep Mode Timeout (Minutes)", "type":"combobox", "values":["1", "2", "3", "5", "10", "Never"], "default":"5"},
 	];
+}
+
+let sleepModeDict =
+{
+    "1" : 0x00,
+    "2" : 0x01,
+    "3" : 0x02,
+    "5" : 0x03,
+    "10" : 0x04,
+    "Never" : 0xff
 }
 
 let vKeysLeft =
 [
 	6,   14,
-	32,      56, 64, 72, 80,   96, 104, 112, 120, 128, 136, 144, 152,   160, 168, 176,
+	32,      56, 64, 72, 80, 96, 104, 112, 120, 128, 136, 144, 152,   160, 168, 176,
 	33,  49, 57, 65, 73, 81, 89, 97, 105, 113, 121, 129, 137,    153,   161, 169, 177,   1, 9, 17, 25,
 	34,  50, 58, 66, 74, 82, 90, 98, 106, 114, 122, 130, 138,    154,   162, 170, 178,   2, 10, 18, 26,
 	35,  51, 59, 67, 75, 83, 91, 99, 107, 115, 123, 131,         155,                  3, 11, 19,
@@ -57,7 +69,7 @@ let vKeyNames =
 
 let vKeyPositionsRight =
 [
-	[0, 0],	[1, 0],
+	[0, 0],	 [1, 0],
 	[0, 1],  [1, 1], [2, 1], [3, 1], [4, 1],        [6, 1], [7, 1], [8, 1], [9, 1], [10, 1], [11, 1], [12, 1], [13, 1],   [14, 1], [15, 1], [16, 1],
 	[0, 2],  [1, 2], [2, 2], [3, 2], [4, 2], [5, 2], [6, 2], [7, 2], [8, 2], [9, 2], [10, 2], [11, 2], [12, 2], [13, 2],   [14, 1], [15, 1], [16, 1],   [17, 2], [18, 2], [19, 2], [20, 2],
 	[0, 3],  [1, 3], [2, 3], [3, 3], [4, 3], [5, 3], [6, 3], [7, 3], [8, 3], [9, 3], [10, 3], [11, 3], [12, 3], [13, 3],   [14, 2], [15, 2], [16, 2],   [17, 3], [18, 3], [19, 3], [20, 3],
@@ -68,7 +80,7 @@ let vKeyPositionsRight =
 
 let vKeyPositionsLeft =
 [
-	[4, 0],	[5, 0],
+	[4, 0],	 [5, 0],
 	[4, 1],  [5, 1], [6, 1], [7, 1], [8, 1],        [10, 1], [11, 1], [12, 1], [13, 1], [14, 1], [15, 1], [16, 1], [17, 1],   [18, 1], [19, 1], [20, 1],
 	[4, 2],  [5, 2], [6, 2], [7, 2], [8, 2], [9, 2], [10, 2], [11, 2], [12, 2], [13, 2], [14, 2], [15, 2], [16, 2], [17, 2],   [18, 2], [19, 2], [20, 2],   [0, 2], [1, 2], [2, 2], [3, 2],
 	[4, 3],  [5, 3], [6, 3], [7, 3], [8, 3], [9, 3], [10, 3], [11, 3], [12, 3], [13, 3], [14, 3], [15, 3], [16, 3], [17, 3],   [18, 3], [19, 3], [20, 3],   [0, 3], [1, 3], [2, 3], [3, 3],
@@ -77,36 +89,65 @@ let vKeyPositionsLeft =
 	[4, 6],  [5, 6], [6, 6],                      [10, 6],                         [14, 6], [15, 6], [16, 6], [17, 6],   [18, 6], [19, 6], [20, 6],   [0, 6],        [2, 6],
 ];
 
-function LedKeys() {
-	if (layout == "Left") {
+let layout = "Right";
+let savedPollTimer = Date.now();
+let PollModeInternal = 15000;
+
+function LedKeys() 
+{
+	if (layout == "Left") 
+	{
 		return vKeysLeft;
-	} else if (layout == "Right") {
+	} 
+	else if (layout == "Right") 
+	{
 		return vKeysRight;
-	} else {
+	} 
+	else 
+	{
 		return [];
 	}
 }
 
-export function LedNames() {
+export function LedNames() 
+{
 	return vKeyNames;
 }
 
-export function LedPositions() {
-	if (layout == "Left") {
+export function LedPositions() 
+{
+	if (layout == "Left") 
+	{
 		return vKeyPositionsLeft;
-	} else if (layout == "Right") {
+	} 
+	else if (layout == "Right") 
+	{
 		return vKeyPositionsRight;
-	} else {
+	} 
+	else 
+	{
 		return [];
 	}
 }
 
-export function Initialize() {
-
+export function Initialize()
+{
+	device.set_endpoint(1,0x0001,0xff00);
+	device.addFeature("battery");
+	macroJunk();
+	batteryLEDMode();
+	sleepTimeout();
+	device.write([0x00, 0x51, 0x3a, 0x00, 0x00, 0x19], 65);
+	powerSavings();
+	device.write([0x00, 0x50, 0x55],65);
+	statusGrabber();
 }
 
-export function Render() {
+export function Render() 
+{
 	sendColors();
+	macroReadback();
+	pollBattery();
 }
 
 export function Shutdown() {
@@ -115,11 +156,122 @@ export function Shutdown() {
 	sendPacketString("00 50 55", 65);
 }
 
-function sendColors(shutdown = false) {
+function clearReadBuffer()
+{
+	let packet = device.read([0x00],65,10);
+	do
+	{
+		packet = device.read([0x00],65,10);
+	}
+	while(device.getLastReadSize() > 0);
+}
+
+function statusGrabber()
+{
+	clearReadBuffer();
+	let packet = [0x00,0x12];
+	device.write(packet,65);
+	let returnpacket = device.read(packet,65)
+	device.log(returnpacket)
+	layout = returnpacket[17] ? "Right" : "Left";
+	device.repollLeds();
+	packet = [0x00,0x12,0x01];
+	device.write(packet,65);
+	returnpacket = device.read(packet,65)
+	device.log(returnpacket)
+
+	packet = [0x00,0x12,0x02];
+	device.write(packet,65);
+	returnpacket = device.read(packet,65)
+	device.log(returnpacket)
+}
+
+function pollBattery()
+{
+	if (Date.now() - savedPollTimer < PollModeInternal) 
+    {
+        return
+    }
+    savedPollTimer = Date.now();
+	clearReadBuffer();
+	let packet = [0x00, 0x12, 0x01]; //0x00, 0x12, 0x00 is some sort of status. also hits 0x02
+	device.write(packet,65);
+	let returnpacket = device.read(packet,65);
+	let BatteryPercentage = returnpacket[6]
+	battery.setBatteryLevel(BatteryPercentage);
+}
+
+function macroJunk()
+{
+	device.write([0x00, 0x51, 0x00, 0x00, 0x00, 0x06], 65); //Software Mode? 
+	
+	for(let iIdx = 0; iIdx < 150; iIdx++) 
+	{
+		let packet = [0x00, 0x51, 0x20, iIdx, 0x00, 0x00];
+		device.write(packet,65);
+	}
+}
+
+function macroReadback()
+{
+	device.set_endpoint(2,0x0001,0xffc0);
+	do
+	{
+		let packet = device.read([0x00],65,10);
+		if(packet[0] === 0x03 && packet[1] === 0x81 && packet[2] === 0x04 && packet[3] === 0x00 && packet[4] === 0x01)
+		{
+			device.log("Right Plate attached");
+			layout = "Right";
+			device.repollLeds();
+		}
+		if(packet[0] === 0x03 && packet[1] === 0x81 && packet[2] === 0x04 && packet[3] === 0x00 && packet[4] === 0x00)
+		{
+			device.log("Left Plate attached");
+			layout = "Left";
+			device.repollLeds();
+		}
+		if(packet[0] === 0x03 && packet[5] !== 0x00)
+		{
+			device.log(packet);
+		}
+	}
+	while(device.getLastReadSize() > 0);
+	device.set_endpoint(1,0x0001,0xff00);
+}
+
+function sleepTimeout()
+{
+	let packet = [0x00, 0x51, 0x38, 0x00, 0x00, sleepModeDict[sleepTimeout]];
+	device.write(packet,65);
+}
+
+function powerSavings()
+{
+	let packet = [0x00, 0x51, 0x39, 0x00, 0x00, 0x02] //0x02 LED Dim Mode
+	device.write(packet,65);
+}
+
+function batteryLEDMode()
+{
+	let packet = [0x00, 0x51, 0x0a, 0x00, 0x00, 0x01];
+	device.write(packet,65);																						//Red green blue
+	//let packet2 = [0x00, 0x51, 0x2c, 0x04, 0x00, 0x00, 0xff, 0x00, 0x00, 0xff, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0xff, 0xff, 0xff, 0xff, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00];
+	//device.write(packet2,65);
+}
+
+//51 20 keyIdx 00 00 is Macro Exclusive Mode
+//51 38 00 00 01 is 2 minute timeout ff is never 
+//51 39 00 00 01 is power saving mode with LEDs off, 0x02 is with LEDs dimmed 0x00 is no power saving
+//let packet = [0x00, 0x51, 0x0a, 0x00, 0x00, 0x01]; //Battery Mode for 4 Lights 0x00 for RGB Mode
+//let packet2 = [0x00, 0x50, 0x55];
+
+function sendColors(shutdown = false) 
+{
 	let RGBData = new Array(600).fill(255);
 	let TotalLedCount = 120;
 
-	for(let iIdx = 0; iIdx < LedKeys().length; iIdx++) {
+	for(let iIdx = 0; iIdx < LedKeys().length; iIdx++) 
+	{
 		let iPxX = LedPositions()[iIdx][0];
 		let iPxY = LedPositions()[iIdx][1];
 		var col;
@@ -140,16 +292,12 @@ function sendColors(shutdown = false) {
 
 	let packetCount = 0;
 
-	while(TotalLedCount > 0){
+	while(TotalLedCount > 0)
+	{
 		let ledsToSend = TotalLedCount >= 15 ? 15 : TotalLedCount;
 
-		let packet = [];
-		packet[0] = 0x00;
-		packet[1] = 0xC0;
-		packet[2] = 0x81;
-		packet[3] = 0x90 - (0x0F * packetCount++);
-		packet[4] = 0x00;
-		packet = packet.concat(RGBData.splice(0, ledsToSend*4));
+		let packet = [0x00, 0xC0, 0x81, 0x90 - (0x0F * packetCount++), 0x00];
+		packet.push(...RGBData.splice(0, ledsToSend*4));
 		device.write(packet, 65);
 
 		TotalLedCount -= ledsToSend;
@@ -157,8 +305,9 @@ function sendColors(shutdown = false) {
 
 }
 
-export function Validate(endpoint) {
-	return endpoint.interface === 1;
+export function Validate(endpoint) 
+{
+	return endpoint.interface === 1 || endpoint.interface === 2 && endpoint.usage === 0x0001 && endpoint.usage_page === 0xffc0;
 }
 
 function hexToRgb(hex) {
