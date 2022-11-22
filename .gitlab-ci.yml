@@ -30,6 +30,7 @@ eslint:
 validate:
   stage: validate
   when: always
+  allow_failure: true
   script:
     #- apk add --update npm
     #- npm install
