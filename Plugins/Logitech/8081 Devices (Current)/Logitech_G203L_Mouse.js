@@ -507,19 +507,6 @@ function DetectInputs()
 
     	}
     	while(device.getLastReadSize() > 0)
-
-	device.set_endpoint(EndpointByte1, ShortMessageEndpointByte, EndpointByte3);
-	do
-	{
-	let packet = device.read([0x00],7, 10);
-
-		if(packet[0] == ShortMessage && packet[1] == ConnectionMode && packet[2] == 0x41 && packet[3] == 0x0C && packet[6] == 0x40)
-		{
-		device.log("Mouse Going to Sleep");
-		return Sleep = true;
-		}
-	}
-	while(device.getLastReadSize() > 0)
 }
 
 function ProcessInputs(packet)
@@ -584,14 +571,6 @@ function ProcessInputs(packet)
 
 		}
 
-	}
-
-	if(packet[0] == LongMessage && packet[1] == ConnectionMode && packet[2] == 0x06 && packet[3] == 0x00 && packet[6] == 0x00)
-	{
-	device.log("Waking From Sleep");
-	device.pause(5000); //Wait five seconds before Handoff. Allows device boot time.
-	Initialize();
-	return Sleep = false;
 	}
 }
 
