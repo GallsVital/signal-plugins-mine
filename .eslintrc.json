@@ -27,7 +27,8 @@
         "module": "writable",
         "device": "readonly", 
         "bus": "readonly",
-        "battery": "readonly"
+        "battery": "readonly",
+        "mouse": "readonly"
     },
     "rules": {
         "semi":"warn",
