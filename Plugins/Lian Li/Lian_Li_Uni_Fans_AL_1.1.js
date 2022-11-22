@@ -131,16 +131,19 @@ const channelArray =  [Channel_1_Controller, Channel_2_Controller, Channel_3_Con
 const PACKET_START =  [0x00, 0x43, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x01];
 const PACKET_COMMIT = [0x00, 0x01, 0xFF, 0x01, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x01];
 
-export function LedNames() {
+export function LedNames() 
+{
 	return vLedNames;
 }
 
-export function LedPositions() {
+export function LedPositions() 
+{
 	return vLedPos;
 }
 
-export function Initialize() {
-	sendControlPacket(PACKET_START, 16);
+export function Initialize() 
+{
+	sendControlPacket(COMMAND_ADDRESS, PACKET_START, 16);
 
 	SetupChannels();
 
@@ -149,60 +152,61 @@ export function Initialize() {
 	setMoboPassthrough();
 }
 
-export function onmoboSyncChanged() {
+export function onmoboSyncChanged() 
+{
 	setMoboPassthrough();
 }
 
-export function onFanModeChanged() {
+export function onFanModeChanged() 
+{
 	setFanMode();
 }
 
 export function Render() //I don't care how jank it is, it works.
 {
-	if(FanMode == "SignalRGB") {
+	if(FanMode == "SignalRGB") 
+	{
 		PollFans();
 	}
 
-	if(moboSync == false) {
-		sendChannels();
-	}
-
-	sendControlPacket(channelArray[Commitloop].commitOuter, PACKET_COMMIT, 16);
-	Commitloop++;
-
-	if(Commitloop == outerring)//Current Commit loop. Works better for smoothness of inner rings. Current detection is POC.
+	if(moboSync == false) 
 	{
-		Commitloop = 0;
-	}
+		sendChannels();
+
+		sendControlPacket(channelArray[Commitloop].commitOuter, PACKET_COMMIT, 16);
+		Commitloop++;
+		
+		if(Commitloop >= outerring)
+		{
+			Commitloop = 0;
+		}
+	}	
 }
 
-export function Shutdown() {
+export function Shutdown() 
+{
 
 }
 
-function setFans() {
-	for(let channel = 0; channel < 4;channel++) {
-		channelArray[channel].count = 4;
-	}
-
-	let packet = [0x00, 0x40, 0x01, Channel1Count, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x01];//Set channel counts
+function setFans() 
+{
+	let packet = [0x00, 0x40, 0x01, 0x50, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x01];//Set channel counts
 	sendControlPacket(COMMAND_ADDRESS, packet, 16);
-	packet = [0x00, 0x40, 0x02, Channel2Count, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x01];//etc etc all the way down
+	packet = [0x00, 0x40, 0x02, 0x50, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x01];//etc etc all the way down
 	sendControlPacket(COMMAND_ADDRESS, packet, 16);
-	packet = [0x00, 0x40, 0x03, Channel3Count, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x01];
+	packet = [0x00, 0x40, 0x03, 0x50, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x01];
 	sendControlPacket(COMMAND_ADDRESS, packet, 16);
-	packet = [0x00, 0x40, 0x04, Channel4Count, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x01];
+	packet = [0x00, 0x40, 0x04, 0x50, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x01];
 	sendControlPacket(COMMAND_ADDRESS, packet, 16);
 }
 
-function isChannelActive(channelIdx) {
-	return channelArray[channelIdx].count > 0;
-}
-
-function sendChannels() {
+function sendChannels() 
+{
 	outerring = 0;
-	for(let Channel = 0; Channel < 4;Channel++) {
-		if (isChannelActive(Channel)) {
+	for(let Channel = 0; Channel < 4;Channel++) 
+	{
+		if (device.channel(ChannelArray[Channel][0]).LedCount() > 0) 
+		{
 			fanledcount = 0;
 			fancount = 0;
 			outerring++
@@ -210,7 +214,8 @@ function sendChannels() {
 			let ChannelLedCount = device.channel(ChannelArray[Channel][0]).LedCount();
 			ChannelRGBData = getChannelColors(Channel, ChannelLedCount);
 
-			do {
+			do 
+			{
 				fancount ++;
 				fanledcount = (fancount * 20);
 			}
@@ -218,10 +223,10 @@ function sendChannels() {
 
 			fanledcount = fanledcount-20;
 			fancount = fancount-1;
-
-			if (device.channel(ChannelArray[Channel][0]).LedCount() != 0) {
 				
-				for (let fan = 0; fan < (fancount); fan++) {
+				for (let fan = 0; fan < (fancount); fan++) 
+				{
+					
 					innerRGBData = ChannelRGBData.splice(0, 8 * 3);
 					sendControlPacket(channelArray[Channel].innerAction[fan], innerRGBData, 24);
 
@@ -229,29 +234,31 @@ function sendChannels() {
 					sendControlPacket(channelArray[Channel].outerAction[fan], outerRGBData, 36);
 				}
 
-				device.pause(5);
+				
 				sendControlPacket(channelArray[Channel].commitInner, PACKET_COMMIT, 16);
-			}
-
 		}
 	}
 
 }
 
-function  getChannelColors(Channel, ledcount, shutdown = false) {
-
+function  getChannelColors(Channel, ledcount, shutdown = false) 
+{
 	let RGBData = [];
 
-	if(LightingMode === "Forced") {
+	if(LightingMode === "Forced") 
+	{
 		RGBData = device.createColorArray(forcedColor, ledcount, "Inline", "RBG");
 
-	} else if(device.getLedCount() == 0) {
+	} else if(device.getLedCount() == 0) 
+	{
 		ledcount = 80;
 
 		let pulseColor = device.getChannelPulseColor(ChannelArray[Channel][0], ledcount);
 		RGBData = device.createColorArray(pulseColor, ledcount, "Inline", "RBG");
 
-	} else {
+	} 
+	else 
+	{
 		RGBData = device.channel(ChannelArray[Channel][0]).getColors("Inline", "RBG");
 	}
 
@@ -260,8 +267,10 @@ function  getChannelColors(Channel, ledcount, shutdown = false) {
 
 let savedMoboPassthrough;
 
-function setMoboPassthrough() {
-	if(savedMoboPassthrough != moboSync) {
+function setMoboPassthrough() 
+{
+	if(savedMoboPassthrough != moboSync) 
+	{
 		savedMoboPassthrough = moboSync;
 
 		let packet = [0x00, 0x41, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x01];
@@ -349,12 +358,14 @@ function setFanMode() {
 	}
 }
 
-function readControlPacket(index, data, length) {
+function readControlPacket(index, data, length) 
+{
 	//                  iType, iRequest, iValue, iReqIdx, pBuf, iLen, iTimeout
 	return device.control_transfer(0xC0, 0x81, 0, index, data, length, 1000);
 }
 
-function sendControlPacket(index, data, length) {
+function sendControlPacket(index, data, length) 
+{
 	//                  iType, iRequest, iValue, iReqIdx, pBuf, iLen, iTimeout
 	device.control_transfer(0x40, 0x80, 0, index, data, length, 1000);
 	device.pause(1);
