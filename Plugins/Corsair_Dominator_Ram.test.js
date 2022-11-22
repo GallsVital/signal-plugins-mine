@@ -1,34 +1,9 @@
 const { CorsairDominatorProtocol } = require("./Corsair_Dominator_Ram");
+const { MockDevice} = require("../tests/MockDevice");
+const { MockBus} = require("../tests/MockBus");
 
 const pluginPath = "./Corsair_Dominator_Ram.js";
 
-class MockBus{
-	IsSystemBus = jest.fn().mockImplementation(() => {return false;});
-	IsIntelBus = jest.fn().mockImplementation(() => {return false;});
-	IsAMDBus = jest.fn().mockImplementation(() => {return false;});
-	IsNvidiaBus = jest.fn().mockImplementation(() => {return false;});
-	IsNuvotonBus = jest.fn().mockImplementation(() => {return false;});
-
-	WriteQuick = jest.fn().mockImplementation((address) => { return -1; });
-	WriteBlock = jest.fn().mockImplementation((register, Length, Data) => {return -1;  });
-	ReadByte = jest.fn().mockImplementation((address, register) => {return -1;  });
-
-	log = jest.fn().mockImplementation((data) => {
-		console.log(data);
-	});
-}
-
-class MockDevice{
-	log = jest.fn().mockImplementation((data) => {
-		console.log(data);
-	});
-	color = jest.fn().mockImplementation(() => {
-		return [10, 20, 30];
-	});
-	setName = jest.fn().mockImplementation((name) => {});
-	setSize = jest.fn().mockImplementation(([x, y]) => {});
-	setControllableLeds = jest.fn().mockImplementation((names, positions) => {});
-}
 
 let Plugin;
 beforeEach(() => {
