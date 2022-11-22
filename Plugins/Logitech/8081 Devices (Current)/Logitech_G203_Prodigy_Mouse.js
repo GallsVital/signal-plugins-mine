@@ -268,17 +268,6 @@ function DetectInputs()
     	}
     	while(device.getLastReadSize() > 0)
 
-	do
-	{
-	let packet = device.read([0x00],7, 3);
-
-		if(packet[0] == Logitech.ShortMessage && packet[1] == Logitech.ConnectionMode && packet[2] == 0x41 && packet[3] == 0x0C && packet[6] == 0x40)
-		{
-		device.log("Mouse Going to Sleep");
-		return Sleep = true;
-		}
-	}
-	while(device.getLastReadSize() > 0)
 }
 
 function ProcessInputs(packet)

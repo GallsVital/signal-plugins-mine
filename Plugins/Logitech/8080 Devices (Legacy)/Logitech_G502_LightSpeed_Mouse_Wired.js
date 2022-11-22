@@ -523,7 +523,7 @@ function hexToRgb(hex)
 			 /** @type {string[]} */
 			 LedNames : ["Primary Zone", "Logo Zone"],
 			 /** Variable that represents if a device has multiple connection methods and which method it is connected by.  */
-			 CommunicationType : 0,
+			 CommunicationType : this.CommunicationType["SingleConnection"],
 			 /** Variable that represents which method a device is connected by. */
 			 ConnectionMode : 0,
 			 /** Variable for defining if a mouse supports the 8071 RGB Protocol. */
@@ -532,8 +532,6 @@ function hexToRgb(hex)
 			 HasDPILights : false,
 			 /** Variable for defining if a mouse supports battery status and level. */
 			 HasBattery : false,
- 
-			 CommunicationType : this.CommunicationType["SingleConnection"],
  
 			 DeviceName: "UNKNOWN",
 			 DeviceType: "-1"
