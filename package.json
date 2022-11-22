@@ -31,11 +31,6 @@
 		"SAVED": "npx -p typescript tsc ModernCorsairProtocol.js --declaration --allowJs --emitDeclarationOnly --outDir types",
 		"prepare": "husky install"
 	},
-	"jest": {
-		"transform": {
-			"^.+\\.[t|j]sx?$": "babel-jest"
-		}
-	},
 	"jest-junit": {
 		"suiteName": "Unit Tests",
 		"outputDirectory": ".",

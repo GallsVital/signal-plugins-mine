@@ -1,3 +1,4 @@
+
 export class MockBus{
 	IsSystemBus = jest.fn().mockImplementation(() => {return false;});
 	IsIntelBus = jest.fn().mockImplementation(() => {return false;});
