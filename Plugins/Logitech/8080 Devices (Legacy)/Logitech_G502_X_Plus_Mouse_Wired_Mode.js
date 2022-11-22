@@ -149,11 +149,8 @@ export function Render()
 {
 	DetectInputs();
 
-	if(Sleep == false)
-	{	
-		grabColors();
-		PollBattery();
-	}
+	grabColors();
+	PollBattery();
 }
 
 export function Shutdown()
