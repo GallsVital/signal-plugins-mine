@@ -1,7 +1,7 @@
 export function Name() { return "Asus SMBus Motherboard Controller"; }
 export function Publisher() { return "WhirlwindFX"; }
 export function Type() { return "SMBUS"; }
-export function Size() { return [22, 1]; }
+export function Size() { return [1, 1]; }
 export function DefaultPosition(){return [0, 0];}
 export function DefaultScale(){return 8.0;}
 export function LedNames() { return vLedNames; }
@@ -64,6 +64,7 @@ let deviceLEDCount = 0;
 let deviceName = "";
 let deviceProtocolVersion = "";
 let ParentDeviceName = "";
+
 export function SupportsSubdevices(){ return true; }
 
 export function Initialize() 
@@ -78,6 +79,10 @@ export function Initialize()
 
 export function Render() 
 {
+    if(!AsusMotherboard.ValidDeviceID)
+    {
+        return;
+    }
     sendColors();
 }
 
@@ -337,6 +342,8 @@ class AsusAuraSMBusController
             "V2" : 0x1B
         };
 
+        this.ValidDeviceID = false;
+
         this.deviceNameDict =
         {
             "LED-0116"        : "V1",
@@ -422,6 +429,9 @@ class AsusAuraSMBusController
         device.log("Device Type: " + deviceName);
         device.log("Device Protocol Version: " + deviceProtocolVersion);
         device.log("Device Onboard LED Count: " + deviceLEDCount);
+        if(deviceName in this.deviceNameDict) { this.ValidDeviceID = true; }
+
+        else { device.log("Invalid Model Returned, Aborting Render Loop"); }
     }
 
     getDeviceName()

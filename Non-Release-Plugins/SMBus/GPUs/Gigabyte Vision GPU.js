@@ -79,7 +79,7 @@ function SetGPUNameFromBusIds(GPUList)
 	}
 }
 
-function GigabyteVisionGpuCheck(bus, GPU)
+function GigabyteVisionGpuCheck(bus, GPU) //We know this function is going to explode
 {
     const ValidReturnCodes = [0x10, 0x11, 0x12, 0x14];
     // 0x62 (Gaming OC) cards use a 8 byte write length.
