@@ -209,6 +209,8 @@ class AsusGPUController
         let deviceLEDCount = deviceConfigTable[3]; //No need to properly parse this. We only pull a single value off it for now.
         device.log("Device Controller Identifier: " + deviceName, {toFile: true});
         device.log("Device LED Count: " + deviceLEDCount, {toFile: true});
+        vLedNames = [];
+        vLedPositions = [];
         if(deviceLEDCount > 30 || deviceLEDCount < 0)
         {
             device.log("Device returned out of bounds LED Count.", {toFile: true});
@@ -364,6 +366,7 @@ class Asus_Ampere_Lovelace_IDs
 
         this.RTX3070_STRIX_GAMING           = 0x87BE;
         this.RTX3070_STRIX_GAMING_OC        = 0x87D8;
+        this.RTX3070_STRIX_GAMING_OC_3        = 0x87D0; //Untested.
         this.RTX3070_STRIX_GAMING_OC_2      = 0x87B8;
         this.RTX3070_STRIX_GAMING_OC_WHITE  = 0x87E0;
         this.RTX3070_STRIX_GAMING_OC_WHITE_V2 = 0x8833; //LHR
@@ -394,6 +397,7 @@ class Asus_Ampere_Lovelace_IDs
         this.RTX3080_TUF_O10G_GAMING           = 0x882B;
         this.RTX3080_TUF_GAMING_OC_LHR         = 0x882E;
         this.RTX3080_TUF_GAMING_OC             = 0x87B0;
+        this.RTX3080_TUF_GAMING_OC_8GB         = 0x886A;
         this.RTX3080_TUF_GAMING_OC_GDDR6X      = 0x886E; //0x220A
         this.RTX3080_TUF_GAMING_OC_GDDR6X_LHR  = 0x886F; //0x220A
         this.RTX3080_STRIX_O12G_GAMING_OC      = 0x886B;
@@ -447,6 +451,7 @@ const Asus3000GPUIDs =
     new AsusGPUIdentifier(Nvidia.RTX3070, AsusID.RTX3070_STRIX_GAMING, "Asus ROG Strix 3070 O8G Gaming"),
 	new AsusGPUIdentifier(Nvidia.RTX3070, AsusID.RTX3070_STRIX_GAMING_OC, "Asus ROG Strix 3070 O8G Gaming OC"),
     new AsusGPUIdentifier(Nvidia.RTX3070, AsusID.RTX3070_STRIX_GAMING_OC_2, "Asus ROG Strix 3070 O8G Gaming OC"),
+    new AsusGPUIdentifier(Nvidia.RTX3070, AsusID.RTX3070_STRIX_GAMING_OC_3, "Asus ROG Strix 3070 O8G Gaming OC"),
     new AsusGPUIdentifier(Nvidia.RTX3070, AsusID.RTX3070_STRIX_GAMING_OC_WHITE, "Asus ROG Strix 3070 Gaming OC White"),
     new AsusGPUIdentifier(Nvidia.RTX3070_LHR, AsusID.RTX3070_STRIX_GAMING_OC_WHITE_V2, "Asus ROG Strix 3070 Gaming OC White V2"),
     new AsusGPUIdentifier(Nvidia.RTX3070_LHR, AsusID.RTX3070_STRIX_GAMING_OC_LHR, "Asus ROG Strix 3070 Gaming OC LHR"),
@@ -471,6 +476,7 @@ const Asus3000GPUIDs =
     new AsusGPUIdentifier(Nvidia.RTX3080_LHR, AsusID.RTX3080_TUF_GAMING_LHR, "Asus TUF 3080 O10G Gaming LHR"),
 
     new AsusGPUIdentifier(Nvidia.RTX3080, AsusID.RTX3080_TUF_GAMING, "Asus TUF 3080 Gaming"),
+    new AsusGPUIdentifier(Nvidia.RTX3080, AsusID.RTX3080_TUF_GAMING_OC_8GB, "Asus TUF 3080 Gaming OC"),
     new AsusGPUIdentifier(Nvidia.RTX3080, AsusID.RTX3080_TUF_GAMING_V2, "Asus TUF 3080 Gaming V2"),
     new AsusGPUIdentifier(Nvidia.RTX3080_LHR, AsusID.RTX3080_TUF_O10G_GAMING, "Asus TUF 3080 O10G Gaming"),
     new AsusGPUIdentifier(Nvidia.RTX3080_GA102, AsusID.RTX3080_TUF_GAMING_OC_GDDR6X, "Asus TUF 3080 Gaming OC GDDR6X"),
