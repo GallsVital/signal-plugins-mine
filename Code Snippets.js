@@ -58,3 +58,38 @@ class Profiler{
 
 	}
 }
+
+// Fires a callback at the given interval
+class PolledFunction{
+	constructor(callback, interval){
+		this.callback = callback;
+		this.interval = interval;
+		this.lastPollTime = Date.now();
+	}
+	Poll(){
+		if (Date.now() - this.lastPollTime < this.interval) {
+			return;
+		}
+
+		this.callback();
+
+		this.lastPollTime = Date.now();
+	}
+	RunNow(){
+		this.callback();
+
+		this.lastPollTime = Date.now();
+	}
+}
+
+
+function decimalToHex(d, padding) {
+	let hex = Number(d).toString(16);
+	padding = typeof (padding) === "undefined" || padding === null ? padding = 2 : padding;
+
+	while (hex.length < padding) {
+		hex = "0" + hex;
+	}
+
+	return "0x" + hex;
+}

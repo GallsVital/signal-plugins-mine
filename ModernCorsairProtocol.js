@@ -38,25 +38,6 @@ function getKeyByValue(object, value) {
 	return parseInt(Key);
 }
 
-const BragiPropertyNames = /** @type {const} */([
-	"Polling Rate",
-	"HW Brightness",
-	"Mode",
-	"Angle Snapping",
-	"Idle Mode",
-	"Battery Level",
-	"Battery Status",
-	"Vendor Id",
-	"Product Id",
-	"Firmware Version",
-	"DPI Profile",
-	"DPI Mask",
-	"DPI X",
-	"DPI Y",
-	"Idle Mode Timeout",
-	"HW Layout",
-	"Max Polling Rate",
-]);
 
 /**
  * @typedef {String} PropertyName
@@ -68,9 +49,11 @@ const BragiPropertyNames = /** @type {const} */([
  * @class ModernCorsairProtocol
  */
 export class ModernCorsairProtocol{
-	constructor() {
+	constructor(options = {}) {
 		this.DeviceBufferSize = 1280;
-		this.IsLightingController = false;
+		this.IsLightingController = options.hasOwnProperty("IsLightingController") ? options.IsLightingController : false;
+		this.developmentFirmwareVersion = options.hasOwnProperty("developmentFirmwareVersion") ? options.developmentFirmwareVersion : "Unknown";
+
 		this.KeyCodes = [];
 		this.KeyCount = 0;
 
@@ -353,7 +336,7 @@ export class ModernCorsairProtocol{
 			device.read([0x00], 1024);
 
 			this.DeviceBufferSize = device.getLastReadSize();
-			device.log(`CorsairProtocol: buffer length set to ${this.DeviceBufferSize}`);
+			device.log(`CorsairProtocol: Buffer length set to ${this.DeviceBufferSize}`);
 		}
 	}
 	/**
@@ -368,6 +351,7 @@ export class ModernCorsairProtocol{
 
 		const firmwareString = `${data[4]}.${data[5]}.${data[6]}`;
 		device.log(`Firmware Version: [${firmwareString}]`);
+		device.log(`Developed on Firmware [${this.developmentFirmwareVersion}]`);
 
 		return firmwareString;
 	}
@@ -643,9 +627,9 @@ export class ModernCorsairProtocol{
 		const isHandleOpen = this.IsHandleOpen(Handle);
 
 		if(isHandleOpen){
-			device.log(`CorsairProtocol: Handle is already open: [${this.HandleNames[Handle]}, ${decimalToHex(Handle, 2)}]. Aborting ReadEndpoint operation.`);
+			device.log(`CorsairProtocol: Handle is already open: [${this.HandleNames[Handle]}, ${decimalToHex(Handle, 2)}]. Attemping to close...`);
+			this.CloseHandle(Handle);
 
-			return;
 		}
 
 		const ErrorCode = this.OpenHandle(Handle, Endpoint);
@@ -805,10 +789,6 @@ export class ModernCorsairProtocol{
 	SetMode(Mode){
 		let CurrentMode = this.FetchProperty(this.Properties.mode);
 
-		// Bash Handles and reopen as needed
-		this.CloseHandle(this.Handles.Lighting);
-		this.CloseHandle(this.Handles.Background);
-
 		if(CurrentMode !== Mode) {
 			device.log(`Setting Device Mode to ${Mode === this.softwareMode ? "Software" : "Hardware"}`);
 			this.SetProperty(this.Properties.mode, Mode);
@@ -896,11 +876,11 @@ export class ModernCorsairProtocol{
 	FetchFanStates() {
 		device.log("CorsairProtocol: Reading Fan States.");
 
-		if(device.fanControlDisabled()) {
-			device.log("Fan Control is Disabled! Are you sure you want to try this?");
+		// if(device.fanControlDisabled()) {
+		// 	device.log("Fan Control is Disabled! Are you sure you want to try this?");
 
-			return [];
-		}
+		// 	return [];
+		// }
 
 		const data = this.ReadEndpoint(this.Handles.Background, this.Endpoints.FanStates, 0x09);
 

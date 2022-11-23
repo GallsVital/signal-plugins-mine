@@ -29,4 +29,6 @@ declare class ComponentChannel{
 	 * @returns boolean on if this ComponentChannel should force pulse.
 	 */
 	public shouldPulseColors(): boolean
+
+	public getComponentNames(): string[]
 }
