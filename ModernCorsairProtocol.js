@@ -49,12 +49,11 @@ function getKeyByValue(object, value) {
  * @class ModernCorsairProtocol
  */
 export class ModernCorsairProtocol{
-	constructor(options) {
+	constructor(options = {}) {
 		this.DeviceBufferSize = 1280;
-		this.IsLightingController = options.IsLightingController || false;
-		this.developmentFirmwareVersion = options.developmentFirmwareVersion || "Unknown";
+		this.IsLightingController = options.hasOwnProperty("IsLightingController") ? options.IsLightingController : false;
+		this.developmentFirmwareVersion = options.hasOwnProperty("developmentFirmwareVersion") ? options.developmentFirmwareVersion : "Unknown";
 
-		device.log(`isLightingController ${this.IsLightingController}`);
 		this.KeyCodes = [];
 		this.KeyCount = 0;
 
