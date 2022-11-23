@@ -45,11 +45,6 @@ export function Scan(bus) {
 		MSIGPUID.SubDevice === bus.SubDevice()
 		) {
 			FoundAddresses.push(MSIGPUID.Address);
-		} else {
-			bus.log(`Expected Vendor [${MSIGPUID.Vendor}] got Vendor [${bus.Vendor()}]`);
-			bus.log(`Expected SubVender [${MSIGPUID.SubVendor}] got Vendor [${bus.SubVendor()}]`);
-			bus.log(`Expected Device [${MSIGPUID.Device}] got Vendor [${bus.Product()}]`);
-			bus.log(`Expected SubDevice [${MSIGPUID.SubDevice}] got Vendor [${bus.SubDevice()}]`);
 		}
 	}
 

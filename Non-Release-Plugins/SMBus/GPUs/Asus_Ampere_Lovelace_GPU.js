@@ -12,8 +12,7 @@ shutdownColor:readonly
 LightingMode:readonly
 forcedColor:readonly
 */
-export function ControllableParameters()
-{
+export function ControllableParameters() {
 	return [
 		{"property":"shutdownColor", "group":"lighting", "label":"Shutdown Color", "min":"0", "max":"360", "type":"color", "default":"#009bde"},
 		{"property":"LightingMode", "group":"lighting", "label":"Lighting Mode", "type":"combobox", "values":["Canvas", "Forced"], "default":"Canvas"},
@@ -25,118 +24,92 @@ let vLedNames = [];
 let vLedPositions = [];
 
 /** @param {FreeAddressBus} bus */
-export function Scan(bus) 
-{
+export function Scan(bus) {
 	const FoundAddresses = [];
 
 	  // Skip any non AMD / INTEL Busses
-	  if (!bus.IsNvidiaBus()) 
-	{
+	  if (!bus.IsNvidiaBus()) {
 		return [];
 	}
 
-	for(const AsusGPUID of Asus3000GPUIDs)
-	{
+	for(const AsusGPUID of Asus3000GPUIDs) {
 		if(AsusGPUID.Vendor === bus.Vendor() &&
 		AsusGPUID.SubVendor === bus.SubVendor() &&
 		AsusGPUID.Device === bus.Product() &&
 		AsusGPUID.SubDevice === bus.SubDevice()
-		)
-		{
+		) {
 			// No Quick Write test on Nvidia
-			if(bus.ReadByteWithoutRegister(AsusGPUID.Address) > 0)
-			{
+			if(bus.ReadByteWithoutRegister(AsusGPUID.Address) > 0) {
 				FoundAddresses.push(AsusGPUID.Address);
 			}
-
-		}
-		else
-		{
-			bus.log(`Expected Vendor [${AsusGPUID.Vendor}] got Vendor [${bus.Vendor()}]`);
-			bus.log(`Expected SubVender [${AsusGPUID.SubVendor}] got Vendor [${bus.SubVendor()}]`);
-			bus.log(`Expected Device [${AsusGPUID.Device}] got Vendor [${bus.Product()}]`);
-			bus.log(`Expected SubDevice [${AsusGPUID.SubDevice}] got Vendor [${bus.SubDevice()}]`);
 		}
 	}
 
 	return FoundAddresses;
 }
 
-export function Initialize() 
-{
+export function Initialize() {
 	AsusGPU.getDeviceInformation();
 	SetGPUNameFromBusIds();
 	AsusGPU.setMode(AsusGPU.modes.static);
 }
 
-export function Render() 
-{
+export function Render() {
 	sendColors();
 }
 
-export function Shutdown() 
-{
+export function Shutdown() {
 	AsusGPU.setMode(AsusGPU.modes.rainbow);
 }
 
-function SetGPUNameFromBusIds()
-{
-	for(const AsusGPUID of Asus3000GPUIDs)
-	{
+function SetGPUNameFromBusIds() {
+	for(const AsusGPUID of Asus3000GPUIDs) {
 		if(AsusGPUID.Vendor === bus.Vendor() &&
 		AsusGPUID.SubVendor === bus.SubVendor() &&
 		AsusGPUID.Device === bus.Product() &&
 		AsusGPUID.SubDevice === bus.SubDevice()
-		)
-		{
+		) {
 			device.setName(AsusGPUID.Name);
 		}
 	}
 }
 
-function sendColors(shutdown = false)
-{
+function sendColors(shutdown = false) {
 	bus.WriteBlock(AsusGPU.registers.command, 2, [0x81, 0x60]);
-	let RGBData = new Array(90);
-	for(let iIdx = 0; iIdx < vLedPositions.length; iIdx++) 
-	{
-		let iPxX = vLedPositions[iIdx][0];
-		let iPxY = vLedPositions[iIdx][1];
+
+	const RGBData = new Array(90);
+
+	for(let iIdx = 0; iIdx < vLedPositions.length; iIdx++) {
+		const iPxX = vLedPositions[iIdx][0];
+		const iPxY = vLedPositions[iIdx][1];
 		var color;
 
-		if(shutdown) 
-		{
+		if(shutdown) {
 			color = hexToRgb(shutdownColor);
-		} 
-		else if (LightingMode === "Forced") 
-		{
+		} else if (LightingMode === "Forced") {
 			color = hexToRgb(forcedColor);
-		} 
-		else 
-		{
+		} else {
 			color = device.color(iPxX, iPxY);
 		}
 
-		let iLedIdx = iIdx * 3;
+		const iLedIdx = iIdx * 3;
 		RGBData[iLedIdx] = color[0];
 		RGBData[iLedIdx+1] = color[2];
 		RGBData[iLedIdx+2] = color[1];
 	}
 
-	while(RGBData.length > 0)
-	{
-		let packet = [0x1E];
-		packet.push(...RGBData.splice(0,30));
+	while(RGBData.length > 0) {
+		const packet = [0x1E];
+		packet.push(...RGBData.splice(0, 30));
 		bus.WriteBlock(AsusGPU.registers.color, 31, packet);
 	}
+
 	bus.WriteBlock(AsusGPU.registers.command, 2, [0x80, 0x2F]);
 	bus.WriteByte(AsusGPU.registers.direction, 0x01);
 }
 
-class AsusGPUController
-{
-	constructor()
-	{
+class AsusGPUController {
+	constructor() {
 		this.registers =
         {
         	command   : 0x00,
@@ -179,87 +152,80 @@ class AsusGPUController
         	colorCtlV1   : 0x8000,
         	colorCtlV2   : 0x8100,
         	apply        : 0x80A0
-        }
+        };
 	}
 
-	auraReadRegister(reg)
-	{
-		bus.WriteBlock(this.registers.command, 2, [reg >> 8 & 0xFF , reg & 0xff]);
+	auraReadRegister(reg) {
+		bus.WriteBlock(this.registers.command, 2, [reg >> 8 & 0xFF, reg & 0xff]);
 
 		return bus.ReadByte(0x81);
 	}
 
-	auraWriteRegister(reg, value)
-	{
-		bus.WriteBlock(this.registers.command, 2, [reg >> 8 & 0xFF , reg & 0xff]);
+	auraWriteRegister(reg, value) {
+		bus.WriteBlock(this.registers.command, 2, [reg >> 8 & 0xFF, reg & 0xff]);
 
 		bus.WriteByte(this.registers.direction, value);
 	}
 
-	auraWriteRegisterBlock(reg, size, data)
-	{
-		let iWord = bus.WriteBlock(this.registers.command, 2, [reg >> 8 & 0xFF , reg & 0xff]); //The variable here isn't needed for gpus and normal cases. Hence, we aren't making use of it.
+	auraWriteRegisterBlock(reg, size, data) {
+		const iWord = bus.WriteBlock(this.registers.command, 2, [reg >> 8 & 0xFF, reg & 0xff]); //The variable here isn't needed for gpus and normal cases. Hence, we aren't making use of it.
 		bus.WriteBlock(this.registers.color, size, data);
 	}
 
-	getDeviceInformation()
-	{
-		let deviceName = AsusGPU.getDeviceName();
-		let deviceConfigTable = AsusGPU.getDeviceConfigTable();
+	getDeviceInformation() {
+		const deviceName = AsusGPU.getDeviceName();
+		const deviceConfigTable = AsusGPU.getDeviceConfigTable();
 		let deviceLEDCount = deviceConfigTable[3]; //No need to properly parse this. We only pull a single value off it for now.
 		device.log("Device Controller Identifier: " + deviceName, {toFile: true});
 		device.log("Device LED Count: " + deviceLEDCount, {toFile: true});
 		vLedNames = [];
 		vLedPositions = [];
-		if(deviceLEDCount > 30 || deviceLEDCount < 0)
-		{
+
+		if(deviceLEDCount > 30 || deviceLEDCount < 0) {
 			device.log("Device returned out of bounds LED Count.", {toFile: true});
 			deviceLEDCount = 30;
 		}
-        
-		for(let i = 0; i < deviceLEDCount; i++)
-		{
+
+		for(let i = 0; i < deviceLEDCount; i++) {
 			vLedNames.push(`LED ${i + 1}`);
 			vLedPositions.push([ (deviceLEDCount - 1) - i, 0 ]);
 		}
-       
-		device.setControllableLeds(vLedNames,vLedPositions);
+
+		device.setControllableLeds(vLedNames, vLedPositions);
 		device.setSize([deviceLEDCount, 1]);
 	}
 
-	getDeviceName()
-	{
-		let deviceName = [];
-		for(let iIdx = 0; iIdx < 16; iIdx++)
-		{
-			let character = this.auraReadRegister(this.auraCommands.deviceName + iIdx);
-			if(character > 0)
-			{
+	getDeviceName() {
+		const deviceName = [];
+
+		for(let iIdx = 0; iIdx < 16; iIdx++) {
+			const character = this.auraReadRegister(this.auraCommands.deviceName + iIdx);
+
+			if(character > 0) {
 				deviceName.push(character);
 			}
 		}
+
 		return String.fromCharCode(...deviceName);
 	}
 
-	getDeviceConfigTable()
-	{
-		let configTable = new Array(65);
-		for(let iIdx = 0; iIdx < 64; iIdx++)
-		{
+	getDeviceConfigTable() {
+		const configTable = new Array(65);
+
+		for(let iIdx = 0; iIdx < 64; iIdx++) {
 			configTable[iIdx] = this.auraReadRegister(this.auraCommands.configTable + iIdx);
 		}
+
 		return configTable;
 	}
 
-	setMode(deviceMode)
-	{
+	setMode(deviceMode) {
 		bus.WriteBlock(this.registers.command, 2, [this.commands.action, this.commands.speed]);
 		bus.WriteBlock(this.registers.speed, 2, [this.speeds.medium, deviceMode]);
 		this.setDirection(0x00); //0x00 is left. 0x01 is right. I'm not making a dict for two values.
 	}
 
-	setDirection(direction)
-	{
+	setDirection(direction) {
 		bus.WriteBlock(this.registers.command, 2, [this.commands.action, this.commands.direction]);
 		bus.WriteByte(this.registers.direction, direction);
 		bus.WriteBlock(this.registers.command, 2, [this.commands.action, this.commands.apply]);
@@ -269,10 +235,8 @@ class AsusGPUController
 
 const AsusGPU = new AsusGPUController();
 
-class GPUIdentifier
-{
-	constructor(Vendor, SubVendor, Device, SubDevice, Address, Name, Model = "")
-	{
+class GPUIdentifier {
+	constructor(Vendor, SubVendor, Device, SubDevice, Address, Name, Model = "") {
 		this.Vendor = Vendor;
 		this.SubVendor = SubVendor;
 		this.Device = Device;
@@ -283,18 +247,14 @@ class GPUIdentifier
 	}
 }
 
-class AsusGPUIdentifier extends GPUIdentifier
-{
-	constructor(Device, SubDevice, Name, Model = "")
-	{
+class AsusGPUIdentifier extends GPUIdentifier {
+	constructor(Device, SubDevice, Name, Model = "") {
 		super(0x10DE, 0x1043, Device, SubDevice, 0x67, Name, Model);
 	}
 }
 
-class NvidiaGPUDeviceIds 
-{
-	constructor()
-	{
+class NvidiaGPUDeviceIds {
+	constructor() {
 		this.GTX1050TI       = 0x1C82;
 		this.GTX1060         = 0x1C03;
 		this.GTX1070         = 0x1B81;
@@ -340,10 +300,8 @@ class NvidiaGPUDeviceIds
 
 const Nvidia = new NvidiaGPUDeviceIds();
 
-class Asus_Ampere_Lovelace_IDs
-{
-	constructor()
-	{
+class Asus_Ampere_Lovelace_IDs {
+	constructor() {
 		this.RTX3050_STRIX_GAMING           = 0x8872; //0x2507
 
 		this.RTX3060_STRIX_GAMING           = 0x8818;
@@ -383,7 +341,7 @@ class Asus_Ampere_Lovelace_IDs
 		this.RTX3070TI_STRIX_GAMING         = 0x880E;
 		this.RTX3070TI_TUF_GAMING           = 0x8812;
 		this.RTX3070TI_TUF_GAMING_2         = 0x8813;
-        
+
 
 		this.RTX3080_STRIX_GAMING_WHITE     = 0x87D1;
 		this.RTX3080_STRIX_GAMING_WHITE_OC_LHR = 0x8830;
@@ -402,7 +360,7 @@ class Asus_Ampere_Lovelace_IDs
 		this.RTX3080_TUF_GAMING_OC_GDDR6X_LHR  = 0x886F; //0x220A
 		this.RTX3080_STRIX_O12G_GAMING_OC      = 0x886B;
 		this.RTX3080_STRIX_EVA                 = 0x8887;
-        
+
 		this.RTX3080TI_TUF_GAMING_OC               = 0x8802;
 		this.RTX3080TI_TUF_GAMING                  = 0x8803;
 		this.RTX3080TI_STRIX_GAMING                = 0x8807;
@@ -507,8 +465,7 @@ const Asus3000GPUIDs =
 	new AsusGPUIdentifier(Nvidia.RTX4090, AsusID.RTX4090_TUF_GAMING_2, "Asus TUF RTX 4090 Gaming")
 ];
 
-function hexToRgb(hex) 
-{
+function hexToRgb(hex) {
 	const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
 	const colors = [];
 	colors[0] = parseInt(result[1], 16);
