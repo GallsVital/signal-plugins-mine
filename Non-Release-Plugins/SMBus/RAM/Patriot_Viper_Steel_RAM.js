@@ -113,11 +113,13 @@ export function Shutdown()
 
 function sendColors(shutdown = false)
 {
+	let color;
+
 	for(let iIdx = 0; iIdx < 5; iIdx++)
 	{
 		const iPxX = vLedPositions[iIdx][0];
 		const iPxY = vLedPositions[iIdx][1];
-		let color;
+
 
 		if(shutdown)
 		{
@@ -143,10 +145,10 @@ class PatriotViperSteelController
 		this.registers = [0x17, 0x18, 0x19, 0x1A, 0x1B];
 	}
 
-	writeRegister(register, value1, value2, value3)
+	writeRegister(register, color)
 	{
-		bus.WriteByte(register, value1);
-		bus.WriteByte(value2, value3);
+		bus.WriteByte(register, color[0]);
+		bus.WriteByte(color[1], color[2]);
 	}
 }
 
