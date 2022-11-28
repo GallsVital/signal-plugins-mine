@@ -19,8 +19,8 @@
         "destination": "docs/",
         "recurse": false,
         "verbose": true,
-        "template": "./node_modules/better-docs"
-
+        "template": "./node_modules/better-docs",
+        "access": "all"
     },
     "templates": {
         "cleverLinks": false,

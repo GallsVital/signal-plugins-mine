@@ -51,6 +51,11 @@ function getKeyByValue(object, value) {
  * @typedef {0 | 1 | 2 | "Lighting" | "Background" | "Auxiliary"} Handle
  * @memberof ModernCorsairProtocol
  */
+/**
+ * @class Corsair Bragi Protocol Class
+ * Major concepts are {@link ModernCorsairProtocol#Properties|Properties} and {@link ModernCorsairProtocol#Handles|Handles}/{@link ModernCorsairProtocol#Endpoints|Endpoints}.
+ *
+ */
 export class ModernCorsairProtocol{
 
 
@@ -59,8 +64,8 @@ export class ModernCorsairProtocol{
 	 */
 	constructor(options = {}) {
 		/**
+		 * Use {@link ModernCorsairProtocol#GetBufferSize} instead
 		 * @private
-		 *  - Use {@link ModernCorsairProtocol#GetBufferSize} instead
 		 * */
 		this.DeviceBufferSize = 1280;
 		this.ConfiguredDeviceBuffer = false;
@@ -897,7 +902,9 @@ export class ModernCorsairProtocol{
 			BytesSent += BytesToSend;
 		}
 	}
-	/** @private */
+	/**
+	 * @private
+	 */
 	WriteLighting(LedCount, RGBData){
 
 		const packet = [];
@@ -919,7 +926,9 @@ export class ModernCorsairProtocol{
 		this.CheckError(response, "WriteLighting");
 	}
 
-	/** @private */
+	/**
+	 * @private
+	 */
 	StreamLighting(RGBData) {
 
 		const packet = [];
@@ -950,9 +959,9 @@ export class ModernCorsairProtocol{
 
 		// if going into hardware mode we want to close all handles.
 		// if going into software mode we don't want any handles stuck open from Icue or the file watchdog trigger.
-		Corsair.CloseHandleIfOpen(Corsair.Handles.Lighting);
-		Corsair.CloseHandleIfOpen(Corsair.Handles.Background);
-		Corsair.CloseHandleIfOpen(Corsair.Handles.Auxiliary);
+		this.CloseHandleIfOpen("Lighting");
+		this.CloseHandleIfOpen("Background");
+		this.CloseHandleIfOpen("Auxiliary");
 
 		if(CurrentMode !== Mode) {
 			device.log(`Setting Device Mode to ${this.Modes[Mode]}`);
@@ -1062,7 +1071,7 @@ export class ModernCorsairProtocol{
 		}
 
 		const FanCount = data[6];
-		device.log(`CorsairProtocol: Device Reported [${FanCount}] Fans`);
+		//device.log(`CorsairProtocol: Device Reported [${FanCount}] Fans`);
 
 		const FanData = data.slice(7, 7 + FanCount);
 
@@ -1104,7 +1113,7 @@ export class ModernCorsairProtocol{
 
 		if(data[4] === this.ResponseIds.temperatureData && data[5] === 0) {
 			const ProbeCount = data[6];
-			device.log(`CorsairProtocol: Device Reported [${ProbeCount}] Temperature Probes`);
+			//device.log(`CorsairProtocol: Device Reported [${ProbeCount}] Temperature Probes`);
 
 			const TempValues = data.slice(7, 7 + 3 * ProbeCount);
 

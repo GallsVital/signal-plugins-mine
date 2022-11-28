@@ -1320,9 +1320,9 @@ export class ModernCorsairProtocol{
 
 		// if going into hardware mode we want to close all handles.
 		// if going into software mode we don't want any handles stuck open from Icue or the file watchdog trigger.
-		Corsair.CloseHandleIfOpen("Lighting");
-		Corsair.CloseHandleIfOpen("Background");
-		Corsair.CloseHandleIfOpen("Auxiliary");
+		this.CloseHandleIfOpen("Lighting");
+		this.CloseHandleIfOpen("Background");
+		this.CloseHandleIfOpen("Auxiliary");
 
 		if(CurrentMode !== Mode) {
 			device.log(`Setting Device Mode to ${this.Modes[Mode]}`);
