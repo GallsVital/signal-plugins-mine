@@ -186,8 +186,6 @@ export function Initialize() {
 
 	InitializeDevice();
 	//Corsair.SetKeyStates(true);
-
-	FetchDeviceSettings();
 }
 
 export function InitializeDevice() {
@@ -198,17 +196,14 @@ export function InitializeDevice() {
 	Corsair.OpenHandle("Lighting", Corsair.Endpoints.Lighting);
 
 	Corsair.FetchFirmware();
-
-	Corsair.SetHWBrightness(1000);
-
-}
-
-function FetchDeviceSettings() {
 	device.log(`Vid is [${decimalToHex(Corsair.FetchProperty("Vendor Id"), 4)}]`);
 	device.log(`Pid is [${decimalToHex(Corsair.FetchProperty("Product Id"), 4)}]`);
 
 	device.log(`HW Layout: ${Corsair.Layouts[Corsair.FetchProperty("HW Layout")]}`);
 	device.log(`Polling Rate: ${Corsair.PollingRates[Corsair.FetchProperty("Polling Rate")]}`);
+
+	Corsair.SetHWBrightness(1000);
+
 }
 
 
