@@ -69,9 +69,11 @@ var OnBoardState;
 var DPIStage = 1;
 
 const vLedNames = ["Primary Zone"];
+/** @type {LedPosition[]} */
 const vLedPositions = [ [0,1] ];
 
 let vPERLedNames = ["Left Zone", "Logo Zone", "Right Zone"];
+/** @type {LedPosition[]} */
 let vPERLedPositions = [ [0, 1], [1, 2], [2, 1] ];
 
 const WIRED = 0xFF;
@@ -112,26 +114,12 @@ const deviceIdMap =
 
 export function LedNames()
 {
-	if(ARGBMode === true)
-	{
-	return vPERLedNames;
-	}
-	else
-	{
     return vLedNames;
-	}
 }
 
 export function LedPositions()
 {
-	if(ARGBMode === true)
-	{
-	return vPERLedPositions;
-	}
-	else
-	{
     return vLedPositions;
-	}
 }
 
 export function Initialize()
@@ -168,6 +156,13 @@ export function Initialize()
 	{
 		DPIStageControl();
 	}
+
+	if(ARGBMode){
+		device.setControllableLeds(vPERLedNames, vPERLedPositions)
+	}else{
+		device.setControllableLeds(vLedNames, vLedPositions)
+	}
+
 }
 
 export function Render()
@@ -195,7 +190,11 @@ export function Shutdown()
 
 export function onARGBModeChanged()
 {
-	device.repollLeds();
+	if(ARGBMode){
+		device.setControllableLeds(vPERLedNames, vPERLedPositions)
+	}else{
+		device.setControllableLeds(vLedNames, vLedPositions)
+	}
 }
 
 export function onDpiControlChanged()
