@@ -52,7 +52,7 @@ const ChannelArray = [
 
 let ConnectedFans = [];
 let savedPollFanTimer = Date.now();
-const PollModeInternal = 3000;
+const PollModeInternal = 4000;
 let PumpDevice = null;
 let PumpConnected = false;
 const PumpDeviceName = "Elite Capellix Pump";
@@ -122,6 +122,8 @@ export function Initialize() {
 	/// }
 
 	Corsair.SetFanType();
+	PumpConnected = FetchPumpConnectionStatus();
+	SetPumpType();
 
 	GetFanSettings();
 
@@ -274,20 +276,36 @@ function GetPumpLedData() {
 	return RGBData;
 }
 
-function GetFanSettings() {
-
+function FetchPumpConnectionStatus(){
 	const FanData = Corsair.FetchFanStates();
 
 	if(FanData[0] === 0){
 		device.log("Pump is Disconnected!", {toFile: true});
-		PumpConnected = false;
-		SetPumpType();
+		return false;
 	}else if(FanData[0] === 7){
 		device.log("Pump is Connected! Creating Subdevice...", {toFile: true});
-		PumpConnected = true;
-		SetPumpType();
+		return true
 	}else{
 		device.log(`Unknown Pump State: [${FanData[0]}]`, {toFile: true});
+	}
+	device.log(`Failed to read pump connection status...`);
+	return false;
+}
+
+function GetFanSettings() {
+
+	const FanData = Corsair.FetchFanStates();
+
+	// Skip iterating other fans and creating FanControllers if the system is disabled.
+	if(device.fanControlDisabled()) {
+		// Reset if the system was disbled during runtime.
+		device.log("System Monitoring disabled, Clearing Connected Fans", {toFile: true});
+		ConnectedFans = [];
+		return false;
+	}
+
+	if(ConnectedFans.length != 0){
+		return;
 	}
 
 	for(let i = 0; i < FanData.length; i++) {
@@ -325,7 +343,16 @@ function PollFans() {
 
 	savedPollFanTimer = Date.now();
 
+	if(device.fanControlDisabled()) {
+		// Reset if the system was disbled during runtime.
+		device.log("System Monitoring disabled, Clearing Connected Fans", {toFile: true});
+		ConnectedFans = [];
+		return;
+	}
+
 	if(ConnectedFans.length === 0){
+		// Attempt to redetect connected Fans.
+		// The user may have nothing connected but that is unlikely given this is primarily a fan controller
 		if(!GetFanSettings()){
 			device.log(`Connected Fans are still being initialized by the controller. Aborting Detection!`, {toFile: true});
 
@@ -333,9 +360,7 @@ function PollFans() {
 		}
 	}
 
-	if(device.fanControlDisabled()) {
-		return;
-	}
+
 
 	// Read Fan RPM
 	const FanSpeeds = Corsair.FetchFanRPM();
@@ -344,7 +369,7 @@ function PollFans() {
 		const fanRPM = FanSpeeds[i];
 
 		if(fanRPM > 0) {
-			device.log(`${FanControllerArray[i]} us running at rpm ${fanRPM}`);
+			device.log(`${FanControllerArray[i]} is running at rpm ${fanRPM}`);
 		}
 
 		device.setRPM(FanControllerArray[i], fanRPM);

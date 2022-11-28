@@ -44,8 +44,7 @@ function SetupChannels() {
 }
 
 //Global Variables
-const ConnectedFans = [];
-let FansDetected = false;
+let ConnectedFans = [];
 let savedLedCount;
 let PollConnectedFans;
 let PollFanStates;
@@ -68,7 +67,9 @@ const FanControllerArray = [
 ];
 
 export function Initialize() {
-	PollConnectedFans = new PolledFunction(GetFanSettings, 15000);
+	ConnectedFans = [];
+
+	PollConnectedFans = new PolledFunction(GetFanSettings, 10000);
 	PollFanStates = new PolledFunction(GetFanStates, 3000);
 
 	Corsair.SetMode("Software");
@@ -96,9 +97,7 @@ export function Shutdown() {
 
 export function Render() {
 
-	if(!FansDetected){
-		PollConnectedFans.Poll();
-	}
+	PollConnectedFans.Poll();
 
 	PollFanStates.Poll();
 
@@ -116,9 +115,20 @@ function GetFanStates() {
 }
 
 function GetFanSettings() {
+	// Skip iterating other fans and creating FanControllers if the system is disabled.
+	if(device.fanControlDisabled()) {
+		// Reset if the system was disbled during runtime.
+		device.log("System Monitoring disabled, Clearing Connected Fans", {toFile: true});
+		ConnectedFans = [];
+		return;
+	}
+
+	if(ConnectedFans.length != 0){
+
+		return;
+	}
 
 	const FanData = Corsair.FetchFanStates();
-	FansDetected = true;
 
 	for(let i = 0; i < FanData.length; i++) {
 		const fanState = FanData[i];
@@ -130,8 +140,7 @@ function GetFanSettings() {
 		case 4:
 			device.log("Device is still booting up. We'll refetch fan states later...");
 			// We need to recheck this in 10 seconds or so.
-			FansDetected = false;
-
+			ConnectedFans = []
 			return;
 		case 7:
 			if(!ConnectedFans.includes(i)){
