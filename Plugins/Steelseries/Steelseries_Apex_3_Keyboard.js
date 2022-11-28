@@ -3,7 +3,7 @@ export function VendorId() { return 0x1038; }
 export function Documentation(){ return "troubleshooting/steelseries"; }
 export function ProductId() { return 0x161A; }
 export function Publisher() { return "WhirlwindFX"; }
-export function Size() { return [10, 3]; }
+export function Size() { return [21, 6]; }
 export function DefaultPosition(){return [10, 100];}
 const DESIRED_HEIGHT = 85;
 export function DefaultScale(){return Math.floor(DESIRED_HEIGHT/Size()[1]);}
@@ -25,7 +25,7 @@ let vLedNames = [
 ];
 
 let vLedPositions = [
-	[0, 0], [1, 0], [2, 0], [3, 0], [4, 0], [5, 0], [6, 0], [7, 0], [8, 0], [9, 0]
+	[1, 3], [3, 3], [5, 3], [7, 3], [9, 3], [11, 3], [13, 3], [15, 3], [17, 3], [19, 3]
 ];
 let vLedNamesFake = [
 
@@ -57,28 +57,6 @@ export function LedNames() {
 
 export function LedPositions() {
 	return vLedPositionsFake;
-}
-
-function sendPacketString(string, size){
-	let packet= [];
-	let data = string.split(' ');
-
-	for(let i = 0; i < data.length; i++){
-		packet[parseInt(i, 16)] = parseInt(data[i], 16);//.toString(16)
-	}
-
-	device.write(packet, size);
-}
-
-function sendReportString(string, size){
-	let packet= [];
-	let data = string.split(' ');
-
-	for(let i = 0; i < data.length; i++){
-		packet[parseInt(i, 16)] =parseInt(data[i], 16);//.toString(16)
-	}
-
-	device.send_report(packet, size);
 }
 
 export function Shutdown() {

@@ -64,7 +64,7 @@ export function VendorId() { return 0x1532; }
 export function Documentation(){ return "troubleshooting/razer"; }
 export function ProductId() { return 0x011A; }
 export function Publisher() { return "BlackSwan"; }
-export function Size() { return [10, 10]; }
+export function Size() { return [21, 6]; }
 export function Type() { return "Hid"; }
 export function DefaultPosition() { return [75, 70]; }
 export function DefaultScale() { return 1.0; }
