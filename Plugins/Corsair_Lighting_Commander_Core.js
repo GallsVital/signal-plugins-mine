@@ -96,14 +96,18 @@ function compareVersionRecursive(a, b) {
 }
 
 export function Initialize() {
+	StateMgr.Push(new StateSetFanSpeeds(StateMgr));
+	StateMgr.Push(new StatePollTempProbes(StateMgr));
+	StateMgr.Push(new StatePollFanSpeeds(StateMgr));
+	StateMgr.Push(new StateSystemMonitoringDisabled(StateMgr));
 
 	// Account for different firmware versions between product Id's
-	if(device.productId() == 0x0C1C){
-		Corsair.config.developmentFirmwareVersion = "2.10.219"
-	}else if(device.productId() == 0x0C32){
-		Corsair.config.developmentFirmwareVersion = "2.0.17"
+	if(device.productId() === 0x0C1C){
+		Corsair.config.developmentFirmwareVersion = "2.10.219";
+	}else if(device.productId() === 0x0C32){
+		Corsair.config.developmentFirmwareVersion = "2.0.17";
 	}
-	
+
 	Corsair.SetMode("Software");
 	Corsair.OpenHandle("Lighting", Corsair.Endpoints.LightingController);
 
@@ -125,7 +129,7 @@ export function Initialize() {
 	PumpConnected = FetchPumpConnectionStatus();
 	SetPumpType();
 
-	GetFanSettings();
+	//GetFanSettings();
 
 }
 
@@ -143,7 +147,8 @@ export function Render() {
 
 	UpdateRGB();
 
-	PollFans();
+	StateMgr.process();
+	//PollFans();
 }
 
 function UpdateRGB(){
@@ -281,14 +286,18 @@ function FetchPumpConnectionStatus(){
 
 	if(FanData[0] === 0){
 		device.log("Pump is Disconnected!", {toFile: true});
+
 		return false;
 	}else if(FanData[0] === 7){
 		device.log("Pump is Connected! Creating Subdevice...", {toFile: true});
-		return true
-	}else{
-		device.log(`Unknown Pump State: [${FanData[0]}]`, {toFile: true});
+
+		return true;
 	}
+
+	device.log(`Unknown Pump State: [${FanData[0]}]`, {toFile: true});
+
 	device.log(`Failed to read pump connection status...`);
+
 	return false;
 }
 
@@ -301,11 +310,12 @@ function GetFanSettings() {
 		// Reset if the system was disbled during runtime.
 		device.log("System Monitoring disabled, Clearing Connected Fans", {toFile: true});
 		ConnectedFans = [];
+
 		return false;
 	}
 
-	if(ConnectedFans.length != 0){
-		return;
+	if(ConnectedFans.length !== 0){
+		return true;
 	}
 
 	for(let i = 0; i < FanData.length; i++) {
@@ -317,6 +327,7 @@ function GetFanSettings() {
 			break;
 		case 4:
 			device.log("Device is still booting up. We'll refetch fan states later...", {toFile: true});
+			ConnectedFans = [];
 
 			return false;
 		case 7:
@@ -347,6 +358,7 @@ function PollFans() {
 		// Reset if the system was disbled during runtime.
 		device.log("System Monitoring disabled, Clearing Connected Fans", {toFile: true});
 		ConnectedFans = [];
+
 		return;
 	}
 
@@ -359,8 +371,6 @@ function PollFans() {
 			return;
 		}
 	}
-
-
 
 	// Read Fan RPM
 	const FanSpeeds = Corsair.FetchFanRPM();
@@ -384,10 +394,199 @@ function PollFans() {
 	//Set Fan Speeds
 	SendCoolingdata();
 
-	device.log(`took ${Date.now() - savedPollFanTimer}ms`)
+	device.log(`took ${Date.now() - savedPollFanTimer}ms`);
 }
 
-//0x00, 0x08, 0x06, 0x01, 0x1F, 0x00, 0x00, 0x00, 
+class StateManager{
+	constructor(){
+		/** @type {State[]} */
+		this.states = [];
+		/** @type {State?} */
+		this.currentState = null;
+		this.lastProcessTime = Date.now();
+		this.interval = 1000;
+	}
+	UpdateState(){
+		if (this.states.length > 0) {
+			this.currentState = this.states[this.states.length - 1];
+			this.interval = this.currentState.interval || 3000;
+			//device.log(`Set State Interval to ${this.interval}`);
+		} else {
+			this.currentState = null;
+		}
+	}
+	/**
+	 * @param {State} newState
+	 */
+	Push(newState){
+		if(!newState){
+			return;
+		}
+
+		this.states.push(newState);
+		this.UpdateState();
+
+
+	}
+	/**
+	 * @param {State} newState
+	 */
+	Replace(newState){
+		this.states.pop();
+		this.Push(newState);
+	}
+	Pop(){
+		this.states.pop();
+		this.UpdateState();
+	}
+
+	Shift(){
+		const state = this.states.shift();
+
+		if(state){
+			this.Push(state);
+		}
+	}
+
+	process(){
+		//Break if were not ready to process this state
+		if(Date.now() - this.lastProcessTime < this.interval) {
+			return;
+		}
+		const startTime = Date.now();
+
+		if(this.currentState !== null){
+			this.currentState.run();
+		}
+
+		this.lastProcessTime = Date.now();
+		device.log(`State Took [${Date.now() - startTime}]ms to process`);
+
+	}
+}
+const StateMgr = new StateManager();
+
+class State{
+	/**
+	 * @param {StateManager} controller
+	 * @param {number} interval
+	 */
+	constructor(controller, interval){
+		this.controller = controller;
+		this.interval = interval;
+	}
+	run(){
+
+	}
+}
+class StateSystemMonitoringDisabled extends State{
+	constructor(controller){
+		super(controller, 5000);
+	}
+	run(){
+		// Stay here until fan control is enabled.
+		if(!device.fanControlDisabled()) {
+			device.log(`Fan Control Enabled, Fetching Connected Fans...`);
+			this.controller.Replace(new StateEnumerateConnectedFans(this.controller));
+
+		}
+	};
+};
+
+class StateEnumerateConnectedFans extends State{
+	constructor(controller){
+		super(controller, 1000);
+	}
+	run(){
+		// Add Blocking State if fan control is disabled
+		if(device.fanControlDisabled()) {
+			device.log(`Fan Control Disabled. Resetting Connected Fans...`);
+			this.controller.Push(new StateSystemMonitoringDisabled(this.controller));
+		}
+
+		if(GetFanSettings()){
+			device.log(`Found Connected Fans. Starting Polling Loop...`);
+			this.controller.Pop();
+		}else{
+			device.log(`Connected Fans are still being initialized by the controller. Delaying Detection!`, {toFile: true});
+			// delay next poll operation to give the device time to finish booting.
+			this.interval = 5000;
+		}
+	};
+}
+
+
+class StatePollFanSpeeds extends State{
+	constructor(controller){
+		super(controller, 2000);
+	}
+	run(){
+		// Add Blocking State if fan control is disabled
+		if(device.fanControlDisabled()) {
+			device.log(`Fan Control Disabled. Resetting Connected Fans...`);
+			this.controller.Replace(new StateSystemMonitoringDisabled(this.controller));
+		}
+
+		// Read Fan RPM
+		const FanSpeeds = Corsair.FetchFanRPM();
+
+		for(let i = 0; i < FanSpeeds.length; i++) {
+			const fanRPM = FanSpeeds[i];
+
+			if(fanRPM > 0) {
+				device.log(`${FanControllerArray[i]} is running at rpm ${fanRPM}`);
+			}
+
+			device.setRPM(FanControllerArray[i], fanRPM);
+		}
+
+		this.controller.Shift();
+
+	};
+};
+
+class StatePollTempProbes extends State{
+	constructor(controller){
+		super(controller, 2000);
+	}
+	run(){
+		// Add Blocking State if fan control is disabled
+		if(device.fanControlDisabled()) {
+			device.log(`Fan Control Disabled. Resetting Connected Fans...`);
+			this.controller.Push(new StateSystemMonitoringDisabled(this.controller));
+		}
+
+		// Read Temperature Probes
+		const Temperatures = Corsair.FetchTemperatures();
+		Temperatures.forEach(function (temp, iIdx) {
+			device.log(`Temp ${iIdx + 1} is ${temp}C`);
+		});
+
+		this.controller.Shift();
+
+	};
+};
+
+class StateSetFanSpeeds extends State{
+	constructor(controller){
+		super(controller, 2000);
+	}
+	run(){
+		// Add Blocking State if fan control is disabled
+		if(device.fanControlDisabled()) {
+			device.log(`Fan Control Disabled. Resetting Connected Fans...`);
+			this.controller.Push(new StateSystemMonitoringDisabled(this.controller));
+		}
+
+		//Set Fan Speeds
+		SendCoolingdata();
+
+		this.controller.Shift();
+
+	};
+};
+
+//0x00, 0x08, 0x06, 0x01, 0x1F, 0x00, 0x00, 0x00,
 function SendCoolingdata() {
 
 	const CoolingData = [
@@ -411,8 +610,9 @@ function SendCoolingdata() {
 	}
 
 	Corsair.WriteEndpoint("Background", Corsair.Endpoints.FanSpeeds, CoolingData);
-	
+
 }
+
 function decimalToHex(d, padding) {
 	let hex = Number(d).toString(16);
 	padding = typeof (padding) === "undefined" || padding === null ? padding = 2 : padding;
@@ -1112,8 +1312,11 @@ export class ModernCorsairProtocol{
 		if(typeof Handle === "string"){
 			Handle = this.Handles[Handle];
 		}
+
+		ClearReadBuffer(1);
+
 		let packet = [0x00, this.ConnectionType, this.CommandIds.checkHandle, Handle, 0x00];
-		device.read(packet, this.GetBufferSize());
+
 		device.write(packet, this.GetBufferSize());
 		packet = device.read(packet, this.GetBufferSize());
 
@@ -1159,6 +1362,8 @@ export class ModernCorsairProtocol{
 	 * @returns The entire packet read from the device.
 	 */
 	ReadEndpoint(Handle, Endpoint, Command) {
+
+
 		if(typeof Handle === "string"){
 			Handle = this.Handles[Handle];
 		}
@@ -1169,6 +1374,7 @@ export class ModernCorsairProtocol{
 		}
 
 		const ErrorCode = this.OpenHandle(Handle, Endpoint);
+
 
 		if(ErrorCode){
 			this.CloseHandle(Handle);
@@ -1181,6 +1387,7 @@ export class ModernCorsairProtocol{
 
 		let Data = [];
 		Data = device.read([0x00], this.GetBufferSize());
+
 
 		let RetryCount = 4;
 
@@ -1234,7 +1441,7 @@ export class ModernCorsairProtocol{
 
 		device.write(packet, this.GetBufferSize());
 		// Extra read to skip an empty packet.
-		device.read([0x00], this.GetBufferSize());
+		//device.read([0x00], this.GetBufferSize(), 5);
 
 		packet = device.read([0x00], this.GetBufferSize());
 
@@ -1509,6 +1716,25 @@ export class ModernCorsairProtocol{
 const Corsair = new ModernCorsairProtocol(options);
 
 // Helper Functions
+/**
+ *
+ * @param {number}timeout
+ */
+function ClearReadBuffer(timeout = 10){
+	let count = 0;
+	let LastRead = 1;
+
+	while(LastRead > 0){
+		device.read([0x00], 17, timeout);
+
+		LastRead = device.getLastReadSize();
+		count++;
+	}
+
+	// if(count > 1){
+	// 	device.log(`Cleared ${count} Read Packets!`);
+	// }
+}
 
 function Convert_To_16Bit(values) {
 	let returnValue = 0;
