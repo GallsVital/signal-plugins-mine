@@ -372,7 +372,7 @@ function hexToRgb(hex)
  *
  */
 
-class LogitechProtocol
+export class LogitechProtocol
 {
 	constructor(options = {})
 	{
@@ -1328,7 +1328,7 @@ class LogitechProtocol
  
 	SetDpiLightAlwaysOn(DPILight)
 	{
-		if(!Logitech.Config.HasDPILights)
+		if(!this.Config.HasDPILights)
 		{
 			return;
 		}
