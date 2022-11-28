@@ -388,7 +388,16 @@ function SendCoolingdata() {
 	Corsair.WriteEndpoint("Background", Corsair.Endpoints.FanSpeeds, CoolingData);
 	
 }
+function decimalToHex(d, padding) {
+	let hex = Number(d).toString(16);
+	padding = typeof (padding) === "undefined" || padding === null ? padding = 2 : padding;
 
+	while (hex.length < padding) {
+		hex = "0" + hex;
+	}
+
+	return "0x" + hex;
+}
 /**
  * @typedef Options
  * @type {Object}
