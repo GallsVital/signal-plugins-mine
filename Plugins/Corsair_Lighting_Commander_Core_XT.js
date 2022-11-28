@@ -174,7 +174,7 @@ function SendCoolingData() {
 	];
 
 	for(let fan = 0; fan < ConnectedFans.length; fan++) {
-		const fanLevel = (device.getFanlevel(FanControllerArray[ConnectedFans[fan]]));
+		const fanLevel = device.getFanlevel(FanControllerArray[ConnectedFans[fan]]);
 		//device.log(`Setting Fan ${ConnectedFans[fan] + 1} Level to ${fanLevel}%`);
 		CoolingData[5 + ConnectedFans[fan] * 4] = fanLevel;
 	}

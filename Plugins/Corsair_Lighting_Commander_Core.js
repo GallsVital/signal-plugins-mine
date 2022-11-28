@@ -325,16 +325,16 @@ function PollFans() {
 
 	savedPollFanTimer = Date.now();
 
-	if(device.fanControlDisabled()) {
-		return;
-	}
-
 	if(ConnectedFans.length === 0){
 		if(!GetFanSettings()){
 			device.log(`Connected Fans are still being initialized by the controller. Aborting Detection!`, {toFile: true});
 
 			return;
 		}
+	}
+
+	if(device.fanControlDisabled()) {
+		return;
 	}
 
 	// Read Fan RPM
@@ -351,22 +351,22 @@ function PollFans() {
 	}
 
 	// Read Temperature Probes
-	const Temperatures = Corsair.FetchTemperatures();
-	Temperatures.forEach(function (temp, iIdx) {
-		//device.log(`Temp ${iIdx + 1} is ${temp}C`);
-	});
+	// const Temperatures = Corsair.FetchTemperatures();
+	// Temperatures.forEach(function (temp, iIdx) {
+	// 	//device.log(`Temp ${iIdx + 1} is ${temp}C`);
+	// });
 
 	//Set Fan Speeds
 	SendCoolingdata();
 
-	//device.log(`Fan ${ConnectedFans[index]} RPM: ${rpm}, Level: ${(level).toFixed(2)}, took ${Date.now() - savedPollFanTimer}ms`)
+	device.log(`took ${Date.now() - savedPollFanTimer}ms`)
 }
 
-
+//0x00, 0x08, 0x06, 0x01, 0x1F, 0x00, 0x00, 0x00, 
 function SendCoolingdata() {
 
 	const CoolingData = [
-		0x00, 0x08, 0x06, 0x01, 0x1F, 0x00, 0x00, 0x00, 0x07, 0x00, 0x07,
+		0x07, 0x00, 0x07,
 		0x00, 0x00, 0x32, 0x00,
 		0x01, 0x00, 0x32, 0x00,
 		0x02, 0x00, 0x32, 0x00,
@@ -377,12 +377,16 @@ function SendCoolingdata() {
 	];
 
 	for(let fan = 0; fan < ConnectedFans.length; fan++) {
-		const fanLevel = (device.getNormalizedFanlevel(FanControllerArray[ConnectedFans[fan]]) * 100).toFixed(0);
-		//device.log(`${FanControllerArray[ConnectedFans[fan]]} level set to ${fanLevel}%`);
-		CoolingData[13 + ConnectedFans[fan] * 4] = fanLevel;
+		//const fanLevel = (device.getNormalizedFanlevel(FanControllerArray[ConnectedFans[fan]]) * 100).toFixed(0);
+		const fanLevel = device.getFanlevel(FanControllerArray[ConnectedFans[fan]]);
+
+		device.log(`${FanControllerArray[ConnectedFans[fan]]} level set to ${fanLevel}%`);
+
+		CoolingData[5 + ConnectedFans[fan] * 4] = fanLevel;
 	}
 
 	Corsair.WriteEndpoint("Background", Corsair.Endpoints.FanSpeeds, CoolingData);
+	
 }
 
 /**
