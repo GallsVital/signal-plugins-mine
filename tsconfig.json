@@ -8,7 +8,8 @@
 		"checkJs": true,
 		"declaration": true,
 		"outDir": "dist",
-		"noEmit": true,
+		//"noEmit": true,
+		"esModuleInterop": true,
 		"strictNullChecks": true,
 		"strictFunctionTypes": true,
 		//"noUncheckedIndexedAccess": true,
@@ -20,7 +21,8 @@
 			"@Mock/*": [
 				"./tests/*"
 			]
-		}
+		},
+
 	},
 
 	"exclude": [

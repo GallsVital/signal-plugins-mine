@@ -229,8 +229,9 @@ declare class Device{
 	 * @param ColorOrder The R,G,B order of the output array
 	 * @returns An array containing the given Color repeated the requested times.
 	 */
-	public createColorArray(HexColor: string, LedCount: number, ArrayOrder?: ArrayOrder, ColorOrder?: ColorOrder): number[]
-	
+	public createColorArray(HexColor: string, LedCount: number, ArrayOrder?: InlineArray, ColorOrder?: ColorOrder): number[]
+	public createColorArray(HexColor: string, LedCount: number, ArrayOrder?: SeparateArray, ColorOrder?: ColorOrder): number[][]
+
 	/**
 	 * Creates a new alert to relay an issue to the user. The returned AlertId should be stored in order to remove the alert when the issue is fixed.
 	 * @see {@link https://docs.signalrgb.com/plugins/utilities#devicenotify SignalRGB Documentation}

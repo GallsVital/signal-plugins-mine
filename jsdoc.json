@@ -2,32 +2,47 @@
     "tags": {
         "allowUnknownTags": true
     },
+    "mode": "typescript",
     "source": {
-        "include": ["types/"],
+        "include": ["./Plugins/ModernCorsairProtocol.js"],
         "exclude": ["./node_modules", "./docs"],
         "includePattern": "\\.(jsx|js|ts|tsx|d.ts)$"
     },
     "plugins": [
+        "plugins/markdown",
         "node_modules/better-docs/typescript",
-        "node_modules/better-docs/typedef-import",
-        "plugins/markdown"
+        "node_modules/better-docs/category",
+        "node_modules/better-docs/typedef-import"
     ],
     "opts": {
         "encoding": "utf8",
         "destination": "docs/",
-        "recurse": true,
+        "recurse": false,
         "verbose": true,
-        "template": "node_modules/better-docs"
+        "template": "./node_modules/better-docs"
+
     },
     "templates": {
-        "better-docs": {
-              "name": "SignalRGB Plugins"  
-        },
+        "cleverLinks": false,
+        "monospaceLinks": false,
         "search": true,
         "default": {
-          "staticFiles": {
-            "include": []
-          }
-      }
+            "staticFiles": {
+            }
+        },
+        "better-docs": {
+            "name": "SignalRGB Plugins",
+            "logo": "images/logo.png",
+            "title": "SignalRGB Plugins Documentation",
+            "css": "style.css",
+            "trackingCode": "",
+            "hideGenerator": false,
+            "navLinks": [
+                {
+                    "label": "Github",
+                    "href": "https://gitlab.com/signalrgb/signal-plugins"
+                }
+            ]
+        }
     }
-  }
+}
