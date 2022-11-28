@@ -4,7 +4,7 @@
     },
     "mode": "typescript",
     "source": {
-        "include": ["./Plugins/ModernCorsairProtocol.js"],
+        "include": ["./Protocols/ModernCorsairProtocol.js", "./Plugins/Logitech/Logitech_Wireless_Mouse_Dongle.js"],
         "exclude": ["./node_modules", "./docs"],
         "includePattern": "\\.(jsx|js|ts|tsx|d.ts)$"
     },

@@ -23,8 +23,8 @@ export function ControllableParameters(){
 }
 
 function hexToRgb(hex) {
-	let result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
-	let colors = [];
+	const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+	const colors = [];
 	colors[0] = parseInt(result[1], 16);
 	colors[1] = parseInt(result[2], 16);
 	colors[2] = parseInt(result[3], 16);
@@ -33,7 +33,7 @@ function hexToRgb(hex) {
 }
 
 // This is an array of key indexes for setting colors in our render array, indexed left to right, row top to bottom.
-let vKeys = [
+const vKeys = [
 	134, 135, 136, 137, 138, 139, 140, 141, 142, 143, 144, 145, 146, 147, 148, 149, 150, 151, 152, 153, 154, 155,
 	156,                      185, 178, 179,                                                                                167,
 	157,                  124, 184, 133, 180, 110,              186, 187, 188, 98,                                              168,
@@ -50,7 +50,7 @@ let vKeys = [
 ];
 
 
-let vKeyNames = [
+const vKeyNames = [
 	"lightBar1", "lightBar2", "lightBar3", "lightBar4", "lightBar5", "lightBar6", "lightBar7", "lightBar8", "lightBar9", "lightBar10", "lightBar11", "lightBar12", "lightBar13", "lightBar14", "lightBar15", "lightBar16", "lightBar17", "lightBar18", "lightBar19", "lightBar20", "lightBar21", "lightBar22",
 	"LeftBar1",             "Control Wheel 1", "Control Wheel 2", "Control Wheel 3",                                                                                 "RightBar 1",
 	"LeftBar2",   "Profile", "Control Wheel 8", "Control Wheel Center", "Control Wheel 4", "Lock",    "Logo 1", "Logo 2", "Logo 3",    "VOLUME_MUTE",                    "RightBar 2",
@@ -67,7 +67,7 @@ let vKeyNames = [
 	"ISO #", "ISO <"
 ];
 
-let vKeyPositions = [
+const vKeyPositions = [
 
 	[0, 0], [2, 0], [3, 0], [4, 0], [5, 0], [6, 0], [7, 0], [8, 0], [9, 0], [11, 0], [12, 0], [13, 0], [14, 0], [16, 0], [17, 0], [18, 0], [19, 0], [20, 0], [21, 0], [23, 0], [24, 0], [25, 0],
 	[0, 1],         [3, 1], [4, 1], [5, 1],                                                                                                                                                    [25, 1],
@@ -91,14 +91,14 @@ export function Validate(endpoint) {
 /** @type {Options} */
 const options = {
 	IsLightingController: true
-}
+};
 export function Initialize() {
 
 	Corsair.SetMode("Software");
 	Corsair.OpenHandle("Lighting", Corsair.Endpoints.LightingController);
 
 	Corsair.FetchFirmware();
-	
+
 	device.log(`Vid is [${decimalToHex(Corsair.FetchProperty("Vendor Id"), 4)}]`);
 	device.log(`Pid is [${decimalToHex(Corsair.FetchProperty("Product Id"), 4)}]`);
 
@@ -121,12 +121,12 @@ export function Shutdown() {
 
 function sendColors(shutdown = false){
 
-	let RGBData = [];
+	const RGBData = [];
 
 	for(let iIdx = 0; iIdx < vKeys.length; iIdx++) {
-		let iPxX = vKeyPositions[iIdx][0];
-		let iPxY = vKeyPositions[iIdx][1];
-		var mxPxColor;
+		const iPxX = vKeyPositions[iIdx][0];
+		const iPxY = vKeyPositions[iIdx][1];
+		let mxPxColor;
 
 		if(shutdown){
 			mxPxColor = hexToRgb(shutdownColor);
@@ -135,7 +135,10 @@ function sendColors(shutdown = false){
 		}else{
 			mxPxColor = device.color(iPxX, iPxY);
 		}
-		RGBData.push(...mxPxColor);
+
+		RGBData[(vKeys[iIdx]+4) * 3] = mxPxColor[0];
+		RGBData[(vKeys[iIdx]+4) * 3 + 1] = mxPxColor[1];
+		RGBData[(vKeys[iIdx]+4) * 3 + 2] = mxPxColor[2];
 	}
 
 	Corsair.SendRGBData(RGBData);
