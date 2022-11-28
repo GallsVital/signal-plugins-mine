@@ -79,13 +79,6 @@ const options = {
 	IsLightingController: true
 };
 
-// Account for different firmware versions between product Id's
-if(device.productId() == 0x0C1C){
-	options.developmentFirmwareVersion = "2.10.219"
-}else if(device.productId() == 0x0C32){
-	options.developmentFirmwareVersion = "2.0.17"
-}
-
 function compareVersion(a, b) {
 	return compareVersionRecursive(a.split("."), b.split(".")) >= 0;
 }
@@ -104,6 +97,13 @@ function compareVersionRecursive(a, b) {
 
 export function Initialize() {
 
+	// Account for different firmware versions between product Id's
+	if(device.productId() == 0x0C1C){
+		Corsair.config.developmentFirmwareVersion = "2.10.219"
+	}else if(device.productId() == 0x0C32){
+		Corsair.config.developmentFirmwareVersion = "2.0.17"
+	}
+	
 	Corsair.SetMode("Software");
 	Corsair.OpenHandle("Lighting", Corsair.Endpoints.LightingController);
 
