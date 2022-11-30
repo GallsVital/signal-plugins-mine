@@ -56,7 +56,7 @@
         "no-dupe-keys": "error",
         "prefer-const":"warn",
         "yoda":["warn", "never", { "onlyEquality": true }],
-        "complexity": ["warn",{"max":10}],
+        "complexity": ["warn",{"max":12}],
         "no-return-assign": "error",
         "no-constant-binary-expression": "error",
         "for-direction": "error",

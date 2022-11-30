@@ -12,7 +12,7 @@ declare interface LogOptions{
 }
 declare type ImageFormat = "JPEG" | "PNG" | "BMP"
 
-declare type DeviceFeature = "Battery" | "mouse";
+declare type DeviceFeature = "battery" | "mouse";
 declare type hexToRgb = (HexString: string) => ColorArray;
 
 declare type ChannelConfig = {0: ChannelId, 1: number};
