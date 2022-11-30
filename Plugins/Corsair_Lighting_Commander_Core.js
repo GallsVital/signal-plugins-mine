@@ -479,8 +479,12 @@ class State{
 class StateSystemMonitoringDisabled extends State{
 	constructor(controller){
 		super(controller, 5000);
+		// Reset Connected fans on creation
+		// this should only be created if the monitoring system is disabled
+		ConnectedFans = [];
 	}
 	run(){
+
 		// Stay here until fan control is enabled.
 		if(!device.fanControlDisabled()) {
 			device.log(`Fan Control Enabled, Fetching Connected Fans...`);
