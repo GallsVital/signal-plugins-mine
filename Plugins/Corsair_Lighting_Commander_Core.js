@@ -99,7 +99,6 @@ export function Initialize() {
 	StateMgr.Push(new StateSetFanSpeeds(StateMgr));
 	StateMgr.Push(new StatePollTempProbes(StateMgr));
 	StateMgr.Push(new StatePollFanSpeeds(StateMgr));
-	StateMgr.Push(new StateSystemMonitoringDisabled(StateMgr));
 
 	// Account for different firmware versions between product Id's
 	if(device.productId() === 0x0C1C){
@@ -425,8 +424,6 @@ class StateManager{
 
 		this.states.push(newState);
 		this.UpdateState();
-
-
 	}
 	/**
 	 * @param {State} newState
@@ -502,6 +499,8 @@ class StateEnumerateConnectedFans extends State{
 		if(device.fanControlDisabled()) {
 			device.log(`Fan Control Disabled. Resetting Connected Fans...`);
 			this.controller.Push(new StateSystemMonitoringDisabled(this.controller));
+
+			return;
 		}
 
 		if(GetFanSettings()){
@@ -524,7 +523,17 @@ class StatePollFanSpeeds extends State{
 		// Add Blocking State if fan control is disabled
 		if(device.fanControlDisabled()) {
 			device.log(`Fan Control Disabled. Resetting Connected Fans...`);
-			this.controller.Replace(new StateSystemMonitoringDisabled(this.controller));
+			this.controller.Push(new StateSystemMonitoringDisabled(this.controller));
+
+			return;
+		}
+
+		// Add Blocking State if we have no connected fans detected
+		if(ConnectedFans.length === 0){
+			device.log(`No Connected Fans Known. Fetching Connected Fans... `);
+			this.controller.Push(new StateEnumerateConnectedFans(this.controller));
+
+			return;
 		}
 
 		// Read Fan RPM
@@ -554,6 +563,16 @@ class StatePollTempProbes extends State{
 		if(device.fanControlDisabled()) {
 			device.log(`Fan Control Disabled. Resetting Connected Fans...`);
 			this.controller.Push(new StateSystemMonitoringDisabled(this.controller));
+
+			return;
+		}
+
+		// Add Blocking State if we have no connected fans detected
+		if(ConnectedFans.length === 0){
+			device.log(`No Connected Fans Known. Fetching Connected Fans... `);
+			this.controller.Push(new StateEnumerateConnectedFans(this.controller));
+
+			return;
 		}
 
 		// Read Temperature Probes
@@ -576,6 +595,16 @@ class StateSetFanSpeeds extends State{
 		if(device.fanControlDisabled()) {
 			device.log(`Fan Control Disabled. Resetting Connected Fans...`);
 			this.controller.Push(new StateSystemMonitoringDisabled(this.controller));
+
+			return;
+		}
+
+		// Add Blocking State if we have no connected fans detected
+		if(ConnectedFans.length === 0){
+			device.log(`No Connected Fans Known. Fetching Connected Fans... `);
+			this.controller.Push(new StateEnumerateConnectedFans(this.controller));
+
+			return;
 		}
 
 		//Set Fan Speeds
