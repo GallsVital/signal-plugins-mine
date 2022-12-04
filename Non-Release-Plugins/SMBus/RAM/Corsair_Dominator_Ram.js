@@ -13,7 +13,7 @@ export function ControllableParameters(){
 		{"property":"LightingMode", "group":"lighting", "label":"Lighting Mode", "type":"combobox", "values":["Canvas", "Forced"], "default":"Canvas"},
 		{"property":"forcedColor", "group":"lighting", "label":"Forced Color", "min":"0", "max":"360", "type":"color", "default":"009bde"},
 		{"property":"forceRam", "group":"settings", "label":"Force Ram Model", "type":"boolean", "default":"false"},
-		{"property":"forcedRamType", "group":"settings", "label":"Forced Ram Model", "type":"combobox", "values": ["Dominator Platinum", "Vengeance Pro SR", "Vengeance Pro SL"], "default":"Dominator Platinum"}
+		{"property":"forcedRamType", "group":"settings", "label":"Forced Ram Model", "type":"combobox", "values": DominatorProtocol.ModelNames, "default":"Dominator Platinum"}
 	];
 }
 
@@ -29,18 +29,15 @@ let vLedNames = [];
 let vLedPositions = [];
 
 export function onforceRamChanged(){
-	SetupForcedRamType();
+	SetupRamModel();
 }
 
 export function onforcedRamTypeChanged(){
-	SetupForcedRamType();
+	SetupRamModel();
 }
 
 export function Initialize() {
-	DetermineRamType();
-	SetDeviceSettings();
-
-	SetupForcedRamType();
+	SetupRamModel();
 }
 
 export function Render() {
@@ -70,7 +67,7 @@ export function Scan(bus) {
 	  }
 
 	  // Add address if it matches expected values
-	  if(CheckForDominatorRam(bus, address)){
+	  if(DominatorProtocol.CheckForDominatorRam(bus, address)){
 			bus.log("Dominator Ram Found At Address: " + address);
 			FoundAddresses.push(address);
 	  }
@@ -79,64 +76,9 @@ export function Scan(bus) {
 	return FoundAddresses;
 }
 
-
-function CheckForDominatorRam(bus, address){
-	const vendorByte = bus.ReadByte(address, DominatorProtocol.Registers.Vender);
-	bus.log(`Address ${address} has Vendor Byte ${vendorByte}`, {toFile: true});
-
-	if (vendorByte !== DominatorProtocol.VendorId){
-		return false;
-	}
-
-	const modelByte = bus.ReadByte(address, DominatorProtocol.Registers.Model);
-	bus.log(`Address ${address} has Model Byte ${modelByte}`, {toFile: true});
-
-	return DominatorProtocol.ModelIds.includes(modelByte);
-}
-
-
-function DetermineRamType(){
-	// This Check only works if all sticks are the same.
-	// Mapping individual part numbers to specific sticks ins't supported.
-	const RamPartNumber = bus.FetchRamInfo();
-	device.log(`Found Ram Part Number: [${RamPartNumber}]`);
-
-	// We only care about the first 3 Characters
-	const RamTypeString = RamPartNumber.slice(0, 3);
-
-	if(DominatorProtocol.Models[RamTypeString] !== null){
-		DominatorProtocol.SetModel(RamTypeString);
-		device.log(`Found Ram Type: [${DominatorProtocol.Config.Model.name}]`);
-	}else{
-		device.log(`Invalid Ram Type defaulting to Corsair Dominator`);
-	}
-}
-
-
-function SetDeviceSettings(){
-	device.setName(DominatorProtocol.Config.Model.name);
-	device.setSize([2, DominatorProtocol.Config.Model.ledCount]);
-
-	CreateLeds();
-}
-
-function CreateLeds(){
-	// Bash Old Led Info
-	vLedNames = [];
-	vLedPositions = [];
-
-	for(let iIdx = 0; iIdx < DominatorProtocol.Config.Model.ledCount; iIdx++){
-		vLedNames.push(`Led ${iIdx + 1}`);
-		vLedPositions.push([0, iIdx]);
-	}
-
-	// Tell SignalRGB We Changed These.
-	device.setControllableLeds(vLedNames, vLedPositions);
-}
-
 function SendColors(shutdown = false){
 
-	const RGBData = [];
+	const RGBData = new Array(38).fill(0);
 
 	//Fetch Colors
 	for(let iIdx = 0; iIdx < vLedPositions.length; iIdx++){
@@ -160,20 +102,22 @@ function SendColors(shutdown = false){
 	DominatorProtocol.SendRGBData(RGBData);
 }
 
-function SetupForcedRamType(){
-	if(!forceRam){
-		DetermineRamType();
-	}else{
-		DominatorProtocol.Config.Model = DominatorProtocol.StringToModel[forcedRamType];
-	}
+function SetupRamModel(){
 
-	SetDeviceSettings();
+	if(!forceRam){
+		DominatorProtocol.SetRamToSystemId();
+	}else{
+		const Model = DominatorProtocol.GetRamModelByName(forcedRamType);
+		DominatorProtocol.SetModelId(Model ? Model.id : "");
+	}
 }
 
 class DominatorRamModel{
-	constructor(name, ledCount){
+	constructor(name, ledCount, id){
 		this.name = name;
+		this.shortName = name.replace("Corsair ", "");
 		this.ledCount = ledCount;
+		this.id = id;
 	}
 }
 
@@ -212,20 +156,21 @@ export class CorsairDominatorProtocol{
 		/**
 		 * Contains Known Ram Models using the Corsair Dominator Protocol
 		 */
-		this.Models = {
-			"CMT" : new DominatorRamModel("Corsair Dominator Platinum RGB", 12),
-			"CMH" : new DominatorRamModel("Corsair Vengeance Pro SL", 10),
-			"CMG" : new DominatorRamModel("Corsair Vengeance Pro SR", 6),
+		 this.Models = {
+			"CMT" : new DominatorRamModel("Corsair Dominator Platinum RGB", 12, "CMT"),
+			"CMH" : new DominatorRamModel("Corsair Vengeance Pro SL", 10, "CMH"),
+			"CMN" : new DominatorRamModel("Corsair Vengeance RGB RT", 10, "CMN"),
+			"CMG" : new DominatorRamModel("Corsair Vengeance RGB RS", 6, "CMG"),
 		};
 
-		this.StringToModel = {
-			"Dominator Platinum" : this.Models["CMT"],
-			"Vengeance Pro SL" : this.Models["CMH"],
-			"Vengeance Pro SR" : this.Models["CMG"],
-		};
+		this.ModelNames = [];
+
+		for(const RamModel of Object.values(this.Models)){
+			this.ModelNames.push(RamModel.shortName);
+		}
 
 		this.Config = {
-			Model: this.StringToModel["Dominator Platinum"]
+			Model: this.Models["CMT"]
 		};
 
 		this.PecTable = [
@@ -241,20 +186,76 @@ export class CorsairDominatorProtocol{
 			152, 159, 138, 141, 132, 131, 222, 217, 208, 215, 194, 197, 204, 203, 230, 225, 232, 239, 250, 253, 244, 243
 		];
 	}
+
+	GetRamModelByName(ModelName){
+		for(const RamModel of Object.values(this.Models)){
+			if(RamModel.name === ModelName || RamModel.shortName === ModelName){
+				return RamModel;
+			}
+		}
+
+		return null;
+	}
+	GetModelIdFromSystem(){
+	// This Check only works if all sticks are the same.
+	// Mapping individual part numbers to specific sticks ins't supported.
+		const RamPartNumber = bus.FetchRamInfo();
+		device.log(`Found Ram Part Number: [${RamPartNumber}]`);
+
+		// We only care about the first 3 Characters
+		return RamPartNumber.slice(0, 3);
+	}
+
+	SetRamToSystemId(){
+		const ModelId = this.GetModelIdFromSystem();
+		this.SetModelId(ModelId);
+
+	}
 	/**
 	 * Sets the current ram type to the ModelId given
 	 * @param {string} ModelId 3 character ram ModelId
 	 */
-	SetModel(ModelId){
-		if(!this.Models.hasOwnProperty(ModelId)){
-			device.log(`CorsairDominatorProtocol: SetModel(): Unknown Model Id [${ModelId}]`);
+	SetModelId(ModelId){
+		if(!this.HasModel(ModelId)){
+			device.log(`CorsairDominatorProtocol: SetModelId(): Unknown Model Id [${ModelId}]`);
+			this.SetModelId("CMT"); // Default to Dominator Plat
 
 			return;
 		}
 
 		this.Config.Model = this.Models[ModelId];
+		// Update Device Info anytime the model changes
+		this.SetDeviceSettings();
+
 	}
 
+	HasModel(ModelId){
+		return this.Models.hasOwnProperty(ModelId);
+	}
+	SetDeviceSettings(){
+		const Model = this.Config.Model;
+
+		device.setName(Model.name);
+		device.setSize([2, Model.ledCount]);
+
+		this.CreateLeds();
+	}
+
+	CreateLeds(){
+		// Bash Old Led Info
+		vLedNames = [];
+		vLedPositions = [];
+
+		const Model = this.Config.Model;
+
+		for(let iIdx = 0; iIdx < Model.ledCount; iIdx++){
+			vLedNames.push(`Led ${iIdx + 1}`);
+			vLedPositions.push([0, iIdx]);
+		}
+
+		// Tell SignalRGB We Changed These.
+		device.setControllableLeds(vLedNames, vLedPositions);
+	}
 	/**
 	 * Sends the given RGB data to the device.
 	 * @param {number[]} RGBData RGB array containing 'RGBRGBRGB' style colors. Array cannot be larger then 36 bytes.
@@ -263,11 +264,10 @@ export class CorsairDominatorProtocol{
 		const packet = [];
 		packet[0] = this.Commands.DirectRGB;
 
-		packet.push(...RGBData.slice(0, 36));
+		packet.push(...RGBData);
 
 		// Calc CRC.
 		packet[37] = this.CalculateCRC(packet);
-
 		bus.WriteBlock(this.Registers.DirectRGB, 32, packet.splice(0, 32));
 		bus.WriteBlock(this.Registers.DirectRGB + 1, 6, packet.splice(0, 6));
 	}
@@ -285,6 +285,19 @@ export class CorsairDominatorProtocol{
 		}
 
 		return iCrc;
+	}
+	CheckForDominatorRam(bus, address){
+		const vendorByte = bus.ReadByte(address, this.Registers.Vender);
+		bus.log(`Address ${address} has Vendor Byte ${vendorByte}`, {toFile: true});
+
+		if (vendorByte !== this.VendorId){
+			return false;
+		}
+
+		const modelByte = bus.ReadByte(address, this.Registers.Model);
+		bus.log(`Address ${address} has Model Byte ${modelByte}`, {toFile: true});
+
+		return this.ModelIds.includes(modelByte);
 	}
 }
 
