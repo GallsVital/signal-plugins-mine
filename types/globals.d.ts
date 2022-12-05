@@ -19,6 +19,7 @@ declare type ChannelConfig = {0: ChannelId, 1: number};
 declare type ChannelConfigArray = ChannelConfig[];
 
 declare type AlertPriority = 0 | 1;
+declare type AlertAction = "Settings" | "Documentation"
 declare type AlertId = string;
 declare type MessageId = string;
 declare type InlineArray = "Inline";

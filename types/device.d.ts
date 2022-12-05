@@ -84,7 +84,14 @@ declare class Device{
 	 * @return The number of bytes read.
 	 */
 	public getLastReadSize(): number
-
+	/**
+	 * Sets the device to a non-blocking read mode and quickly discards all queued Hid packets.
+	 * 
+	 * This should be done before every important read operation where you need to get data back from the device to prevent a stale packet from being read instead.
+	 * 
+	 * Only works for HID type devices that use Write/Read calls. 
+	 */
+	public clearReadBuffer(): void
 	/**
 	 * Changes the currently active USB Endpoint being used for HID commands. These Endpoints must have been already opened by the exported Validate(Endpoint) function.
 	 * @see {@link https://docs.signalrgb.com/plugins/utilities#deviceset_endpoint SignalRGB Documentation}
@@ -238,9 +245,10 @@ declare class Device{
 	 * @param Title The Alerts Title.
 	 * @param Description The Alerts description text.
 	 * @param Priority The Alerts priority level. Valid values are 0 (Info) and 1 (Critical)
+	 * @param Action Determines what action the "details" button performs in the alert. Current options are to open the "Settings" page, or open the devices "Documentation" URL.
 	 * @returns The created alertId string.
 	 */
-	public notify(Title: string, Description: string, Priority: AlertPriority): AlertId
+	public notify(Title: string, Description: string, Priority: AlertPriority, Action: AlertAction): AlertId
 
 	/**
 	 * Removes an alert with the given Id if one exists.
@@ -325,4 +333,6 @@ declare class Device{
 	 * @returns The Image's data saved into an array
 	 */
 	public ConvertColorToImageBuffer(HexString: string, ImageWidth: number, ImageHeight: number, ImageFormat: ImageFormat): number[]
+
+	getHidEndpoints(): HidEndpoint[]
 }
