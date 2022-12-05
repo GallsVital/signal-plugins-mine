@@ -1,7 +1,7 @@
 {
-    "ProductName": "Lian Li GPU Strimer Plus",
-    "DisplayName": "Lian Li GPU Strimer Plus - 27 LED",
-    "Brand" : "Lian Li",
+    "ProductName": "LianLi GPU Strimer Plus",
+    "DisplayName": "LianLi GPU Strimer Plus - 27 LED",
+    "Brand" : "LianLi",
     "Type" : "Strip",
     "LedCount" : 27,
     "Width": 1,
