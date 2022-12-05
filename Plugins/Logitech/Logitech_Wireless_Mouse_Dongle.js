@@ -44,6 +44,7 @@ export function ControllableParameters()
 	];
 }
 
+let Sniper = false;
 let DPIStage = 1;
 let DeviceConnected = false;
 let savedPollTimer = Date.now();
