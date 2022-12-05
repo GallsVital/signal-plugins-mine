@@ -1,5 +1,3 @@
-const filePath = "./Corsair_K95_Plat_XT_Keyboard.js";
-
 class MockDevice{
 
 	set_endpoint = jest.fn().mockImplementation((_interface, usage, usage_page) => {
@@ -30,7 +28,7 @@ global.LightingMode = "Canvas";
 describe("Corsair K95 Plat XT", () => {
 	describe("Device Initialization", ()=>{
 		it("Initialize", () => {
-			const pluginfile = require("./Corsair_K95_Plat_XT_Keyboard.js");
+			const pluginfile = require("./Corsair/Modern_Corsair/Corsair_K95_Plat_XT_Keyboard.js");
 
 			pluginfile.Initialize();
 
