@@ -151,9 +151,11 @@ describe("Corsair Dominator Ram", () => {
 
 		const CorsairRam = new CorsairDominatorProtocol();
 		expect(CorsairRam.Config.Model.name).toBe("Corsair Dominator Platinum RGB"); // Check Default is in place
-		CorsairRam.SetModel("CMG");
-		expect(CorsairRam.Config.Model.name).toBe("Corsair Vengeance Pro SR"); // Model was set to Veng Pro SR
-		CorsairRam.SetModel("ASDF");
+		CorsairRam.SetModelId("CMG");
+		expect(CorsairRam.Config.Model.name).toBe("Corsair Vengeance RGB RS"); // Model was set to Veng Pro RS
+		CorsairRam.SetModelId("CMN");
+		expect(CorsairRam.Config.Model.name).toBe("Corsair Vengeance RGB RT"); // Model was set to Veng Pro RT
+		CorsairRam.SetModelId("ASDF");
 		expect(CorsairRam.Config.Model.name).toBe("Corsair Dominator Platinum RGB"); // Model was Unchanged when passing an invalid model type
 	});
 	it("SendRGBData", () => {
@@ -174,7 +176,7 @@ describe("Corsair Dominator Ram", () => {
 		const CorsairDominator = new CorsairDominatorProtocol();
 		const bus = new MockBus();
 		global.bus = bus;
-		CorsairDominator.SetModel("");
+		CorsairDominator.SetModelId("");
 		CorsairDominator.SendRGBData(RGBData);
 
 		// 2 packets per frame
@@ -214,7 +216,7 @@ describe("Corsair Dominator Ram", () => {
 		expect(Plugin.LedNames().length).toBe(6);
 		expect(Plugin.LedPositions().length).toBe(6);
 		expect(device.setName.mock.calls.length).toBe(3);
-		expect(device.setName.mock.lastCall).toEqual(["Corsair Vengeance Pro SR"]);
+		expect(device.setName.mock.lastCall).toEqual(["Corsair Vengeance RGB RS"]);
 	});
 
 	it("SetupForcedRamType Using Forced Mode", () => {
@@ -223,6 +225,7 @@ describe("Corsair Dominator Ram", () => {
 
 		Plugin.onforceRamChanged();
 		// Expect Led Count and name to use the Corsair Vengeance Pro SL config
+
 		expect(Plugin.LedNames().length).toBe(10);
 		expect(Plugin.LedPositions().length).toBe(10);
 		expect(device.setName.mock.calls.length).toBe(1);
@@ -241,7 +244,7 @@ describe("Corsair Dominator Ram", () => {
 		expect(Plugin.LedNames().length).toBe(6);
 		expect(Plugin.LedPositions().length).toBe(6);
 		expect(device.setName.mock.calls.length).toBe(1);
-		expect(device.setName.mock.calls[0]).toEqual(["Corsair Vengeance Pro SR"]);
+		expect(device.setName.mock.calls[0]).toEqual(["Corsair Vengeance RGB RS"]);
 	});
 
 	it("SetupForcedRamType Using FetchRamInfo With Invalid Type", () => {

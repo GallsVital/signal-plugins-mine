@@ -13,7 +13,7 @@ export function ControllableParameters(){
 		{"property":"LightingMode", "group":"lighting", "label":"Lighting Mode", "type":"combobox", "values":["Canvas", "Forced"], "default":"Canvas"},
 		{"property":"forcedColor", "group":"lighting", "label":"Forced Color", "min":"0", "max":"360", "type":"color", "default":"009bde"},
 		{"property":"forceRam", "group":"settings", "label":"Force Ram Model", "type":"boolean", "default":"false"},
-		{"property":"forcedRamType", "group":"settings", "label":"Forced Ram Model", "type":"combobox", "values": ["Dominator Platinum", "Vengeance Pro SR", "Vengeance Pro SL"], "default":"Dominator Platinum"}
+		{"property":"forcedRamType", "group":"settings", "label":"Forced Ram Model", "type":"combobox", "values": DominatorProtocol.ModelNames, "default":"Dominator Platinum"}
 	];
 }
 
@@ -102,17 +102,22 @@ function SendColors(shutdown = false){
 	DominatorProtocol.SendRGBData(RGBData);
 }
 
-export function SetupRamModel(){
+function SetupRamModel(){
+	device.log(forcedRamType);
+
 	if(!forceRam){
 		DominatorProtocol.SetRamToSystemId();
 	}else{
-		DominatorProtocol.SetModel(DominatorProtocol.GetRamIdByName(forcedRamType));
+		const Model = DominatorProtocol.GetRamModelByName(forcedRamType);
+		device.log(Model);
+		DominatorProtocol.SetModelId(Model ? Model.id : "");
 	}
 }
 
 class DominatorRamModel{
 	constructor(name, ledCount, id){
 		this.name = name;
+		this.shortName = name.replace("Corsair ", "");
 		this.ledCount = ledCount;
 		this.id = id;
 	}
@@ -153,20 +158,21 @@ export class CorsairDominatorProtocol{
 		/**
 		 * Contains Known Ram Models using the Corsair Dominator Protocol
 		 */
-		this.Models = {
+		 this.Models = {
 			"CMT" : new DominatorRamModel("Corsair Dominator Platinum RGB", 12, "CMT"),
 			"CMH" : new DominatorRamModel("Corsair Vengeance Pro SL", 10, "CMH"),
-			"CMG" : new DominatorRamModel("Corsair Vengeance Pro SR", 6, "CMG"),
+			"CMN" : new DominatorRamModel("Corsair Vengeance RGB RT", 10, "CMN"),
+			"CMG" : new DominatorRamModel("Corsair Vengeance RGB RS", 6, "CMG"),
 		};
 
-		this.StringToModel = {
-			"Dominator Platinum" : this.Models["CMT"],
-			"Vengeance Pro SL" : this.Models["CMH"],
-			"Vengeance Pro SR" : this.Models["CMG"],
-		};
+		this.ModelNames = [];
+
+		for(const RamModel of Object.values(this.Models)){
+			this.ModelNames.push(RamModel.shortName);
+		}
 
 		this.Config = {
-			Model: this.StringToModel["Dominator Platinum"]
+			Model: this.Models["CMT"]
 		};
 
 		this.PecTable = [
@@ -182,9 +188,12 @@ export class CorsairDominatorProtocol{
 			152, 159, 138, 141, 132, 131, 222, 217, 208, 215, 194, 197, 204, 203, 230, 225, 232, 239, 250, 253, 244, 243
 		];
 	}
-	GetRamIdByName(ModelName){
-		if(this.StringToModel.hasOwnProperty(ModelName)){
-			return this.StringToModel[ModelName].id;
+
+	GetRamModelByName(ModelName){
+		for(const RamModel of Object.values(this.Models)){
+			if(RamModel.name === ModelName || RamModel.shortName === ModelName){
+				return RamModel;
+			}
 		}
 
 		return null;
@@ -201,24 +210,24 @@ export class CorsairDominatorProtocol{
 
 	SetRamToSystemId(){
 		const ModelId = this.GetModelIdFromSystem();
-		this.SetModel(ModelId);
+		this.SetModelId(ModelId);
 
 	}
 	/**
 	 * Sets the current ram type to the ModelId given
 	 * @param {string} ModelId 3 character ram ModelId
 	 */
-	SetModel(ModelId){
+	SetModelId(ModelId){
 		if(!this.HasModel(ModelId)){
-			device.log(`CorsairDominatorProtocol: SetModel(): Unknown Model Id [${ModelId}]`);
-			this.SetModel("CMT"); // Default to Dominator Plat
+			device.log(`CorsairDominatorProtocol: SetModelId(): Unknown Model Id [${ModelId}]`);
+			this.SetModelId("CMT"); // Default to Dominator Plat
 
 			return;
 		}
 
 		this.Config.Model = this.Models[ModelId];
 		// Update Device Info anytime the model changes
-		DominatorProtocol.SetDeviceSettings();
+		this.SetDeviceSettings();
 
 	}
 
