@@ -2,7 +2,7 @@ export function Name() { return "PNY GPU"; }
 export function Publisher() { return "WhirlwindFX"; }
 export function Documentation(){ return "troubleshooting/asus"; }
 export function Type() { return "SMBUS"; }
-export function Size() { return [1, 1]; }
+export function Size() { return [3, 1]; }
 export function DefaultPosition(){return [5, 2];}
 export function DefaultScale(){return 2.5;}
 export function LedNames() { return vLedNames; }
@@ -21,7 +21,7 @@ export function ControllableParameters() {
 }
 
 const vLedNames = [ "GPU" ];
-const vLedPositions = [ [3, 1]];
+const vLedPositions = [ [1, 0] ];
 
 /** @param {FreeAddressBus} bus */
 export function Scan(bus) {

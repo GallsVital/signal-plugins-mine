@@ -29,7 +29,7 @@ export function ConflictingProcesses()
 
 const devicePIDs =
 [
-	0x7B93, 0x7C34, 0x7C35, 0x7C36, 0x7C37, 0x7C56, 0x7C59, 0x7C70, 0x7C71, 0x7C73, 0x7C75, 0x7C76, 0x7C77, 0x7C79, 0x7C80, 0x7C81, 0x7C82, 0x7C83, 0x7C84, 0x7C85, 0x7C86, 0x7C88, 0x7C89, 0x7C90, 0x7C91, 0x7C92, 0x7C94, 0x7C95, 0x7C98, 0x7C99, 0x7D03, 0x7D04, 0x7D05, 0x7D06, 0x7D07, 0x7D08, 0x7D09, 0x7D10, 0x7D11, 0x7D12, 0x7D13, 0x7D14, 0x7D15, 0x7D16, 0x7D17, 0x7D18, 0x7D19, 0x7D20, 0x7D21, 0x7D22, 0x7D25, 0x7D27, 0x7D28, 0x7D29, 0x7D30, 0x7D31, 0x7D32, 0x7D36, 0x7D37, 0x7D38, 0x7D40, 0x7D41, 0x7D42, 0x7D43, 0x7D45, 0x7D46, 0x7D50, 0x7D52, 0x7D53, 0x7D54, 0x7D59, 0x7D67, 0x7D69, 0x7D70, 0x7D86, 0x7D91, 0x7D97
+	0x7B93, 0x7C34, 0x7C35, 0x7C36, 0x7C37, 0x7C56, 0x7C59, 0x7C70, 0x7C71, 0x7C73, 0x7C75, 0x7C76, 0x7C77, 0x7C79, 0x7C80, 0x7C81, 0x7C82, 0x7C83, 0x7C84, 0x7C85, 0x7C86, 0x7C88, 0x7C89, 0x7C90, 0x7C91, 0x7C92, 0x7C94, 0x7C95, 0x7C98, 0x7C99, 0x7D03, 0x7D04, 0x7D05, 0x7D06, 0x7D07, 0x7D08, 0x7D09, 0x7D10, 0x7D11, 0x7D12, 0x7D13, 0x7D14, 0x7D15, 0x7D16, 0x7D17, 0x7D18, 0x7D19, 0x7D20, 0x7D21, 0x7D22, 0x7D25, 0x7D27, 0x7D28, 0x7D29, 0x7D30, 0x7D31, 0x7D32, 0x7D36, 0x7D37, 0x7D38, 0x7D40, 0x7D41, 0x7D42, 0x7D43, 0x7D45, 0x7D46, 0x7D50, 0x7D52, 0x7D53, 0x7D54, 0x7D59, 0x7D67, 0x7D69, 0x7D70, 0x7D74, 0x7D86, 0x7D91, 0x7D97
 ];
 let ParentDeviceName = "Mystic Light Controller";
 
@@ -64,6 +64,7 @@ export function Initialize()
 {
 	MSIMotherboard.checkPerLEDSupport();
 	MSIMotherboard.createLEDs();
+	device.setName(device.getMotherboardName());
 }
 
 export function Render()
@@ -120,6 +121,22 @@ class MysticLight
 {
 	constructor()
 	{
+
+		this.ConfigurationOverrides =
+		{
+			"MSI Z790 TOMAHAWK DDR4":
+			{
+				OnboardLEDs    : 0,
+				RGBHeaders     : 1,
+				ARGBHeaders    : 3,
+				JPipeLEDs	   : 0,
+				CorsairHeaders : 0,
+				//PERLED
+				PerLEDOnboardLEDs : 0,
+				ForceZoneBased	  : false,
+			},
+		};
+
 
 		this.Library =
 		{
@@ -936,6 +953,17 @@ class MysticLight
 				PerLEDOnboardLEDs : 6,
 				ForceZoneBased	  : false,
 			},
+			0x7D74 : //B650 Carbon Wifi
+			{
+				OnboardLEDs    : 6,
+				RGBHeaders     : 1,
+				ARGBHeaders    : 3,
+				JPipeLEDs	   : 0,
+				CorsairHeaders : 0,
+				//PERLED
+				PerLEDOnboardLEDs : 6,
+				ForceZoneBased	  : false,
+			},
 			0x7D86 : //Z790 Ace
 			{
 				OnboardLEDs    : 7,
@@ -946,22 +974,15 @@ class MysticLight
 				//PERLED
 				PerLEDOnboardLEDs : 12
 			},
-			0x7D91 : //Z790 Tomahawk Wifi DDR4 AND Z790 EDGE. I'll need to add a config override
+			0x7D91 : //Z790 Edge
 			{
-				//OnboardLEDs    : 0,
-				///RGBHeaders     : 1,
-				//ARGBHeaders    : 3,
-				//JPipeLEDs	   : 0,
-				//CorsairHeaders : 0,
-				//PERLED
-				//PerLEDOnboardLEDs : 0
-				OnboardLEDs    : 0,
+				OnboardLEDs    : 6,
 				RGBHeaders     : 1,
 				ARGBHeaders    : 3,
 				JPipeLEDs	   : 0,
 				CorsairHeaders : 0,
 				//PERLED
-				PerLEDOnboardLEDs : 6, //Still need a config override.
+				PerLEDOnboardLEDs : 6,
 				ForceZoneBased	  : false,
 			},
 			0x7D97 : //B660M Mortar Max
@@ -1187,14 +1208,14 @@ class MysticLight
 		if(response > 0)
 		{
 			perLED = true;
-			device.log("Motherboard is PerLED 🙂");
+			device.log("Motherboard is PerLED 🙂", {toFile:true});
 		}
 		else
 		{
-			device.log("Motherboard is not PerLED 😔");
+			device.log("Motherboard is not PerLED 😔", {toFile:true});
 		}
 
-		if(MSIMotherboard.Library[device.productId()]["ForceZoneBased"] === true)
+		if(this.Library[device.productId()]["ForceZoneBased"] === true) //I'm leaving this untouched, as no new boards are zone based. Lord so help me if that changes MSI.
 		{
 			perLED = false;
 		}
@@ -1209,53 +1230,118 @@ class MysticLight
 
 	createLEDs()
 	{
-		for(let RGBHeaders = 0; RGBHeaders < MSIMotherboard.Library[device.productId()]["RGBHeaders"]; RGBHeaders++)
+		if(device.getMotherboardName() in this.ConfigurationOverrides)
+		{
+			this.createStandardLEDs(this.ConfigurationOverrides[device.getMotherboardName()]);
+			device.log("Using Configuration Override", {toFile:true});
+		}
+		else
+		{
+			this.createStandardLEDs(this.Library[device.productId()]);
+		}
+
+	}
+
+	createStandardLEDs(configTable)
+	{
+		for(let RGBHeaders = 0; RGBHeaders < configTable["RGBHeaders"]; RGBHeaders++)
 		{
 			this.createSubdevice(this.LEDArrays.RGBHeaderArray[RGBHeaders]);
 		}
 
-		ARGBHeaders = MSIMotherboard.Library[device.productId()]["ARGBHeaders"];
-		CorsairHeaders = MSIMotherboard.Library[device.productId()]["CorsairHeaders"];
+		ARGBHeaders = configTable["ARGBHeaders"];
+		CorsairHeaders = configTable["CorsairHeaders"];
 
 		if(perLED === false)
 		{
-			for(let JPipeLEDs = 0; JPipeLEDs < MSIMotherboard.Library[device.productId()]["JPipeLEDs"]; JPipeLEDs++)
+			for(let JPipeLEDs = 0; JPipeLEDs < configTable["JPipeLEDs"]; JPipeLEDs++)
 			{
 				this.createSubdevice(this.LEDArrays.JPipeArray[JPipeLEDs]);
 			}
 
-			for(let ARGBHeaders = 0; ARGBHeaders < MSIMotherboard.Library[device.productId()]["ARGBHeaders"]; ARGBHeaders++)
+			for(let ARGBHeaders = 0; ARGBHeaders < configTable["ARGBHeaders"]; ARGBHeaders++)
 			{
 				this.createSubdevice(this.LEDArrays.ARGBHeaderArray[ARGBHeaders]);
 			}
 
-			for(let CorsairHeaders = 0; CorsairHeaders < MSIMotherboard.Library[device.productId()]["CorsairHeaders"]; CorsairHeaders++)
+			for(let CorsairHeaders = 0; CorsairHeaders < configTable["CorsairHeaders"]; CorsairHeaders++)
 			{
 				this.createSubdevice(this.LEDArrays.CorsairHeaderArray[CorsairHeaders]);
 			}
 
-			for(let OnboardLEDs = 0; OnboardLEDs < MSIMotherboard.Library[device.productId()]["OnboardLEDs"]; OnboardLEDs++)
+			for(let OnboardLEDs = 0; OnboardLEDs < configTable["OnboardLEDs"]; OnboardLEDs++)
 			{
 				this.createSubdevice(this.LEDArrays.OnboardArray[OnboardLEDs]);
 			}
 
-			JPipeLEDs = MSIMotherboard.Library[device.productId()]["JPipeLEDs"];
-			OnboardLEDs = MSIMotherboard.Library[device.productId()]["OnboardLEDs"];
+			JPipeLEDs = configTable["JPipeLEDs"];
+			OnboardLEDs = configTable["OnboardLEDs"];
 		}
 		else
 		{
-			for(let OnboardLEDs = 0; OnboardLEDs < (MSIMotherboard.Library[device.productId()]["PerLEDOnboardLEDs"]); OnboardLEDs++)
+			for(let OnboardLEDs = 0; OnboardLEDs < (configTable["PerLEDOnboardLEDs"]); OnboardLEDs++)
 			{
 				this.createSubdevice(this.LEDArrays.OnboardArray[OnboardLEDs]);
 			}
 
-			OnboardLEDs = MSIMotherboard.Library[device.productId()]["PerLEDOnboardLEDs"];
+			OnboardLEDs = configTable["PerLEDOnboardLEDs"];
 
 			this.SetupChannels();
 			this.PerLEDInit();
 		}
 
-		RGBHeaders  = MSIMotherboard.Library[device.productId()]["RGBHeaders"];
+		RGBHeaders  = configTable["RGBHeaders"];
+	}
+
+	createConfigurationOverrideLEDs()
+	{
+		for(let RGBHeaders = 0; RGBHeaders < this.ConfigurationOverrides[device.getMotherboardName()]["RGBHeaders"]; RGBHeaders++)
+		{
+			this.createSubdevice(this.LEDArrays.RGBHeaderArray[RGBHeaders]);
+		}
+
+		ARGBHeaders = this.ConfigurationOverrides[device.getMotherboardName()]["ARGBHeaders"];
+		CorsairHeaders = this.ConfigurationOverrides[device.getMotherboardName()]["CorsairHeaders"];
+
+		if(perLED === false)
+		{
+			for(let JPipeLEDs = 0; JPipeLEDs < this.ConfigurationOverrides[device.getMotherboardName()]["JPipeLEDs"]; JPipeLEDs++)
+			{
+				this.createSubdevice(this.LEDArrays.JPipeArray[JPipeLEDs]);
+			}
+
+			for(let ARGBHeaders = 0; ARGBHeaders < this.ConfigurationOverrides[device.getMotherboardName()]["ARGBHeaders"]; ARGBHeaders++)
+			{
+				this.createSubdevice(this.LEDArrays.ARGBHeaderArray[ARGBHeaders]);
+			}
+
+			for(let CorsairHeaders = 0; CorsairHeaders < this.ConfigurationOverrides[device.getMotherboardName()]["CorsairHeaders"]; CorsairHeaders++)
+			{
+				this.createSubdevice(this.LEDArrays.CorsairHeaderArray[CorsairHeaders]);
+			}
+
+			for(let OnboardLEDs = 0; OnboardLEDs < this.ConfigurationOverrides[device.getMotherboardName()]["OnboardLEDs"]; OnboardLEDs++)
+			{
+				this.createSubdevice(this.LEDArrays.OnboardArray[OnboardLEDs]);
+			}
+
+			JPipeLEDs = this.ConfigurationOverrides[device.getMotherboardName()]["JPipeLEDs"];
+			OnboardLEDs = this.ConfigurationOverrides[device.getMotherboardName()]["OnboardLEDs"];
+		}
+		else
+		{
+			for(let OnboardLEDs = 0; OnboardLEDs < (this.ConfigurationOverrides[device.getMotherboardName()]["PerLEDOnboardLEDs"]); OnboardLEDs++)
+			{
+				this.createSubdevice(this.LEDArrays.OnboardArray[OnboardLEDs]);
+			}
+
+			OnboardLEDs = this.ConfigurationOverrides[device.getMotherboardName()]["PerLEDOnboardLEDs"];
+
+			this.SetupChannels();
+			this.PerLEDInit();
+		}
+
+		RGBHeaders  = this.ConfigurationOverrides[device.getMotherboardName()]["RGBHeaders"];
 	}
 
 	SetupChannels()
