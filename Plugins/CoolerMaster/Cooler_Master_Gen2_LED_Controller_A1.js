@@ -6,6 +6,14 @@ export function Documentation(){ return "troubleshooting/coolermaster"; }
 export function Size() { return [1, 1]; }
 export function DefaultPosition(){return [1, 1];}
 export function DefaultScale(){return 1.0;}
+/* global
+shutdownColor:readonly
+LightingMode:readonly
+forcedColor:readonly
+GenCh1:readonly
+GenCh2:readonly
+GenCh3:readonly
+*/
 export function ControllableParameters(){
 	return [
 		{"property":"shutdownColor", "group":"lighting", "label":"Shutdown Color", "min":"0", "max":"360", "type":"color", "default":"009bde"},
@@ -95,11 +103,11 @@ export function Shutdown() {
 }
 
 function setLEDCounts() {
-	for(Channel = 0; Channel <ChannelArray.length; Channel++) {
+	for(let Channel = 0; Channel <ChannelArray.length; Channel++) {
 		const initPacket = [0x00, 0x80, 0x06, 0x02, Channel+1, 0x08, 0x07];
 		const LEDCountPacket = [0x00, 0x80, 0x06, 0x02, Channel+1, 0x01, 0x3c];
-		device.write(initPacket);
-		device.write(LEDCountPacket);
+		device.write(initPacket, 65);
+		device.write(LEDCountPacket, 65);
 	}
 }
 

@@ -8,6 +8,11 @@ export function DefaultScale(){return 8.0;}
 export function ConflictingProcesses() {
 	return ["NGenuity2.exe"];
 }
+/* global
+shutdownColor:readonly
+LightingMode:readonly
+forcedColor:readonly
+*/
 export function ControllableParameters(){
 	return [
 		{"property":"shutdownColor", "group":"lighting", "label":"Shutdown Color", "min":"0", "max":"360", "type":"color", "default":"009bde"},
@@ -17,16 +22,16 @@ export function ControllableParameters(){
 	];
 }
 
-let vLedNames = [ 
-	"Top Ring", "Bottom Ring" 
+const vLedNames = [
+	"Top Ring", "Bottom Ring"
 ];
 
-let vLedPositions = [ 
-	[1, 0], [1, 2] 
+const vLedPositions = [
+	[1, 0], [1, 2]
 ];
 
-let vKeymap = [ 
-	0, 1 
+const vKeymap = [
+	0, 1
 ];
 
 export function LedNames() {
@@ -57,13 +62,13 @@ function sendColor(shutdown = false) {
 	StartPacket();
 
 	//get color data
-	let red = [168];
-	let green = [168];
-	let blue = [168];
+	const red = [168];
+	const green = [168];
+	const blue = [168];
 
 	for(let iIdx = 0; iIdx < vKeymap.length; iIdx++) {
-		let iPxX = vLedPositions[iIdx][0];
-		let iPxY = vLedPositions[iIdx][1];
+		const iPxX = vLedPositions[iIdx][0];
+		const iPxY = vLedPositions[iIdx][1];
 		var color;
 
 		if(shutdown) {
@@ -79,18 +84,16 @@ function sendColor(shutdown = false) {
 		blue[vKeymap[iIdx]] = color[2];
 	}
 
-	let packet = [];
+	const packet = [];
 	packet[0x00] = 0x00;
 
 	let TotalkeyCount = 2;
 	let sentKeys = 0;
 
-	while(TotalkeyCount > 0)
-	{
-		let keys = TotalkeyCount >= 16 ? 16 : TotalkeyCount;
+	while(TotalkeyCount > 0) {
+		const keys = TotalkeyCount >= 16 ? 16 : TotalkeyCount;
 
-		for(let idx = 0; idx < keys; idx++) 
-		{
+		for(let idx = 0; idx < keys; idx++) {
 			packet[(idx * 4) + 1] = 0x81;
 			packet[(idx * 4) + 2] = red[sentKeys];
 			packet[(idx * 4) + 3] = green[sentKeys];
@@ -98,13 +101,14 @@ function sendColor(shutdown = false) {
 			TotalkeyCount--;
 			sentKeys++;
 		}
+
 		device.send_report(packet, 65);
 	}
 }
 
 function hexToRgb(hex) {
-	let result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
-	let colors = [];
+	const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+	const colors = [];
 	colors[0] = parseInt(result[1], 16);
 	colors[1] = parseInt(result[2], 16);
 	colors[2] = parseInt(result[3], 16);
