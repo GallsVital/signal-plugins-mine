@@ -12,8 +12,7 @@ shutdownColor:readonly
 LightingMode:readonly
 forcedColor:readonly
 */
-export function ControllableParameters()
-{
+export function ControllableParameters() {
 	return [
 		{"property":"shutdownColor", "group":"lighting", "label":"Shutdown Color", "min":"0", "max":"360", "type":"color", "default":"#009bde"},
 		{"property":"LightingMode", "group":"lighting", "label":"Lighting Mode", "type":"combobox", "values":["Canvas", "Forced"], "default":"Canvas"},
@@ -31,28 +30,22 @@ let startupBrightness;
 let startupMode;
 
 /** @param {FreeAddressBus} bus */
-export function Scan(bus)
-{
+export function Scan(bus) {
 	const FoundAddresses = [];
 
 	  // Skip any non AMD / INTEL Busses
-	  if (!bus.IsNvidiaBus())
-	{
+	  if (!bus.IsNvidiaBus()) {
 		return [];
 	}
 
-	for(const MSIGPUID of new MSIGPUList().devices)
-	{
+	for(const MSIGPUID of new MSIGPUList().devices) {
 		if(MSIGPUID.Vendor === bus.Vendor() &&
 		MSIGPUID.SubVendor === bus.SubVendor() &&
 		MSIGPUID.Device === bus.Product() &&
 		MSIGPUID.SubDevice === bus.SubDevice()
-		)
-		{
+		) {
 			FoundAddresses.push(MSIGPUID.Address);
-		}
-		else
-		{
+		} else {
 			bus.log(`Expected Vendor [${MSIGPUID.Vendor}] got Vendor [${bus.Vendor()}]`);
 			bus.log(`Expected SubVender [${MSIGPUID.SubVendor}] got Vendor [${bus.SubVendor()}]`);
 			bus.log(`Expected Device [${MSIGPUID.Device}] got Vendor [${bus.Product()}]`);
@@ -65,8 +58,7 @@ export function Scan(bus)
 
 export function BrandGPUList(){ return new MSIGPUList().devices; }
 
-export function Initialize()
-{
+export function Initialize() {
 	bus.WriteByte(0x2E, 0x00);
 	bus.WriteByte(0x2D, 0x00); //40 Series flags
 	MSIGPU.setDeviceMode(MSIGPU.modes.STATIC);
@@ -75,49 +67,37 @@ export function Initialize()
 	SetGPUNameFromBusIds(new MSIGPUList().devices);
 }
 
-export function Render()
-{
+export function Render() {
 	sendColors();
 }
 
-export function Shutdown()
-{
+export function Shutdown() {
 }
 
-function SetGPUNameFromBusIds(GPUList)
-{
-	for(const GPU of GPUList)
-	{
-		if(CheckForIdMatch(bus, GPU))
-		{
+function SetGPUNameFromBusIds(GPUList) {
+	for(const GPU of GPUList) {
+		if(CheckForIdMatch(bus, GPU)) {
 			device.setName(GPU.Name);
 			break;
 		}
 	}
 }
 
-function CheckForIdMatch(bus, Gpu)
-{
+function CheckForIdMatch(bus, Gpu) {
 	return Gpu.Vendor === bus.Vendor() &&
     Gpu.SubVendor === bus.SubVendor() &&
     Gpu.Device === bus.Product() &&
     Gpu.SubDevice === bus.SubDevice();
 }
 
-function sendColors(shutdown = false)
-{
+function sendColors(shutdown = false) {
 	let color;
 
-	if(shutdown)
-	{
+	if(shutdown) {
 		color = hexToRgb(shutdownColor);
-	}
-	else if (LightingMode === "Forced")
-	{
+	} else if (LightingMode === "Forced") {
 		color = hexToRgb(forcedColor);
-	}
-	else
-	{
+	} else {
 		color = device.color( vLedPositions[0][0],  vLedPositions[0][1]);
 	}
 
@@ -129,10 +109,8 @@ function sendColors(shutdown = false)
 	device.pause(120);
 }
 
-class MSIGPUController
-{
-	constructor()
-	{
+class MSIGPUController {
+	constructor() {
 		this.registers =
         {
         	BRIGHTNESS                 : 0x36,
@@ -197,16 +175,13 @@ class MSIGPUController
 		return [startupRed, startupBlue, startupGreen, startupBrightness, startupMode];
 	}
 
-	initializeGPU(brightness, mode)
-	{
-		if(mode !== this.modes.STATIC)
-		{
+	initializeGPU(brightness, mode) {
+		if(mode !== this.modes.STATIC) {
 			this.setDeviceMode(this.modes.STATIC);
 			device.log(this.getStartupValues[4]); //Recheck
 		}
 
-		if(brightness !== 0x64)
-		{
+		if(brightness !== 0x64) {
 			this.setDeviceBrightness(0x64);
 			device.log(this.getStartupValues[3]); //Recheck brightness
 		}
@@ -214,28 +189,23 @@ class MSIGPUController
 		device.log("Startup Color Code" + startupRed << 8 + startupGreen << 8 + startupBlue << 8);
 	}
 
-	setDeviceMode(mode)
-	{
+	setDeviceMode(mode) {
 		bus.WriteByte(this.registers.MODE, mode);
 	}
 
-	setDeviceBrightness(brightness)
-	{
+	setDeviceBrightness(brightness) {
 		bus.WriteByte(this.registers.BRIGHTNESS, brightness);
 	}
 
-	setDeviceEffectSpeed(speed)
-	{
+	setDeviceEffectSpeed(speed) {
 		bus.WriteByte(this.registers.SPEED, speed);
 	}
 }
 
 const MSIGPU = new MSIGPUController();
 
-class GPUIdentifier
-{
-	constructor(Vendor, SubVendor, Device, SubDevice, Address, Name, Model = "")
-	{
+class GPUIdentifier {
+	constructor(Vendor, SubVendor, Device, SubDevice, Address, Name, Model = "") {
 		this.Vendor = Vendor;
 		this.SubVendor = SubVendor;
 		this.Device = Device;
@@ -246,18 +216,14 @@ class GPUIdentifier
 	}
 }
 
-class MSIGPUIdentifier extends GPUIdentifier
-{
-	constructor(device, SubDevice, Address, Name)
-	{
-		super(0x10DE, 0x1458, device, SubDevice, Address, Name, "");
+class MSIGPUIdentifier extends GPUIdentifier {
+	constructor(device, SubDevice, Address, Name) {
+		super(0x10DE, 0x1462, device, SubDevice, Address, Name, "");
 	}
 }
 
-class NvidiaGPUDeviceIds
-{
-	constructor()
-	{
+class NvidiaGPUDeviceIds {
+	constructor() {
 		this.GTX1050TI       = 0x1C82;
 		this.GTX1060         = 0x1C03;
 		this.GTX1070         = 0x1B81;
@@ -304,20 +270,16 @@ class NvidiaGPUDeviceIds
 
 const Nvidia = new NvidiaGPUDeviceIds();
 
-class MSIGPUDeviceIDs
-{
-	constructor()
-	{
+class MSIGPUDeviceIDs {
+	constructor() {
 		this.RTX4090_GAMING_TRIO			         = 0x5103;
 		this.RTX4090_SUPRIM_LIQUID_X                 = 0x5104;
 	}
 }
 
 
-class MSIGPUList
-{
-	constructor()
-	{
+class MSIGPUList {
+	constructor() {
 		const Nvidia = new NvidiaGPUDeviceIds();
 		const MSIGPUIDs  = new MSIGPUDeviceIDs();
 		this.devices =
@@ -328,8 +290,7 @@ class MSIGPUList
 	}
 }
 
-function hexToRgb(hex)
-{
+function hexToRgb(hex) {
 	const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
 	const colors = [];
 	colors[0] = parseInt(result[1], 16);
