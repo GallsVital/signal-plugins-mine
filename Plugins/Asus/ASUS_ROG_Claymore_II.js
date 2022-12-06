@@ -1,7 +1,7 @@
 export function Name() { return "ASUS ROG Claymore II"; }
 export function VendorId() { return 0x0B05; }
 export function Documentation(){ return "troubleshooting/asus"; }
-export function ProductId() { return 0x196B; }
+export function ProductId() { return [0x1934, 0x196B]; } // 0x1934 is wired
 export function Publisher() { return "WhirlwindFX"; }
 export function Size() { return [21, 7]; }
 export function DefaultPosition(){return [10, 100];}
@@ -22,7 +22,7 @@ export function ControllableParameters(){
 	];
 }
 
-let vKeysLeft =
+const vKeysLeft =
 [
 	6,   14,
 	32,      56, 64, 72, 80,   96, 104, 112, 120, 128, 136, 144, 152,   160, 168, 176,
@@ -33,7 +33,7 @@ let vKeysLeft =
 	37,  45,  53,      85,           109, 125, 133,         157,   165, 173, 181,   5,   21,
 ];
 
-let vKeysRight =
+const vKeysRight =
 [
 	6,  14,
 	0,      24, 32, 40, 48,   64, 72, 80, 88, 96, 104, 112, 120,   128, 136, 144,
@@ -44,7 +44,7 @@ let vKeysRight =
 	5,  13, 21,      53,            77, 93, 101,    125,   133, 141, 149,   157, 173,
 ];
 
-let vKeyNames =
+const vKeyNames =
 [
 	"Logo Left", "Logo Right",
 	"Esc", "F1", "F2", "F3", "F4", "F5", "F6", "F7", "F8", "F9", "F10", "F11", "F12",         "Print Screen", "Scroll Lock", "Pause Break",
@@ -55,7 +55,7 @@ let vKeyNames =
 	"Left Ctrl", "Left Win", "Left Alt", "Space", "Right Alt", "Fn", "Menu", "Right Ctrl",  "Left Arrow", "Down Arrow", "Right Arrow", "Num 0", "Num ."
 ];
 
-let vKeyPositionsRight =
+const vKeyPositionsRight =
 [
 	[0, 0],	[1, 0],
 	[0, 1],  [1, 1], [2, 1], [3, 1], [4, 1],        [6, 1], [7, 1], [8, 1], [9, 1], [10, 1], [11, 1], [12, 1], [13, 1],   [14, 1], [15, 1], [16, 1],
@@ -66,7 +66,7 @@ let vKeyPositionsRight =
 	[0, 6],  [1, 6], [2, 6],                      [6, 6],                      [10, 6], [11, 6], [12, 6], [13, 6],    [14, 6], [15, 6], [16, 6],   [17, 6],         [19, 6],
 ];
 
-let vKeyPositionsLeft =
+const vKeyPositionsLeft =
 [
 	[4, 0],	[5, 0],
 	[4, 1],  [5, 1], [6, 1], [7, 1], [8, 1],        [10, 1], [11, 1], [12, 1], [13, 1], [14, 1], [15, 1], [16, 1], [17, 1],   [18, 1], [19, 1], [20, 1],
@@ -82,9 +82,10 @@ function LedKeys() {
 		return vKeysLeft;
 	} else if (layout == "Right") {
 		return vKeysRight;
-	} else {
-		return [];
 	}
+
+	return [];
+
 }
 
 export function LedNames() {
@@ -96,9 +97,10 @@ export function LedPositions() {
 		return vKeyPositionsLeft;
 	} else if (layout == "Right") {
 		return vKeyPositionsRight;
-	} else {
-		return [];
 	}
+
+	return [];
+
 }
 
 export function Initialize() {
@@ -116,12 +118,12 @@ export function Shutdown() {
 }
 
 function sendColors(shutdown = false) {
-	let RGBData = new Array(600).fill(255);
+	const RGBData = new Array(600).fill(255);
 	let TotalLedCount = 120;
 
 	for(let iIdx = 0; iIdx < LedKeys().length; iIdx++) {
-		let iPxX = LedPositions()[iIdx][0];
-		let iPxY = LedPositions()[iIdx][1];
+		const iPxX = LedPositions()[iIdx][0];
+		const iPxY = LedPositions()[iIdx][1];
 		var col;
 
 		if(shutdown) {
@@ -141,7 +143,7 @@ function sendColors(shutdown = false) {
 	let packetCount = 0;
 
 	while(TotalLedCount > 0){
-		let ledsToSend = TotalLedCount >= 15 ? 15 : TotalLedCount;
+		const ledsToSend = TotalLedCount >= 15 ? 15 : TotalLedCount;
 
 		let packet = [];
 		packet[0] = 0x00;
@@ -162,8 +164,8 @@ export function Validate(endpoint) {
 }
 
 function hexToRgb(hex) {
-	let result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
-	let colors = [];
+	const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+	const colors = [];
 	colors[0] = parseInt(result[1], 16);
 	colors[1] = parseInt(result[2], 16);
 	colors[2] = parseInt(result[3], 16);
@@ -172,8 +174,8 @@ function hexToRgb(hex) {
 }
 
 function sendPacketString(string, size) {
-	let packet= [];
-	let data = string.split(' ');
+	const packet= [];
+	const data = string.split(' ');
 
 	for(let i = 0; i < data.length; i++) {
 		packet[i] =parseInt(data[i], 16);//.toString(16)

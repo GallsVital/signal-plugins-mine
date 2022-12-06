@@ -1,7 +1,7 @@
-export function Name() { return "ASUS Chakram Wireless - Wired Mode"; }
+export function Name() { return "ASUS Chakram Wireless"; }
 export function VendorId() { return 0x0B05; }
 export function Documentation(){ return "troubleshooting/asus"; }
-export function ProductId() { return 0x18E3; }
+export function ProductId() { return [0x18E3, 0x18E5]; }
 export function Publisher() { return "WhirlwindFX"; }
 export function Size() { return [5, 5]; }
 export function DefaultPosition() {return [225, 120]; }
@@ -21,8 +21,8 @@ export function ControllableParameters(){
 }
 
 function hexToRgb(hex) {
-	let result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
-	let colors = [];
+	const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+	const colors = [];
 	colors[0] = parseInt(result[1], 16);
 	colors[1] = parseInt(result[2], 16);
 	colors[2] = parseInt(result[3], 16);
@@ -44,14 +44,14 @@ export function Shutdown() {
 }
 
 
-let vKeyNames = [
+const vKeyNames = [
 	"Scroll Wheel", "Logo", "Front Zone",
 
 ];
 
 // This array must be the same length as vKeys[], and represents the pixel color position in our pixel matrix that we reference.  For example,
 // item at index 3 [9,0] represents the corsair logo, and the render routine will grab its color from [9,0].
-let vKeyPositions = [
+const vKeyPositions = [
 	[1, 4], [1, 1], [1, 0],
 ];
 
@@ -72,7 +72,7 @@ export function Render() {
 
 function sendColors(zone, shutdown = false){
 
-	let packet = [];
+	const packet = [];
 	packet[0] = 0x00;
 	packet[1] = 0x51;
 	packet[2] = 0x28;
@@ -81,8 +81,8 @@ function sendColors(zone, shutdown = false){
 	packet[5] = 0x00;
 	packet[6] = 0x04;
 
-	let iPxX = vKeyPositions[zone][0];
-	let iPxY = vKeyPositions[zone][1];
+	const iPxX = vKeyPositions[zone][0];
+	const iPxY = vKeyPositions[zone][1];
 	let col;
 
 	if(shutdown){
@@ -126,8 +126,8 @@ export function Validate(endpoint) {
 
 function sendPacketString(string, size){
 
-	let packet= [];
-	let data = string.split(' ');
+	const packet= [];
+	const data = string.split(' ');
 
 	for(let i = 0; i < data.length; i++){
 		packet[i] =parseInt(data[i], 16);//.toString(16)
