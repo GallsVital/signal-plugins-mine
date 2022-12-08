@@ -118,7 +118,7 @@ function GetFanSettings() {
 	// Skip iterating other fans and creating FanControllers if the system is disabled.
 	if(device.fanControlDisabled()) {
 		// Reset if the system was disbled during runtime.
-		device.log("System Monitoring disabled, Clearing Connected Fans", {toFile: true});
+		//device.log("System Monitoring disabled, Clearing Connected Fans", {toFile: true});
 		ConnectedFans = [];
 
 		return;
