@@ -118,8 +118,9 @@ function GetFanSettings() {
 	// Skip iterating other fans and creating FanControllers if the system is disabled.
 	if(device.fanControlDisabled()) {
 		// Reset if the system was disbled during runtime.
-		device.log("System Monitoring disabled, Clearing Connected Fans", {toFile: true});
+		//device.log("System Monitoring disabled, Clearing Connected Fans", {toFile: true});
 		ConnectedFans = [];
+
 		return;
 	}
 
@@ -140,7 +141,8 @@ function GetFanSettings() {
 		case 4:
 			device.log("Device is still booting up. We'll refetch fan states later...");
 			// We need to recheck this in 10 seconds or so.
-			ConnectedFans = []
+			ConnectedFans = [];
+
 			return;
 		case 7:
 			if(!ConnectedFans.includes(i)){
@@ -265,9 +267,10 @@ function Get4PinColors(){
 		if(!componentChannel.shouldPulseColors()){
 			ComponentColors = componentChannel.getComponentColors(components[i], "Inline");
 
+			const QLFanLedCount = 34;
 
-			for(let j = ComponentColors.length; j < 34; j++) {
-				ComponentColors.push(...[0, 0, 0]);
+			if(ComponentColors.length < (QLFanLedCount * 3)){
+				ComponentColors.push(...new Array(QLFanLedCount * 3 - ComponentColors.length).fill(0));
 			}
 
 		}else{
@@ -336,8 +339,8 @@ function SetFanLedCount(ledCount) {
 	Corsair.OpenHandle("Background", Corsair.Endpoints.LedCount_4Pin);
 	Corsair.CheckHandle("Background");
 
-	device.write(FanSettings, Corsair.DeviceBufferSize);
-	device.read([0x00], Corsair.DeviceBufferSize);
+	device.write(FanSettings, Corsair.GetBufferSize());
+	device.read([0x00], Corsair.GetBufferSize());
 	// THEN open and set the strip ports before closing the endpoints
 	// If we don't then the Fan Leds will toggle on and off with each sending of this
 	Corsair.OpenHandle("Auxiliary", Corsair.Endpoints.LedCount_3Pin);
@@ -352,7 +355,7 @@ function SetFanLedCount(ledCount) {
 
 	// Send Confirm packet
 	const packet = [0x00, Corsair.ConnectionType, Corsair.CommandIds.confirmChange, 1];
-	device.write(packet, Corsair.DeviceBufferSize);
+	device.write(packet, Corsair.GetBufferSize());
 }
 
 // Helper Functions
