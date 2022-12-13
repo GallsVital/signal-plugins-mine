@@ -44,6 +44,7 @@ export function ControllableParameters()
 	];
 }
 
+// eslint-disable-next-line no-unused-vars
 let Sniper = false;
 let DPIStage = 1;
 let DeviceConnected = false;
@@ -604,6 +605,7 @@ export class LogitechProtocol
 			 "4079" : "Logitech GPro Wireless",
 			 "4093" : "Logitech GPro X Superlight",
 			 "407c" : "Logitech G915 Keyboard",
+			 "408E" : "Logitech G915 TKL Keyboard", //I'm going to strangle someone at Logitech. Stop sharing PIDs.
 			 "4099" : "Logitech G502 X Plus"
 		 };
 		 /** @type {Object.<string, LedPosition[]>} */
@@ -794,6 +796,8 @@ export class LogitechProtocol
 			 "Left_Click"    : 0x00,
 			 "Right_Click"   : 0x00,
 			 "Middle_Click"  : 0x00,
+			 "DPI_UP"		 : 10,
+			 "DPI_Down"		 : 12,
 			 "Scroll_Left"   : 14,
 			 "Scroll_Right"  : 16,
 			 "Backward"      : 18,
@@ -801,24 +805,24 @@ export class LogitechProtocol
 			 "Right_Forward" : 22,
 			 "Right_Back"    : 24,
 			 "Top"           : 26,
-			 "Sniper"        : 0x00,
+			 "Sniper"        : 28,
 			 "Null"          : 0x00,
 		 };
 
-		 this.macroArray =
-		 {
-			 0 : 0, //this.buttonMapDict[this.ButtonMaps[this.Config.MouseBodyStyle]["button7"]], //DPI Up
-			 1 : this.buttonMapDict[this.ButtonMaps[this.Config.MouseBodyStyle]["button11"]], //Left Scroll
-			 2 : this.buttonMapDict[this.ButtonMaps[this.Config.MouseBodyStyle]["button10"]], //Right Scroll
-			 8 : 0, //this.buttonMapDict[this.ButtonMaps[this.Config.MouseBodyStyle]["button1"]],//Left Click
-			 9 : 0, //this.buttonMapDict[this.ButtonMaps[this.Config.MouseBodyStyle]["button2"]], //Right Click
-			 10 : 0, //this.buttonMapDict[this.ButtonMaps[this.Config.MouseBodyStyle]["button3"]],//Middle Click
-			 11 : this.buttonMapDict[this.ButtonMaps[this.Config.MouseBodyStyle]["button4"]], //Back Hit
-			 12 : this.buttonMapDict[this.ButtonMaps[this.Config.MouseBodyStyle]["button5"]], //Forward Hit
-			 13 : this.buttonMapDict[this.ButtonMaps[this.Config.MouseBodyStyle]["button6"]], //Right Back
-			 14 : this.buttonMapDict[this.ButtonMaps[this.Config.MouseBodyStyle]["button9"]], //Right Forward
-			 15 : 0, //this.buttonMapDict[this.ButtonMaps[this.Config.MouseBodyStyle]["button8"]],//DPI Down
-		 };
+		this.PhysicalButtonIds =
+		{
+			0 : "button7",
+			1 : "button11",
+			2 : "button10",
+			8 : "button1",
+			9 : "button2",
+			10 : "button3",
+			11 : "button4",
+			12 : "button5",
+			13 : "button6",
+			14 : "button9",
+			15 : "button8",
+		};
 
 		 this.VoltageArray =
 		 [
@@ -1322,6 +1326,7 @@ export class LogitechProtocol
 
 		  this.Config.DeviceName = String.fromCharCode(...DeviceNameBytes);
 		  device.log("Internal Device Name: " + this.Config.DeviceName, {toFile: true});
+		  device.setName(this.Config.DeviceName);
 
 		  return this.Config.DeviceName;
 	 }
@@ -1336,6 +1341,7 @@ export class LogitechProtocol
 
 		 return data[0];
 	 }
+
 	 FetchDeviceType()
 	 {
 		 const deviceTypePacket = [this.FeatureIDs.DeviceNameID, 0x20];
@@ -1375,7 +1381,7 @@ export class LogitechProtocol
 			}
 
 
-			if(this.CompareArrays(response,reconnectMessage))
+			if(this.CompareArrays(response, reconnectMessage))
 			{
 
 				devicePaired = true;
@@ -1392,6 +1398,19 @@ export class LogitechProtocol
 
 		//This function holds up init until we get a good result or timeout. No further action needed. I could add a return for logging good values tho.
 	 }
+
+	 MacroMapping(button)
+	 {
+		const PhysicalbuttonID = this.MapPhysicalButtonIDToName(button);
+		const PhysicalbuttonName = this.GetMouseButtons(PhysicalbuttonID);
+		const macroButtonID = this.MapButtonNameToSignalRGBValue(PhysicalbuttonName);
+
+		return macroButtonID;
+	 }
+
+	 MapPhysicalButtonIDToName(buttonId){ return this.PhysicalButtonIds[buttonId];}
+	 GetMouseButtons(physicalButton){ return this.ButtonMaps[this.GetDeviceBodyType()][physicalButton];}
+	 MapButtonNameToSignalRGBValue(ButtonName){ return this.buttonMapDict[ButtonName];}
 
 	 GetBatteryCharge()
 	 {
@@ -1462,14 +1481,16 @@ export class LogitechProtocol
 
 	 GetBatteryVoltage()
 	 {
-		 const packet = [this.FeatureIDs.BatteryVoltageID, 0x00, 0x10];
-		 const BatteryArray = this.SendLongMessage(packet);
-		 const BatteryVoltage = (BatteryArray[0] << 8) + BatteryArray[1];
-		 const BatteryStatus = BatteryArray[2];
+		device.pause(50);
 
-		 device.log("Battery Voltage: " + BatteryVoltage);
+		const packet = [this.FeatureIDs.BatteryVoltageID, 0x00, 0x10];
+		const BatteryArray = this.SendLongMessage(packet);
+		const BatteryVoltage = (BatteryArray[0] << 8) + BatteryArray[1];
+		const BatteryStatus = BatteryArray[2];
 
-		 return [BatteryVoltage, BatteryStatus];
+		device.log("Battery Voltage: " + BatteryVoltage);
+
+		return [BatteryVoltage, BatteryStatus];
 	 }
 	 //This needs hit with a hammer.
 	 GetApproximateBatteryPercentage(BatteryVoltage)
@@ -1482,6 +1503,11 @@ export class LogitechProtocol
 
 		  return this.PercentageLookupTable[nearestVoltageBand];
 	 }
+
+	GetDeviceBodyType()
+	{
+		return this.Config.MouseBodyStyle;
+	}
 
 	 setDpi(dpi, stage)
 	 {
@@ -1736,7 +1762,7 @@ class BitArray
 
 					 const bitIdx = byteIdx * 8 + bit;
 
-					 if(isPressed != this.get(byteIdx * 8 + bit))
+					 if(isPressed !== this.get(byteIdx * 8 + bit))
 					 {
 						 // KEY CHANGED
 						 // TODO - clean this up
@@ -1744,19 +1770,20 @@ class BitArray
 
 						 if(isPressed)
 						 {
-							 if(Logitech.macroArray[bitIdx] === 10)
+							 if(Logitech.MacroMapping(bitIdx) === 10)
 							 {
 								 DPIStage++;
 								 DPIStageControl();
+								 device.log("DPI UP");
 								 break;
 							 }
-							 else if(Logitech.macroArray[bitIdx] === 12)
+							 else if(Logitech.MacroMapping(bitIdx) === 12)
 							 {
 								 DPIStage--;
 								 DPIStageControl();
 								 break;
 							 }
-							 else if(Logitech.macroArray[bitIdx] === 28)
+							 else if(Logitech.MacroMapping(bitIdx) === 28)
 							 {
 								 Sniper = true;
 								 Logitech.setDpi(dpi6, 1);
@@ -1764,27 +1791,27 @@ class BitArray
 							 }
 							 else
 							 {
-								 mouse.sendEvent({"buttonCode":(Logitech.macroArray[bitIdx])}, "Button Press");
+								 mouse.sendEvent({"buttonCode":(Logitech.MacroMapping(bitIdx))}, "Button Press");
 							 }
 						 }
 						 else
 						 {
-							 if(Logitech.macroArray[bitIdx] === 10)
+							 if(Logitech.MacroMapping(bitIdx) === 10)
 							 {
-								 return; //Return as we don't need a depress event as this is internal to the plugin
+								return; //Return as we don't need a depress event as this is internal to the plugin
 							 }
-							 else if(Logitech.macroArray[bitIdx] === 12)
+							 else if(Logitech.MacroMapping(bitIdx) === 12)
 							 {
-								 return; //Return as we don't need a depress event as this is internal to the plugin
+								return; //Return as we don't need a depress event as this is internal to the plugin
 							 }
-							 else if(Logitech.macroArray[bitIdx] === 28)
+							 else if(Logitech.MacroMapping(bitIdx) === 28)
 							 {
 								 Sniper = false;
 								 DPIStageControl(); //The Sniper stuff needs wrapped into the DPIStageControl function. DPIStageControl should be wrapped into the class or more likely deprecated with the DPIHandler class.
 							 }
 							 else
 							 {
-								 mouse.sendEvent({"buttonCode":(Logitech.macroArray[bitIdx] + 1)}, "Button Press");
+								 mouse.sendEvent({"buttonCode":(Logitech.MacroMapping(bitIdx) + 1)}, "Button Press");
 							 }
 						 }
 					 }
