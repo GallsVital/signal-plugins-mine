@@ -34,7 +34,7 @@ export function DeviceMessages()
 export function SupportsSubdevices(){ return true; }
 export function DefaultComponentBrand() { return "LianLi";}
 
-const DeviceMaxLedLimit = 240;
+const DeviceMaxLedLimit = 80 * 4;
 
 //Channel Name, Led Limit
 const ChannelArray = [
