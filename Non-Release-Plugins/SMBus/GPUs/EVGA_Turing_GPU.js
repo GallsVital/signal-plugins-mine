@@ -59,34 +59,7 @@ function SetGPUNameFromBusIds(GPUList){
 	}
 }
 
-class TestClass{
-	constructor(){
-		this.value = 42;
-		this.registers = TestClass.registers; // dumb workaround to keep static functions on the constructed instance
-	};
-	static registers() {
-		return {
-			mode: 1,
-			red: 2,
-			green: 3,
-			blue: 4
-		};
-	};
-	static DoThings(){
-		return 42;
-	};
-}
-
 export function Initialize() {
-	let instance = new TestClass();
-
-	device.log(TestClass.DoThings()); // Static function
-	device.log(TestClass.registers()); // Static function
-	device.log(instance.value); // instance property
-	device.log(TestClass.registers().red); // Static property
-
-	device.log(instance.registers()); // needs workaround to not have to use a class reference isntead of 'this' (c++ style)
-
 	SetGPUNameFromBusIds(new EVGATuringGPUList().devices);
 	EVGATuring.SetMode(EVGATuring.modes.static);
 
@@ -379,7 +352,7 @@ class EVGATuringGPUList extends GPUList{
 			new EVGATuringIdentifier(Nvidia.RTX2060S_OC,        EVGATuringIds.RTX2060_SUPER_XC_ULTRA_GAMING,    "EVGA RTX 2060 Super XC Ultra Gaming"),
 			new EVGATuringIdentifier(Nvidia.RTX2070_OC,         EVGATuringIds.RTX2070_XC_GAMING,                "EVGA RTX 2070 XC Gaming"),
 			new EVGATuringIdentifier(Nvidia.RTX2070_OC,         EVGATuringIds.RTX2070_XC_OC,                    "EVGA RTX 2070 OC"),
-			//new EVGATuringIdentifier(Nvidia.RTX2070_OC,         EVGATuringIds.RTX2070_FTW3_ULTRA,               "EVGA RTX 2070 FTW3 Ultra"), // UNTESTED
+			new EVGATuringIdentifier(Nvidia.RTX2070_OC,         EVGATuringIds.RTX2070_FTW3_ULTRA,               "EVGA RTX 2070 FTW3 Ultra"),
 			new EVGATuringIdentifier(Nvidia.RTX2070S,           EVGATuringIds.RTX2070_SUPER_XC_ULTRA,           "EVGA RTX 2070 Super XC Ultra"),
 			new EVGATuringIdentifier(Nvidia.RTX2070S,           EVGATuringIds.RTX2070_SUPER_XC_ULTRA_PLUS,      "EVGA RTX 2070 XC Ultra+"),
 			new EVGATuringIdentifier(Nvidia.RTX2070S,           EVGATuringIds.RTX2070_SUPER_XC_GAMING,          "EVGA RTX 2070 Super XC Gaming"),
