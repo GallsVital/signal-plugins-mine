@@ -198,6 +198,10 @@ function deviceInitialization() {
 		Logitech.SetWiredMouseType(Logitech.ProductID);
 		DeviceID = Logitech.ProductID;
 		deviceName = Logitech.ProductIDs[Logitech.ProductID] || "UNKNOWN";
+	} else {
+		DeviceConnected = false;
+
+		return; //Kick back to pairing check if our DeviceIDCheck fails. I should probably add a timeout here, but we'll see. At the very least this doesn't lock up the render loop.
 	}
 
 	device.log(`Device Id Found: ${DeviceID}`, {toFile: true});
@@ -1149,10 +1153,10 @@ export class LogitechProtocol {
 
 	FetchDeviceInfo() {
 		Logitech.clearLongReadBuffer();
+		Logitech.clearShortReadBuffer();
 
 		const DeviceInfoPacket = [this.FeatureIDs.DeviceInfoID, 0x00];
 		this.SendShortMessage(DeviceInfoPacket);
-		device.pause(10);
 
 		const DeviceInfoResponsePacket = this.Long_Get();
 		const TotalEntities = DeviceInfoResponsePacket[0];
@@ -1171,7 +1175,6 @@ export class LogitechProtocol {
 		for(let entityIDX = 0; entityIDX < Math.max(TotalEntities, 3); entityIDX++) {
 			const FirmwareInfoPacket = [this.FeatureIDs.DeviceInfoID, 0x10, entityIDX];
 			this.SendShortMessage(FirmwareInfoPacket);
-			device.pause(10);
 
 			const FirmwareResponsePacket = this.Long_Get();
 			const FirmwareType = FirmwareResponsePacket[0];
