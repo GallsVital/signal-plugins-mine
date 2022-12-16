@@ -109,9 +109,11 @@ function GetFanStates() {
 		return;
 	}
 
+
 	GetFanSpeeds();
 	GetTemps();
 	SendCoolingData();
+
 }
 
 function GetFanSettings() {
@@ -189,6 +191,7 @@ function SendCoolingData() {
 		//device.log(`Setting Fan ${ConnectedFans[fan] + 1} Level to ${fanLevel}%`);
 		CoolingData[5 + ConnectedFans[fan] * 4] = fanLevel;
 	}
+
 
 	Corsair.WriteEndpoint("Background", Corsair.Endpoints.FanSpeeds, CoolingData);
 }
@@ -1073,6 +1076,7 @@ export class ModernCorsairProtocol{
 			Handle = this.Handles[Handle];
 		}
 		let packet = [0x00, this.ConnectionType, this.CommandIds.closeHandle, 1, Handle];
+		device.clearReadBuffer();
 		device.write(packet, this.GetBufferSize());
 		packet = device.read(packet, this.GetBufferSize());
 
@@ -1109,7 +1113,7 @@ export class ModernCorsairProtocol{
 			Handle = this.Handles[Handle];
 		}
 		let packet = [0x00, this.ConnectionType, this.CommandIds.checkHandle, Handle, 0x00];
-		device.read(packet, this.GetBufferSize());
+		device.clearReadBuffer();
 		device.write(packet, this.GetBufferSize());
 		packet = device.read(packet, this.GetBufferSize());
 
@@ -1131,6 +1135,7 @@ export class ModernCorsairProtocol{
 			Handle = this.Handles[Handle];
 		}
 		let packet = [0x00, this.ConnectionType, this.CommandIds.checkHandle, Handle, 0x00];
+		device.clearReadBuffer();
 		device.write(packet, this.GetBufferSize());
 		packet = device.read(packet, this.GetBufferSize());
 
@@ -1172,6 +1177,8 @@ export class ModernCorsairProtocol{
 
 			return [];
 		}
+
+		device.clearReadBuffer();
 
 		device.write([0x00, this.ConnectionType, this.CommandIds.readEndpoint, Handle], this.GetBufferSize());
 
@@ -1228,9 +1235,8 @@ export class ModernCorsairProtocol{
 		let packet = [0x00, this.ConnectionType, this.CommandIds.writeEndpoint, Handle, Data.length & 0xff, (Data.length >> 8) & 0xFF, 0x00, 0x00];
 		packet.push(...Data);
 
+		device.clearReadBuffer();
 		device.write(packet, this.GetBufferSize());
-		// Extra read to skip an empty packet.
-		device.read([0x00], this.GetBufferSize());
 
 		packet = device.read([0x00], this.GetBufferSize());
 
