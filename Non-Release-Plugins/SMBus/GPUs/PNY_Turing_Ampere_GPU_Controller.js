@@ -1,6 +1,5 @@
 export function Name() { return "PNY GPU"; }
 export function Publisher() { return "WhirlwindFX"; }
-export function Documentation(){ return "troubleshooting/asus"; }
 export function Type() { return "SMBUS"; }
 export function Size() { return [3, 1]; }
 export function DefaultPosition(){return [5, 2];}
