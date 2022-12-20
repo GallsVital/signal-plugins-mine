@@ -1,12 +1,11 @@
 export function Name() { return "CoolerMaster MK550 V2"; }
 export function VendorId() { return 0x2516; }
-export function Documentation(){ return "troubleshooting/coolermaster"; }
 export function ProductId() { return 0x0145; }
 export function Publisher() { return "WhirlwindFX"; }
+export function Documentation(){ return "troubleshooting/coolermaster"; }
 export function Size() { return [21, 6]; }
 export function DefaultPosition(){return [10, 100];}
-const DESIRED_HEIGHT = 85;
-export function DefaultScale(){return Math.floor(DESIRED_HEIGHT/Size()[1]);}
+export function DefaultScale(){return 8.0;}
 /* global
 shutdownColor:readonly
 LightingMode:readonly
@@ -20,42 +19,7 @@ export function ControllableParameters(){
 	];
 }
 
-function hexToRgb(hex) {
-	let result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
-	let colors = [];
-	colors[0] = parseInt(result[1], 16);
-	colors[1] = parseInt(result[2], 16);
-	colors[2] = parseInt(result[3], 16);
-
-	return colors;
-}
-
-export function Initialize() {
-	SendMagicColorPacketStart();
-	sendPacketString("00 51 00 00 00 05", 65); //Set Profile
-	//SendCommits();
-}
-
-function sendPacketString(string, size){
-
-	let packet= [];
-	let data = string.split(' ');
-
-	for(let i = 0; i < data.length; i++){
-		packet[i] =parseInt(data[i], 16);//.toString(16)
-	}
-
-	device.write(packet, size);
-}
-
-export function Shutdown() {
-	sendPacketString("00 41 80", 65);
-	sendPacketString("00 51 28 00 00 01", 65); // Set Mode
-
-}
-
-
-let vLedNames = [
+const vLedNames = [
 
 	"Esc", "F1", "F2", "F3", "F4", "F5", "F6", "F7", "F8", "F9", "F10", "F11", "F12",               "Print Screen", "Scroll Lock",  "Pause Break",
 	"`", "1", "2", "3", "4", "5", "6", "7", "8", "9", "0", "-_", "=+", "Backspace",                 "Insert", "Home", "Page Up",                    "NumLock", "Num /", "Num *", "Num -",  //21
@@ -65,18 +29,16 @@ let vLedNames = [
 	"Left Ctrl", "Left Win", "Left Alt", "Space", "Right Alt", "Right Win", "Menu", "Right Ctrl",  "Left Arrow", "Down Arrow", "Right Arrow",        "Num 0", "Num ."                       //13
 ];
 
-let vLedPositions = [
+const vLedPositions = [
 
-	[0, 0],    [1, 0], [2, 0], [3, 0], [4, 0], [5, 0], [6, 0], [7, 0], [8, 0], [9, 0], [10, 0], [11, 0], [12, 0], [13, 0],     [14, 0], [15, 0], [16, 0],    //[17,1], [18,1], [19,1],
+	[0, 0], 		[2, 0], [3, 0], [4, 0], [5, 0], [6, 0], [7, 0], [8, 0], [9, 0], [10, 0], [11, 0], [12, 0], [13, 0],     [14, 0], [15, 0], [16, 0],    //[17,1], [18,1], [19,1],
 	[0, 1], [1, 1], [2, 1], [3, 1], [4, 1], [5, 1], [6, 1], [7, 1], [8, 1], [9, 1], [10, 1], [11, 1], [12, 1], [13, 1],     [14, 1], [15, 1], [16, 1],   [17, 1], [18, 1], [19, 1], [20, 1], //21
 	[0, 2], [1, 2], [2, 2], [3, 2], [4, 2], [5, 2], [6, 2], [7, 2], [8, 2], [9, 2], [10, 2], [11, 2], [12, 2], [13, 2],     [14, 2], [15, 2], [16, 2],   [17, 2], [18, 2], [19, 2], [20, 2], //20
-	[0, 3], [1, 3], [2, 3], [3, 3], [4, 3], [5, 3], [6, 3], [7, 3], [8, 3], [9, 3], [10, 3], [11, 3],         [13, 3],                               [17, 3], [18, 3], [19, 3], // 17
-	[0, 4], [1, 4], [2, 4], [3, 4], [4, 4], [5, 4], [6, 4], [7, 4], [8, 4], [9, 4], [10, 4],                 [13, 4],             [15, 4],           [17, 4], [18, 4], [19, 4], [20, 4], // 17
-	[0, 5], [1, 5], [2, 5],                      [6, 5],                      [10, 5], [11, 5], [12, 5], [13, 5],     [14, 5], [15, 5], [16, 5],   [17, 5],         [19, 5] // 13
-
-
+	[0, 3], [1, 3], [2, 3], [3, 3], [4, 3], [5, 3], [6, 3], [7, 3], [8, 3], [9, 3], [10, 3], [11, 3],          [13, 3],                               	 [17, 3], [18, 3], [19, 3], // 17
+	[0, 4], [1, 4], [2, 4], [3, 4], [4, 4], [5, 4], [6, 4], [7, 4], [8, 4], [9, 4], [10, 4],                   [13, 4],              [15, 4],            [17, 4], [18, 4], [19, 4], [20, 4], // 17
+	[0, 5], [1, 5], [2, 5],                      [6, 5],                      		[10, 5], [11, 5], [12, 5], [13, 5],     [14, 5], [15, 5], [16, 5],   [17, 5],         [19, 5] // 13
 ];
-let vKeys = [
+const vKeys = [
 
 	0,     18, 24, 30, 36, 42, 48, 54, 60, 66, 72,  78, 84, 90,  96, 102, 108,    //120,126,132,
 	1,  13, 19, 25, 31, 37, 43, 49, 55, 61, 67, 73, 79,  91,  97, 103, 109,  115, 121, 127, 133,
@@ -95,18 +57,26 @@ export function LedPositions() {
 	return vLedPositions;
 }
 
+export function Initialize() {
+	device.write([0x00, 0x51, 0x00, 0x00, 0x00, 0x05], 65);
+}
+
 export function Render() {
-	SendMagicColorPacketStart();
 	SendColors();
 	SendCommits();
 }
 
+export function Shutdown() {
+	device.write([0x00, 0x41, 0x80], 65);
+	device.write([0x00, 0x51, 0x28, 0x00, 0x00, 0x01], 65);
+}
+
 function SendColors(shutdown = false){
-	let RGBData = [];//new Array(700).fill(0);
+	const RGBData = [];
 
 	for(let iIdx = 0; iIdx < vKeys.length; iIdx++) {
-		let iPxX = vLedPositions[iIdx][0];
-		let iPxY = vLedPositions[iIdx][1];
+		const iPxX = vLedPositions[iIdx][0];
+		const iPxY = vLedPositions[iIdx][1];
 		var mxPxColor;
 
 		if(shutdown){
@@ -122,7 +92,7 @@ function SendColors(shutdown = false){
 		RGBData[vKeys[iIdx]*3 +2 ] = mxPxColor[2];
 	}
 
-	sendPacketString("00 56 81 00 00 01 00 00 00 09 00 00 00 BB BB BB BB", 65);
+	device.write([0x00, 0x56, 0x81, 0x00, 0x00, 0x01, 0x00, 0x00, 0x00, 0x09, 0x00, 0x00, 0x00, 0xBB, 0xBB, 0xBB, 0xBB], 65);
 
 	//Send the left light bar and first column
 	let InitColorPacket = [0x00, 0x56, 0x83, 0x00, 0x00, 0x01, 0x00, 0x00, 0x00, 0x80, 0x01, 0x00, 0xFF, 0x00, 0x00, 0x00, 0x00, 0xFF, 0xFF, 0xFF, 0xFF, 0x00, 0x00, 0x00, 0x00];
@@ -145,11 +115,6 @@ function SendColors(shutdown = false){
 
 }
 
-
-export function Validate(endpoint) {
-	return endpoint.interface === 1;
-}
-
 function StreamPacket(packetId, RGBData){
 	let packet = [];
 	packet[0] = 0x00;
@@ -161,44 +126,25 @@ function StreamPacket(packetId, RGBData){
 	device.write(packet, 65);
 
 	device.read(packet, 65);
-
 }
 
 function SendCommits(){
-	//sendPacketString("00 41 80",65);
-	sendPacketString("00 51 28 00 00 FF", 65);
+	device.write([0x00, 0x51, 0x28, 0x00, 0x00, 0xFF], 65);
 	device.pause(1);
-
 }
 
-function SendMagicColorPacketStart(){
-	// sendPacketString("00 56 15 00 00 01 00 04 00 88 88 88 88",65);
-	// sendPacketString("00 56 15 01 00 01 00 0A 00 99 99 99 99",65);
-	// sendPacketString("00 56 15 02 00 02 00 20 00 88 88 88 88",65);
-	// sendPacketString("00 56 15 03 00 02 00 2C 00 88 88 88 88",65);
-	// sendPacketString("00 56 15 04 00 01 00 BC 00 BB BB BB BB",65);
-	// sendPacketString("00 56 15 05 00 02 00 C7 00 88 88 88 88",65);
-	// sendPacketString("00 56 15 06 00 02 00 D4 00 88 88 88 88",65);
-	// sendPacketString("00 56 15 07 00 01 00 DC 00 88 88 88 88",65);
-	// sendPacketString("00 56 15 08 00 01 00 E2 00 88 88 88 88",65);
-	// sendPacketString("00 56 15 09 00 02 00 F7 00 88 88 88 88",65);
-	// sendPacketString("00 56 15 0A 00 02 00 03 00 88 88 88 88",65);
-	// sendPacketString("00 56 15 0B 00 02 00 0F 00 88 88 88 88",65);
-	// sendPacketString("00 56 15 0C 00 02 00 18 00 88 88 88 88",65);
-	// sendPacketString("00 56 15 0D 00 01 00 1F 00 88 88 88 88",65);
-	// sendPacketString("00 56 15 0E 00 01 00 04 00 88 88 88 88",65);
-	// sendPacketString("00 56 15 0F 00 02 00 29 01 88 88 88 88",65);
-	// sendPacketString("00 56 15 10 00 02 00 39 01 88 88 88 88",65);
-	// sendPacketString("00 56 15 11 00 01 00 3E 01 AA AA AA AA",65);
-	// sendPacketString("00 56 15 12 00 02 00 49 01 88 88 88 88",65);
-	// sendPacketString("00 56 15 13 00 02 00 74 01 88 88 88 88",65);
-	// sendPacketString("00 56 15 14 00 05 00 BB 01 88 88 88 88",65);
+function hexToRgb(hex) {
+	const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+	const colors = [];
+	colors[0] = parseInt(result[1], 16);
+	colors[1] = parseInt(result[2], 16);
+	colors[2] = parseInt(result[3], 16);
 
-	// sendPacketString("00 56 21 00 00 00 01 00 C1 00 00 00 00 0A 14 1E FF 00 00 00 00 00 00 00 00 00 32 00 C1 07 00 00 00 FF FF FF FF 00 00 06 00 00 04 08 00 05 00 00 00 00 01 00 C1 00 00 00 00 00 00 00 FF 00 00 00 00",65);
+	return colors;
+}
 
-	// sendPacketString("00 56 21 01 00 00 80 00 80 0A 10 00 00 FF 00 00 FF 00 00 05 00 03 00 00 00 FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF",65);
-	// sendPacketString("00 56 21 02 00 FF FF FF FF FF FF FF FF 14 00 14 00 0B 00 00 00 0F 00 01 00 00 01 00 C1 00 00 00 00 00 00 C6 FF 00 00 00 00 00 80 00 80 0B 10 00 00 FF FF FF FF 00 00 02 00 00 00 00 00 14 00 14 00",65);
-
+export function Validate(endpoint) {
+	return endpoint.interface === 1;
 }
 
 export function Image() {
