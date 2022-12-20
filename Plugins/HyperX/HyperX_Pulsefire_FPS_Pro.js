@@ -1,6 +1,6 @@
 export function Name() { return "HyperX PulseFire FPS Pro"; }
 export function VendorId() { return 0x0951; }
-export function ProductId() { return 0x1729; }
+export function ProductId() { return [0x1729, 0x16d7]; }
 export function Publisher() { return "WhirlwindFX"; }
 export function Size() { return [3, 3]; }
 export function DefaultPosition() {return [225, 120]; }
