@@ -4,7 +4,12 @@ export function ProductId() { return 0x100b; }
 export function Publisher() { return "Bruno St. John"; }
 export function Size() { return [17,5]; }
 export function DefaultPosition(){return [10, 100]; }
-export function DefaultScale(){return 8.0}
+export function DefaultScale(){return 8.0;}
+/* global
+shutdownColor:readonly
+LightingMode:readonly
+forcedColor:readonly
+*/
 export function ControllableParameters() {
 	return [
 		{"property":"shutdownColor", "group":"lighting", "label":"Shutdown Color", "min":"0", "max":"360", "type":"color", "default":"009bde"},

@@ -11,8 +11,7 @@ shutdownColor:readonly
 LightingMode:readonly
 forcedColor:readonly
 */
-export function ControllableParameters()
-{
+export function ControllableParameters() {
 	return [
 		{"property":"shutdownColor", "group":"lighting", "label":"Shutdown Color", "min":"0", "max":"360", "type":"color", "default":"009bde"},
 		{"property":"LightingMode", "group":"lighting", "label":"Lighting Mode", "type":"combobox", "values":["Canvas", "Forced"], "default":"Canvas"},
@@ -233,26 +232,16 @@ const vKeyPositionsProIso =
 let LEDCount = 0;
 let UniqueIdentifierByte3 = 0;
 
-export function LedNames()
-{
-	if(UniqueIdentifierByte3 == 9)
-	{
+export function LedNames() {
+	if(UniqueIdentifierByte3 == 9) {
 		return vKeyNames96;
-	}
-	else if(UniqueIdentifierByte3 == 10)
-	{
+	} else if(UniqueIdentifierByte3 == 10) {
 		return vKeyNames96ISO;
-	}
-	else if(UniqueIdentifierByte3 == 8)
-	{
+	} else if(UniqueIdentifierByte3 == 8) {
 		return vKeyNames65ISO;
-	}
-	else if(UniqueIdentifierByte3 == 6)
-	{
+	} else if(UniqueIdentifierByte3 == 6) {
 		return vKeyNamesProIso;
-	}
-	else if(UniqueIdentifierByte3 == 5)
-	{
+	} else if(UniqueIdentifierByte3 == 5) {
 		return vKeyNamesProAnsi;
 	}
 
@@ -260,26 +249,16 @@ export function LedNames()
 
 }
 
-export function LedPositions()
-{
-	if(UniqueIdentifierByte3 == 9)
-	{
+export function LedPositions() {
+	if(UniqueIdentifierByte3 == 9) {
 		return vKeyPositions96;
-	}
-	else if(UniqueIdentifierByte3 == 10)
-	{
+	} else if(UniqueIdentifierByte3 == 10) {
 		return vKeyPositions96ISO;
-	}
-	else if(UniqueIdentifierByte3 == 8)
-	{
+	} else if(UniqueIdentifierByte3 == 8) {
 		return vKeyPositions65ISO;
-	}
-	else if(UniqueIdentifierByte3 == 6)
-	{
+	} else if(UniqueIdentifierByte3 == 6) {
 		return vKeyPositionsProIso;
-	}
-	else if(UniqueIdentifierByte3 == 5)
-	{
+	} else if(UniqueIdentifierByte3 == 5) {
 		return vKeyPositionsProAnsi;
 	}
 
@@ -287,30 +266,26 @@ export function LedPositions()
 
 }
 
-export function Initialize()
-{
+export function Initialize() {
 	ClearReadBuffer();
 	checkFirmwareType();
 	versionQMK();
 	versionSignalRGBProtocol();
 	uniqueIdentifier();
-	device.repollLeds();
+	device.setControllableLeds(LedNames(), LedPositions());
 	effectEnable();
 	totalLEDs();
 }
 
-export function Render()
-{
+export function Render() {
 	sendColors();
 }
 
-export function Shutdown()
-{
+export function Shutdown() {
 	effectDisable();
 }
 
-function checkFirmwareType()
-{
+function checkFirmwareType() {
 	const packet = [];
 	packet[0] = 0x00;
 	packet[1] = 0x28;
@@ -320,8 +295,7 @@ function checkFirmwareType()
 	const returnpacket = device.read(packet, 32);
 	const FirmwareTypeByte = returnpacket[2];
 
-	if(FirmwareTypeByte !== 1 || FirmwareTypeByte !== 2)
-	{
+	if(FirmwareTypeByte !== 1 || FirmwareTypeByte !== 2) {
 		device.notify("Unsupported Firmware: ", "Click Show Console, and then click on troubleshooting for your keyboard to find out more.", 0);
 	}
 
@@ -334,8 +308,7 @@ function ClearReadBuffer(timeout = 10) //Clear Read buffer to get correct values
 	let count = 0;
 	const readCounts = [];
 
-	while(device.getLastReadSize() > 0)
-	{
+	while(device.getLastReadSize() > 0) {
 		device.read([0x00], 32, timeout);
 		count++;
 		readCounts.push(device.getLastReadSize());
@@ -422,28 +395,20 @@ function effectDisable() //Revert to Hardware Mode
 	device.write(packet, 32);
 }
 
-function grabColors(shutdown = false)
-{
+function grabColors(shutdown = false) {
 	const rgbdata = [];
 
-	if(UniqueIdentifierByte3 == 9)
-	{
-		for(let iIdx = 0; iIdx < vKeys96.length; iIdx++)
-		{
+	if(UniqueIdentifierByte3 == 9) {
+		for(let iIdx = 0; iIdx < vKeys96.length; iIdx++) {
 			const iPxX = vKeyPositions96[iIdx][0];
 			const iPxY = vKeyPositions96[iIdx][1];
 			let color;
 
-			if(shutdown)
-			{
+			if(shutdown) {
 				color = hexToRgb(shutdownColor);
-			}
-			else if (LightingMode === "Forced")
-			{
+			} else if (LightingMode === "Forced") {
 				color = hexToRgb(forcedColor);
-			}
-			else
-			{
+			} else {
 				color = device.color(iPxX, iPxY);
 			}
 
@@ -453,26 +418,17 @@ function grabColors(shutdown = false)
 			rgbdata[iLedIdx+2] = color[2];
 		}
 
-	}
-
-	else if(UniqueIdentifierByte3 == 10)
-	{
-		for(let iIdx = 0; iIdx < vKeys96ISO.length; iIdx++)
-		{
+	} else if(UniqueIdentifierByte3 == 10) {
+		for(let iIdx = 0; iIdx < vKeys96ISO.length; iIdx++) {
 			const iPxX = vKeyPositions96ISO[iIdx][0];
 			const iPxY = vKeyPositions96ISO[iIdx][1];
 			let color;
 
-			if(shutdown)
-			{
+			if(shutdown) {
 				color = hexToRgb(shutdownColor);
-			}
-			else if (LightingMode === "Forced")
-			{
+			} else if (LightingMode === "Forced") {
 				color = hexToRgb(forcedColor);
-			}
-			else
-			{
+			} else {
 				color = device.color(iPxX, iPxY);
 			}
 
@@ -482,26 +438,17 @@ function grabColors(shutdown = false)
 			rgbdata[iLedIdx+2] = color[2];
 		}
 
-	}
-
-	else if(UniqueIdentifierByte3 == 8)
-	{
-		for(let iIdx = 0; iIdx < vKeys65ISO.length; iIdx++)
-		{
+	} else if(UniqueIdentifierByte3 == 8) {
+		for(let iIdx = 0; iIdx < vKeys65ISO.length; iIdx++) {
 			const iPxX = vKeyPositions65ISO[iIdx][0];
 			const iPxY = vKeyPositions65ISO[iIdx][1];
 			let color;
 
-			if(shutdown)
-			{
+			if(shutdown) {
 				color = hexToRgb(shutdownColor);
-			}
-			else if (LightingMode === "Forced")
-			{
+			} else if (LightingMode === "Forced") {
 				color = hexToRgb(forcedColor);
-			}
-			else
-			{
+			} else {
 				color = device.color(iPxX, iPxY);
 			}
 
@@ -511,26 +458,17 @@ function grabColors(shutdown = false)
 			rgbdata[iLedIdx+2] = color[2];
 		}
 
-	}
-
-	else if(UniqueIdentifierByte3 == 5)
-	{
-		for(let iIdx = 0; iIdx < vKeyNamesProAnsi.length; iIdx++)
-		{
+	} else if(UniqueIdentifierByte3 == 5) {
+		for(let iIdx = 0; iIdx < vKeyNamesProAnsi.length; iIdx++) {
 			const iPxX = vKeyPositionsProAnsi[iIdx][0];
 			const iPxY = vKeyPositionsProAnsi[iIdx][1];
 			let color;
 
-			if(shutdown)
-			{
+			if(shutdown) {
 				color = hexToRgb(shutdownColor);
-			}
-			else if (LightingMode === "Forced")
-			{
+			} else if (LightingMode === "Forced") {
 				color = hexToRgb(forcedColor);
-			}
-			else
-			{
+			} else {
 				color = device.color(iPxX, iPxY);
 			}
 
@@ -540,26 +478,17 @@ function grabColors(shutdown = false)
 			rgbdata[iLedIdx+2] = color[2];
 		}
 
-	}
-
-	else if(UniqueIdentifierByte3 == 6)
-	{
-		for(let iIdx = 0; iIdx < vKeyNamesProIso.length; iIdx++)
-		{
+	} else if(UniqueIdentifierByte3 == 6) {
+		for(let iIdx = 0; iIdx < vKeyNamesProIso.length; iIdx++) {
 			const iPxX = vKeyPositionsProIso[iIdx][0];
 			const iPxY = vKeyPositionsProIso[iIdx][1];
 			let color;
 
-			if(shutdown)
-			{
+			if(shutdown) {
 				color = hexToRgb(shutdownColor);
-			}
-			else if (LightingMode === "Forced")
-			{
+			} else if (LightingMode === "Forced") {
 				color = hexToRgb(forcedColor);
-			}
-			else
-			{
+			} else {
 				color = device.color(iPxX, iPxY);
 			}
 
@@ -569,26 +498,17 @@ function grabColors(shutdown = false)
 			rgbdata[iLedIdx+2] = color[2];
 		}
 
-	}
-
-	else
-	{
-		for(let iIdx = 0; iIdx < vKeys65.length; iIdx++)
-		{
+	} else {
+		for(let iIdx = 0; iIdx < vKeys65.length; iIdx++) {
 			const iPxX = vKeyPositions65[iIdx][0];
 			const iPxY = vKeyPositions65[iIdx][1];
 			let color;
 
-			if(shutdown)
-			{
+			if(shutdown) {
 				color = hexToRgb(shutdownColor);
-			}
-			else if (LightingMode === "Forced")
-			{
+			} else if (LightingMode === "Forced") {
 				color = hexToRgb(forcedColor);
-			}
-			else
-			{
+			} else {
 				color = device.color(iPxX, iPxY);
 			}
 
@@ -603,10 +523,8 @@ function grabColors(shutdown = false)
 	return rgbdata;
 }
 
-function sendColors()
-{
-	if(UniqueIdentifierByte3 == 9)
-	{
+function sendColors() {
+	if(UniqueIdentifierByte3 == 9) {
 		LEDCount = 119;
 	}
 	const rgbdata = grabColors();
@@ -614,8 +532,7 @@ function sendColors()
 	const finalpacketoffset = (totalpackets*9);
 	const finalpacketledstosend = (LEDCount - finalpacketoffset);
 
-	for(let index = 0; index < totalpackets; index++)
-	{
+	for(let index = 0; index < totalpackets; index++) {
 		const packet = [];
 		const offset = index * 9;
 		packet[0] = 0x00;
@@ -638,8 +555,7 @@ function sendColors()
 }
 
 
-function hexToRgb(hex)
-{
+function hexToRgb(hex) {
 	const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
 	const colors = [];
 	colors[0] = parseInt(result[1], 16);
@@ -649,12 +565,10 @@ function hexToRgb(hex)
 	return colors;
 }
 
-export function Validate(endpoint)
-{
+export function Validate(endpoint) {
 	return endpoint.interface === 1;
 }
 
-export function Image()
-{
+export function Image() {
 	return "";
 }
