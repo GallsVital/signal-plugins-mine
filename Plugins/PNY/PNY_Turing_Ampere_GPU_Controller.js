@@ -1,10 +1,10 @@
-export function Name() { return "ASUS Legacy GPU"; }
+// Modifing SMBUS Plugins is -DANGEROUS- and can -DESTROY- devices.
+export function Name() { return "PNY GPU"; }
 export function Publisher() { return "WhirlwindFX"; }
-export function Documentation(){ return "troubleshooting/asus"; }
 export function Type() { return "SMBUS"; }
-export function Size() { return [5, 2]; }
-export function DefaultPosition(){return [192, 127];}
-export function DefaultScale(){return 12.5;}
+export function Size() { return [3, 1]; }
+export function DefaultPosition(){return [5, 2];}
+export function DefaultScale(){return 2.5;}
 export function LedNames() { return vLedNames; }
 export function LedPositions() { return vLedPositions; }
 /* global
@@ -12,7 +12,7 @@ shutdownColor:readonly
 LightingMode:readonly
 forcedColor:readonly
 */
-export function ControllableParameters(){
+export function ControllableParameters() {
 	return [
 		{"property":"shutdownColor", "group":"lighting", "label":"Shutdown Color", "min":"0", "max":"360", "type":"color", "default":"#009bde"},
 		{"property":"LightingMode", "group":"lighting", "label":"Lighting Mode", "type":"combobox", "values":["Canvas", "Forced"], "default":"Canvas"},
@@ -20,8 +20,8 @@ export function ControllableParameters(){
 	];
 }
 
-const vLedNames = ["Main Zone"];
-const vLedPositions = [[3, 1]];
+const vLedNames = [ "GPU" ];
+const vLedPositions = [ [1, 0] ];
 
 /** @param {FreeAddressBus} bus */
 export function Scan(bus) {
@@ -32,287 +32,85 @@ export function Scan(bus) {
 		return [];
 	}
 
-	for(const GPU of new ASUSLegacyGPUList().devices){
-		if(CheckForIdMatch(bus, GPU)){
-			// No Quick Write test on Nvidia
-			if(CheckForASUSLegacyGPU(bus, GPU.Address))
-			FoundAddresses.push(GPU.Address);
-			break;
+	for(const PNYGPUID of PNYGPUIDs) {
+		if(PNYGPUID.Vendor === bus.Vendor() &&
+		PNYGPUID.SubVendor === bus.SubVendor() &&
+		PNYGPUID.Device === bus.Product() &&
+		PNYGPUID.SubDevice === bus.SubDevice()
+		) {
+			FoundAddresses.push(PNYGPUID.Address);
 		}
 	}
 
 	return FoundAddresses;
 }
 
-function CheckForASUSLegacyGPU(bus, address){
-	const ASUSLegacyTestValue = 0x1589;
-	const highByte = bus.ReadByte(address, 0x20);
-	const lowByte = bus.ReadByte(address, 0x21);
-
-	return (highByte << 8) + lowByte === ASUSLegacyTestValue;
-}
-
-function CheckForIdMatch(bus, Gpu){
-	return Gpu.Vendor === bus.Vendor() &&
-    Gpu.SubVendor === bus.SubVendor() &&
-    Gpu.Device === bus.Product() &&
-    Gpu.SubDevice === bus.SubDevice();
-}
-
-function SetGPUNameFromBusIds(GPUList){
-	for(const GPU of GPUList){
-		if(CheckForIdMatch(bus, GPU)){
-			device.setName(GPU.Name);
-			break;
-		}
-	}
-}
-
-
 export function Initialize() {
-	SetGPUNameFromBusIds(new ASUSLegacyGPUList().devices);
-	ASUSLegacy.SetMode(ASUSLegacy.modes.static);
-
+	bus.WriteByte(PNYGPU.registers.Control, 0x00);
+	bus.WriteByte(PNYGPU.registers.Mode, 0x01);
+	bus.WriteByte(PNYGPU.registers.Brightness, 0x64);
+	SetGPUNameFromBusIds();
 }
 
 export function Render() {
-	SendRGB();
-
-	PollHardwareModes();
-	// Mimic old Refresh Speed. Noticing slight color blending going from Blue to Red where a Purple color gets flashed
-	//device.pause(10);
-
-	//device.log(`Total Packets [${sentPackets + savedPackets}]. Checking RGB values saved us sending [${Math.floor(savedPackets/(savedPackets+sentPackets) * 100)}]% of them`)
-	//device.log(`Saved: [${savedPackets}] Sent: [${sentPackets}]`);
+	sendColors();
 }
-
 
 export function Shutdown() {
-	ASUSLegacy.SetMode(ASUSLegacy.modes.colorCycle);
-
 }
 
-function PollHardwareModes(){
-	const PollInterval = 5000;
-
-	if (Date.now() - PollHardwareModes.lastPollTime < PollInterval) {
-		return;
+function SetGPUNameFromBusIds() {
+	for(const PNYGPUID of PNYGPUIDs) {
+		if(PNYGPUID.Vendor === bus.Vendor() &&
+		PNYGPUID.SubVendor === bus.SubVendor() &&
+		PNYGPUID.Device === bus.Product() &&
+		PNYGPUID.SubDevice === bus.SubDevice()
+		) {
+			device.setName(PNYGPUID.Name);
+		}
 	}
-
-	const CurrentMode = ASUSLegacy.ReadCurrentMode();
-
-	if(CurrentMode !== ASUSLegacy.modes.static){
-		device.log(`Found Device in Invalid Mode! [${ASUSLegacy.GetModeNameFromId(CurrentMode)}]. Setting back to Static...`);
-		ASUSLegacy.SetMode(ASUSLegacy.modes.static);
-	}
-
-
-	PollHardwareModes.lastPollTime = Date.now();
 }
 
+function sendColors(shutdown = false) {
+	const iPxX = vLedPositions[0][0];
+	const iPxY = vLedPositions[0][1];
+	let color;
 
-function CompareArrays(array1, array2){
-	return array1.length === array2.length &&
-	array1.every(function(value, index) { return value === array2[index];});
-}
-
-
-let OldRGB = [];
-
-function SendRGB(shutdown = false){
-
-	let Color;
-
-	if(shutdown){
-		Color = hexToRgb(shutdownColor);
-	}else if(LightingMode === "Forced") {
-		Color = hexToRgb(forcedColor);
+	if(shutdown) {
+		color = hexToRgb(shutdownColor);
+	} else if (LightingMode === "Forced") {
+		color = hexToRgb(forcedColor);
 	} else {
-		Color = device.color(...vLedPositions[0]);
+		color = device.color(iPxX, iPxY);
 	}
 
-	if(!CompareArrays(Color, OldRGB)){
-		ASUSLegacy.WriteRGB(Color);
-	}
-
-	OldRGB = Color;
+	bus.WriteByte(PNYGPU.registers.R, color[0]);
+	bus.WriteByte(PNYGPU.registers.G, color[1]);
+	bus.WriteByte(PNYGPU.registers.B, color[2]);
 }
 
-
-function hexToRgb(hex) {
-	const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
-	const colors = [];
-	colors[0] = parseInt(result[1], 16);
-	colors[1] = parseInt(result[2], 16);
-	colors[2] = parseInt(result[3], 16);
-
-	return colors;
-}
-
-class ASUSLegacyGPUProtocol{
-	constructor(){
-		this.registers = {
-			red: 0x04,
-			green: 0x05,
-			blue: 0x06,
-			mode: 0x07,
-			sync: 0x0C,
-			apply: 0x0E,
-		};
-		this.modes = {
-			static: 0x01,
-			breathing: 0x02,
-			flash: 0x03,
-			colorCycle: 0x04
-		};
-
+class PNYGPUController {
+	constructor() {
+		this.registers =
+        {
+        	Control    : 0xE0,
+        	Mode       : 0x60,
+        	R          : 0x6C,
+        	G          : 0x6D,
+        	B          : 0x6E,
+        	Brightness : 0x6F
+        };
 	}
 
-	GetModeNameFromId(mode){
-		if(Object.values(this.modes).includes(mode)){
-			return Object.keys(this.modes).find(key => this.modes[key] === mode);
-		}
-
-		return "UNKNOWN MODE";
-	}
-
-	ReadCurrentMode(){
-		const iRet = bus.ReadByte(this.registers.mode);
-
-		if(iRet < 0){
-			device.log(`Failed to read existing lighting mode. Error Code: [${iRet}]`);
-		}else{
-			//device.log(`Current Lighting Mode: [${this.GetModeNameFromId(iRet)}]`);
-		}
-
-		return iRet;
-	}
-	SetMode(mode){
-		if(!Object.values(this.modes).includes(mode)){
-			device.log(`Cannot Set invalid Lighting Mode: [${mode}]`);
-
-			return;
-		}
-
-		const currentMode = this.ReadCurrentMode();
-
-		if(currentMode != mode){
-			device.log(`Setting Lighting Mode: [${this.GetModeNameFromId(mode)}]`);
-			bus.WriteByte(this.registers.mode, mode);
-			bus.WriteByte(this.registers.apply, 1);
-		}
-	}
-
-	WriteRGB(RGBData){
-
-		bus.WriteByte(this.registers.red, RGBData[0]);
-		bus.WriteByte(this.registers.green, RGBData[1]);
-		bus.WriteByte(this.registers.blue, RGBData[2]);
-
+	setDeviceMode(mode) {
+		bus.WriteByte(this.registers.Mode, mode);
 	}
 }
 
-const ASUSLegacy = new ASUSLegacyGPUProtocol();
+const PNYGPU = new PNYGPUController();
 
-class NvidiaGPUDeviceIds {
-	constructor(){
-		this.GTX1050TI       = 0x1C82;
-		this.GTX1060         = 0x1C03;
-		this.GTX1070         = 0x1B81;
-		this.GTX1070TI       = 0x1B82;
-		this.GTX1080         = 0x1B80;
-		this.GTX1080TI       = 0x1B06;
-		this.GTX1650         = 0x1F82;
-		this.GTX1650S        = 0x2187;
-		this.GTX1660         = 0x2184;
-		this.GTX1660TI       = 0x2182;
-		this.GTX1660S        = 0x21C4;
-		this.RTX2060_TU104   = 0x1E89;
-		this.RTX2060_TU106   = 0x1F08;
-		this.RTX2060S        = 0x1F47;
-		this.RTX2060S_OC     = 0x1F06;
-		this.RTX2070         = 0x1F02;
-		this.RTX2070_OC      = 0x1F07;
-		this.RTX2070S        = 0x1E84;
-		this.RTX2080         = 0x1E82;
-		this.RTX2080_A       = 0x1E87;
-		this.RTX2080S        = 0x1E81;
-		this.RTX2080TI_TU102 = 0x1E04;
-		this.RTX2080TI       = 0x1E07;
-		this.RTX2080_SUPER   = 0x1E81;
-		this.RTX3050         = 0x2507;
-		this.RTX3060         = 0x2503;
-		this.RTX3060_LHR     = 0x2504;
-		this.RTX3060_GA104   = 0x2487;
-		this.RTX3060TI       = 0x2486;
-		this.RTX3060TI_LHR   = 0x2489;
-		this.RTX3070         = 0x2484;
-		this.RTX3070_LHR     = 0x2488;
-		this.RTX3070TI       = 0x2482;
-		this.RTX3080         = 0x2206;
-		this.RTX3080_LHR     = 0x2216;
-		this.RTX3080_GA102   = 0x220A;
-		this.RTX3080TI       = 0x2208;
-		this.RTX3090         = 0x2204;
-		this.RTX3090TI       = 0x2203;
-	}
-};
-
-class ASUSLegacyGPUDeviceIds{
-	constructor(){
-		this.GTX1050TI_STRIX_GAMING_OC                 = 0x85D1;
-		this.GTX1060_STRIX_GAMING_FE                   = 0x85A4;
-		this.GTX1060_STRIX                             = 0x85AC;
-		this.GTX1060_STRIX_GAMING                      = 0x854A;
-		this.GTX1070_STRIX_GAMING                      = 0x8598;
-		this.GTX1070_STRIX_OC                          = 0x8599;
-		this.GTX1070TI_STRIX_GAMING                    = 0x861E;
-		this.GTX1080_STRIX                             = 0x8592;
-		this.GTX1080_STRIX_GAMING_OC                   = 0x8593;
-		this.GTX1080_STRIX_GAMING                      = 0x85E8;
-		this.ROG_STRIX_GTX1080_A8G_GAMING              = 0x85AA;
-		this.ROG_STRIX_GTX1080_O8G_GAMING              = 0x85F9;
-		this.ROG_STRIX_GTX1080TI_11G_GAMING            = 0x85F1;
-		this.ROG_STRIX_GTX1080TI_GAMING                = 0x85EA;
-		this.ROG_STRIX_GTX1660_SUPER_GAMING_ADVANCED   = 0x8753;
-		this.ROG_GTX1660TI_OC                          = 0x86A5;
-		this.ROG_STRIX_GTX1650_SUPER_GAMING_ADVANCED   = 0x8750;
-		this.ROG_STRIX_GTX1650_SUPER_GAMING_OC         = 0x8751;
-		this.ROG_STRIX_GTX1650_SUPER_OC                = 0x874F;
-		this.ROG_STRIX_RTX2060_GAMING                  = 0x86D1;
-		this.ROG_STRIX_RTX2060_EVO_GAMING              = 0x86D3;
-		this.ROG_STRIX_RTX2060_EVO_V2_GAMING           = 0x880B;
-		this.ROG_STRIX_RTX2060_EVO_V2                  = 0x880c;
-		this.ROG_STRIX_RTX2060_OC                      = 0x868E;
-		this.ROG_STRIX_RTX2060_O6G_GAMING              = 0x868F;
-		this.ROG_STRIX_RTX2060_SUPER_A8G_EVO_GAMING    = 0x8703;
-		this.ROG_STRIX_RTX2060_SUPER_O8G_GAMING        = 0x872F;
-		this.ROG_STRIX_RTX2060_SUPER_O8G_GAMING_OC     = 0x86FB;
-		this.ROG_STRIX_RTX2060_SUPER_A8G_GAMING_OC     = 0x86FC;
-		this.ROG_STRIX_RTX2070_A8G_GAMING              = 0x8671;
-		this.ROG_STRIX_RTX2070_O8G_GAMING              = 0x8670;
-		this.ROG_STRIX_RTX2070_O8G                     = 0x8796;
-		this.ROG_STRIX_RTX2070_SUPER_O8G_GAMING_OC     = 0x8729;
-		this.ROG_STRIX_RTX2070_SUPER_A8G_GAMING        = 0x8728;
-		this.ROG_STRIX_RTX2070_SUPER_O8G_GAMING        = 0x8727;
-		this.ROG_STRIX_RTX2070_SUPER_A08G_GAMING       = 0x8706;
-		this.ROG_STRIX_RTX2080_O8G_GAMING              = 0x865F;
-		this.ROG_STRIX_RTX2080_A8G_GAMING              = 0x8660;
-		this.ROG_STRIX_RTX2080_SUPER_GAMING            = 0x8711;
-		this.ROG_STRIX_RTX2080_SUPER_OC                = 0x8712;
-		this.ROG_STRIX_RTX2080_SUPER_OC_WHITE          = 0x876B;
-		this.ROG_STRIX_RTX2080TI_O11G_GAMING           = 0x866A;
-		this.ROG_STRIX_RTX2080TI_011G                  = 0x8759;
-		this.ROG_STRIX_RTX2080TI_011G_GAMING_OC_WHITE  = 0x875A;
-		this.ROG_STRIX_RTX2080TI_O11G_GAMING_TU102     = 0x8687;
-		this.ROG_STRIX_RTX2080TI_O11G_GAMING_OC        = 0x866B;
-		this.ROG_STRIX_RTX2080TI_O11G_BLACKOPS_4       = 0x8689;
-	}
-}
-
-
-class GPUIdentifier{
-	constructor(Vendor, SubVendor, Device, SubDevice, Address, Name, Model = ""){
+class GPUIdentifier {
+	constructor(Vendor, SubVendor, Device, SubDevice, Address, Name, Model = "") {
 		this.Vendor = Vendor;
 		this.SubVendor = SubVendor;
 		this.Device = Device;
@@ -323,69 +121,26 @@ class GPUIdentifier{
 	}
 }
 
-class ASUSLegacyDeviceIdentifier extends GPUIdentifier{
-	constructor(Device, SubDevice, Address, Name, Model = ""){
-		super(0x10DE, 0x1043, Device, SubDevice, Address, Name, Model);
+class PNYGPUIdentifier extends GPUIdentifier {
+	constructor(Device, SubDevice, Name, Model = "") {
+		super(0x10DE, 0x196E, Device, SubDevice, 0x49, Name, Model);
 	}
 }
-export function BrandGPUList(){ return new ASUSLegacyGPUList().devices; }
 
-class ASUSLegacyGPUList{
-	constructor(){
-		const Nvidia = new NvidiaGPUDeviceIds();
-		const ASUSLegacyGPUIds = new ASUSLegacyGPUDeviceIds();
-		
-		this.devices = [
-			new ASUSLegacyDeviceIdentifier(Nvidia.GTX1050TI,       	ASUSLegacyGPUIds.GTX1050TI_STRIX_GAMING_OC,         		0x29, "ASUS GTX 1050Ti Strix Gaming OC"),
-			new ASUSLegacyDeviceIdentifier(Nvidia.GTX1060,         	ASUSLegacyGPUIds.GTX1060_STRIX,                     		0x29, "ASUS GTX 1060 Strix"),
-			new ASUSLegacyDeviceIdentifier(Nvidia.GTX1060,         	ASUSLegacyGPUIds.GTX1060_STRIX_GAMING_FE,           		0x29, "ASUS GTX 1060 Strix Gaming FE"),
-			new ASUSLegacyDeviceIdentifier(Nvidia.GTX1060,         	ASUSLegacyGPUIds.GTX1060_STRIX_GAMING,              		0x29, "ASUS GTX 1060 Strix Gaming"),
-			new ASUSLegacyDeviceIdentifier(Nvidia.GTX1070,         	ASUSLegacyGPUIds.GTX1070_STRIX_GAMING,              		0x29, "ASUS GTX 1070 Strix Gaming"),
-			new ASUSLegacyDeviceIdentifier(Nvidia.GTX1070,         	ASUSLegacyGPUIds.GTX1070_STRIX_OC,                  		0x29, "ASUS GTX 1070 Strix OC"),
-			new ASUSLegacyDeviceIdentifier(Nvidia.GTX1070TI,       	ASUSLegacyGPUIds.GTX1070TI_STRIX_GAMING,            		0x29, "ASUS GTX 1070Ti Strix Gaming"),
-			new ASUSLegacyDeviceIdentifier(Nvidia.GTX1080,         	ASUSLegacyGPUIds.GTX1080_STRIX,                     		0x29, "ASUS GTX 1080 Strix"),
-			new ASUSLegacyDeviceIdentifier(Nvidia.GTX1080,         	ASUSLegacyGPUIds.GTX1080_STRIX_GAMING_OC,           		0x29, "ASUS GTX 1080 Strix Gaming OC"),
-			new ASUSLegacyDeviceIdentifier(Nvidia.GTX1080,         	ASUSLegacyGPUIds.GTX1080_STRIX_GAMING,              		0x29, "ASUS GTX 1080 Strix Gaming"),
-			new ASUSLegacyDeviceIdentifier(Nvidia.GTX1080,         	ASUSLegacyGPUIds.ROG_STRIX_GTX1080_A8G_GAMING,      		0x29, "ASUS ROG Strix GTX 1080 A8G Gaming"),
-			new ASUSLegacyDeviceIdentifier(Nvidia.GTX1080,         	ASUSLegacyGPUIds.ROG_STRIX_GTX1080_O8G_GAMING,      		0x29, "ASUS ROG Strix GTX 1080 OC 11 Gbps"),
-			new ASUSLegacyDeviceIdentifier(Nvidia.GTX1080TI,       	ASUSLegacyGPUIds.ROG_STRIX_GTX1080TI_GAMING,        		0x29, "ASUS ROG Strix GTX 1080Ti Gaming OC"),
-			new ASUSLegacyDeviceIdentifier(Nvidia.GTX1080TI,       	ASUSLegacyGPUIds.ROG_STRIX_GTX1080TI_11G_GAMING,    		0x29, "ASUS ROG Strix GTX 1080Ti Gaming 11G"),
-			new ASUSLegacyDeviceIdentifier(Nvidia.GTX1650S,        	ASUSLegacyGPUIds.ROG_STRIX_GTX1650_SUPER_OC,        		0x2A, "ASUS ROG Strix GTX 1650 Super OC"),
-			new ASUSLegacyDeviceIdentifier(Nvidia.GTX1650S,        	ASUSLegacyGPUIds.ROG_STRIX_GTX1650_SUPER_GAMING_ADVANCED, 	0x2A, "ASUS ROG Strix GTX 1650 Super Gaming Advanced"),
-			new ASUSLegacyDeviceIdentifier(Nvidia.GTX1650S,        	ASUSLegacyGPUIds.ROG_STRIX_GTX1650_SUPER_GAMING_OC, 		0x2A, "ASUS ROG Strix GTX 1650 Super Gaming OC"),
-			new ASUSLegacyDeviceIdentifier(Nvidia.GTX1660S,        	ASUSLegacyGPUIds.ROG_STRIX_GTX1660_SUPER_GAMING_ADVANCED, 	0x2A, "ASUS ROG Strix GTX 1660 Super Gaming Advanced"),
-			new ASUSLegacyDeviceIdentifier(Nvidia.GTX1660TI,       	ASUSLegacyGPUIds.ROG_GTX1660TI_OC,                  		0x2A, "ASUS ROG Strix GTX 1660TI OC"),
-			new ASUSLegacyDeviceIdentifier(Nvidia.RTX2060_TU106,   	ASUSLegacyGPUIds.ROG_STRIX_RTX2060_GAMING,          		0x2A, "ASUS ROG Strix RTX 2060 Gaming"),
-			new ASUSLegacyDeviceIdentifier(Nvidia.RTX2060_TU106,   	ASUSLegacyGPUIds.ROG_STRIX_RTX2060_O6G_GAMING,          	0x2A, "ASUS ROG Strix RTX 2060 Gaming 6gb"),
-			new ASUSLegacyDeviceIdentifier(Nvidia.RTX2060_TU106,   	ASUSLegacyGPUIds.ROG_STRIX_RTX2060_EVO_GAMING,      		0x2A, "ASUS ROG Strix RTX 2060 EVO Gaming"),
-			new ASUSLegacyDeviceIdentifier(Nvidia.RTX2060S,        	ASUSLegacyGPUIds.ROG_STRIX_RTX2060_SUPER_A8G_EVO_GAMING, 	0x2A, "ASUS ROG Strix RTX 2060 Super EVO Gaming"),
-			new ASUSLegacyDeviceIdentifier(Nvidia.RTX2060S_OC,     	ASUSLegacyGPUIds.ROG_STRIX_RTX2060_SUPER_O8G_GAMING, 		0x2A, "ASUS ROG Strix RTX 2060 Super Gaming"),
-			new ASUSLegacyDeviceIdentifier(Nvidia.RTX2060S_OC,     	ASUSLegacyGPUIds.ROG_STRIX_RTX2060_SUPER_O8G_GAMING_OC, 	0x2A, "ASUS ROG Strix RTX 2060 Super Gaming OC"),
-			new ASUSLegacyDeviceIdentifier(Nvidia.RTX2060S_OC,     	ASUSLegacyGPUIds.ROG_STRIX_RTX2060_SUPER_A8G_GAMING_OC, 	0x2A, "ASUS ROG Strix RTX 2060 Super Gaming Advanced OC"),
-			new ASUSLegacyDeviceIdentifier(Nvidia.RTX2060_TU106,   	ASUSLegacyGPUIds.ROG_STRIX_RTX2060_OC,              		0x2A, "ASUS ROG Strix RTX 2060 OC"),
-			new ASUSLegacyDeviceIdentifier(Nvidia.RTX2070_OC,      	ASUSLegacyGPUIds.ROG_STRIX_RTX2070_A8G_GAMING,      		0x2A, "ASUS ROG Strix RTX 2070 Gaming Advanced"),
-			new ASUSLegacyDeviceIdentifier(Nvidia.RTX2070_OC,      	ASUSLegacyGPUIds.ROG_STRIX_RTX2070_O8G_GAMING,      		0x2A, "ASUS ROG Strix RTX 2070 Gaming OC"),
-			new ASUSLegacyDeviceIdentifier(Nvidia.RTX2070,         	ASUSLegacyGPUIds.ROG_STRIX_RTX2070_O8G,             		0x2A, "ASUS ROG Strix RTX 2070 Gaming"),
-			new ASUSLegacyDeviceIdentifier(Nvidia.RTX2070S,        	ASUSLegacyGPUIds.ROG_STRIX_RTX2070_SUPER_A08G_GAMING,  	    0x2A, "ASUS ROG Strix RTX 2070 Super Gaming Advanced"),
-			new ASUSLegacyDeviceIdentifier(Nvidia.RTX2070S,        	ASUSLegacyGPUIds.ROG_STRIX_RTX2070_SUPER_A8G_GAMING,   	    0x2A, "ASUS ROG Strix RTX 2070 Super Gaming Advanced"),
-			new ASUSLegacyDeviceIdentifier(Nvidia.RTX2070S,        	ASUSLegacyGPUIds.ROG_STRIX_RTX2070_SUPER_O8G_GAMING_OC,	    0x2A, "ASUS ROG Strix RTX 2070 Super Gaming OC"),
-			new ASUSLegacyDeviceIdentifier(Nvidia.RTX2070S,        	ASUSLegacyGPUIds.ROG_STRIX_RTX2070_SUPER_O8G_GAMING,   	    0x2A, "ASUS ROG Strix RTX 2070 Super Gaming OC"),
-			new ASUSLegacyDeviceIdentifier(Nvidia.RTX2080_A,       	ASUSLegacyGPUIds.ROG_STRIX_RTX2080_O8G_GAMING,      		0x2A, "ASUS ROG Strix RTX 2080 Gaming OC"),
-			new ASUSLegacyDeviceIdentifier(Nvidia.RTX2080_A,       	ASUSLegacyGPUIds.ROG_STRIX_RTX2080_A8G_GAMING,      		0x2A, "ASUS ROG Strix RTX 2080 Gaming Advanced"),
-			new ASUSLegacyDeviceIdentifier(Nvidia.RTX2080TI,       	ASUSLegacyGPUIds.ROG_STRIX_RTX2080TI_O11G_GAMING,   		0x2A, "ASUS ROG Strix RTX 2080Ti Gaming"),
-			new ASUSLegacyDeviceIdentifier(Nvidia.RTX2060_TU106,   	ASUSLegacyGPUIds.ROG_STRIX_RTX2060_EVO_V2_GAMING,   		0x2A, "ASUS ROG Strix RTX 2060 Evo V2"),
-			new ASUSLegacyDeviceIdentifier(Nvidia.RTX2080TI,       	ASUSLegacyGPUIds.ROG_STRIX_RTX2080TI_O11G_GAMING_OC,   		0x2A, "ASUS ROG Strix RTX 2080Ti Gaming OC"),
-			new ASUSLegacyDeviceIdentifier(Nvidia.RTX2080TI,       	ASUSLegacyGPUIds.ROG_STRIX_RTX2080TI_O11G_BLACKOPS_4,  	 	0x2A, "ASUS ROG Strix RTX 2080Ti Call of Duty BO4"),
-			new ASUSLegacyDeviceIdentifier(Nvidia.RTX2060_TU106,   	ASUSLegacyGPUIds.ROG_STRIX_RTX2060_EVO_V2,             	 	0x2A, "ASUS ROG Strix RTX 2060 Evo"),
-			new ASUSLegacyDeviceIdentifier(Nvidia.RTX2080S,        	ASUSLegacyGPUIds.ROG_STRIX_RTX2080_SUPER_GAMING,       	 	0x2A, "ASUS ROG Strix RTX 2080 Super Gaming"),
-			new ASUSLegacyDeviceIdentifier(Nvidia.RTX2080S,        	ASUSLegacyGPUIds.ROG_STRIX_RTX2080_SUPER_OC,        		0x2A, "ASUS ROG Strix RTX 2080 Super Gaming Advanced"),
-			new ASUSLegacyDeviceIdentifier(Nvidia.RTX2080S,        	ASUSLegacyGPUIds.ROG_STRIX_RTX2080_SUPER_OC_WHITE,     	 	0x2A, "ASUS ROG Strix RTX 2080 Super Gaming OC White Edition"),
-			new ASUSLegacyDeviceIdentifier(Nvidia.RTX2080TI,       	ASUSLegacyGPUIds.ROG_STRIX_RTX2080TI_011G,          		0x2A, "ASUS ROG Strix RTX 2080Ti"),
-			new ASUSLegacyDeviceIdentifier(Nvidia.RTX2080TI,       	ASUSLegacyGPUIds.ROG_STRIX_RTX2080TI_011G_GAMING_OC_WHITE,  0x2A, "ASUS ROG Strix RTX 2080Ti Gaming OC White Edition"),
-			new ASUSLegacyDeviceIdentifier(Nvidia.RTX2080TI_TU102, 	ASUSLegacyGPUIds.ROG_STRIX_RTX2080TI_O11G_GAMING_TU102,     0x2A, "ASUS ROG Strix RTX 2080Ti Gaming (TU102)"),
-		
-		];
-	}
+const PNYGPUIDs =
+[
+	new PNYGPUIdentifier(0x2216, 0x138B, "PNY RTX 3080 XLR8"),
+	new PNYGPUIdentifier(0x2208, 0x1385, "PNY RTX 3080TI Revel"),
+];
+
+function hexToRgb(hex) {
+	const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+	const colors = [];
+	colors[0] = parseInt(result[1], 16);
+	colors[1] = parseInt(result[2], 16);
+	colors[2] = parseInt(result[3], 16);
+
+	return colors;
 }
 
 export function Image() {

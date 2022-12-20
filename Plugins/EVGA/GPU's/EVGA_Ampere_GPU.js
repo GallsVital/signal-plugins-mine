@@ -1,3 +1,4 @@
+// Modifing SMBUS Plugins is -DANGEROUS- and can -DESTROY- devices.
 export function Name() { return "EVGA Ampere GPU"; }
 export function Publisher() { return "WhirlwindFX"; }
 export function Documentation(){ return "troubleshooting/evga"; }

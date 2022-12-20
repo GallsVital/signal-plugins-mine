@@ -1,5 +1,7 @@
-export function Name() { return "PNY GPU"; }
+// Modifing SMBUS Plugins is -DANGEROUS- and can -DESTROY- devices.
+export function Name() { return "PALIT GPU"; }
 export function Publisher() { return "WhirlwindFX"; }
+export function Documentation(){ return "troubleshooting/asus"; }
 export function Type() { return "SMBUS"; }
 export function Size() { return [3, 1]; }
 export function DefaultPosition(){return [5, 2];}
@@ -31,13 +33,13 @@ export function Scan(bus) {
 		return [];
 	}
 
-	for(const PNYGPUID of PNYGPUIDs) {
-		if(PNYGPUID.Vendor === bus.Vendor() &&
-		PNYGPUID.SubVendor === bus.SubVendor() &&
-		PNYGPUID.Device === bus.Product() &&
-		PNYGPUID.SubDevice === bus.SubDevice()
+	for(const PALITGPUID of PALITGPUIDs) {
+		if(PALITGPUID.Vendor === bus.Vendor() &&
+		PALITGPUID.SubVendor === bus.SubVendor() &&
+		PALITGPUID.Device === bus.Product() &&
+		PALITGPUID.SubDevice === bus.SubDevice()
 		) {
-			FoundAddresses.push(PNYGPUID.Address);
+			FoundAddresses.push(PALITGPUID.Address);
 		}
 	}
 
@@ -45,9 +47,9 @@ export function Scan(bus) {
 }
 
 export function Initialize() {
-	bus.WriteByte(PNYGPU.registers.Control, 0x00);
-	bus.WriteByte(PNYGPU.registers.Mode, 0x01);
-	bus.WriteByte(PNYGPU.registers.Brightness, 0x64);
+	bus.WriteByte(PALITGPU.registers.Control, 0x00);
+	bus.WriteByte(PALITGPU.registers.Mode, 0x01);
+	bus.WriteByte(PALITGPU.registers.Brightness, 0x64);
 	SetGPUNameFromBusIds();
 }
 
@@ -59,13 +61,13 @@ export function Shutdown() {
 }
 
 function SetGPUNameFromBusIds() {
-	for(const PNYGPUID of PNYGPUIDs) {
-		if(PNYGPUID.Vendor === bus.Vendor() &&
-		PNYGPUID.SubVendor === bus.SubVendor() &&
-		PNYGPUID.Device === bus.Product() &&
-		PNYGPUID.SubDevice === bus.SubDevice()
+	for(const PALITGPUID of PALITGPUIDs) {
+		if(PALITGPUID.Vendor === bus.Vendor() &&
+		PALITGPUID.SubVendor === bus.SubVendor() &&
+		PALITGPUID.Device === bus.Product() &&
+		PALITGPUID.SubDevice === bus.SubDevice()
 		) {
-			device.setName(PNYGPUID.Name);
+			device.setName(PALITGPUID.Name);
 		}
 	}
 }
@@ -83,12 +85,12 @@ function sendColors(shutdown = false) {
 		color = device.color(iPxX, iPxY);
 	}
 
-	bus.WriteByte(PNYGPU.registers.R, color[0]);
-	bus.WriteByte(PNYGPU.registers.G, color[1]);
-	bus.WriteByte(PNYGPU.registers.B, color[2]);
+	bus.WriteByte(PALITGPU.registers.R, color[0]);
+	bus.WriteByte(PALITGPU.registers.G, color[1]);
+	bus.WriteByte(PALITGPU.registers.B, color[2]);
 }
 
-class PNYGPUController {
+class PALITGPUController {
 	constructor() {
 		this.registers =
         {
@@ -106,7 +108,7 @@ class PNYGPUController {
 	}
 }
 
-const PNYGPU = new PNYGPUController();
+const PALITGPU = new PALITGPUController();
 
 class GPUIdentifier {
 	constructor(Vendor, SubVendor, Device, SubDevice, Address, Name, Model = "") {
@@ -120,16 +122,19 @@ class GPUIdentifier {
 	}
 }
 
-class PNYGPUIdentifier extends GPUIdentifier {
+class PALITGPUIdentifier extends GPUIdentifier {
 	constructor(Device, SubDevice, Name, Model = "") {
-		super(0x10DE, 0x196E, Device, SubDevice, 0x49, Name, Model);
+		super(0x10DE, 0x1569, Device, SubDevice, 0x49, Name, Model);
 	}
 }
 
-const PNYGPUIDs =
+const PALITGPUIDs =
 [
-	new PNYGPUIdentifier(0x2216, 0x138B, "PNY RTX 3080 XLR8"),
-	new PNYGPUIdentifier(0x2208, 0x1385, "PNY RTX 3080TI Revel"),
+	new PALITGPUIdentifier(0x2486, 0x2486, "PALIT RTX 3060TI Dual OC"),
+	new PALITGPUIdentifier(0x2482, 0xf278, "PALIT RTX 3070TI GameRock"),
+	new PALITGPUIdentifier(0x2204, 0x2204, "PALIT RTX 3090 Gaming Pro"),
+	new PALITGPUIdentifier(0x2484, 0x2484, "PALIT RTX 3070 Gaming Pro"),
+
 ];
 
 function hexToRgb(hex) {
