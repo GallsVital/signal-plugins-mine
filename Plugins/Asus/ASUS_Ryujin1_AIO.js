@@ -6,11 +6,6 @@ export function Documentation(){ return "troubleshooting/asus"; }
 export function Size() { return [5, 5]; }
 export function DefaultPosition(){return [10, 100]; }
 export function DefaultScale(){ return 1.0; }
-/* global
-shutdownColor:readonly
-LightingMode:readonly
-forcedColor:readonly
-*/
 export function ControllableParameters() {
 	return [
 		{"property":"shutdownColor", "group":"lighting", "label":"Shutdown Color", "min":"0", "max":"360", "type":"color", "default":"009bde"},
@@ -18,14 +13,6 @@ export function ControllableParameters() {
 		{"property":"forcedColor", "group":"lighting", "label":"Forced Color", "min":"0", "max":"360", "type":"color", "default":"009bde"},
 
 	];
-}
-
-export function Initialize() {
-
-}
-
-export function Shutdown() {
-	sendColors(true);
 }
 
 let vLedNames = [
@@ -44,25 +31,22 @@ export function LedPositions() {
 	return vLedPos;
 }
 
+export function Initialize() {
+	device.write([0xec, 0x3b, 0x00, 0xe3, 0xff], 65)
+}
+
 export function Render() {
 	sendColors();
 }
 
-function hexToRgb(hex) {
-	let result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
-	let colors = [];
-	colors[0] = parseInt(result[1], 16);
-	colors[1] = parseInt(result[2], 16);
-	colors[2] = parseInt(result[3], 16);
-
-	return colors;
+export function Shutdown() {
+	sendColors(true);
 }
 
 function sendColors(shutdown = false){
 	let packet = [];
 	let color;
 
-	//packet[0x00]   = 0x00;
 	packet[0x00]   = 0xec;
 	packet[0x01]   = 0x40;
 	packet[0x02]   = 0x80;
@@ -97,8 +81,18 @@ function sendColors(shutdown = false){
 	device.write(packet, 65);
 }
 
+function hexToRgb(hex) {
+	let result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+	let colors = [];
+	colors[0] = parseInt(result[1], 16);
+	colors[1] = parseInt(result[2], 16);
+	colors[2] = parseInt(result[3], 16);
+
+	return colors;
+}
+
 export function Validate(endpoint) {
-	return endpoint.interface === 0;
+	return endpoint.interface === -1 || endpoint.interface === 0 ;
 }
 
 export function Image() {
