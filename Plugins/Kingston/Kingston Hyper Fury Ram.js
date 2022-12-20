@@ -42,7 +42,6 @@ export function Shutdown() {
 // 51 -> 49 -> 61?
 // 53 -> 4B -> 63?
 export function Scan(bus) {
-	bus.log(JSON.stringify(bus));
 
 	const PossibleAddresses = [0x60, 0x61, 0x62, 0x63];
 	const FoundAddresses = [];

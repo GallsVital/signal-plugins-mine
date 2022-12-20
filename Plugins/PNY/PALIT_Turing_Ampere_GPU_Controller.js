@@ -133,6 +133,7 @@ const PALITGPUIDs =
 	new PALITGPUIdentifier(0x2486, 0x2486, "PALIT RTX 3060TI Dual OC"),
 	new PALITGPUIdentifier(0x2482, 0xf278, "PALIT RTX 3070TI GameRock"),
 	new PALITGPUIdentifier(0x2204, 0x2204, "PALIT RTX 3090 Gaming Pro"),
+	new PALITGPUIdentifier(0x2216, 0x2216, "PALIT RTX 3080 Gaming Pro"),
 	new PALITGPUIdentifier(0x2484, 0x2484, "PALIT RTX 3070 Gaming Pro"),
 
 ];
