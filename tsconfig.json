@@ -1,30 +1,33 @@
 {
 	"compilerOptions": {
-		"module": "CommonJS",
-		"moduleResolution": "Node",
+		"module": "ES6",
+		"moduleResolution": "NodeNext",
 		"target": "ES6",
 		"lib": ["ES6", "es2017"],
 		"allowJs": true,
 		"checkJs": true,
-		"declaration": true,
+		//"declaration": true,
+		//"declarationMap": true,
 		"outDir": "dist",
 		//"noEmit": true,
 		"esModuleInterop": true,
 		"strictNullChecks": true,
 		"strictFunctionTypes": true,
 		//"noUncheckedIndexedAccess": true,
-		"declarationMap": true,
 		"typeRoots": ["./types", "./node_modules/@types"],
 		"disableSizeLimit": true, // Plugin images being base64 breaks Typescript checking in the project. 20mb filesize limit by default
 		"baseUrl": ".",
 		"paths": {
-			"@Mock/*": [
-				"./tests/*"
-			]
+			"@Mock/*": ["tests/*"],
+			"@Types/*":["types/*"]
 		},
-
 	},
-
+	"files": [
+		"./types/globals.d.ts",
+		"./types/device.d.ts",
+		"./types/bus.d.ts"
+    ],
+	"include": ["Plugins/**/*"],
 	"exclude": [
 		"node_modules",
 		"**/node_modules/*",
