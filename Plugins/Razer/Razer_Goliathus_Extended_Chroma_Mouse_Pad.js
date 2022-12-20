@@ -1,57 +1,9 @@
-function GetReport(cmd_class, cmd_id, size) {
-	let report = new Array(91).fill(0);
-
-	report[0] = 0;
-
-	// Status.
-	report[1] = 0x00;
-
-	// Transaction ID.
-	report[2] = 0xFF;
-
-	// Remaining packets.
-	report[3] = 0x00;
-	report[4] = 0x00;
-
-	// Protocol type.
-	report[5] = 0x00;
-
-	// Data size.
-	report[6] = size;
-
-	// Command class.
-	report[7] = cmd_class;
-
-	// Command id.
-	report[8] = cmd_id;
-
-	//report[8-87] = data;
-
-	//report[89] = crc;
-
-	//report[89] = reserved;
-
-	return report;
-}
-
-
-function CalculateCrc(report) {
-	let iCrc = 0;
-
-	for (let iIdx = 3; iIdx < 89; iIdx++) {
-		iCrc ^= report[iIdx];
-	}
-
-	return iCrc;
-}
-
-
 export function Name() { return "Razer Goliathus Extended Chroma"; }
 export function VendorId() { return 0x1532; }
-export function Documentation(){ return "troubleshooting/razer"; }
 export function ProductId() { return 0x0c02; }
 export function Publisher() { return "WhirlwindFX"; }
-export function Size() { return [10, 10]; }
+export function Documentation(){ return "troubleshooting/razer"; }
+export function Size() { return [8, 3]; }
 export function Type() { return "Hid"; }
 export function DefaultPosition(){return [120, 80];}
 export function DefaultScale(){return 8.0;}
@@ -68,22 +20,8 @@ export function ControllableParameters(){
 	];
 }
 
-function hexToRgb(hex) {
-	let result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
-	let colors = [];
-	colors[0] = parseInt(result[1], 16);
-	colors[1] = parseInt(result[2], 16);
-	colors[2] = parseInt(result[3], 16);
-
-	return colors;
-}
-
-let vLedNames = ["MousePad"];
-let vLedPositions = [
-
-	[5, 5]
-
-];
+const vLedNames = ["MousePad"];
+const vLedPositions = [	[4, 2] ];
 
 export function LedNames() {
 	return vLedNames;
@@ -93,51 +31,31 @@ export function LedPositions() {
 	return vLedPositions;
 }
 
-function EnableSoftwareControl() {
-	let report = GetReport(0x0F, 0x03, 0x47);
-
-	report[2] = 0x3F; // transaction id.
-
-	report[11] = 0; // row index.
-
-	report[13] = 15; // led count.
-
-	report[89] = CalculateCrc(report);
-
-
-	device.send_report(report, 91);
-}
-
-
-function ReturnToHardwareControl() {
-
-}
-
-
 export function Initialize() {
 
 }
 
+export function Render() {
+	SendPacket();
+}
+
+export function Shutdown() {
+	SendPacket(true);
+}
+
 function SendPacket(shutdown = false) {
-	let packet = [];
-	packet[0] = 0x00;
-	packet[1] = 0x00;
+	const packet = [];
+
 	packet[2] = 0x1F;
-	packet[3] = 0x00;
-	packet[4] = 0x00;
-	packet[5] = 0x00;
 	packet[6] = 0x08;
 	packet[7] = 0x0F;
 	packet[8] = 0x03;
-	packet[11] = 0;
-	packet[13] = 0x00;
-
 
 	for(let iIdx = 0; iIdx < vLedPositions.length; iIdx++){
 
-		let iPxX = vLedPositions[iIdx][0];
-		let iPxY = vLedPositions[iIdx][1];
-		var col;
+		const iPxX = vLedPositions[iIdx][0];
+		const iPxY = vLedPositions[iIdx][1];
+		let col;
 
 		if(shutdown){
 			col = hexToRgb(shutdownColor);
@@ -146,7 +64,7 @@ function SendPacket(shutdown = false) {
 		}else{
 			col = device.color(iPxX, iPxY);
 		}
-		let iLedIdx = (iIdx*3) + 14;
+		const iLedIdx = (iIdx*3) + 14;
 		packet[iLedIdx] = col[0];
 		packet[iLedIdx+1] = col[1];
 		packet[iLedIdx+2] = col[2];
@@ -159,36 +77,24 @@ function SendPacket(shutdown = false) {
 
 }
 
+function CalculateCrc(report) {
+	let iCrc = 0;
 
-function Apply() {
-	let packet = []; //new Array(91).fill(0);
-	packet[0] = 0x00;
-	packet[1] = 0x00;
-	packet[2] = 0x3F;
-	packet[3] = 0x00;
-	packet[4] = 0x00;
-	packet[5] = 0x00;
-	packet[6] = 0x0C;
-	packet[7] = 0x0F;
-	packet[8] = 0x02;
-	packet[11] = 0x08;
+	for (let iIdx = 3; iIdx < 89; iIdx++) {
+		iCrc ^= report[iIdx];
+	}
 
-	packet[89] = CalculateCrc(packet);
-
-	device.send_report(packet, 91);
+	return iCrc;
 }
 
+function hexToRgb(hex) {
+	const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+	const colors = [];
+	colors[0] = parseInt(result[1], 16);
+	colors[1] = parseInt(result[2], 16);
+	colors[2] = parseInt(result[3], 16);
 
-export function Render() {
-	SendPacket();
-
-
-}
-
-
-export function Shutdown() {
-	SendPacket(true);
-
+	return colors;
 }
 
 export function Validate(endpoint) {
