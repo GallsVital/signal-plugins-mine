@@ -42,7 +42,6 @@ export function Scan(bus) {
 	Ballistix = new CrucialBallistix(CrucialInterface);
 
 	const FoundAddresses = [];
-	const x = y;
 	// Crucial Ballistix Ram like Aura/ENE ram needs to have its address remapped by the first program that touches it.
 	// If we have a device on 0x27 then we need to attempt to remap them.
 	const iRet = bus.WriteQuick(0x27);
