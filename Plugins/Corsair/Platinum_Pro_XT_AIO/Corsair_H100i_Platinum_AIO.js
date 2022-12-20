@@ -42,7 +42,7 @@ let CoolingCommand = 0x14;
 let CurrentFanSpeed;
 export function Name() { return "Corsair h100i Platinum "; }
 export function VendorId() { return  0x1b1c; }
-export function ProductId() { return 0x0C18; }
+export function ProductId() { return [0x0C15, 0x0C18]; }
 export function Publisher() { return "WhirlwindFX"; }
 export function Size() { return [5, 5]; }
 export function DefaultPosition(){return [165, 60];}
