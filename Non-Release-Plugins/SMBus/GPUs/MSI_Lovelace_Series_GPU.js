@@ -186,7 +186,7 @@ class MSIGPUController {
 			device.log(this.getStartupValues[3]); //Recheck brightness
 		}
 
-		device.log("Startup Color Code" + startupRed << 8 + startupGreen << 8 + startupBlue << 8);
+		device.log("Startup Color Code" + (startupRed << 8) + (startupGreen << 8) + (startupBlue << 8));
 	}
 
 	setDeviceMode(mode) {
@@ -272,6 +272,9 @@ const Nvidia = new NvidiaGPUDeviceIds();
 
 class MSIGPUDeviceIDs {
 	constructor() {
+		this.RTX4080_SUPRIM							 = 0x5110;
+		this.RTX4080_GAMING_X_TRIO					 = 0x5111;
+
 		this.RTX4090_GAMING_TRIO			         = 0x5103;
 		this.RTX4090_SUPRIM_LIQUID_X                 = 0x5104;
 	}
@@ -284,6 +287,8 @@ class MSIGPUList {
 		const MSIGPUIDs  = new MSIGPUDeviceIDs();
 		this.devices =
         [
+        	new MSIGPUIdentifier(Nvidia.RTX4080, MSIGPUIDs.RTX4080_SUPRIM, 0x68, "MSI RTX 4080 SUPRIM"),
+        	new MSIGPUIdentifier(Nvidia.RTX4080, MSIGPUIDs.RTX4080_GAMING_X_TRIO, 0x68, "MSI RTX 4080 GAMING X TRIO"),
         	new MSIGPUIdentifier(Nvidia.RTX4090, MSIGPUIDs.RTX4090_GAMING_TRIO, 0x68, "MSI RTX 4090 GAMING TRIO"),
         	new MSIGPUIdentifier(Nvidia.RTX4090, MSIGPUIDs.RTX4090_SUPRIM_LIQUID_X, 0x68, "MSI RTX 4090 SUPRIM LIQUID X")
         ];
