@@ -43,7 +43,7 @@ function SetupChannels(){
 }
 
 export function Validate(endpoint) {
-	return endpoint.interface === -1;
+	return endpoint.interface === -1 || endpoint.interface === 2;
 }
 
 export function Initialize() {
