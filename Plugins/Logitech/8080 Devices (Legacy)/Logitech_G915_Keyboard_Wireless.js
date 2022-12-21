@@ -617,7 +617,7 @@ function SendNumpad(shutdown = false)
 
 		}
 
-		Logitech.SendLongMessage(packet);
+		Logitech.SendLongMessageNoResponse(packet);
 	}
 }
 
@@ -656,7 +656,7 @@ function SendGkeys(shutdown = false)
 
 		}
 
-		Logitech.SendLongMessage(packet);
+		Logitech.SendLongMessageNoResponse(packet);
 	}
 }
 
@@ -698,7 +698,7 @@ function SendLogoZone(shutdown = false)
 			packet[4] = 0x99;
 		}
 
-		Logitech.SendLongMessage(packet);
+		Logitech.SendLongMessageNoResponse(packet);
 	}
 }
 
@@ -726,7 +726,7 @@ function SendMediaZones(shutdown = false)
 		}
 
 		const packet = [ 0x0B, 0x10, 155+iIdx, color[0], color[1], color[2], 0xFF ];
-		Logitech.SendLongMessage(packet);
+		Logitech.SendLongMessageNoResponse(packet);
 	}
 }
 
@@ -785,7 +785,7 @@ function SendPacket(keymap, ledPositions, shutdown = false)
 		packet = packet.concat(RGBData.splice(0, 16));
 		TotalKeys -= 4;
 
-		Logitech.SendLongMessage(packet);
+		Logitech.SendLongMessageNoResponse(packet);
 	}
 }
 
