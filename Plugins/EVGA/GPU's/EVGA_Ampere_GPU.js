@@ -270,7 +270,7 @@ class EVGAAmpereProtocol{
 	 * @returns string
 	 */
 	FetchFirmwareVersion(){
-		const [ReturnCode, Data] = bus.ReadBlockBytes(this.Registers.Firmware, 6, []);
+		const [ReturnCode, Data] = bus.ReadBlockBytes(this.Registers.Firmware, 6);
 
 		if(ReturnCode < 0){
 			device.log(`Failed to read Firmware version. Error Code: [${ReturnCode}]`);
@@ -287,7 +287,7 @@ class EVGAAmpereProtocol{
 	}
 
 	ReadCurrentModeData(logData = false){
-		const [ReturnCode, Data] = bus.ReadBlockBytes(this.Registers.CurrentMode, 10, []);
+		const [ReturnCode, Data] = bus.ReadBlockBytes(this.Registers.CurrentMode, 10);
 
 		if(ReturnCode < 0){
 			device.log(`Failed to read Current Modes. Error Code: [${ReturnCode}]`);
