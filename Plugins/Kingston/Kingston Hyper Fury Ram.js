@@ -53,7 +53,7 @@ export function Scan(bus) {
 	  }
 
 	  const validAddress = bus.WriteQuick(addr);
-	  //bus.log(validAddress);
+	  //bus.log(`Address: ${addr} returned ${validAddress}`, {toFile: true});
 
 	  // Skip any address that fails a quick write
 	  if (validAddress !== 0){
@@ -61,7 +61,7 @@ export function Scan(bus) {
 	  }
 
 	  if(CheckForHyperFuryRam(bus, addr)){
-			bus.log("Kingston Hyper Fury Ram Found At Address: " + addr);
+			bus.log("Kingston Hyper Fury Ram Found At Address: " + addr, {toFile: true});
 			FoundAddresses.push(addr);
 	  }
 	}
@@ -84,19 +84,19 @@ function CheckForHyperFuryRam(bus, addr){
 	const SubAddresses = AddressPairs[addr];
 
 	const iReturn = bus.ReadByte(SubAddresses[0], 0x31); // Value changes every time
-	bus.log(`Address [${SubAddresses[0]}], Reg 31: ${iReturn}`);
+	bus.log(`Address [${SubAddresses[0]}], Reg 31: ${iReturn}`, {toFile: true});
 
 	if(iReturn >= 0){
 		const iRet1 = bus.ReadByte(SubAddresses[1], 0x21);
-		bus.log(`Address [${SubAddresses[1]}], Reg 21: ${iRet1}`);
+		bus.log(`Address [${SubAddresses[1]}], Reg 21: ${iRet1}`, {toFile: true});
 
 		const iRet2 = bus.ReadByte(SubAddresses[1], 0x25);
-		bus.log(`Address [${SubAddresses[1]}], Reg 25: ${iRet2}`);
+		bus.log(`Address [${SubAddresses[1]}], Reg 25: ${iRet2}`, {toFile: true});
 
 		const iRet3 = bus.ReadByte(SubAddresses[1], 0x27);
-		bus.log(`Address [${SubAddresses[1]}], Reg 27: ${iRet3}`);
+		bus.log(`Address [${SubAddresses[1]}], Reg 27: ${iRet3}`, {toFile: true});
 
-		const ExpectedValues = [120, 180, 220];
+		const ExpectedValues = [120, 180, 200, 220];
 
 		return ExpectedValues.includes(iRet1) && ExpectedValues.includes(iRet2) && ExpectedValues.includes(iRet3);
 	}
