@@ -1,4 +1,3 @@
-
 export function Name() { return "Cooler Master ARGB Controller"; }
 export function VendorId() { return   0x2516;}
 export function Documentation(){ return "troubleshooting/coolermaster"; }
@@ -28,11 +27,22 @@ export function ControllableParameters(){
 	];
 }
 
-let ParentDeviceName = "Cooler Master ARGB Controller";
+const vKeyNames = [];
+const vKeyPositions = [];
+
+export function LedNames() {
+	return vKeyNames;
+}
+
+export function LedPositions() {
+	return vKeyPositions;
+}
+
+const ParentDeviceName = "Cooler Master ARGB Controller";
 export function SupportsSubdevices(){ return true; }
 const DeviceMaxLedLimit = 196;
 //Channel Name, Led Limit
-let ChannelArray = 
+const ChannelArray =
 [
 	["Channel 1", 48],
 	["Channel 2", 48],
@@ -43,42 +53,20 @@ let ChannelArray =
 function SetupChannels(){
 	device.SetLedLimit(DeviceMaxLedLimit);
 
-	for(let i = 0; i < ChannelArray.length; i++)
-	{
+	for(let i = 0; i < ChannelArray.length; i++) {
 		device.addChannel(ChannelArray[i][0], ChannelArray[i][1]);
 	}
 }
 
-
-function InitChannels()
-{
-	sendPacketString("00 80 17 02", 65);   //Init Custom Mode ARGB
-}
-
-export function Initialize() 
-{
+export function Initialize() {
 	SetupChannels();
 }
 
-export function Shutdown() 
-{
+export function Shutdown() {
 
 }
 
-const vKeyNames = [];
-const vKeyPositions = [];
-
-export function LedNames() 
-{
-	return vKeyNames;
-}
-
-export function LedPositions() 
-{
-	return vKeyPositions;
-}
-
-let RGBConfigs = 
+const RGBConfigs =
 {
 	"RGB" : [0, 1, 2],
 	"RBG" : [0, 2, 1],
@@ -90,23 +78,19 @@ let RGBConfigs =
 
 let savedMotherboardPass;
 
-function setMotherboardPass()
-{
+function setMotherboardPass() {
 	savedMotherboardPass = MotherboardPass;
 
-	if(savedMotherboardPass)
-	{
-		sendPacketString("00 80 17 02", 65);
-		sendPacketString("00 80 01 02", 65);
-		sendPacketString("00 80 01 02", 65);
-		sendPacketString("00 80 01 02", 65);
-		sendPacketString("00 80 01 02", 65);
-		sendPacketString("00 80 01 04 01", 65); //RGB header
+	if(savedMotherboardPass) {
+		device.write([0, 80, 17, 2], 65);
+		device.write([0, 80, 1, 2], 65);
+		device.write([0, 80, 1, 2], 65);
+		device.write([0, 80, 1, 2], 65);
+		device.write([0, 80, 1, 2], 65);
+		device.write([0, 80, 1, 4, 1], 65); //RGB header
 
-	}
-	else
-	{
-		sendPacketString("00 80 01 01", 65);
+	} else {
+		device.write([0, 80, 1, 1], 65);
 
 	}
 }
@@ -114,7 +98,7 @@ function setMotherboardPass()
 function SendChannel(Channel, shutdown = false) {
 
 	let ChannelLedCount = device.channel(ChannelArray[Channel][0]).ledCount;
-	let componentChannel = device.channel(ChannelArray[Channel][0]);
+	const componentChannel = device.channel(ChannelArray[Channel][0]);
 
 	let RGBData = [];
 
@@ -124,9 +108,11 @@ function SendChannel(Channel, shutdown = false) {
 	}else if(componentChannel.shouldPulseColors()){
 		ChannelLedCount = 48;
 
-		let pulseColor = device.getChannelPulseColor(ChannelArray[Channel][0], ChannelLedCount);
+		const pulseColor = device.getChannelPulseColor(ChannelArray[Channel][0], ChannelLedCount);
 		RGBData = device.createColorArray(pulseColor, ChannelLedCount, "Inline");
 
+	}else if(shutdown){
+		RGBData = device.createColorArray(shutdownColor, ChannelLedCount, "Inline", RGBconfig);
 	}else{
 		RGBData = device.channel(ChannelArray[Channel][0]).getColors("Inline");
 	}
@@ -160,9 +146,9 @@ function SendChannel(Channel, shutdown = false) {
 }
 
 function sendRGBHeader(shutdown = false){
-	sendPacketString("00 80 01 03", 65);
+	device.write([0, 80, 1, 3], 65);
 
-	let packet = [];
+	const packet = [];
 	packet[0] = 0x00;
 	packet[1] = 0x80;
 	packet[2] = 0x04;
@@ -172,8 +158,8 @@ function sendRGBHeader(shutdown = false){
 	packet[6] = 0xFF; //Brightess
 
 	if(savedRGBHeader){
-		let iPxX = RGB_Header.positioning[0][0];
-		let iPxY = RGB_Header.positioning[0][1];
+		const iPxX = RGB_Header.positioning[0][0];
+		const iPxY = RGB_Header.positioning[0][1];
 		let mxPxColor;
 
 		//find colors
@@ -247,21 +233,9 @@ export function Render() {
 	setRGBHeader();
 }
 
-function sendPacketString(string, size){
-
-	let packet= [];
-	let data = string.split(' ');
-
-	for(let i = 0; i < data.length; i++){
-		packet[i] = parseInt(data[i], 16);//.toString(16)
-	}
-
-	device.write(packet, size);
-}
-
 function hexToRgb(hex) {
-	let result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
-	let colors = [];
+	const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+	const colors = [];
 	colors[0] = parseInt(result[1], 16);
 	colors[1] = parseInt(result[2], 16);
 	colors[2] = parseInt(result[3], 16);
