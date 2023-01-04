@@ -82,16 +82,15 @@ function setMotherboardPass() {
 	savedMotherboardPass = MotherboardPass;
 
 	if(savedMotherboardPass) {
-		device.write([0, 80, 17, 2], 65);
-		device.write([0, 80, 1, 2], 65);
-		device.write([0, 80, 1, 2], 65);
-		device.write([0, 80, 1, 2], 65);
-		device.write([0, 80, 1, 2], 65);
-		device.write([0, 80, 1, 4, 1], 65); //RGB header
+		device.write([0x00, 0x80, 0x17, 0x02], 65);
+		device.write([0x00, 0x80, 0x01, 0x02], 65);
+		device.write([0x00, 0x80, 0x01, 0x02], 65);
+		device.write([0x00, 0x80, 0x01, 0x02], 65);
+		device.write([0x00, 0x80, 0x01, 0x02], 65);
+		device.write([0x00, 0x80, 0x01, 0x04, 0x01], 65); //RGB header
 
 	} else {
-		device.write([0, 80, 1, 1], 65);
-
+		device.write([0x00, 0x080, 0x01, 0x01], 65);
 	}
 }
 
@@ -112,7 +111,7 @@ function SendChannel(Channel, shutdown = false) {
 		RGBData = device.createColorArray(pulseColor, ChannelLedCount, "Inline");
 
 	}else if(shutdown){
-		RGBData = device.createColorArray(shutdownColor, ChannelLedCount, "Inline", RGBconfig);
+		RGBData = device.createColorArray(shutdownColor, ChannelLedCount, "Inline");
 	}else{
 		RGBData = device.channel(ChannelArray[Channel][0]).getColors("Inline");
 	}
@@ -146,7 +145,7 @@ function SendChannel(Channel, shutdown = false) {
 }
 
 function sendRGBHeader(shutdown = false){
-	device.write([0, 80, 1, 3], 65);
+	device.write([0x00, 0x080, 0x01, 0x03], 65);
 
 	const packet = [];
 	packet[0] = 0x00;

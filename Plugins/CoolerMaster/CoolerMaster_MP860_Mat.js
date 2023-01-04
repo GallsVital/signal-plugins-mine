@@ -84,7 +84,7 @@ function SendColors(shutdown = false){
 	let packetCount = 0;
 	let ledsSent = 0;
 	TotalLedCount = 30;
-	device.write([0, 65, 128], 65);
+	device.write([0x00, 0x41, 0x80], 65);
 
 	while(packetCount < 6){
 		const ledsToSend = TotalLedCount >= 12 ? 12 : TotalLedCount;
@@ -104,7 +104,7 @@ function SendColors(shutdown = false){
 		packetCount += 2;
 	}
 
-	device.write([0, 81, 40, 0, 0, 176], 65);
+	device.write([0x00, 0x51, 0x28, 0x00, 0x00, 0xB0], 65);
 }
 
 function hexToRgb(hex) {

@@ -45,7 +45,7 @@ export function LedPositions() {
 }
 
 export function Initialize() {
-	device.write([0, 80, 1, 1, 2, 2], 65);
+	device.write([0x00, 0x80, 0x01, 0x01, 0x02, 0x02], 65);
 	SetupChannels();
 }
 

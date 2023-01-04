@@ -56,7 +56,7 @@ export function LedPositions() {
 
 export function Initialize() {
 	MagicStartupPacket();
-	device.write([0, 86, 129, 0, 0, 1, 0, 0, 0, 12, 0, 0, 0, 187, 187, 187, 187], 65);
+	device.write([0x00, 0x56, 0x81, 0x00, 0x00, 0x01, 0x00, 0x00, 0x00, 0x0C, 0x00, 0x00, 0x00, 0xBB, 0xBB, 0xBB, 0xBB], 65);
 }
 
 export function Render() {
@@ -68,54 +68,13 @@ export function Shutdown() {
 }
 
 function MagicStartupPacket() {
-	const packet = [];
-
-	packet[0] = 0x00;
-	packet[1] = 0x41;
-	packet[2] = 0x80;
-	device.write(packet, 65);
-
-	packet.fill(0);
-	packet[0] = 0x00;
-	packet[1] = 0x12;
-	device.write(packet, 65);
-
-	packet[0] = 0x00;
-	packet[1] = 0x12;
-	packet[2] = 0x20;
-	device.write(packet, 65);
-
-	packet[0] = 0x00;
-	packet[1] = 0x12;
-	packet[2] = 0x01;
-	device.write(packet, 65);
-
-	packet[0] = 0x00;
-	packet[1] = 0x12;
-	packet[2] = 0x22;
-	device.write(packet, 65);
-
-	packet.fill(0);
-	packet[0] = 0x00;
-	packet[1] = 0x42;
-	packet[2] = 0x00;
-	packet[3] = 0x00;
-	packet[4] = 0x00;
-	packet[5] = 0x01;
-	packet[6] = 0x00;
-	packet[7] = 0x00;
-	packet[8] = 0x01;
-	packet[9] = 0x01;
-	device.write(packet, 65);
-
-	packet.fill(0);
-	packet[0] = 0x00;
-	packet[1] = 0x43;
-	packet[2] = 0x00;
-	packet[3] = 0x00;
-	packet[4] = 0x00;
-	packet[5] = 0x01;
-	device.write(packet, 65);
+	device.write([0x00, 0x41, 0x80], 65);
+	device.write([0x00, 0x12], 65);
+	device.write([0x00, 0x12, 0x20], 65);
+	device.write([0x00, 0x12, 0x01], 65);
+	device.write([0x00, 0x12, 0x22], 65);
+	device.write([0x00, 0x42, 0x00, 0x00, 0x00, 0x01, 0x00, 0x00, 0x01, 0x01], 65);
+	device.write([0x00, 0x43, 0x00, 0x00, 0x00, 0x01], 65);
 }
 
 function SendColors(shutdown = false){
@@ -164,7 +123,7 @@ function SendColors(shutdown = false){
 		SendPacket(packets, colors.splice(0, 60));
 	}
 
-	device.write([0, 81, 40, 0, 0, 255], 65);
+	device.write([0x00, 0x51, 0x28, 0x00, 0x00, 0xFF], 65);
 }
 
 function SendPacket(packetIdx, data) {

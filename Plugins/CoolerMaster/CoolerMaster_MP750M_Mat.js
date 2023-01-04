@@ -75,7 +75,7 @@ function SendColors(shutdown = false){
 	}
 
 	device.write(packet, 65);
-	device.write([0, 6], 65);
+	device.write([0x00, 0x06], 65);
 
 }
 

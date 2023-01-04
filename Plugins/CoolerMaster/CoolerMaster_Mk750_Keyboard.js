@@ -63,7 +63,7 @@ export function Initialize() {
 	//41 02: Set manual control
 	//This is a completely manual mode. Once enabled, the device goes black and simply waits for control commands to set LEDs. The relevant packets are described at the end of this documents.
 	//This is also the mode used by the official SDK to set effects. The official control software only goes into this mode for the "System Status" pseudo-effect.
-	device.write([0, 41, 2, 0, 0, 0], 65);
+	device.write([0x00, 0x41, 0x02, 0x00, 0x00, 0x00], 65);
 	device.pause(1);
 }
 
@@ -73,8 +73,8 @@ export function Render() {
 }
 
 export function Shutdown() {
-	device.write([0, 65, 128], 65);
-	device.write([0, 51, 28, 0, 0, 7], 65);
+	device.write([0x00, 0x41, 0x80], 65);
+	device.write([0x00, 0x51, 0x28, 0x00, 0x00, 0x07], 65);
 }
 
 function SendColors(shutdown = false){
@@ -123,7 +123,7 @@ function StreamPacket(packetId, RGBData){
 }
 
 function SendCommits(){
-	device.write([0, 81, 40, 0, 0, 255], 65);
+	device.write([0x00, 0x51, 0x28, 0x00, 0x00, 0xFF], 65);
 	device.pause(3);
 }
 

@@ -131,9 +131,9 @@ function sendDpi(){
 	DpiPacket[20] = dpi7;
 
 	device.write(DpiPacket, 65);
-	device.write([0, 81, 240, 0, 0, pollingDict[mousePolling]], 65);
-	device.write([0, 81, 16], 65);
-	device.write([0, 81, 16, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 5, 0, 0, 0, 1], 65);
+	device.write([0x00, 0x51, 0xF0, 0x00, 0x00, pollingDict[mousePolling]], 65);
+	device.write([0x00, 0x51, 0x10], 65);
+	device.write([0x00, 0x51, 0x10, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x05, 0x00, 0x00, 0x00, 0x01], 65);
 }
 
 function SendColors(shutdown = false){
@@ -157,7 +157,7 @@ function SendColors(shutdown = false){
 		RGBData[vKeymap[iIdx]*3 +2 ] = mxPxColor[2];
 	}
 
-	device.write([0, 65, 128], 65);
+	device.write([0x00, 0x41, 0x80], 65);
 
 	let packet = [];
 	packet[0] = 0x00;
@@ -168,7 +168,7 @@ function SendColors(shutdown = false){
 	packet = packet.concat(RGBData.splice(0, 6));
 
 	device.write(packet, 65);
-	device.write([0, 81, 40, 0, 0, 176], 65);
+	device.write([0x00, 0x51, 0x28, 0x00, 0x00, 0xB0], 65);
 }
 
 function hexToRgb(hex) {

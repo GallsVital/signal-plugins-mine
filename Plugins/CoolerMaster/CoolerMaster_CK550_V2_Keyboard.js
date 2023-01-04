@@ -55,7 +55,7 @@ export function LedPositions() {
 }
 
 export function Initialize() {
-	device.write([0, 51, 0, 0, 0, 5], 65);
+	device.write([0x00, 0x51, 0x00, 0x00, 0x00, 0x05], 65);
 }
 
 export function Render() {
@@ -64,8 +64,8 @@ export function Render() {
 }
 
 export function Shutdown() {
-	device.write([0, 65, 128], 65);
-	device.write([0, 81, 40, 0, 0, 1], 65);
+	device.write([0x00, 0x41, 0x80], 65);
+	device.write([0x00, 0x51, 0x28, 0x00, 0x00, 0x01], 65);
 }
 
 function SendColors(shutdown = false){
@@ -89,7 +89,7 @@ function SendColors(shutdown = false){
 		RGBData[vKeys[iIdx]*3 +2 ] = mxPxColor[2];
 	}
 
-	device.write([0, 86, 129, 0, 0, 1, 0, 0, 0, 9, 0, 0, 0, 187, 187, 187, 187], 65);
+	device.write([0x00, 0x56, 0x81, 0x00, 0x00, 0x01, 0x00, 0x00, 0x00, 0x09, 0x00, 0x00, 0x00, 0xBB, 0xBB, 0xBB, 0xBB], 65);
 
 	//Send the left light bar and first column
 	let InitColorPacket = [0x00, 0x56, 0x83, 0x00, 0x00, 0x01, 0x00, 0x00, 0x00, 0x80, 0x01, 0x00, 0xFF, 0x00, 0x00, 0x00, 0x00, 0xFF, 0xFF, 0xFF, 0xFF, 0x00, 0x00, 0x00, 0x00];
@@ -125,7 +125,7 @@ function StreamPacket(packetId, RGBData){
 }
 
 function SendCommits(){
-	device.write([0, 81, 40, 0, 0, 255], 65);
+	device.write([0x00, 0x51, 0x28, 0x00, 0x00, 0xFF], 65);
 	device.pause(3);
 }
 
