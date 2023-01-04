@@ -29,8 +29,9 @@ export function ConflictingProcesses()
 
 const devicePIDs =
 [
-	0x7B93, 0x7C34, 0x7C35, 0x7C36, 0x7C37, 0x7C56, 0x7C59, 0x7C70, 0x7C71, 0x7C73, 0x7C75, 0x7C76, 0x7C77, 0x7C79, 0x7C80, 0x7C81, 0x7C82, 0x7C83, 0x7C84, 0x7C85, 0x7C86, 0x7C88, 0x7C89, 0x7C90, 0x7C91, 0x7C92, 0x7C94, 0x7C95, 0x7C98, 0x7C99, 0x7D03, 0x7D04, 0x7D05, 0x7D06, 0x7D07, 0x7D08, 0x7D09, 0x7D10, 0x7D11, 0x7D12, 0x7D13, 0x7D14, 0x7D15, 0x7D16, 0x7D17, 0x7D18, 0x7D19, 0x7D20, 0x7D21, 0x7D22, 0x7D25, 0x7D27, 0x7D28, 0x7D29, 0x7D30, 0x7D31, 0x7D32, 0x7D36, 0x7D37, 0x7D38, 0x7D40, 0x7D41, 0x7D42, 0x7D43, 0x7D45, 0x7D46, 0x7D50, 0x7D52, 0x7D53, 0x7D54, 0x7D59, 0x7D69,0x7D70, 0x7D97
+	0x7B93, 0x7C34, 0x7C35, 0x7C36, 0x7C37, 0x7C56, 0x7C59, 0x7C70, 0x7C71, 0x7C73, 0x7C75, 0x7C76, 0x7C77, 0x7C79, 0x7C80, 0x7C81, 0x7C82, 0x7C83, 0x7C84, 0x7C85, 0x7C86, 0x7C88, 0x7C89, 0x7C90, 0x7C91, 0x7C92, 0x7C94, 0x7C95, 0x7C98, 0x7C99, 0x7D03, 0x7D04, 0x7D05, 0x7D06, 0x7D07, 0x7D08, 0x7D09, 0x7D10, 0x7D11, 0x7D12, 0x7D13, 0x7D14, 0x7D15, 0x7D16, 0x7D17, 0x7D18, 0x7D19, 0x7D20, 0x7D21, 0x7D22, 0x7D25, 0x7D27, 0x7D28, 0x7D29, 0x7D30, 0x7D31, 0x7D32, 0x7D36, 0x7D37, 0x7D38, 0x7D40, 0x7D41, 0x7D42, 0x7D43, 0x7D45, 0x7D46, 0x7D50, 0x7D52, 0x7D53, 0x7D54, 0x7D59
 ];
+//Temporarily Axed. 0x7D67, 0x7D69, 0x7D70, 0x7D74, 0x7D86, 0x7D91, 0x7D97, 0x7E07
 let ParentDeviceName = "Mystic Light Controller";
 
 export function SupportsSubdevices(){ return true; }
@@ -64,6 +65,7 @@ export function Initialize()
 {
 	MSIMotherboard.checkPerLEDSupport();
 	MSIMotherboard.createLEDs();
+	device.setName(device.getMotherboardName());
 }
 
 export function Render()
@@ -121,6 +123,22 @@ class MysticLight
 	constructor()
 	{
 
+		this.ConfigurationOverrides =
+		{
+			"MSI Z790 TOMAHAWK DDR4":
+			{
+				OnboardLEDs    : 0,
+				RGBHeaders     : 1,
+				ARGBHeaders    : 3,
+				JPipeLEDs	   : 0,
+				CorsairHeaders : 0,
+				//PERLED
+				PerLEDOnboardLEDs : 0,
+				ForceZoneBased	  : false,
+			},
+		};
+
+
 		this.Library =
 		{
 			0x7B93 : //X570 Gaming Pro Carbon Wifi
@@ -131,7 +149,8 @@ class MysticLight
 				JPipeLEDs	   : 1,
 				CorsairHeaders : 1,
 				//PERLED
-				PerLEDOnboardLEDs : 8
+				PerLEDOnboardLEDs : 8,
+				ForceZoneBased	  : true,
 			},
 			0x7C34 : //X570 Godlike
 			{
@@ -141,7 +160,8 @@ class MysticLight
 				JPipeLEDs	   : 2,
 				CorsairHeaders : 1,
 				//PERLED
-				PerLEDOnboardLEDs : 20
+				PerLEDOnboardLEDs : 20,
+				ForceZoneBased	  : true, //WHY ARE YOU LIKE THIS
 			},
 			0x7C35 : //X570 Ace
 			{
@@ -151,7 +171,8 @@ class MysticLight
 				JPipeLEDs	   : 1,
 				CorsairHeaders : 1,
 				//PERLED
-				PerLEDOnboardLEDs : 17
+				PerLEDOnboardLEDs : 17,
+				ForceZoneBased	  : true,
 			},
 			0x7C36 : //X570 Creation
 			{
@@ -161,7 +182,8 @@ class MysticLight
 				JPipeLEDs	   : 1,
 				CorsairHeaders : 1,
 				//PERLED
-				PerLEDOnboardLEDs : 12
+				PerLEDOnboardLEDs : 12,
+				ForceZoneBased	  : true,
 			},
 			0x7C37 : //X570 Gaming Edge
 			{
@@ -171,7 +193,8 @@ class MysticLight
 				JPipeLEDs	   : 0,
 				CorsairHeaders : 0,
 				//PERLED
-				PerLEDOnboardLEDs : 6
+				PerLEDOnboardLEDs : 6,
+				ForceZoneBased	  : true,
 			},
 			0x7C56 : //B550 Gaming Plus
 			{
@@ -181,7 +204,8 @@ class MysticLight
 				JPipeLEDs	   : 0,
 				CorsairHeaders : 0,
 				//PERLED
-				PerLEDOnboardLEDs : 6
+				PerLEDOnboardLEDs : 6,
+				ForceZoneBased	  : false,
 			},
 			0x7C59 : //Creator TRX40
 			{
@@ -191,7 +215,8 @@ class MysticLight
 				JPipeLEDs	   : 0,
 				CorsairHeaders : 1,
 				//PERLED
-				PerLEDOnboardLEDs : 8
+				PerLEDOnboardLEDs : 8,
+				ForceZoneBased	  : false,
 			},
 			0x7C70 : //Z490 Godlike
 			{
@@ -201,7 +226,8 @@ class MysticLight
 				JPipeLEDs	   : 2,
 				CorsairHeaders : 2,
 				//PERLED
-				PerLEDOnboardLEDs : 26
+				PerLEDOnboardLEDs : 26,
+				ForceZoneBased	  : false,
 			},
 			0x7C71 : //Z490 Ace
 			{
@@ -211,7 +237,8 @@ class MysticLight
 				JPipeLEDs	   : 2,
 				CorsairHeaders : 1,
 				//PERLED
-				PerLEDOnboardLEDs : 12
+				PerLEDOnboardLEDs : 12,
+				ForceZoneBased	  : false,
 			},
 			0x7C73 : //Z490 Gaming Carbon
 			{
@@ -221,7 +248,8 @@ class MysticLight
 				JPipeLEDs	   : 0,
 				CorsairHeaders : 1,
 				//PERLED
-				PerLEDOnboardLEDs : 10
+				PerLEDOnboardLEDs : 10,
+				ForceZoneBased	  : false,
 			},
 			0x7C75 : //Z490 Gaming Plus
 			{
@@ -231,7 +259,8 @@ class MysticLight
 				JPipeLEDs	   : 0,
 				CorsairHeaders : 0,
 				//PERLED
-				PerLEDOnboardLEDs : 6
+				PerLEDOnboardLEDs : 6,
+				ForceZoneBased	  : false,
 			},
 			0x7C76 : //Z490M Gaming Edge
 			{
@@ -241,7 +270,8 @@ class MysticLight
 				JPipeLEDs	   : 0,
 				CorsairHeaders : 0,
 				//PERLED
-				PerLEDOnboardLEDs : 6
+				PerLEDOnboardLEDs : 6,
+				ForceZoneBased	  : false,
 			},
 			0x7C77 : //Z490 Ace
 			{
@@ -251,7 +281,8 @@ class MysticLight
 				JPipeLEDs	   : 0,
 				CorsairHeaders : 0,
 				//PERLED
-				PerLEDOnboardLEDs : 6
+				PerLEDOnboardLEDs : 6,
+				ForceZoneBased	  : false,
 			},
 			0x7C79 : //Z490 Gaming Edge
 			{
@@ -261,7 +292,8 @@ class MysticLight
 				JPipeLEDs	   : 0,
 				CorsairHeaders : 0,
 				//PERLED
-				PerLEDOnboardLEDs : 6
+				PerLEDOnboardLEDs : 6,
+				ForceZoneBased	  : false,
 			},
 			0x7C80 : //Z490 Tomahawk
 			{
@@ -271,7 +303,8 @@ class MysticLight
 				JPipeLEDs	   : 0,
 				CorsairHeaders : 0,
 				//PERLED
-				PerLEDOnboardLEDs : 6
+				PerLEDOnboardLEDs : 6,
+				ForceZoneBased	  : false,
 			},
 			0x7C81 : //B460 Tomahawk
 			{
@@ -281,7 +314,8 @@ class MysticLight
 				JPipeLEDs	   : 0,
 				CorsairHeaders : 0,
 				//PERLED
-				PerLEDOnboardLEDs : 6
+				PerLEDOnboardLEDs : 6,
+				ForceZoneBased	  : false,
 			},
 			0x7C82 : //B460 M Mortar
 			{
@@ -291,7 +325,8 @@ class MysticLight
 				JPipeLEDs	   : 0,
 				CorsairHeaders : 0,
 				//PERLED
-				PerLEDOnboardLEDs : 6
+				PerLEDOnboardLEDs : 6,
+				ForceZoneBased	  : false,
 			},
 			0x7C83 : //Mag B460 M Bazooka
 			{
@@ -301,7 +336,8 @@ class MysticLight
 				JPipeLEDs	   : 0,
 				CorsairHeaders : 0,
 				//PERLED
-				PerLEDOnboardLEDs : 6
+				PerLEDOnboardLEDs : 6,
+				ForceZoneBased	  : false,
 			},
 			0x7C84 : //Mag X570 Tomahawk Wifi
 			{
@@ -311,7 +347,8 @@ class MysticLight
 				JPipeLEDs	   : 0,
 				CorsairHeaders : 0,
 				//PERLED
-				PerLEDOnboardLEDs : 6
+				PerLEDOnboardLEDs : 6,
+				ForceZoneBased	  : false,
 			},
 			0x7C85 : //B460-A Pro
 			{
@@ -321,7 +358,8 @@ class MysticLight
 				JPipeLEDs	   : 0,
 				CorsairHeaders : 0,
 				//PERLED
-				PerLEDOnboardLEDs : 6
+				PerLEDOnboardLEDs : 6,
+				ForceZoneBased	  : false,
 			},
 			0x7C86 : //B460I Gaming Edge
 			{
@@ -331,7 +369,8 @@ class MysticLight
 				JPipeLEDs	   : 0,
 				CorsairHeaders : 0,
 				//PERLED
-				PerLEDOnboardLEDs : 6
+				PerLEDOnboardLEDs : 6,
+				ForceZoneBased	  : false,
 			},
 			0x7C88 : //B460M Pro
 			{
@@ -341,7 +380,8 @@ class MysticLight
 				JPipeLEDs	   : 0,
 				CorsairHeaders : 0,
 				//PERLED
-				PerLEDOnboardLEDs : 6
+				PerLEDOnboardLEDs : 6,
+				ForceZoneBased	  : false,
 			},
 			0x7C89 : //H410M Pro
 			{
@@ -351,7 +391,8 @@ class MysticLight
 				JPipeLEDs	   : 0,
 				CorsairHeaders : 0,
 				//PERLED
-				PerLEDOnboardLEDs : 6
+				PerLEDOnboardLEDs : 6,
+				ForceZoneBased	  : false,
 			},
 			0x7C90 : //B550 Gaming Carbon Wifi
 			{
@@ -361,17 +402,19 @@ class MysticLight
 				JPipeLEDs	   : 0,
 				CorsairHeaders : 1,
 				//PERLED
-				PerLEDOnboardLEDs : 10
+				PerLEDOnboardLEDs : 10,
+				ForceZoneBased	  : false,
 			},
 			0x7C91 : //B550 Gaming Edge Max Wifi
 			{
 				OnboardLEDs    : 6,
 				RGBHeaders     : 1,
-				ARGBHeaders    : 1,
+				ARGBHeaders    : 2,
 				JPipeLEDs	   : 0,
 				CorsairHeaders : 0,
 				//PERLED
-				PerLEDOnboardLEDs : 6
+				PerLEDOnboardLEDs : 6,
+				ForceZoneBased	  : false,
 			},
 			0x7C92 : //B550I Gaming Edge Wifi
 			{
@@ -381,7 +424,8 @@ class MysticLight
 				JPipeLEDs	   : 0,
 				CorsairHeaders : 0,
 				//PERLED
-				PerLEDOnboardLEDs : 6
+				PerLEDOnboardLEDs : 6,
+				ForceZoneBased	  : false,
 			},
 			0x7C94 : //B550M Mortar
 			{
@@ -391,7 +435,8 @@ class MysticLight
 				JPipeLEDs	   : 0,
 				CorsairHeaders : 0,
 				//PERLED
-				PerLEDOnboardLEDs : 6
+				PerLEDOnboardLEDs : 6,
+				ForceZoneBased	  : false,
 			},
 			0x7C95 : //B550-M Bazooka
 			{
@@ -401,7 +446,8 @@ class MysticLight
 				JPipeLEDs	   : 0,
 				CorsairHeaders : 0,
 				//PERLED
-				PerLEDOnboardLEDs : 6
+				PerLEDOnboardLEDs : 6,
+				ForceZoneBased	  : false,
 			},
 			0x7C98 : //Z490-S01
 			{
@@ -411,7 +457,8 @@ class MysticLight
 				JPipeLEDs	   : 0,
 				CorsairHeaders : 0,
 				//PERLED
-				PerLEDOnboardLEDs : 6
+				PerLEDOnboardLEDs : 6,
+				ForceZoneBased	  : false,
 			},
 			0x7C99 : //Z490M
 			{
@@ -421,7 +468,8 @@ class MysticLight
 				JPipeLEDs	   : 0,
 				CorsairHeaders : 0,
 				//PERLED
-				PerLEDOnboardLEDs : 6
+				PerLEDOnboardLEDs : 6,
+				ForceZoneBased	  : false,
 			},
 			0x7D03 : //Z590 GODLIKE
 			{
@@ -431,7 +479,8 @@ class MysticLight
 				JPipeLEDs	   : 0,
 				CorsairHeaders : 1,
 				//PERLED
-				PerLEDOnboardLEDs : 32 //?!?!?!?
+				PerLEDOnboardLEDs : 32, //?!?!?!?
+				ForceZoneBased	  : false,
 			},
 			0x7D04 : //Z590 Ace
 			{
@@ -441,7 +490,8 @@ class MysticLight
 				JPipeLEDs	   : 0,
 				CorsairHeaders : 1,
 				//PERLED
-				PerLEDOnboardLEDs : 21
+				PerLEDOnboardLEDs : 21,
+				ForceZoneBased	  : false,
 			},
 			0x7D05 : //Z590I Unify
 			{
@@ -451,7 +501,8 @@ class MysticLight
 				JPipeLEDs	   : 0,
 				CorsairHeaders : 0,
 				//PERLED
-				PerLEDOnboardLEDs : 6
+				PerLEDOnboardLEDs : 6,
+				ForceZoneBased	  : false,
 			},
 			0x7D06 : //Z590 Carbon Wifi/Z590 Gaming Force
 			{
@@ -461,7 +512,8 @@ class MysticLight
 				JPipeLEDs	   : 0,
 				CorsairHeaders : 1,
 				//PERLED
-				PerLEDOnboardLEDs : 8
+				PerLEDOnboardLEDs : 8,
+				ForceZoneBased	  : false,
 			},
 			0x7D07 : //Z590 Gaming Edge
 			{
@@ -471,7 +523,8 @@ class MysticLight
 				JPipeLEDs	   : 0,
 				CorsairHeaders : 0,
 				//PERLED
-				PerLEDOnboardLEDs : 8
+				PerLEDOnboardLEDs : 8,
+				ForceZoneBased	  : false,
 			},
 			0x7D08 : //Z590 Tomahawk
 			{
@@ -481,7 +534,8 @@ class MysticLight
 				JPipeLEDs	   : 0,
 				CorsairHeaders : 0,
 				//PERLED
-				PerLEDOnboardLEDs : 6
+				PerLEDOnboardLEDs : 6,
+				ForceZoneBased	  : false,
 			},
 			0x7D09 : //Z590 Pro
 			{
@@ -491,7 +545,8 @@ class MysticLight
 				JPipeLEDs	   : 0,
 				CorsairHeaders : 0,
 				//PERLED
-				PerLEDOnboardLEDs : 6
+				PerLEDOnboardLEDs : 6,
+				ForceZoneBased	  : false,
 			},
 			0x7D10 : //Z590-A Pro
 			{
@@ -501,7 +556,8 @@ class MysticLight
 				JPipeLEDs	   : 0,
 				CorsairHeaders : 0,
 				//PERLED
-				PerLEDOnboardLEDs : 6
+				PerLEDOnboardLEDs : 6,
+				ForceZoneBased	  : false,
 			},
 			0x7D11 : //Z590 Plus
 			{
@@ -511,7 +567,8 @@ class MysticLight
 				JPipeLEDs	   : 0,
 				CorsairHeaders : 0,
 				//PERLED
-				PerLEDOnboardLEDs : 6
+				PerLEDOnboardLEDs : 6,
+				ForceZoneBased	  : false,
 			},
 			0x7D12 : //Z690M Gaming Edge Wifi
 			{
@@ -521,7 +578,8 @@ class MysticLight
 				JPipeLEDs	   : 0,
 				CorsairHeaders : 0,
 				//PERLED
-				PerLEDOnboardLEDs : 10
+				PerLEDOnboardLEDs : 10,
+				ForceZoneBased	  : false,
 			},
 			0x7D13 : //B550 Unify-X
 			{
@@ -531,7 +589,8 @@ class MysticLight
 				JPipeLEDs	   : 0,
 				CorsairHeaders : 1,
 				//PERLED
-				PerLEDOnboardLEDs : 6
+				PerLEDOnboardLEDs : 6,
+				ForceZoneBased	  : false,
 			},
 			0x7D14 : //B550 Gaming Carbon Wifi
 			{
@@ -541,7 +600,8 @@ class MysticLight
 				JPipeLEDs	   : 0,
 				CorsairHeaders : 0,
 				//PERLED
-				PerLEDOnboardLEDs : 6
+				PerLEDOnboardLEDs : 6,
+				ForceZoneBased	  : false,
 			},
 			0x7D15 : //B560 Tomahawk Wifi
 			{
@@ -551,7 +611,8 @@ class MysticLight
 				JPipeLEDs	   : 0,
 				CorsairHeaders : 0,
 				//PERLED
-				PerLEDOnboardLEDs : 6
+				PerLEDOnboardLEDs : 6,
+				ForceZoneBased	  : false,
 			},
 			0x7D16 : //B560 Tomahawk
 			{
@@ -561,7 +622,8 @@ class MysticLight
 				JPipeLEDs	   : 0,
 				CorsairHeaders : 0,
 				//PERLED
-				PerLEDOnboardLEDs : 6
+				PerLEDOnboardLEDs : 6,
+				ForceZoneBased	  : false,
 			},
 			0x7D17 : //B560M Mortar
 			{
@@ -571,7 +633,8 @@ class MysticLight
 				JPipeLEDs	   : 0,
 				CorsairHeaders : 0,
 				//PERLED
-				PerLEDOnboardLEDs : 6
+				PerLEDOnboardLEDs : 6,
+				ForceZoneBased	  : false,
 			},
 			0x7D18 : //B560M Bazooka
 			{
@@ -581,7 +644,8 @@ class MysticLight
 				JPipeLEDs	   : 0,
 				CorsairHeaders : 0,
 				//PERLED
-				PerLEDOnboardLEDs : 6
+				PerLEDOnboardLEDs : 6,
+				ForceZoneBased	  : false,
 			},
 			0x7D19 : //B560I Gaming Edge
 			{
@@ -591,7 +655,8 @@ class MysticLight
 				JPipeLEDs	   : 0,
 				CorsairHeaders : 0,
 				//PERLED
-				PerLEDOnboardLEDs : 6
+				PerLEDOnboardLEDs : 6,
+				ForceZoneBased	  : false,
 			},
 			0x7D20 : //B560M Pro
 			{
@@ -601,7 +666,8 @@ class MysticLight
 				JPipeLEDs	   : 0,
 				CorsairHeaders : 0,
 				//PERLED
-				PerLEDOnboardLEDs : 6
+				PerLEDOnboardLEDs : 6,
+				ForceZoneBased	  : false,
 			},
 			0x7D21 : //B560M Pro Wifi
 			{
@@ -611,7 +677,8 @@ class MysticLight
 				JPipeLEDs	   : 0,
 				CorsairHeaders : 0,
 				//PERLED
-				PerLEDOnboardLEDs : 6
+				PerLEDOnboardLEDs : 6,
+				ForceZoneBased	  : false,
 			},
 			0x7D22 : //H510M-Pro
 			{
@@ -621,7 +688,8 @@ class MysticLight
 				JPipeLEDs	   : 0,
 				CorsairHeaders : 0,
 				//PERLED
-				PerLEDOnboardLEDs : 6
+				PerLEDOnboardLEDs : 6,
+				ForceZoneBased	  : false,
 			},
 			0x7D25 : //Pro Z690-A
 			{
@@ -631,7 +699,8 @@ class MysticLight
 				JPipeLEDs	   : 0,
 				CorsairHeaders : 0,
 				//PERLED
-				PerLEDOnboardLEDs : 6
+				PerLEDOnboardLEDs : 6,
+				ForceZoneBased	  : false,
 			},
 			0x7D27 : //MEG Z690 Ace
 			{
@@ -641,7 +710,8 @@ class MysticLight
 				JPipeLEDs	   : 0,
 				CorsairHeaders : 1,
 				//PERLED
-				PerLEDOnboardLEDs : 6
+				PerLEDOnboardLEDs : 6,
+				ForceZoneBased	  : false,
 			},
 			0x7D28 : //MEG Z690 Unify
 			{
@@ -651,7 +721,8 @@ class MysticLight
 				JPipeLEDs	   : 0,
 				CorsairHeaders : 1,
 				//PERLED
-				PerLEDOnboardLEDs : 6
+				PerLEDOnboardLEDs : 6,
+				ForceZoneBased	  : false,
 			},
 			0x7D29 : //MEG Z690I Unify
 			{
@@ -661,7 +732,8 @@ class MysticLight
 				JPipeLEDs	   : 0,
 				CorsairHeaders : 0,
 				//PERLED
-				PerLEDOnboardLEDs : 6
+				PerLEDOnboardLEDs : 6,
+				ForceZoneBased	  : false,
 			},
 			0x7D30 : //MPG Z690 Carbon
 			{
@@ -671,7 +743,8 @@ class MysticLight
 				JPipeLEDs	   : 1,
 				CorsairHeaders : 1,
 				//PERLED
-				PerLEDOnboardLEDs : 11
+				PerLEDOnboardLEDs : 11,
+				ForceZoneBased	  : false,
 			},
 			0x7D31 : //MPG Z690 Edge
 			{
@@ -681,7 +754,8 @@ class MysticLight
 				JPipeLEDs	   : 0, //This board has a Jpipe? It says to combine so idk what led is on that, we'll bypass it assuming it's PERLED
 				CorsairHeaders : 1,
 				//PERLED
-				PerLEDOnboardLEDs : 8
+				PerLEDOnboardLEDs : 8,
+				ForceZoneBased	  : false,
 			},
 			0x7D32 : //MAG Z690 Tomahawk
 			{
@@ -691,7 +765,8 @@ class MysticLight
 				JPipeLEDs	   : 0,
 				CorsairHeaders : 0,
 				//PERLED
-				PerLEDOnboardLEDs : 6
+				PerLEDOnboardLEDs : 6,
+				ForceZoneBased	  : false,
 			},
 			0x7D36 : //Pro Z690-P
 			{
@@ -701,7 +776,8 @@ class MysticLight
 				JPipeLEDs	   : 0,
 				CorsairHeaders : 0,
 				//PERLED
-				PerLEDOnboardLEDs : 6
+				PerLEDOnboardLEDs : 6,
+				ForceZoneBased	  : false,
 			},
 			0x7D37 : //B660M-A CEC
 			{
@@ -711,7 +787,8 @@ class MysticLight
 				JPipeLEDs	   : 0,
 				CorsairHeaders : 0,
 				//PERLED
-				PerLEDOnboardLEDs : 6
+				PerLEDOnboardLEDs : 6,
+				ForceZoneBased	  : false,
 			},
 			0x7D38 : //Z590 Unify
 			{
@@ -721,7 +798,8 @@ class MysticLight
 				JPipeLEDs	   : 0,
 				CorsairHeaders : 1,
 				//PERLED
-				PerLEDOnboardLEDs : 6
+				PerLEDOnboardLEDs : 6,
+				ForceZoneBased	  : false,
 			},
 			0x7D40 : //B660I Gaming Edge Wifi
 			{
@@ -731,7 +809,8 @@ class MysticLight
 				JPipeLEDs	   : 0,
 				CorsairHeaders : 0,
 				//PERLED
-				PerLEDOnboardLEDs : 6
+				PerLEDOnboardLEDs : 6,
+				ForceZoneBased	  : false,
 			},
 			0x7D41 : //B660 Tomahawk
 			{
@@ -741,7 +820,8 @@ class MysticLight
 				JPipeLEDs	   : 0,
 				CorsairHeaders : 0,
 				//PERLED
-				PerLEDOnboardLEDs : 6
+				PerLEDOnboardLEDs : 6,
+				ForceZoneBased	  : false,
 			},
 			0x7D42 : //Z690M Mortar
 			{
@@ -751,7 +831,8 @@ class MysticLight
 				JPipeLEDs	   : 0,
 				CorsairHeaders : 0,
 				//PERLED
-				PerLEDOnboardLEDs : 6
+				PerLEDOnboardLEDs : 6,
+				ForceZoneBased	  : false,
 			},
 			0x7D43 : //B660M Bazooka
 			{
@@ -761,7 +842,8 @@ class MysticLight
 				JPipeLEDs	   : 0,
 				CorsairHeaders : 0,
 				//PERLED
-				PerLEDOnboardLEDs : 6
+				PerLEDOnboardLEDs : 6,
+				ForceZoneBased	  : false,
 			},
 			0x7D45 : //B660M-G
 			{
@@ -771,7 +853,8 @@ class MysticLight
 				JPipeLEDs	   : 0,
 				CorsairHeaders : 0,
 				//PERLED
-				PerLEDOnboardLEDs : 6
+				PerLEDOnboardLEDs : 6,
+				ForceZoneBased	  : false,
 			},
 			0x7D46 : //H610M-G
 			{
@@ -781,7 +864,8 @@ class MysticLight
 				JPipeLEDs	   : 0,
 				CorsairHeaders : 0,
 				//PERLED
-				PerLEDOnboardLEDs : 6
+				PerLEDOnboardLEDs : 6,
+				ForceZoneBased	  : false,
 			},
 			0x7D50 : //X570S Ace Max
 			{
@@ -791,7 +875,8 @@ class MysticLight
 				JPipeLEDs	   : 2,
 				CorsairHeaders : 1,
 				//PERLED
-				PerLEDOnboardLEDs : 18
+				PerLEDOnboardLEDs : 18,
+				ForceZoneBased	  : false,
 			},
 			0x7D52 : //X570 Carbon Max Wifi
 			{
@@ -801,7 +886,8 @@ class MysticLight
 				JPipeLEDs	   : 2,
 				CorsairHeaders : 1,
 				//PERLED
-				PerLEDOnboardLEDs : 20
+				PerLEDOnboardLEDs : 20, //REDEMPTION!
+				ForceZoneBased	  : false,
 			},
 			0x7D53 : //X570 Edge Max Wifi
 			{
@@ -811,7 +897,8 @@ class MysticLight
 				JPipeLEDs	   : 0,
 				CorsairHeaders : 0,
 				//PERLED
-				PerLEDOnboardLEDs : 6
+				PerLEDOnboardLEDs : 6,
+				ForceZoneBased	  : false,
 			},
 			0x7D54 : //X570S Tomahawk
 			{
@@ -821,7 +908,8 @@ class MysticLight
 				JPipeLEDs	   : 0,
 				CorsairHeaders : 0,
 				//PERLED
-				PerLEDOnboardLEDs : 6
+				PerLEDOnboardLEDs : 6,
+				ForceZoneBased	  : false,
 			},
 			0x7D59 : //Pro B660-A
 			{
@@ -831,7 +919,18 @@ class MysticLight
 				JPipeLEDs	   : 0,
 				CorsairHeaders : 0,
 				//PERLED
-				PerLEDOnboardLEDs : 6
+				PerLEDOnboardLEDs : 6,
+				ForceZoneBased	  : false,
+			},
+			0x7D67 : //Pro X670
+			{
+				OnboardLEDs    : 0,
+				RGBHeaders     : 2,
+				ARGBHeaders    : 2,
+				JPipeLEDs	   : 0,
+				CorsairHeaders : 0,
+				//PERLED
+				PerLEDOnboardLEDs : 0
 			},
 			0x7D69 : //X670E Ace
 			{
@@ -841,7 +940,8 @@ class MysticLight
 				JPipeLEDs	   : 0,
 				CorsairHeaders : 0,
 				//PERLED
-				PerLEDOnboardLEDs : 6
+				PerLEDOnboardLEDs : 12,
+				ForceZoneBased	  : false,
 			},
 			0x7D70 : //X670E Carbon Wifi
 			{
@@ -851,7 +951,40 @@ class MysticLight
 				JPipeLEDs	   : 0,
 				CorsairHeaders : 0,
 				//PERLED
-				PerLEDOnboardLEDs : 6
+				PerLEDOnboardLEDs : 6,
+				ForceZoneBased	  : false,
+			},
+			0x7D74 : //B650 Carbon Wifi
+			{
+				OnboardLEDs    : 6,
+				RGBHeaders     : 1,
+				ARGBHeaders    : 3,
+				JPipeLEDs	   : 0,
+				CorsairHeaders : 0,
+				//PERLED
+				PerLEDOnboardLEDs : 6,
+				ForceZoneBased	  : false,
+			},
+			0x7D86 : //Z790 Ace
+			{
+				OnboardLEDs    : 7,
+				RGBHeaders     : 1,
+				ARGBHeaders    : 3,
+				JPipeLEDs	   : 0,
+				CorsairHeaders : 0,
+				//PERLED
+				PerLEDOnboardLEDs : 12
+			},
+			0x7D91 : //Z790 Edge
+			{
+				OnboardLEDs    : 6,
+				RGBHeaders     : 1,
+				ARGBHeaders    : 3,
+				JPipeLEDs	   : 0,
+				CorsairHeaders : 0,
+				//PERLED
+				PerLEDOnboardLEDs : 6,
+				ForceZoneBased	  : false,
 			},
 			0x7D97 : //B660M Mortar Max
 			{
@@ -861,7 +994,8 @@ class MysticLight
 				JPipeLEDs	   : 0,
 				CorsairHeaders : 0,
 				//PERLED
-				PerLEDOnboardLEDs : 0
+				PerLEDOnboardLEDs : 0,
+				ForceZoneBased	  : false,
 			}
 		};
 
@@ -1070,16 +1204,21 @@ class MysticLight
 
 	checkPerLEDSupport()
 	{
-		let response = device.send_report([0x53], 725);
+		const response = device.send_report([0x53], 725);
 
 		if(response > 0)
 		{
 			perLED = true;
-			device.log("Motherboard is PerLED 🙂");
+			device.log("Motherboard is PerLED 🙂", {toFile:true});
 		}
 		else
 		{
-			device.log("Motherboard is not PerLED 😔");
+			device.log("Motherboard is not PerLED 😔", {toFile:true});
+		}
+
+		if(this.Library[device.productId()]["ForceZoneBased"] === true) //I'm leaving this untouched, as no new boards are zone based. Lord so help me if that changes MSI.
+		{
+			perLED = false;
 		}
 	}
 
@@ -1092,53 +1231,118 @@ class MysticLight
 
 	createLEDs()
 	{
-		for(let RGBHeaders = 0; RGBHeaders < MSIMotherboard.Library[device.productId()]["RGBHeaders"]; RGBHeaders++)
+		if(device.getMotherboardName() in this.ConfigurationOverrides)
+		{
+			this.createStandardLEDs(this.ConfigurationOverrides[device.getMotherboardName()]);
+			device.log("Using Configuration Override", {toFile:true});
+		}
+		else
+		{
+			this.createStandardLEDs(this.Library[device.productId()]);
+		}
+
+	}
+
+	createStandardLEDs(configTable)
+	{
+		for(let RGBHeaders = 0; RGBHeaders < configTable["RGBHeaders"]; RGBHeaders++)
 		{
 			this.createSubdevice(this.LEDArrays.RGBHeaderArray[RGBHeaders]);
 		}
 
-		ARGBHeaders = MSIMotherboard.Library[device.productId()]["ARGBHeaders"];
-		CorsairHeaders = MSIMotherboard.Library[device.productId()]["CorsairHeaders"];
+		ARGBHeaders = configTable["ARGBHeaders"];
+		CorsairHeaders = configTable["CorsairHeaders"];
 
 		if(perLED === false)
 		{
-			for(let JPipeLEDs = 0; JPipeLEDs < MSIMotherboard.Library[device.productId()]["JPipeLEDs"]; JPipeLEDs++)
+			for(let JPipeLEDs = 0; JPipeLEDs < configTable["JPipeLEDs"]; JPipeLEDs++)
 			{
 				this.createSubdevice(this.LEDArrays.JPipeArray[JPipeLEDs]);
 			}
 
-			for(let ARGBHeaders = 0; ARGBHeaders < MSIMotherboard.Library[device.productId()]["ARGBHeaders"]; ARGBHeaders++)
+			for(let ARGBHeaders = 0; ARGBHeaders < configTable["ARGBHeaders"]; ARGBHeaders++)
 			{
 				this.createSubdevice(this.LEDArrays.ARGBHeaderArray[ARGBHeaders]);
 			}
 
-			for(let CorsairHeaders = 0; CorsairHeaders < MSIMotherboard.Library[device.productId()]["CorsairHeaders"]; CorsairHeaders++)
+			for(let CorsairHeaders = 0; CorsairHeaders < configTable["CorsairHeaders"]; CorsairHeaders++)
 			{
 				this.createSubdevice(this.LEDArrays.CorsairHeaderArray[CorsairHeaders]);
 			}
 
-			for(let OnboardLEDs = 0; OnboardLEDs < MSIMotherboard.Library[device.productId()]["OnboardLEDs"]; OnboardLEDs++)
+			for(let OnboardLEDs = 0; OnboardLEDs < configTable["OnboardLEDs"]; OnboardLEDs++)
 			{
 				this.createSubdevice(this.LEDArrays.OnboardArray[OnboardLEDs]);
 			}
 
-			JPipeLEDs = MSIMotherboard.Library[device.productId()]["JPipeLEDs"];
-			OnboardLEDs = MSIMotherboard.Library[device.productId()]["OnboardLEDs"];
+			JPipeLEDs = configTable["JPipeLEDs"];
+			OnboardLEDs = configTable["OnboardLEDs"];
 		}
 		else
 		{
-			for(let OnboardLEDs = 0; OnboardLEDs < (MSIMotherboard.Library[device.productId()]["PerLEDOnboardLEDs"]); OnboardLEDs++)
+			for(let OnboardLEDs = 0; OnboardLEDs < (configTable["PerLEDOnboardLEDs"]); OnboardLEDs++)
 			{
 				this.createSubdevice(this.LEDArrays.OnboardArray[OnboardLEDs]);
 			}
 
-			OnboardLEDs = MSIMotherboard.Library[device.productId()]["PerLEDOnboardLEDs"];
+			OnboardLEDs = configTable["PerLEDOnboardLEDs"];
 
 			this.SetupChannels();
 			this.PerLEDInit();
 		}
 
-		RGBHeaders  = MSIMotherboard.Library[device.productId()]["RGBHeaders"];
+		RGBHeaders  = configTable["RGBHeaders"];
+	}
+
+	createConfigurationOverrideLEDs()
+	{
+		for(let RGBHeaders = 0; RGBHeaders < this.ConfigurationOverrides[device.getMotherboardName()]["RGBHeaders"]; RGBHeaders++)
+		{
+			this.createSubdevice(this.LEDArrays.RGBHeaderArray[RGBHeaders]);
+		}
+
+		ARGBHeaders = this.ConfigurationOverrides[device.getMotherboardName()]["ARGBHeaders"];
+		CorsairHeaders = this.ConfigurationOverrides[device.getMotherboardName()]["CorsairHeaders"];
+
+		if(perLED === false)
+		{
+			for(let JPipeLEDs = 0; JPipeLEDs < this.ConfigurationOverrides[device.getMotherboardName()]["JPipeLEDs"]; JPipeLEDs++)
+			{
+				this.createSubdevice(this.LEDArrays.JPipeArray[JPipeLEDs]);
+			}
+
+			for(let ARGBHeaders = 0; ARGBHeaders < this.ConfigurationOverrides[device.getMotherboardName()]["ARGBHeaders"]; ARGBHeaders++)
+			{
+				this.createSubdevice(this.LEDArrays.ARGBHeaderArray[ARGBHeaders]);
+			}
+
+			for(let CorsairHeaders = 0; CorsairHeaders < this.ConfigurationOverrides[device.getMotherboardName()]["CorsairHeaders"]; CorsairHeaders++)
+			{
+				this.createSubdevice(this.LEDArrays.CorsairHeaderArray[CorsairHeaders]);
+			}
+
+			for(let OnboardLEDs = 0; OnboardLEDs < this.ConfigurationOverrides[device.getMotherboardName()]["OnboardLEDs"]; OnboardLEDs++)
+			{
+				this.createSubdevice(this.LEDArrays.OnboardArray[OnboardLEDs]);
+			}
+
+			JPipeLEDs = this.ConfigurationOverrides[device.getMotherboardName()]["JPipeLEDs"];
+			OnboardLEDs = this.ConfigurationOverrides[device.getMotherboardName()]["OnboardLEDs"];
+		}
+		else
+		{
+			for(let OnboardLEDs = 0; OnboardLEDs < (this.ConfigurationOverrides[device.getMotherboardName()]["PerLEDOnboardLEDs"]); OnboardLEDs++)
+			{
+				this.createSubdevice(this.LEDArrays.OnboardArray[OnboardLEDs]);
+			}
+
+			OnboardLEDs = this.ConfigurationOverrides[device.getMotherboardName()]["PerLEDOnboardLEDs"];
+
+			this.SetupChannels();
+			this.PerLEDInit();
+		}
+
+		RGBHeaders  = this.ConfigurationOverrides[device.getMotherboardName()]["RGBHeaders"];
 	}
 
 	SetupChannels()

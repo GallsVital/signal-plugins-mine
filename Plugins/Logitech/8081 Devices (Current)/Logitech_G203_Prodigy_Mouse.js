@@ -267,18 +267,6 @@ function DetectInputs()
 
     	}
     	while(device.getLastReadSize() > 0)
-
-	do
-	{
-	let packet = device.read([0x00],7, 3);
-
-		if(packet[0] == Logitech.ShortMessage && packet[1] == Logitech.ConnectionMode && packet[2] == 0x41 && packet[3] == 0x0C && packet[6] == 0x40)
-		{
-		device.log("Mouse Going to Sleep");
-		return Sleep = true;
-		}
-	}
-	while(device.getLastReadSize() > 0)
 }
 
 function ProcessInputs(packet)
@@ -352,15 +340,7 @@ function ProcessInputs(packet)
 		Logitech.setDpi(DPIStageDict[DPIStage]());
 		Logitech.SetDPILights(DPIStage);
 		}
-	}
-
-	if(packet[0] == Logitech.LongMessage && packet[1] == Logitech.ConnectionMode && packet[2] == 0x06 && packet[3] == 0x00 && packet[6] == 0x00)
-	{
-	device.log("Waking From Sleep");
-	device.pause(5000); //Wait five seconds before Handoff. Allows device boot time.
-	Initialize();
-	return Sleep = false;
-	}
+		}
 	}
 }
 
@@ -513,7 +493,7 @@ function hexToRgb(hex)
 			 /** @type {string[]} */
 			 LedNames : ["Primary Zone", "Logo Zone"],
 			 /** Variable that represents if a device has multiple connection methods and which method it is connected by.  */
-			 CommunicationType : 0,
+			 CommunicationType : this.CommunicationType["SingleConnection"],
 			 /** Variable that represents which method a device is connected by. */
 			 ConnectionMode : 0,
 			 /** Variable for defining if a mouse supports the 8071 RGB Protocol. */
@@ -522,9 +502,7 @@ function hexToRgb(hex)
 			 HasDPILights : false,
 			 /** Variable for defining if a mouse supports battery status and level. */
 			 HasBattery : false,
- 
-			 CommunicationType : this.CommunicationType["SingleConnection"],
- 
+  
 			 DeviceName: "UNKNOWN",
 			 DeviceType: "-1"
 		 };
@@ -1305,19 +1283,19 @@ function hexToRgb(hex)
  
 	 GKeySetup()
 	 {
-	 let InfoPacket = [GKeyID, 0x00]; //Info
+	 let InfoPacket = [this.FeatureIDs.GKeyID, 0x00]; //Info
 	 this.SendShortMessage(InfoPacket);
  
-	 let SoftwareEnablePacket = [GKeyID, 0x20, 0x01]; //Software Enable Flag for GKeys and Mkeys
+	 let SoftwareEnablePacket = [this.FeatureIDs.GKeyID, 0x20, 0x01]; //Software Enable Flag for GKeys and Mkeys
 	 this.SendShortMessage(SoftwareEnablePacket)
 	 }
  
 	 MKeySetup()
 	 {
-	 let InfoPacket = [MKeyID, 0x00];
+	 let InfoPacket = [this.FeatureIDs.MKeyID, 0x00];
 	 this.SendShortMessage(InfoPacket);
  
-	 let SoftwareEnablePacket = [MKeyID, 0x10]; //Led Number Flag in binary
+	 let SoftwareEnablePacket = [this.FeatureIDs.MKeyID, 0x10]; //Led Number Flag in binary
 	 this.SendShortMessage(SoftwareEnablePacket);
 	 }
  

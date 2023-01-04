@@ -136,9 +136,6 @@ export function Initialize()
 		Logitech.SetDPILights(3); //Fallback to set DPILights to full
 	}
 
-	device.repollLeds();
-	device.repollSize();
-
 	if(Logitech.Config.HasBattery)
 	{
 		device.addFeature("battery");
@@ -151,6 +148,7 @@ export function Initialize()
 export function Render()
 {
 	DetectInputs();
+
 	grabColors();
 	PollBattery();
 }
@@ -259,7 +257,7 @@ function DetectInputs()
 			if(DpiControl)
 			{
 			Sniper = true;
-			Logitech.setDpi(dpi6, 1);
+			Logitech.setDpi(dpi6);
 			Logitech.SetDPILights(1);
 			}
 		}
@@ -360,7 +358,7 @@ function ProcessInputs(packet)
 		
 			if(DpiControl)
 			{
-				Logitech.setDpi(DPIStageDict[DPIStage](), DPIStage);
+				Logitech.setDpi(DPIStageDict[DPIStage]());
 				Logitech.SetDPILights(DPIStage);
 			}
 		}
@@ -391,8 +389,7 @@ function DPIStageControl(override,stage)
 	
 	if(DpiControl)
 	{
-		
-    Logitech.setDpi(DPIStageDict[DPIStage](), DPIStage);
+    Logitech.setDpi(DPIStageDict[DPIStage]());
 	Logitech.SetDPILights(DPIStage);
 	}
 	device.log(DPIStage);
@@ -523,7 +520,7 @@ function hexToRgb(hex)
 			 /** @type {string[]} */
 			 LedNames : ["Primary Zone", "Logo Zone"],
 			 /** Variable that represents if a device has multiple connection methods and which method it is connected by.  */
-			 CommunicationType : 0,
+			 CommunicationType : this.CommunicationType["SingleConnection"],
 			 /** Variable that represents which method a device is connected by. */
 			 ConnectionMode : 0,
 			 /** Variable for defining if a mouse supports the 8071 RGB Protocol. */
@@ -532,8 +529,6 @@ function hexToRgb(hex)
 			 HasDPILights : false,
 			 /** Variable for defining if a mouse supports battery status and level. */
 			 HasBattery : false,
- 
-			 CommunicationType : this.CommunicationType["SingleConnection"],
  
 			 DeviceName: "UNKNOWN",
 			 DeviceType: "-1"
@@ -718,14 +713,12 @@ function hexToRgb(hex)
 
 		 this.ProductIDs =
 		 {
-			"c081" : "G900",
 			"c082" : "G403 Prodigy",
 			"c083" : "G403",
 			"c084" : "G203 Prodigy",
 			"c085" : "GPro Wired",
 			"c088" : "GPro Wireless",
 			"c08b" : "G502 Hero",
-			"c08c" : "GPro Wired", //AltPid (╯°□°）╯︵ ┻━┻
 			"c08d" : "G502 Lightspeed",
 			"c08f" : "G403 Hero",
 			"c090" : "G703",
@@ -924,62 +917,67 @@ function hexToRgb(hex)
 			break;
 
 		case "c084" :
-		case "c085" :
-		case "c08c" :
 			this.Config.LedNames = this.LEDNameDict["SingleZoneMouse"];
 			this.Config.LedPositions = this.LEDPositionDict["SingleZoneMouse"];
 			this.Config.MouseBodyStyle = "G200Body";
 			this.SetHasDPILights(false);
 			break;
 
-		case "c082" :
-		case "c083" :
-		case "c08f" :
-		case "c088" :
-		case "c090" :
+		 case "c082" :
+		 case "c083" :
+		 case "c08f" :
+		 case "c088" :
+		 case "c090" :
+			 this.Config.LedNames = this.LEDNameDict["TwoZoneMouse"];
+			 this.Config.LedPositions = this.LEDPositionDict["TwoZoneMouse"];
+			 this.Config.MouseBodyStyle = "G200Body";
+			 this.SetHasDPILights(false);
+			 break;
+ 
+		 case "c08b":
+		 case "c08d":
+		 case "c332":
+			 this.Config.LedNames = this.LEDNameDict["TwoZoneMouse"];
+			 this.Config.LedPositions = this.LEDPositionDict["TwoZoneMouse"];
+			 this.Config.MouseBodyStyle = "G500Body";
+			 this.SetHasDPILights(true);
+			 break;
+
+		case "c085" :
 			this.Config.LedNames = this.LEDNameDict["TwoZoneMouse"];
 			this.Config.LedPositions = this.LEDPositionDict["TwoZoneMouse"];
 			this.Config.MouseBodyStyle = "G200Body";
-			this.SetHasDPILights(false);
-			break;
- 
-		case "c08b":
-		case "c08d":
-		case "c332":
-			this.Config.LedNames = this.LEDNameDict["TwoZoneMouse"];
-			this.Config.LedPositions = this.LEDPositionDict["TwoZoneMouse"];
-			this.Config.MouseBodyStyle = "G500Body";
 			this.SetHasDPILights(true);
 			break;
  
-		case "c081" :
-		case "c091":
-			this.Config.LedNames = this.LEDNameDict["TwoZoneMouse"];
-			this.Config.LedPositions = this.LEDPositionDict["TwoZoneMouse"];
-			this.Config.MouseBodyStyle = "G900Body";
-			this.SetHasDPILights(true);
-			break;
+		 case "c091":
+			 this.Config.LedNames = this.LEDNameDict["TwoZoneMouse"];
+			 this.Config.LedPositions = this.LEDPositionDict["TwoZoneMouse"];
+			 this.Config.MouseBodyStyle = "G900Body";
+			 this.SetHasDPILights(true);
+			 break;
  
-		case "c095":
+		 case "c095":
 			this.Config.LedNames = this.LEDNameDict["G502XPlus"];
 			this.Config.LedPositions = this.LEDPositionDict["G502XPlus"];
-			this.Config.MouseBodyStyle = "G502XPlusBody";
-			this.SetHasDPILights(false);
-			break;
+			 this.Config.MouseBodyStyle = "G502XPlusBody";
+			 this.SetHasDPILights(false);
+			 break;
 
-		case "c094":
+		 case "c094":
 			this.Config.LedNames = this.LEDNameDict["Null"];
 			this.Config.LedPositions = this.LEDPositionDict["Null"];
-			this.Config.MouseBodyStyle = "G200Body";
-			this.SetHasDPILights(false);
+			 this.Config.MouseBodyStyle = "G200Body";
+			 this.SetHasDPILights(false);
  
-		default:
-			this.Config.LedNames = this.LEDNameDict["TwoZoneMouse"];
-			this.Config.LedPositions = this.LEDPositionDict["TwoZoneMouse"];
-			this.Config.MouseBodyStyle = "G200Body";
-			this.SetHasDPILights(true);
-			break;
-		}
+		 default:
+			 this.Config.LedNames = this.LEDNameDict["TwoZoneMouse"];
+			 this.Config.LedPositions = this.LEDPositionDict["TwoZoneMouse"];
+			 this.Config.MouseBodyStyle = "G200Body";
+			 this.SetHasDPILights(true);
+			 break;
+ 
+		 }
  
 	 }
  
@@ -1031,7 +1029,7 @@ function hexToRgb(hex)
 	 data  = data || [0x00, 0x00, 0x00];
 	 packet.push(...data);
 	 device.write(packet, 7);
-	 device.pause(5);
+	 device.pause(1);
 	 packet = device.read(packet,7);
  
 	 return packet.slice(3,7);
@@ -1044,7 +1042,7 @@ function hexToRgb(hex)
 	 data  = data || [0x00, 0x00, 0x00];
 	 packet.push(...data);
 	 device.write(packet, 7);
-	 device.pause(5);
+	 device.pause(1);
 	 packet = device.read(packet,7);
  
 	 return packet.slice(3,7);
@@ -1067,7 +1065,6 @@ function hexToRgb(hex)
 	 data = data || [0x00, 0x00, 0x00];
 	 packet.push(...data);
 	 device.write(packet, 20);
-	 device.pause(5);
 	 packet = device.read(packet,20);
 	 
 	 return packet.slice(4,20);
@@ -1258,10 +1255,10 @@ function hexToRgb(hex)
 	 return this.PercentageLookupTable[nearestVoltageBand]
 	 }
  
-	 setDpi(dpi, stage)
+	 setDpi(dpi)
 	 {
-	 let packet = [this.FeatureIDs.DPIID, 0x30, 0x00, Math.floor(dpi/256), dpi%256, stage]; //Oh there's actually a stage flag?
-	 this.SendLongMessageNoResponse(packet);
+	 let packet = [this.FeatureIDs.DPIID, 0x30, 0x00, Math.floor(dpi/256), dpi%256];
+	 this.SendShortMessage(packet);
 	 }
  
 	 SetDPILights(stage)
@@ -1313,19 +1310,19 @@ function hexToRgb(hex)
  
 	 GKeySetup()
 	 {
-	 let InfoPacket = [GKeyID, 0x00]; //Info
+	 let InfoPacket = [this.FeatureIDs.GKeyID, 0x00]; //Info
 	 this.SendShortMessage(InfoPacket);
  
-	 let SoftwareEnablePacket = [GKeyID, 0x20, 0x01]; //Software Enable Flag for GKeys and Mkeys
+	 let SoftwareEnablePacket = [this.FeatureIDs.GKeyID, 0x20, 0x01]; //Software Enable Flag for GKeys and Mkeys
 	 this.SendShortMessage(SoftwareEnablePacket)
 	 }
  
 	 MKeySetup()
 	 {
-	 let InfoPacket = [MKeyID, 0x00];
+	 let InfoPacket = [this.FeatureIDs.MKeyID, 0x00];
 	 this.SendShortMessage(InfoPacket);
  
-	 let SoftwareEnablePacket = [MKeyID, 0x10]; //Led Number Flag in binary
+	 let SoftwareEnablePacket = [this.FeatureIDs.MKeyID, 0x10]; //Led Number Flag in binary
 	 this.SendShortMessage(SoftwareEnablePacket);
 	 }
  

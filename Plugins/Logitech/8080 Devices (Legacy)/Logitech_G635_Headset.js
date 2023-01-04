@@ -27,8 +27,8 @@ var DeviceId;
 var TransactionId;
 var deviceName;
 var InfoID;
-var RGBFeatureID;
 var GKeyID;
+var RGBFeatureID;
 var ADCMeasurementID;
 var SidetoneID;
 var EqualizerID;
@@ -40,7 +40,7 @@ const LongMessage = 0x11;
 const ConnectionMode = WIRED;
 
 let vLedNames = ["Logo", "Light Strip"];
-let vLedPositions = [ [0, 2], [0, 1] ];
+let vLedPositions = [ [0, 1], [0, 0] ];
 
 export function LedNames() 
 {
@@ -81,14 +81,14 @@ export function onsideToneChanged()
 	setSideTone();
 }
 
-function GKeySetup()//Controls software modes for the G and M keys
-{
-	var packet = [LongMessage, ConnectionMode, GKeyID, 0x00]; //Info
-	device.write(packet,20);
+//function GKeySetup()//Controls software modes for the G and M keys
+//{
+//	var packet = [LongMessage, ConnectionMode, GKeyID, 0x00]; //Info
+//	device.write(packet,20);
 
-	packet = [LongMessage, ConnectionMode, GKeyID, 0x20, 0x01]; //Software Enable Flag for GKeys and Mkeys
-	device.write(packet,20);
-}
+//	packet = [LongMessage, ConnectionMode, GKeyID, 0x20, 0x01]; //Software Enable Flag for GKeys and Mkeys
+//	device.write(packet,20);
+//}
 
 function SetDirectMode()
 {
@@ -102,11 +102,11 @@ function setSideTone()
 	device.write(packet, 20);
 }
 
-function setIdleTimeout()
-{
-	let packet = [LongMessage, ConnectionMode, ADCMeasurementID, 0x20, timeout];//timeout in minutes
-	device.write(packet, 20);
-}
+//function setIdleTimeout()
+//{
+//	let packet = [LongMessage, ConnectionMode, ADCMeasurementID, 0x20, timeout];//timeout in minutes
+//	device.write(packet, 20);
+//}
 
 function sidetoneSetup()
 {
@@ -214,18 +214,6 @@ function DetectInputs()
     	ProcessInputs(packet);
     }
     while(device.getLastReadSize() > 0)
-
-	do
-	{
-	let packet = device.read([0x00],7, 10);
-
-		if(packet[0] == ShortMessage && packet[1] == ConnectionMode && packet[2] == 0x41 && packet[3] == 0x0C && packet[6] == 0x40)
-		{
-		device.log("Mouse Going to Sleep");
-		return Sleep = true;
-		}
-	}
-	while(device.getLastReadSize() > 0)
 }
 
 function ProcessInputs(packet)
@@ -384,7 +372,6 @@ function GrabIds()
 		RGBFeatureID = Logitech_FeatureID_Get(RGB8071Page);
 			if(RGBFeatureID != 0)
 			{
-			Hero = true;
 			device.log("Hero Mouse Found");
 			}
 		}

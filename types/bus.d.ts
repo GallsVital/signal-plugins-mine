@@ -35,7 +35,7 @@ declare class FreeAddressBus extends BusBase{
 declare class FixedAddressBus extends BusBase{
 	public ReadByte(Register: number): number
 	public ReadByteWithoutRegister(): number
-	public ReadBlockBytes(Register: number, Size: number, Data: number[]): [number, number[]]
+	public ReadBlockBytes(Register: number, Size: number): [number, number[]]
 	public ReadBlockWithoutRegister(Size: number): [number, number[]]
 	public WriteBlock(Register: number, Size: number, Data: number[]): number
 	public WriteBlockWithoutRegister(Address: number, Size: number, Data: number[]): number

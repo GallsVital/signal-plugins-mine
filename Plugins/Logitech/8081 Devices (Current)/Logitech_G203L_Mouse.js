@@ -69,9 +69,11 @@ var OnBoardState;
 var DPIStage = 1;
 
 const vLedNames = ["Primary Zone"];
+/** @type {LedPosition[]} */
 const vLedPositions = [ [0,1] ];
 
 let vPERLedNames = ["Left Zone", "Logo Zone", "Right Zone"];
+/** @type {LedPosition[]} */
 let vPERLedPositions = [ [0, 1], [1, 2], [2, 1] ];
 
 const WIRED = 0xFF;
@@ -112,26 +114,12 @@ const deviceIdMap =
 
 export function LedNames()
 {
-	if(ARGBMode === true)
-	{
-	return vPERLedNames;
-	}
-	else
-	{
     return vLedNames;
-	}
 }
 
 export function LedPositions()
 {
-	if(ARGBMode === true)
-	{
-	return vPERLedPositions;
-	}
-	else
-	{
     return vLedPositions;
-	}
 }
 
 export function Initialize()
@@ -168,6 +156,13 @@ export function Initialize()
 	{
 		DPIStageControl();
 	}
+
+	if(ARGBMode){
+		device.setControllableLeds(vPERLedNames, vPERLedPositions)
+	}else{
+		device.setControllableLeds(vLedNames, vLedPositions)
+	}
+
 }
 
 export function Render()
@@ -195,7 +190,11 @@ export function Shutdown()
 
 export function onARGBModeChanged()
 {
-	device.repollLeds();
+	if(ARGBMode){
+		device.setControllableLeds(vPERLedNames, vPERLedPositions)
+	}else{
+		device.setControllableLeds(vLedNames, vLedPositions)
+	}
 }
 
 export function onDpiControlChanged()
@@ -507,19 +506,6 @@ function DetectInputs()
 
     	}
     	while(device.getLastReadSize() > 0)
-
-	device.set_endpoint(EndpointByte1, ShortMessageEndpointByte, EndpointByte3);
-	do
-	{
-	let packet = device.read([0x00],7, 10);
-
-		if(packet[0] == ShortMessage && packet[1] == ConnectionMode && packet[2] == 0x41 && packet[3] == 0x0C && packet[6] == 0x40)
-		{
-		device.log("Mouse Going to Sleep");
-		return Sleep = true;
-		}
-	}
-	while(device.getLastReadSize() > 0)
 }
 
 function ProcessInputs(packet)
@@ -584,14 +570,6 @@ function ProcessInputs(packet)
 
 		}
 
-	}
-
-	if(packet[0] == LongMessage && packet[1] == ConnectionMode && packet[2] == 0x06 && packet[3] == 0x00 && packet[6] == 0x00)
-	{
-	device.log("Waking From Sleep");
-	device.pause(5000); //Wait five seconds before Handoff. Allows device boot time.
-	Initialize();
-	return Sleep = false;
 	}
 }
 

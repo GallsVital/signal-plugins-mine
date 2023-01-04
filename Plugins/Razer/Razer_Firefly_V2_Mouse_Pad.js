@@ -191,7 +191,7 @@ export function Render() {
 
 
 export function Shutdown() {
-
+	SendPacket(true);
 }
 
 export function Validate(endpoint) {

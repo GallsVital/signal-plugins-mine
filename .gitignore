@@ -1,5 +1,7 @@
 /node_modules
 /docs
-settings.json
+/dist
 /coverage
 junit.xml
+settings.json
+

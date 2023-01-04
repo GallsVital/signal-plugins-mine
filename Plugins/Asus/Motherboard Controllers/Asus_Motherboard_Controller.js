@@ -98,11 +98,13 @@ const ASUS_MAINBOARD_DIRECTIDX = 4;
 const ASUS_MODE_DIRECT = 0xFF;
 // AULA3-AR32-0207 - 3 mainboard, 3 ARGB, 1 12V - ROG STRIX Z690 GAMING WIFI
 // AULA3-AR42-0207 - 3 Mainboard, 1 ARGB, 2 12V - TUF GAMING X570-PRO (WI-FI)
+// AULA3-AR42-0207 - 3 Mainboard, 2 ARGB, 2 12V - TUF GAMING B550-PLUS WIFI II
 // AULA3-6K75-0207 - 3 Mainboard, 1 ARGB, 2 12V - TUF GAMING X570-PLUS
 
 const ConfigurationOverrides = {
 	"AULA3-AR32-0207":{MainboardCount: 3, ARGBChannelCount:3, RGBHeaderCount: 1}, // THIS HAS A SPACE AT THE END?!?!?!
-	"AULA3-AR42-0207":{MainboardCount: 3, ARGBChannelCount:1, RGBHeaderCount: 2}
+	//"AULA3-AR42-0207":{MainboardCount: 3, ARGBChannelCount:1, RGBHeaderCount: 2},
+	"TUF GAMING X570-PRO (WI-FI)": {MainboardCount: 3, ARGBChannelCount:1, RGBHeaderCount: 2},
 };
 
 const DeviceInfo = {
@@ -393,7 +395,8 @@ function FetchConfigTable(){
 function ParseConfigTable(){
 
 	for(const config in ConfigurationOverrides){
-		if(DeviceInfo.Model.localeCompare(config) == 0){
+		// If modelId matches, or if mobo name does
+		if(DeviceInfo.Model.localeCompare(config) == 0 || device.getMotherboardName() == config){
 			LoadOverrideConfiguration(config);
 
 			return;

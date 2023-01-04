@@ -1,6 +1,6 @@
 ﻿export function Name() { return "Cooler Master Gen2 LED Controller A1"; }
-export function VendorId() { return 0x2516;}
-export function ProductId() { return 0x0173;}
+export function VendorId() { return 0x2516; }
+export function ProductId() { return [0x0173, 0x01C9]; }
 export function Publisher() { return "FeuerSturm"; }
 export function Documentation(){ return "troubleshooting/coolermaster"; }
 export function Size() { return [1, 1]; }
@@ -14,11 +14,11 @@ GenCh1:readonly
 GenCh2:readonly
 GenCh3:readonly
 */
-export function ControllableParameters(){
+export function ControllableParameters(){
 	return [
-		{"property":"shutdownColor", "label":"Shutdown Color", "min":"0", "max":"360", "type":"color", "default":"009bde"},
-		{"property":"LightingMode", "label":"Lighting Mode", "type":"combobox", "values":["Canvas", "Forced"], "default":"Canvas"},
-		{"property":"forcedColor", "label":"Forced Color", "min":"0", "max":"360", "type":"color", "default":"009bde"},
+		{"property":"shutdownColor", "group":"lighting", "label":"Shutdown Color", "min":"0", "max":"360", "type":"color", "default":"009bde"},
+		{"property":"LightingMode", "group":"lighting", "label":"Lighting Mode", "type":"combobox", "values":["Canvas", "Forced"], "default":"Canvas"},
+		{"property":"forcedColor", "group":"lighting", "label":"Forced Color", "min":"0", "max":"360", "type":"color", "default":"009bde"},
 		{"property":"GenCh1", "label":"Channel 1 Mode", "type":"combobox", "values":["GEN1", "GEN2"], "default":"GEN1", "tooltip":"GEN2 will ONLY work with daisy-chained Cooler Master GEN2 devices!"},
 		{"property":"GenCh2", "label":"Channel 2 Mode", "type":"combobox", "values":["GEN1", "GEN2"], "default":"GEN1", "tooltip":"GEN2 will ONLY work with daisy-chained Cooler Master GEN2 devices!"},
 		{"property":"GenCh3", "label":"Channel 3 Mode", "type":"combobox", "values":["GEN1", "GEN2"], "default":"GEN1", "tooltip":"GEN2 will ONLY work with daisy-chained Cooler Master GEN2 devices!"},
@@ -85,10 +85,10 @@ export function LedPositions() {
 }
 
 export function Initialize() {
-	sendPacketString("00 80 01 02 01", 65);
-	sendPacketString("00 00 09 ff ff 90", 65);
-	sendPacketString("00 01 09", 65);
-	sendPacketString("00 82 09", 65);
+	device.write([0x00, 0x80, 0x01, 0x02, 0x01], 65);
+	device.write([0x00, 0x00, 0x09, 0xff, 0xff, 0x90], 65);
+	device.write([0x00, 0x01, 0x09], 65);
+	device.write([0x00, 0x82, 0x09], 65);
 	savedGenCh1 = GenCh1;
 	savedGenCh2 = GenCh2;
 	savedGenCh3 = GenCh3;
@@ -102,20 +102,18 @@ export function Shutdown() {
 	SendChannel(2, true, savedGenCh3 == 'GEN1' ? false : true);
 }
 
-function setLEDCounts()
-{
-	for(Channel = 0; Channel <ChannelArray.length; Channel++)
-	{
-		let initPacket = [0x00, 0x80, 0x06, 0x02, Channel+1, 0x08, 0x07];
-		let LEDCountPacket = [0x00, 0x80, 0x06, 0x02, Channel+1, 0x01, 0x3c];
-		device.write(initPacket);
-		device.write(LEDCountPacket);
+function setLEDCounts() {
+	for(let Channel = 0; Channel <ChannelArray.length; Channel++) {
+		const initPacket = [0x00, 0x80, 0x06, 0x02, Channel+1, 0x08, 0x07];
+		const LEDCountPacket = [0x00, 0x80, 0x06, 0x02, Channel+1, 0x01, 0x3c];
+		device.write(initPacket, 65);
+		device.write(LEDCountPacket, 65);
 	}
 }
 
 function SendChannel(Channel, shutdown = false, GEN2 = false) {
 	let ChannelLedCount = device.channel(ChannelArray[Channel]).ledCount;
-	let componentChannel = device.channel(ChannelArray[Channel]);
+	const componentChannel = device.channel(ChannelArray[Channel]);
 
 	let RGBData = [];
 
@@ -197,17 +195,6 @@ export function Render() {
 	SendChannel(0, false, savedGenCh1 == 'GEN1' ? false : true);
 	SendChannel(1, false, savedGenCh2 == 'GEN1' ? false : true);
 	SendChannel(2, false, savedGenCh3 == 'GEN1' ? false : true);
-}
-
-function sendPacketString(string, size) {
-	const packet= [];
-	const data = string.split(' ');
-
-	for(let i = 0; i < data.length; i++) {
-		packet[i] = parseInt(data[i], 16);
-	}
-
-	device.write(packet, size);
 }
 
 export function Validate(endpoint) {

@@ -31,10 +31,8 @@ const ChannelArray = [
 
 let channelCount = 0;
 
-const vLedNames = ["Led 1", "Led 2", "Led 3", "Led 4", "Led 5", "Led 6", "RGB Header 1", "RGB Header 2"];
-const vLedPositions = [
-	[0, 0], [1, 0], [2, 0], [3, 0], [4, 0], [5, 0], [6, 0], [7, 0]
-];
+const vLedNames = [];
+const vLedPositions = [];
 export function LedNames() {
 	return vLedNames;
 }

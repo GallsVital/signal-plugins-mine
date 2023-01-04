@@ -51,7 +51,7 @@ export function VendorId() { return 0x1532; }
 export function Documentation(){ return "troubleshooting/razer"; }
 export function ProductId() { return 0x0f0D; }
 export function Publisher() { return "WhirlwindFX"; }
-export function Size() { return [15, 1]; }
+export function Size() { return [16, 1]; }
 export function Type() { return "Hid"; }
 export function DefaultPosition(){return [120, 80];}
 export function DefaultScale(){return 4.0;}
@@ -84,7 +84,7 @@ let vLedNames = [
 ];
 let vLedPositions = [
 
-	[1, 0], [2, 0], [3, 0], [4, 0], [5, 0], [6, 0], [7, 0], [8, 0], [9, 0], [10, 0], [11, 0], [12, 0], [13, 0], [14, 0], [15, 0], [15, 0]
+	[0, 0], [1, 0], [2, 0], [3, 0], [4, 0], [5, 0], [6, 0], [7, 0], [8, 0], [9, 0], [10, 0], [11, 0], [12, 0], [13, 0], [14, 0], [15, 0],
 
 ];
 

@@ -20,7 +20,8 @@ declare class ComponentChannel{
 	 * @param ArrayOrder The output arrays format.
 	 * @param ColorOrder The R,G,B order of the output array.
 	 */
-	public getColors(ArrayOrder: ArrayOrder, ColorOrder: ColorOrder): number[] | number[][]
+	public getColors(ArrayOrder: InlineArray, ColorOrder?: ColorOrder): number[]
+	public getColors(ArrayOrder: SeparateArray, ColorOrder?: ColorOrder): number [][]
 
 	/**
 	 * this function returns a boolean on if this device channel should be 'pulsing'. This can be requested due to no Components being selected, or if the onboarding Component Setup UI is being shown.
@@ -29,4 +30,13 @@ declare class ComponentChannel{
 	 * @returns boolean on if this ComponentChannel should force pulse.
 	 */
 	public shouldPulseColors(): boolean
+	
+	public getPulse(LedCount: number,  ArrayOrder?: InlineArray, ColorOrder?: ColorOrder): number[]
+	public getPulse(LedCount: number,  ArrayOrder: SeparateArray, ColorOrder?: ColorOrder): number[][]
+
+	public getComponentNames(): string[]
+	public getComponentColors(ComponentId: SubdeviceId, ArrayOrder?: InlineArray): number[]
+	public getComponentColors(ComponentId: SubdeviceId, ArrayOrder: SeparateArray): number[][]
+
+	public OverrideColors(): boolean
 }

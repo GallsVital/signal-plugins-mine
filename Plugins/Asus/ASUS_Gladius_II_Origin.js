@@ -1,7 +1,7 @@
 export function Name() { return "ASUS Gladius II Origin"; }
 export function VendorId() { return 0x0B05; }
 export function Documentation(){ return "troubleshooting/asus"; }
-export function ProductId() { return 0x1877; }
+export function ProductId() { return [0x1877, 0x1845]; }
 export function Publisher() { return "komikaze & vermis"; }
 export function Size() { return [7, 8]; }
 export function DefaultPosition(){return [225, 120];}

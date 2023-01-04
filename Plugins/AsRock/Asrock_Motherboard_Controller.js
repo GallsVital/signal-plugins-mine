@@ -89,32 +89,19 @@ export function ControllableParameters()
 }
 
 const vARGBLedNames = [ ];
+/** @type {LedPosition[]} */
 const vARGBLedPositions = [ ];
 
 export function SupportsSubdevices(){ return true; }
 
 export function LedNames() 
 {
-    if(ARGBMode == true)
-    {
-	return vARGBLedNames;
-    }
-    else
-    {
     return vLedNames;
-    }
 }
 
 export function LedPositions() 
 {
-    if(ARGBMode == true)
-    {
-	return vARGBLedPositions;
-    }
-    else
-    {
     return vLedPositions;
-    }
 }
 
 export function Initialize() 
@@ -122,6 +109,7 @@ export function Initialize()
     ClearBuffer();
     if(ARGBMode == true)
     {
+        device.setControllableLeds(vARGBLedNames, vARGBLedPositions);
         LEDConfig();
         CreateRGBHeaders();
 	    SetupChannels();
@@ -131,6 +119,8 @@ export function Initialize()
     }
     else
     {
+        
+        device.setControllableLeds(vLedNames, vLedPositions);
         ReadConfig(1);
 
         let LedCounts = ReadConfig(2).slice(5, 13);
@@ -246,6 +236,7 @@ let Zoneconfig = [
 ];
 
 let vLedNames = [ "PCH", "IO cover", "PCB", "ARGB Header 1", "ARGB Header 2" ];
+/** @type {LedPosition[]} */
 let vLedPositions = [ [2, 0], [3, 0], [4, 0], [0, 0], [1, 0] ];
 
 function HexToRGB(r, g, b)
@@ -450,7 +441,6 @@ export function onRGBHeadersChanged()
 
 export function onARGBModeChanged()
 {
-    device.repollLeds();
     Initialize();
 }
 
