@@ -130,6 +130,17 @@ const MotherboardConfigs = {
 			0x24: ["12V Header Top", HeaderConfiguration]
 		}
 	},
+	"B550M AORUS PRO": {
+		ARGB:{
+			"5v ARGB Header 1": 0x58,
+			"5v ARGB Header 2": 0x59,
+		},
+		Mainboard:{
+			0x21: ["12v Header Bottom", HeaderConfiguration],
+			0x23: ["PCIe", MainboardConfiguration],
+			0x24: ["12V Header Top", HeaderConfiguration]
+		}
+	},
 	"X570 AORUS ELITE": {
 		ARGB:{
 			"5v ARGB Header 1": 0x58,
