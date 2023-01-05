@@ -71,6 +71,8 @@ export function Initialize() {
 
 	PollConnectedFans = new PolledFunction(GetFanSettings, 10000);
 	PollFanStates = new PolledFunction(GetFanStates, 3000);
+	Corsair.SetDeviceBufferSize(1025);
+	//device.log(device.getHidInfo());
 
 	Corsair.SetMode("Software");
 	Corsair.OpenHandle("Lighting", Corsair.Endpoints.LightingController);
@@ -244,7 +246,7 @@ function Get4PinColors(){
 	}
 	let ChannelLedCount = componentChannel.LedCount();
 
-	let ChannelData = [];
+	const ChannelData = [];
 
 	if(LightingMode  === "Forced") {
 		return device.createColorArray(forcedColor, ChannelLedCount, "Inline");
@@ -284,8 +286,7 @@ function Get4PinColors(){
 			}
 		}
 
-		ChannelData = ChannelData.concat(ComponentColors);
-
+		ChannelData.push(...ComponentColors);
 	}
 
 	return ChannelData;
@@ -1271,6 +1272,7 @@ export class ModernCorsairProtocol{
 
 		let TotalBytes = RGBData.length;
 		const InitialPacketSize = this.GetBufferSize() - InitialHeaderSize;
+		device.log([this.GetBufferSize(), InitialPacketSize]);
 
 		this.WriteLighting(RGBData.length, RGBData.splice(0, InitialPacketSize));
 
