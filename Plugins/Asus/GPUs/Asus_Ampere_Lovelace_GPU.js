@@ -40,9 +40,9 @@ export function Scan(bus) {
 		AsusGPUID.SubDevice === bus.SubDevice()
 		) {
 			// No Quick Write test on Nvidia
-			if(bus.ReadByteWithoutRegister(AsusGPUID.Address) > 0) {
-				FoundAddresses.push(AsusGPUID.Address);
-			}
+			//if(bus.ReadByteWithoutRegister(AsusGPUID.Address) > 0) {
+			FoundAddresses.push(AsusGPUID.Address);
+			//}
 		}
 	}
 
