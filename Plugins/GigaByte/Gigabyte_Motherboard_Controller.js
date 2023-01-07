@@ -333,14 +333,16 @@ function CreateZ790IOPanel(Enable){
 	}
 }
 
-function SendSubdeviceAsARGBchannel(SubdeviceId, SubdeviceConfig, ChannelId){
+function SendSubdeviceAsARGBchannel(SubdeviceId, SubdeviceConfig, ChannelId, shutdown = false){
 	const RGBData = [];
 
 	for(let iIdx = 0 ; iIdx < SubdeviceConfig.positioning.length; iIdx++){
 		const Led = SubdeviceConfig.positioning[iIdx];
 		let col;
 
-		if (LightingMode  === "Forced") {
+		if(shutdown){
+			col = hexToRgb(shutdownColor);
+		}else if (LightingMode === "Forced") {
 			col = hexToRgb(forcedColor);
 		}else{
 			col = device.subdeviceColor(SubdeviceId, Led[0], Led[1]);
@@ -373,22 +375,35 @@ export function Render() {
 			UpdateARGBChannels(channel);
 		}
 	}
-
 }
 
 
 export function Shutdown() {
-	//device.removeMessage("firmware test");
+	if(Z790MA_Mode){
+		for(let i = 0x20; i < 0x28;i++){
+			sendColorPacket(i, [0, 0, 0]);
+			sendCommit();
+		}
 
+		SendSubdeviceAsARGBchannel("Z790IOPanel", Z790_IO_Panel, 0x58, true);
+	}else{
+		UpdateActiveZones(true);
+
+		for(let channel = 0; channel < vDLED_Zones.length; channel++){
+			UpdateARGBChannels(channel, true);
+		}
+	}
 }
 
-function UpdateActiveZones(){
+function UpdateActiveZones(shutdown = false){
 
 	for(let iIdx = 0 ; iIdx < ActiveZones.length; iIdx++){
 		const zone = ActiveZones[iIdx];
 		let col;
 
-		if (LightingMode  === "Forced") {
+		if(shutdown){
+			col = hexToRgb(shutdownColor);
+		}else if (LightingMode === "Forced") {
 			col = hexToRgb(forcedColor);
 		}else{
 			col = device.subdeviceColor(zone.name, 1, 1);
@@ -481,6 +496,8 @@ function UpdateARGBChannels(Channel, shutdown = false) {
 
 		RGBData = device.createColorArray(pulseColor, ChannelLedCount, "Inline", RGBconfig);
 
+	}else if(shutdown){
+		RGBData = device.createColorArray(shutdownColor, ChannelLedCount, "Inline", RGBconfig);
 	}else{
 		RGBData = componentChannel.getColors("Inline", RGBconfig);
 	}
