@@ -1,9 +1,8 @@
-
-
 export function Name() { return "Corsair M55 Mouse"; }
 export function VendorId() { return 0x1b1c; }
 export function ProductId() { return 0x1B70; }
 export function Publisher() { return "WhirlwindFX"; }
+export function Documentation(){ return "troubleshooting/corsair"; }
 export function Size() { return [3, 3]; }
 export function DefaultPosition() {return [225, 120]; }
 export function DefaultScale(){return 15.0;}
@@ -24,11 +23,9 @@ export function ControllableParameters(){
 	];
 }
 
-export function Documentation(){ return "troubleshooting/corsair"; }
-
 let savedDpi1;
-let vLedNames = ["DPI Zone", "Logo Zone"];
-let vLedPositions = [[1, 0], [1, 1]];
+const vLedNames = ["DPI Zone", "Logo Zone"];
+const vLedPositions = [[1, 0], [1, 1]];
 
 export function LedNames() {
 	return vLedNames;
@@ -38,44 +35,6 @@ export function LedPositions() {
 	return vLedPositions;
 }
 
-function sendPacketString(string, size){
-	let packet= [];
-	let data = string.split(' ');
-
-	for(let i = 0; i < data.length; i++){
-		packet[i] = parseInt(data[i], 16);//.toString(16)
-	}
-
-	device.write(packet, size);
-}
-
-function EnableSoftwareControl() {
-
-	sendPacketString("00 08 01 03 00 02", 65);//software control packet
-
-	sendPacketString("00 08 0D 00 02", 65); //open key endpoint
-	sendPacketString("00 08 06 00 08 00 00 00 01 01 01 01 01 01 01", 65); // set key bindings - fixes loss of right mouse button
-
-	sendPacketString("00 08 0D 00 01", 65); // open lighting endpoint
-
-	if(DpiControl){
-		setDpi(dpi1);
-	}
-}
-
-
-function ReturnToHardwareControl() {
-	let packet = [];
-	packet[0x00]           = 0x00;
-	packet[0x01]           = 0x08;
-	packet[0x02]           = 0x01;
-	packet[0x03]           = 0x03;
-	packet[0x04]           = 0x00;
-	packet[0x05]           = 0x01;
-	device.write(packet, 65);
-}
-
-
 export function Initialize() {
 	EnableSoftwareControl();
 
@@ -84,8 +43,43 @@ export function Initialize() {
 	}
 }
 
+export function Render() {
+	sendColors();
+
+	if(savedDpi1 != dpi1 && DpiControl){
+		setDpi(dpi1);
+	}
+}
+
+export function Shutdown() {
+	sendColors(true);
+	ReturnToHardwareControl();
+}
+
+function EnableSoftwareControl() {
+	device.write([0x00, 0x08, 0x01, 0x03, 0x00, 0x02], 65);//software control packet
+	device.write([0x00, 0x08, 0x0D, 0x00, 0x02], 65); //open key endpoint
+	device.write([0x00, 0x08, 0x06, 0x00, 0x08, 0x00, 0x00, 0x00, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01], 65); // set key bindings - fixes loss of right mouse button
+	device.write([0x00, 0x08, 0x0D, 0x00, 0x01], 65); // open lighting endpoint
+
+	if(DpiControl){
+		setDpi(dpi1);
+	}
+}
+
+function ReturnToHardwareControl() {
+	const packet = [];
+	packet[0x00] = 0x00;
+	packet[0x01] = 0x08;
+	packet[0x02] = 0x01;
+	packet[0x03] = 0x03;
+	packet[0x04] = 0x00;
+	packet[0x05] = 0x01;
+	device.write(packet, 65);
+}
+
 function sendColors(shutdown = false){
-	let packet = [];
+	const packet = [];
 	packet[0x00]   = 0x00;
 	packet[0x01]   = 0x08;
 	packet[0x02]   = 0x06;
@@ -95,13 +89,12 @@ function sendColors(shutdown = false){
 	packet[0x06]   = 0x00;
 	packet[0x07]   = 0x00;
 
-
 	//Dpi Zone
-	let iX = vLedPositions[0][0];
-	let iY = vLedPositions[0][1];
+	const iX = vLedPositions[0][0];
+	const iY = vLedPositions[0][1];
 	//Logo Zone
-	let iX2 = vLedPositions[1][0];
-	let iY2 = vLedPositions[1][1];
+	const iX2 = vLedPositions[1][0];
+	const iY2 = vLedPositions[1][1];
 
 	let col;
 	let col2;
@@ -109,15 +102,12 @@ function sendColors(shutdown = false){
 	if(shutdown){
 		col = hexToRgb(shutdownColor);
 		col2 = hexToRgb(shutdownColor);
-
 	}else if (LightingMode === "Forced") {
 		col = hexToRgb(forcedColor);
 		col2 = hexToRgb(forcedColor);
-
 	}else{
 		col = device.color(iX, iY);
 		col2 = device.color(iX2, iY2);
-
 	}
 
 	packet[0x08]   = col[0];
@@ -129,20 +119,12 @@ function sendColors(shutdown = false){
 	device.write(packet, 65);
 	device.pause(1);
 }
-export function Render() {
-	sendColors();
-
-	if(savedDpi1 != dpi1 && DpiControl){
-		setDpi(dpi1);
-	}
-
-}
 
 function setDpi(dpi){
 
 	savedDpi1 = dpi;
 
-	let packet = [];
+	const packet = [];
 	packet[0] = 0x00;
 	packet[1] = 0x08;
 	packet[2] = 0x01;
@@ -154,8 +136,8 @@ function setDpi(dpi){
 }
 
 function hexToRgb(hex) {
-	let result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
-	let colors = [];
+	const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+	const colors = [];
 	colors[0] = parseInt(result[1], 16);
 	colors[1] = parseInt(result[2], 16);
 	colors[2] = parseInt(result[3], 16);
@@ -164,12 +146,6 @@ function hexToRgb(hex) {
 }
 export function Validate(endpoint) {
 	return endpoint.interface === 1;
-}
-
-export function Shutdown() {
-	sendColors(true);
-	ReturnToHardwareControl();
-
 }
 
 export function Image() {
