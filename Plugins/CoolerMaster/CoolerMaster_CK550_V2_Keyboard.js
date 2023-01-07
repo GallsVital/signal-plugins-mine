@@ -36,6 +36,7 @@ const vLedPositions = [
 	[0, 4], [1, 4], [2, 4], [3, 4], [4, 4], [5, 4], [6, 4], [7, 4], [8, 4], [9, 4], [10, 4],                   [13, 4],              [15, 4],            [17, 4], [18, 4], [19, 4], [20, 4], // 17
 	[0, 5], [1, 5], [2, 5],                      [6, 5],                      		[10, 5], [11, 5], [12, 5], [13, 5],     [14, 5], [15, 5], [16, 5],   [17, 5],         [19, 5] // 13
 ];
+
 const vKeys = [
 	0,     18, 24, 30, 36, 42, 48, 54, 60, 66, 72,  78, 84, 90,  96, 102, 108,    //120,126,132,
 	1,  13, 19, 25, 31, 37, 43, 49, 55, 61, 67, 73, 79,  91,  97, 103, 109,  115, 121, 127, 133,
@@ -44,7 +45,6 @@ const vKeys = [
 	4,  16, 22, 28, 34, 40, 46, 52, 58, 64, 70,       94,    106,       118, 124, 130, 136,
 	5, 11, 17,         41,             65, 71, 77,   95, 101, 107, 113,      125, 131,
 ];
-
 
 export function LedNames() {
 	return vLedNames;
@@ -71,7 +71,7 @@ export function Shutdown() {
 function SendColors(shutdown = false){
 	const RGBData = [];
 
-	for(let iIdx = 0; iIdx < vKeys.length; iIdx++) {
+	for(let iIdx = 0; iIdx < vLedPositions.length; iIdx++) {
 		const iPxX = vLedPositions[iIdx][0];
 		const iPxY = vLedPositions[iIdx][1];
 		let mxPxColor;

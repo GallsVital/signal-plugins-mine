@@ -92,7 +92,7 @@ function SendColors(shutdown = false){
 
 	const colors = new Array(560).fill(0);
 
-	for (let iIdx = 0; iIdx < vKeymap.length; iIdx++) {
+	for (let iIdx = 0; iIdx < vLedPositions.length; iIdx++) {
 		const iPxX = vLedPositions[iIdx][0];
 		const iPxY = vLedPositions[iIdx][1];
 		let mxPxColor;

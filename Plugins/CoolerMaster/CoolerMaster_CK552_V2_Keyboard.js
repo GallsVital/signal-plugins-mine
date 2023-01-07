@@ -71,7 +71,7 @@ export function Shutdown() {
 function SendColors(shutdown = false){
 	const RGBData = [];
 
-	for(let iIdx = 0; iIdx < vKeys.length; iIdx++) {
+	for(let iIdx = 0; iIdx < vLedPositions.length; iIdx++) {
 		const iPxX = vLedPositions[iIdx][0];
 		const iPxY = vLedPositions[iIdx][1];
 		let mxPxColor;
