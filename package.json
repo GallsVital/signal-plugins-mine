@@ -32,7 +32,8 @@
 		"docs": "jsdoc -c jsdoc.json",
 		"SAVED": "npx -p typescript tsc ./Plugins/ModernCorsairProtocol.js --declaration --allowJs --emitDeclarationOnly --outDir types",
 		"prepare": "husky install",
-		"build": "tsc"
+		"build": "tsc",
+		"ts-watch":  "tsc -watch --incremental"
 	},
 	"jest-junit": {
 		"suiteName": "Unit Tests",

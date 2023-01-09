@@ -64,6 +64,7 @@ build:
 
   artifacts:
     when: always
+    name: "Javascript Plugins"
     paths:
       - dist/
     reports:
