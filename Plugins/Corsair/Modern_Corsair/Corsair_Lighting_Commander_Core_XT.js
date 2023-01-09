@@ -1272,7 +1272,6 @@ export class ModernCorsairProtocol{
 
 		let TotalBytes = RGBData.length;
 		const InitialPacketSize = this.GetBufferSize() - InitialHeaderSize;
-		device.log([this.GetBufferSize(), InitialPacketSize]);
 
 		this.WriteLighting(RGBData.length, RGBData.splice(0, InitialPacketSize));
 
