@@ -31,7 +31,8 @@
 		"test:CheckDuplicateGPU": "node ./Scripts/GPUIdCollector.js",
 		"docs": "jsdoc -c jsdoc.json",
 		"SAVED": "npx -p typescript tsc ./Plugins/ModernCorsairProtocol.js --declaration --allowJs --emitDeclarationOnly --outDir types",
-		"prepare": "husky install"
+		"prepare": "husky install",
+		"build": "tsc"
 	},
 	"jest-junit": {
 		"suiteName": "Unit Tests",
