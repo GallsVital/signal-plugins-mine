@@ -231,7 +231,7 @@ class AsusSMBus {
 
 		const DeviceModel = String.fromCharCode(...Characters);
 
-		this.Bus().log(`Address: [${address}], Found Device Model: [${DeviceModel}]`);
+		this.Bus().log(`Address: [${address}], Found Device Model: [${DeviceModel}]`, {toFile: true});
 
 		if(DeviceModel in this.deviceNameDict) {
 			return true;
@@ -389,6 +389,7 @@ class AsusAuraSMBusController {
 
 	getDeviceLEDs() {
 		const ProtocolVersionOffset = this.ledConfigs[deviceProtocolVersion];
+		let RGBHeaderCount = 0;
 
 		for(let i = 0; i < deviceLEDCount; i++) {
 			// Get Zone name of the current LED in the config table
@@ -400,7 +401,12 @@ class AsusAuraSMBusController {
 				continue;
 			}
 
-			const ChannelName = this.motherboardZones[configTable[ProtocolVersionOffset + i]];
+			let ChannelName = this.motherboardZones[configTable[ProtocolVersionOffset + i]];
+
+			// Rename 12V Headers as they can share a name in the config table
+			if(ChannelName.includes("RGBHeader")){
+				ChannelName = `RGB Header ${++RGBHeaderCount}`;
+			}
 
 			// Add Empty Channel array if it doesn't exist;
 			if(!LedChannels.hasOwnProperty(ChannelName)) {
@@ -419,9 +425,9 @@ class AsusAuraSMBusController {
 		deviceProtocolVersion = this.deviceNameDict[deviceName];
 		configTable = this.getDeviceConfigTable();
 		deviceLEDCount = configTable[2];
-		device.log("Device Type: " + deviceName);
-		device.log("Device Protocol Version: " + deviceProtocolVersion);
-		device.log("Device Onboard LED Count: " + deviceLEDCount);
+		device.log("Device Type: " + deviceName, {toFile: true});
+		device.log("Device Protocol Version: " + deviceProtocolVersion, {toFile: true});
+		device.log("Device Onboard LED Count: " + deviceLEDCount, {toFile: true});
 
 		if(deviceName in this.deviceNameDict) { this.ValidDeviceID = true; } else { device.log("Invalid Model Returned, Aborting Render Loop"); }
 	}
@@ -445,6 +451,12 @@ class AsusAuraSMBusController {
 
 		for(let iIdx = 0; iIdx < 64; iIdx++) {
 			configTable[iIdx] = this.auraReadRegister(this.auraCommands.configTable + iIdx);
+		}
+
+		device.log("Config Table", {toFile: true});
+
+		for(let i = 0; i < configTable.length; i += 8){
+			device.log(configTable.slice(i, i+8), {toFile: true});
 		}
 
 		return configTable;
