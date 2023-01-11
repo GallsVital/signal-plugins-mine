@@ -53,6 +53,11 @@ unit test:
     #- apk add --update npm
     #- npm install
     - npm run test:ci
+  artifacts:
+    when: always
+    reports:
+      junit:
+        - junit.xml
 
 build:
   stage: build

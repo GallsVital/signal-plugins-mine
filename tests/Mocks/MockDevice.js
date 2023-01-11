@@ -14,4 +14,5 @@ export class MockDevice{
 	getLastReadSize = jest.fn().mockImplementation(() => { });
 
 	set_endpoint = jest.fn().mockImplementation((Interface, Usage, UsagePage, Collection) => {});
+	clearReadBuffer = jest.fn().mockImplementation(() => {});
 }
