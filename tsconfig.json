@@ -28,7 +28,8 @@
 	"files": [
 		"./types/globals.d.ts",
 		"./types/device.d.ts",
-		"./types/bus.d.ts"
+		"./types/bus.d.ts",
+		"./types/battery.d.ts"
     ],
 	"include": ["Plugins/**/*"],
 	"exclude": [

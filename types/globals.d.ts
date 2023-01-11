@@ -27,3 +27,18 @@ declare type SeparateArray = "Separate";
 declare type ArrayOrder = InlineArray | SeparateArray;
 declare type ColorOrder = "RGB" | "RBG" | "BGR" | "BRG" | "GBR" | "GRB";
 declare type FanId = string;
+
+
+// Common variable names for user props.
+// TS doesn't understand these and we can only declare them inside .ts files
+declare let forcedColor: string
+declare let LightingMode: string
+declare let shutdownColor: string
+declare let DpiControl: string
+declare let dpi1: number
+declare let dpi2: number
+declare let dpi3: number
+declare let dpi4: number
+declare let dpi5: number
+declare let dpi6: number
+
