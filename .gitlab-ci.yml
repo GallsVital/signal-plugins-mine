@@ -67,7 +67,7 @@ build:
     when: always
     name: "Javascript Plugins"
     paths:
-      - dist/
+      - dist/**/*.js
     reports:
       junit:
         - junit.xml
