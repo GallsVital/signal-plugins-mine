@@ -1,6 +1,6 @@
 export function Name() { return "GMMK 2 65% ANSI QMK Keyboard"; }
 export function VendorId() { return 0x320F; }
-export function ProductId() { return 0x504B; }
+export function ProductId() { return 0x5045; }
 export function Publisher() { return "WhirlwindFX"; }
 export function Size() { return [17, 5]; }
 export function DefaultPosition(){return [10, 100]; }
