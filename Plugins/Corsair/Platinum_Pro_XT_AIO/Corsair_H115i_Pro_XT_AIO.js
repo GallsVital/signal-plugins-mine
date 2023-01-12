@@ -42,7 +42,7 @@ let CoolingCommand = 0x14;
 let CurrentFanSpeed;
 export function Name() { return "Corsair H115i Pro XT "; }
 export function VendorId() { return  0x1b1c; }
-export function ProductId() { return 0x0C21; }
+export function ProductId() { return [0x0C21, 0x0C2e]; }
 export function Publisher() { return "WhirlwindFX"; }
 export function Size() { return [5, 5]; }
 export function DefaultPosition(){return [165, 60];}
