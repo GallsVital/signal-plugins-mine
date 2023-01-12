@@ -1,7 +1,7 @@
 const { MockDevice } = require("../../tests/mocks.js");
-const { LogitechProtocol } = require("./Logitech_Wireless_Mouse_Dongle");
+const { LogitechProtocol } = require("./Logitech_Wireless_Dongle");
 
-const pluginPath = "./Logitech_Wireless_Mouse_Dongle.js";
+const pluginPath = "./Logitech_Wireless_Dongle.js";
 
 
 let Plugin;
@@ -15,7 +15,7 @@ beforeEach(() => {
 	});
 });
 
-describe("Logitech Mouse Dongle", () => {
+describe("Logitech Dongle", () => {
 	it("SetDpiLightAlwaysOnDoesNothingIfNoDpiLights", () => {
 		const Logitech = new LogitechProtocol();
 		Logitech.Config.HasDPILights = false;
