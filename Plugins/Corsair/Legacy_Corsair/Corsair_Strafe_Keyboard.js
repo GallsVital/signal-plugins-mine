@@ -70,7 +70,7 @@ export function LedPositions() {
 }
 
 export function Initialize() {
-	device.write([0x00, CORSAIR_COMMAND_WRITE, CORSAIR_PROPERTY_LIGHTING_CONTROL, CORSAIR_LIGHTING_CONTROL_SOFTWARE, 0x03], 65);
+	device.write([0x00, CORSAIR_COMMAND_WRITE, CORSAIR_PROPERTY_LIGHTING_CONTROL, CORSAIR_LIGHTING_CONTROL_SOFTWARE, 0x00, 0x03], 65);
 }
 
 export function Render() {

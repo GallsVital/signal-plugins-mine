@@ -139,7 +139,7 @@ function sendColors(shutdown = false){
 		packet[3] = savedStartUpValue;
 
 		device.write(packet, 1025);
-		savedStartUpValue = savedStartUpValue === 1 ? 0 : 1;
+		savedStartUpValue = savedStartUpValue == 1 ? 0 : 1;
 		device.log("Selected Lighting Handle: " + savedStartUpValue);
 		Initialize();
 	}
