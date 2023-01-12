@@ -4,10 +4,17 @@ export function ProductId() { return 0x7a42; }
 export function Publisher() { return "serega6531"; }
 export function Size() { return [10, 10]; }
 export function DefaultPosition() { return [10, 100]; }
-export function DefaultScale() { return 8.0 }
+export function DefaultScale() { return 8.0; }
 export function ConflictingProcesses() {
 	return ["RGBFusion.exe"];
 }
+/* global
+shutdownColor:readonly
+LightingMode:readonly
+forcedColor:readonly
+speed:readonly
+tempRpmIndicator:readonly
+*/
 export function ControllableParameters() {
 	return [
 		{ "property": "shutdownColor", "group": "lighting", "label": "Shutdown Color", "min": "0", "max": "360", "type": "color", "default": "009bde" },
@@ -86,36 +93,36 @@ function updateStateIfRequired(shutdown) {
 
 function updateState() {
 	switch (currentMode) {
-		case Mode["Color shift"]:
-			sendUpdateState(currentMode, 0x08, 0x02);
-			break;
-		case Mode.Tricolor:
-			sendUpdateState(currentMode, 0x02, 0x00);
-			sendColors(false, false);
-			// sendB6Packet();
-			sendUpdateState(currentMode, 0x02, 0x01);
-			// another colors update will be sent in sendColors
+	case Mode["Color shift"]:
+		sendUpdateState(currentMode, 0x08, 0x02);
+		break;
+	case Mode.Tricolor:
+		sendUpdateState(currentMode, 0x02, 0x00);
+		sendColors(false, false);
+		// sendB6Packet();
+		sendUpdateState(currentMode, 0x02, 0x01);
+		// another colors update will be sent in sendColors
 
-			break;
-		case Mode.Gradient:
-			updateGradientColor();
-			break;
-		case Mode.Radiate:
-			sendUpdateState(currentMode, 0x00, 0x02);
-			break;
-		default:
-			sendUpdateState(currentMode, 0x00, 0x00);  // logo
-			// sendB6Packet();
-			sendUpdateState(currentMode, 0x08, 0x01);  // ring
-			// sendB6Packet();
-			break;
+		break;
+	case Mode.Gradient:
+		updateGradientColor();
+		break;
+	case Mode.Radiate:
+		sendUpdateState(currentMode, 0x00, 0x02);
+		break;
+	default:
+		sendUpdateState(currentMode, 0x00, 0x00);  // logo
+		// sendB6Packet();
+		sendUpdateState(currentMode, 0x08, 0x01);  // ring
+		// sendB6Packet();
+		break;
 	}
 
 	currentColors = null; // force colors update
 }
 
 function updateColorIfRequired(shutdown) {
-	let zoneColors = [...Array(9)].map((_, i) => getColorForLed(i, shutdown));
+	const zoneColors = [...Array(9)].map((_, i) => getColorForLed(i, shutdown));
 
 	if (currentColors == null || !deepArraysEquals(zoneColors, currentColors)) {
 		device.log('Updating colors: ' + zoneColors);
@@ -126,20 +133,20 @@ function updateColorIfRequired(shutdown) {
 
 function updateColor(shutdown) {
 	switch (currentMode) {
-		case Mode["Color cycle"]:
-		case Mode["Rainbow loop"]:
-		case Mode.Wave:
-			// do nothing, the mode will work by itself
-			break;
-		case Mode.Gradient:
-			updateGradientColor();
-			break;
-		case Mode.Radiate:
-			sendColors(false, shutdown);
-			break;
-		default:
-			sendColors(true, shutdown);
-			break;
+	case Mode["Color cycle"]:
+	case Mode["Rainbow loop"]:
+	case Mode.Wave:
+		// do nothing, the mode will work by itself
+		break;
+	case Mode.Gradient:
+		updateGradientColor();
+		break;
+	case Mode.Radiate:
+		sendColors(false, shutdown);
+		break;
+	default:
+		sendColors(true, shutdown);
+		break;
 	}
 }
 
@@ -147,6 +154,7 @@ function sendColors(includeLogo) {
 	if (includeLogo) {
 		sendLogoColor(currentColors[0]);
 	}
+
 	sendTwoZoneColorPacket(0, currentMode, currentColors[1], currentColors[2]);
 	sendTwoZoneColorPacket(1, currentMode, currentColors[3], currentColors[4]);
 	sendTwoZoneColorPacket(2, currentMode, currentColors[5], currentColors[6]);
@@ -156,8 +164,8 @@ function sendColors(includeLogo) {
 }
 
 function getColorForLed(led, shutdown = false) {
-	let iX = vLedPositions[led][0];
-	let iY = vLedPositions[led][1];
+	const iX = vLedPositions[led][0];
+	const iY = vLedPositions[led][1];
 	let col;
 
 	if (shutdown) {
@@ -172,34 +180,34 @@ function getColorForLed(led, shutdown = false) {
 }
 
 function sendLogoColor(col) {
-	let r = col[0];
-	let g = col[1];
-	let b = col[2];
+	const r = col[0];
+	const g = col[1];
+	const b = col[2];
 
-	let packet = [0x00, 0xbc, r, g, b, 0x00, 0x00, 0x00, 0x00];
+	const packet = [0x00, 0xbc, r, g, b, 0x00, 0x00, 0x00, 0x00];
 	send(packet);
 }
 
 function sendB6Packet() {  // unknown purpose
-	let packet = [0x00, 0xb6, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00];
+	const packet = [0x00, 0xb6, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00];
 	send(packet);
 }
 
 function sendUpdateState(mode, partMark1, partMark2) {
-	let packet = [0x00, 0xc9, mode, brightness, currentSpeed, partMark1, partMark2, 0x00, 0x00];
+	const packet = [0x00, 0xc9, mode, brightness, currentSpeed, partMark1, partMark2, 0x00, 0x00];
 	send(packet);
 }
 
 function sendTwoZoneColorPacket(zone, mode, col1, col2) {
-	let r1 = col1[0];
-	let g1 = col1[1];
-	let b1 = col1[2];
+	const r1 = col1[0];
+	const g1 = col1[1];
+	const b1 = col1[2];
 
-	let r2 = col2[0];
-	let g2 = col2[1];
-	let b2 = col2[2];
+	const r2 = col2[0];
+	const g2 = col2[1];
+	const b2 = col2[2];
 
-	let packet = [0x00, 0xb0 + zone, mode, r1, g1, b1, r2, g2, b2];
+	const packet = [0x00, 0xb0 + zone, mode, r1, g1, b1, r2, g2, b2];
 	send(packet);
 }
 
@@ -215,13 +223,13 @@ function updateGradientColor() {
 }
 
 function sendGradientColor() {
-	let col = getColorForLed(1, false);
+	const col = getColorForLed(1, false);
 
-	let r = col[0];
-	let g = col[1];
-	let b = col[2];
+	const r = col[0];
+	const g = col[1];
+	const b = col[2];
 
-	let packet = [0x00, 0xcd, r, g, b, 0x00, 0x00, 0x00, 0x00];
+	const packet = [0x00, 0xcd, r, g, b, 0x00, 0x00, 0x00, 0x00];
 	send(packet);
 }
 
@@ -235,19 +243,21 @@ function updateTempRgbIndicator() {
 
 function sendEnableTempRgbIndicator() {
 	device.log('Enabling cpu temp/rpm indicator');
-	let packet = [0x00, 0xbd, 0x01, 0x05, 0x00, 0x00, 0x00, 0x00, 0xcc];
+
+	const packet = [0x00, 0xbd, 0x01, 0x05, 0x00, 0x00, 0x00, 0x00, 0xcc];
 	send(packet);
 }
 
 function sendDisableTempRgbIndicator() {
 	device.log('Disabling cpu temp/rpm indicator');
-	let packet = [0x00, 0xbe, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0xcc];
+
+	const packet = [0x00, 0xbe, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0xcc];
 	send(packet);
 }
 
 function hexToRgb(hex) {
-	let result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
-	let colors = [];
+	const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+	const colors = [];
 	colors[0] = parseInt(result[1], 16);
 	colors[1] = parseInt(result[2], 16);
 	colors[2] = parseInt(result[3], 16);
