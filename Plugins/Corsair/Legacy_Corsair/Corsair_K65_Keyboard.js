@@ -1,19 +1,16 @@
-export function Name() { return "Corsair K65 RGB Rapidfire"; }
+export function Name() { return "Corsair K65"; }
 export function VendorId() { return 0x1b1c; }
-export function ProductId() { return 0x1B39; }
+export function ProductId() { return Object.keys(Products); }
 export function Publisher() { return "WhirlwindFX"; }
 export function Size() { return [21, 7]; }
 export function DefaultPosition(){return [10, 100];}
 const DESIRED_HEIGHT = 85;
 export function DefaultScale(){return Math.floor(DESIRED_HEIGHT/Size()[1]);}
-
 /* global
 endpointUsed:readonly
 shutdownColor:readonly
 LightingMode:readonly
 forcedColor:readonly
-DpiControl:readonly
-dpi1:readonly
 */
 export function ControllableParameters(){
 	return [
@@ -21,34 +18,41 @@ export function ControllableParameters(){
 		{"property":"shutdownColor", "group":"lighting", "label":"Shutdown Color", "min":"0", "max":"360", "type":"color", "default":"009bde"},
 		{"property":"LightingMode", "group":"lighting", "label":"Lighting Mode", "type":"combobox", "values":["Canvas", "Forced"], "default":"Canvas"},
 		{"property":"forcedColor", "group":"lighting", "label":"Forced Color", "min":"0", "max":"360", "type":"color", "default":"009bde"},
-		{"property":"DpiControl", "group":"mouse", "label":"Enable Dpi Control", "type":"boolean", "default":"false"},
-		{"property":"dpi1", "group":"mouse", "label":"DPI", "type":"number", "min":"200", "max":"12400", "default":"800"},
 	];
 }
 export function Documentation(){ return "troubleshooting/corsair"; }
+const Products = {
+	0x1B17: "Corsair K65 RGB",
+	0x1B37: "Corsair K65 RGB Lux",
+	0x1B39: "Corsair K65 RGB Rapidfire",
+};
 
 function hexToRgb(hex) {
-	let result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
-	let colors = [];
+	const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+	const colors = [];
 	colors[0] = parseInt(result[1], 16);
 	colors[1] = parseInt(result[2], 16);
 	colors[2] = parseInt(result[3], 16);
 
 	return colors;
 }
-let CORSAIR_COMMAND_WRITE       = 0x07;
-let CORSAIR_COMMAND_READ        = 0x0E;
-let CORSAIR_COMMAND_STREAM      = 0x7F;
-let CORSAIR_PROPERTY_LIGHTING_CONTROL           = 0x05;
-let CORSAIR_LIGHTING_CONTROL_HARDWARE           = 0x01;
-let CORSAIR_LIGHTING_CONTROL_SOFTWARE           = 0x02;
-let CORSAIR_PROPERTY_SUBMIT_KEYBOARD_COLOR_24   = 0x28;
-let CORSAIR_PROPERTY_SPECIAL_FUNCTION = 0x04;
-let CORSAIR_PROPERTY_SUBMIT_MOUSE_COLOR         = 0x22;
+const CORSAIR_COMMAND_WRITE       = 0x07;
+const CORSAIR_COMMAND_READ        = 0x0E;
+const CORSAIR_COMMAND_STREAM      = 0x7F;
+const CORSAIR_PROPERTY_LIGHTING_CONTROL           = 0x05;
+const CORSAIR_LIGHTING_CONTROL_HARDWARE           = 0x01;
+const CORSAIR_LIGHTING_CONTROL_SOFTWARE           = 0x02;
+const CORSAIR_PROPERTY_SUBMIT_KEYBOARD_COLOR_24   = 0x28;
+const CORSAIR_PROPERTY_SPECIAL_FUNCTION = 0x04;
+const CORSAIR_PROPERTY_SUBMIT_MOUSE_COLOR         = 0x22;
 
 
 export function Initialize() {
-	let packet = [];
+	if(device.productId() in Products){
+		device.setName(Products[device.productId()]);
+	}
+
+	const packet = [];
 
 	packet[0x00]           = 0x00;
 	packet[0x01]           = CORSAIR_COMMAND_WRITE;
@@ -62,15 +66,15 @@ export function Initialize() {
 
 
 export function Shutdown() {
-	let red = [144];
-	let green = [144];
-	let blue = [144];
+	const red = [144];
+	const green = [144];
+	const blue = [144];
 
 
 	for(let iIdx = 0; iIdx < vKeys.length; iIdx++) {
-		let iPxX = vKeyPositions[iIdx][0];
-		let iPxY = vKeyPositions[iIdx][1];
-		let mxPxColor = device.color(iPxX, iPxY);
+		const iPxX = vKeyPositions[iIdx][0];
+		const iPxY = vKeyPositions[iIdx][1];
+		const mxPxColor = device.color(iPxX, iPxY);
 		red[vKeys[iIdx]] = 255;
 		green[vKeys[iIdx]] = 0;
 		blue[vKeys[iIdx]] = 0;
@@ -104,7 +108,7 @@ function StreamPacket(packet_id, data_sz, data) {
 }
 
 function SubmitKbColors(color_channel, packet_count, finish_val) {
-	let packet = [];
+	const packet = [];
 	packet[0x00]   = 0x00;
 	packet[0x01]   = CORSAIR_COMMAND_WRITE;
 	packet[0x02]   = CORSAIR_PROPERTY_SUBMIT_KEYBOARD_COLOR_24;
@@ -126,7 +130,7 @@ var vKeys = [
 	5,   17, 29,            53,                    89, 101, 113, 91,     115, 127, 139,   //129, 141
 ];
 
-let vKeyNames = [
+const vKeyNames = [
 	"Mute", "Volume Down", "Volume Up",    "Lock",
 	"Esc", "F1", "F2", "F3", "F4", "F5", "F6", "F7", "F8", "F9", "F10", "F11", "F12",         "Print Screen", "Scroll Lock", "Pause Break",
 	"`", "1", "2", "3", "4", "5", "6", "7", "8", "9", "0", "-_", "=+", "Backspace",                        "Insert", "Home", "Page Up",
@@ -149,15 +153,15 @@ var vKeyPositions = [
 ];
 
 // These arrays are unused and for development reference.
-let vMedia = [
+const vMedia = [
 	32, 44, 56, 68
 ];
 
-let vSpecial = [
+const vSpecial = [
 	125, 137, 8, 59, 20
 ];
 
-let vSpecialPositions = [
+const vSpecialPositions = [
 	[0, 3], [0, 4], [0, 5], [0, 9], [0, 17]
 ];
 
@@ -178,14 +182,14 @@ function sendColors(shutdown = false){
 
 	selectEndpoint();
 
-	let red = [144];
-	let green = [144];
-	let blue = [144];
+	const red = [144];
+	const green = [144];
+	const blue = [144];
 
 
 	for(let iIdx = 0; iIdx < vKeys.length; iIdx++) {
-		let iPxX = vKeyPositions[iIdx][0];
-		let iPxY = vKeyPositions[iIdx][1];
+		const iPxX = vKeyPositions[iIdx][0];
+		const iPxY = vKeyPositions[iIdx][1];
 		var col;
 
 		if(shutdown){
