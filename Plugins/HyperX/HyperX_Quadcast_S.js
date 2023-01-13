@@ -1,6 +1,6 @@
 export function Name() { return "HyperX Quadcast S"; }
 export function VendorId() { return 0x0951; }
-export function ProductId() { return [0x171F, 0x171D]; }
+export function ProductId() { return [0x171F]; }
 export function Publisher() { return "WhirlwindFX"; }
 export function Size() { return [3, 3]; }
 export function DefaultPosition() {return [150, 75]; }
