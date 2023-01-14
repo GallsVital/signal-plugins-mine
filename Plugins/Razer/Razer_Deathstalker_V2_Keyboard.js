@@ -1,6 +1,6 @@
-export function Name() { return "Razer Deathstalker V2 Pro"; }
+export function Name() { return "Razer Deathstalker V2"; }
 export function VendorId() { return 0x1532; }
-export function ProductId() { return 0x0292; }
+export function ProductId() { return 0x0295; }
 export function Publisher() { return "WhirlwindFX"; }
 export function Documentation(){ return "troubleshooting/razer"; }
 export function Size() { return [22, 6]; }
