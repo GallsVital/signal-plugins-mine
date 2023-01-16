@@ -433,7 +433,7 @@ export class LogitechProtocol {
 				 //[2, 5], [13, 4],
 			 ],
 			 "G915 TKL": [
-		 		[0, 0],																		 [10, 0],
+		 		[0, 0],					[3, 0],     											 		[11, 1], [12, 1], [13, 1], [14, 1],
 						 [1, 1], [2, 1], [3, 1], [4, 1], [5, 1], 		 [7, 1], [8, 1], [9, 1], [10, 1], [11, 1], [12, 1], [13, 1], [14, 1],   [15, 1], [16, 1], [17, 1],
 		 		[0, 2], [1, 2], [2, 2], [3, 2], [4, 2], [5, 2], [6, 2], [7, 2], [8, 2], [9, 2], [10, 2], [11, 2], [12, 2], [13, 2], [14, 2],   [15, 2], [16, 2], [17, 2],
 		 		[0, 3], [1, 3], [2, 3], [3, 3], [4, 3], [5, 3], [6, 3], [7, 3], [8, 3], [9, 3], [10, 3], [11, 3], [12, 3], [13, 3], [14, 3],   [15, 3], [16, 3], [17, 3],
@@ -462,7 +462,7 @@ export class LogitechProtocol {
 				//104, 47, // ISO Keys
 			],
 			"G915 TKL": [
-				210, 								153,
+				210, 								153,    158, 155, 157, 156,
 					 38, 55, 56, 57, 58, 59, 60, 61, 62, 63, 64, 65, 66,       67, 68, 69,
 				180, 50, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 42, 43, 39,   70, 71, 72,
 				181, 40, 17, 23, 5,  18, 20, 25, 21, 9,  15, 16, 44, 45, 46,   73, 74, 75,
@@ -491,7 +491,7 @@ export class LogitechProtocol {
 				 //"ISO_<", "ISO_#",
 			 ],
 			 "G915 TKL": [
-		 		"logo",                         "brightness",
+		 		"logo",                         "brightness",      "MediaRewind", "MediaPlayPause", "MediaFastForward", "MediaStop",
 		 		"Esc", "F1", "F2", "F3", "F4", "F5", "F6", "F7", "F8", "F9", "F10", "F11", "F12", 			"Print Screen", "Scroll Lock", "Pause Break",
 		 		"G1", "`", "1", "2", "3", "4", "5", "6", "7", "8", "9", "0", "-_", "=+", "Backspace",       "Insert", "Home", "Page Up",
 		 		"G2", "Tab", "Q", "W", "E", "R", "T", "Y", "U", "I", "O", "P", "[", "]", "\\",              "Del", "End", "Page Down",
@@ -1140,6 +1140,11 @@ export class LogitechProtocol {
 			battery.setBatteryLevel(this.GetBatteryCharge());
 		}
 
+		// device.log(this.SendLongMessage([this.FeatureIDs.DisableKeysByUsageID, 0x10]));
+		// device.log(this.SendLongMessage([this.FeatureIDs.RGB8071ID, 0x10, 0x01]));
+		// device.log(this.SendLongMessage([this.FeatureIDs.RGB8071ID, 0x10, 0x01, 0x01]));
+
+
 		if(this.GetDeviceType() === "Mouse"){
 			device.addFeature("mouse");
 
@@ -1715,6 +1720,7 @@ export class LogitechProtocol {
 	 SendPerKeyLightingPacket(RGBData) {
 		 while(RGBData.length > 0) {
 			 const packet = [this.FeatureIDs.PerKeyLightingV2ID, 0x10];
+
 			 packet.push(...RGBData.splice(0, 16));
 			 this.SendLongMessage(packet, true);
 		 }
