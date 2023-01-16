@@ -29,7 +29,10 @@
 		"./types/globals.d.ts",
 		"./types/device.d.ts",
 		"./types/bus.d.ts",
-		"./types/battery.d.ts"
+		"./types/battery.d.ts",
+		"./types/ExportFunctions.d.ts",
+		"./types/ComponentChannel.d.ts",
+		"./types/ControllableParameters.d.ts"
     ],
 	"include": ["Plugins/**/*"],
 	"exclude": [

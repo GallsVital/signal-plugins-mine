@@ -22,7 +22,11 @@ declare interface ImageBufferOptions{
 	*/
 	flipV?: boolean
 }
-
+declare interface HidInfo{
+	featureLength: number,
+	readLength: number,
+	writeLength: number,
+}
 
 declare class Device{
 	/**
@@ -335,4 +339,10 @@ declare class Device{
 	public ConvertColorToImageBuffer(HexString: string, ImageWidth: number, ImageHeight: number, ImageFormat: ImageFormat): number[]
 
 	getHidEndpoints(): HidEndpoint[]
+	getHidInfo(): HidInfo
+
+	createTemperatureSensor(Name: String);
+	removeTemperatureSensor(Name: String);
+	SetTemperature(Name: String, CelsiusTemperature: number);
+
 }
