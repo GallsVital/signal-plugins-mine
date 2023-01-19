@@ -22,6 +22,7 @@ export function LedPositions() { return []; }
 export function SupportsSubdevices() { return true; }
 export function DefaultComponentBrand() { return "Corsair"; }
 export function SystemResumeDelay() { return 9000; }
+export function SupportsFanControl(){ return true; }
 
 /** @param {HidEndpoint} endpoint*/
 export function Validate(endpoint) {
@@ -45,9 +46,8 @@ function SetupChannels() {
 
 //Global Variables
 let ConnectedFans = [];
+let ConnectedProbes = [];
 let savedLedCount;
-let PollConnectedFans;
-let PollFanStates;
 const DeviceMaxLedLimit = 264;
 
 //Channel Name, Led Limit
@@ -67,11 +67,15 @@ const FanControllerArray = [
 ];
 
 export function Initialize() {
-	ConnectedFans = [];
+	if(StateMgr.states.length === 0){
+		StateMgr.Push(new StateSetFanSpeeds(StateMgr));
+		StateMgr.Push(new StatePollTempProbes(StateMgr));
+		StateMgr.Push(new StatePollFanSpeeds(StateMgr));
+	}
 
-	PollConnectedFans = new PolledFunction(GetFanSettings, 10000);
-	PollFanStates = new PolledFunction(GetFanStates, 3000);
-	Corsair.SetDeviceBufferSize(1025);
+	const HidInfo = device.getHidInfo();
+	device.log(`Write Length: ${HidInfo.writeLength}, Read Length: ${HidInfo.readLength}`);
+	Corsair.SetDeviceBufferSize(HidInfo.writeLength);
 	//device.log(device.getHidInfo());
 
 	Corsair.SetMode("Software");
@@ -84,12 +88,37 @@ export function Initialize() {
 	device.log(`Vid is [${decimalToHex(Corsair.FetchProperty("Vendor Id"), 4)}]`);
 	device.log(`Pid is [${decimalToHex(Corsair.FetchProperty(Corsair.Properties.pid), 4)}]`);
 
+
 	Corsair.FetchFirmware();
-	// Fetch Connected Fans on startup
-	PollConnectedFans.RunNow();
 
 	// Set Led Counts to something we can use.
 	SetFanLedCount();
+
+	//const props = [];
+
+	// for(let i = 0; i < 0xFF; i++){
+	// 	if(Corsair.FetchProperty(i) !== -1){
+	// 		props.push(i);
+	// 	}
+	// }
+
+	// for(const prop of props){
+	// 	device.log(`Supports Property: [${decimalToHex(prop, 2)}], ${Corsair.PropertyNames[prop]}`);
+	// }
+
+	// const endpoints = [];
+
+	// for(let i = 0; i < 0x30; i++){
+	// 	if(Corsair.OpenHandle("Background", i) === 0){
+	// 		endpoints.push(i);
+	// 	}
+
+	// 	Corsair.CloseHandleIfOpen("Background");
+	// }
+
+	// for(const endpoint of endpoints){
+	// 	device.log(`Supports Endpoint: [${decimalToHex(endpoint, 2)}], ${Corsair.EndpointNames[endpoint]}`);
+	// }
 
 }
 
@@ -98,42 +127,26 @@ export function Shutdown() {
 }
 
 export function Render() {
-
-	PollConnectedFans.Poll();
-
-	PollFanStates.Poll();
+	StateMgr.process();
 
 	SendColorData();
 }
 
-function GetFanStates() {
-	if(device.fanControlDisabled()) {
-		return;
-	}
-
-
-	GetFanSpeeds();
-	GetTemps();
-	SendCoolingData();
-
-}
-
 function GetFanSettings() {
+
+	const FanData = Corsair.FetchFanStates();
+
 	// Skip iterating other fans and creating FanControllers if the system is disabled.
 	if(device.fanControlDisabled()) {
 		// Reset if the system was disbled during runtime.
-		//device.log("System Monitoring disabled, Clearing Connected Fans", {toFile: true});
-		ConnectedFans = [];
+		device.log("System Monitoring disabled...", {toFile: true});
 
-		return;
+		return false;
 	}
 
-	if(ConnectedFans.length != 0){
-
-		return;
+	if(ConnectedFans.length !== 0){
+		return true;
 	}
-
-	const FanData = Corsair.FetchFanStates();
 
 	for(let i = 0; i < FanData.length; i++) {
 		const fanState = FanData[i];
@@ -143,11 +156,10 @@ function GetFanSettings() {
 			device.log(`${FanControllerArray[i]} is Disconnected!`);
 			break;
 		case 4:
-			device.log("Device is still booting up. We'll refetch fan states later...");
-			// We need to recheck this in 10 seconds or so.
+			device.log("Device is still booting up. We'll refetch fan states later...", {toFile: true});
 			ConnectedFans = [];
 
-			return;
+			return false;
 		case 7:
 			if(!ConnectedFans.includes(i)){
 				device.createFanControl(FanControllerArray[i]);
@@ -157,9 +169,11 @@ function GetFanSettings() {
 
 			break;
 		default:
-			device.log(`${FanControllerArray[i]}: Unknown Fan State [${fanState}]`);
+			device.log(`${FanControllerArray[i]}: Unknown Fan State [${fanState}]`, {toFile: true});
 		}
 	}
+
+	return true;
 }
 
 function GetFanSpeeds() {
@@ -208,7 +222,14 @@ function GetTemps() {
 	for(let i = 0; i < TempData.length; i++) {
 		const temperature = TempData[i];
 
-		device.log(`Temp ${i+1} is ${temperature}C`);
+		if(!ConnectedProbes.includes(i)){
+			ConnectedProbes.push(i);
+			device.createTemperatureSensor(`Temperature Probe ${i + 1}`);
+			device.log(`Found Temperature Sensor on Port ${i + 1}`, {toFile: true});
+		}
+
+		device.SetTemperature(`Temperature Probe ${i + 1}`, temperature);
+		device.log(`Temperature Probe ${i+1} is at ${temperature}C`);
 	}
 
 }
@@ -400,6 +421,243 @@ function decimalToHex(d, padding) {
 
 	return "0x" + hex;
 }
+
+class StateManager{
+	constructor(){
+		/** @type {State[]} */
+		this.states = [];
+		/** @type {State?} */
+		this.currentState = null;
+		this.lastProcessTime = Date.now();
+		this.interval = 1000;
+	}
+	UpdateState(){
+		if (this.states.length > 0) {
+			this.currentState = this.states[this.states.length - 1];
+			this.interval = this.currentState.interval || 3000;
+			//device.log(`Set State Interval to ${this.interval}`);
+		} else {
+			this.currentState = null;
+		}
+	}
+	/**
+	 * @param {State} newState
+	 */
+	Push(newState){
+		if(!newState){
+			return;
+		}
+
+		this.states.push(newState);
+		this.UpdateState();
+	}
+	/**
+	 * @param {State} newState
+	 */
+	Replace(newState){
+		this.states.pop();
+		this.Push(newState);
+	}
+	Pop(){
+		this.states.pop();
+		this.UpdateState();
+	}
+
+	Shift(){
+		const state = this.states.shift();
+
+		if(state){
+			this.Push(state);
+		}
+	}
+
+	process(){
+		//Break if were not ready to process this state
+		if(Date.now() - this.lastProcessTime < this.interval) {
+			return;
+		}
+		const startTime = Date.now();
+
+		if(this.currentState !== null){
+			this.currentState.run();
+		}
+
+		this.lastProcessTime = Date.now();
+		//device.log(`State Took [${Date.now() - startTime}]ms to process`);
+
+	}
+}
+const StateMgr = new StateManager();
+
+class State{
+	/**
+	 * @param {StateManager} controller
+	 * @param {number} interval
+	 */
+	constructor(controller, interval){
+		this.controller = controller;
+		this.interval = interval;
+	}
+	run(){
+
+	}
+}
+class StateSystemMonitoringDisabled extends State{
+	constructor(controller){
+		super(controller, 5000);
+	}
+	run(){
+		// Clear Existing Fans
+		for(const FanID of ConnectedFans){
+			device.log(`Removing Fan Control: ${FanControllerArray[FanID]}`);
+			device.removeFanControl(FanControllerArray[FanID]);
+		}
+
+		ConnectedFans = [];
+
+		// Clear Existing Probes
+		for(const ProbeID of ConnectedProbes){
+			device.log(`Removing Temperature Probe ${ProbeID + 1}`);
+			device.removeTemperatureSensor(`Temperature Probe ${ProbeID + 1}`);
+		}
+
+		ConnectedProbes = [];
+
+		// Stay here until fan control is enabled.
+		if(!device.fanControlDisabled()) {
+			device.log(`Fan Control Enabled, Fetching Connected Fans...`);
+			this.controller.Replace(new StateEnumerateConnectedFans(this.controller));
+
+		}
+	};
+};
+
+class StateEnumerateConnectedFans extends State{
+	constructor(controller){
+		super(controller, 1000);
+	}
+	run(){
+		// Add Blocking State if fan control is disabled
+		if(device.fanControlDisabled()) {
+			device.log(`Fan Control Disabled...`);
+			this.controller.Push(new StateSystemMonitoringDisabled(this.controller));
+
+			return;
+		}
+
+		if(GetFanSettings()){
+			device.log(`Found Connected Fans. Starting Polling Loop...`);
+			this.controller.Pop();
+		}else{
+			device.log(`Connected Fans are still being initialized by the controller. Delaying Detection!`, {toFile: true});
+			// delay next poll operation to give the device time to finish booting.
+			this.interval = 5000;
+		}
+	};
+}
+
+
+class StatePollFanSpeeds extends State{
+	constructor(controller){
+		super(controller, 2000);
+	}
+	run(){
+		// Add Blocking State if fan control is disabled
+		if(device.fanControlDisabled()) {
+			device.log(`Fan Control Disabled...`);
+			this.controller.Push(new StateSystemMonitoringDisabled(this.controller));
+
+			return;
+		}
+
+		// Add Blocking State if we have no connected fans detected
+		if(ConnectedFans.length === 0){
+			device.log(`No Connected Fans Known. Fetching Connected Fans... `);
+			this.controller.Push(new StateEnumerateConnectedFans(this.controller));
+
+			return;
+		}
+
+		// Read Fan RPM
+		const FanSpeeds = Corsair.FetchFanRPM();
+
+		for(let i = 0; i < FanSpeeds.length; i++) {
+			const fanRPM = FanSpeeds[i];
+
+			if(fanRPM > 0) {
+				device.log(`${FanControllerArray[i]} is running at rpm ${fanRPM}`);
+			}
+
+			device.setRPM(FanControllerArray[i], fanRPM);
+		}
+
+		this.controller.Shift();
+
+	};
+};
+
+class StatePollTempProbes extends State{
+	constructor(controller){
+		super(controller, 2000);
+	}
+	run(){
+		// Add Blocking State if fan control is disabled
+		if(device.fanControlDisabled()) {
+			device.log(`Fan Control Disabled...`);
+			this.controller.Push(new StateSystemMonitoringDisabled(this.controller));
+
+			return;
+		}
+
+		// Read Temperature Probes
+		const Temperatures = Corsair.FetchTemperatures();
+
+		for(let i = 0; i < Temperatures.length; i++) {
+			const temperature = Temperatures[i];
+
+			if(!ConnectedProbes.includes(i)){
+				ConnectedProbes.push(i);
+				device.createTemperatureSensor(`Temperature Probe ${i + 1}`);
+				device.log(`Found Temperature Sensor on Port ${i + 1}`, {toFile: true});
+			}
+
+			device.SetTemperature(`Temperature Probe ${i + 1}`, temperature);
+			device.log(`Temperature Probe ${i+1} is at ${temperature}C`);
+		}
+
+		this.controller.Shift();
+
+	};
+};
+
+class StateSetFanSpeeds extends State{
+	constructor(controller){
+		super(controller, 2000);
+	}
+	run(){
+		// Add Blocking State if fan control is disabled
+		if(device.fanControlDisabled()) {
+			device.log(`Fan Control Disabled...`);
+			this.controller.Push(new StateSystemMonitoringDisabled(this.controller));
+
+			return;
+		}
+
+		// Add Blocking State if we have no connected fans detected
+		if(ConnectedFans.length === 0){
+			device.log(`No Connected Fans Known. Fetching Connected Fans... `);
+			this.controller.Push(new StateEnumerateConnectedFans(this.controller));
+
+			return;
+		}
+
+		//Set Fan Speeds
+		SendCoolingData();
+
+		this.controller.Shift();
+
+	};
+};
 
 class PolledFunction{
 	constructor(callback, interval){
@@ -601,6 +859,10 @@ export class ModernCorsairProtocol{
 			0x22: "DPI Y",
 			0x37: "Idle Mode Timeout",
 			0x41: "HW Layout",
+			0x44: "Brightness Level",
+			0x45: "WinLock Enabled",
+			0x4a: "WinLock Disabled Shortcuts",
+			0x5f: "MultipointConnectionSupport",
 			0x96: "Max Polling Rate",
 		});
 
@@ -646,13 +908,14 @@ export class ModernCorsairProtocol{
 		this.EndpointNames = Object.freeze({
 			0x01: "Lighting",
 			0x02: "Buttons",
-			0x17: "Fan RPMs",
-			0x08: "Fan Speeds",
+			0x17: "Fan RPM",
+			0x18: "Fan Speeds",
 			0x1A: "Fan States",
 			0x1D: "3Pin Led Count",
 			0x1E: "4Pin Led Count",
 			0x21: "Temperature Probes",
 			0x22: "Lighting Controller",
+			0x27: "Error Log"
 		});
 
 		this.ChargingStates = Object.freeze({
