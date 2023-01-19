@@ -18,7 +18,7 @@ declare type hexToRgb = (HexString: string) => ColorArray;
 declare type ChannelConfig = {0: ChannelId, 1: number};
 declare type ChannelConfigArray = ChannelConfig[];
 
-declare type AlertPriority = 0 | 1;
+declare type AlertPriority = 0 | 1 | 2 | 3;
 declare type AlertAction = "Settings" | "Documentation"
 declare type AlertId = string;
 declare type MessageId = string;
