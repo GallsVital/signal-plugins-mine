@@ -8,14 +8,12 @@ export function DefaultScale() { return 1.0; }
 /* global
 LightingMode:readonly
 forcedColor:readonly
-pumpToggle:readonly
 cpuCooler:readonly
 */
 export function ControllableParameters() {
 	return [
 		{ "property": "LightingMode", "group":"lighting", "label": "Lighting Mode", "type": "combobox", "values": ["Canvas", "Forced"], "default": "Canvas" },
 		{ "property": "forcedColor", "group":"lighting", "label": "Forced Color", "min": "0", "max": "360", "type": "color", "default": "#009bde" },
-		//{ "property": "pumpToggle", "group": "", "label": "Pump Connected", "type": "boolean", "default": "1" },
 		{ "property": "cpuCooler", "group": "", "label": "Pump Type", "type": "combobox", "values": ["Elite Capellix", "Elite LCD"], "default": "Elite Capellix" },
 	];
 }
@@ -24,6 +22,8 @@ export function LedNames() { return []; }
 export function LedPositions() { return []; }
 
 export function SupportsSubdevices() { return true; }
+export function SupportsFanControl(){ return true; }
+
 export function DefaultComponentBrand() { return "Corsair"; }
 export function Documentation(){ return "troubleshooting/corsair"; }
 export function SystemResumeDelay() { return 9000; }
@@ -51,6 +51,7 @@ const ChannelArray = [
 ];
 
 let ConnectedFans = [];
+let ConnectedProbes = [];
 let savedPollFanTimer = Date.now();
 const PollModeInternal = 4000;
 let PumpDevice = null;
@@ -96,9 +97,13 @@ function compareVersionRecursive(a, b) {
 }
 
 export function Initialize() {
-	StateMgr.Push(new StateSetFanSpeeds(StateMgr));
-	StateMgr.Push(new StatePollTempProbes(StateMgr));
-	StateMgr.Push(new StatePollFanSpeeds(StateMgr));
+	if(StateMgr.states.length === 0){
+		StateMgr.Push(new StateSetFanSpeeds(StateMgr));
+		StateMgr.Push(new StatePollTempProbes(StateMgr));
+		StateMgr.Push(new StatePollFanSpeeds(StateMgr));
+	}
+
+	device.addFeature("corsairmutex");
 
 	// Account for different firmware versions between product Id's
 	if(device.productId() === 0x0C1C){
@@ -457,7 +462,7 @@ class StateManager{
 		}
 
 		this.lastProcessTime = Date.now();
-		device.log(`State Took [${Date.now() - startTime}]ms to process`);
+		//device.log(`State Took [${Date.now() - startTime}]ms to process`);
 
 	}
 }
@@ -479,11 +484,23 @@ class State{
 class StateSystemMonitoringDisabled extends State{
 	constructor(controller){
 		super(controller, 5000);
-		// Reset Connected fans on creation
-		// this should only be created if the monitoring system is disabled
-		ConnectedFans = [];
 	}
 	run(){
+		// Clear Existing Fans
+		for(const FanID of ConnectedFans){
+			device.log(`Removing Fan Control: ${FanControllerArray[FanID]}`);
+			device.removeFanControl(FanControllerArray[FanID]);
+		}
+
+		ConnectedFans = [];
+
+		// Clear Existing Probes
+		for(const ProbeID of ConnectedProbes){
+			device.log(`Removing Temperature Probe ${ProbeID + 1}`);
+			device.removeTemperatureSensor(`Temperature Probe ${ProbeID + 1}`);
+		}
+
+		ConnectedProbes = [];
 
 		// Stay here until fan control is enabled.
 		if(!device.fanControlDisabled()) {
@@ -501,7 +518,7 @@ class StateEnumerateConnectedFans extends State{
 	run(){
 		// Add Blocking State if fan control is disabled
 		if(device.fanControlDisabled()) {
-			device.log(`Fan Control Disabled. Resetting Connected Fans...`);
+			device.log(`Fan Control Disabled...`);
 			this.controller.Push(new StateSystemMonitoringDisabled(this.controller));
 
 			return;
@@ -518,7 +535,6 @@ class StateEnumerateConnectedFans extends State{
 	};
 }
 
-
 class StatePollFanSpeeds extends State{
 	constructor(controller){
 		super(controller, 2000);
@@ -526,7 +542,7 @@ class StatePollFanSpeeds extends State{
 	run(){
 		// Add Blocking State if fan control is disabled
 		if(device.fanControlDisabled()) {
-			device.log(`Fan Control Disabled. Resetting Connected Fans...`);
+			device.log(`Fan Control Disabled...`);
 			this.controller.Push(new StateSystemMonitoringDisabled(this.controller));
 
 			return;
@@ -565,25 +581,41 @@ class StatePollTempProbes extends State{
 	run(){
 		// Add Blocking State if fan control is disabled
 		if(device.fanControlDisabled()) {
-			device.log(`Fan Control Disabled. Resetting Connected Fans...`);
+			device.log(`Fan Control Disabled...`);
 			this.controller.Push(new StateSystemMonitoringDisabled(this.controller));
-
-			return;
-		}
-
-		// Add Blocking State if we have no connected fans detected
-		if(ConnectedFans.length === 0){
-			device.log(`No Connected Fans Known. Fetching Connected Fans... `);
-			this.controller.Push(new StateEnumerateConnectedFans(this.controller));
 
 			return;
 		}
 
 		// Read Temperature Probes
 		const Temperatures = Corsair.FetchTemperatures();
-		Temperatures.forEach(function (temp, iIdx) {
-			device.log(`Temp ${iIdx + 1} is ${temp}C`);
-		});
+
+		for(let i = 0; i < Temperatures.length; i++) {
+			const temperature = Temperatures[i];
+
+			if(!ConnectedProbes.includes(i)){
+				ConnectedProbes.push(i);
+
+				if(i === 0){
+					device.createTemperatureSensor(`Liquid Temperature`);
+					device.log(`Found Liquid Temperature Sensor on Port ${i + 1}`, {toFile: true});
+				}else{
+					device.createTemperatureSensor(`Temperature Probe ${i + 1}`);
+					device.log(`Found Temperature Sensor on Port ${i + 1}`, {toFile: true});
+
+				}
+			}
+
+			if(i === 0){
+				device.SetTemperature(`Liquid Temperature`, temperature);
+				device.log(`Liquid Temperature is at ${temperature}C`);
+			}else{
+				device.SetTemperature(`Temperature Probe ${i + 1}`, temperature);
+				device.log(`Temperature Probe ${i+1} is at ${temperature}C`);
+
+			}
+
+		}
 
 		this.controller.Shift();
 
@@ -597,7 +629,7 @@ class StateSetFanSpeeds extends State{
 	run(){
 		// Add Blocking State if fan control is disabled
 		if(device.fanControlDisabled()) {
-			device.log(`Fan Control Disabled. Resetting Connected Fans...`);
+			device.log(`Fan Control Disabled...`);
 			this.controller.Push(new StateSystemMonitoringDisabled(this.controller));
 
 			return;
@@ -635,12 +667,19 @@ function SendCoolingdata() {
 
 	for(let fan = 0; fan < ConnectedFans.length; fan++) {
 		//const fanLevel = (device.getNormalizedFanlevel(FanControllerArray[ConnectedFans[fan]]) * 100).toFixed(0);
-		const fanLevel = device.getFanlevel(FanControllerArray[ConnectedFans[fan]]);
+		let fanLevel = device.getFanlevel(FanControllerArray[ConnectedFans[fan]]);
+
+		// Prevent pump from going below 60%
+		// Doing this on newer models will put the device into a failsafe mode until power cycled.
+		if(fan === 0){
+			fanLevel = Math.max(60, fanLevel);
+		}
 
 		device.log(`${FanControllerArray[ConnectedFans[fan]]} level set to ${fanLevel}%`);
 
 		CoolingData[5 + ConnectedFans[fan] * 4] = fanLevel;
 	}
+
 
 	Corsair.WriteEndpoint("Background", Corsair.Endpoints.FanSpeeds, CoolingData);
 

@@ -258,6 +258,7 @@ class NvidiaGPUDeviceIds {
 		this.RTX3080TI       = 0x2208;
 		this.RTX3090         = 0x2204;
 		this.RTX3090TI       = 0x2203;
+		this.RTX4070TI		 = 0x2782;
 		this.RTX4080		 = 0x2704;
 		this.RTX4090		 = 0x2684;
 	}
@@ -267,9 +268,12 @@ const Nvidia = new NvidiaGPUDeviceIds();
 
 class MSIGPUDeviceIDs {
 	constructor() {
+		this.RTX4070TI_GAMING_X_TRIO				 = 0x5132;
+
 		this.RTX4080_SUPRIM							 = 0x5110;
 		this.RTX4080_GAMING_X_TRIO					 = 0x5111;
 
+		this.RTX4090_SUPRRIM_X						 = 0x5102;
 		this.RTX4090_GAMING_TRIO			         = 0x5103;
 		this.RTX4090_SUPRIM_LIQUID_X                 = 0x5104;
 	}
@@ -282,10 +286,12 @@ class MSIGPUList {
 		const MSIGPUIDs  = new MSIGPUDeviceIDs();
 		this.devices =
         [
+        	new MSIGPUIdentifier(Nvidia.RTX4070TI, MSIGPUIDs.RTX4070TI_GAMING_X_TRIO, 0x68, "MSI RTX 4070Ti GAMING X TRIO"),
         	new MSIGPUIdentifier(Nvidia.RTX4080, MSIGPUIDs.RTX4080_SUPRIM, 0x68, "MSI RTX 4080 SUPRIM"),
         	new MSIGPUIdentifier(Nvidia.RTX4080, MSIGPUIDs.RTX4080_GAMING_X_TRIO, 0x68, "MSI RTX 4080 GAMING X TRIO"),
         	new MSIGPUIdentifier(Nvidia.RTX4090, MSIGPUIDs.RTX4090_GAMING_TRIO, 0x68, "MSI RTX 4090 GAMING TRIO"),
-        	new MSIGPUIdentifier(Nvidia.RTX4090, MSIGPUIDs.RTX4090_SUPRIM_LIQUID_X, 0x68, "MSI RTX 4090 SUPRIM LIQUID X")
+        	new MSIGPUIdentifier(Nvidia.RTX4090, MSIGPUIDs.RTX4090_SUPRIM_LIQUID_X, 0x68, "MSI RTX 4090 SUPRIM LIQUID X"),
+			new MSIGPUIdentifier(Nvidia.RTX4090, MSIGPUIDs.RTX4090_SUPRRIM_X, 0x68, "MSI RTX 4090 SUPRIM X")
         ];
 	}
 }
