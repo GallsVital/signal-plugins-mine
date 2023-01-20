@@ -73,6 +73,8 @@ export function Initialize() {
 		StateMgr.Push(new StatePollFanSpeeds(StateMgr));
 	}
 
+	device.addFeature("corsairmutex");
+
 	const HidInfo = device.getHidInfo();
 	device.log(`Write Length: ${HidInfo.writeLength}, Read Length: ${HidInfo.readLength}`);
 	Corsair.SetDeviceBufferSize(HidInfo.writeLength);

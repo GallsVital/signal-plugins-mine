@@ -103,6 +103,8 @@ export function Initialize() {
 		StateMgr.Push(new StatePollFanSpeeds(StateMgr));
 	}
 
+	device.addFeature("corsairmutex");
+
 	// Account for different firmware versions between product Id's
 	if(device.productId() === 0x0C1C){
 		Corsair.config.developmentFirmwareVersion = "2.10.219";
