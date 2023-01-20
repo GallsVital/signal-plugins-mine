@@ -1,0 +1,27 @@
+{
+"ProductName": "Corsair LC100 Triangle", 
+   "DisplayName": "Corsair LC100 Triangle",
+   "Brand": "Corsair",
+   "Type": "Peripheral",
+   "LedCount": 10,
+   "Width": 16,
+   "Height": 16,
+   "LedMapping": [
+       0,1,2,3,4,5,6,7,8
+   ],
+   "LedCoordinates": [
+       [4,0],[9,0],[14,0],[16,4],[14,8],[12,12],[6,12],[4,8],[2,4]
+   ],
+   "LedNames": [
+       "Led1",
+       "Led2",
+       "Led3",
+       "Led4",
+       "Led5",
+       "Led6",
+       "Led7",
+       "Led8",
+       "Led9",
+   ],
+"Image": “The image of the device goes here. The image needs encoded into base 64.”
+}
