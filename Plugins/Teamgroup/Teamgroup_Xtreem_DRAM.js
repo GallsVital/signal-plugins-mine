@@ -27,10 +27,10 @@ const vLedNames = [
 	"LED 6", "LED 7", "LED 8", "LED 9", "LED 10",
 	"LED 11", "LED 12", "LED 13", "LED 14", "LED 15"
 ];
-const vLedPositions = [ 
-	[0, 0], [1, 0], [2, 0], [3, 0], [4, 0], [5, 0], [6, 0], [7, 0], 
+const vLedPositions = [
+	[0, 0], [1, 0], [2, 0], [3, 0], [4, 0], [5, 0], [6, 0], [7, 0],
 	[6, 1], [5, 1], [4, 1], [3, 1], [2, 1], [1, 1], [0, 1]
-  ];
+];
 
 let Xtreem;
 
@@ -51,18 +51,20 @@ export function Scan(bus) {
 	const FoundAddresses = [];
 	const startingAddresses = [0x70, 0x71, 0x72, 0x73, 0x74, 0x75, 0x76, 0x77];
 	const attachedSticks = Xtreem.CheckAttachedSticks();
+
 	// Teamgroup Xtreem Ram like Aura/ENE ram needs to have its address remapped by the first program that touches it.
 	// If we have a device on 0x77 then we need to attempt to remap them.
-	for(const address of startingAddresses)
-	{
+	for(const address of startingAddresses) {
 		Xtreem.CheckForFreeAddresses(address, attachedSticks);
 	}
 
 	for (const address of Xtreem.potentialAddresses) {
 		const iRet = bus.WriteQuick(address);
+
 		if(iRet < 0){
 			continue;
 		}
+
 		bus.log(`Address [${address}] has something on it`, {toFile:true});
 
 		const ValidRegisters = Xtreem.TestRegisterValues(address);
@@ -114,7 +116,7 @@ function UpdateColors(shutdown = false){
 
 		//RGBData.push(...Color);
 
-		 let ledIdx = iIdx * 3;
+		 const ledIdx = iIdx * 3;
 		 RGBData[ledIdx] = Color[0];
 		 RGBData[ledIdx + 1] = Color[2];
 		 RGBData[ledIdx + 2] = Color[1];
@@ -152,17 +154,16 @@ class TeamgroupInterfaceFree extends TeamgroupInterface{
 
 		let returnValue = (this.bus.ReadByte(address, 0x81) << 8) & 0xFF00;
 		returnValue |= this.bus.ReadByte(address, 0x81) & 0xFF;
-		
+
 		return returnValue;
 	}
-	
+
 	ReadBlockByBytes(address, register, length){
 		this.bus.WriteWord(address, 0x00, ((register << 8) & 0xFF00) | ((register >> 8) & 0x00FF));
 
 		const returnedBytes = [];
 
-		for(let bytesToRead = 0; bytesToRead < length; bytesToRead++)
-		{
+		for(let bytesToRead = 0; bytesToRead < length; bytesToRead++) {
 			returnedBytes[bytesToRead] = this.bus.ReadByte(address, 0x81);
 		}
 
@@ -197,8 +198,7 @@ class TeamgroupInterfaceFixed extends TeamgroupInterface{
 		this.bus.WriteByte(0x01, 0x01);
 	}
 
-	WriteRegisterWithoutArgument(register)
-	{
+	WriteRegisterWithoutArgument(register) {
 		this.bus.WriteWord(0x00, ((register << 8) & 0xFF00) | ((register >> 8) & 0x00FF));
 	}
 
@@ -218,17 +218,16 @@ class TeamgroupInterfaceFixed extends TeamgroupInterface{
 
 		let returnValue = (this.bus.ReadByte(0x81) << 8) & 0xFF00;
 		returnValue |= this.bus.ReadByte(0x81) & 0xFF;
-		
+
 		return returnValue;
 	}
-	
+
 	ReadBlockByBytes(register, length){
 		this.bus.WriteWord(0x00, ((register << 8) & 0xFF00) | ((register >> 8) & 0x00FF));
 
 		const returnedBytes = [];
 
-		for(let bytesToRead = 0; bytesToRead < length; bytesToRead++)
-		{
+		for(let bytesToRead = 0; bytesToRead < length; bytesToRead++) {
 			returnedBytes[bytesToRead] = this.bus.ReadByte(0x81);
 		}
 
@@ -245,10 +244,10 @@ class TeamgroupXtreem{
 		};
 
 		this.potentialAddresses = [0x39, 0x3A, 0x67, 0x70, 0x71, 0x72, 0x73, 0x74, 0x75, 0x76, 0x77 ];
-		
+
 
 		this.registers = {
-			ColorsStart: 0xE300, 
+			ColorsStart: 0xE300,
 			DirectMode: 0xE020,
 		};
 	}
@@ -267,43 +266,46 @@ class TeamgroupXtreem{
 	SendRGBData(RGBData){
 
 		let bytesWritten = 0;
-		
+
 	 	while(RGBData.length > 0) {
-		 	let DataLength = Math.min(30, RGBData.length);
+		 	const DataLength = Math.min(30, RGBData.length);
 
 		 	const packet = RGBData.splice(0, DataLength);
 		 	this.Interface.WriteBlock(this.registers.ColorsStart + bytesWritten, packet);
 		 	bytesWritten += DataLength;
-			
-		}		
+
+		}
+
 		this.Interface.WriteRegister(0xE02f, 0xa0);
 	}
 
-	CheckAttachedSticks()
-	{
+	CheckAttachedSticks() {
 		if(this.IsFixedBus()){
 			this.Bus().log("Bus Interface must be a \"Free\" Type to use this function! This can only be done inside of the Scan() export.");
 
 			return;
 		}
-		let TForceSticks = [];
-		for(let address = 0; address < 8; address++)
-		{
+		const TForceSticks = [];
+
+		for(let address = 0; address < 8; address++) {
 			this.Bus().WriteByte(0x36, 0x00, 0x00);
-			let return1 = this.Bus().ReadByte(0x50 + address, 0x02);
-			let return2 = this.Bus().ReadByte(0x50 + address, 0x00);
-			if(return1 === 0x0c && return2 === 0x23)
-			{
+
+			const return1 = this.Bus().ReadByte(0x50 + address, 0x02);
+			const return2 = this.Bus().ReadByte(0x50 + address, 0x00);
+
+			if(return1 === 0x0c && return2 === 0x23) {
 				TForceSticks.push(address);
 				continue;
 			}
-			if(return1 >= 0 || return2 >= 0)
-			{
+
+			if(return1 >= 0 || return2 >= 0) {
 				this.Bus().log(`SPD Check 1 Failed! Returned value: ${return1}, ${return2}, Expected: 0x0C on address [${address}]`, {toFile: true});
 			}
 
 		}
+
 		this.Bus().log("TForce Sticks Found on ChannelIDX's: " + TForceSticks, {toFile: true});
+
 		return TForceSticks;
 	}
 
@@ -314,6 +316,7 @@ class TeamgroupXtreem{
 
 			return;
 		}
+
 		for (let iChannelIdx = 0; iChannelIdx < channels.length; iChannelIdx++) {
 			const iRet = this.Bus().WriteQuick(primaryAddress);
 
@@ -362,33 +365,40 @@ class TeamgroupXtreem{
 			return false;
 		}
 
-		const Value1 = this.Interface.ReadWord(address, 0xF01C)
-		
+		const Value1 = this.Interface.ReadWord(address, 0xF01C);
+
 		if(Value1 !== 0x0000){
 			this.Bus().log(`Check 1 Failed! Returned value: ${Value1}, Expected: 0x0000`, {toFile:true});
+
 			return false;
 		}
 
-		const value2 = this.Interface.ReadWord(address, 0x4000)
+		const value2 = this.Interface.ReadWord(address, 0x4000);
+
 		if(value2 !== 0x7742){
-			this.Bus().log(`Check 1 Failed! Returned value: ${Value2}, Expected: 0x7742`, {toFile:true});
+			this.Bus().log(`Check 1 Failed! Returned value: ${value2}, Expected: 0x7742`, {toFile:true});
+
 			return false;
 		}
 
 		for(let offset = 0x00; offset < 5; offset++){
-			let val = this.Bus().ReadByte(address, 0x9B + offset);
+			const val = this.Bus().ReadByte(address, 0x9B + offset);
+
 			if(val != 0x1b + offset){
 				this.Bus().log(`Check 3 Failed! Expected ${0x1b + offset}, Got ${val}`, {toFile:true});
+
 				return false;
 			}
 		}
-		
-		let iRet = this.Bus().ReadByte(address, 0xA0)
+
+		const iRet = this.Bus().ReadByte(address, 0xA0);
+
 		if(iRet != 0x20){
 			this.Bus().log(`Check 4 Failed! Expected ${0x20}, Got ${iRet}`, {toFile:true});
+
 			return false;
 		}
-		
+
 		return true;
 	}
 }

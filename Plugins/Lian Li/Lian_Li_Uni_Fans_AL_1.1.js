@@ -10,6 +10,7 @@ LightingMode:readonly
 forcedColor:readonly
 moboSync:readonly
 FanMode:readonly
+newProtocol:readonly
 */
 export function ControllableParameters() {
 	return [
