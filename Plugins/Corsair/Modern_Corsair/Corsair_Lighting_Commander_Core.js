@@ -23,6 +23,9 @@ export function LedPositions() { return []; }
 
 export function SupportsSubdevices() { return true; }
 export function SupportsFanControl(){ return true; }
+// Use the CorsairLink mutex any time this device is rendering.
+// if we don't our reads may be ruined by other programs
+export function UsesCorsairMutex(){ return true; }
 
 export function DefaultComponentBrand() { return "Corsair"; }
 export function Documentation(){ return "troubleshooting/corsair"; }
@@ -102,8 +105,6 @@ export function Initialize() {
 		StateMgr.Push(new StatePollTempProbes(StateMgr));
 		StateMgr.Push(new StatePollFanSpeeds(StateMgr));
 	}
-
-	device.addFeature("corsairmutex");
 
 	// Account for different firmware versions between product Id's
 	if(device.productId() === 0x0C1C){

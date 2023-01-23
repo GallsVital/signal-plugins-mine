@@ -22,6 +22,9 @@ export function ControllableParameters(){
 
 export function SupportsSubdevices(){ return true; }
 export function SupportsFanControl(){ return true; }
+// Use the CorsairLink mutex any time this device is rendering.
+// if we don't our reads may be ruined by other programs
+export function UsesCorsairMutex(){ return true; }
 
 export function DefaultComponentBrand() { return "Corsair";}
 export function Documentation(){ return "troubleshooting/corsair"; }
@@ -56,10 +59,6 @@ export function Validate(endpoint) {
 }
 
 export function Initialize() {
-	// Use the CorsairLink mutex any time this device is rendering.
-	// if we don't our reads may be ruined by other programs
-	device.addFeature("corsairmutex");
-
 	// Set the proper device name for the 1000D case as we're sharing the plugin file
 	device.setName(ProductNames[device.productId()]);
 

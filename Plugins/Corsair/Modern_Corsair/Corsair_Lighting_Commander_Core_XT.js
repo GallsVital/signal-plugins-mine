@@ -23,6 +23,9 @@ export function SupportsSubdevices() { return true; }
 export function DefaultComponentBrand() { return "Corsair"; }
 export function SystemResumeDelay() { return 9000; }
 export function SupportsFanControl(){ return true; }
+// Use the CorsairLink mutex any time this device is rendering.
+// if we don't our reads may be ruined by other programs
+export function UsesCorsairMutex(){ return true; }
 
 /** @param {HidEndpoint} endpoint*/
 export function Validate(endpoint) {
@@ -72,8 +75,6 @@ export function Initialize() {
 		StateMgr.Push(new StatePollTempProbes(StateMgr));
 		StateMgr.Push(new StatePollFanSpeeds(StateMgr));
 	}
-
-	device.addFeature("corsairmutex");
 
 	const HidInfo = device.getHidInfo();
 	device.log(`Write Length: ${HidInfo.writeLength}, Read Length: ${HidInfo.readLength}`);
