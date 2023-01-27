@@ -16,7 +16,8 @@ export function ControllableParameters(){
 		{"property":"shutdownColor", "label":"Shutdown Color", "min":"0", "max":"360", "type":"color", "default":"009bde"},
 		{"property":"LightingMode", "label":"Lighting Mode", "type":"combobox", "values":["Canvas", "Forced"], "default":"Canvas"},
 		{"property":"forcedColor", "label":"Forced Color", "min":"0", "max":"360", "type":"color", "default":"009bde"},
-		{"property":"LogoMode", "label":"Logo Mode", "type":"combobox", "values":["On", "Off", "Breathing"], "default":"On"},
+		{"property":"LogoMode", "group":"lighting", "label":"Logo Mode", "type":"combobox", "values":["On", "Off", "Breathing"], "default":"On"},
+		{"property":"BreathingSpd", "group":"lighting", "label":"Breathing Speed", "type":"number", "min":"1", "max":"10", "default":"3"},
 	];
 }
 export function ConflictingProcesses() {
@@ -86,18 +87,18 @@ export function Render() {
 		device.write([0x00, 0xc0, 0x01, 0x01, 0x00, 0x96, 0x99, 0x99, 0x99], 65);
 	}else if (LogoMode === "Breathing") {
 		if (Breathing_dir === 0){
-			if ((Breathing_idx + 3) < 99){
-				Breathing_idx += 3;
+			if ((Breathing_idx + BreathingSpd) < 99){
+				Breathing_idx += BreathingSpd;
 			}else {
 				Breathing_dir = 1;
-				Breathing_idx -= 3;
+				Breathing_idx -= BreathingSpd;
 			}
 		}else {
-			if ((Breathing_idx - 3) > 0){
-				Breathing_idx -= 3;
+			if ((Breathing_idx - BreathingSpd) > 0){
+				Breathing_idx -= BreathingSpd;
 			}else {
 				Breathing_dir = 0;
-				Breathing_idx += 3;
+				Breathing_idx += BreathingSpd;
 			}
 		}
 
