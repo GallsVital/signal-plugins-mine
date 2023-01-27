@@ -1,12 +1,11 @@
-export function Name() { return "CoolerMaster MK530 V2"; }
+export function Name() { return "CoolerMaster MK730"; }
 export function VendorId() { return 0x2516; }
-export function Documentation(){ return "troubleshooting/coolermaster"; }
-export function ProductId() { return 0x0147; }
+export function ProductId() { return 0x008F; }
 export function Publisher() { return "WhirlwindFX"; }
+export function Documentation(){ return "troubleshooting/coolermaster"; }
 export function Size() { return [19, 7]; }
 export function DefaultPosition(){return [10, 100];}
-const DESIRED_HEIGHT = 85;
-export function DefaultScale(){return Math.floor(DESIRED_HEIGHT/Size()[1]);}
+export function DefaultScale(){return 8.0;}
 /* global
 shutdownColor:readonly
 LightingMode:readonly
@@ -20,73 +19,36 @@ export function ControllableParameters(){
 	];
 }
 
-function hexToRgb(hex) {
-	let result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
-	let colors = [];
-	colors[0] = parseInt(result[1], 16);
-	colors[1] = parseInt(result[2], 16);
-	colors[2] = parseInt(result[3], 16);
-
-	return colors;
-}
-
-export function Initialize() {
-	SendMagicColorPacketStart();
-	sendPacketString("00 51 00 00 00 05", 65); //Set Profile
-	//SendCommits();
-}
-
-function sendPacketString(string, size){
-
-	let packet= [];
-	let data = string.split(' ');
-
-	for(let i = 0; i < data.length; i++){
-		packet[i] =parseInt(data[i], 16);//.toString(16)
-	}
-
-	device.write(packet, size);
-}
-
-export function Shutdown() {
-	sendPacketString("00 41 80", 65);
-	sendPacketString("00 51 28 00 00 01", 65); // Set Mode
-
-}
-
-
-let vLedNames = [
-//"Scroll Lock", "Caps Lock",
-
-	"Esc", "F1", "F2", "F3", "F4", "F5", "F6", "F7", "F8", "F9", "F10", "F11", "F12",                     "Print Screen",  "Pause Break",
-	"`", "1", "2", "3", "4", "5", "6", "7", "8", "9", "0", "-_", "=+", "Backspace",                       "Insert", "Home", "Page Up",
-	"Tab", "Q", "W", "E", "R", "T", "Y", "U", "I", "O", "P", "[", "]", "\\",                              "Del", "End", "Page Down",
-	"A", "S", "D", "F", "G", "H", "J", "K", "L", ";", "'", "Enter",
-	"Left Shift", "Z", "X", "C", "V", "B", "N", "M", ",", ".", "/", "Right Shift",                             "Up Arrow",
+const vLedNames = [
+	"Esc", "F1", "F2", "F3", "F4", "F5", "F6", "F7", "F8", "F9", "F10", "F11", "F12",                            "Print Screen",  "Pause Break",
+	"Left Bar 1", "`", "1", "2", "3", "4", "5", "6", "7", "8", "9", "0", "-_", "=+", "Backspace",                       "Insert", "Home", "Page Up",       "Right Bar 1",
+	"Left Bar 2", "Tab", "Q", "W", "E", "R", "T", "Y", "U", "I", "O", "P", "[", "]", "\\",                              "Del", "End", "Page Down",         "Right Bar 2",
+	"Left Bar 3", 		 "A", "S", "D", "F", "G", "H", "J", "K", "L", ";", "'", "Enter",                                                                   "Right Bar 3",
+	"Left Bar 4", "Left Shift", "Z", "X", "C", "V", "B", "N", "M", ",", ".", "/", "Right Shift",                             "Up Arrow",                   "Right Bar 4",
 	"Left Ctrl", "Left Win", "Left Alt", "Space", "Right Alt", "Right Win", "Menu", "Right Ctrl",  "Left Arrow", "Down Arrow", "Right Arrow",
+	"Bottom Bar 1", "Bottom Bar 2", "Bottom Bar 3", "Bottom Bar 4", "Bottom Bar 5", "Bottom Bar 6", "Bottom Logo", "Bottom Bar 7", "Bottom Bar 8", "Bottom Bar 9", "Bottom Bar 10", "Bottom Bar 11", "Bottom Bar 12",
 ];
 
-let vLedPositions = [
-	//[0,0],[0,0],
-
+const vLedPositions = [
 	[1, 0], [2, 0], [3, 0], [4, 0], [5, 0], [6, 0], [7, 0], [8, 0], [9, 0], [10, 0], [11, 0], [12, 0],        [13, 0],         [15, 0], 	       [17, 0],
-	[1, 1], [1, 1], [2, 1], [3, 1], [4, 1], [5, 1], [6, 1], [7, 1], [8, 1], [9, 1], [10, 1], [11, 1],  [12, 1],   [13, 1],   [15, 1], [16, 1], [17, 1],
-	[1, 2], [2, 2], [3, 2], [4, 2], [5, 2], [6, 2], [7, 2], [8, 2], [9, 2], [10, 2], [11, 2], [12, 2], [13, 2], [14, 2],   [15, 2], [16, 2], [17, 2],
-	[2, 3], [3, 3], [4, 3], [5, 3], [6, 3], [7, 3], [8, 3], [9, 3], [10, 3], [11, 3], [12, 3],         [14, 3],
-	[1, 4], [2, 4], [3, 4], [4, 4], [5, 4], [6, 4], [7, 4], [8, 4], [9, 4], [10, 4], [11, 4],                 [14, 4],           [16, 4],
+	[0, 1],   [1, 1], [1, 1], [2, 1], [3, 1], [4, 1], [5, 1], [6, 1], [7, 1], [8, 1], [9, 1], [10, 1], [11, 1],  [12, 1],   [13, 1],   [15, 1], [16, 1], [17, 1],   [18, 1],
+	[0, 2],   [1, 2], [2, 2], [3, 2], [4, 2], [5, 2], [6, 2], [7, 2], [8, 2], [9, 2], [10, 2], [11, 2], [12, 2], [13, 2], [14, 2],   [15, 2], [16, 2], [17, 2],   [18, 2],
+	[0, 3],          [2, 3], [3, 3], [4, 3], [5, 3], [6, 3], [7, 3], [8, 3], [9, 3], [10, 3], [11, 3], [12, 3],         [14, 3],                             [18, 3],
+	[0, 4],   [1, 4], [2, 4], [3, 4], [4, 4], [5, 4], [6, 4], [7, 4], [8, 4], [9, 4], [10, 4], [11, 4],                 [14, 4],           [16, 4],           [18, 4],
 	[1, 5], [2, 5], [3, 5],                      [6, 5],                       [11, 5], [12, 5], [13, 5], [14, 5],   [15, 5], [16, 5], [17, 5],
 
-];
-let vKeys = [
-	//118,9,
-	6,       21, 27, 34, 41,      55, 62, 69, 76,   83, 90, 97, 104,   111,     125,
-	7,   15, 22, 28, 35, 42, 49, 56, 63, 70, 77, 84, 91,      105,   112, 119, 126,
-	8,   16, 23, 29, 36, 43, 50, 57, 64, 71, 78, 85, 92,       106,   113, 120, 127,
-	17, 24, 30, 37, 44, 51, 58, 65, 72,  79, 86,          107,
-	10,   18, 25, 31, 38, 45, 52, 59, 66, 73, 80,              108,       122,
-	11, 12, 19,            46,           74, 81, 88,          109,   116, 123, 130,
+	[2, 6],     [3, 6], [4, 6],     [5, 6],     [6, 6],     [7, 6],      [9, 6],      [10, 6],        [11, 6], [12, 6], [13, 6],              [15, 6],       [16, 6],
 ];
 
+const vKeys = [
+	6,       21, 27, 34, 41,      55, 62, 69, 76,   83, 90, 97, 104,   111,     125,
+	0, 7,   15, 22, 28, 35, 42, 49, 56, 63, 70, 77, 84, 91,      105,   112, 119, 126, 133,
+	1, 8,   16, 23, 29, 36, 43, 50, 57, 64, 71, 78, 85, 92,       106,   113, 120, 127, 134,
+	2,      17, 24, 30, 37, 44, 51, 58, 65, 72,  79, 86,          107,                 135,
+	3, 10,   18, 25, 31, 38, 45, 52, 59, 66, 73, 80,              108,       122,      136,
+	11, 12, 19,            46,           74, 81, 88,          109,   116, 123, 130,
+	13, 20, 26,  33,     47,     54, 61,   68,   82, 96,  103,   110,    117
+];
 
 export function LedNames() {
 	return vLedNames;
@@ -96,19 +58,27 @@ export function LedPositions() {
 	return vLedPositions;
 }
 
+export function Initialize() {
+	device.write([0x00, 0x51, 0x00, 0x00, 0x00, 0x05], 65); //Set Profile
+}
+
 export function Render() {
-	SendMagicColorPacketStart();
 	SendColors();
 	SendCommits();
 }
 
-function SendColors(shutdown = false){
-	let RGBData = [];//new Array(700).fill(0);
+export function Shutdown() {
+	device.write([0x00, 0x41, 0x80], 65);
+	device.write([0x00, 0x51, 0x28, 0x00, 0x00, 0x01], 65);
+}
 
-	for(let iIdx = 0; iIdx < vKeys.length; iIdx++) {
-		let iPxX = vLedPositions[iIdx][0];
-		let iPxY = vLedPositions[iIdx][1];
-		var mxPxColor;
+function SendColors(shutdown = false){
+	const RGBData = [];
+
+	for(let iIdx = 0; iIdx < vLedPositions.length; iIdx++) {
+		const iPxX = vLedPositions[iIdx][0];
+		const iPxY = vLedPositions[iIdx][1];
+		let mxPxColor;
 
 		if(shutdown){
 			mxPxColor = hexToRgb(shutdownColor);
@@ -123,7 +93,7 @@ function SendColors(shutdown = false){
 		RGBData[vKeys[iIdx]*3 +2 ] = mxPxColor[2];
 	}
 
-	sendPacketString("00 56 81 00 00 01 00 00 00 0A 00 00 00 BB BB BB BB", 65);
+	device.write([0x00, 0x56, 0x81, 0x00, 0x00, 0x01, 0x00, 0x00, 0x00, 0x0A, 0x00, 0x00, 0x00, 0xBB, 0xBB, 0xBB, 0xBB], 65);
 
 	//Send the left light bar and first column
 	let InitColorPacket = [0x00, 0x56, 0x83, 0x00, 0x00, 0x01, 0x00, 0x00, 0x00, 0x80, 0x01, 0x00, 0xC1, 0x00, 0x00, 0x00, 0x00, 0xFF, 0xFF, 0xFF, 0xFF, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00];
@@ -146,11 +116,6 @@ function SendColors(shutdown = false){
 
 }
 
-
-export function Validate(endpoint) {
-	return endpoint.interface === 1;
-}
-
 function StreamPacket(packetId, RGBData){
 	let packet = [];
 	packet[0] = 0x00;
@@ -160,46 +125,26 @@ function StreamPacket(packetId, RGBData){
 	packet[4] = 0x00;
 	packet = packet.concat(RGBData);
 	device.write(packet, 65);
-
 	device.read(packet, 65);
-
 }
 
 function SendCommits(){
-	//sendPacketString("00 41 80",65);
-	sendPacketString("00 51 28 00 00 FF", 65);
-	device.pause(1);
-
+	device.write([0x00, 0x51, 0x28, 0x00, 0x00, 0xFF], 65);
+	device.pause(3);
 }
 
-function SendMagicColorPacketStart(){
-	// sendPacketString("00 56 15 00 00 01 00 04 00 88 88 88 88",65);
-	// sendPacketString("00 56 15 01 00 01 00 0A 00 99 99 99 99",65);
-	// sendPacketString("00 56 15 02 00 02 00 20 00 88 88 88 88",65);
-	// sendPacketString("00 56 15 03 00 02 00 2C 00 88 88 88 88",65);
-	// sendPacketString("00 56 15 04 00 01 00 BC 00 BB BB BB BB",65);
-	// sendPacketString("00 56 15 05 00 02 00 C7 00 88 88 88 88",65);
-	// sendPacketString("00 56 15 06 00 02 00 D4 00 88 88 88 88",65);
-	// sendPacketString("00 56 15 07 00 01 00 DC 00 88 88 88 88",65);
-	// sendPacketString("00 56 15 08 00 01 00 E2 00 88 88 88 88",65);
-	// sendPacketString("00 56 15 09 00 02 00 F7 00 88 88 88 88",65);
-	// sendPacketString("00 56 15 0A 00 02 00 03 00 88 88 88 88",65);
-	// sendPacketString("00 56 15 0B 00 02 00 0F 00 88 88 88 88",65);
-	// sendPacketString("00 56 15 0C 00 02 00 18 00 88 88 88 88",65);
-	// sendPacketString("00 56 15 0D 00 01 00 1F 00 88 88 88 88",65);
-	// sendPacketString("00 56 15 0E 00 01 00 04 00 88 88 88 88",65);
-	// sendPacketString("00 56 15 0F 00 02 00 29 01 88 88 88 88",65);
-	// sendPacketString("00 56 15 10 00 02 00 39 01 88 88 88 88",65);
-	// sendPacketString("00 56 15 11 00 01 00 3E 01 AA AA AA AA",65);
-	// sendPacketString("00 56 15 12 00 02 00 49 01 88 88 88 88",65);
-	// sendPacketString("00 56 15 13 00 02 00 74 01 88 88 88 88",65);
-	// sendPacketString("00 56 15 14 00 05 00 BB 01 88 88 88 88",65);
+function hexToRgb(hex) {
+	const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+	const colors = [];
+	colors[0] = parseInt(result[1], 16);
+	colors[1] = parseInt(result[2], 16);
+	colors[2] = parseInt(result[3], 16);
 
-	// sendPacketString("00 56 21 00 00 00 01 00 C1 00 00 00 00 0A 14 1E FF 00 00 00 00 00 00 00 00 00 32 00 C1 07 00 00 00 FF FF FF FF 00 00 06 00 00 04 08 00 05 00 00 00 00 01 00 C1 00 00 00 00 00 00 00 FF 00 00 00 00",65);
+	return colors;
+}
 
-	// sendPacketString("00 56 21 01 00 00 80 00 80 0A 10 00 00 FF 00 00 FF 00 00 05 00 03 00 00 00 FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF",65);
-	// sendPacketString("00 56 21 02 00 FF FF FF FF FF FF FF FF 14 00 14 00 0B 00 00 00 0F 00 01 00 00 01 00 C1 00 00 00 00 00 00 C6 FF 00 00 00 00 00 80 00 80 0B 10 00 00 FF FF FF FF 00 00 02 00 00 00 00 00 14 00 14 00",65);
-
+export function Validate(endpoint) {
+	return endpoint.interface === 1;
 }
 
 export function Image() {
