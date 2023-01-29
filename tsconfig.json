@@ -16,7 +16,10 @@
 		"esModuleInterop": true,
 		"strictNullChecks": true,
 		"strictFunctionTypes": true,
-		//"noUncheckedIndexedAccess": true,
+		"noUncheckedIndexedAccess": true,
+		"noImplicitReturns": true,
+		"noUnusedLocals": true,
+		"noUnusedParameters": true,
 		"typeRoots": ["./types", "./node_modules/@types"],
 		"disableSizeLimit": true, // Plugin images being base64 breaks Typescript checking in the project. 20mb filesize limit by default
 		"baseUrl": ".",
