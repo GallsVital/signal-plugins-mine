@@ -42,6 +42,7 @@
 		"node_modules",
 		"**/node_modules/*",
 		"docs",
-		"**/docs/*"
+		"**/docs/*",
+		"**/*.test.js"
 	]
 }
