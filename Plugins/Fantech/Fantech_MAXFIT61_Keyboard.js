@@ -12,6 +12,11 @@ export function ControllableParameters() {
 		{"property":"forcedColor", "group":"lighting", "label":"Forced Color", "min":"0", "max":"360", "type":"color", "default":"009bde"},
 	];
 }
+/* global
+shutdownColor:readonly
+LightingMode:readonly
+forcedColor:readonly
+*/
 
 const vKeyNames = [
 	"Esc", "1", "2", "3", "4", "5", "6", "7", "8", "9", "0", "-_", "=+", "Backspace",
@@ -91,7 +96,7 @@ function sendColors(shutdown = false) {
 		packet[2] = 0x00;
 		packet[3] = 0x00;
 		packet[4] = row;
-		packet[5] = row == 7 ? 0x12 : 0x36;
+		packet[5] = row === 7 ? 0x12 : 0x36;
 		packet = packet.concat(RGBData.splice(0, 54));
 		device.write(packet, 64);
 	}
