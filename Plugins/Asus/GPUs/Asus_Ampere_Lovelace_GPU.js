@@ -286,6 +286,7 @@ class NvidiaGPUDeviceIds {
 		this.RTX3060_GA104   = 0x2487;
 		this.RTX3060TI       = 0x2486;
 		this.RTX3060TI_LHR   = 0x2489;
+		this.RTX3060TI_GDDR6X = 0x24C9;
 		this.RTX3070         = 0x2484;
 		this.RTX3070_LHR     = 0x2488;
 		this.RTX3070TI       = 0x2482;
@@ -295,6 +296,7 @@ class NvidiaGPUDeviceIds {
 		this.RTX3080TI       = 0x2208;
 		this.RTX3090         = 0x2204;
 		this.RTX3090TI       = 0x2203;
+		this.RTX4070TI 		 = 0x2782;
 		this.RTX4080 		 = 0x2704;
 		this.RTX4090         = 0x2684;
 	}
@@ -313,8 +315,9 @@ class Asus_Ampere_Lovelace_IDs {
 		this.RTX3060_TUF_GAMING_OC_V2          = 0x8816;
 		this.RTX3060_TUF_GAMING_O12G           = 0x87F6; //0x2503
 		this.RTX3060_TUF_GAMING_OC_V2_LHR      = 0x8817; //0x2504
-		this.RTX3060_DUAL_GAMING_OC_V2         = 0x881D; //0x2504
+		//this.RTX3060_DUAL_GAMING_OC_V2         = 0x881D; //0x2504
 		this.RTX3060_STRIX_O12G_KO             = 0x8821; //0x2504
+		this.RTX3060_TUF_O12G_OC_DEMON_SLAYER  = 0x8896;
 
 		this.RTX3060TI_STRIX_GAMING            = 0x87BA;
 		this.RTX3060TI_STRIX_GAMING_KO         = 0x883E;
@@ -322,7 +325,7 @@ class Asus_Ampere_Lovelace_IDs {
 		this.RTX3060TI_STRIX_GAMING_V2         = 0x8834;
 		this.RTX3060TI_TUF_GAMING_OC           = 0x87C6;
 		this.RTX3060TI_TUF_GAMING_OC_LHR       = 0x8827;
-		this.RTX3060TI_DUAL_GAMING_OC          = 0x884F; //0x2489
+		//this.RTX3060TI_DUAL_GAMING_OC          = 0x884F; //0x2489
 
 		this.RTX3070_STRIX_GAMING              = 0x87BE;
 		this.RTX3070_STRIX_GAMING_OC           = 0x87D8;
@@ -407,15 +410,16 @@ const Asus3000GPUIDs =
 	new AsusGPUIdentifier(Nvidia.RTX3060, AsusID.RTX3060_TUF_GAMING_OC, "Asus TUF RTX 3060 Gaming O12G Gaming OC"),
 	new AsusGPUIdentifier(Nvidia.RTX3060_LHR, AsusID.RTX3060_TUF_GAMING_OC_V2, "Asus TUF RTX 3060 Gaming O12G Gaming OC V2"),
 	new AsusGPUIdentifier(Nvidia.RTX3060_LHR, AsusID.RTX3060_TUF_GAMING_OC_V2_LHR, "Asus TUF 3060 Gaming O12G Gaming OC V2 LHR"),
-	new AsusGPUIdentifier(Nvidia.RTX3060_LHR, AsusID.RTX3060_DUAL_GAMING_OC_V2, "Asus Dual 3060 V2 OC"),
+	//new AsusGPUIdentifier(Nvidia.RTX3060_LHR, AsusID.RTX3060_DUAL_GAMING_OC_V2, "Asus Dual 3060 V2 OC"),
+	new AsusGPUIdentifier(Nvidia.RTX3060_LHR, AsusID.RTX3060_TUF_O12G_OC_DEMON_SLAYER, "Asus TUF 3060 Gaming OC Demon Slayer"),
+
 
 	new AsusGPUIdentifier(Nvidia.RTX3060TI_LHR, AsusID.RTX3060TI_STRIX_GAMING_V2, "Asus ROG Strix 3060TI O8G Gaming V2"),
 	new AsusGPUIdentifier(Nvidia.RTX3060TI_LHR, AsusID.RTX3060TI_TUF_GAMING_OC_LHR, "Asus TUF 3060TI O8G Gaming OC LHR"),
 	new AsusGPUIdentifier(Nvidia.RTX3060TI, AsusID.RTX3060TI_STRIX_GAMING, "Asus ROG Strix 3060TI O8G Gaming"),
 	new AsusGPUIdentifier(Nvidia.RTX3060TI_LHR, AsusID.RTX3060TI_STRIX_GAMING_KO, "Asus ROG Strix 3060TI O8G Gaming KO"),
 	new AsusGPUIdentifier(Nvidia.RTX3060TI, AsusID.RTX3060TI_TUF_GAMING_OC, "Asus TUF 3060TI O8G Gaming OC"),
-	new AsusGPUIdentifier(Nvidia.RTX3060TI_LHR, AsusID.RTX3060TI_DUAL_GAMING_OC, "Asus ROG Strix 3060TI O8G Gaming LHR"),
-	new AsusGPUIdentifier(Nvidia.RTX3060TI, AsusID.RTX3060TI_STRIX_GAMING_KO_2, "Asus TUF 3060TI O8G KO Gaming OC "),
+	//new AsusGPUIdentifier(Nvidia.RTX3060TI_LHR, AsusID.RTX3060TI_DUAL_GAMING_OC, "Asus ROG Strix 3060TI O8G Gaming LHR"),
 
 	new AsusGPUIdentifier(Nvidia.RTX3070, AsusID.RTX3070_STRIX_GAMING, "Asus ROG Strix 3070 O8G Gaming"),
 	new AsusGPUIdentifier(Nvidia.RTX3070, AsusID.RTX3070_STRIX_GAMING_OC, "Asus ROG Strix 3070 O8G Gaming OC"),
