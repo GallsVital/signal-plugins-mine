@@ -324,7 +324,7 @@ class BinaryUtils{
 		return this.ReadInt32LittleEndian(array.slice(0, 4).reverse());
 	}
 	static WriteInt32LittleEndian(value){
-		return [value & 0xFF, ((value << 8) & 0xFF), ((value<< 16) & 0xFF), ((value << 24) & 0xFF)];
+		return [value & 0xFF, ((value >> 8) & 0xFF), ((value >> 16) & 0xFF), ((value >> 24) & 0xFF)];
 	}
 	static WriteInt32BigEndian(value){
 		return this.WriteInt32LittleEndian(value).reverse();
