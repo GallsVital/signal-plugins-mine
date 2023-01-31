@@ -326,6 +326,7 @@ class Asus_Ampere_Lovelace_IDs {
 		this.RTX3060TI_TUF_GAMING_OC           = 0x87C6;
 		this.RTX3060TI_TUF_GAMING_OC_LHR       = 0x8827;
 		//this.RTX3060TI_DUAL_GAMING_OC          = 0x884F; //0x2489
+		this.RTX3060TI_TUF_O8G_GDDR6X 		   = 0x88AC;
 
 		this.RTX3070_STRIX_GAMING              = 0x87BE;
 		this.RTX3070_STRIX_GAMING_OC           = 0x87D8;
@@ -420,6 +421,7 @@ const Asus3000GPUIDs =
 	new AsusGPUIdentifier(Nvidia.RTX3060TI_LHR, AsusID.RTX3060TI_STRIX_GAMING_KO, "Asus ROG Strix 3060TI O8G Gaming KO"),
 	new AsusGPUIdentifier(Nvidia.RTX3060TI, AsusID.RTX3060TI_TUF_GAMING_OC, "Asus TUF 3060TI O8G Gaming OC"),
 	//new AsusGPUIdentifier(Nvidia.RTX3060TI_LHR, AsusID.RTX3060TI_DUAL_GAMING_OC, "Asus ROG Strix 3060TI O8G Gaming LHR"),
+	new AsusGPUIdentifier(Nvidia.RTX3060TI_GDDR6X, AsusID.RTX3060TI_TUF_O8G_GDDR6X, "Asus TUF 3060TI O8G GDDR6X"),
 
 	new AsusGPUIdentifier(Nvidia.RTX3070, AsusID.RTX3070_STRIX_GAMING, "Asus ROG Strix 3070 O8G Gaming"),
 	new AsusGPUIdentifier(Nvidia.RTX3070, AsusID.RTX3070_STRIX_GAMING_OC, "Asus ROG Strix 3070 O8G Gaming OC"),
