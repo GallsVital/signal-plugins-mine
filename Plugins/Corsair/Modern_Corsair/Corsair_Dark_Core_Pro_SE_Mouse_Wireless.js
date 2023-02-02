@@ -1,7 +1,8 @@
 export function Name() { return "Corsair Dark Core RGB Pro SE Wireless Mode"; }
 export function VendorId() { return 0x1b1c; }
-export function ProductId() { return  0x1B7F; }//0x1B7F
+export function ProductId() { return  [0x1BA6, 0x1B7F]; }
 export function Publisher() { return "WhirlwindFX"; }
+export function Documentation(){ return "troubleshooting/corsair"; }
 export function Size() { return [7, 7]; }
 export function DefaultPosition(){return [225, 120];}
 export function DefaultScale(){return 7.0;}
@@ -22,23 +23,12 @@ export function ControllableParameters(){
 	];
 }
 
-export function Documentation(){ return "troubleshooting/corsair"; }
-
-function hexToRgb(hex) {
-	let result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
-	let colors = [];
-	colors[0] = parseInt(result[1], 16);
-	colors[1] = parseInt(result[2], 16);
-	colors[2] = parseInt(result[3], 16);
-
-	return colors;
-}
-let vLedNames = ["Scroll Wheel",
+const vLedNames = ["Scroll Wheel",
 	"Side Led 1", "Side Led 2", "Side Led 3", "Side Led 4", "Side Led 5", "logo", "Right Side Led",
 	"Dpi 1", "dpi 2", "Dpi 3",
 	"Battery indicator"];
 
-let vLedPositions = [
+const vLedPositions = [
 	[3, 0],
 	[0, 1], [0, 2], [0, 3], [0, 4], [0, 5], [3, 5], [5, 5],
 	[0, 0], [0, 1], [0, 2],
@@ -54,28 +44,15 @@ export function LedPositions() {
 }
 
 function EnableSoftwareControl() {
-	sendPacketString("00 09 01 03 00 02", 65);//software control packet
-	sendPacketString("00 09 02 6E", 65); // Critical
-	sendPacketString("00 09 0D 00 01", 65); // open lighting channel
+	device.write([0x00, 0x09, 0x01, 0x03, 0x00, 0x02], 65);//software control packet
+	device.write([0x00, 0x09, 0x02, 0x6E], 65); // Critical
+	device.write([0x00, 0x09, 0x0D, 0x00, 0x01], 65); // open lighting channel
 	//sendPacketString("00 09 0D 00 02",65) // open endpoint
-
-}
-
-function sendPacketString(string, size){
-	let packet= [];
-	let data = string.split(' ');
-
-	for(let i = 0; i < data.length; i++){
-		packet[parseInt(i, 16)] = parseInt(data[i], 16);//.toString(16)
-	}
-
-	device.write(packet, size);
 }
 
 function ReturnToHardwareControl() {
-	sendPacketString("00 09 01 03 00 01", 65); //hardware control packet
+	device.write([0x00, 0x09, 0x01, 0x03, 0x00, 0x01], 65); //hardware control packet
 }
-
 
 export function Initialize() {
 	EnableSoftwareControl();
@@ -100,6 +77,10 @@ export function Render() {
 	// }
 }
 
+export function Shutdown() {
+	ReturnToHardwareControl();
+}
+
 function sendColors(shutdown = false){
 
 	let packet = [];
@@ -120,17 +101,17 @@ function sendColors(shutdown = false){
 	//00 00 00 00 00 00 00 00 00 00 00 80
 
 	// Fetch color at 1,1
-	let iX = vLedPositions[0][0];
-	let iY = vLedPositions[0][1];
+	const iX = vLedPositions[0][0];
+	const iY = vLedPositions[0][1];
 	var col = device.color(iX, iY);
 
-	let red = new Array(12).fill(0);
-	let green = new Array(12).fill(0);
-	let blue = new Array(12).fill(0);
+	const red = new Array(12).fill(0);
+	const green = new Array(12).fill(0);
+	const blue = new Array(12).fill(0);
 
 	for(let iIdx = 0; iIdx < vLedPositions.length; iIdx++) {
-		let iPxX = vLedPositions[iIdx][0];
-		let iPxY = vLedPositions[iIdx][1];
+		const iPxX = vLedPositions[iIdx][0];
+		const iPxY = vLedPositions[iIdx][1];
 		var col;
 
 		if(shutdown){
@@ -154,12 +135,18 @@ function sendColors(shutdown = false){
 	device.write(packet, 65);
 }
 
-export function Validate(endpoint) {
-	return endpoint.interface === 1;
+function hexToRgb(hex) {
+	const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+	const colors = [];
+	colors[0] = parseInt(result[1], 16);
+	colors[1] = parseInt(result[2], 16);
+	colors[2] = parseInt(result[3], 16);
+
+	return colors;
 }
 
-export function Shutdown() {
-	ReturnToHardwareControl();
+export function Validate(endpoint) {
+	return endpoint.interface === 1;
 }
 
 export function Image() {

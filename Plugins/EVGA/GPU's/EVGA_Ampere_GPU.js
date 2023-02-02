@@ -492,7 +492,7 @@ class EVGAAmpereDeviceIds{
 		this.RTX3080TI_XC3_ULTRA_HYBRID         = 0x3958;
 		this.RTX3090_FTW3_GAMING                = 0x3985;
 		this.RTX3090_FTW3_ULTRA                 = 0x3987;
-		this.RTX3090_FTW3_ULTRA_2               = 0x3387; // UNTESTED
+		this.RTX3090_FTW3_ULTRA_2               = 0x3387;
 		this.RTX3090_FTW3_ULTRA_HC              = 0x3989;
 		this.RTX3090_FTW3_ULTRA_HYBRID          = 0x3988;
 		this.RTX3090_FTW3_ULTRA_HYBRID_V2       = 0x3983;
@@ -599,7 +599,7 @@ class EVGAAmpereGPUList{
 			new EVGAAmpereIdentifier(Nvidia.RTX3090,           EVGAAmpereIds.RTX3090_XC3_ULTRA_HYBRID,          "EVGA RTX 3090 XC3 Ultra Hybrid"),
 			new EVGAAmpereIdentifier(Nvidia.RTX3090,           EVGAAmpereIds.RTX3090_XC3_ULTRA_HC,              "EVGA RTX 3090 XC3 Ultra HydroCopper"),
 			new EVGAAmpereIdentifier(Nvidia.RTX3090,           EVGAAmpereIds.RTX3090_FTW3_ULTRA,                "EVGA RTX 3090 FTW3 Ultra"),
-			//new EVGAAmpereIdentifier(Nvidia.RTX3090,           EVGAAmpereIds.RTX3090_FTW3_ULTRA_2,              "EVGA RTX 3090 FTW3 Ultra"), // UNTESTED
+			new EVGAAmpereIdentifier(Nvidia.RTX3090,           EVGAAmpereIds.RTX3090_FTW3_ULTRA_2,              "EVGA RTX 3090 FTW3 Ultra"),
 			new EVGAAmpereIdentifier(Nvidia.RTX3090,           EVGAAmpereIds.RTX3090_FTW3_ULTRA_V2,             "EVGA RTX 3090 FTW3 Ultra v2"),
 			new EVGAAmpereIdentifier(Nvidia.RTX3090,           EVGAAmpereIds.RTX3090_FTW3_ULTRA_HC,             "EVGA RTX 3090 FTW3 Ultra HydroCopper"),
 			new EVGAAmpereIdentifier(Nvidia.RTX3090,           EVGAAmpereIds.RTX3090_XC3_ULTRA_GAMING,          "EVGA RTX 3090 XC3 Ultra Gaming"),
