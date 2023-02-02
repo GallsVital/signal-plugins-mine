@@ -290,6 +290,7 @@ class NvidiaGPUDeviceIds {
 		this.RTX3070         = 0x2484;
 		this.RTX3070_LHR     = 0x2488;
 		this.RTX3070TI       = 0x2482;
+		this.RTX3070TI_GA102 = 0x2207;
 		this.RTX3080         = 0x2206;
 		this.RTX3080_LHR     = 0x2216;
 		this.RTX3080_GA102   = 0x220A;
@@ -348,7 +349,7 @@ class Asus_Ampere_Lovelace_IDs {
 		this.RTX3070TI_STRIX_GAMING_2          = 0x880F;
 		this.RTX3070TI_TUF_GAMING              = 0x8812;
 		this.RTX3070TI_TUF_GAMING_2            = 0x8813;
-
+		this.RTX3070TI_TUF_GAMING_OC 		   = 0x88BC;
 
 		this.RTX3080_STRIX_GAMING_WHITE        = 0x87D1;
 		this.RTX3080_STRIX_GAMING_WHITE_OC_LHR = 0x8830;
@@ -445,6 +446,8 @@ const Asus3000GPUIDs =
 
 	new AsusGPUIdentifier(Nvidia.RTX3070TI, AsusID.RTX3070TI_TUF_GAMING, "Asus TUF 3070TI Gaming"),
 	new AsusGPUIdentifier(Nvidia.RTX3070TI, AsusID.RTX3070TI_TUF_GAMING_2, "Asus TUF 3070TI Gaming 2"),
+	new AsusGPUIdentifier(Nvidia.RTX3070TI_GA102, AsusID.RTX3070TI_TUF_GAMING_OC, "Asus TUF 3070TI Gaming OC"),
+
 
 	new AsusGPUIdentifier(Nvidia.RTX3080, AsusID.RTX3080_STRIX_GAMING_WHITE, "Asus ROG Strix 3080 O10G White Gaming"),
 	new AsusGPUIdentifier(Nvidia.RTX3080_LHR, AsusID.RTX3080_STRIX_GAMING_WHITE_OC_LHR, "Asus ROG Strix 3080 O10G White OC LHR"),
