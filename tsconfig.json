@@ -25,12 +25,14 @@
 		"baseUrl": ".",
 		"paths": {
 			"@Mock/*": ["tests/*"],
-			"@Types/*":["types/*"]
+			"@Types/*":["types/*"],
+			"performance": ["./types/performance.d.ts"]
 		},
 	},
 	"files": [
 		"./types/globals.d.ts",
 		"./types/device.d.ts",
+		"./types/console.d.ts",
 		"./types/bus.d.ts",
 		"./types/battery.d.ts",
 		"./types/Exports.d.ts",

@@ -36,7 +36,7 @@
         "semi":"warn",
         "consistent-return": "warn",
         "curly":"warn",
-        "no-console": "error",
+        //"no-console": "error",
         "no-var": "warn",
         "no-useless-return":"warn",
         "brace-style": ["warn","1tbs", { "allowSingleLine": true }],
