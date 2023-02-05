@@ -1,6 +1,6 @@
 export function Name() { return "Razer Kraken V3"; }
 export function VendorId() { return 0x1532; }
-export function ProductId() { return 0x0549; }
+export function ProductId() { return [0x0533, 0x0537, 0x0549]; }
 export function Publisher() { return "WhirlwindFX"; }
 export function Documentation(){ return "troubleshooting/razer"; }
 export function Size() { return [2, 2]; }
