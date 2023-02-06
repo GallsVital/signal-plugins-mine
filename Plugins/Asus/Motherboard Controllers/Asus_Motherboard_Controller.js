@@ -93,7 +93,7 @@ const ASUS_RESPONSE_CONFIGTABLE = 0x30;
 const ASUS_CONFIG_ARGB_CHANNELS = 0x06;
 const ASUS_CONFIG_MAINBOARD_LEDS = 31;
 const ASUS_CONFIG_12V_HEADERS = 33;
-
+//31, B1, 31 01, 31 02, 31 03, 31 04
 const ASUS_MAINBOARD_DIRECTIDX = 4;
 const ASUS_MODE_DIRECT = 0xFF;
 // AULA3-AR32-0207 - 3 mainboard, 3 ARGB, 1 12V - ROG STRIX Z690 GAMING WIFI
@@ -113,7 +113,8 @@ const DeviceInfo = {
 	MainChannelLedCount: 0,
 	ARGBChannelCount: 0,
 	MainBoardLedCount: 0,
-	RGBHeaderCount: 0
+	RGBHeaderCount: 0,
+	PolymoSupport : 0
 };
 
 
@@ -130,6 +131,7 @@ export function Initialize() {
 	}
 
 	//this is updated after loading so it won't display in the editor
+	CreatePolymoSubdevice();
 	CreateMainBoardLeds();
 
 	if(!disableRGBHeaders){
@@ -139,11 +141,23 @@ export function Initialize() {
 	// Set Mainboard to direct Mode
 	SetChannelModeDirect(0);
 
-	//set all ARGB channels to direct mode
+	if(DeviceInfo.PolymoSupport)
+	{
+			//set all ARGB channels to direct mode
+	for(let channel = 1; channel < DeviceInfo.ARGBChannelCount + 2; channel++){ //I offset the total count to account for polymo.
+		SetChannelModeDirect(channel);
+		ChannelArray.push([`Channel ${channel}`, Device_ChannelLedLimit]);
+	}
+	}
+	else
+	{
+			//set all ARGB channels to direct mode
 	for(let channel = 1; channel < DeviceInfo.ARGBChannelCount + 1; channel++){
 		SetChannelModeDirect(channel);
 		ChannelArray.push([`Channel ${channel}`, Device_ChannelLedLimit]);
 	}
+	}
+
 
 	// For Component Backend
 	SetupChannels();
@@ -158,9 +172,62 @@ export function Shutdown() {
 export function Render() {
 	SendMainBoardLeds();
 
-	for(let channel = 0; channel < DeviceInfo.ARGBChannelCount; channel++){
-		SendARGBChannel(channel);
+	if(DeviceInfo.PolymoSupport)
+	{
+		sendPolymoColors();
+		for(let channel = 0; channel < DeviceInfo.ARGBChannelCount; channel++){
+			SendARGBChannel(channel, true);
+		}
 	}
+	else
+	{
+		for(let channel = 0; channel < DeviceInfo.ARGBChannelCount; channel++){
+			SendARGBChannel(channel);
+		}
+	}
+
+}
+
+const polymoDevice =
+{
+	Names : [ "ROG Logo LED 1", "ROG Logo LED 2", "ROG Logo LED 3", "ROG Logo LED 4", "ROG Logo LED 5", "ROG Logo LED 6", "ROG Logo LED 7", "ROG Logo LED 8", "ROG Logo LED 9", "ROG Logo LED 10", "ROG Logo LED 11", "Hero LED 1", "Hero LED 2", "Hero LED 3", "Hero LED 4", "Hero LED 5", "Hero LED 6", "Hero LED 7" ],
+	Positions : [ [3, 0], [3, 1], [3, 2], [3, 3], [3, 4], [3, 5], [3, 6], [3, 7], [3, 8], [3, 9], [3, 10], [0, 11], [1, 11], [2, 11], [3, 11], [4, 11], [5, 11], [6, 11] ]
+}
+
+function CreatePolymoSubdevice()
+{
+	if(DeviceInfo.PolymoSupport)
+	{
+		device.createSubdevice("Polymo");
+		device.setSubdeviceName("Polymo", `${device.getMotherboardName()} - Polymo Panel`);
+		device.setSubdeviceSize("Polymo", 7, 12);
+		device.setSubdeviceLeds("Polymo", polymoDevice.Names, polymoDevice.Positions);
+	}
+}
+
+function sendPolymoColors(shutdown = false)
+{
+	const RGBData = [];
+
+	for(let polymoLEDs = 0; polymoLEDs < polymoDevice.Positions.length; polymoLEDs++) {
+		const iX = polymoDevice.Positions[polymoLEDs][0];
+		const iY = polymoDevice.Positions[polymoLEDs][1];
+		let color;
+
+		if(shutdown) {
+			color = hexToRgb(shutdownColor);
+		} else if (LightingMode == "Forced") {
+			color = hexToRgb(forcedColor);
+		} else {
+			color = device.subdeviceColor("Polymo", iX, iY);
+		}
+		const ledIdx = polymoLEDs * 3;
+		RGBData[ledIdx] = color[0];
+		RGBData[ledIdx + 1] = color[1];
+		RGBData[ledIdx + 2] = color[2];
+	}
+	
+	StreamDirectColors(0, RGBData, 18);
 }
 
 function SetMotherboardName(){
@@ -277,7 +344,7 @@ function Fetch12VHeaderColors(shutdown = false){
 	return [RGBData, TotalLedCount];
 }
 
-function SendARGBChannel(ChannelIdx, shutdown = false) {
+function SendARGBChannel(ChannelIdx, polymo = false) {
 	//Fetch Colors
 	let ChannelLedCount = device.channel(ChannelArray[ChannelIdx][0]).LedCount();
 	const componentChannel = device.channel(ChannelArray[ChannelIdx][0]);
@@ -297,33 +364,15 @@ function SendARGBChannel(ChannelIdx, shutdown = false) {
 		RGBData = device.channel(ChannelArray[ChannelIdx][0]).getColors("Inline", RGBconfig);
 	}
 
+	if(polymo)
+	{
+		StreamDirectColors(ChannelIdx + 1, RGBData, ChannelLedCount);
+	}
+	else
+	{
+		StreamDirectColors(ChannelIdx, RGBData, ChannelLedCount);
+	}
 
-	StreamDirectColors(ChannelIdx, RGBData, ChannelLedCount);
-
-}
-
-
-//Protocol Functions
-function sendColorPacket(start, count, data){
-
-	//these mask's are awful to find out
-	const mask = (((1 << count) -1)<< start);
-
-	let packet = [];
-	packet[0] = 0xEC;
-	packet[1] = 0x36;
-	packet[2] = mask >> 8;
-	packet[3] = mask & 0xFF;
-	packet[4] = 0x00;
-
-	packet = packet.concat(data);
-	device.write(packet, 65);
-}
-
-
-function sendCommit(){
-	const packet = [ASUS_COMMAND, 0x3f, 0x55];
-	device.write(packet, Device_Write_Length);
 }
 
 
@@ -403,8 +452,19 @@ function ParseConfigTable(){
 		}
 	}
 
-	DeviceInfo.ARGBChannelCount = DeviceInfo.ConfigTable[ASUS_CONFIG_ARGB_CHANNELS];
-	device.log(`ARGB channel Count ${DeviceInfo.ARGBChannelCount} `, {toFile: true});
+	if(DeviceInfo.ConfigTable[ASUS_CONFIG_ARGB_CHANNELS] === 4)
+	{
+		DeviceInfo.ARGBChannelCount = DeviceInfo.ConfigTable[ASUS_CONFIG_ARGB_CHANNELS] - 1;
+		device.log(`ARGB channel Count ${DeviceInfo.ARGBChannelCount} `, {toFile: true});
+		DeviceInfo.PolymoSupport = 1;
+		device.log("Motherboard has a Polymo Panel.");
+	}
+	else
+	{
+		DeviceInfo.ARGBChannelCount = DeviceInfo.ConfigTable[ASUS_CONFIG_ARGB_CHANNELS];
+		device.log(`ARGB channel Count ${DeviceInfo.ARGBChannelCount} `, {toFile: true});
+	}
+
 
 	DeviceInfo.MainChannelLedCount = DeviceInfo.ConfigTable[ASUS_CONFIG_MAINBOARD_LEDS];
 	device.log(`MainBoard Led Count ${DeviceInfo.MainChannelLedCount} `, {toFile: true});
