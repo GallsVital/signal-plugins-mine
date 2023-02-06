@@ -1,21 +1,8 @@
-
-
-function CalculateCrc(report) {
-	let iCrc = 0;
-
-	for (let iIdx = 3; iIdx < 89; iIdx++) {
-		iCrc ^= report[iIdx];
-	}
-
-	return iCrc;
-}
-
-
 export function Name() { return "Razer Kraken 7.1 V2"; }
 export function VendorId() { return 0x1532; }
-export function Documentation(){ return "troubleshooting/razer"; }
-export function ProductId() { return 0x0510; }
+export function ProductId() { return [0x0510, 0x0504]; }
 export function Publisher() { return "WhirlwindFX"; }
+export function Documentation(){ return "troubleshooting/razer"; }
 export function Size() { return [2, 2]; }
 export function Type() { return "Hid"; }
 export function DefaultPosition() {return [75, 70]; }
@@ -34,33 +21,14 @@ export function ControllableParameters(){
 	];
 }
 
-function sendPacketString(string, size){
-	let packet= [];
-	let data = string.split(' ');
-
-	for(let i = 0; i < data.length; i++){
-		packet[parseInt(i, 16)] = parseInt(data[i], 16);//.toString(16)
-	}
-
-	device.write(packet, size);
-}
-
-function hexToRgb(hex) {
-	let result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
-	let colors = [];
-	colors[0] = parseInt(result[1], 16);
-	colors[1] = parseInt(result[2], 16);
-	colors[2] = parseInt(result[3], 16);
-
-	return colors;
-}
-let vLedNames = [
+const vLedNames = [
 	"Both Cans"
 ];
 
-let vLedPositions = [
+const vLedPositions = [
 	[0, 0]
 ];
+
 export function LedNames() {
 	return vLedNames;
 }
@@ -69,14 +37,20 @@ export function LedPositions() {
 	return vLedPositions;
 }
 
-
 export function Initialize() {
-	sendPacketString("40 01 00 00 08", 9);//software control packet
+	device.write([0x40, 0x01, 0x00, 0x00, 0x08], 9);//software control packet
+}
 
+export function Render() {
+	SendPacket();
+}
+
+export function Shutdown(){
+	SendPacket(true);
 }
 
 function SendPacket(shutdown = false) {
-	let packet = [];
+	const packet = [];
 	packet[0] = 0x04;
 	packet[1] = 0x40;
 	packet[2] = 0x03;
@@ -85,8 +59,8 @@ function SendPacket(shutdown = false) {
 
 
 	let color;
-	let iPxX = vLedPositions[0][0];
-	let iPxY = vLedPositions[0][1];
+	const iPxX = vLedPositions[0][0];
+	const iPxY = vLedPositions[0][1];
 
 	if(shutdown){
 		color = hexToRgb(shutdownColor);
@@ -105,17 +79,14 @@ function SendPacket(shutdown = false) {
 
 }
 
+function hexToRgb(hex) {
+	const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+	const colors = [];
+	colors[0] = parseInt(result[1], 16);
+	colors[1] = parseInt(result[2], 16);
+	colors[2] = parseInt(result[3], 16);
 
-export function Render() {
-	SendPacket();
-
-
-}
-
-
-export function Shutdown(){
-	SendPacket(true);
-
+	return colors;
 }
 
 export function Validate(endpoint) {
