@@ -137,6 +137,7 @@ const PALITGPUIDs =
 	new PALITGPUIdentifier(0x2204, 0x2204, "PALIT RTX 3090 Gaming Pro"),
 	new PALITGPUIdentifier(0x2216, 0x2216, "PALIT RTX 3080 Gaming Pro"),
 	new PALITGPUIdentifier(0x2484, 0x2484, "PALIT RTX 3070 Gaming Pro"),
+	new PALITGPUIdentifier(0x2488, 0x2488, "PALIT RTX 3070 Gaming Pro"),
 	new PALITGPUIdentifier(0x2484, 0xf280, "PALIT RTX 3070 JetStream"),
 ];
 
