@@ -90,7 +90,7 @@ export function ControllableParameters() {
 			"values":["Off", "Static", "Breathing", "Strobe", "Spectrum Cycle", "Wave", "Spring", "Stack", "Cram", "Scan", "Neon", "Water", "Rainbow"], "default":"Static"},
 		{"property":"Zone8Speed", "group":"lighting", "label":"Audio Speed", "type":"number", "min":"0", "max":"255", "default":"80"},
 
-		{"property":"ARGBMode", "group":"", "label":"SignalRGB Support", "type":"boolean", "default": "true"},
+		{"property":"ARGBMode", "group":"", "label":"SignalRGB Canvas Support", "type":"boolean", "default": "true"},
 	];
 }
 
@@ -106,7 +106,7 @@ const RGBConfigs = {
 	"GRB" : [1, 0, 2]
 };
 
-//export function SupportsSubdevices(){ return true; }
+export function SupportsSubdevices(){ return true; }
 
 export function LedNames() {
 	return vLedNames;
@@ -455,8 +455,19 @@ const HeaderArray =
 	"12v RGB Header 2"
 ];
 
-const ConfigurationOverrides =
+const ConfigurationOverrides = //Leave this here for now. Just in case
 {
+	"B660M-C":
+	{
+		RGBHeader1Exists : 1,
+		RGBHeader2Exists : 0,
+		Header1Length : 80,
+		Header2Length : 80,
+		Header3Length : 80,
+		PCHLength : 0, //30 WHICH IS CORRECT FOR EMPTY
+		IOShieldLength : 0, //30 WHICH IS CORRECT FOR EMPTY
+		PCBLength : 0, //5
+	},
 	"Z690 Taichi Razer Edition": //This is still wrong. I need more testing, but my board committed seppuku.
 	{
 		RGBHeader1Exists : 1,
@@ -466,7 +477,7 @@ const ConfigurationOverrides =
 		Header3Length : 80,
 		PCHLength : 46,
 		IOShieldLength : 6,
-		UnderglowLength : 12,
+		PCBLength : 12,
 	},
 	"Z690 PG Velocita":
 	{
@@ -475,76 +486,108 @@ const ConfigurationOverrides =
 		Header1Length : 80,
 		Header2Length : 80,
 		Header3Length : 80,
+		PCHLength : 6, //6
+		IOShieldLength : 7, //7
+		PCBLength : 0, //13
+	},
+	"Z790-C":
+	{
+		RGBHeader1Exists : 1,
+		RGBHeader2Exists : 0,
+		Header1Length : 80,
+		Header2Length : 80,
+		Header3Length : 80,
+		PCHLength : 0, //5
+		IOShieldLength : 0, //7
+		PCBLength : 0, //13
+	},
+	"Z790 Pro RS":
+	{
+		RGBHeader1Exists : 1,
+		RGBHeader2Exists : 0,
+		Header1Length : 80,
+		Header2Length : 80,
+		Header3Length : 80,
+		PCHLength : 16, //16
+		IOShieldLength : 0, //4
+		PCBLength : 0, //13
+	},
+	"X670E PG Lightning":
+	{
+		RGBHeader1Exists : 1,
+		RGBHeader2Exists : 0,
+		Header1Length : 80,
+		Header2Length : 80,
+		Header3Length : 80,
+		PCHLength : 0,
+		IOShieldLength : 0,
+		PCBLength : 0,
+	},
+	"X670E Steel Legend":
+	{
+		RGBHeader1Exists : 1,
+		RGBHeader2Exists : 0,
+		Header1Length : 80,
+		Header2Length : 80,
+		Header3Length : 80,
 		PCHLength : 6,
-		IOShieldLength : 7,
-		UnderglowLength : 0,
+		IOShieldLength : 0, //Detected as 7.
+		PCBLength : 15,
+	},
+	"X670E Taichi":
+	{
+		RGBHeader1Exists : 1,
+		RGBHeader2Exists : 0,
+		Header1Length : 80,
+		Header2Length : 80,
+		Header3Length : 80,
+		PCHLength : 5,
+		IOShieldLength : 0, //Detected as 7.
+		PCBLength : 6,
 	}
 };
 
-let RGBHeader1Exists = 0;
-let RGBHeader2Exists = 0;
-let Header1Length = 0;
-let Header2Length = 0;
-let Header3Length = 0;
-let PCHLength = 0;
-let IOShieldLength = 0;
-let UnderglowLength = 0;
-let TotalDeviceLEDs = 0;
+const deviceZones =
+{
+	RGBHeader1  : 0,
+	RGBHeader2  : 0,
+	ARGBHeader1 : 0,
+	ARGBHeader2 : 0,
+	PCH			: 0,
+	IOShield	: 0,
+	PCB			: 0,
+	ARGBHeader3 : 0
+}
 
 function LEDConfig() {
-	const LEDCounts = ReadConfig(2);
-	device.log(LEDCounts);
-	RGBHeader1Exists = LEDCounts[5];
-	RGBHeader2Exists = LEDCounts[6];
-	Header1Length = LEDCounts[7];
-	Header2Length = LEDCounts[8];
-	PCHLength = LEDCounts[9];
-	Header3Length = LEDCounts[12];
-	device.log("PCH Length: " + PCHLength);
+	const zoneLEDCounts = ReadConfig(2);
+	device.log(zoneLEDCounts);
 
-	if(PCHLength === 30) {
-		PCHLength = 0; //Empty
+
+	device.write([0x00, 0x14, 0x00, 0x01], 65);
+	const returnPacket = device.read([0x00], 65);
+	const comparisonValue = returnPacket[5];
+
+	for(let zone = 0; zone < 8; zone++)
+	{
+		const disabledZone = isZoneDisabled(comparisonValue, zone);
+		if(!disabledZone)
+		{
+			if(zoneLEDCounts[5 + zone] !== 30)
+			{
+				deviceZones[zone] = zoneLEDCounts[5 + zone];
+			}
+		}
 	}
+}
 
-	IOShieldLength = LEDCounts[10];
-	device.log("IOShield Length: " + IOShieldLength);
-
-	if(IOShieldLength === 30) {
-		IOShieldLength = 0; //Empty
-	}
-
-	UnderglowLength = LEDCounts[11];
-	device.log("PCB Length: " + UnderglowLength);
-
-	if(UnderglowLength === 30) {
-		UnderglowLength = 0; //Empty
-	}
-
-	if(Header3Length === 1 || Header3Length === 30) {
-		Header3Length = 0; //If we have one nonexistent led, pretend we don't. Stop ruining my led count logic.
-	}
-
-	//AudioLength = LEDCounts[12]; Audio no longer exists lol.
-	if(device.getMotherboardName() in ConfigurationOverrides) {
-		RGBHeader1Exists = ConfigurationOverrides[device.getMotherboardName()]["RGBHeader1Exists"];
-		RGBHeader2Exists = ConfigurationOverrides[device.getMotherboardName()]["RGBHeader2Exists"];
-		Header1Length = ConfigurationOverrides[device.getMotherboardName()]["Header1Length"];
-		Header2Length = ConfigurationOverrides[device.getMotherboardName()]["Header2Length"];
-		PCHLength = ConfigurationOverrides[device.getMotherboardName()]["PCHLength"];
-		IOShieldLength = ConfigurationOverrides[device.getMotherboardName()]["IOShieldLength"];
-		UnderglowLength = ConfigurationOverrides[device.getMotherboardName()]["UnderglowLength"];
-		Header3Length = ConfigurationOverrides[device.getMotherboardName()]["Header3Length"];
-		device.log("Override PCH Length: " + PCHLength);
-		device.log("Override IOShield Length: " + IOShieldLength);
-		device.log("Override PCB Length: " + UnderglowLength);
-	}
-
-	TotalDeviceLEDs = (RGBHeader1Exists + RGBHeader2Exists + Header1Length + Header2Length + Header3Length + PCHLength + IOShieldLength + UnderglowLength);
+function isZoneDisabled(value, bitIndex){
+	return !((value >> bitIndex) & 1)
 }
 
 function removeChannels()
 {
-	for(let i = 0; i < 3; i++){
+	for(let i = 0; i < 5; i++){
 		device.removeChannel(ChannelArray[i][0], ChannelArray[i][1]);
 	}
 }
@@ -563,15 +606,15 @@ let ARGBHeaders = 0;
 function CreateARGBHeaders() {
 	ARGBHeaders = 0; //Let's not have 20 ARGB Headers lol.
 
-	if(Header1Length > 1) {
+	if(deviceZones[2] > 1) {
 		ARGBHeaders++;
 	}
 
-	if(Header2Length > 1) {
+	if(deviceZones[3] > 1) {
 		ARGBHeaders++;
 	}
 
-	if(Header3Length > 30) {
+	if(deviceZones[7] > 30) {
 		ARGBHeaders++;
 	}
 
@@ -586,7 +629,7 @@ function CreateRGBHeaders() {
 		device.removeSubdevice(HeaderArray[header]);
 	}
 
-	if(RGBHeader1Exists === 1) {
+	if(deviceZones[0] === 1) {
 		device.createSubdevice(HeaderArray[0]);
 
 		device.setSubdeviceName(HeaderArray[0], `${"Asrock RGB Controller"} - ${HeaderArray[0]}`);
@@ -595,7 +638,7 @@ function CreateRGBHeaders() {
 		RGBHeaders = 1;
 	}
 
-	if(RGBHeader2Exists === 1) {
+	if(deviceZones[1] === 1) {
 		device.createSubdevice(HeaderArray[1]);
 
 		device.setSubdeviceName(HeaderArray[1], `${"Asrock RGB Controller"} - ${HeaderArray[1]}`);
@@ -608,10 +651,10 @@ function CreateRGBHeaders() {
 
 function CreatePCHZone() {
 
-	const PCHLEDs = vPCHLEDs.slice(0, PCHLength);
-	const PCHPositions = vPCHPositions.slice(0, PCHLength);
+	const PCHLEDs = vPCHLEDs.slice(0, deviceZones[4]);
+	const PCHPositions = vPCHPositions.slice(0, deviceZones[4]);
 
-	if(PCHLength > 0) {
+	if(deviceZones[4] > 0) {
 		device.createSubdevice("PCH");
 
 		device.setSubdeviceName("PCH", `${"Asrock RGB Controller"} - ${"PCH"}`);
@@ -623,10 +666,10 @@ function CreatePCHZone() {
 }
 
 function CreateIOShieldZone() {
-	const IOShieldLEDs = vIOShieldLEDs.slice(0, IOShieldLength);
-	const IOShieldPositions = vIOShieldPositions.slice(0, IOShieldLength);
+	const IOShieldLEDs = vIOShieldLEDs.slice(0, deviceZones[5]);
+	const IOShieldPositions = vIOShieldPositions.slice(0, deviceZones[5]);
 
-	if(IOShieldLength > 0) {
+	if(deviceZones[5] > 0) {
 		device.createSubdevice("IO Shield");
 
 		device.setSubdeviceName("IO Shield", `${"Asrock RGB Controller"} - ${"IO Shield"}`);
@@ -638,10 +681,10 @@ function CreateIOShieldZone() {
 }
 
 function CreatePCBZone() {
-	const PCBLEDs = vPCBLEDs.slice(0, UnderglowLength);
-	const PCBPositions = vPCBPositions.slice(0, UnderglowLength);
+	const PCBLEDs = vPCBLEDs.slice(0, deviceZones[6]);
+	const PCBPositions = vPCBPositions.slice(0, deviceZones[6]);
 
-	if(UnderglowLength > 0) {
+	if(deviceZones[6] > 0) {
 		device.createSubdevice("PCB");
 
 		device.setSubdeviceName("PCB", `${"Asrock RGB Controller"} - ${"PCB"}`);
@@ -681,7 +724,7 @@ function grabMoboData(shutdown = false) {
 	const IOShieldData = [];
 	const PCBData = [];
 
-	for(let iIdx = 0; iIdx < PCHLength; iIdx++) {
+	for(let iIdx = 0; iIdx < deviceZones[4]; iIdx++) {
 		const iPxX = vPCHPositions[iIdx][0];
 		const iPxY = vPCHPositions[iIdx][1];
 		let col;
@@ -699,7 +742,7 @@ function grabMoboData(shutdown = false) {
 		PCHData[iLedIdx+2] = col[RGBConfigs[Mainboardconfig][2]];;
 	}
 
-	for(let iIdx = 0; iIdx < IOShieldLength; iIdx++) {
+	for(let iIdx = 0; iIdx < deviceZones[5]; iIdx++) {
 		const iPxX = vIOShieldPositions[iIdx][0];
 		const iPxY = vIOShieldPositions[iIdx][1];
 		let col;
@@ -717,7 +760,7 @@ function grabMoboData(shutdown = false) {
 		IOShieldData[iLedIdx+2] = col[RGBConfigs[Mainboardconfig][2]];;
 	}
 
-	for(let iIdx = 0; iIdx < UnderglowLength; iIdx++) {
+	for(let iIdx = 0; iIdx < deviceZones[6]; iIdx++) {
 		const iPxX = vPCBPositions[iIdx][0];
 		const iPxY = vPCBPositions[iIdx][1];
 		let col;
@@ -751,7 +794,7 @@ function grabRGBData(Channel) {
 		RGBData = device.createColorArray(forcedColor, ChannelLedCount, "Inline", RGBconfig);
 
 	} else if(componentChannel.shouldPulseColors()) {
-		ChannelLedCount = Header1Length;
+		ChannelLedCount = 80;
 
 		const pulseColor = device.getChannelPulseColor(ChannelArray[Channel][0], ChannelLedCount);
 		RGBData = device.createColorArray(pulseColor, ChannelLedCount, "Inline", RGBconfig);

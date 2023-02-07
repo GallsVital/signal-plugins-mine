@@ -29,9 +29,9 @@ export function ConflictingProcesses()
 
 const devicePIDs =
 [
-	0x7B93, 0x7C34, 0x7C35, 0x7C36, 0x7C37, 0x7C56, 0x7C59, 0x7C70, 0x7C71, 0x7C73, 0x7C75, 0x7C76, 0x7C77, 0x7C79, 0x7C80, 0x7C81, 0x7C82, 0x7C83, 0x7C84, 0x7C85, 0x7C86, 0x7C88, 0x7C89, 0x7C90, 0x7C91, 0x7C92, 0x7C94, 0x7C95, 0x7C98, 0x7C99, 0x7D03, 0x7D04, 0x7D05, 0x7D06, 0x7D07, 0x7D08, 0x7D09, 0x7D10, 0x7D11, 0x7D12, 0x7D13, 0x7D14, 0x7D15, 0x7D16, 0x7D17, 0x7D18, 0x7D19, 0x7D20, 0x7D21, 0x7D22, 0x7D25, 0x7D27, 0x7D28, 0x7D29, 0x7D30, 0x7D31, 0x7D32, 0x7D36, 0x7D37, 0x7D38, 0x7D40, 0x7D41, 0x7D42, 0x7D43, 0x7D45, 0x7D46, 0x7D50, 0x7D52, 0x7D53, 0x7D54, 0x7D59
+	0x7B93, 0x7C34, 0x7C35, 0x7C36, 0x7C37, 0x7C56, 0x7C59, 0x7C70, 0x7C71, 0x7C73, 0x7C75, 0x7C76, 0x7C77, 0x7C79, 0x7C80, 0x7C81, 0x7C82, 0x7C83, 0x7C84, 0x7C85, 0x7C86, 0x7C88, 0x7C89, 0x7C90, 0x7C91, 0x7C92, 0x7C94, 0x7C95, 0x7C98, 0x7C99, 0x7D03, 0x7D04, 0x7D05, 0x7D06, 0x7D07, 0x7D08, 0x7D09, 0x7D10, 0x7D11, 0x7D12, 0x7D13, 0x7D14, 0x7D15, 0x7D16, 0x7D17, 0x7D18, 0x7D19, 0x7D20, 0x7D21, 0x7D22, 0x7D25, 0x7D27, 0x7D28, 0x7D29, 0x7D30, 0x7D31, 0x7D32, 0x7D36, 0x7D37, 0x7D38, 0x7D40, 0x7D41, 0x7D42, 0x7D43, 0x7D45, 0x7D46, 0x7D50, 0x7D52, 0x7D53, 0x7D54, 0x7D59, 0x7D74,0x7D67, 0x7D69, 0x7D70,  0x7D86, 0x7D91, 0x7D97, 0x7E07
 ];
-//Temporarily Axed. 0x7D67, 0x7D69, 0x7D70, 0x7D74, 0x7D86, 0x7D91, 0x7D97, 0x7E07
+//Temporarily Axed. 
 let ParentDeviceName = "Mystic Light Controller";
 
 export function SupportsSubdevices(){ return true; }
@@ -50,6 +50,7 @@ let ARGBHeaders = 0;
 let OnboardLEDs = 0;
 let JPipeLEDs = 0;
 let RGBHeaders = 0;
+let gen2Support = false;
 
 export function LedNames()
 {
@@ -65,6 +66,7 @@ export function Initialize()
 {
 	MSIMotherboard.checkPerLEDSupport();
 	MSIMotherboard.createLEDs();
+	MSIMotherboard.detectGen2Support();
 	device.setName(device.getMotherboardName());
 }
 
@@ -72,14 +74,20 @@ export function Render()
 {
 	if(perLED === true)
 	{
-		if(ARGBHeaders > 1 && CorsairHeaders > 0)
+		if(ARGBHeaders > 2 || ARGBHeaders > 1 && CorsairHeaders > 0)
 		{
-			//MSIMotherboard.sendSplitPacketARGB();
-			MSIMotherboard.sendARGB(); //I'm leaving the logic here for later. I will fix this.
+			if(gen2Support)
+			{
+				MSIMotherboard.sendGen2SplitPacketARGB();
+			}
+			else
+			{
+				MSIMotherboard.sendGen1SplitPacketARGB();
+			}
 		}
 		else
 		{
-			MSIMotherboard.sendARGB();
+			MSIMotherboard.sendGen1ARGB();
 		}
 	}
 	else
@@ -936,7 +944,7 @@ class MysticLight
 			{
 				OnboardLEDs    : 6,
 				RGBHeaders     : 1,
-				ARGBHeaders    : 3,
+				ARGBHeaders    : 3, //Headers are out of order. 
 				JPipeLEDs	   : 0,
 				CorsairHeaders : 0,
 				//PERLED
@@ -1183,10 +1191,10 @@ class MysticLight
 			0x01, 0x00, 0x00, 0x00, 0x2a, 0x00, 0x00, 0x00, 0x80, 0x00, //JPipe1
 			0x01, 0x00, 0x00, 0x00, 0x2a, 0x00, 0x00, 0x00, 0x80, 0x00, //JPipe2
 			0x25, 0x00, 0x00, 0x00, 0x29, 0x00, 0x00, 0x00, 0x80, 0x00, 0xC8, //JRainbow1 //Extra Byte determines number of leds We're keeping these capped at 75 for now. No boom. This does give headroom for up to 200.
-			0x25, 0x00, 0x00, 0x00, 0x29, 0x00, 0x00, 0x00, 0x80, 0x00, 0xF0, //JRainbow2
-			0x25, 0x00, 0x00, 0x00, 0x29, 0x00, 0x00, 0x00, 0x82, 0x00, 0xF0, //JRainbow3 or Corsair?
+			0x25, 0x00, 0x00, 0x00, 0x29, 0x00, 0x00, 0x00, 0x80, 0x00, 0xf0, //JRainbow2
+			0x25, 0x00, 0x00, 0x00, 0x29, 0x00, 0x00, 0x00, 0x82, 0x00, 0xf0, //JRainbow3 or Corsair?
 			0x01, 0x00, 0x00, 0x00, 0x28, 0x00, 0x00, 0x00, 0x80, 0x00, //JCorsair other?
-			0x25, 0x00, 0x00, 0x00, 0xa9, 0x00, 0x00, 0x00, 0x9f, 0x00, //JOnboard1
+			0x25, 0x00, 0x00, 0x00, 0xa9, 0x00, 0x00, 0x00, 0xb1, 0x00, //JOnboard1
 			0x01, 0x00, 0x00, 0x00, 0x28, 0x00, 0x00, 0x00, 0x80, 0x00, //JOnboard2
 			0x01, 0x00, 0x00, 0x00, 0x28, 0x00, 0x00, 0x00, 0x80, 0x00, //JOnboard3
 			0x01, 0x00, 0x00, 0x00, 0x28, 0x00, 0x00, 0x00, 0x80, 0x00, //JOnboard4
@@ -1421,10 +1429,9 @@ class MysticLight
 	///////////////////////////////////////////////////////////////////////PERLED
 	PerLEDInit()
 	{
-		if(ARGBHeaders > 1 && CorsairHeaders > 0)
+		if(ARGBHeaders > 2 || ARGBHeaders > 1 && CorsairHeaders > 0)
 		{
-			//device.send_report(this.splitPerLEDPacket, 185);
-			device.send_report(this.perledpacket, 185); //Same. Will come back later for you.
+			device.send_report(this.splitPerLEDPacket, 185);
 		}
 		else
 		{
@@ -1500,6 +1507,58 @@ class MysticLight
     	return RGBData.concat(new Array((ChannelLedLimit*3) - RGBData.length).fill(0));
 	}
 
+	detectGen2Support()
+	{
+		device.clearReadBuffer();
+		this.setARGBGen2Mode(2, 1);
+		device.pause(5000);
+		const ARGBGen2 = this.getARGBGen2Mode(2);
+		
+		if(ARGBGen2)
+		{
+			gen2Support = true;
+			device.log("Gen 2 Supported.")
+		}
+
+		this.setARGBGen2Mode(2, 0);
+	}
+
+	detectARGBGen2(port)
+	{
+		device.write([0x01, 0x82, 0x00, 0x00, 0x00, 0x00, port], 64);
+		const returnPacket = device.read([0x01, 0x82], 64);
+		const gen2DeviceSupport = false;
+		if(returnPacket[7] !== 0)
+		{
+			device.log(`Port ${port} has Gen 2 Devices Connected to it.`)
+			gen2DeviceSupport = true;
+
+		}
+		else
+		{
+			device.log(`Port ${port} has no Gen 2 Devices Connected.`)
+		}
+		device.log(returnPacket[6]); //Port
+		device.log(returnPacket[7]); //Gen 2 Strips.
+
+		return gen2DeviceSupport;
+	}
+
+	getARGBGen2Mode(port)
+	{
+		device.write([0x01, 0x80, 0x00, 0x00, 0x00, 0x00, port], 64);
+		const returnPacket = device.read([0x01, 0x80], 64);
+		device.log(returnPacket);
+		const Gen2Enabled = returnPacket[7];
+
+		return Gen2Enabled;
+	}
+
+	setARGBGen2Mode(port, enable)
+	{
+		device.write([0x01, 0x84, 0x00, 0x00, 0x00, 0x00, port, enable], 64);
+	}
+
 	grabZones()
 	{
 		let OnboardLEDData = [];
@@ -1518,7 +1577,7 @@ class MysticLight
 		return [ OnboardLEDData, RGBHeaderData ];
 	}
 
-	sendARGB()
+	sendGen1ARGB()
 	{
 		let [OnboardLEDData, RGBHeaderData] = this.grabZones();
 		let packet = [0x53, 0x25, 0x06, 0x00, 0x00];
@@ -1541,18 +1600,61 @@ class MysticLight
 		device.send_report(packet, 725);
 	}
 
-	sendSplitPacketARGB()//This only gets called if a user has 2 argb headers AND a Corsair header, meaning I can safely hardcode some things.
+	sendGen1SplitPacketARGB()
 	{
 		let [OnboardLEDData, RGBHeaderData] = this.grabZones();
 		OnboardLEDData.push(...RGBHeaderData); //Why did I separate these in the first place?
-		let jRainbow1Data = this.grabChannelRGBData(0);
-		let jRainbow2Data = this.grabChannelRGBData(1);
-		let jCorsairData = this.grabChannelRGBData(2);
+		let header1Data = this.grabChannelRGBData(0);
+		let header2Data = this.grabChannelRGBData(1);
+		let header3Data = this.grabChannelRGBData(2);
 	
-		device.send_report([0x53, 0x25, 0x04, 0x00, 0x00].concat(jRainbow1Data), 725);
-		device.send_report([0x53, 0x25, 0x04, 0x01, 0x00].concat(jRainbow2Data), 725);
-		device.send_report([0x53, 0x25, 0x05, 0x00, 0x00].concat(jCorsairData), 725);
-		device.send_report([0x53, 0x25, 0x06, 0x00, 0x00].concat(OnboardLEDData), 725);
+		if(header1Data.length > 0)
+		{
+			device.send_report([0x53, 0x25, 0x04, 0x00, 0x00].concat(header1Data), 725);
+			device.pause(10);
+		}
+		if(header2Data.length > 0)
+		{
+			device.send_report([0x53, 0x25, 0x04, 0x01, 0x00].concat(header2Data), 725);
+			device.pause(10);
+		}
+		if(header3Data.length > 0)
+		{
+			device.send_report([0x53, 0x25, 0x05, 0x00, 0x00].concat(header3Data), 725);
+			device.pause(10);			
+		}
+
+		if(OnboardLEDData.length > 0)
+		{
+			device.send_report([0x53, 0x25, 0x06, 0x00, 0x00].concat(OnboardLEDData), 725);
+			device.pause(10);
+		}
+	}
+	sendGen2SplitPacketARGB()
+	{
+		let [OnboardLEDData, RGBHeaderData] = this.grabZones();
+		OnboardLEDData.push(...RGBHeaderData); //Why did I separate these in the first place?
+		let header1Data = this.grabChannelRGBData(0);
+		let header2Data = this.grabChannelRGBData(1);
+		let header3Data = this.grabChannelRGBData(2);
+	
+		if(header1Data.length > 0)
+		{
+			device.send_report([0x53, 0x25, 0x04, 0x00, 0x00].concat(header1Data), 725);
+		}
+		if(header2Data.length > 0)
+		{
+			device.send_report([0x53, 0x25, 0x04, 0x01, 0x00].concat(header2Data), 725);
+		}
+		if(header3Data.length > 0)
+		{
+			device.send_report([0x53, 0x25, 0x04, 0x02, 0x00].concat(header3Data), 725);	
+		}
+
+		if(OnboardLEDData.length > 0)
+		{
+			device.send_report([0x53, 0x25, 0x06, 0x00, 0x00].concat(OnboardLEDData), 725);
+		}
 	}
 }
 
