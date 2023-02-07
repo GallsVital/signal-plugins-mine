@@ -86,11 +86,7 @@ function sendZone(zone, shutdown = false) //TODO Come back and fix this. It woul
 	packet[0x04] = zone;
 	packet[0x05] = 0x01;
 
-	if(zone%2 === 0){
-		let deviceSelected = G560_Speaker_Left;
-	}else{
-		let deviceSelected = G560_Speaker_Right;
-	}
+	const deviceSelected = (zone %2 === 0) ? G560_Speaker_Left : G560_Speaker_Right;
 
 	const iPxX = deviceSelected.positioning[Math.floor(zone/2)][0];
 	const iPxY = deviceSelected.positioning[Math.floor(zone/2)][1];
