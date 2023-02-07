@@ -11,8 +11,7 @@ shutdownColor:readonly
 LightingMode:readonly
 forcedColor:readonly
 */
-export function ControllableParameters()
-{
+export function ControllableParameters() {
 	return [
 		{"property":"shutdownColor", "group":"lighting", "label":"Shutdown Color", "min":"0", "max":"360", "type":"color", "default":"009bde"},
 		{"property":"LightingMode", "group":"lighting", "label":"Lighting Mode", "type":"combobox", "values":["Canvas", "Forced"], "default":"Canvas"},
@@ -20,7 +19,7 @@ export function ControllableParameters()
 	];
 }
 
-const G560_Speaker_Right = 
+const G560_Speaker_Right =
 {
 	mapping : [ 0, 1 ],
 	positioning : [ [0, 2], [2, 0] ],
@@ -31,7 +30,7 @@ const G560_Speaker_Right =
 	height: 3,
 	image: RightSpeakerImage()
 };
-const G560_Speaker_Left = 
+const G560_Speaker_Left =
 {
 	mapping : [ 0, 1 ],
 	positioning : [ [2, 0], [0, 2] ],
@@ -43,22 +42,19 @@ const G560_Speaker_Left =
 	image: LeftSpeakerImage()
 };
 
-let vLedNames = [];
-let vLedPositions = [];
+const vLedNames = [];
+const vLedPositions = [];
 
-export function LedNames() 
-{
+export function LedNames() {
 	return vLedNames;
 }
 
-export function LedPositions() 
-{
+export function LedPositions() {
 	return vLedPositions;
 }
 
 
-export function Initialize() 
-{
+export function Initialize() {
 //Left Speaker
 	device.createSubdevice("Left Speaker");
 	// Parent Device + Sub device Name + Ports
@@ -82,7 +78,7 @@ export function Initialize()
 
 function sendZone(zone, shutdown = false) //TODO Come back and fix this. It would benefit from a class. Looks to be 8070? Possibly 8071. Also Should support EQ.
 {
-	let packet = [];
+	const packet = [];
 	packet[0x00] = 0x11;
 	packet[0x01] = 0xFF;
 	packet[0x02] = 0x04;
@@ -90,14 +86,14 @@ function sendZone(zone, shutdown = false) //TODO Come back and fix this. It woul
 	packet[0x04] = zone;
 	packet[0x05] = 0x01;
 
-	if(zone%2 == 0){
-		var deviceSelected = G560_Speaker_Left;
+	if(zone%2 === 0){
+		let deviceSelected = G560_Speaker_Left;
 	}else{
-		var deviceSelected = G560_Speaker_Right;
+		let deviceSelected = G560_Speaker_Right;
 	}
 
-	let iPxX = deviceSelected.positioning[Math.floor(zone/2)][0];
-	let iPxY = deviceSelected.positioning[Math.floor(zone/2)][1];
+	const iPxX = deviceSelected.positioning[Math.floor(zone/2)][0];
+	const iPxY = deviceSelected.positioning[Math.floor(zone/2)][1];
 
 	let color;
 
@@ -117,12 +113,10 @@ function sendZone(zone, shutdown = false) //TODO Come back and fix this. It woul
 	packet[0x09] = 0x02;
 
 	device.write(packet, 20);
-	device.read(packet, 20);
-	device.pause(3);
+	device.pause(5);
 }
 
-export function Render() 
-{
+export function Render() {
 	sendZone(0);
 	sendZone(1);
 	sendZone(2);
@@ -130,8 +124,8 @@ export function Render()
 }
 
 function hexToRgb(hex) {
-	let result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
-	let colors = [];
+	const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+	const colors = [];
 	colors[0] = parseInt(result[1], 16);
 	colors[1] = parseInt(result[2], 16);
 	colors[2] = parseInt(result[3], 16);
