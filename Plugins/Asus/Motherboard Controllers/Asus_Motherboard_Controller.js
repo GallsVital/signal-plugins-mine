@@ -103,6 +103,7 @@ const ASUS_MODE_DIRECT = 0xFF;
 
 const ConfigurationOverrides = {
 	"AULA3-AR32-0207":{MainboardCount: 3, ARGBChannelCount:3, RGBHeaderCount: 1}, // THIS HAS A SPACE AT THE END?!?!?!
+	//"AULA3-6K75-0206":{MainboardCount: 7, ARGBChannelCount:3, RGBHeaderCount: 1},
 	//"AULA3-AR42-0207":{MainboardCount: 3, ARGBChannelCount:1, RGBHeaderCount: 2},
 	"TUF GAMING X570-PRO (WI-FI)": {MainboardCount: 3, ARGBChannelCount:1, RGBHeaderCount: 2},
 };
@@ -284,7 +285,7 @@ function SendMainBoardLeds(shutdown = false) {
 	const [HeaderRGBData, HeaderLedCount] = Fetch12VHeaderColors(shutdown);
 
 	// Append 12v Header Info, Both are sent together with 12v Headers always at the end of the Mainboard LEDS
-	RGBData = RGBData.concat(HeaderRGBData);
+	RGBData.push(...HeaderRGBData);
 	TotalLedCount += HeaderLedCount;
 
 	//Mainboard is channel 0 normally, but channel 4 in direct mode
@@ -411,7 +412,7 @@ function SendDirectPacket(channel, start, count, data, apply){
 	packet[2] = apply ? 0x80 | channel : channel;
 	packet[3] = start;
 	packet[4] = count;
-	packet = packet.concat(data);
+	packet.push(...data);
 
 	device.write(packet, Device_Write_Length);
 }
@@ -465,12 +466,25 @@ function ParseConfigTable(){
 		device.log(`ARGB channel Count ${DeviceInfo.ARGBChannelCount} `, {toFile: true});
 	}
 
+	if(DeviceInfo.ConfigTable[ASUS_CONFIG_12V_HEADERS] === 3) //Weird offset edge case.
+	{	
+		device.log("Config Table Returned 3 12 Volt Headers. Board most likely does not have 3 12 Volt Headers. Adjusting counts.")
 
-	DeviceInfo.MainChannelLedCount = DeviceInfo.ConfigTable[ASUS_CONFIG_MAINBOARD_LEDS];
-	device.log(`MainBoard Led Count ${DeviceInfo.MainChannelLedCount} `, {toFile: true});
+		DeviceInfo.MainChannelLedCount = DeviceInfo.ConfigTable[ASUS_CONFIG_MAINBOARD_LEDS] - 1;
+		device.log(`MainBoard Led Count ${DeviceInfo.MainChannelLedCount} `, {toFile: true});
 
-	DeviceInfo.RGBHeaderCount = DeviceInfo.ConfigTable[ASUS_CONFIG_12V_HEADERS];
-	device.log(`12V Header Count ${DeviceInfo.RGBHeaderCount} `, {toFile: true});
+		DeviceInfo.RGBHeaderCount = 1;
+		device.log(`12V Header Count ${DeviceInfo.RGBHeaderCount} `, {toFile: true});
+	}
+	else
+	{
+		DeviceInfo.MainChannelLedCount = DeviceInfo.ConfigTable[ASUS_CONFIG_MAINBOARD_LEDS] - DeviceInfo.ConfigTable[ASUS_CONFIG_12V_HEADERS];
+		device.log(`MainBoard Led Count ${DeviceInfo.MainChannelLedCount} `, {toFile: true});
+
+		DeviceInfo.RGBHeaderCount = DeviceInfo.ConfigTable[ASUS_CONFIG_12V_HEADERS];
+		device.log(`12V Header Count ${DeviceInfo.RGBHeaderCount} `, {toFile: true});
+	}
+
 
 	// Edge Case where model report the wrong number of RGB Headers
 	if(DeviceInfo.MainChannelLedCount < DeviceInfo.RGBHeaderCount){
