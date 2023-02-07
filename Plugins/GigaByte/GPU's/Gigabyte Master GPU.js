@@ -73,6 +73,10 @@ export function Initialize() {
 		GigabyteMaster.setMode(0x01, zones);
 	}
 
+	// @ts-ignore
+	bus.WriteBlockWithoutRegister(8, [0x88, 0x0A, 0x05, 0x63, 0x00, 0x05, 0x00, 0x00]); //High quality bandaid :)
+	// @ts-ignore
+	bus.WriteBlockWithoutRegister(8, [0x88, 0x09, 0x05, 0x63, 0x08, 0x06, 0x00, 0x00]);
 	GigabyteMaster.BuildLEDs();
 
 	SetGPUNameFromBusIds(new GigabyteMasterGPuList().devices);
@@ -286,7 +290,16 @@ const Nvidia = new NvidiaGPUDeviceIds();
 
 class GigabyteMasterDeviceIds {
 	constructor() {
+		this.RTX2060S_AORUS_P               = 0x3FF8;
+		this.RTX2080S_AORUS                 = 0x3FF3;
+		this.RTX2080S_AORUS_P               = 0x3FF4;
+		this.RTX3060_MASTER_O08G            = 0x4051;
+		this.RTX3070_MASTER                 = 0x4069;
+		this.RTX3070TI_MASTER               = 0x408E;
+		this.RTX3080_XTREME_WATERFORCE      = 0x4038;
+		this.RTX3090_XTREME_WATERFORCE      = 0x403A;
 		this.RTX4090_GAMING_OC_24GB			= 0x40BF;
+		this.RTX4090_AORUS_MASTER 			= 0x40C0;
 	}
 }
 
@@ -315,7 +328,18 @@ class GigabyteMasterGPuList {
 		const GigabyteMasterIds  = new GigabyteMasterDeviceIds();
 
 		this.devices = [
+			new GigabyteMasterIdentifier(Nvidia.RTX2060S,       GigabyteMasterIds.RTX2060S_AORUS_P,         0x50, "GIGABYTE AORUS 2060 Super OC"),
+			new GigabyteMasterIdentifier(Nvidia.RTX2080S,       GigabyteMasterIds.RTX2080S_AORUS,         0x50, "GIGABYTE AORUS 2080 Super OC"),
+			new GigabyteMasterIdentifier(Nvidia.RTX2080S,       GigabyteMasterIds.RTX2080S_AORUS_P,         0x50, "GIGABYTE AORUS 2080 Super"),
+			new GigabyteMasterIdentifier(Nvidia.RTX3060TI,        GigabyteMasterIds.RTX3060_MASTER_O08G,         0x66, "GIGABYTE AORUS 3060Ti Master 8GB"),
+			new GigabyteMasterIdentifier(Nvidia.RTX3070,        GigabyteMasterIds.RTX3070_MASTER,         0x66, "GIGABYTE AORUS 3070 Master 8GB"),
+			new GigabyteMasterIdentifier(Nvidia.RTX3070_LHR,        GigabyteMasterIds.RTX3070_MASTER,         0x66, "GIGABYTE AORUS 3070 Master 8GB LHR"),
+			new GigabyteMasterIdentifier(Nvidia.RTX3070TI,        GigabyteMasterIds.RTX3070TI_MASTER,         0x70, "GIGABYTE AORUS 3070Ti Master 8GB"),
+			new GigabyteMasterIdentifier(Nvidia.RTX3080,        GigabyteMasterIds.RTX3080_XTREME_WATERFORCE,         0x64, "GIGABYTE AORUS 3080 XTREME Waterforce 10GB"),
+			new GigabyteMasterIdentifier(Nvidia.RTX3080_LHR,        GigabyteMasterIds.RTX3080_XTREME_WATERFORCE,         0x64, "GIGABYTE AORUS 3080 XTREME Waterforce 10GB LHR"),
+			new GigabyteMasterIdentifier(Nvidia.RTX3090,        GigabyteMasterIds.RTX3090_XTREME_WATERFORCE,         0x64, "GIGABYTE AORUS 3090 XTREME Waterforce 24GB"),
 			new GigabyteMasterIdentifier(Nvidia.RTX4090,        GigabyteMasterIds.RTX4090_GAMING_OC_24GB,         0x71, "GIGABYTE 4090 Gaming OC"),
+			new GigabyteMasterIdentifier(Nvidia.RTX4090, 		GigabyteMasterIds.RTX4090_AORUS_MASTER,           0x71, "GIGABYTE RTX4090 Aorus Master")
 		];
 	}
 }

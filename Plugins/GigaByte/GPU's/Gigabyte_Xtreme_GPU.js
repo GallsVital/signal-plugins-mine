@@ -242,8 +242,11 @@ const Nvidia = new NvidiaGPUDeviceIds();
 
 class GigabyteXtremeDeviceIds {
 	constructor() {
-		this.RTX3080_AORUS_MASTER = 0x403E;
-		this.RTX4090_AORUS_MASTER = 0x40C0;
+		this.RTX3080AORUS_X_10GD_LHR      =  0x403D;
+		this.RTX3080AORUS_X_10GD          =  0x403E;
+		this.RTX3090AOURUS_X_24GD         =  0x4041;
+		this.RTX3080TI_XTREME_12G       =  0x4080;
+		this.RTX3080TI_MASTER           =  0x4081;
 	}
 }
 
@@ -271,7 +274,11 @@ class GigabyteXtremeGPUList {
 		const GigabyteXtremeIds  = new GigabyteXtremeDeviceIds();
 
 		this.devices = [
-			new GigabyteXtremeIdentifier(Nvidia.RTX3080, GigabyteXtremeIds.RTX3080_AORUS_MASTER, 0x61, "GIGABYTE RTX 3080 Aorus Master"),
+			new GigabyteXtremeIdentifier(Nvidia.RTX3080_LHR, GigabyteXtremeIds.RTX3080AORUS_X_10GD_LHR, 0x61, "GIGABYTE RTX 3080 Aorus Master LHR"),
+			new GigabyteXtremeIdentifier(Nvidia.RTX3080, GigabyteXtremeIds.RTX3080AORUS_X_10GD, 0x61, "GIGABYTE RTX 3080 Aorus Master"),
+			new GigabyteXtremeIdentifier(Nvidia.RTX3090, GigabyteXtremeIds.RTX3090AOURUS_X_24GD, 0x61, "GIGABYTE RTX 3090 XTREME"),
+			new GigabyteXtremeIdentifier(Nvidia.RTX3080TI, GigabyteXtremeIds.RTX3080TI_XTREME_12G, 0x61, "GIGABYTE RTX 3080TI XTREME"),
+			new GigabyteXtremeIdentifier(Nvidia.RTX3080TI, GigabyteXtremeIds.RTX3080TI_MASTER, 0x61, "GIGABYTE RTX 3080TI Aorus Master"),
 		];
 	}
 }
