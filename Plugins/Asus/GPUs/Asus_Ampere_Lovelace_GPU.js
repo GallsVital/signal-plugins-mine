@@ -351,7 +351,9 @@ class Asus_Ampere_Lovelace_IDs {
 		this.RTX3070TI_TUF_GAMING_2            = 0x8813;
 		this.RTX3070TI_TUF_GAMING_OC 		   = 0x88BC;
 
+
 		this.RTX3080_STRIX_GAMING_WHITE        = 0x87D1;
+		this.RGB3080_STRIX_GAMING_V2 		   = 0x882F;
 		this.RTX3080_STRIX_GAMING_WHITE_OC_LHR = 0x8830;
 		this.RTX3080_STRIX_GAMING_GUNDAM       = 0x87CE;
 		this.RTX3080_STRIX_GAMING              = 0x87AC;
@@ -450,6 +452,8 @@ const Asus3000GPUIDs =
 
 
 	new AsusGPUIdentifier(Nvidia.RTX3080, AsusID.RTX3080_STRIX_GAMING_WHITE, "Asus ROG Strix 3080 O10G White Gaming"),
+	new AsusGPUIdentifier(Nvidia.RTX3080_LHR, AsusID.RGB3080_STRIX_GAMING_V2, "Asus ROG Strix 3080 O10G Gaming LHR"),
+	
 	new AsusGPUIdentifier(Nvidia.RTX3080_LHR, AsusID.RTX3080_STRIX_GAMING_WHITE_OC_LHR, "Asus ROG Strix 3080 O10G White OC LHR"),
 	new AsusGPUIdentifier(Nvidia.RTX3080, AsusID.RTX3080_STRIX_GAMING_GUNDAM, "Asus ROG Strix 3080 O10G Gundam"),
 	new AsusGPUIdentifier(Nvidia.RTX3080, AsusID.RTX3080_STRIX_GAMING, "Asus ROG Strix 3080 O10G Gaming"),
