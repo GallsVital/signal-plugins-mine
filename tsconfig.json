@@ -16,26 +16,35 @@
 		"esModuleInterop": true,
 		"strictNullChecks": true,
 		"strictFunctionTypes": true,
-		//"noUncheckedIndexedAccess": true,
+		"noUncheckedIndexedAccess": true,
+		"noImplicitReturns": true,
+		"noUnusedLocals": true,
+		"noUnusedParameters": true,
 		"typeRoots": ["./types", "./node_modules/@types"],
 		"disableSizeLimit": true, // Plugin images being base64 breaks Typescript checking in the project. 20mb filesize limit by default
 		"baseUrl": ".",
 		"paths": {
 			"@Mock/*": ["tests/*"],
-			"@Types/*":["types/*"]
+			"@Types/*":["types/*"],
+			"performance": ["./types/performance.d.ts"]
 		},
 	},
 	"files": [
 		"./types/globals.d.ts",
 		"./types/device.d.ts",
+		"./types/console.d.ts",
 		"./types/bus.d.ts",
-		"./types/battery.d.ts"
+		"./types/battery.d.ts",
+		"./types/Exports.d.ts",
+		"./types/ComponentChannel.d.ts",
+		"./types/ControllableParameters.d.ts"
     ],
 	"include": ["Plugins/**/*"],
 	"exclude": [
 		"node_modules",
 		"**/node_modules/*",
 		"docs",
-		"**/docs/*"
+		"**/docs/*",
+		"**/*.test.js"
 	]
 }

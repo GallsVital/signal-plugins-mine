@@ -12,13 +12,13 @@ declare interface LogOptions{
 }
 declare type ImageFormat = "JPEG" | "PNG" | "BMP"
 
-declare type DeviceFeature = "battery" | "mouse";
+declare type DeviceFeature = "battery" | "mouse" | "corsairmutex" | "usbmutex";
 declare type hexToRgb = (HexString: string) => ColorArray;
 
 declare type ChannelConfig = {0: ChannelId, 1: number};
 declare type ChannelConfigArray = ChannelConfig[];
 
-declare type AlertPriority = 0 | 1;
+declare type AlertPriority = 0 | 1 | 2 | 3;
 declare type AlertAction = "Settings" | "Documentation"
 declare type AlertId = string;
 declare type MessageId = string;

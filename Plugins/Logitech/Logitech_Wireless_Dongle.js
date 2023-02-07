@@ -250,6 +250,7 @@ function grabColors(shutdown = false) {
 		if(Logitech.UsesPerLedLightingV2()) {
 			// Skip Updating Leds with the same color as the previous frame
 			if(PreviousFrameColors[iIdx] && Logitech.CompareArrays(PreviousFrameColors[iIdx], color)){
+				PreviousFrameColors[iIdx] = color;
 				continue;
 			}
 
@@ -265,6 +266,7 @@ function grabColors(shutdown = false) {
 			RGBData[iLedIdx+1] = color[1];
 			RGBData[iLedIdx+2] = color[2];
 		}
+
 
 	}
 
@@ -427,21 +429,21 @@ export class LogitechProtocol {
 				 [0, 2], [1, 2], [2, 2], [3, 2], [4, 2], [5, 2], [6, 2], [7, 2], [8, 2], [9, 2], [10, 2], [11, 2], [12, 2], [13, 2], [14, 2],   [15, 2], [16, 2], [17, 2],  [18, 2], [19, 2], [20, 2], [21, 2],
 				 [0, 3], [1, 3], [2, 3], [3, 3], [4, 3], [5, 3], [6, 3], [7, 3], [8, 3], [9, 3], [10, 3], [11, 3], [12, 3], [13, 3], [14, 3],   [15, 3], [16, 3], [17, 3],  [18, 3], [19, 3], [20, 3], [21, 3],
 				 [0, 4], [1, 4], [2, 4], [3, 4], [4, 4], [5, 4], [6, 4], [7, 4], [8, 4], [9, 4], [10, 4], [11, 4], [12, 4],          [14, 4],   						    [18, 4], [19, 4], [20, 4],
-				 [0, 5], [1, 5],         [3, 5], [4, 5], [5, 5], [6, 5], [7, 5], [8, 5], [9, 5], [10, 5], [11, 5], [12, 5 ],         [14, 5],           [16, 5],            [18, 5], [19, 5], [20, 5], [21, 5],
+				 [0, 5], [1, 5],         [3, 5], [4, 5], [5, 5], [6, 5], [7, 5], [8, 5], [9, 5], [10, 5], [11, 5], [12, 5 ],         [14, 5],            [16, 5],           [18, 5], [19, 5], [20, 5], [21, 5],
 				 [0, 6], [1, 6], [2, 6], [3, 6],                         [7, 6],                          [11, 6], [12, 6], [13, 6], [14, 6],   [15, 6], [16, 6], [17, 6],  [18, 6], 		  [20, 6],
 
-				 //[2, 5], [13, 4],
+				 [2, 5], [13, 4],
 			 ],
 			 "G915 TKL": [
-		 		[0, 0],																		 [10, 0],
-						 [1, 1], [2, 1], [3, 1], [4, 1], [5, 1], 		 [7, 1], [8, 1], [9, 1], [10, 1], [11, 1], [12, 1], [13, 1], [14, 1],   [15, 1], [16, 1], [17, 1],
-		 		[0, 2], [1, 2], [2, 2], [3, 2], [4, 2], [5, 2], [6, 2], [7, 2], [8, 2], [9, 2], [10, 2], [11, 2], [12, 2], [13, 2], [14, 2],   [15, 2], [16, 2], [17, 2],
-		 		[0, 3], [1, 3], [2, 3], [3, 3], [4, 3], [5, 3], [6, 3], [7, 3], [8, 3], [9, 3], [10, 3], [11, 3], [12, 3], [13, 3], [14, 3],   [15, 3], [16, 3], [17, 3],
-		 		[0, 4], [1, 4], [2, 4], [3, 4], [4, 4], [5, 4], [6, 4], [7, 4], [8, 4], [9, 4], [10, 4], [11, 4], [12, 4],          [14, 4],
-		 		[0, 5], [1, 5],         [3, 5], [4, 5], [5, 5], [6, 5], [7, 5], [8, 5], [9, 5], [10, 5], [11, 5], [12, 5 ],         [14, 5],           [16, 5],
-		 		[0, 6], [1, 6], [2, 6], [3, 6],                         [7, 6],                          [11, 6], [12, 6], [13, 6], [14, 6],   [15, 6], [16, 6], [17, 6],
+		 		[0, 0],					[3, 0],     											[10, 0], [11, 0], [12, 0], [13, 0],
+		 		[0, 1], [1, 1], [2, 1], [3, 1], [4, 1], 	    [6, 1], [7, 1], [8, 1], [9, 1], [10, 1], [11, 1], [12, 1], [13, 1],   [14, 1], [15, 1], [16, 1],
+		 		[0, 2], [1, 2], [2, 2], [3, 2], [4, 2], [5, 2], [6, 2], [7, 2], [8, 2], [9, 2], [10, 2], [11, 2], [12, 2], [13, 2],   [14, 2], [15, 2], [16, 2],
+		 		[0, 3], [1, 3], [2, 3], [3, 3], [4, 3], [5, 3], [6, 3], [7, 3], [8, 3], [9, 3], [10, 3], [11, 3], [12, 3], [13, 3],   [14, 3], [15, 3], [16, 3],
+		 		[0, 4], [1, 4], [2, 4], [3, 4], [4, 4], [5, 4], [6, 4], [7, 4], [8, 4], [9, 4], [10, 4], [11, 4],          [13, 4],
+		 		[0, 5],         [2, 5], [3, 5], [4, 5], [5, 5], [6, 5], [7, 5], [8, 5], [9, 5], [10, 5], [11, 5],          [13, 5],            [15, 5],
+		 		[0, 6], [1, 6], [2, 6],                         [6, 6],                         [10, 6], [11, 6], [12, 6], [13, 6],   [14, 6], [15, 6], [16, 6],
 
-		 		//[2, 5], [13, 4],
+		 		[1, 5], [12, 4],
 		 	]
 		 };
 
@@ -459,17 +461,17 @@ export class LogitechProtocol {
 				182, 54, 1,  19, 4,  6,  7,  8,  10, 11, 12, 48, 49, 37,				    89, 90, 91,
 				183, 105, 26, 24, 3,  22, 2,  14, 13, 51, 52, 53, 109,             79,	 	86, 87, 88, 85,
 				184, 104, 107, 106,          41,            110, 111, 98, 108,  77, 78, 76,	95, 96,
-				//104, 47, // ISO Keys
+				97, 47, // ISO Keys
 			],
 			"G915 TKL": [
-				210, 								153,
-					 38, 55, 56, 57, 58, 59, 60, 61, 62, 63, 64, 65, 66,       67, 68, 69,
-				180, 50, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 42, 43, 39,   70, 71, 72,
-				181, 40, 17, 23, 5,  18, 20, 25, 21, 9,  15, 16, 44, 45, 46,   73, 74, 75,
-				182, 54, 1,  19, 4,  6,  7,  8,  10, 11, 12, 48, 49, 37,
-				183, 105, 26, 24, 3,  22, 2,  14, 13, 51, 52, 53, 109,             79,
-				184, 104, 107, 106,          41,            110, 111, 98, 108,  77, 78, 76,
-				//104, 47, // ISO Keys
+				210, 								153,    158, 155, 157, 156,
+				38, 55, 56, 57, 58, 59, 60, 61, 62, 63, 64, 65, 66,       67, 68, 69,
+				50, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 42, 43, 39,   70, 71, 72,
+				40, 17, 23, 5,  18, 20, 25, 21, 9,  15, 16, 44, 45, 46,   73, 74, 75,
+				54, 1,  19, 4,  6,  7,  8,  10, 11, 12, 48, 49, 37,
+				105, 26, 24, 3,  22, 2,  14, 13, 51, 52, 53, 109,             79,
+				104, 107, 106,          41,            110, 111, 98, 108,  77, 78, 76,
+				97, 47, // ISO Keys
 			]
 		 };
 
@@ -488,17 +490,17 @@ export class LogitechProtocol {
 				 "G3", "CapsLock", "A", "S", "D", "F", "G", "H", "J", "K", "L", ";", "'", "Enter",                                                               "Num 4", "Num 5", "Num 6",
 				 "G4", "Left Shift", "Z", "X", "C", "V", "B", "N", "M", ",", ".", "/", "Right Shift",                                  "Up Arrow",                "Num 1", "Num 2", "Num 3", "Num Enter",
 				 "G5", "Left Ctrl", "Left Win", "Left Alt", "Space", "Right Alt", "Fn", "Menu", "Right Ctrl",  "Left Arrow", "Down Arrow", "Right Arrow",        "Num 0", "Num .",
-				 //"ISO_<", "ISO_#",
+				 "ISO_<", "ISO_#",
 			 ],
 			 "G915 TKL": [
-		 		"logo",                         "brightness",
+		 		"logo",                         "brightness",      "MediaRewind", "MediaPlayPause", "MediaFastForward", "MediaStop",
 		 		"Esc", "F1", "F2", "F3", "F4", "F5", "F6", "F7", "F8", "F9", "F10", "F11", "F12", 			"Print Screen", "Scroll Lock", "Pause Break",
-		 		"G1", "`", "1", "2", "3", "4", "5", "6", "7", "8", "9", "0", "-_", "=+", "Backspace",       "Insert", "Home", "Page Up",
-		 		"G2", "Tab", "Q", "W", "E", "R", "T", "Y", "U", "I", "O", "P", "[", "]", "\\",              "Del", "End", "Page Down",
-		 		"G3", "CapsLock", "A", "S", "D", "F", "G", "H", "J", "K", "L", ";", "'", "Enter",
-		 		"G4", "Left Shift", "Z", "X", "C", "V", "B", "N", "M", ",", ".", "/", "Right Shift",                        "Up Arrow",
-		 		"G5", "Left Ctrl", "Left Win", "Left Alt", "Space", "Right Alt", "Fn", "Menu", "Right Ctrl",  "Left Arrow", "Down Arrow", "Right Arrow",
-		 		//"ISO_<", "ISO_#",
+		 		"`", "1", "2", "3", "4", "5", "6", "7", "8", "9", "0", "-_", "=+", "Backspace",       "Insert", "Home", "Page Up",
+		 		"Tab", "Q", "W", "E", "R", "T", "Y", "U", "I", "O", "P", "[", "]", "\\",              "Del", "End", "Page Down",
+		 		"CapsLock", "A", "S", "D", "F", "G", "H", "J", "K", "L", ";", "'", "Enter",
+		 		"Left Shift", "Z", "X", "C", "V", "B", "N", "M", ",", ".", "/", "Right Shift",                        "Up Arrow",
+		 		"Left Ctrl", "Left Win", "Left Alt", "Space", "Right Alt", "Fn", "Menu", "Right Ctrl",  "Left Arrow", "Down Arrow", "Right Arrow",
+		 		"ISO_<", "ISO_#",
 		 	],
 		 };
 
@@ -894,7 +896,7 @@ export class LogitechProtocol {
 		case "408e":
 			this.SetDeviceLeds("G915 TKL");
 			this.SetHasDPILights(false);
-			this.SetDeviceSize([18, 7]);
+			this.SetDeviceSize([17, 7]);
 			break;
 		case "c094":
 			this.SetDeviceLeds("Null");
@@ -1139,6 +1141,11 @@ export class LogitechProtocol {
 			device.pause(1000);
 			battery.setBatteryLevel(this.GetBatteryCharge());
 		}
+
+		// device.log(this.SendLongMessage([this.FeatureIDs.DisableKeysByUsageID, 0x10]));
+		// device.log(this.SendLongMessage([this.FeatureIDs.RGB8071ID, 0x10, 0x01]));
+		// device.log(this.SendLongMessage([this.FeatureIDs.RGB8071ID, 0x10, 0x01, 0x01]));
+
 
 		if(this.GetDeviceType() === "Mouse"){
 			device.addFeature("mouse");
@@ -1715,7 +1722,9 @@ export class LogitechProtocol {
 	 SendPerKeyLightingPacket(RGBData) {
 		 while(RGBData.length > 0) {
 			 const packet = [this.FeatureIDs.PerKeyLightingV2ID, 0x10];
-			 packet.push(...RGBData.splice(0, 16));
+
+			 const DataLength = Math.min(16, RGBData.length);
+			 packet.push(...RGBData.splice(0, DataLength));
 			 this.SendLongMessage(packet, true);
 		 }
 
