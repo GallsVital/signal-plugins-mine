@@ -69,14 +69,20 @@ export function Initialize() {
 	// We must do this before any other writes as a bad length will soft lock the GPU.
 	GigabyteMaster.determineWriteLength();
 
-	for(let zones = 0; zones < 8; zones++) {
+	for(let zones = 0; zones < 8; zones++) { //2, 3, 5, 6
 		GigabyteMaster.setMode(0x01, zones);
 	}
 
-	// @ts-ignore
-	bus.WriteBlockWithoutRegister(8, [0x88, 0x0A, 0x05, 0x63, 0x00, 0x05, 0x00, 0x00]); //High quality bandaid :)
-	// @ts-ignore
-	bus.WriteBlockWithoutRegister(8, [0x88, 0x09, 0x05, 0x63, 0x08, 0x06, 0x00, 0x00]);
+	//bus.WriteBlockWithoutRegister(8, [0x88, 0x01, 0x05, 0x63, 0x00, 0x02, 0x00, 0x00]);
+
+	//bus.WriteBlockWithoutRegister(8, [0x88, 0x01, 0x05, 0x63, 0x00, 0x03, 0x00, 0x00]);
+	//bus.WriteBlockWithoutRegister(8, [0xBD, 0x01, 0xff, 0xff, 0x00, 0xff, 0xff, 0x00]);
+
+	//bus.WriteBlockWithoutRegister(8, [0x88, 0x01, 0x05, 0x63, 0x00, 0x05, 0x00, 0x00]);
+	//bus.WriteBlockWithoutRegister(8, [0xBC, 0x01, 0xff, 0xff, 0x00, 0xff, 0xff, 0x00]);
+
+	//bus.WriteBlockWithoutRegister(8, [0x88, 0x01, 0x05, 0x63, 0x00, 0x06, 0x00, 0x00]);
+	//bus.WriteBlockWithoutRegister(8, [0xBE, 0x01, 0xff, 0xff, 0x00, 0xff, 0xff, 0x00]);
 	GigabyteMaster.BuildLEDs();
 
 	SetGPUNameFromBusIds(new GigabyteMasterGPuList().devices);
@@ -156,6 +162,7 @@ class GigabyteMasterProtocol {
 			0x40bf :
 			{
 				Size: [5, 3],
+				modeZones : [0], //This is an odd card all the way around.
 				Zones:
 				{
 					0: {Names : [ "Fan 1", "Fan 2", "Fan 3" ], Positions : [ [1, 2], [2, 2], [3, 2] ], Mapping : [ 0, 1, 2 ]},
@@ -166,13 +173,14 @@ class GigabyteMasterProtocol {
 			},
 			0x40c0 :
 			{
-				Size: [8, 4],
+				Size: [15, 9],
+				modeZones : [2, 3, 5, 6],
 				Zones:
 				{
-					0: {Names : [ "Placeholder 1", "Placeholder 2", "Placeholder 3", "Placeholder 4", "Placeholder 5", "Placeholder 6", "Placeholder 7", "Placeholder 8",],         Positions : [ [0, 0], [1, 0], [2, 0], [3, 0], [4, 0], [5, 0], [6, 0], [7, 0], ], Mapping : [ 0, 1, 2, 3, 4, 5, 6, 7 ]},
-					1: {Names : [ "Placeholder 9", "Placeholder 10", "Placeholder 11", "Placeholder 12", "Placeholder 13", "Placeholder 14", "Placeholder 15", "Placeholder 16",],  Positions : [ [0, 1], [1, 1], [2, 1], [3, 1], [4, 1], [5, 1], [6, 1], [7, 1], ], Mapping : [ 0, 1, 2, 3, 4, 5, 6, 7 ]},
-					2: {Names : [ "Placeholder 17", "Placeholder 18", "Placeholder 19", "Placeholder 20", "Placeholder 21", "Placeholder 22", "Placeholder 23", "Placeholder 24",], Positions : [ [0, 2], [1, 2], [2, 2], [3, 2], [4, 2], [5, 2], [6, 2], [7, 2], ], Mapping : [ 0, 1, 2, 3, 4, 5, 6, 7 ]},
-					3: {Names : [ "Placeholder 25", "Placeholder 26", "Placeholder 27", "Placeholder 28", "Placeholder 29", "Placeholder 30", "Placeholder 31", "Placeholder 32",], Positions : [ [0, 3], [1, 3], [2, 3], [3, 3], [4, 3], [5, 3], [6, 3], [7, 3], ], Mapping : [ 0, 1, 2, 3, 4, 5, 6, 7 ]}
+					0: {Names : [ "Fan 1 LED 1", "Fan 1 LED 2", "Fan 1 LED 3", "Fan 1 LED 4", "Fan 1 LED 5", "Fan 1 LED 6", "Fan 1 LED 7", "Fan 1 LED 8",], Positions : [ [0, 5], [1, 4], [2, 3], [3, 4], [4, 5], [3, 6], [2, 7], [1, 8], ], Mapping : [ 0, 1, 2, 3, 4, 5, 6, 7 ]},
+					1: {Names : [ "Fan 2 LED 1", "Fan 2 LED 2", "Fan 2 LED 3", "Fan 2 LED 4", "Fan 2 LED 5", "Fan 2 LED 6", "Fan 2 LED 7", "Fan 2 LED 8",], Positions : [ [5, 5], [6, 4], [7, 3], [8, 4], [9, 5], [8, 6], [7, 7], [6, 8], ], Mapping : [ 0, 1, 2, 3, 4, 5, 6, 7 ]},
+					2: {Names : [ "Fan 3 LED 1", "Fan 3 LED 2", "Fan 3 LED 3", "Fan 3 LED 4", "Fan 3 LED 5", "Fan 3 LED 6", "Fan 3 LED 7", "Fan 3 LED 8",], Positions : [ [10, 5], [11, 4], [12, 3], [13, 4], [14, 5], [13, 6], [12, 7], [11, 8], ], Mapping : [ 0, 1, 2, 3, 4, 5, 6, 7 ]},
+					3: {Names : [ "Side Logo LED 1", "Side Logo LED 2", "Face Logo LED", ], Positions : [ [11, 0], [12, 1], [12, 2],], Mapping : [ 0, 1, 2 ]}
 				}
 			}
 		};
@@ -198,6 +206,8 @@ class GigabyteMasterProtocol {
 	}
 
 	UpdateLEDs() {
+		this.setMode(this.modes.static, this.library[bus.SubDevice()].modeZones[0]);
+
 		for(const [zoneId, ZoneInfo] of Object.entries(this.library[bus.SubDevice()].Zones)) {
 			grabRGB(zoneId, ZoneInfo);
 		}
