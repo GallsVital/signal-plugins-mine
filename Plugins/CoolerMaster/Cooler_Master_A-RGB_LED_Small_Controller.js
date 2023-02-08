@@ -21,7 +21,7 @@ export function ControllableParameters(){
 export function SupportsSubdevices(){ return true; }
 
 const DeviceMaxLedLimit = 48;
-let ChannelArray = [
+const ChannelArray = [
 	["Channel 1", 48],
 ];
 
@@ -45,8 +45,12 @@ export function LedPositions() {
 }
 
 export function Initialize() {
-	sendPacketString("00 80 01 01 02 02", 65);
+	device.write([0x00, 0x80, 0x01, 0x01, 0x02, 0x02], 65);
 	SetupChannels();
+}
+
+export function Render() {
+	SendChannel(0);
 }
 
 export function Shutdown() {
@@ -55,7 +59,7 @@ export function Shutdown() {
 
 function SendChannel(Channel, shutdown = false) {
 	let ChannelLedCount = device.channel(ChannelArray[Channel][0]).ledCount;
-	let componentChannel = device.channel(ChannelArray[Channel][0]);
+	const componentChannel = device.channel(ChannelArray[Channel][0]);
 
 	let RGBData = [];
 
@@ -66,7 +70,7 @@ function SendChannel(Channel, shutdown = false) {
 	} else if(componentChannel.shouldPulseColors()) {
 		ChannelLedCount = 48;
 
-		let pulseColor = device.getChannelPulseColor(ChannelArray[Channel][0], ChannelLedCount);
+		const pulseColor = device.getChannelPulseColor(ChannelArray[Channel][0], ChannelLedCount);
 		RGBData = device.createColorArray(pulseColor, ChannelLedCount, "Inline");
 	} else {
 		RGBData = device.channel(ChannelArray[Channel][0]).getColors("Inline");
@@ -91,21 +95,6 @@ function SendChannel(Channel, shutdown = false) {
 	}
 
 	device.pause(10);
-}
-
-export function Render() {
-	SendChannel(0);
-}
-
-function sendPacketString(string, size) {
-	let packet= [];
-	let data = string.split(' ');
-
-	for(let i = 0; i < data.length; i++) {
-		packet[i] = parseInt(data[i], 16);
-	}
-
-	device.write(packet, size);
 }
 
 export function Validate(endpoint) {

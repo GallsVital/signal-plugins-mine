@@ -36,7 +36,7 @@
         "semi":"warn",
         "consistent-return": "warn",
         "curly":"warn",
-        "no-console": "error",
+        //"no-console": "error",
         "no-var": "warn",
         "no-useless-return":"warn",
         "brace-style": ["warn","1tbs", { "allowSingleLine": true }],
@@ -94,6 +94,18 @@
                 "selector": "MemberExpression[object.name = 'device'][property.name='repollSize']", 
                 "message": "device.repollSize() is deprecated and should not be used. Instead use device.setSize()"
             }
+            // {
+            //     "selector": "MemberExpression[object.name = 'device'][property.name='log']", 
+            //     "message": "device.log() is deprecated and should not be used. Instead use console.log()"
+            // },
+            // {
+            //     "selector": "MemberExpression[object.name = 'bus'][property.name='log']", 
+            //     "message": "bus.log() is deprecated and should not be used. Instead use console.log()"
+            // },
+            // {
+            //     "selector": "CallExpression[callee.name='sendPacketString']", 
+            //     "message": "sendPacketString() is deprecated and should not be used. Instead initialize an array."
+            // }
         ],
         // // JSDoc 
         // //"jsdoc/check-access": 1, // Recommended

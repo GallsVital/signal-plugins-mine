@@ -1,4 +1,4 @@
-// Modifing SMBUS Plugins is -DANGEROUS- and can -DESTROY- devices.
+// Modifying SMBUS Plugins is -DANGEROUS- and can -DESTROY- devices.
 export function Name() { return "Kingston Hyper Fury Ram"; }
 export function Publisher() { return "WhirlwindFX"; }
 export function Documentation(){ return "troubleshooting"; }
@@ -96,7 +96,7 @@ function CheckForHyperFuryRam(bus, addr){
 		const iRet3 = bus.ReadByte(SubAddresses[1], 0x27);
 		bus.log(`Address [${SubAddresses[1]}], Reg 27: ${iRet3}`, {toFile: true});
 
-		const ExpectedValues = [120, 180, 200, 220, 240];
+		const ExpectedValues = [120, 130, 180, 200, 220, 240];
 
 		return ExpectedValues.includes(iRet1) && ExpectedValues.includes(iRet2) && ExpectedValues.includes(iRet3);
 	}

@@ -1,4 +1,4 @@
-// Modifing SMBUS Plugins is -DANGEROUS- and can -DESTROY- devices.
+// Modifying SMBUS Plugins is -DANGEROUS- and can -DESTROY- devices.
 export function Name() { return "ASUS Legacy GPU"; }
 export function Publisher() { return "WhirlwindFX"; }
 export function Documentation(){ return "troubleshooting/asus"; }
@@ -307,6 +307,7 @@ class ASUSLegacyGPUDeviceIds{
 		this.ROG_STRIX_RTX2080TI_011G_GAMING_OC_WHITE  = 0x875A;
 		this.ROG_STRIX_RTX2080TI_O11G_GAMING_TU102     = 0x8687;
 		this.ROG_STRIX_RTX2080TI_O11G_GAMING_OC        = 0x866B;
+		this.ROG_STRIX_RTX2080TI_O11G_GAMING_ALT       = 0x866C;
 		this.ROG_STRIX_RTX2080TI_O11G_BLACKOPS_4       = 0x8689;
 	}
 }
@@ -382,6 +383,7 @@ class ASUSLegacyGPUList{
 			new ASUSLegacyDeviceIdentifier(Nvidia.RTX2080S,        	ASUSLegacyGPUIds.ROG_STRIX_RTX2080_SUPER_OC,        		0x2A, "ASUS ROG Strix RTX 2080 Super Gaming Advanced"),
 			new ASUSLegacyDeviceIdentifier(Nvidia.RTX2080S,        	ASUSLegacyGPUIds.ROG_STRIX_RTX2080_SUPER_OC_WHITE,     	 	0x2A, "ASUS ROG Strix RTX 2080 Super Gaming OC White Edition"),
 			new ASUSLegacyDeviceIdentifier(Nvidia.RTX2080TI,       	ASUSLegacyGPUIds.ROG_STRIX_RTX2080TI_011G,          		0x2A, "ASUS ROG Strix RTX 2080Ti"),
+			new ASUSLegacyDeviceIdentifier(Nvidia.RTX2080TI,        ASUSLegacyGPUIds.ROG_STRIX_RTX2080TI_O11G_GAMING_ALT,       0x2A, "ASUS Rog Strix RTX 2080Ti Gaming"),
 			new ASUSLegacyDeviceIdentifier(Nvidia.RTX2080TI,       	ASUSLegacyGPUIds.ROG_STRIX_RTX2080TI_011G_GAMING_OC_WHITE,  0x2A, "ASUS ROG Strix RTX 2080Ti Gaming OC White Edition"),
 			new ASUSLegacyDeviceIdentifier(Nvidia.RTX2080TI_TU102, 	ASUSLegacyGPUIds.ROG_STRIX_RTX2080TI_O11G_GAMING_TU102,     0x2A, "ASUS ROG Strix RTX 2080Ti Gaming (TU102)"),
 

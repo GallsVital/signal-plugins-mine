@@ -25,23 +25,23 @@ export function ControllableParameters(){
 export function Documentation(){ return "troubleshooting/corsair"; }
 
 function hexToRgb(hex) {
-	let result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
-	let colors = [];
+	const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+	const colors = [];
 	colors[0] = parseInt(result[1], 16);
 	colors[1] = parseInt(result[2], 16);
 	colors[2] = parseInt(result[3], 16);
 
 	return colors;
 }
-let CORSAIR_COMMAND_WRITE       = 0x07;
-let CORSAIR_COMMAND_READ        = 0x0E;
-let CORSAIR_COMMAND_STREAM      = 0x7F;
-let CORSAIR_PROPERTY_LIGHTING_CONTROL           = 0x05;
-let CORSAIR_LIGHTING_CONTROL_HARDWARE           = 0x01;
-let CORSAIR_LIGHTING_CONTROL_SOFTWARE           = 0x02;
-let CORSAIR_PROPERTY_SUBMIT_KEYBOARD_COLOR_24   = 0x28;
-let CORSAIR_PROPERTY_SPECIAL_FUNCTION = 0x04;
-let CORSAIR_PROPERTY_SUBMIT_MOUSE_COLOR         = 0x22;
+const CORSAIR_COMMAND_WRITE       = 0x07;
+const CORSAIR_COMMAND_READ        = 0x0E;
+const CORSAIR_COMMAND_STREAM      = 0x7F;
+const CORSAIR_PROPERTY_LIGHTING_CONTROL           = 0x05;
+const CORSAIR_LIGHTING_CONTROL_HARDWARE           = 0x01;
+const CORSAIR_LIGHTING_CONTROL_SOFTWARE           = 0x02;
+const CORSAIR_PROPERTY_SUBMIT_KEYBOARD_COLOR_24   = 0x28;
+const CORSAIR_PROPERTY_SPECIAL_FUNCTION = 0x04;
+const CORSAIR_PROPERTY_SUBMIT_MOUSE_COLOR         = 0x22;
 
 
 export function Initialize() {
@@ -67,11 +67,11 @@ export function Initialize() {
 }
 
 let savedLayout;
-let SkippedKeys_ANSI = [
+const SkippedKeys_ANSI = [
 	63, 65, 66, 81, 83, 85, 111, 120, 121, 122, 123, 124, 125, 126, 127, 128, 129,
 ];
 
-let SkippedKeys_ISO = [
+const SkippedKeys_ISO = [
 	63, 65, 66, 80, 83, 85, 111, 120, 121, 122, 123, 124, 125, 126, 127, 128, 129,
 ];
 const LayoutDict = {
@@ -84,7 +84,7 @@ function InitScanCodes(){
 	savedLayout = layout;
 	device.log(`Setting layout to ${savedLayout}`);
 
-	let ScanCodes = [];
+	const ScanCodes = [];
 
 	for(let ScanCode = 0; ScanCode < 120 + LayoutDict[layout].length && ScanCode < 0x84; ScanCode++){
 		if(LayoutDict[layout].includes(ScanCode)){
@@ -110,8 +110,8 @@ function InitScanCodes(){
 
 function sendPacketString(string, size){
 
-	let packet= [];
-	let data = string.split(' ');
+	const packet= [];
+	const data = string.split(' ');
 
 	for(let i = 0; i < data.length; i++){
 		packet[i] =parseInt(data[i], 16);//.toString(16)
@@ -120,15 +120,15 @@ function sendPacketString(string, size){
 	device.write(packet, size);
 }
 export function Shutdown() {
-	let red = [168];
-	let green = [168];
-	let blue = [168];
+	const red = [168];
+	const green = [168];
+	const blue = [168];
 
 
 	for(let iIdx = 0; iIdx < vKeys.length; iIdx++) {
-		let iPxX = vKeyPositions[iIdx][0];
-		let iPxY = vKeyPositions[iIdx][1];
-		let mxPxColor = device.color(iPxX, iPxY);
+		const iPxX = vKeyPositions[iIdx][0];
+		const iPxY = vKeyPositions[iIdx][1];
+		const mxPxColor = device.color(iPxX, iPxY);
 		red[vKeys[iIdx]] = 255;
 		green[vKeys[iIdx]] = 0;
 		blue[vKeys[iIdx]] = 0;
@@ -139,18 +139,21 @@ export function Shutdown() {
 	StreamPacket(2, 60, red.splice(0, 60));
 	StreamPacket(3, 48, red.splice(0, 48));
 	SubmitKbColors(1, 3, 1);
+	device.pause(1);
 
 	StreamPacket(1, 60, green.splice(0, 60));
 	StreamPacket(2, 60, green.splice(0, 60));
 	StreamPacket(3, 48, green.splice(0, 48));
 	SubmitKbColors(2, 3, 1);
+	device.pause(1);
 
 	StreamPacket(1, 60, blue.splice(0, 60));
 	StreamPacket(2, 60, blue.splice(0, 60));
 	StreamPacket(3, 48, blue.splice(0, 48));
 	SubmitKbColors(3, 3, 2);
+	device.pause(1);
 
-	let packet = [];
+	const packet = [];
 
 	packet[0x00]           = 0x00;
 	packet[0x01]           = CORSAIR_COMMAND_WRITE;
@@ -179,7 +182,7 @@ function StreamPacket(packet_id, data_sz, data) {
 
 
 function SubmitKbColors(color_channel, packet_count, finish_val) {
-	let packet = [];
+	const packet = [];
 
 	packet[0x00]   = 0x00;
 	packet[0x01]   = CORSAIR_COMMAND_WRITE;
@@ -226,7 +229,7 @@ var vKeyPositions = [
 
 ];
 
-let vKeyNames = [
+const vKeyNames = [
 	"Profile", "Brightness", "Lock",                  "Logo",                   "Mute",
 	"G1", "Esc", "F1", "F2", "F3", "F4", "F5", "F6", "F7", "F8", "F9", "F10", "F11", "F12",         "Print Screen", "Scroll Lock", "Pause Break",   "MediaStop", "MediaRewind", "MediaPlayPause", "MediaFastForward",
 	"G2", "`", "1", "2", "3", "4", "5", "6", "7", "8", "9", "0", "-_", "=+", "Backspace",                        "Insert", "Home", "Page Up",       "NumLock", "Num /", "Num *", "Num -",  //21
@@ -243,15 +246,15 @@ let vKeyNames = [
 
 
 // These arrays are unused and for development reference.
-let vMedia = [
+const vMedia = [
 	32, 44, 56, 68
 ];
 
-let vSpecial = [
+const vSpecial = [
 	125, 137, 8, 59, 20
 ];
 
-let vSpecialPositions = [
+const vSpecialPositions = [
 	[0, 3], [0, 4], [0, 5], [0, 9], [0, 17]
 ];
 
@@ -268,19 +271,21 @@ export function Render() {
 		InitScanCodes();
 	}
 
+	device.clearReadBuffer();
+
 	sendColors();
 }
 
 function sendColors(shutdown = false){
 
-	let red = [168];
-	let green = [168];
-	let blue = [168];
+	const red = [168];
+	const green = [168];
+	const blue = [168];
 
 
 	for(let iIdx = 0; iIdx < vKeys.length; iIdx++) {
-		let iPxX = vKeyPositions[iIdx][0];
-		let iPxY = vKeyPositions[iIdx][1];
+		const iPxX = vKeyPositions[iIdx][0];
+		const iPxY = vKeyPositions[iIdx][1];
 		var mxPxColor;
 
 		if(shutdown){
