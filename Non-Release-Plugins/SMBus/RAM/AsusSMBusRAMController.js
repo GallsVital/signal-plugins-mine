@@ -1,4 +1,4 @@
-// Modifing SMBUS Plugins is -DANGEROUS- and can -DESTROY- devices.
+// Modifying SMBUS Plugins is -DANGEROUS- and can -DESTROY- devices.
 export function Name() { return "Asus Aura Compatible Ram"; }
 export function Publisher() { return "WhirlwindFX"; }
 export function Type() { return "SMBUS"; }

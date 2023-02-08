@@ -1,4 +1,4 @@
-// Modifing SMBUS Plugins is -DANGEROUS- and can -DESTROY- devices.
+// Modifying SMBUS Plugins is -DANGEROUS- and can -DESTROY- devices.
 export function Name() { return "Corsair Vengenace Pro Ram"; }
 export function Publisher() { return "WhirlwindFX"; }
 export function Documentation(){ return "troubleshooting/corsair"; }
@@ -35,6 +35,11 @@ export function Scan(bus) {
 export function Size() { return [2, 10]; }
 export function DefaultPosition(){return [40, 30];}
 export function DefaultScale(){return 10.0;}
+/* global
+shutdownColor:readonly
+LightingMode:readonly
+forcedColor:readonly
+*/
 export function ControllableParameters(){
 	return [
 		{"property":"shutdownColor", "group":"lighting", "label":"Shutdown Color", "min":"0", "max":"360", "type":"color", "default":"009bde"},
@@ -74,7 +79,7 @@ const vPecTable = [
 
 
 function WritePacket() {
-	if (iRamVersion === 4) { WritePacketV4(); } else if (iRamVersion === 3) { WritePacketV3(); }
+	if (iRamVersion === 4) { WritePacketV4(); }// else if (iRamVersion === 3) { WritePacketV3(); }
 }
 
 

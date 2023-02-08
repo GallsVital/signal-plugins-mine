@@ -1,4 +1,4 @@
-// Modifing SMBUS Plugins is -DANGEROUS- and can -DESTROY- devices.
+// Modifying SMBUS Plugins is -DANGEROUS- and can -DESTROY- devices.
 //DO NOT USE THIS PLUGIN. This device is flash-based.
 export function Name() { return "PNY GPU"; }
 export function Publisher() { return "WhirlwindFX"; }
