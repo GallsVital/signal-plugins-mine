@@ -12,7 +12,7 @@ shutdownColor:readonly
 LightingMode:readonly
 forcedColor:readonly
 */
-export function ControllableParameters(){
+export function ControllableParameters() {
 	return [
 		{"property":"shutdownColor", "group":"lighting", "label":"Shutdown Color", "min":"0", "max":"360", "type":"color", "default":"009bde"},
 		{"property":"LightingMode", "group":"lighting", "label":"Lighting Mode", "type":"combobox", "values":["Canvas", "Forced"], "default":"Canvas"},
@@ -20,7 +20,7 @@ export function ControllableParameters(){
 	];
 }
 
-let vLedNames =
+const vLedNames =
 [
 	"Esc", "F1", "F2", "F3", "F4", "F5", "F6", "F7", "F8", "F9", "F10", "F11", "F12",         "Print Screen", "Scroll Lock", "Pause Break",
 	"`", "1", "2", "3", "4", "5", "6", "7", "8", "9", "0", "-_", "=+", "Backspace",                        "Insert", "Home", "Page Up",
@@ -30,7 +30,7 @@ let vLedNames =
 	"Left Ctrl", "Left Win", "Left Alt", "Space", "Right Alt", "Fn", "Menu", "Right Ctrl",  "Left Arrow", "Down Arrow", "Right Arrow",
 ];
 
-let vLedPositions =
+const vLedPositions =
 [
 	[1, 0], [2, 0], [3, 0], [4, 0], [5, 0], [6, 0], [7, 0], [8, 0], [9, 0], [10, 0], [11, 0], [12, 0], [13, 0],           [15, 0], [16, 0], [17, 0],            //20
 	[1, 1], [2, 1], [3, 1], [4, 1], [5, 1], [6, 1], [7, 1], [8, 1], [9, 1], [10, 1], [11, 1], [12, 1], [13, 1], [14, 1],   [15, 1], [16, 1], [17, 1],
@@ -60,8 +60,6 @@ export function Render() {
 	SendPacket(3);
 	SendPacket(4);
 	SendPacket(5);
-
-	Apply();
 }
 
 
@@ -72,13 +70,10 @@ export function Shutdown() {
 	SendPacket(3, true);
 	SendPacket(4, true);
 	SendPacket(5, true);
-
-	Apply();
-
 }
 
 function SendPacket(idx, shutdown = false) {
-	let packet = [];
+	const packet = [];
 	packet[0] = 0x00;
 	packet[1] = 0x00;
 	packet[2] = 0x1F;
@@ -104,7 +99,7 @@ function SendPacket(idx, shutdown = false) {
 			col = device.color(iIdx, idx);
 		}
 
-		let iLedIdx = (iIdx*3) + 14;
+		const iLedIdx = (iIdx*3) + 14;
 		packet[iLedIdx] = col[0];
 		packet[iLedIdx+1] = col[1];
 		packet[iLedIdx+2] = col[2];
@@ -114,57 +109,6 @@ function SendPacket(idx, shutdown = false) {
 
 	device.send_report(packet, 91);
 }
-
-function Apply() {
-	let packet = []; //new Array(91).fill(0);
-	packet[0] = 0x00;
-	packet[1] = 0x00;
-	packet[2] = 0x1F;
-	packet[3] = 0x00;
-	packet[4] = 0x00;
-	packet[5] = 0x00;
-	packet[6] = 0x08;
-	packet[7] = 0x0F;
-	packet[8] = 0x03;
-	packet[14] = 0xcc;
-	packet[15] = 0x60;
-	packet[16] = 0xff;
-
-	packet[89] = CalculateCrc(packet);
-
-	device.send_report(packet, 91);
-}
-
-function GetReport(cmd_class, cmd_id, size) {
-	let report = new Array(91).fill(0);
-
-	report[0] = 0;
-
-	// Status.
-	report[1] = 0x00;
-
-	// Transaction ID.
-	report[2] = 0xFF;
-
-	// Remaining packets.
-	report[3] = 0x00;
-	report[4] = 0x00;
-
-	// Protocol type.
-	report[5] = 0x00;
-
-	// Data size.
-	report[6] = size;
-
-	// Command class.
-	report[7] = cmd_class;
-
-	// Command id.
-	report[8] = cmd_id;
-
-	return report;
-}
-
 
 function CalculateCrc(report) {
 	let iCrc = 0;
@@ -177,8 +121,8 @@ function CalculateCrc(report) {
 }
 
 function hexToRgb(hex) {
-	let result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
-	let colors = [];
+	const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+	const colors = [];
 	colors[0] = parseInt(result[1], 16);
 	colors[1] = parseInt(result[2], 16);
 	colors[2] = parseInt(result[3], 16);
