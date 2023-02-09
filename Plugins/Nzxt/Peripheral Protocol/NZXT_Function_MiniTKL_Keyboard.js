@@ -1,6 +1,6 @@
 export function Name() { return "NZXT Function MiniTKL"; }
 export function VendorId() { return 0x1E71; }
-export function ProductId() { return 0x2105; }
+export function ProductId() { return [0x2105, 0x2108]; }
 export function Publisher() { return "WhirlwindFX"; }
 export function Documentation(){ return "troubleshooting/nzxt"; }
 export function Size() { return [10, 10]; }
@@ -64,7 +64,7 @@ function sendColorBurstOne(shutdown = false) {
 		const offset = zone_idx;
 		const iX = vLedPositions[offset][0];
 		const iY = vLedPositions[offset][1];
-		let col;
+		var col;
 
 		if(shutdown) {
 			col = hexToRgb(shutdownColor);
@@ -126,7 +126,7 @@ function sendColorBurstTwo(shutdown = false) {
 		const offset = zone_idx + 2;
 		const iX = vLedPositions[offset][0];
 		const iY = vLedPositions[offset][1];
-		let col;
+		var col;
 
 		if(shutdown) {
 			col = hexToRgb(shutdownColor);
@@ -185,7 +185,7 @@ function sendColorBurstThree(shutdown = false) {
 		const offset = zone_idx + 5;
 		const iX = vLedPositions[offset][0];
 		const iY = vLedPositions[offset][1];
-		let col;
+		var col;
 
 		if(shutdown) {
 			col = hexToRgb(shutdownColor);
@@ -255,7 +255,7 @@ function sendColorBurstFour(shutdown = false) {
 		const offset = zone_idx + 8;
 		const iX = vLedPositions[offset][0];
 		const iY = vLedPositions[offset][1];
-		let col;
+		var col;
 
 		if(shutdown) {
 			col = hexToRgb(shutdownColor);
