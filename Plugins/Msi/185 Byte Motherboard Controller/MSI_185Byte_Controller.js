@@ -34,7 +34,7 @@ const ParentDeviceName = "Mystic Light Controller";
 
 export function SupportsSubdevices(){ return true; }
 
-const DeviceMaxLedLimit = 270;
+const DeviceMaxLedLimit = 360;
 
 //Channel Name, Led Limit
 const ChannelArray = [];
@@ -59,23 +59,24 @@ export function LedPositions() {
 }
 
 export function Initialize() {
+	MSIMotherboard.detectGen2Support(); //Kind of cheating to call this detection, but welcome to MSI. Abandon all hope of autodetection.
 	MSIMotherboard.checkPerLEDSupport();
 	MSIMotherboard.createLEDs();
-	MSIMotherboard.detectGen2Support(); //Kind of cheating to call this detection, but welcome to MSI. Abandon all hope of autodetection.
 
 	device.setName(device.getMotherboardName());
 }
 
 export function Render() {
 	if(perLED === true) {
-		if(ARGBHeaders > 2 || ARGBHeaders > 1 && CorsairHeaders > 0) {
-			if(gen2Support) {
-				MSIMotherboard.sendGen2SplitPacketARGB();
-			} else {
-				MSIMotherboard.sendGen1SplitPacketARGB();
-			}
+		if(ARGBHeaders > 1 && CorsairHeaders > 0) {
+			MSIMotherboard.sendGen1SplitPacketARGB();//Gen 1 boards have JCorsair headers and therefore use a new zone register.
 		} else {
-			MSIMotherboard.sendGen1ARGB();
+			if(gen2Support) { ///MMM Nesting
+				MSIMotherboard.sendGen2SplitPacketARGB(); //Gen 2 boards use a 3rd register on the 0x04 zone as that's still a JRainbow.
+			} else {
+				MSIMotherboard.sendGen1ARGB(); //This is the older ARGB Send style. It uses a single packet for all zones. I may deprecate this.
+			}
+
 		}
 	} else {
 		if(MSIMotherboard.CheckPacketLength() !== 185) {
@@ -1087,7 +1088,19 @@ class MysticLight {
 				PerLEDOnboardLEDs : 0,
 				ForceZoneBased	  : false,
 				JARGB_V2		  : true,
-			}
+			},
+			0x7E07 : //Z790-A Pro DDR4
+			{
+				OnboardLEDs    : 0,
+				RGBHeaders     : 1,
+				ARGBHeaders    : 3,
+				JPipeLEDs	   : 0,
+				CorsairHeaders : 0,
+				//PERLED
+				PerLEDOnboardLEDs : 0,
+				ForceZoneBased	  : false,
+				JARGB_V2		  : true,
+			},
 		};
 
 		this.OffsetDict =
@@ -1157,9 +1170,9 @@ class MysticLight {
 		{
 			JRainbowArray :
 			[
-				["JRainbow 1", 75],
-				["JRainbow 2", 75],
-				["Jrainbow 3", 75]
+				["JRainbow 1", 120],
+				["JRainbow 2", 120],
+				["Jrainbow 3", 120]
 			],
 
 			JCorsairArray :
@@ -1273,9 +1286,9 @@ class MysticLight {
 			0x01, 0x00, 0x00, 0x00, 0x08, 0x00, 0x00, 0x00, 0x80, 0x00, //JRGB1
 			0x01, 0x00, 0x00, 0x00, 0x2a, 0x00, 0x00, 0x00, 0x80, 0x00, //JPipe1
 			0x01, 0x00, 0x00, 0x00, 0x2a, 0x00, 0x00, 0x00, 0x80, 0x00, //JPipe2
-			0x25, 0x00, 0x00, 0x00, 0x29, 0x00, 0x00, 0x00, 0x80, 0x00, 0x4B, //JRainbow1 //Extra Byte determines number of leds We're keeping these capped at 75 for now. No boom. This does give headroom for up to 200.
-			0x25, 0x00, 0x00, 0x00, 0x29, 0x00, 0x00, 0x00, 0x80, 0x00, 0x4B, //JRainbow2
-			0x25, 0x00, 0x00, 0x00, 0x29, 0x00, 0x00, 0x00, 0x82, 0x00, 0x4B, //JRainbow3 or Corsair?
+			0x25, 0x00, 0x00, 0x00, 0x29, 0x00, 0x00, 0x00, 0x80, 0x00, 0x78, //JRainbow1 //Extra Byte determines number of leds We're keeping these capped at 75 for now. No boom. This does give headroom for up to 200.
+			0x25, 0x00, 0x00, 0x00, 0x29, 0x00, 0x00, 0x00, 0x80, 0x00, 0x78, //JRainbow2
+			0x25, 0x00, 0x00, 0x00, 0x29, 0x00, 0x00, 0x00, 0x82, 0x00, 0x78, //JRainbow3 or Corsair?
 			0x01, 0x00, 0x00, 0x00, 0x28, 0x00, 0x00, 0x00, 0x80, 0x00, //JCorsair other?
 			0x25, 0x00, 0x00, 0x00, 0xa9, 0x00, 0x00, 0x00, 0xb1, 0x00, //JOnboard1
 			0x01, 0x00, 0x00, 0x00, 0x28, 0x00, 0x00, 0x00, 0x80, 0x00, //JOnboard2
@@ -1467,7 +1480,7 @@ class MysticLight {
 
 	///////////////////////////////////////////////////////////////////////PERLED
 	PerLEDInit() {
-		if(ARGBHeaders > 2 || ARGBHeaders > 1 && CorsairHeaders > 0) {
+		if(gen2Support || ARGBHeaders > 1 && CorsairHeaders > 0) {
 			device.send_report(this.splitPerLEDPacket, 185);
 		} else {
 			device.send_report(this.perledpacket, 185);
@@ -1505,7 +1518,6 @@ class MysticLight {
 
 	grabChannelRGBData(Channel) {
     	let ChannelLedCount = device.channel(ChannelArray[Channel][0]).LedCount();
-		const ChannelLedLimit = device.channel(ChannelArray[Channel][0]).LedLimit();
 		const componentChannel = device.channel(ChannelArray[Channel][0]);
 
 		let RGBData = [];
@@ -1521,7 +1533,7 @@ class MysticLight {
 			RGBData = device.channel(ChannelArray[Channel][0]).getColors("Inline");
 		}
 
-    	return RGBData.concat(new Array((ChannelLedLimit*3) - RGBData.length).fill(0));
+    	return RGBData.concat(new Array((120*3) - RGBData.length).fill(0));
 	}
 
 	detectGen2Support() {
@@ -1605,9 +1617,9 @@ class MysticLight {
 
 	sendGen1ARGB() {
 		const [OnboardLEDData, RGBHeaderData] = this.grabZones();
-		const packet = [0x53, 0x25, 0x06, 0x00, 0x00];
-		packet.push(...OnboardLEDData.splice(0, 3*OnboardLEDs));
-		packet.push(...RGBHeaderData.splice(0, 3*RGBHeaders));
+		const packet = [0x53, 0x25, 0x06, 0x00, 0x00]; //Header for RGB Sends
+		packet.push(...OnboardLEDData.splice(0, 3*OnboardLEDs)); //Push Onboard LEDs First.
+		packet.push(...RGBHeaderData.splice(0, 3*RGBHeaders)); //Push Data From RGB Headers.
 
 		for(let jRainbowHeaders = 0; jRainbowHeaders < ARGBHeaders; jRainbowHeaders++) {
 			const jRainbowHeaderRGBData = this.grabChannelRGBData(jRainbowHeaders);
@@ -1657,22 +1669,29 @@ class MysticLight {
 
 		const header1Data = this.grabChannelRGBData(0);
 		const header2Data = this.grabChannelRGBData(1);
-		const header3Data = this.grabChannelRGBData(2);
 
 		if(header1Data.length > 0) {
 			device.send_report([0x53, 0x25, 0x04, 0x00, 0x00].concat(header1Data), 725);
+			device.pause(5);
 		}
 
 		if(header2Data.length > 0) {
 			device.send_report([0x53, 0x25, 0x04, 0x01, 0x00].concat(header2Data), 725);
+			device.pause(5);
 		}
 
-		if(header3Data.length > 0) {
-			device.send_report([0x53, 0x25, 0x04, 0x02, 0x00].concat(header3Data), 725);
+		if(ARGBHeaders > 2) {
+			const header3Data = this.grabChannelRGBData(2);
+
+			if(header3Data.length > 0) {
+				device.send_report([0x53, 0x25, 0x04, 0x02, 0x00].concat(header3Data), 725);
+				device.pause(5);
+			}
 		}
 
 		if(OnboardLEDData.length > 0) {
 			device.send_report([0x53, 0x25, 0x06, 0x00, 0x00].concat(OnboardLEDData), 725);
+			device.pause(5);
 		}
 	}
 }
