@@ -388,6 +388,7 @@ class Asus_Ampere_Lovelace_IDs {
 		this.RTX3090TI_TUF_GAMING				   = 0x8874;
 
 		this.RTX4070TI_TUF_GAMING_OC			   = 0x88A3;
+		this.RTX4070TI_12GB_STRIX_GAMING_OC		   = 0X88A7;
 		this.RTX4080_TUF_GAMING					   = 0x88A1;
 		this.RTX4080_STRIX_GAMING_OC 			   = 0x88BF;
 		this.RTX4080_TUF_GAMING_OC				   = 0x88CA;
@@ -491,6 +492,7 @@ const Asus3000GPUIDs =
 	new AsusGPUIdentifier(Nvidia.RTX3090TI, AsusID.RTX3090TI_STRIX_LC_GAMING_OC, "Asus ROG Strix 3090TI LC OC"),
 	new AsusGPUIdentifier(Nvidia.RTX3090TI, AsusID.RTX3090TI_TUF_GAMING, "Asus TUF 3090TI Gaming"),
 
+	new AsusGPUIdentifier(Nvidia.RTX4070TI, AsusID.RTX4070TI_12GB_STRIX_GAMING_OC, "Asus ROG Strix RTX 4070Ti 12GB Gaming OC"),
 	new AsusGPUIdentifier(Nvidia.RTX4070TI, AsusID.RTX4070TI_TUF_GAMING_OC, "Asus TUF RTX 4070Ti Gaming OC"),
 	new AsusGPUIdentifier(Nvidia.RTX4080, AsusID.RTX4080_TUF_GAMING, "Asus TUF RTX 4080 Gaming"),
 	new AsusGPUIdentifier(Nvidia.RTX4080, AsusID.RTX4080_STRIX_GAMING_OC, "Asus ROG Strix 4080 Gaming OC"),
