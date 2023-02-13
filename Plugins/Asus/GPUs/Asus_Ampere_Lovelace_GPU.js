@@ -500,7 +500,6 @@ const Asus3000GPUIDs =
 	new AsusGPUIdentifier(Nvidia.RTX4070TI, AsusID.RTX4070TI_12GB_STRIX_GAMING_OC, "Asus ROG Strix RTX 4070Ti 12GB Gaming OC"),
 	new AsusGPUIdentifier(Nvidia.RTX4070TI, AsusID.RTX4070TI_TUF_GAMING_OC, "Asus TUF RTX 4070Ti Gaming OC"),
 	new AsusGPUIdentifier(Nvidia.RTX4080, AsusID.RTX4080_TUF_GAMING, "Asus TUF RTX 4080 Gaming"),
-	new AsusGPUIdentifier(Nvidia.RTX4080, AsusID.RTX4080_STRIX_GAMING, "Asus ROG Strix RTX 4080 Gaming"),
 	new AsusGPUIdentifier(Nvidia.RTX4080, AsusID.RTX4080_TUF_GAMING_2, "Asus TUF RTX 4080 Gaming"),
 	new AsusGPUIdentifier(Nvidia.RTX4080, AsusID.RTX4080_STRIX_GAMING, "Asus ROG Strix RTX 4080 Gaming"),
 	new AsusGPUIdentifier(Nvidia.RTX4080, AsusID.RTX4080_STRIX_GAMING_OC, "Asus ROG Strix 4080 Gaming OC"),
