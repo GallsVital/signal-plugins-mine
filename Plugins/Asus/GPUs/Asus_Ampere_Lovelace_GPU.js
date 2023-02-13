@@ -376,6 +376,7 @@ class Asus_Ampere_Lovelace_IDs {
 		this.RTX3080TI_STRIX_GAMING                = 0x8807;
 		this.RTX3080TI_STRIX_GAMING_OC             = 0x8808;
 		this.RTX3080TI_STRIX_LC_GAMING_OC          = 0x8809;
+		this.RTX3080TI_STRIX_LC                    = 0x880a;
 
 		this.RTX3090_TUF_GAMING_OC                 = 0x87B3;
 		this.RTX3090_TUF_GAMING                    = 0x87B5;
@@ -486,6 +487,7 @@ const Asus3000GPUIDs =
 	new AsusGPUIdentifier(Nvidia.RTX3080TI, AsusID.RTX3080TI_STRIX_GAMING, "Asus ROG Strix 3080TI O12G Gaming"),
 	new AsusGPUIdentifier(Nvidia.RTX3080TI, AsusID.RTX3080TI_STRIX_GAMING_OC, "Asus ROG Strix 3080TI O12G Gaming OC"),
 	new AsusGPUIdentifier(Nvidia.RTX3080TI, AsusID.RTX3080TI_STRIX_LC_GAMING_OC, "Asus ROG Strix 3080TI LC Gaming OC"),
+	new AsusGPUIdentifier(Nvidia.RTX3080TI, AsusID.RTX3080TI_STRIX_LC, "Asus ROG Strix RTX 3080TI LC"),
 
 	new AsusGPUIdentifier(Nvidia.RTX3090, AsusID.RTX3090_TUF_GAMING_OC, "Asus TUF 3090 Gaming OC"),
 	new AsusGPUIdentifier(Nvidia.RTX3090, AsusID.RTX3090_TUF_GAMING, "Asus TUF 3090 Gaming"),
