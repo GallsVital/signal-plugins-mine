@@ -10,13 +10,13 @@ export function LedPositions() { return []; }
 /* global
 LightingMode:readonly
 forcedColor:readonly
-EndpointMode:readonly
+ArduinoCompatibilityMode:readonly
 */
 export function ControllableParameters(){
 	return [
 		{"property":"LightingMode", "group":"lighting", "label":"Lighting Mode", "type":"combobox", "values":["Canvas", "Forced"], "default":"Canvas"},
 		{"property":"forcedColor", "group":"lighting", "label":"Forced Color", "min":"0", "max":"360", "type":"color", "default":"009bde"},
-		{"property":"EndpointMode", "group":"", "label":"Endpoint Mode", "type":"combobox", "values":["Corsair", "Arduino"], "default":"Corsair"},
+		{"property":"ArduinoCompatibilityMode", "group":"", "label":"Arduino Compatibility Mode", "type":"boolean", "default":"false", "tooltip":"This is required for Arduino Based Models. Enabling will lower frame rate on Official Corsair Models."},
 	];
 }
 
@@ -48,6 +48,7 @@ export function Validate(endpoint) {
 
 export function Initialize() {
 	SetupChannels();
+
 	CorsairLightingController.FetchFirmwareVersion();
 }
 
@@ -61,7 +62,6 @@ export function Render() {
 	device.pause(1);
 
 	CorsairLightingController.CommitColors();
-
 
 }
 
@@ -154,17 +154,17 @@ class CorsairLightingControllerProtocol{
 		const packet = [0x00, this.commandIds.mode, ChannelId, Mode];
 
 		device.write(packet, this.writeLength);
-		//device.read([0x00], this.readLength);
+		this.SafeRead();
 	}
 	/**
 	 * @param {ChannelId} ChannelId
 	 * @param {number[][]} RGBData
 	 */
 	SetDirectColors(ChannelId, RGBData){
-		CorsairLightingController.SetChannelToSoftwareMode(ChannelId);
+		this.SetChannelToSoftwareMode(ChannelId);
 
-		if(EndpointMode === "Arduino"){
-			CorsairLightingController.StartDirectColorSend(ChannelId);
+		if(ArduinoCompatibilityMode){
+			this.StartDirectColorSend(ChannelId);
 		}
 
 		//Stream RGB Data
@@ -175,11 +175,11 @@ class CorsairLightingControllerProtocol{
 		while(TotalLedCount > 0){
 			const ledsToSend = TotalLedCount >= 50 ? 50 : TotalLedCount;
 
-			CorsairLightingController.StreamDirectColors(ledsSent, ledsToSend, 0, RGBData[0].splice(0, ledsToSend), ChannelId);
+			this.StreamDirectColors(ledsSent, ledsToSend, 0, RGBData[0].splice(0, ledsToSend), ChannelId);
 
-			CorsairLightingController.StreamDirectColors(ledsSent, ledsToSend, 1, RGBData[1].splice(0, ledsToSend), ChannelId);
+			this.StreamDirectColors(ledsSent, ledsToSend, 1, RGBData[1].splice(0, ledsToSend), ChannelId);
 
-			CorsairLightingController.StreamDirectColors(ledsSent, ledsToSend, 2, RGBData[2].splice(0, ledsToSend), ChannelId);
+			this.StreamDirectColors(ledsSent, ledsToSend, 2, RGBData[2].splice(0, ledsToSend), ChannelId);
 
 			ledsSent += ledsToSend;
 			TotalLedCount -= ledsToSend;
@@ -189,20 +189,30 @@ class CorsairLightingControllerProtocol{
 		const packet = [0x00, this.commandIds.startDirect, ChannelId];
 
 		device.write(packet, this.writeLength);
-		//device.read([0x00], this.readLength);
+		this.SafeRead();
 	}
 	StreamDirectColors(startIdx, count, colorChannelid, data, channelId) {
 		let packet = [0x00, this.commandIds.directColors, channelId, startIdx, count, colorChannelid];
 		packet = packet.concat(data);
 
 		device.write(packet, this.writeLength);
-		//device.read([0x00], this.readLength);
+		this.SafeRead();
 	}
 	CommitColors(){
 		const packet = [0x00, this.commandIds.commit, 0xFF];
 
 		device.write(packet, this.writeLength);
-		//device.read([0x00], this.readLength, 5);
+		this.SafeRead();
+	}
+
+	// Arduino based Node Pro's cannot use a 0 timeout buffer clear.
+	// This results in a 6fps loss for arduino models we can avoid on official models.
+	SafeRead(){
+		if(ArduinoCompatibilityMode){
+			return device.read([0x00], 17);
+		}
+
+		return device.read([0x00], 17, 0);
 	}
 }
 const CorsairLightingController = new CorsairLightingControllerProtocol();

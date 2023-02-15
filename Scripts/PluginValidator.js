@@ -51,7 +51,7 @@ class PluginValidator {
 		this.validators = [
 			CheckThatLEDNameAndPositionLengthsMatch,
 			CheckAllLedPositionsAreWithinBounds,
-			CheckForGPUListDuplicates,
+			//CheckForGPUListDuplicates,
 		];
 		this.excludedFiles = [".test.js"];
 	}

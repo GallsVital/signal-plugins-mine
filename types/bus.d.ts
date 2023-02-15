@@ -38,7 +38,7 @@ declare class FixedAddressBus extends BusBase{
 	public ReadBlockBytes(Register: number, Size: number): [number, number[]]
 	public ReadBlockWithoutRegister(Size: number): [number, number[]]
 	public WriteBlock(Register: number, Size: number, Data: number[]): number
-	public WriteBlockWithoutRegister(Address: number, Size: number, Data: number[]): number
+	public WriteBlockWithoutRegister(Size: number, Data: number[]): number
 	public WriteWord(Register: number, Word: number): number
 	public WriteByte(Register: number, Byte: number): number
 	public WriteQuick(Address: number): number

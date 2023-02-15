@@ -86,7 +86,7 @@ function HeaderConfiguration(){
 // 	0x24, // RGB Header Top "LED_C2"
 // ];
 
-const vDLED_Zones = [];
+let vDLED_Zones = [];
 
 const MotherboardConfigs = {
 	'Auto': {
@@ -130,6 +130,17 @@ const MotherboardConfigs = {
 			0x24: ["12V Header Top", HeaderConfiguration]
 		}
 	},
+	"B550M AORUS PRO": {
+		ARGB:{
+			"5v ARGB Header 1": 0x58,
+			"5v ARGB Header 2": 0x59,
+		},
+		Mainboard:{
+			0x21: ["12v Header Bottom", HeaderConfiguration],
+			0x23: ["PCIe", MainboardConfiguration],
+			0x24: ["12V Header Top", HeaderConfiguration]
+		}
+	},
 	"X570 AORUS ELITE": {
 		ARGB:{
 			"5v ARGB Header 1": 0x58,
@@ -164,6 +175,19 @@ const MotherboardConfigs = {
 			0x21: ["12v Header Bottom", HeaderConfiguration],
 			0x23: ["PCIe", MainboardConfiguration],
 			0x24: ["12V Header Top", HeaderConfiguration]
+		}
+	},
+	// Has typo in WMI?
+	"X570S I AORUS PRO AX": {
+		ARGB:{
+			"5v ARGB Header 1": 0x58,
+		},
+		Mainboard:{
+			0x20: ["Back IO", MainboardConfiguration],
+			0x21: ["Mainboard", MainboardConfiguration],
+			0x22: ["PCIe", MainboardConfiguration],
+			0x23: ["South Bridge", HeaderConfiguration],
+			0x24: ["12v Header", HeaderConfiguration],
 		}
 	},
 	"X570 AORUS ULTRA": {
@@ -261,6 +285,8 @@ function InitializeZones(){
 		CreateZone(zone, ...configuration.Mainboard[zone]);
 	}
 
+	vDLED_Zones = [];
+
 	for(const header in configuration.ARGB){
 		device.log(`Adding ARGB Header [${header}], Id: ${configuration.ARGB[header]}`, {toFile: true});
 		ChannelArray.push([header, DevicePerChannelLedLimit]);
@@ -333,14 +359,16 @@ function CreateZ790IOPanel(Enable){
 	}
 }
 
-function SendSubdeviceAsARGBchannel(SubdeviceId, SubdeviceConfig, ChannelId){
+function SendSubdeviceAsARGBchannel(SubdeviceId, SubdeviceConfig, ChannelId, shutdown = false){
 	const RGBData = [];
 
 	for(let iIdx = 0 ; iIdx < SubdeviceConfig.positioning.length; iIdx++){
 		const Led = SubdeviceConfig.positioning[iIdx];
 		let col;
 
-		if (LightingMode  === "Forced") {
+		if(shutdown){
+			col = hexToRgb(shutdownColor);
+		}else if (LightingMode === "Forced") {
 			col = hexToRgb(forcedColor);
 		}else{
 			col = device.subdeviceColor(SubdeviceId, Led[0], Led[1]);
@@ -373,22 +401,35 @@ export function Render() {
 			UpdateARGBChannels(channel);
 		}
 	}
-
 }
 
 
 export function Shutdown() {
-	//device.removeMessage("firmware test");
+	if(Z790MA_Mode){
+		for(let i = 0x20; i < 0x28;i++){
+			sendColorPacket(i, [0, 0, 0]);
+			sendCommit();
+		}
 
+		SendSubdeviceAsARGBchannel("Z790IOPanel", Z790_IO_Panel, 0x58, true);
+	}else{
+		UpdateActiveZones(true);
+
+		for(let channel = 0; channel < vDLED_Zones.length; channel++){
+			UpdateARGBChannels(channel, true);
+		}
+	}
 }
 
-function UpdateActiveZones(){
+function UpdateActiveZones(shutdown = false){
 
 	for(let iIdx = 0 ; iIdx < ActiveZones.length; iIdx++){
 		const zone = ActiveZones[iIdx];
 		let col;
 
-		if (LightingMode  === "Forced") {
+		if(shutdown){
+			col = hexToRgb(shutdownColor);
+		}else if (LightingMode === "Forced") {
 			col = hexToRgb(forcedColor);
 		}else{
 			col = device.subdeviceColor(zone.name, 1, 1);
@@ -481,6 +522,8 @@ function UpdateARGBChannels(Channel, shutdown = false) {
 
 		RGBData = device.createColorArray(pulseColor, ChannelLedCount, "Inline", RGBconfig);
 
+	}else if(shutdown){
+		RGBData = device.createColorArray(shutdownColor, ChannelLedCount, "Inline", RGBconfig);
 	}else{
 		RGBData = componentChannel.getColors("Inline", RGBconfig);
 	}

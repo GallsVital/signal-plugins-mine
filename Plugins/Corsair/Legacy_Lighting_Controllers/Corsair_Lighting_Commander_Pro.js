@@ -10,17 +10,22 @@ export function LedPositions() {return []; }
 /* global
 LightingMode:readonly
 forcedColor:readonly
-EndpointMode:readonly
+MonitoringCompatibilityMode:readonly
 */
 export function ControllableParameters(){
 	return [
 		{"property":"LightingMode", "group":"lighting", "label":"Lighting Mode", "type":"combobox", "values":["Canvas", "Forced"], "default":"Canvas"},
 		{"property":"forcedColor", "group":"lighting", "label":"Forced Color", "min":"0", "max":"360", "type":"color", "default":"009bde"},
-		{"property":"EndpointMode", "group":"", "label":"Endpoint Mode", "type":"combobox", "values":["Corsair", "Arduino"], "default":"Corsair"},
+		{"property":"MonitoringCompatibilityMode", "group":"", "label":"Monitoring Compatibility Mode", "type":"boolean", "default":"false", "tooltip":"This is required for compatibility with other hardware monitors. Enabling will lower frame rate and RGB may stutter when other programs are interacting with this device."},
 	];
 }
 
 export function SupportsSubdevices(){ return true; }
+export function SupportsFanControl(){ return true; }
+// Use the CorsairLink mutex any time this device is rendering.
+// if we don't our reads may be ruined by other programs
+export function UsesCorsairMutex(){ return true; }
+
 export function DefaultComponentBrand() { return "Corsair";}
 export function Documentation(){ return "troubleshooting/corsair"; }
 
@@ -57,14 +62,18 @@ export function Initialize() {
 	// Set the proper device name for the 1000D case as we're sharing the plugin file
 	device.setName(ProductNames[device.productId()]);
 
-	StateMgr.Push(new StatePollFans(StateMgr));
-	StateMgr.Push(new StatePollTempProbes(StateMgr));
+	if(StateMgr.states.length === 0){
+		StateMgr.Push(new StatePollFans(StateMgr));
+		StateMgr.Push(new StatePollTempProbes(StateMgr));
+	}
 
 	SetupChannels();
 
 }
 
 export function Render() {
+	device.clearReadBuffer();
+
 	StateMgr.process();
 
 	SendChannel(0);
@@ -75,16 +84,28 @@ export function Render() {
 
 	CorsairLightingController.CommitColors();
 
+
+	// Wait until the device has no pending packets left
+	// if we let the last packet land after we unlock the corsair link mutex then programs using the
+	// CPUID SDK will risk getting their packets shifted by one if it lands after their first write.
+	// This takes ~10ms to do
+	if(MonitoringCompatibilityMode){
+		//const start = Date.now();
+
+		device.clearReadBuffer();
+		device.read([0x00], 17, 40);
+
+		//const end = Date.now();
+		//device.log(`Final Read took ${end-start}ms.`);
+	}
+
 }
 
 
 export function Shutdown() {
 	CorsairLightingController.SetChannelToHardwareMode(0);
 	CorsairLightingController.SetChannelToHardwareMode(1);
-	ConnectedFans = [];
-	ConnectedProbes = [];
 }
-
 
 /**
  * @param {ChannelId} Channel
@@ -167,6 +188,7 @@ function FindTempSensors(){
 		if(config[i] === 1){
 			if(!ConnectedProbes.includes(i)){
 				ConnectedProbes.push(i);
+				device.createTemperatureSensor(`Temperature Probe ${i + 1}`);
 				device.log(`Found Temp Sensor on Port ${i + 1}`, {toFile: true});
 			}
 		}
@@ -256,12 +278,24 @@ class State{
 class StateSystemMonitoringDisabled extends State{
 	constructor(controller){
 		super(controller, 5000);
-		// Reset Connected fans on creation
-		// this should only be created if the monitoring system is disabled
-		ConnectedFans = [];
-		ConnectedProbes = [];
 	}
 	run(){
+		// Clear Existing Fans
+		for(const FanID of ConnectedFans){
+			device.log(`Removing Fan Control: Fan ${FanID+1}`);
+			device.removeFanControl(`Fan ${FanID+1}`);
+		}
+
+		ConnectedFans = [];
+
+		// Clear Existing Probes
+		for(const ProbeID of ConnectedProbes){
+			device.log(`Removing Temperature Probe ${ProbeID + 1}`);
+			device.removeTemperatureSensor(`Temperature Probe ${ProbeID + 1}`);
+		}
+
+		ConnectedProbes = [];
+
 		// Stay here until fan control is enabled.
 		if(!device.fanControlDisabled()) {
 			device.log(`Fan Control Enabled, Fetching Connected Fans...`, {toFile: true});
@@ -278,7 +312,7 @@ class StateEnumerateConnectedFans extends State{
 	run(){
 		// Add Blocking State if fan control is disabled
 		if(device.fanControlDisabled()) {
-			device.log(`Fan Control Disabled. Resetting Connected Fans...`, {toFile: true});
+			device.log(`Fan Control Disabled...`, {toFile: true});
 			this.controller.Push(new StateSystemMonitoringDisabled(this.controller));
 
 			return;
@@ -312,7 +346,7 @@ class StatePollFans extends State{
 	run(){
 		// Add Blocking State if fan control is disabled
 		if(device.fanControlDisabled()) {
-			device.log(`Fan Control Disabled. Resetting Connected Fans...`, {toFile: true});
+			device.log(`Fan Control Disabled...`, {toFile: true});
 			this.Reset();
 			this.controller.Push(new StateSystemMonitoringDisabled(this.controller));
 
@@ -370,7 +404,7 @@ class StateEnumerateConnectedProbes extends State{
 	run(){
 		// Add Blocking State if fan control is disabled
 		if(device.fanControlDisabled()) {
-			device.log(`Fan Control Disabled. Resetting Connected Fans...`, {toFile: true});
+			device.log(`Fan Control Disabled...`, {toFile: true});
 			this.controller.Push(new StateSystemMonitoringDisabled(this.controller));
 
 			return;
@@ -398,7 +432,7 @@ class StatePollTempProbes extends State{
 	run(){
 		// Add Blocking State if fan control is disabled
 		if(device.fanControlDisabled()) {
-			device.log(`Fan Control Disabled. Resetting Connected Fans...`, {toFile: true});
+			device.log(`Fan Control Disabled...`, {toFile: true});
 			this.Reset();
 			this.controller.Push(new StateSystemMonitoringDisabled(this.controller));
 
@@ -431,6 +465,8 @@ class StatePollTempProbes extends State{
 		if(Temperature !== 0){
 			device.log(`Temperature Probe ${ConnectedProbes[this.index] + 1} is currently at ${Temperature}c`);
 			// Do something later
+			device.SetTemperature(`Temperature Probe ${ConnectedProbes[this.index] + 1}`, Temperature);
+
 		}else{
 			device.log(`Temperature Probe ${ConnectedProbes[this.index] + 1} returned a bad read!`);
 
@@ -557,9 +593,7 @@ class CorsairLightingControllerProtocol{
 	SetDirectColors(ChannelId, RGBData){
 		CorsairLightingController.SetChannelToSoftwareMode(ChannelId);
 
-		//if(EndpointMode === "Arduino"){
 		CorsairLightingController.StartDirectColorSend(ChannelId);
-		//}
 
 		//Stream RGB Data
 		let ledsSent = 0;

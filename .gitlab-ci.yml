@@ -5,6 +5,7 @@ stages:
   - validate
   - duplicate gpu check
   - unit test
+  - build
   
 # Cache modules in between jobs
 cache:
@@ -44,7 +45,6 @@ duplicate gpu check:
     #- npm install
     - npm run test:CheckDuplicateGPU
 
-
 unit test:
   stage: unit test
   when: always
@@ -53,9 +53,26 @@ unit test:
     #- apk add --update npm
     #- npm install
     - npm run test:ci
+  artifacts:
+    when: always
+    reports:
+      junit:
+        - junit.xml
+
+build:
+  stage: build
+  allow_failure: true # User Props will always throw errors in TS.
+
+  script:
+    #- apk add --update npm
+    #- npm install
+    - npm run build
 
   artifacts:
     when: always
+    name: "Javascript Plugins"
+    paths:
+      - dist/**/*.js
     reports:
       junit:
         - junit.xml

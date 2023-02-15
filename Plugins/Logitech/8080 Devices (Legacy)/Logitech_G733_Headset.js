@@ -17,7 +17,7 @@ export function ControllableParameters(){
 		{"property":"shutdownColor", "group":"lighting", "label":"Shutdown Color", "min":"0", "max":"360", "type":"color", "default":"009bde"},
 		{"property":"LightingMode", "group":"lighting", "label":"Lighting Mode", "type":"combobox", "values":["Canvas", "Forced"], "default":"Canvas"},
 		{"property":"forcedColor", "group":"lighting", "label":"Forced Color", "min":"0", "max":"360", "type":"color", "default":"009bde"},
-		{"property":"sideTone", "group":"", "label":"Sidetone", "step":"1", "type":"number", "min":"0", "max":"100", "default":"100"},
+		{"property":"sideTone", "group":"", "label":"Sidetone", "step":"1", "type":"number", "min":"0", "max":"100", "default":"0"},
 
 	];
 }

@@ -1,4 +1,4 @@
-// Modifing SMBUS Plugins is -DANGEROUS- and can -DESTROY- devices.
+// Modifying SMBUS Plugins is -DANGEROUS- and can -DESTROY- devices.
 export function Name() { return "Crucial Ballistix Ram"; }
 export function Publisher() { return "WhirlwindFX"; }
 export function Documentation(){ return "troubleshooting"; }
@@ -86,16 +86,7 @@ export function Initialize() {
 }
 
 export function Render() {
-	if(this.profile === undefined){
-		this.profile = new Profiler("UpdateColors");
-	}else{
-		this.profile.setStart();
-	}
-
 	UpdateColors();
-	device.log(`Total Packets [${sentPackets + savedPackets}]. Checking RGB values saved us sending [${Math.floor(savedPackets/(savedPackets+sentPackets) * 100)}]% of them`);
-	device.log(`Saved: [${savedPackets}] Sent: [${sentPackets}]`);
-	this.profile.detailedReport();
 }
 
 export function Shutdown() {
@@ -129,63 +120,6 @@ function UpdateColors(shutdown = false){
 
 	 Ballistix.SendRGBData(RedColors, GreenColors, BlueColors);
 
-}
-
-const sentPackets = 0;
-const savedPackets = 0;
-
-function CompareArrays(array1, array2){
-	return array1.length === array2.length &&
-	array1.every(function(value, index) { return value === array2[index];});
-}
-
-class Profiler{
-	constructor(context){
-		this.context = context;
-		this.startTime = Date.now();
-		this.shortestTime = Infinity;
-		this.longestTime = 0;
-		this.averageTime = 0;
-		this.values = [];
-	}
-	setStart(){
-		this.startTime = Date.now();
-	}
-	report(){
-		const elapsedTime = Date.now() - this.startTime;
-		device.log(`${this.context} took: ${elapsedTime}ms!`);
-	}
-	detailedReport(){
-		const currentTime = Date.now();
-		const elapsedTime = currentTime - this.startTime;
-
-		this.shortestTime = Math.min(this.shortestTime, elapsedTime);
-		this.longestTime = Math.max(this.longestTime, elapsedTime);
-
-		this.values.push(elapsedTime);
-
-		// calculate the real average at a small number of values
-		// swap over to a quicker to calculate moving average when we hit 50 calls.
-		if(this.values.length < 50){
-			this.averageTime = this.values.reduce((a, b) => (a + b)) / this.values.length;
-		}else{
-			this.averageTime -= this.values.shift() / 50;
-			this.averageTime += elapsedTime / 50;
-		}
-
-		device.log(`${this.context} took: ${elapsedTime}ms!, Shortest: [${this.shortestTime}]ms, Longest: [${this.longestTime}]ms, Average: [${Math.round(this.averageTime * 100) / 100}]ms`);
-
-		this.startTime = currentTime;
-
-	}
-}
-
-function ProfileFunction(context, func){
-	const Profile = new Profiler(context);
-
-	func();
-
-	Profile.report();
 }
 
 class CrucialInterface{
@@ -279,45 +213,9 @@ class CrucialBallistix{
 	}
 
 	SendRGBData(RedData, GreenData, BlueData){
-		// let skippedPackets = 0;
-
-		// if(!CompareArrays(RedData, this.config.RedChannelData)){
-		// 	this.Interface.WriteBlock(this.registers.RedColorChannel, RedData);
-		// 	this.config.RedChannelData = RedData;
-		// 	sentPackets++;
-		// }else{
-		// 	skippedPackets++;
-		// 	savedPackets++;
-		// }
-
-		// if(!CompareArrays(GreenData, this.config.GreenChannelData)){
-		// 	this.Interface.WriteBlock(this.registers.GreenColorChannel, GreenData);
-		// 	this.config.GreenChannelData = GreenData;
-		// 	sentPackets++;
-		// }else{
-		// 	skippedPackets++;
-		// 	savedPackets++;
-		// }
-
-		// if(!CompareArrays(BlueData, this.config.BlueChannelData)){
-		// 	this.Interface.WriteBlock(this.registers.BlueColorChannel, BlueData);
-		// 	this.config.BlueChannelData = BlueData;
-		// 	sentPackets++;
-		// }else{
-		// 	skippedPackets++;
-		// 	savedPackets++;
-		// }
-
-		// if(skippedPackets){
-		// 	device.pause(3 * skippedPackets);
-		// }
-
 		this.Interface.WriteBlock(this.registers.RedColorChannel, RedData);
-
 		this.Interface.WriteBlock(this.registers.GreenColorChannel, GreenData);
-
 		this.Interface.WriteBlock(this.registers.BlueColorChannel, BlueData);
-
 	}
 
 	CheckForFreeAddresses() {
