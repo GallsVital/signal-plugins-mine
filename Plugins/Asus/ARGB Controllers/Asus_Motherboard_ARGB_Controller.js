@@ -83,6 +83,8 @@ function Sendchannel(Channel, shutdown = false) {
 		const pulseColor = device.getChannelPulseColor(ChannelArray[Channel][0], ChannelLedCount);
 		RGBData = device.createColorArray(pulseColor, ChannelLedCount, "Inline");
 
+	}else if(shutdown){
+		RGBData = device.createColorArray(shutdownColor, ChannelLedCount, "Inline");
 	}else{
 		RGBData = device.channel(ChannelArray[Channel][0]).getColors("Inline");
 	}
