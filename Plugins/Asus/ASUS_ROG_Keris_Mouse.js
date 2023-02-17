@@ -1,6 +1,6 @@
 export function Name() { return "ASUS ROG Keris"; }
 export function VendorId() { return 0x0B05; }
-export function ProductId() { return [0x195C, 0x1960]; }
+export function ProductId() { return [0x195C, 0x1960, 0x195e]; }
 export function Publisher() { return "WhirlwindFX"; }
 export function Documentation(){ return "troubleshooting/asus"; }
 export function Size() { return [7, 8]; }
