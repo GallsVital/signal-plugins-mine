@@ -390,6 +390,7 @@ class Asus_Ampere_Lovelace_IDs {
 
 		this.RTX4070TI_TUF_GAMING_OC			   = 0x88A3;
 		this.RTX4070TI_12GB_STRIX_GAMING_OC		   = 0X88A7;
+
 		this.RTX4070TI_TUF_GAMING_OC_2			   = 0x88A4;
 		this.RTX4080_TUF_GAMING					   = 0x88A1;
 		this.RTX4080_STRIX_GAMING				   = 0x889f;
