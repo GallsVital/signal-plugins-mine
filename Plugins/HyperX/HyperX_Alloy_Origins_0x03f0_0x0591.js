@@ -83,23 +83,11 @@ const vKeymapABNT2 = [
 ];
 
 export function LedNames() {
-	if (layout === "ANSI"){
-		vLedNames = vLedNamesANSI;
-	}else {
-		vLedNames = vLedNamesABNT2;
-	}
-
-	return vLedNames;
+	return vLedNamesANSI;
 }
 
 export function LedPositions() {
-	if (layout === "ANSI"){
-		vLedPositions = vLedPositionsANSI;
-	}else {
-		vLedPositions = vLedPositionsABNT2;
-	}
-
-	return vLedPositions;
+	return vLedPositionsANSI;
 }
 
 export function onlayoutChanged() {
@@ -118,7 +106,7 @@ export function onlayoutChanged() {
 }
 
 export function Initialize() {
-
+	onlayoutChanged();
 }
 
 export function Render() {
@@ -144,7 +132,7 @@ function sendColor(shutdown = false) {
 	for(let iIdx = 0; iIdx < vKeymap.length; iIdx++) {
 		const iPxX = vLedPositions[iIdx][0];
 		const iPxY = vLedPositions[iIdx][1];
-		var color;
+		let color;
 
 		if(shutdown) {
 			color = hexToRgb(shutdownColor);
