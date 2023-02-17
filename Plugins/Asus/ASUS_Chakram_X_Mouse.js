@@ -21,8 +21,8 @@ export function ControllableParameters(){
 }
 
 function hexToRgb(hex) {
-	let result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
-	let colors = [];
+	const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+	const colors = [];
 	colors[0] = parseInt(result[1], 16);
 	colors[1] = parseInt(result[2], 16);
 	colors[2] = parseInt(result[3], 16);
@@ -36,11 +36,11 @@ export function Initialize() {
 export function Shutdown() {
 }
 
-let vKeyNames = [
+const vKeyNames = [
 	"Scroll Wheel", "Logo", "Front Zone", "Front Zone 2", "Front Zone 3",
 ];
 
-let vKeyPositions = [
+const vKeyPositions = [
 	[1, 1], [1, 3], [0, 0], [1, 0], [2, 0],
 ];
 
@@ -53,13 +53,13 @@ export function LedPositions() {
 }
 
 export function Render() {
-	sendColors(4,5);
-	sendColors(5,0);
+	sendColors(4, 5);
+	sendColors(5, 0);
 }
 
 function sendColors(zone, zone2, shutdown = false){
 
-	let packet = [];
+	const packet = [];
 	packet[0] = 0x00;
 	packet[1] = 0x51;
 	packet[2] = 0x29;
@@ -68,8 +68,8 @@ function sendColors(zone, zone2, shutdown = false){
 	packet[5] = zone2;
 
 	for(let iIdx = 0; iIdx < vKeyPositions.length; iIdx++) {
-		let iPxX = vKeyPositions[iIdx][0];
-		let iPxY = vKeyPositions[iIdx][1];
+		const iPxX = vKeyPositions[iIdx][0];
+		const iPxY = vKeyPositions[iIdx][1];
 		var color;
 
 		if(shutdown) {
@@ -84,7 +84,7 @@ function sendColors(zone, zone2, shutdown = false){
 		packet[iIdx*3+6+1] = color[1];
 		packet[iIdx*3+6+2] = color[2];
 	}
- 
+
 	device.write(packet, 65);
 }
 

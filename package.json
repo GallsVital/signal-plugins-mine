@@ -21,7 +21,7 @@
 		"typescript": "^4.8.2"
 	},
 	"scripts": {
-		"lint": "node node_modules/eslint/bin/eslint.js ./Plugins",
+		"lint": "node node_modules/eslint/bin/eslint.js ./Plugins --fix",
 		"lint:ci": "node node_modules/eslint/bin/eslint.js ./Plugins --quiet",
 		"lint:addGlobals": "node ./Scripts/ASTParser.js --comments",
 		"lint:checkGlobals": "node ./Scripts/ASTParser.js --comments --dryrun",

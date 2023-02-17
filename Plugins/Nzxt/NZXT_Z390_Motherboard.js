@@ -18,12 +18,12 @@ export function ControllableParameters(){
 		{"property":"forcedColor", "group":"lighting", "label":"Forced Color", "min":"0", "max":"360", "type":"color", "default":"009bde"},
 	];
 }
-let ParentDeviceName = "NZXT Z390";
+const ParentDeviceName = "NZXT Z390";
 export function SupportsSubdevices(){ return true; }
 const DeviceMaxLedLimit = 120;
 
 //Channel Name, Led Limit
-let ChannelArray = [
+const ChannelArray = [
 	["Channel 1", 40],
 	["Channel 2", 40],
 	["Channel 2", 40],
@@ -60,7 +60,7 @@ function StreamLightingPacketChanneled(packetNumber, count, data, channel) {
 }
 
 function SubmitLightingColors(channel) {
-	let packet = [];
+	const packet = [];
 	packet[0] = 0x22;
 	packet[1] = 0xA0;
 	packet[2] = 1 << channel;
@@ -92,7 +92,7 @@ export function LedPositions() {
 
 function SendChannel(Channel, shutdown = false) {
 	let ChannelLedCount = device.channel(ChannelArray[Channel][0]).LedCount();
-	let componentChannel = device.channel(ChannelArray[Channel][0]);
+	const componentChannel = device.channel(ChannelArray[Channel][0]);
 
 	let RGBData = [];
 
@@ -102,7 +102,7 @@ function SendChannel(Channel, shutdown = false) {
 	}else if(componentChannel.shouldPulseColors()){
 		ChannelLedCount = 40;
 
-		let pulseColor = device.getChannelPulseColor(ChannelArray[Channel][0], ChannelLedCount);
+		const pulseColor = device.getChannelPulseColor(ChannelArray[Channel][0], ChannelLedCount);
 		RGBData = device.createColorArray(pulseColor, ChannelLedCount, "Inline", "GRB");
 
 	}else{
@@ -113,7 +113,7 @@ function SendChannel(Channel, shutdown = false) {
 	ChannelLedCount = ChannelLedCount >= 120 ? 120 : ChannelLedCount;
 
 	while(ChannelLedCount > 0){
-		let ledsToSend = ChannelLedCount >= 20 ? 20 : ChannelLedCount;
+		const ledsToSend = ChannelLedCount >= 20 ? 20 : ChannelLedCount;
 		StreamLightingPacketChanneled(packetNumber, ledsToSend, RGBData.splice(0, ledsToSend * 3), Channel);
 
 		packetNumber += 1;

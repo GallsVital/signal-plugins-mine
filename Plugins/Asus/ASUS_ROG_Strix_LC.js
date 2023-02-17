@@ -23,8 +23,8 @@ export function ControllableParameters(){
 }
 
 function hexToRgb(hex) {
-	let result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
-	let colors = [];
+	const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+	const colors = [];
 	colors[0] = parseInt(result[1], 16);
 	colors[1] = parseInt(result[2], 16);
 	colors[2] = parseInt(result[3], 16);
@@ -32,8 +32,8 @@ function hexToRgb(hex) {
 	return colors;
 }
 
-let vLedNames = ["Led 1", "Led 2", "Led 3", "Led 4", ];
-let vLedPositions = [
+const vLedNames = ["Led 1", "Led 2", "Led 3", "Led 4", ];
+const vLedPositions = [
 	[0, 2], [1, 2], [2, 2], [3, 2]
 ];
 
@@ -52,11 +52,11 @@ export function Initialize() {
 
 function SendColors(shutdown = false) {
 	let TotalLedCount = 0;
-	let RGBdata = [];
+	const RGBdata = [];
 
 	for(let iIdx = 0; iIdx < vLedPositions.length; iIdx++) {
-		let iPxX = vLedPositions[iIdx][0];
-		let iPxY = vLedPositions[iIdx][1];
+		const iPxX = vLedPositions[iIdx][0];
+		const iPxY = vLedPositions[iIdx][1];
 		var col;
 
 		if(shutdown){
@@ -97,7 +97,7 @@ function sendDirectPacket(channel, start, count, data, apply){
 }
 
 function setDirectMode(){
-	let packet = [0xEC, 0x3B, 0x00, 0xFF];
+	const packet = [0xEC, 0x3B, 0x00, 0xFF];
 	device.write(packet, 65);
 }
 
@@ -106,8 +106,8 @@ export function Shutdown() {
 }
 
 function sendPacketString(string, size){
-	let packet= [];
-	let data = string.split(' ');
+	const packet= [];
+	const data = string.split(' ');
 
 	for(let i = 0; i < data.length; i++){
 		packet[i] = parseInt(data[i], 16);

@@ -26,11 +26,11 @@ export function ControllableParameters(){
 export function ConflictingProcesses(){
 	return ["LedKeeper.exe", "Dragon Center", "DCv2.exe", "LightKeeperService.exe", "LightKeeperService2.exe" ];
 }
-let ParentDeviceName = "MSI B450";
+const ParentDeviceName = "MSI B450";
 
 function hexToRgb(hex) {
-	let result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
-	let colors = [];
+	const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+	const colors = [];
 	colors[0] = parseInt(result[1], 16);
 	colors[1] = parseInt(result[2], 16);
 	colors[2] = parseInt(result[3], 16);
@@ -38,14 +38,14 @@ function hexToRgb(hex) {
 	return colors;
 }
 
-let vLedNames = [
+const vLedNames = [
 	"Mainboard Led 1", "Mainboard Led 2", "Mainboard Led 3", "Mainboard Led 4", "Mainboard Led 5",
 	"Mainboard Led 6", "Mainboard Led 7", "Mainboard Led 8", "Mainboard Led 9", "Mainboard Led 10",
 ];
-let vLedPositions = [
+const vLedPositions = [
 	[0, 0], [1, 0], [2, 0], [3, 0], [4, 0], [5, 0], [6, 0], [7, 0], [8, 0], [9, 0]
 ];
-let vLedMap = [
+const vLedMap = [
 	0, 1, 2, 3, 4, 5, 6, 7, 8, 9
 ];
 const initialPacket = [
@@ -115,11 +115,11 @@ const HeaderDict = [
 const ARGBHeaderDict = [
 	MSI_162_RAINBOW1_OFFSET
 ];
-let HeaderArray = [
+const HeaderArray = [
 	"Bottom Fans",
 	"Top Fans",
 ];
-let ARGBHeaderArray = [
+const ARGBHeaderArray = [
 	"5v ARGB Header 1"
 ];
 export function LedNames() {
@@ -205,8 +205,8 @@ function CreateARGBHeaders(){
 
 function SetMainboardLeds(shutdown = false) {
 	for(let iIdx = 0; iIdx < vLedMap.length; iIdx++) {
-		let iPxX = vLedPositions[iIdx][0];
-		let iPxY = vLedPositions[iIdx][1];
+		const iPxX = vLedPositions[iIdx][0];
+		const iPxY = vLedPositions[iIdx][1];
 		var col;
 
 		if(shutdown){

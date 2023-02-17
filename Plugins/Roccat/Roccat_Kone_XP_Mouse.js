@@ -43,7 +43,7 @@ export function ControllableParameters(){
 	];
 }
 
-let SettingReport =
+const SettingReport =
 [
 	0x06, 0xae, 0x00, 0x06, 0x06, 0x1f, 0x04, 0x08, 0x00, 0x10, 0x00, 0x18, 0x00, 0x20, 0x00, 0x48, 0x00, 0x08, 0x00, 0x10, 0x00, 0x18, 0x00, 0x20, 0x00, 0x40, 0x00, 0x00,
 	0x00, 0x03, 0x0a, 0x06, 0xff, 0x0f, 0x00, 0x00, 0x14, 0xff, 0x00, 0x48, 0xff, 0x64, 0x14, 0xff, 0x00, 0x48, 0xff, 0x64, 0x14, 0xff, 0x00, 0x48, 0xff, 0x64, 0x14, 0xff,
@@ -94,65 +94,56 @@ export function Shutdown() {
 }
 
 export function ondpi1Changed() {
-	if(DpiControl)
-	{
-	Setup();
+	if(DpiControl) {
+		Setup();
 	}
 }
 
 export function ondpi2Changed() {
-	if(DpiControl)
-	{
-	Setup();
+	if(DpiControl) {
+		Setup();
 	}
 }
 
 export function ondpi3Changed() {
-	if(DpiControl)
-	{
-	Setup();
+	if(DpiControl) {
+		Setup();
 	}
 }
 
 export function ondpi4Changed() {
-	if(DpiControl)
-	{
-	Setup();
+	if(DpiControl) {
+		Setup();
 	}
 }
 
 export function ondpi5Changed() {
-	if(DpiControl)
-	{
-	Setup();
+	if(DpiControl) {
+		Setup();
 	}
 }
 
 export function onPollingRateChanged() {
-	if(DpiControl)
-	{
-	Setup();
+	if(DpiControl) {
+		Setup();
 	}
 }
 
 export function onanglesnappingChanged() {
-	if(DpiControl)
-	{
-	Setup();
+	if(DpiControl) {
+		Setup();
 	}
 }
 
 export function ontimeoutChanged() {
-	if(DpiControl)
-	{
-	Setup();
+	if(DpiControl) {
+		Setup();
 	}
 }
 
 export function ontimeoutlengthChanged() {
-	if(DpiControl)
-	{
-	Setup();
+	if(DpiControl) {
+		Setup();
 	}
 }
 
@@ -165,8 +156,8 @@ export function onlodChanged() {
 }
 
 function sendReportString(string, size) {
-	let packet= [];
-	let data = string.split(' ');
+	const packet= [];
+	const data = string.split(' ');
 
 	for(let i = 0; i < data.length; i++) {
 		packet[parseInt(i, 16)] =parseInt(data[i], 16);//.toString(16)
@@ -177,7 +168,7 @@ function sendReportString(string, size) {
 
 function SetDebounce() //for some reason this has its own function?
 {
-	let packet = [];
+	const packet = [];
 	packet[0] = 0x11;
 	packet[1] = 0x14;
 	packet[2] = debounce;
@@ -191,7 +182,7 @@ function SetDebounce() //for some reason this has its own function?
 
 function SetLiftOffDistance() //also has its own function?
 {
-	let packet = [];
+	const packet = [];
 	packet[0] = 0x0f;
 	packet[1] = 0x06;
 
@@ -208,8 +199,7 @@ function SetLiftOffDistance() //also has its own function?
 
 }
 
-function Setup() 
-{
+function Setup() {
 	SettingReport[7] =    (dpi1/50)%256;
 	SettingReport[8] =   Math.floor(dpi1/50/256);
 	SettingReport[9] =    (dpi2/50)%256;
@@ -232,13 +222,13 @@ function Setup()
 }
 
 function sendZone(shutdown = false) {
-	let packet = [];
+	const packet = [];
 	packet[0] = 0x0D;
 	packet[1] = 0x7a;
 
 	for(let iIdx = 0; iIdx < 20; iIdx++) {
-		let iPxX = vLedPositions[iIdx][0];
-		let iPxY = vLedPositions[iIdx][1];
+		const iPxX = vLedPositions[iIdx][0];
+		const iPxY = vLedPositions[iIdx][1];
 		var col;
 
 		if(shutdown) {
@@ -268,8 +258,8 @@ export function Validate(endpoint) {
 }
 
 function hexToRgb(hex) {
-	let result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
-	let colors = [];
+	const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+	const colors = [];
 	colors[0] = parseInt(result[1], 16);
 	colors[1] = parseInt(result[2], 16);
 	colors[2] = parseInt(result[3], 16);

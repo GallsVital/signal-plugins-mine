@@ -61,8 +61,8 @@ function sendColors(shutdown = false) {
 	packet[0] = 0x00; //Zero Padding
 
 	for (let idx = 0; idx < vLedPositions.length; idx++) {
-		let iPxX = vLedPositions[idx][0];
-		let iPxY = vLedPositions[idx][1];
+		const iPxX = vLedPositions[idx][0];
+		const iPxY = vLedPositions[idx][1];
 		var color;
 
 		if (shutdown){
@@ -83,8 +83,8 @@ function sendColors(shutdown = false) {
 }
 
 function hexToRgb(hex) {
-	let result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
-	let colors = [];
+	const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+	const colors = [];
 	colors[0] = parseInt(result[1], 16);
 	colors[1] = parseInt(result[2], 16);
 	colors[2] = parseInt(result[3], 16);

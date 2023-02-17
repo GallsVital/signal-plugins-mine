@@ -19,12 +19,12 @@ export function ControllableParameters(){
 	];
 }
 
-let vLedNames = [ "Zone 1", "Zone 2", "Zone 3", "Zone 4", "Zone 5", "Zone 6", "Zone 7", "Zone 8" ];
+const vLedNames = [ "Zone 1", "Zone 2", "Zone 3", "Zone 4", "Zone 5", "Zone 6", "Zone 7", "Zone 8" ];
 
-let vLedPositions = [ [0, 0], [1, 0], [2, 0], [3, 0], [4, 0], [5, 0], [6, 0], [7, 0] ];
+const vLedPositions = [ [0, 0], [1, 0], [2, 0], [3, 0], [4, 0], [5, 0], [6, 0], [7, 0] ];
 
 export function Initialize() {
-	let packet = [];
+	const packet = [];
 	packet[0x00]   = 0x00;
 	packet[0x01]   = 0x90;
 	packet[0x02]   = 0x00;
@@ -54,14 +54,14 @@ export function Validate(endpoint) {
 
 
 function sendColors(shutdown = false){
-	let packet = [];
+	const packet = [];
 	packet[0x00] = 0x00;
 	packet[0x01] = 0x21;
 	packet[0x02] = 0xff;
 
 	for (let idx = 0; idx < vLedPositions.length; idx++) {
-		let iPxX = vLedPositions[idx][0];
-		let iPxY = vLedPositions[idx][1];
+		const iPxX = vLedPositions[idx][0];
+		const iPxY = vLedPositions[idx][1];
 
 		var col;
 
@@ -84,7 +84,7 @@ function sendColors(shutdown = false){
 }
 
 function Apply() {
-	let packet = [];
+	const packet = [];
 	packet[0x00]   = 0x00;
 	packet[0x01]   = 0x23;
 	packet[0x02]   = 0x10;
@@ -98,8 +98,8 @@ export function Render() {
 }
 
 function hexToRgb(hex) {
-	let result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
-	let colors = [];
+	const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+	const colors = [];
 	colors[0] = parseInt(result[1], 16);
 	colors[1] = parseInt(result[2], 16);
 	colors[2] = parseInt(result[3], 16);

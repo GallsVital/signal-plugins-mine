@@ -27,23 +27,22 @@ ScrollMode:readonly
 ScrollAccel:readonly
 SmartReel:readonly
 */
-export function ControllableParameters()
-{
+export function ControllableParameters() {
 	return [
 		{"property":"shutdownColor", "group":"lighting", "label":"Shutdown Color", "min":"0", "max":"360", "type":"color", "default":"009bde"},
 		{"property":"LightingMode", "group":"lighting", "label":"Lighting Mode", "type":"combobox", "values":["Canvas", "Forced"], "default":"Canvas"},
 		{"property":"forcedColor", "group":"lighting", "label":"Forced Color", "min":"0", "max":"360", "type":"color", "default":"009bde"},
 		{"property":"DpiControl", "group":"mouse", "label":"Enable Dpi Control", "type":"boolean", "default":"false"},
-		{"property":"DPIRollover", "group":"mouse", "label":"DPI Stage Rollover","type":"boolean","default": "false"},
-		{"property":"OnboardDPI", "group":"mouse", "label":"Save DPI to Onboard Storage","type":"boolean","default": "false"},
-		{"property":"dpiStages", "group":"mouse", "label":"Number of DPI Stages","step":"1", "type":"number","min":"1", "max":"5","default":"5"},
-		{"property":"dpi1", "group":"mouse", "label":"DPI 1","step":"50", "type":"number","min":"200", "max":"20000","default":"400"},
-		{"property":"dpi2", "group":"mouse", "label":"DPI 2","step":"50", "type":"number","min":"200", "max":"20000","default":"800"},
-		{"property":"dpi3", "group":"mouse", "label":"DPI 3","step":"50", "type":"number","min":"200", "max":"20000","default":"1200"},
-		{"property":"dpi4", "group":"mouse", "label":"DPI 4","step":"50", "type":"number","min":"200", "max":"20000","default":"1600"},
-		{"property":"dpi5", "group":"mouse", "label":"DPI 5","step":"50", "type":"number","min":"200", "max":"20000","default":"2000"},
-		{"property":"pollingRate", "group":"mouse", "label":"Polling Rate","type":"combobox", "values":[ "1000","500", "100" ], "default":"1000"},
-		{"property":"liftOffDistance", "group":"mouse", "label":"Lift Off Distance (MM)","step":"1", "type":"number","min":"1", "max":"3","default":"1"},
+		{"property":"DPIRollover", "group":"mouse", "label":"DPI Stage Rollover", "type":"boolean", "default": "false"},
+		{"property":"OnboardDPI", "group":"mouse", "label":"Save DPI to Onboard Storage", "type":"boolean", "default": "false"},
+		{"property":"dpiStages", "group":"mouse", "label":"Number of DPI Stages", "step":"1", "type":"number", "min":"1", "max":"5", "default":"5"},
+		{"property":"dpi1", "group":"mouse", "label":"DPI 1", "step":"50", "type":"number", "min":"200", "max":"20000", "default":"400"},
+		{"property":"dpi2", "group":"mouse", "label":"DPI 2", "step":"50", "type":"number", "min":"200", "max":"20000", "default":"800"},
+		{"property":"dpi3", "group":"mouse", "label":"DPI 3", "step":"50", "type":"number", "min":"200", "max":"20000", "default":"1200"},
+		{"property":"dpi4", "group":"mouse", "label":"DPI 4", "step":"50", "type":"number", "min":"200", "max":"20000", "default":"1600"},
+		{"property":"dpi5", "group":"mouse", "label":"DPI 5", "step":"50", "type":"number", "min":"200", "max":"20000", "default":"2000"},
+		{"property":"pollingRate", "group":"mouse", "label":"Polling Rate", "type":"combobox", "values":[ "1000", "500", "100" ], "default":"1000"},
+		{"property":"liftOffDistance", "group":"mouse", "label":"Lift Off Distance (MM)", "step":"1", "type":"number", "min":"1", "max":"3", "default":"1"},
 		{"property":"asymmetricLOD", "group":"mouse", "label":"Asymmetric Lift Off Distance", "type":"boolean", "default":"false"},
 		{"property":"ScrollMode", "group":"mouse", "label":"Freespin Scrolling", "type":"boolean", "default":"false"},
 		{"property":"ScrollAccel", "group":"mouse", "label":"Scroll Acceleration", "type":"boolean", "default":"true"},
@@ -51,32 +50,28 @@ export function ControllableParameters()
 	];
 }
 
-let transactionID = 0x1f;
+const transactionID = 0x1f;
 
-let vLedNames = ["Logo", "Scrollwheel", "UnderLeft1", "UnderLeft2", "UnderLeft3", "UnderLeft4", "UnderLeft5", "UnderBottom", "UnderRight1", "UnderRight2", "UnderRight3", "UnderRight4", "UnderRight5"];
+const vLedNames = ["Logo", "Scrollwheel", "UnderLeft1", "UnderLeft2", "UnderLeft3", "UnderLeft4", "UnderLeft5", "UnderBottom", "UnderRight1", "UnderRight2", "UnderRight3", "UnderRight4", "UnderRight5"];
 
-let vLedPositions = [[3, 4], [3, 0], [0, 1], [0, 2], [0, 3], [0, 4], [1, 5], [3, 6], [4, 4], [5, 3], [5, 2], [5, 1], [5, 0]];
+const vLedPositions = [[3, 4], [3, 0], [0, 1], [0, 2], [0, 3], [0, 4], [1, 5], [3, 6], [4, 4], [5, 3], [5, 2], [5, 1], [5, 0]];
 
-export function LedNames() 
-{
+export function LedNames() {
 	return vLedNames;
 }
 
-export function LedPositions() 
-{
+export function LedPositions() {
 	return vLedPositions;
 }
 
-export function Initialize()
-{
-	device.set_endpoint(0,0x0002,0x0001);
+export function Initialize() {
+	device.set_endpoint(0, 0x0002, 0x0001);
 
 	getDeviceMode();
 	getDeviceFirmwareVersion();
 	getDeviceSerial();
 
-	if(DpiControl)
-	{
+	if(DpiControl) {
 		DPIStageControl();
 	}
 
@@ -84,246 +79,205 @@ export function Initialize()
 	setDeviceLOD();
 	setDeviceScrollMode();
 	setDeviceScrollAccel();
-	setDeviceSmartReel();	
+	setDeviceSmartReel();
 }
 
-export function Render() 
-{
+export function Render() {
 	setDeviceColor();
 
 	detectInputs();
 }
 
-export function Shutdown() 
-{
+export function Shutdown() {
 	setDeviceMode(0x00);
 }
 
-export function onDpiControlChanged()
-{
-	if(DpiControl)
-	{
-	DPIStageControl();
-	}
-	else
-	{
-	setDeviceMode(0x00);
+export function onDpiControlChanged() {
+	if(DpiControl) {
+		DPIStageControl();
+	} else {
+		setDeviceMode(0x00);
 	}
 }
 
-export function ondpiStagesChanged()
-{
-	if(DpiControl)
-	{
-	DPIStageControl();
+export function ondpiStagesChanged() {
+	if(DpiControl) {
+		DPIStageControl();
 	}
 }
 
-export function ondpi1Changed()
-{
-	if(DpiControl)
-	{
-	DPIStageControl(true,1);
+export function ondpi1Changed() {
+	if(DpiControl) {
+		DPIStageControl(true, 1);
 	}
 }
 
-export function ondpi2Changed()
-{
-	if(DpiControl)
-	{
-	DPIStageControl(true,2);
+export function ondpi2Changed() {
+	if(DpiControl) {
+		DPIStageControl(true, 2);
 	}
 }
 
-export function ondpi3Changed()
-{
-	if(DpiControl)
-	{
-	DPIStageControl(true,3);
+export function ondpi3Changed() {
+	if(DpiControl) {
+		DPIStageControl(true, 3);
 	}
 }
 
-export function ondpi4Changed()
-{
-	if(DpiControl)
-	{
-	DPIStageControl(true,4);
+export function ondpi4Changed() {
+	if(DpiControl) {
+		DPIStageControl(true, 4);
 	}
 }
 
-export function ondpi5Changed()
-{
-	if(DpiControl)
-	{
-	DPIStageControl(true,5);
+export function ondpi5Changed() {
+	if(DpiControl) {
+		DPIStageControl(true, 5);
 	}
 }
 
-export function onOnboardDPIChanged()
-{
+export function onOnboardDPIChanged() {
 	getDeviceMode();
 	DPIStageControl();
 }
 
-export function onpollingRateChanged()
-{
+export function onpollingRateChanged() {
 	setDevicePollingRate();
 }
 
-export function onasymmetricLODChanged()
-{
+export function onasymmetricLODChanged() {
 	setDeviceLOD();
 }
 
-export function onliftOffDistanceChanged()
-{
+export function onliftOffDistanceChanged() {
 	setDeviceLOD();
 }
 
-export function onScrollModeChanged()
-{
+export function onScrollModeChanged() {
 	setDeviceScrollMode();
 }
 
-export function onScrollAccelChanged()
-{
+export function onScrollAccelChanged() {
 	setDeviceScrollAccel();
 }
 
-export function onSmartReelChanged()
-{
+export function onSmartReelChanged() {
 	setDeviceSmartReel();
 }
 
-function packetSend(packet,length) //Wrapper for always including our CRC
+function packetSend(packet, length) //Wrapper for always including our CRC
 {
-	let packetToSend = packet;
+	const packetToSend = packet;
 	packetToSend[89] = CalculateCrc(packet);
-	device.send_report(packetToSend,length)
+	device.send_report(packetToSend, length);
 }
 
-function CalculateCrc(report) 
-{
+function CalculateCrc(report) {
 	let iCrc = 0;
 
-	for (let iIdx = 3; iIdx < 89; iIdx++) 
-	{
+	for (let iIdx = 3; iIdx < 89; iIdx++) {
 		iCrc ^= report[iIdx];
 	}
 
 	return iCrc;
 }
 
-function getDeviceMode()
-{
-	let packet = [0x00,0x00,transactionID,0x00,0x00,0x00,0x02,0x00,0x84];
-	packetSend(packet,91);
+function getDeviceMode() {
+	const packet = [0x00, 0x00, transactionID, 0x00, 0x00, 0x00, 0x02, 0x00, 0x84];
+	packetSend(packet, 91);
 
-	let returnpacket = device.get_report(packet,91);
-	returnpacket = device.get_report(packet,91);
-	let deviceMode = returnpacket[9];
+	let returnpacket = device.get_report(packet, 91);
+	returnpacket = device.get_report(packet, 91);
+
+	const deviceMode = returnpacket[9];
 	device.log("Current Device Mode: " + deviceMode);
-	if(OnboardDPI && deviceMode !== 0x00)
-	{
+
+	if(OnboardDPI && deviceMode !== 0x00) {
 		setDeviceMode(0x00);
-	}
-	else if(OnboardDPI === false)
-	{
+	} else if(OnboardDPI === false) {
 		setDeviceMode(0x03);
 	}
 }
 
-function setDeviceMode(mode)
-{
-	let packet = [0x00,0x00,transactionID,0x00,0x00,0x00,0x02,0x00,0x04,mode];
-	packetSend(packet,91)
-	let returnpacket = device.get_report(packet,91);
-	returnpacket = device.get_report(packet,91);
+function setDeviceMode(mode) {
+	const packet = [0x00, 0x00, transactionID, 0x00, 0x00, 0x00, 0x02, 0x00, 0x04, mode];
+	packetSend(packet, 91);
+
+	let returnpacket = device.get_report(packet, 91);
+	returnpacket = device.get_report(packet, 91);
 }
 
-function getDeviceSerial()
-{
-	let packet = [0x00,0x00,transactionID,0x00,0x00,0x00,0x16,0x00,0x82];
-	packetSend(packet,91);
+function getDeviceSerial() {
+	const packet = [0x00, 0x00, transactionID, 0x00, 0x00, 0x00, 0x16, 0x00, 0x82];
+	packetSend(packet, 91);
 
-	let returnpacket = device.get_report(packet,91);
-	returnpacket = device.get_report(packet,91);
-	let Serialpacket = returnpacket.slice(9,24);
-	let SerialString = String.fromCharCode(...Serialpacket)
+	let returnpacket = device.get_report(packet, 91);
+	returnpacket = device.get_report(packet, 91);
+
+	const Serialpacket = returnpacket.slice(9, 24);
+	const SerialString = String.fromCharCode(...Serialpacket);
 	device.log("Device Serial: " + SerialString);
 }
 
-function getDeviceFirmwareVersion()
-{
-	let packet = [0x00,0x00,transactionID,0x00,0x00,0x00,0x02,0x00,0x81];
-	packetSend(packet,91);
+function getDeviceFirmwareVersion() {
+	const packet = [0x00, 0x00, transactionID, 0x00, 0x00, 0x00, 0x02, 0x00, 0x81];
+	packetSend(packet, 91);
 
-	let returnpacket = device.get_report(packet,91);
-	returnpacket = device.get_report(packet,91);
-	let FirmwareByte1 = returnpacket[9];
-	let FirmwareByte2 = returnpacket[10];
+	let returnpacket = device.get_report(packet, 91);
+	returnpacket = device.get_report(packet, 91);
+
+	const FirmwareByte1 = returnpacket[9];
+	const FirmwareByte2 = returnpacket[10];
 	device.log("Firmware Version: " + FirmwareByte1 + "." + FirmwareByte2);
 }
 
-function setDevicePollingRate()
-{
-	let packet = [0x00, 0x00, transactionID, 0x00, 0x00, 0x00, 0x01, 0x00, 0x05, 1000/pollingRate];
-	packetSend(packet,91);
+function setDevicePollingRate() {
+	const packet = [0x00, 0x00, transactionID, 0x00, 0x00, 0x00, 0x01, 0x00, 0x05, 1000/pollingRate];
+	packetSend(packet, 91);
 }
 
-function setDeviceLOD()
-{
-	let packet = [0x00, 0x00, transactionID, 0x00, 0x00, 0x00, 0x04, 0x0b, 0x0b, 0x00, 0x04, (asymmetricLOD ? 0x02 : 0x01), (liftOffDistance - 1)];
-	packetSend(packet,91);
+function setDeviceLOD() {
+	const packet = [0x00, 0x00, transactionID, 0x00, 0x00, 0x00, 0x04, 0x0b, 0x0b, 0x00, 0x04, (asymmetricLOD ? 0x02 : 0x01), (liftOffDistance - 1)];
+	packetSend(packet, 91);
 }
 
-function setDeviceScrollMode()
-{
-	let packet = [0x00, 0x00, transactionID, 0x00, 0x00, 0x00, 0x02, 0x02, 0x14, 0x01, (ScrollMode ? 0x01 : 0x00)];
-	packetSend(packet,91);
+function setDeviceScrollMode() {
+	const packet = [0x00, 0x00, transactionID, 0x00, 0x00, 0x00, 0x02, 0x02, 0x14, 0x01, (ScrollMode ? 0x01 : 0x00)];
+	packetSend(packet, 91);
 	device.pause(1);
-	packetSend(packet,91);
+	packetSend(packet, 91);
 }
 
-function setDeviceScrollAccel()
-{
-	let packet = [0x00, 0x00, transactionID, 0x00, 0x00, 0x00, 0x02, 0x02, 0x16, 0x01, (ScrollAccel ? 0x01 : 0x00)];
-	packetSend(packet,91);
+function setDeviceScrollAccel() {
+	const packet = [0x00, 0x00, transactionID, 0x00, 0x00, 0x00, 0x02, 0x02, 0x16, 0x01, (ScrollAccel ? 0x01 : 0x00)];
+	packetSend(packet, 91);
 	device.pause(1);
-	packetSend(packet,91);
+	packetSend(packet, 91);
 }
 
-function setDeviceSmartReel()
-{
-	let packet = [0x00, 0x00, transactionID, 0x00, 0x00, 0x00, 0x02, 0x02, 0x17, 0x01, (SmartReel ? 0x01 : 0x00)];
-	packetSend(packet,91);
+function setDeviceSmartReel() {
+	const packet = [0x00, 0x00, transactionID, 0x00, 0x00, 0x00, 0x02, 0x02, 0x17, 0x01, (SmartReel ? 0x01 : 0x00)];
+	packetSend(packet, 91);
 	device.pause(1);
-	packetSend(packet,91);
+	packetSend(packet, 91);
 }
 
-function setDeviceColor(shutdown = false)
-{
-	let packet = [0x00,0x00,transactionID,0x00,0x00,0x00,0x0B,0x0F,0x03,0x00,0x00,0x00,0x00,0x01];
+function setDeviceColor(shutdown = false) {
+	const packet = [0x00, 0x00, transactionID, 0x00, 0x00, 0x00, 0x0B, 0x0F, 0x03, 0x00, 0x00, 0x00, 0x00, 0x01];
 
-	for(let iIdx = 0; iIdx < vLedPositions.length; iIdx++)
-	{
-		let iPxX = vLedPositions[iIdx][0];
-		let iPxY = vLedPositions[iIdx][1];
+	for(let iIdx = 0; iIdx < vLedPositions.length; iIdx++) {
+		const iPxX = vLedPositions[iIdx][0];
+		const iPxY = vLedPositions[iIdx][1];
 		var col;
 
-		if(shutdown)
-		{
+		if(shutdown) {
 			col = hexToRgb(shutdownColor);
-		}
-		else if (LightingMode === "Forced") 
-		{
+		} else if (LightingMode === "Forced") {
 			col = hexToRgb(forcedColor);
-		}
-		else
-		{
+		} else {
 			col = device.color(iPxX, iPxY);
 		}
-		let iLedIdx = (iIdx*3) + 14;
+		const iLedIdx = (iIdx*3) + 14;
 		packet[iLedIdx] = col[0];
 		packet[iLedIdx+1] = col[1];
 		packet[iLedIdx+2] = col[2];
@@ -339,28 +293,24 @@ const DPIStageDict =
 	3:  function(){ return dpi3; },
 	4:  function(){ return dpi4; },
 	5:  function(){ return dpi5; }
-}
+};
 
 let DPIStage = 1;
 
-function DPIStageControl(override, stage)
-{
-	if(override === true)
-	{
-	DPIStage = stage;
+function DPIStageControl(override, stage) {
+	if(override === true) {
+		DPIStage = stage;
 	}
 
-	if(DPIStage > dpiStages)
-    {
-        DPIStage = (DPIRollover ? 1 : dpiStages);
-    }
-	if(DPIStage < 1)
-	{
+	if(DPIStage > dpiStages) {
+		DPIStage = (DPIRollover ? 1 : dpiStages);
+	}
+
+	if(DPIStage < 1) {
 		DPIStage = (DPIRollover ? dpiStages : 1);
 	}
 
-	if(DpiControl)
-	{		
+	if(DpiControl) {
 		OnboardDPI ? setDeviceDPI(DPIStage) : setDeviceSoftwareDPI(DPIStageDict[DPIStage]());
 	}
 
@@ -368,17 +318,15 @@ function DPIStageControl(override, stage)
 
 }
 
-function setDeviceSoftwareDPI(dpi)
-{
-	let packet = [0x00, 0x00, 0x1F, 0x00, 0x00, 0x00, 0x07, 0x04, 0x05, 0x00, Math.floor(dpi/256), dpi%256, Math.floor(dpi/256), dpi%256];
-	packetSend(packet,91);
+function setDeviceSoftwareDPI(dpi) {
+	const packet = [0x00, 0x00, 0x1F, 0x00, 0x00, 0x00, 0x07, 0x04, 0x05, 0x00, Math.floor(dpi/256), dpi%256, Math.floor(dpi/256), dpi%256];
+	packetSend(packet, 91);
 }
 
-function setDeviceDPI(stage)
-{
-	let packet = [0x00,0x00,transactionID,0x00,0x00,0x00,0x26,0x04,0x06,0x01,stage,dpiStages,0x00];
-	
-	packet[13] = Math.floor(dpi1/256); 
+function setDeviceDPI(stage) {
+	const packet = [0x00, 0x00, transactionID, 0x00, 0x00, 0x00, 0x26, 0x04, 0x06, 0x01, stage, dpiStages, 0x00];
+
+	packet[13] = Math.floor(dpi1/256);
 	packet[14] = dpi1%256;
 	packet[15] = Math.floor(dpi1/256);
 	packet[16] = dpi1%256;
@@ -410,42 +358,38 @@ function setDeviceDPI(stage)
 	packet[42] = dpi5%256;
 	packet[43] = Math.floor(dpi5/256);
 	packet[44] = dpi5%256;
-	
-	packetSend(packet,91);
+
+	packetSend(packet, 91);
 	device.pause(50);
 }
 
-function detectInputs()
-{
-	device.set_endpoint(1,0x0000,0x0001);
-	let packet = device.read([0x00],16,3);
+function detectInputs() {
+	device.set_endpoint(1, 0x0000, 0x0001);
+
+	const packet = device.read([0x00], 16, 3);
 	processInputs(packet);
-	device.set_endpoint(0,0x0002,0x0001);
+	device.set_endpoint(0, 0x0002, 0x0001);
 }
 
-function processInputs(packet) 
-{
-	if(packet[0] === 0x04 && packet[1] === 0x20)
-	{
+function processInputs(packet) {
+	if(packet[0] === 0x04 && packet[1] === 0x20) {
 		device.log("DPI Up");
-		device.set_endpoint(0,0x0002,0x0001);
-		DPIStage++
+		device.set_endpoint(0, 0x0002, 0x0001);
+		DPIStage++;
 		DPIStageControl();
 	}
 
-	if(packet[0] === 0x04 && packet[1] === 0x21)
-	{
+	if(packet[0] === 0x04 && packet[1] === 0x21) {
 		device.log("DPI Down");
-		device.set_endpoint(0,0x0002,0x0001);
-		DPIStage--
+		device.set_endpoint(0, 0x0002, 0x0001);
+		DPIStage--;
 		DPIStageControl();
 	}
 }
 
-function hexToRgb(hex) 
-{
-	let result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
-	let colors = [];
+function hexToRgb(hex) {
+	const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+	const colors = [];
 	colors[0] = parseInt(result[1], 16);
 	colors[1] = parseInt(result[2], 16);
 	colors[2] = parseInt(result[3], 16);
@@ -453,8 +397,7 @@ function hexToRgb(hex)
 	return colors;
 }
 
-export function Validate(endpoint) 
-{
+export function Validate(endpoint) {
 	return endpoint.interface === 0 && endpoint.usage === 0x0002 || endpoint.interface === 1 && endpoint.usage === 0x0000;
 }
 

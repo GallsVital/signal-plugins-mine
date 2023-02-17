@@ -12,8 +12,7 @@ LightingMode:readonly
 forcedColor:readonly
 RGBconfig:readonly
 */
-export function ControllableParameters()
-{
+export function ControllableParameters() {
 	return [
 		{"property":"shutdownColor", "group":"lighting", "label":"Shutdown Color", "min":"0", "max":"360", "type":"color", "default":"009bde"},
 		{"property":"LightingMode", "group":"lighting", "label":"Lighting Mode", "type":"combobox", "values":["Canvas", "Forced"], "default":"Canvas"},
@@ -25,14 +24,14 @@ export function ControllableParameters()
 export function SupportsSubdevices(){ return true; }
 
 const DeviceMaxLedLimit = 120;
-let ChannelArray = 
+const ChannelArray =
 [
 	["NZXT Header 1", 40],
 	["NZXT Header 2", 40],
 	["ARGB Header 1", 40]
 ];
 
-let RGBConfigs = {
+const RGBConfigs = {
 	"RGB" : [0, 1, 2],
 	"RBG" : [0, 2, 1],
 	"BGR" : [2, 1, 0],
@@ -41,12 +40,10 @@ let RGBConfigs = {
 	"GRB" : [1, 0, 2]
 };
 
-function SetupChannels() 
-{
+function SetupChannels() {
 	device.SetLedLimit(DeviceMaxLedLimit);
 
-	for(let i = 0; i < ChannelArray.length; i++) 
-	{
+	for(let i = 0; i < ChannelArray.length; i++) {
 		device.addChannel(ChannelArray[i][0], ChannelArray[i][1]);
 	}
 }
@@ -54,18 +51,15 @@ function SetupChannels()
 const vKeyNames = [];
 const vKeyPositions = [];
 
-export function LedNames() 
-{
+export function LedNames() {
 	return vKeyNames;
 }
 
-export function LedPositions() 
-{
+export function LedPositions() {
 	return vKeyPositions;
 }
 
-export function Initialize() 
-{
+export function Initialize() {
 	device.createSubdevice("12v RGB Header");
 
 	device.setSubdeviceName("12v RGB Header", `${"NZXT N7 B550"} - ${"12v RGB Header"}`);
@@ -74,82 +68,66 @@ export function Initialize()
 	SetupChannels();
 }
 
-export function Render() 
-{
+export function Render() {
 	sendChannel(0);
 	sendChannel(1);
 	sendChannel(2);
 	SendRGBHeader();
 }
 
-export function Shutdown() 
-{
+export function Shutdown() {
 
 }
 
-function sendChannel(channel)
-{
-	let RGBData = grabRGBData(channel);
+function sendChannel(channel) {
+	const RGBData = grabRGBData(channel);
 	StreamLightingPacketChannel(0, RGBData, channel);
 	StreamLightingPacketChannel(1, RGBData, channel);
 	SubmitLightingColors(channel);
 }
 
-function grabRGBData(Channel)
-{
-    let ChannelLedCount = device.channel(ChannelArray[Channel][0]).ledCount;
-	let componentChannel = device.channel(ChannelArray[Channel][0]);
-    let RGBData = [];
-	if(LightingMode === "Forced")
-    {
+function grabRGBData(Channel) {
+	let ChannelLedCount = device.channel(ChannelArray[Channel][0]).ledCount;
+	const componentChannel = device.channel(ChannelArray[Channel][0]);
+	let RGBData = [];
+
+	if(LightingMode === "Forced") {
 		RGBData = device.createColorArray(forcedColor, ChannelLedCount, "Inline", "GRB");
-	}
-    else if(componentChannel.shouldPulseColors())
-    {
+	} else if(componentChannel.shouldPulseColors()) {
 		ChannelLedCount = 40;
 
-		let pulseColor = device.getChannelPulseColor(ChannelArray[Channel][0], ChannelLedCount);
+		const pulseColor = device.getChannelPulseColor(ChannelArray[Channel][0], ChannelLedCount);
 		RGBData = device.createColorArray(pulseColor, ChannelLedCount, "Inline", "GRB");
-	}
-    else
-    {
+	} else {
 		RGBData = device.channel(ChannelArray[Channel][0]).getColors("Inline", "GRB");
 	}
 
-    return RGBData.concat(new Array(120 - RGBData.length).fill(0));
+	return RGBData.concat(new Array(120 - RGBData.length).fill(0));
 }
 
-function StreamLightingPacketChannel(packetNumber, RGBData, channel) 
-{
-	let packet = [0x22, 0x10 | packetNumber, 0x01 << channel, 0x00];
+function StreamLightingPacketChannel(packetNumber, RGBData, channel) {
+	const packet = [0x22, 0x10 | packetNumber, 0x01 << channel, 0x00];
 	packet.push(...RGBData);
 	device.write(packet, 64);
 }
 
-function SubmitLightingColors(channel) 
-{
-	let packet = [0x22, 0xA0, 1 << channel, 0x00, 0x01, 0x00, 0x00, 0x28, 0x00, 0x00, 0x80, 0x00, 0x32, 0x00, 0x00, 0x01];
+function SubmitLightingColors(channel) {
+	const packet = [0x22, 0xA0, 1 << channel, 0x00, 0x01, 0x00, 0x00, 0x28, 0x00, 0x00, 0x80, 0x00, 0x32, 0x00, 0x00, 0x01];
 	device.write(packet, 64);
 }
 
-function SendRGBHeader(shutdown = false)
-{
-	let packet = 
+function SendRGBHeader(shutdown = false) {
+	const packet =
 	[
 		0x2A, 0x04, 0x08, 0x08, 0x00, 0x32, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x01, 0x00, 0x01, 0x03, 0x00, 0x00, 0x00, 0x00
 	];
 	let col;
 
-	if(shutdown)
-	{
+	if(shutdown) {
 		col = hexToRgb(shutdownColor);
-	}
-	else if (LightingMode === "Forced") 
-	{
+	} else if (LightingMode === "Forced") {
 		col = hexToRgb(forcedColor);
-	}
-	else
-	{
+	} else {
 		col = device.subdeviceColor("12v RGB Header", 1, 1);
 	}
 
@@ -160,10 +138,9 @@ function SendRGBHeader(shutdown = false)
 	device.write(packet, 64);
 }
 
-function hexToRgb(hex) 
-{
-	let result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
-	let colors = [];
+function hexToRgb(hex) {
+	const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+	const colors = [];
 	colors[0] = parseInt(result[1], 16);
 	colors[1] = parseInt(result[2], 16);
 	colors[2] = parseInt(result[3], 16);
@@ -171,8 +148,7 @@ function hexToRgb(hex)
 	return colors;
 }
 
-export function Validate(endpoint) 
-{
+export function Validate(endpoint) {
 	return endpoint.interface === -1;
 }
 

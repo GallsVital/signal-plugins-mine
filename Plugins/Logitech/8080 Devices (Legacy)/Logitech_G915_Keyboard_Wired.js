@@ -22,15 +22,15 @@ export function ControllableParameters(){
 }
 
 function hexToRgb(hex) {
-	let result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
-	let colors = [];
+	const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+	const colors = [];
 	colors[0] = parseInt(result[1], 16);
 	colors[1] = parseInt(result[2], 16);
 	colors[2] = parseInt(result[3], 16);
 
 	return colors;
 }
-let vLedNames = [
+const vLedNames = [
 	"logo",                         "brightness",
 	"Esc", "F1", "F2", "F3", "F4", "F5", "F6", "F7", "F8", "F9", "F10", "F11", "F12",         "Print Screen", "Scroll Lock", "Pause Break",     "MediaRewind", "MediaPlayPause", "MediaFastForward", "MediaStop",
 	"G1", "`", "1", "2", "3", "4", "5", "6", "7", "8", "9", "0", "-_", "=+", "Backspace",                        "Insert", "Home", "Page Up",              "NumLock", "Num /", "Num *", "Num -",
@@ -40,7 +40,7 @@ let vLedNames = [
 	"G5", "Left Ctrl", "Left Win", "Left Alt", "Space", "Right Alt", "Fn", "Menu", "Right Ctrl",  "Left Arrow", "Down Arrow", "Right Arrow",        "Num 0", "Num .",
 ];
 
-let vKeymap = [
+const vKeymap = [
 	38, 55, 56, 57, 58, 59, 60, 61, 62, 63, 64, 65, 66,                   67, 68, 69,
 	50, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 42, 43, 39,              70, 71, 72,
 	40, 17, 23, 5, 18, 20, 25, 21, 9, 15, 16, 44, 45, 46,               73, 74, 75,
@@ -50,7 +50,7 @@ let vKeymap = [
 
 ];
 
-let vLedPositions = [
+const vLedPositions = [
 
 	[1, 1],   [2, 1], [3, 1], [4, 1], [5, 1],   [6, 1], [7, 1], [8, 1], [9, 1],    [11, 1], [12, 1], [13, 1], [14, 1],           [15, 1], [16, 1], [17, 1],
 	[1, 2], [2, 2], [3, 2], [4, 2], [5, 2], [6, 2], [7, 2], [8, 2], [9, 2], [10, 2], [11, 2], [12, 2], [13, 2], [14, 2],   [15, 2], [16, 2], [17, 2],
@@ -61,7 +61,7 @@ let vLedPositions = [
 
 	[0, 0],
 ];
-let vFAKELedPositions = [
+const vFAKELedPositions = [
 	[0, 0],                              [6, 0],
 	[1, 1],   [2, 1], [3, 1], [4, 1], [5, 1],   [6, 1], [7, 1], [8, 1], [9, 1],    [11, 1], [12, 1], [13, 1], [14, 1],    [15, 1], [16, 1], [17, 1], [19, 1], [20, 1], [21, 1], [22, 1],
 	[0, 2],    [1, 2], [2, 2], [3, 2], [4, 2], [5, 2], [6, 2], [7, 2], [8, 2], [9, 2], [10, 2], [11, 2], [12, 2], [13, 2], [14, 2],   [15, 2], [16, 2], [17, 2], [19, 2], [20, 2], [21, 2], [22, 2],
@@ -87,7 +87,7 @@ export function Initialize() {
 
 
 function Apply() {
-	let packet = [];
+	const packet = [];
 
 	packet[0] = 0x11;
 	packet[1] = 0xFF;
@@ -98,14 +98,14 @@ function Apply() {
 }
 
 function SendNumpad(shutdown = false) {
-	let vNumPadPostions = [
+	const vNumPadPostions = [
 		[19, 2], [20, 2], [21, 2], [22, 2],
 		[19, 3], [20, 3], [21, 3], [22, 3],
 		[19, 4], [20, 4], [21, 4],
 		[19, 5], [20, 5], [21, 5], [22, 5],
 		[19, 6], [20, 6],
 	];
-	let vNumpadMap = [
+	const vNumpadMap = [
 		80, 81, 82, 83,
 		92, 93, 94, 84,
 		89, 90, 91,
@@ -116,18 +116,18 @@ function SendNumpad(shutdown = false) {
 
 	for(let iIdx = 0; iIdx < vNumpadMap.length; iIdx = iIdx + 4){
 
-		let packet = [];
+		const packet = [];
 		packet[0] = 0x11;
 		packet[1] = 0xFF;
 		packet[2] = 0x0A;
 
-		let zone = 0x1C;
+		const zone = 0x1C;
 		packet[3] = zone;
 
 		for (let index = 0; index < 4 && index+iIdx < vNumpadMap.length ;index++) {
-			let keyNumber = index+iIdx;
-			let iKeyPosX = vNumPadPostions[keyNumber][0];
-			let iKeyPosY = vNumPadPostions[keyNumber][1];
+			const keyNumber = index+iIdx;
+			const iKeyPosX = vNumPadPostions[keyNumber][0];
+			const iKeyPosY = vNumPadPostions[keyNumber][1];
 			var color;
 
 			if(shutdown){
@@ -137,7 +137,7 @@ function SendNumpad(shutdown = false) {
 			}else{
 				color = device.color(iKeyPosX, iKeyPosY);
 			}
-			let keyValue = vNumpadMap[keyNumber];
+			const keyValue = vNumpadMap[keyNumber];
 
 
 			packet[4 + index*4] = keyValue;
@@ -155,7 +155,7 @@ function SendNumpad(shutdown = false) {
 }
 
 function SendGkeys(shutdown = false) {
-	let vGkeyPostions = [
+	const vGkeyPostions = [
 		[0, 2],
 		[0, 3],
 		[0, 4],
@@ -165,18 +165,18 @@ function SendGkeys(shutdown = false) {
 
 	for(let iIdx = 0; iIdx < vGkeyPostions.length; iIdx = iIdx + 4){
 
-		let packet = [];
+		const packet = [];
 		packet[0] = 0x11;
 		packet[1] = 0xFF;
 		packet[2] = 0x0A;
 
-		let zone = 0x1F;
+		const zone = 0x1F;
 		packet[3] = zone;
 
 		for (let index = 0; index < 4 && index+iIdx < vGkeyPostions.length ;index++) {
-			let keyNumber = index+iIdx;
-			let iKeyPosX = vGkeyPostions[keyNumber][0];
-			let iKeyPosY = vGkeyPostions[keyNumber][1];
+			const keyNumber = index+iIdx;
+			const iKeyPosX = vGkeyPostions[keyNumber][0];
+			const iKeyPosY = vGkeyPostions[keyNumber][1];
 			var color;
 
 			if(shutdown){
@@ -186,7 +186,7 @@ function SendGkeys(shutdown = false) {
 			}else{
 				color = device.color(iKeyPosX, iKeyPosY);
 			}
-			let keyValue = vKeymap[keyNumber];
+			const keyValue = vKeymap[keyNumber];
 
 
 			packet[4 + index*4] = 0xB4 + keyNumber;
@@ -221,7 +221,7 @@ function SendLogoZone(shutdown = false){
 				color = device.color(4, 0);
 			}
 		}
-		let packet = [];
+		const packet = [];
 		packet[0] = 0x11;
 		packet[1] = 0xFF;
 		packet[2] = 0x0A;
@@ -246,13 +246,13 @@ function SendLogoZone(shutdown = false){
 }
 
 function SendMediaZones(shutdown = false){
-	let zones = [
+	const zones = [
 		[12, 0], [14, 0], [13, 0], [11, 0]
 	];
 
 	for(let iIdx = 0; iIdx < zones.length; iIdx++){
-		let iKeyPosX = zones[iIdx][0];
-		let iKeyPosY = zones[iIdx][1];
+		const iKeyPosX = zones[iIdx][0];
+		const iKeyPosY = zones[iIdx][1];
 		var color;
 
 		if(shutdown){
@@ -262,7 +262,7 @@ function SendMediaZones(shutdown = false){
 		}else{
 			color = device.color(iKeyPosX, iKeyPosY);
 		}
-		let packet = [];
+		const packet = [];
 		packet[0] = 0x11;
 		packet[1] = 0xFF;
 		packet[2] = 0x0A;
@@ -285,13 +285,13 @@ function SendPacket(shutdown = false) {
 	//1B 210 vLogoPositions
 	let count = 0;
 
-	let RGBData = [];
+	const RGBData = [];
 	let TotalKeys = 0;
 
 	for (let iIdx = 0; iIdx < vKeymap.length; iIdx++){
 
-		let iKeyPosX = vLedPositions[iIdx][0];
-		let iKeyPosY = vLedPositions[iIdx][1];
+		const iKeyPosX = vLedPositions[iIdx][0];
+		const iKeyPosY = vLedPositions[iIdx][1];
 		var color;
 
 		if(shutdown){
@@ -331,7 +331,7 @@ function SendPacket(shutdown = false) {
 		packet[1] = 0xFF;
 		packet[2] = 0x0A;
 
-		let zone = 0x18;
+		const zone = 0x18;
 		//if(vKeymap[iIdx] >= 80){zone = 0x1D;}
 		//if(vKeymap[iIdx] >= 88){zone = 0x1C;}
 		packet[3] = zone;

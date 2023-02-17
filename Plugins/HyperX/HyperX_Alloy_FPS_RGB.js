@@ -23,7 +23,7 @@ export function ConflictingProcesses() {
 	return ["NGenuity2.exe"];
 }
 
-let vLedNames = 
+const vLedNames =
 [
 	"Esc", "F1", "F2", "F3", "F4", "F5", "F6", "F7", "F8", "F9", "F10", "F11", "F12",         "Print Screen", "Scroll Lock", "Pause Break",
 	"`", "1", "2", "3", "4", "5", "6", "7", "8", "9", "0", "-_", "=+", "Backspace",                        "Insert", "Home", "Page Up",       "NumLock", "Num /", "Num *", "Num -",  //21
@@ -33,7 +33,7 @@ let vLedNames =
 	"Left Ctrl", "Left Win", "Left Alt", "Space", "Right Alt", "Fn", "Menu", "Right Ctrl",  "Left Arrow", "Down Arrow", "Right Arrow", "Num 0", "Num ."                       //13
 ];
 
-let vLedPositions = 
+const vLedPositions =
 [
 	[0, 0],    [1, 0], [2, 0], [3, 0], [4, 0],    [6, 0], [7, 0], [8, 0], [9, 0],  [10, 0], [11, 0], [12, 0], [13, 0],      [14, 0], [15, 0], [16, 0],            //20
 	[0, 1],  [1, 1], [2, 1], [3, 1], [4, 1], [5, 1], [6, 1], [7, 1], [8, 1], [9, 1], [10, 1], [11, 1], [12, 1], [13, 1],     [14, 1], [15, 1], [16, 1],   [17, 1], [18, 1], [19, 1], [20, 1], //21
@@ -45,7 +45,7 @@ let vLedPositions =
 
 ];
 
-let vKeymap = 
+const vKeymap =
 [
 
 	4,    20, 36, 52, 68,   84, 100, 116, 132,    12, 28, 44, 10,  26, 42, 58,
@@ -58,64 +58,51 @@ let vKeymap =
 
 ];
 
-export function LedNames() 
-{
+export function LedNames() {
 	return vLedNames;
 }
 
-export function LedPositions() 
-{
+export function LedPositions() {
 	return vLedPositions;
 }
 
-export function Initialize() 
-{
+export function Initialize() {
 
 }
 
-export function Render() 
-{
+export function Render() {
 	sendColors();
 }
 
-export function Shutdown() 
-{
+export function Shutdown() {
 	sendColors(true);
 }
 
-function sendColorchannel(channel, data)
-{
-	let packet = [0x07, 0x16, channel, 0xA0];
+function sendColorchannel(channel, data) {
+	const packet = [0x07, 0x16, channel, 0xA0];
 	packet.push(...data);
 
 	device.send_report(packet, 264);
 
 }
 
-function sendColors(shutdown = false)
-{
+function sendColors(shutdown = false) {
 	//get color data
-	let red = new Array(106).fill(0);
-	let green = new Array(106).fill(0);
-	let blue = new Array(106).fill(0);
+	const red = new Array(106).fill(0);
+	const green = new Array(106).fill(0);
+	const blue = new Array(106).fill(0);
 
 
-	for(let iIdx = 0; iIdx < vKeymap.length; iIdx++) 
-	{
-		let iPxX = vLedPositions[iIdx][0];
-		let iPxY = vLedPositions[iIdx][1];
+	for(let iIdx = 0; iIdx < vKeymap.length; iIdx++) {
+		const iPxX = vLedPositions[iIdx][0];
+		const iPxY = vLedPositions[iIdx][1];
 		var color;
 
-		if(shutdown)
-		{
+		if(shutdown) {
 			color = hexToRgb(shutdownColor);
-		}
-		else if (LightingMode === "Forced") 
-		{
+		} else if (LightingMode === "Forced") {
 			color = hexToRgb(forcedColor);
-		}
-		else
-		{
+		} else {
 			color = device.color(iPxX, iPxY);
 		}
 
@@ -134,10 +121,9 @@ function sendColors(shutdown = false)
 	device.pause(10);
 }
 
-function hexToRgb(hex) 
-{
-	let result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
-	let colors = [];
+function hexToRgb(hex) {
+	const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+	const colors = [];
 	colors[0] = parseInt(result[1], 16);
 	colors[1] = parseInt(result[2], 16);
 	colors[2] = parseInt(result[3], 16);
@@ -145,8 +131,7 @@ function hexToRgb(hex)
 	return colors;
 }
 
-export function Validate(endpoint) 
-{
+export function Validate(endpoint) {
 	return endpoint.interface === 2 && endpoint.usage === 1 && endpoint.usage_page === 0xff01;
 }
 

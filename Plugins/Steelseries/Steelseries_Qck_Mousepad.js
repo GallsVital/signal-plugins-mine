@@ -6,11 +6,11 @@ export function Publisher() { return "WhirlwindFX"; }
 export function Size() { return [2, 2]; }
 export function DefaultPosition(){return [240, 120];}
 export function DefaultScale(){return 8.0;}
-let vLedNames = [
+const vLedNames = [
 	"Mousemat Top", "Mousemap Bottom"
 ];
 
-let vLedPositions = [[0, 0], [0, 1]];
+const vLedPositions = [[0, 0], [0, 1]];
 
 export function Initialize() {
 	// Qck doesn't require a setup packet.
@@ -30,7 +30,7 @@ export function Shutdown() {
 	// by 64 byte commit packets.  Here, we sent the bytes we'll use and the engine will
 	// pad the rest with zeroes.  Important to note that we add 1 to the send and write functions
 	// because hid firstbyte is (almost) always zero.  Use usblyzer to verify the packets sent.
-	let packet = [];
+	const packet = [];
 
 	// first byte is zero.
 	packet[0] = 0;
@@ -80,7 +80,7 @@ export function Shutdown() {
 
 	// We have to send 'write' vs 'send_report' here with only 0x0D as byte 1. (first byte
 	// is always zero)
-	let apply = [];
+	const apply = [];
 	apply[0] = 0;
 	apply[1] = 0x0D;
 	device.write(apply, 65);
@@ -98,7 +98,7 @@ export function Render() {
 	// by 64 byte commit packets.  Here, we sent the bytes we'll use and the engine will
 	// pad the rest with zeroes.  Important to note that we add 1 to the send and write functions
 	// because hid firstbyte is (almost) always zero.  Use usblyzer to verify the packets sent.
-	let packet = [];
+	const packet = [];
 
 	// first byte is zero.
 	packet[0] = 0;
@@ -110,9 +110,9 @@ export function Render() {
 	packet[4] = 0;
 
 	// Color, bottom.
-	let iBX = vLedPositions[1][0];
-	let iBY = vLedPositions[1][1];
-	let bottom = device.color(iBX, iBY);
+	const iBX = vLedPositions[1][0];
+	const iBY = vLedPositions[1][1];
+	const bottom = device.color(iBX, iBY);
 	packet[5] = bottom[0]; //r
 	packet[6] = bottom[1]; //g
 	packet[7] = bottom[2]; //b
@@ -130,9 +130,9 @@ export function Render() {
 	packet[16] = 0;
 
 	// Color, top.
-	let iTX = vLedPositions[0][0];
-	let iTY = vLedPositions[0][1];
-	let top = device.color(iTX, iTY);
+	const iTX = vLedPositions[0][0];
+	const iTY = vLedPositions[0][1];
+	const top = device.color(iTX, iTY);
 	packet[17] = top[0];
 	packet[18] = top[1];
 	packet[19] = top[2];
@@ -154,7 +154,7 @@ export function Render() {
 
 	// We have to send 'write' vs 'send_report' here with only 0x0D as byte 1. (first byte
 	// is always zero)
-	let apply = [];
+	const apply = [];
 	apply[0] = 0;
 	apply[1] = 0x0D;
 	device.write(apply, 65);

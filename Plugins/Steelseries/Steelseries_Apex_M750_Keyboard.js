@@ -20,7 +20,7 @@ export function ControllableParameters(){
 
 	];
 }
-let vLedNames = [
+const vLedNames = [
 	"Esc", "F1", "F2", "F3", "F4", "F5", "F6", "F7", "F8", "F9", "F10", "F11", "F12",         "Print Screen", "Scroll Lock", "Pause Break",
 	"`", "1", "2", "3", "4", "5", "6", "7", "8", "9", "0", "-_", "=+", "Backspace",                        "Insert", "Home", "Page Up",       "NumLock", "Num /", "Num *", "Num -",  //21
 	"Tab", "Q", "W", "E", "R", "T", "Y", "U", "I", "O", "P", "[", "]", "\\",                               "Del", "End", "Page Down",         "Num 7", "Num 8", "Num 9", "Num +",    //21
@@ -29,7 +29,7 @@ let vLedNames = [
 	"Left Ctrl", "Left Win", "Left Alt", "Space", "Right Alt", "Fn", "Menu", "Right Ctrl",  "Left Arrow", "Down Arrow", "Right Arrow", "Num 0", "Num ."                       //13
 ];
 
-let vLedPositions = [
+const vLedPositions = [
 	[0, 0], [1, 0], [2, 0], [3, 0], [4, 0], [5, 0], [6, 0], [7, 0], [8, 0], [9, 0], [10, 0], [11, 0], [12, 0],           [14, 0], [15, 0], [16, 0],            //20
 	[0, 1], [1, 1], [2, 1], [3, 1], [4, 1], [5, 1], [6, 1], [7, 1], [8, 1], [9, 1], [10, 1], [11, 1], [12, 1], [13, 1],   [14, 1], [15, 1], [16, 1],   [17, 1], [18, 1], [19, 1], [20, 1], //21
 	[0, 2], [1, 2], [2, 2], [3, 2], [4, 2], [5, 2], [6, 2], [7, 2], [8, 2], [9, 2], [10, 2], [11, 2], [12, 2], [13, 2],   [14, 2], [15, 2], [16, 2],   [17, 2], [18, 2], [19, 2], [20, 2], //20
@@ -38,7 +38,7 @@ let vLedPositions = [
 	[0, 5], [1, 5], [2, 5],                      [6, 5],                      [10, 5], [11, 5], [12, 5], [13, 5],   [14, 5], [15, 5], [16, 5],   [17, 5], [18, 5] // 13
 ];
 
-let vKeymap = [
+const vKeymap = [
 	110, 111, 112, 113, 114, 116, 117, 118, 119, 121, 122, 123, 124, 125, 126, 127, // <<- up through prtscrn
 	88, 89, 90, 91, 92, 93, 94, 95, 96,  97, 98, 99, 100,  102,           103, 104, 105,     106, 107, 108, 109,
 	66, 67, 68, 69, 70, 71, 72, 73, 74, 75, 76, 77, 78,  80,             81,  82, 83,     84, 85, 86, 87,
@@ -48,7 +48,7 @@ let vKeymap = [
 ];
 
 export function Initialize() {
-	let packet = [];
+	const packet = [];
 	packet[0x00] = 0x00;
 	packet[0x01] = 0x00;
 	packet[0x02] = 0x00;
@@ -101,7 +101,7 @@ export function Validate(endpoint) {
 }
 
 function sendColor(shutdown = false){
-	let packet = [];
+	const packet = [];
 
 	packet[0x00] = 0x00;
 	packet[0x01] = 0x00;
@@ -114,9 +114,9 @@ function sendColor(shutdown = false){
 	packet[0x08] = 0x16;
 
 	for (let i = 0; i <= 103; i++) {
-		let idx = vKeymap[i];
-		let iPxX = vLedPositions[i][0];
-		let iPxY = vLedPositions[i][1];
+		const idx = vKeymap[i];
+		const iPxX = vLedPositions[i][0];
+		const iPxY = vLedPositions[i][1];
 		var color;
 
 		if(shutdown){
@@ -139,8 +139,8 @@ export function Render() {
 }
 
 function hexToRgb(hex) {
-	let result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
-	let colors = [];
+	const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+	const colors = [];
 	colors[0] = parseInt(result[1], 16);
 	colors[1] = parseInt(result[2], 16);
 	colors[2] = parseInt(result[3], 16);

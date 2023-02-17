@@ -7,11 +7,11 @@ export function Size() { return [2, 2]; }
 export function DefaultPosition(){return [240, 120];}
 export function DefaultScale(){return 8.0;}
 
-let vLedNames = [
+const vLedNames = [
 	"Single Zone Keyboard"
 ];
 
-let vLedPositions = [[0, 0]];
+const vLedPositions = [[0, 0]];
 
 /*
 export function ControllableParameters()
@@ -52,14 +52,14 @@ export function Validate(endpoint) {
 }
 
 export function Render() {
-	let packet = [];
+	const packet = [];
 
 	packet[0] = 0x5D;
 	packet[1] = 0xB3;
 	packet[2] = 0x00;
 	packet[3] = 0x00;
 
-	let col = device.color(0, 0);
+	const col = device.color(0, 0);
 	packet[4] = col[0];
 	packet[5] = col[1];
 	packet[6] = col[2];

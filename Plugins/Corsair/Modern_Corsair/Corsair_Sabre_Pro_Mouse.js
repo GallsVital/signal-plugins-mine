@@ -27,17 +27,17 @@ export function Documentation(){ return "troubleshooting/corsair"; }
 let savedDpi1;
 
 function hexToRgb(hex) {
-	let result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
-	let colors = [];
+	const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+	const colors = [];
 	colors[0] = parseInt(result[1], 16);
 	colors[1] = parseInt(result[2], 16);
 	colors[2] = parseInt(result[3], 16);
 
 	return colors;
 }
-let vLedNames = ["Logo Zone", "Scroll Zone", "DPI Zone 1", "DPI Zone 2", "DPI Zone 3"];
+const vLedNames = ["Logo Zone", "Scroll Zone", "DPI Zone 1", "DPI Zone 2", "DPI Zone 3"];
 
-let vLedPositions = [
+const vLedPositions = [
 	[1, 4], [1, 2], [0, 1], [0, 2], [0, 3]
 ];
 
@@ -50,8 +50,8 @@ export function LedPositions() {
 }
 
 function sendPacketString(string, size){
-	let packet= [];
-	let data = string.split(' ');
+	const packet= [];
+	const data = string.split(' ');
 
 	for(let i = 0; i < data.length; i++){
 		packet[i] = parseInt(data[i], 16);//.toString(16)
@@ -114,7 +114,7 @@ function setDpi(dpi){
 
 	savedDpi1 = dpi;
 
-	let RoundedDpi = Math.round(dpi/100)*100;
+	const RoundedDpi = Math.round(dpi/100)*100;
 	var packet = [];
 	packet[0] = 0x00;
 	packet[1] = 0x08;
@@ -165,7 +165,7 @@ export function Render() {
 
 function sendColors(shutdown = false){
 	//00000000  08 06 00 0F 00 00 00 FF FF 00 FF 00 29 29 00 FF 00 24 24 00 FF 00 00
-	let RGBData = new Array(20).fill(0);
+	const RGBData = new Array(20).fill(0);
 	let packet = [];
 	packet[0x00]   = 0x00;
 	packet[0x01]   = 0x08;
@@ -178,8 +178,8 @@ function sendColors(shutdown = false){
 
 	// Single zone - apply to mouse.
 	for(let zone_idx = 0; zone_idx < vLedPositions.length; zone_idx++) {
-		let iX = vLedPositions[zone_idx][0];
-		let iY = vLedPositions[zone_idx][1];
+		const iX = vLedPositions[zone_idx][0];
+		const iY = vLedPositions[zone_idx][1];
 		var col;
 
 		if(shutdown){
@@ -207,7 +207,7 @@ export function Validate(endpoint) {
 export function Shutdown() {
 	sendPacketString("00 08 01 03 00 01", 65);//hardware control packet'
 
-	let packet = [0x08];
+	const packet = [0x08];
 	device.read(packet, 65);
 
 }

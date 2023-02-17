@@ -18,15 +18,15 @@ export function ControllableParameters(){
 		{"property":"forcedColor", "group":"lighting", "label":"Forced Color", "min":"0", "max":"360", "type":"color", "default":"009bde"},
 	];
 }
-let vLedNames = [
+const vLedNames = [
 	"zone 1", "Zone 2", "Zone 3", "zone 4", "Zone 5",
 ];
 
-let vLedPositions = [
+const vLedPositions = [
 	[0, 0], [1, 0], [2, 0], [3, 0], [4, 0],
 ];
 
-let vLedNamesFake = [
+const vLedNamesFake = [
 
 	"Esc", "F1", "F2", "F3", "F4", "F5", "F6", "F7", "F8", "F9", "F10", "F11", "F12",         "Print Screen", "Scroll Lock", "Pause Break",
 	"`", "1", "2", "3", "4", "5", "6", "7", "8", "9", "0", "-_", "=+", "Backspace",                        "Insert", "Home", "Page Up",       "NumLock", "Num /", "Num *", "Num -",  //21
@@ -37,7 +37,7 @@ let vLedNamesFake = [
 
 ];
 
-let vLedPositionsFake = [
+const vLedPositionsFake = [
 	[0, 0], [1, 0], [2, 0], [3, 0], [4, 0], [5, 0], [6, 0], [7, 0], [8, 0], [9, 0], [10, 0], [11, 0], [12, 0],           [14, 0], [15, 0], [16, 0],            //20
 	[0, 1], [1, 1], [2, 1], [3, 1], [4, 1], [5, 1], [6, 1], [7, 1], [8, 1], [9, 1], [10, 1], [11, 1], [12, 1], [13, 1],   [14, 1], [15, 1], [16, 1],   [17, 1], [18, 1], [19, 1], [20, 1], //21
 	[0, 2], [1, 2], [2, 2], [3, 2], [4, 2], [5, 2], [6, 2], [7, 2], [8, 2], [9, 2], [10, 2], [11, 2], [12, 2], [13, 2],   [14, 2], [15, 2], [16, 2],   [17, 2], [18, 2], [19, 2], [20, 2], //20
@@ -60,8 +60,8 @@ export function Initialize() {
 }
 
 function hexToRgb(hex) {
-	let result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
-	let colors = [];
+	const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+	const colors = [];
 	colors[0] = parseInt(result[1], 16);
 	colors[1] = parseInt(result[2], 16);
 	colors[2] = parseInt(result[3], 16);
@@ -70,7 +70,7 @@ function hexToRgb(hex) {
 }
 
 function Apply() {
-	let packet = [];
+	const packet = [];
 
 	packet[0] = 0x11;
 	packet[1] = 0xFF;
@@ -82,7 +82,7 @@ function Apply() {
 
 
 function SendPacket(shutdown = false) {
-	let packet = [];
+	const packet = [];
 	packet[0] = 0x11;
 	packet[1] = 0xFF;
 	packet[2] = 0x0C;
@@ -90,8 +90,8 @@ function SendPacket(shutdown = false) {
 	packet[5] = 0x01;
 
 	for (let idx = 0; idx < vLedPositions.length; idx++) {
-		let iKeyPosX = vLedPositions[idx][0];
-		let iKeyPosY = vLedPositions[idx][1];
+		const iKeyPosX = vLedPositions[idx][0];
+		const iKeyPosY = vLedPositions[idx][1];
 		let color;
 
 		if(shutdown){
@@ -109,8 +109,8 @@ function SendPacket(shutdown = false) {
 
 		packet[9] = 0x02;
 
-	device.write(packet, 20);
-	device.pause(10);
+		device.write(packet, 20);
+		device.pause(10);
 	}
 }
 export function Render() {
