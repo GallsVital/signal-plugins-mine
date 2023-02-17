@@ -289,6 +289,7 @@ class EVGATuringDeviceIds{
 		this.RTX2080_XC2_GAMING                         = 0x2187;
 		this.RTX2080_XC_ULTRA_GAMING                    = 0x2183;
 		this.RTX2080TI_BLACK_EDITION                    = 0x2281;
+		this.RTX2080TI_XC_ULTRA		                    = 0x2382;
 		this.RTX2080TI_XC_ULTRA_GAMING                  = 0x2383;
 		this.RTX2080TI_FTW3_ULTRA_HYBRID                = 0x2484;
 		this.RTX2080TI_FTW3_ULTRA                       = 0x2487;
@@ -367,6 +368,7 @@ class EVGATuringGPUList extends GPUList{
 			new EVGATuringIdentifier(Nvidia.RTX2080_A,          EVGATuringIds.RTX2080_XC2_GAMING,               "EVGA RTX 2080 XC2 Gaming"),
 			new EVGATuringIdentifier(Nvidia.RTX2080_A,          EVGATuringIds.RTX2080_XC_ULTRA_GAMING,          "EVGA RTX 2080 XC Ultra Gaming"),
 			new EVGATuringIdentifier(Nvidia.RTX2080TI_TU102,    EVGATuringIds.RTX2080TI_BLACK_EDITION,          "EVGA RTX 2080Ti Black Edition"),
+			new EVGATuringIdentifier(Nvidia.RTX2080TI,          EVGATuringIds.RTX2080TI_XC_ULTRA,		        "EVGA RTX 2080Ti XC Ultra"),
 			new EVGATuringIdentifier(Nvidia.RTX2080TI,          EVGATuringIds.RTX2080TI_XC_ULTRA_GAMING,        "EVGA RTX 2080Ti XC Ultra Gaming"),
 			new EVGATuringIdentifier(Nvidia.RTX2080TI,          EVGATuringIds.RTX2080TI_FTW3_ULTRA_HYBRID,      "EVGA RTX 2080Ti FTW3 Ultra Hybrid"),
 			new EVGATuringIdentifier(Nvidia.RTX2080TI,          EVGATuringIds.RTX2080TI_FTW3_ULTRA,             "EVGA RTX 2080Ti FTW3 Ultra"),
