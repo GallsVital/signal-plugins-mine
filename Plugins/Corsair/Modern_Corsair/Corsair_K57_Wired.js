@@ -23,8 +23,8 @@ export function ControllableParameters(){
 export function Documentation(){ return "troubleshooting/corsair"; }
 
 function hexToRgb(hex) {
-	let result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
-	let colors = [];
+	const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+	const colors = [];
 	colors[0] = parseInt(result[1], 16);
 	colors[1] = parseInt(result[2], 16);
 	colors[2] = parseInt(result[3], 16);
@@ -34,8 +34,8 @@ function hexToRgb(hex) {
 
 
 function sendPacketString(string, size){
-	let packet= [];
-	let data = string.split(' ');
+	const packet= [];
+	const data = string.split(' ');
 
 	for(let i = 0; i < data.length; i++){
 		packet[parseInt(i, 16)] =parseInt(data[i], 16);//.toString(16)
@@ -53,7 +53,7 @@ export function Initialize() {
 
 
 export function Shutdown() {
-	let packet = [];
+	const packet = [];
 
 	packet[0x00]   = 0x00;
 	packet[0x01]   = 0x08;
@@ -65,7 +65,7 @@ export function Shutdown() {
 
 }
 // This is an array of key indexes for setting colors in our render array, indexed left to right, row top to bottom.
-let vKeys = [
+const vKeys = [
 
 	//Main KeyBoard
 	131,  41,       58,  59,  60,  61,       62,  63,  64,  65,       66,  67,  68,  69,  70,  71,  72,
@@ -81,7 +81,7 @@ let vKeys = [
 
 // This array must be the same length as vKeys[], and represents the pixel color position in our pixel matrix that we reference.  For example,
 // item at index 3 [9,0] represents the corsair logo, and the render routine will grab its color from [9,0].
-let vKeyPositions = [
+const vKeyPositions = [
 	[0, 1],  [1, 1],    [3, 1], [4, 1], [5, 1], [6, 1],     [7, 1], [8, 1], [9, 1], [10, 1],   [12, 1], [13, 1], [14, 1], [15, 1],  [15, 1], [16, 1], [17, 1],
 	[0, 2],  [1, 2], [2, 2], [3, 2], [4, 2], [5, 2], [6, 2], [7, 2], [8, 2], [9, 2], [10, 2], [11, 2], [12, 2], [13, 2], [14, 2],   [15, 2], [16, 2], [17, 2],   [18, 2], [19, 2], [20, 2], [21, 2],
 	[0, 3],  [1, 3], [2, 3], [3, 3], [4, 3], [5, 3], [6, 3], [7, 3], [8, 3], [9, 3], [10, 3], [11, 3], [12, 3], [13, 3], [14, 3],   [15, 3], [16, 3], [17, 3],   [18, 3], [19, 3], [20, 3], [21, 3],
@@ -92,7 +92,7 @@ let vKeyPositions = [
 	[2, 5], [13, 4]
 ];
 
-let vKeyNames = [
+const vKeyNames = [
 
 	"G1", "Esc", "F1", "F2", "F3", "F4", "F5", "F6", "F7", "F8", "F9", "F10", "F11", "F12",        "Print Screen", "Scroll Lock", "Pause Break",
 	"G2", "`", "1", "2", "3", "4", "5", "6", "7", "8", "9", "0", "-_", "=+", "Backspace",                        "Insert", "Home", "Page Up",       "NumLock", "Num /", "Num *", "Num -",  //21
@@ -149,11 +149,11 @@ export function Render() {
 
 function sendColors(shutdown = false){
 
-	let RGBData = new Array(138*3).fill(0);
+	const RGBData = new Array(138*3).fill(0);
 
 	for(let iIdx = 0; iIdx < vKeys.length; iIdx++) {
-		let iPxX = vKeyPositions[iIdx][0];
-		let iPxY = vKeyPositions[iIdx][1];
+		const iPxX = vKeyPositions[iIdx][0];
+		const iPxY = vKeyPositions[iIdx][1];
 		var col;
 
 		if(shutdown){

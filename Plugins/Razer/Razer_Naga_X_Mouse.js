@@ -1,5 +1,5 @@
 function GetReport(cmd_class, cmd_id, size) {
-	let report = new Array(91).fill(0);
+	const report = new Array(91).fill(0);
 
 	report[0] = 0;
 
@@ -74,8 +74,8 @@ export function ControllableParameters(){
 let savedDpi1;
 
 function hexToRgb(hex) {
-	let result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
-	let colors = [];
+	const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+	const colors = [];
 	colors[0] = parseInt(result[1], 16);
 	colors[1] = parseInt(result[2], 16);
 	colors[2] = parseInt(result[3], 16);
@@ -83,8 +83,8 @@ function hexToRgb(hex) {
 	return colors;
 }
 
-let vLedNames = ["ScrollWheel", "Side Panel"];
-let vLedPositions = [ [1, 0], [0, 1] ];
+const vLedNames = ["ScrollWheel", "Side Panel"];
+const vLedPositions = [ [1, 0], [0, 1] ];
 
 
 export function LedNames() {
@@ -96,7 +96,7 @@ export function LedPositions() {
 }
 
 function EnableSoftwareControl() {
-	let report = GetReport(0x1F, 0x03, 0x47);
+	const report = GetReport(0x1F, 0x03, 0x47);
 
 	report[2] = 0x1F; // transaction id.
 
@@ -117,7 +117,7 @@ function ReturnToHardwareControl() {
 
 
 export function Initialize() {
-	let packet = [];
+	const packet = [];
 	packet[0] = 0x00;
 	packet[1] = 0x00;
 	packet[2] = 0x1F;
@@ -146,7 +146,7 @@ export function Initialize() {
 }
 
 function Init2(){
-	     let packet = [];
+	     const packet = [];
 	packet[0] = 0x00;
 	packet[1] = 0x00;
 	packet[2] = 0x1F;
@@ -163,7 +163,7 @@ function Init2(){
 }
 
 function Init3(){
-	     let packet = [];
+	     const packet = [];
 	packet[0] = 0x00;
 	packet[1] = 0x00;
 	packet[2] = 0x08;
@@ -180,7 +180,7 @@ function Init3(){
 }
 
 function TogglePacket1(){
-	let packet = [];
+	const packet = [];
 	packet[0] = 0x00;
 	packet[1] = 0x00;
 	packet[2] = 0x1F;
@@ -201,7 +201,7 @@ function TogglePacket1(){
 
 
 function TogglePacket2(){
-	let packet = [];
+	const packet = [];
 	packet[0] = 0x00;
 	packet[1] = 0x00;
 	packet[2] = 0x1F;
@@ -221,7 +221,7 @@ function TogglePacket2(){
 }
 
 function TogglePacket3(){
-	let packet = [];
+	const packet = [];
 	packet[0] = 0x00;
 	packet[1] = 0x00;
 	packet[2] = 0x1F;
@@ -238,7 +238,7 @@ function TogglePacket3(){
 }
 
 function TogglePacket4(){
-	let packet = [];
+	const packet = [];
 	packet[0] = 0x00;
 	packet[1] = 0x00;
 	packet[2] = 0x1F;
@@ -258,7 +258,7 @@ function TogglePacket4(){
 function SendPacket(shutdown = false){
 
 
-	let packet = [];
+	const packet = [];
 	packet[0] = 0x00;
 	packet[1] = 0x00;
 	packet[2] = 0x1F;
@@ -274,8 +274,8 @@ function SendPacket(shutdown = false){
 
 	for(let iIdx = 0; iIdx < vLedPositions.length; iIdx++){
 
-		let iPxX = vLedPositions[iIdx][0];
-		let iPxY = vLedPositions[iIdx][1];
+		const iPxX = vLedPositions[iIdx][0];
+		const iPxY = vLedPositions[iIdx][1];
 		var col;
 
 		if(shutdown){
@@ -285,7 +285,7 @@ function SendPacket(shutdown = false){
 		}else{
 			col = device.color(iPxX, iPxY);
 		}
-		let iLedIdx = (iIdx*3) + 14;
+		const iLedIdx = (iIdx*3) + 14;
 		packet[iLedIdx] = col[0];
 		packet[iLedIdx+1] = col[1];
 		packet[iLedIdx+2] = col[2];
@@ -298,7 +298,7 @@ function SendPacket(shutdown = false){
 }
 
 function SecondaryInit() {
-	let packet = [];
+	const packet = [];
 	packet[0] = 0x00;
 	packet[1] = 0x00;
 	packet[2] = 0x3F;
@@ -316,7 +316,7 @@ function SecondaryInit() {
 }
 
 function SecondaryInit2() {
-	let packet = [];
+	const packet = [];
 	packet[0] = 0x00;
 	packet[1] = 0x00;
 	packet[2] = 0x1F;
@@ -333,7 +333,7 @@ function SecondaryInit2() {
 }
 
 function Apply() {
-	let packet = []; //new Array(91).fill(0);
+	const packet = []; //new Array(91).fill(0);
 	packet[0] = 0x00;
 	packet[1] = 0x00;
 	packet[2] = 0x3F;
@@ -355,7 +355,7 @@ function Apply() {
 function setDPIRazer(dpi){
 	savedDpi1 = dpi;
 
-	let packet = [];
+	const packet = [];
 	packet[0] = 0x00;
 	packet[1] = 0x00;
 	packet[2] = 0x1F;

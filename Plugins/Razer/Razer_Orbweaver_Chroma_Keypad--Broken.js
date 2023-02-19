@@ -1,5 +1,5 @@
 function GetReport(cmd_class, cmd_id, size) {
-	let report = new Array(91).fill(0);
+	const report = new Array(91).fill(0);
 
 	report[0] = 0;
 
@@ -53,9 +53,9 @@ export function ProductId() { return 0x0207; }
 export function Publisher() { return "WhirlwindFX"; }
 export function Size() { return [10, 12]; }
 export function Type() { return "Hid"; }
-let vLedNames = ["Keyboard"];
+const vLedNames = ["Keyboard"];
 
-let vLedPositions = [[0, 1]];
+const vLedPositions = [[0, 1]];
 
 export function LedNames() {
 	return vLedNames;
@@ -66,7 +66,7 @@ export function LedPositions() {
 }
 
 function EnableSoftwareControl() {
-	let report = GetReport(0x0F, 0x03, 0x47);
+	const report = GetReport(0x0F, 0x03, 0x47);
 
 	report[2] = 0x3F; // transaction id.
 
@@ -91,7 +91,7 @@ export function Initialize() {
 }
 
 function SendPacket() {
-	let packet = [];
+	const packet = [];
 	packet[0] = 0x00;
 	packet[1] = 0x00;
 	packet[2] = 0x3F;
@@ -103,7 +103,7 @@ function SendPacket() {
 	packet[8] = 0x0A;
 	packet[9] = 0x06;
 
-	let col = device.color(0, 0);
+	const col = device.color(0, 0);
 
 
 	packet[10] = col[0];
@@ -118,7 +118,7 @@ function SendPacket() {
 
 
 function Apply() {
-	let packet = []; //new Array(91).fill(0);
+	const packet = []; //new Array(91).fill(0);
 	packet[0] = 0x00;
 	packet[1] = 0x00;
 	packet[2] = 0x3F;

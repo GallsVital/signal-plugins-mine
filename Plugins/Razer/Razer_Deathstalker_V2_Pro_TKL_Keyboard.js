@@ -32,35 +32,35 @@ function CalculateCrc(report) {
 }
 
 function hexToRgb(hex) {
-	let result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
-	let colors = [];
+	const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+	const colors = [];
 	colors[0] = parseInt(result[1], 16);
 	colors[1] = parseInt(result[2], 16);
 	colors[2] = parseInt(result[3], 16);
 
 	return colors;
 }
-let vLedNames = [
+const vLedNames = [
 	"Esc", "F1", "F2", "F3", "F4", "F5", "F6", "F7", "F8", "F9", "F10", "F11", "F12",         "Print Screen", "Scroll Lock", "Pause Break",
-	"`", "1", "2", "3", "4", "5", "6", "7", "8", "9", "0", "-_", "=+", "Backspace",                        "Insert", "Home", "Page Up",      
-	"Tab", "Q", "W", "E", "R", "T", "Y", "U", "I", "O", "P", "[", "]", "\\",                               "Del", "End", "Page Down",        
-	"CapsLock", "A", "S", "D", "F", "G", "H", "J", "K", "L", ";", "'", "Enter",                                                             
-	"Left Shift", "Z", "X", "C", "V", "B", "N", "M", ",", ".", "/", "Right Shift",                                  "Up Arrow",              
-	"Left Ctrl", "Left Win", "Left Alt", "Space", "Right Alt", "Fn", "Menu", "Right Ctrl",  "Left Arrow", "Down Arrow", "Right Arrow", 
+	"`", "1", "2", "3", "4", "5", "6", "7", "8", "9", "0", "-_", "=+", "Backspace",                        "Insert", "Home", "Page Up",
+	"Tab", "Q", "W", "E", "R", "T", "Y", "U", "I", "O", "P", "[", "]", "\\",                               "Del", "End", "Page Down",
+	"CapsLock", "A", "S", "D", "F", "G", "H", "J", "K", "L", ";", "'", "Enter",
+	"Left Shift", "Z", "X", "C", "V", "B", "N", "M", ",", ".", "/", "Right Shift",                                  "Up Arrow",
+	"Left Ctrl", "Left Win", "Left Alt", "Space", "Right Alt", "Fn", "Menu", "Right Ctrl",  "Left Arrow", "Down Arrow", "Right Arrow",
 ];
 
-let vLedPositions = [
+const vLedPositions = [
 	[0, 0], [2, 0], [3, 0], [4, 0], [5, 0], [6, 0], [7, 0], [8, 0], [9, 0], [10, 0], [11, 0], [12, 0], [13, 0],            [14, 0], [15, 0], [16, 0],            //20
-	[0, 1], [1, 1], [2, 1], [3, 1], [4, 1], [5, 1], [6, 1], [7, 1], [8, 1], [9, 1], [10, 1], [11, 1], [12, 1], [13, 1],   [14, 1], [15, 1], [16, 1],  
-	[0, 2], [1, 2], [2, 2], [3, 2], [4, 2], [5, 2], [6, 2], [7, 2], [8, 2], [9, 2], [10, 2], [11, 2], [12, 2], [13, 2],   [14, 2], [15, 2], [16, 2], 
-	[0, 3], [1, 3], [2, 3], [3, 3], [4, 3], [5, 3], [6, 3], [7, 3], [8, 3], [9, 3], [10, 3], [11, 3],        [13, 3],                                 
-	[0, 4], [2, 4], [3, 4], [4, 4], [5, 4], [6, 4], [7, 4], [8, 4], [9, 4], [10, 4], [11, 4],                [13, 4],               [15, 4],         
-	[0, 5], [1, 5], [2, 5],                      [6, 5],                       [10, 5], [11, 5], [12, 5], [13, 5],        [14, 5], [15, 5], [16, 5], 
+	[0, 1], [1, 1], [2, 1], [3, 1], [4, 1], [5, 1], [6, 1], [7, 1], [8, 1], [9, 1], [10, 1], [11, 1], [12, 1], [13, 1],   [14, 1], [15, 1], [16, 1],
+	[0, 2], [1, 2], [2, 2], [3, 2], [4, 2], [5, 2], [6, 2], [7, 2], [8, 2], [9, 2], [10, 2], [11, 2], [12, 2], [13, 2],   [14, 2], [15, 2], [16, 2],
+	[0, 3], [1, 3], [2, 3], [3, 3], [4, 3], [5, 3], [6, 3], [7, 3], [8, 3], [9, 3], [10, 3], [11, 3],        [13, 3],
+	[0, 4], [2, 4], [3, 4], [4, 4], [5, 4], [6, 4], [7, 4], [8, 4], [9, 4], [10, 4], [11, 4],                [13, 4],               [15, 4],
+	[0, 5], [1, 5], [2, 5],                      [6, 5],                       [10, 5], [11, 5], [12, 5], [13, 5],        [14, 5], [15, 5], [16, 5],
 ];
 
 let savedPollTimer = Date.now();
-let PollModeInternal = 15000;
-let transactionID = 0x1f;
+const PollModeInternal = 15000;
+const transactionID = 0x1f;
 
 export function LedNames() {
 	return vLedNames;
@@ -70,13 +70,11 @@ export function LedPositions() {
 	return vLedPositions;
 }
 
-export function Initialize() 
-{
+export function Initialize() {
 	device.addFeature("battery");
 	getDeviceBatteryStatus();
 }
-export function Render() 
-{
+export function Render() {
 	SendPacket(0);
 	SendPacket(1);
 	SendPacket(2);
@@ -87,8 +85,7 @@ export function Render()
 }
 
 
-export function Shutdown() 
-{
+export function Shutdown() {
 	SendPacket(0, true);
 	SendPacket(1, true);
 	SendPacket(2, true);
@@ -97,26 +94,20 @@ export function Shutdown()
 	SendPacket(5, true);
 }
 
-function SendPacket(idx, shutdown = false)
-{
-	let packet = [0x00, 0x00, 0x1f, 0x00, 0x00, 0x00, 0x38, 0x0F, 0x03, 0x00, 0x00, idx, 0x00, 0x11];
+function SendPacket(idx, shutdown = false) {
+	const packet = [0x00, 0x00, 0x1f, 0x00, 0x00, 0x00, 0x38, 0x0F, 0x03, 0x00, 0x00, idx, 0x00, 0x11];
 
 	for(let iIdx = 0; iIdx < 17; iIdx++){
 		var col;
 
-		if(shutdown)
-		{
+		if(shutdown) {
 			col = hexToRgb(shutdownColor);
-		}
-		else if (LightingMode === "Forced") 
-		{
+		} else if (LightingMode === "Forced") {
 			col = hexToRgb(forcedColor);
-		}
-		else
-		{
+		} else {
 			col = device.color(iIdx, idx);
 		}
-		let iLedIdx = (iIdx*3) + 14;
+		const iLedIdx = (iIdx*3) + 14;
 		packet[iLedIdx] = col[0];
 		packet[iLedIdx+1] = col[1];
 		packet[iLedIdx+2] = col[2];
@@ -127,50 +118,51 @@ function SendPacket(idx, shutdown = false)
 	device.send_report(packet, 91);
 }
 
-function getDeviceChargingStatus()
-{
-	let packet = [0x00,0x00,transactionID,0x00,0x00,0x00,0x02,0x07,0x84];
-	packetSend(packet,91);
-	let returnpacket = device.get_report(packet,91);
-	returnpacket = device.get_report(packet,91);
-	let batteryStatus = returnpacket[10];
+function getDeviceChargingStatus() {
+	const packet = [0x00, 0x00, transactionID, 0x00, 0x00, 0x00, 0x02, 0x07, 0x84];
+	packetSend(packet, 91);
+
+	let returnpacket = device.get_report(packet, 91);
+	returnpacket = device.get_report(packet, 91);
+
+	const batteryStatus = returnpacket[10];
 	device.log("Charging Status: " + batteryStatus);
+
 	return batteryStatus+1;
 }
 
-function getDeviceBatteryLevel()
-{
-	let packet = [0x00,0x00,transactionID,0x00,0x00,0x00,0x02,0x07,0x80];
-	packetSend(packet,91);
+function getDeviceBatteryLevel() {
+	const packet = [0x00, 0x00, transactionID, 0x00, 0x00, 0x00, 0x02, 0x07, 0x80];
+	packetSend(packet, 91);
 
-	let returnpacket = device.get_report(packet,91);
-	returnpacket = device.get_report(packet,91);
-	let batteryLevel = Math.floor(((returnpacket[10])*100)/255);
+	let returnpacket = device.get_report(packet, 91);
+	returnpacket = device.get_report(packet, 91);
+
+	const batteryLevel = Math.floor(((returnpacket[10])*100)/255);
 	device.log("Device Battery Level: " + batteryLevel);
 
 	return batteryLevel;
 }
 
-function getDeviceBatteryStatus()
-{
-	if (Date.now() - savedPollTimer < PollModeInternal) 
-    {
-        return
-    }
-    savedPollTimer = Date.now();
+function getDeviceBatteryStatus() {
+	if (Date.now() - savedPollTimer < PollModeInternal) {
+		return;
+	}
 
-	let battstatus = getDeviceChargingStatus();
-	let battlevel = getDeviceBatteryLevel();
+	savedPollTimer = Date.now();
 
-	battery.setBatteryState(battstatus)
+	const battstatus = getDeviceChargingStatus();
+	const battlevel = getDeviceBatteryLevel();
+
+	battery.setBatteryState(battstatus);
 	battery.setBatteryLevel(battlevel);
 }
 
-function packetSend(packet,length) //Wrapper for always including our CRC
+function packetSend(packet, length) //Wrapper for always including our CRC
 {
-	let packetToSend = packet;
+	const packetToSend = packet;
 	packetToSend[89] = CalculateCrc(packet);
-	device.send_report(packetToSend,length)
+	device.send_report(packetToSend, length);
 }
 
 export function Validate(endpoint) {

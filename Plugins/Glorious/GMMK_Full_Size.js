@@ -20,8 +20,8 @@ export function ControllableParameters(){
 }
 
 function hexToRgb(hex) {
-	let result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
-	let colors = [];
+	const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+	const colors = [];
 	colors[0] = parseInt(result[1], 16);
 	colors[1] = parseInt(result[2], 16);
 	colors[2] = parseInt(result[3], 16);
@@ -86,7 +86,7 @@ export function Initialize() {
 	//sendPacketString("04 91 00 05 54",64);
 	//sendPacketString("04 02 00 02",64);
 	//sendPacketString("04 2F 00 03 2C",64);
-	let profile = 0x00;
+	const profile = 0x00;
 	sendPacketString(`04 ${(0xE0 + profile).toString(16)} 03 04 2C 00 00 00 55 AA FF 02 45 0C 2F 65 03 01 ${profile} 08 00 00 00 00 01 02 03 04 05 06 08 07 09 0B 0A 0C 0D 0E 0F 10 11 12 14`, 64);
 
 	//set to custom Mode
@@ -105,8 +105,8 @@ export function Shutdown() {
 }
 
 function sendPacketString(string, size){
-	let packet= [];
-	let data = string.split(' ');
+	const packet= [];
+	const data = string.split(' ');
 
 	for(let i = 0; i < data.length; i++){
 		packet[i] = parseInt(data[i], 16);//.toString(16)
@@ -117,7 +117,7 @@ function sendPacketString(string, size){
 
 }
 // This is an array of key indexes for setting colors in our render array, indexed left to right, row top to bottom.
-let vKeys = [
+const vKeys = [
 	0,   1, 2, 3, 4,   5, 6, 7, 8,   9, 10, 11, 12,         106, 107, 108,
 	18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 98,    110, 111, 112,  31, 32, 33, 116,
 	35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 64,    113, 114, 115,  48, 49, 50, 117,
@@ -129,7 +129,7 @@ let vKeys = [
 	//13,14,15,16,34,51,85
 ];
 
-let vKeyNames = [
+const vKeyNames = [
 	"Esc", "F1", "F2", "F3", "F4", "F5", "F6", "F7", "F8", "F9", "F10", "F11", "F12",         "Print Screen", "Scroll Lock", "Pause Break",
 	"`", "1", "2", "3", "4", "5", "6", "7", "8", "9", "0", "-_", "=+", "Backspace",                        "Insert", "Home", "Page Up",       "NumLock", "Num /", "Num *", "Num -",  //21
 	"Tab", "Q", "W", "E", "R", "T", "Y", "U", "I", "O", "P", "[", "]", "\\",                               "Del", "End", "Page Down",         "Num 7", "Num 8", "Num 9", "Num +",    //21
@@ -138,7 +138,7 @@ let vKeyNames = [
 	"Left Ctrl", "Left Win", "Left Alt", "Space", "Right Alt", "Fn", "Menu", "Right Ctrl",  "Left Arrow", "Down Arrow", "Right Arrow", "Num 0", "Num ."                       //13
 ];
 
-let vKeyPositions = [
+const vKeyPositions = [
 	[0, 0], [1, 0], [2, 0], [3, 0], [4, 0], [5, 0], [6, 0], [7, 0], [8, 0], [9, 0], [10, 0], [11, 0], [12, 0],           [14, 0], [15, 0], [16, 0],            //20
 	[0, 1], [1, 1], [2, 1], [3, 1], [4, 1], [5, 1], [6, 1], [7, 1], [8, 1], [9, 1], [10, 1], [11, 1], [12, 1], [13, 1],   [14, 1], [15, 1], [16, 1],   [17, 1], [18, 1], [19, 1], [20, 1], //21
 	[0, 2], [1, 2], [2, 2], [3, 2], [4, 2], [5, 2], [6, 2], [7, 2], [8, 2], [9, 2], [10, 2], [11, 2], [12, 2], [13, 2],   [14, 2], [15, 2], [16, 2],   [17, 2], [18, 2], [19, 2], [20, 2], //20
@@ -164,13 +164,13 @@ export function Render() {
 
 function sendColors(shutdown = false){
 
-	let RGBdata = [126*3];
+	const RGBdata = [126*3];
 	let TotalLedCount = 126*3;
 
 
 	for(let iIdx = 0; iIdx < vKeys.length; iIdx++) {
-		let iPxX = vKeyPositions[iIdx][0];
-		let iPxY = vKeyPositions[iIdx][1];
+		const iPxX = vKeyPositions[iIdx][0];
+		const iPxY = vKeyPositions[iIdx][1];
 		var col;
 
 		if(shutdown){
@@ -193,7 +193,7 @@ function sendColors(shutdown = false){
 	//var TotalLedCount = TotalLedCount >= 204 ? 204 : TotalLedCount;
 
 	while(TotalLedCount > 0){
-		let ledsToSend = TotalLedCount >= 0x36 ? 0x36 : TotalLedCount;
+		const ledsToSend = TotalLedCount >= 0x36 ? 0x36 : TotalLedCount;
 
 		StreamLightingPacket(ledsSent, ledsToSend, RGBdata.splice(0, ledsToSend));
 
@@ -222,7 +222,7 @@ function StreamLightingPacket(ledsSent, ledsToSend, data){
 
 	packet = packet.concat(data);
 
-	let CRC = packet.slice(3).reduce(reducer);
+	const CRC = packet.slice(3).reduce(reducer);
 	packet[1] = CRC & 0xFF;
 	packet[2] = CRC >> 8;
 

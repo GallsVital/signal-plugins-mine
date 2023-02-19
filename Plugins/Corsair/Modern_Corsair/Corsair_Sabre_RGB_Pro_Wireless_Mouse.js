@@ -1,13 +1,13 @@
 
-let CORSAIR_COMMAND_WRITE       = 0x07;
-let CORSAIR_COMMAND_READ        = 0x0E;
-let CORSAIR_COMMAND_STREAM      = 0x7F;
+const CORSAIR_COMMAND_WRITE       = 0x07;
+const CORSAIR_COMMAND_READ        = 0x0E;
+const CORSAIR_COMMAND_STREAM      = 0x7F;
 
-let CORSAIR_LIGHTING_CONTROL_HARDWARE           = 0x01;
-let CORSAIR_LIGHTING_CONTROL_SOFTWARE           = 0x02;
+const CORSAIR_LIGHTING_CONTROL_HARDWARE           = 0x01;
+const CORSAIR_LIGHTING_CONTROL_SOFTWARE           = 0x02;
 
-let CORSAIR_PROPERTY_SPECIAL_FUNCTION = 0x04;
-let CORSAIR_PROPERTY_SUBMIT_MOUSE_COLOR         = 0x22;
+const CORSAIR_PROPERTY_SPECIAL_FUNCTION = 0x04;
+const CORSAIR_PROPERTY_SUBMIT_MOUSE_COLOR         = 0x22;
 
 
 export function Name() { return "Corsair Sabre RGB PRO Wireless"; }
@@ -35,9 +35,9 @@ export function ControllableParameters(){
 }
 
 let savedDpi1;
-let vLedNames = ["Logo", "Scroll Zone", "Front Zone"];
+const vLedNames = ["Logo", "Scroll Zone", "Front Zone"];
 
-let vLedPositions = [
+const vLedPositions = [
 	[3, 2], [3, 1], [3, 0]
 ];
 
@@ -51,8 +51,8 @@ export function LedPositions() {
 
 
 function sendPacketString(string, size){
-	let packet= [];
-	let data = string.split(' ');
+	const packet= [];
+	const data = string.split(' ');
 
 	for(let i = 0; i < data.length; i++){
 		packet[parseInt(i, 16)] = parseInt(data[i], 16);//.toString(16)
@@ -86,13 +86,13 @@ function sendColors(shutdown = false){
 	packet[0x06]   = 0x00;
 	packet[0x07]   = 0x00;
 
-	let red = new Array(3).fill(0);
-	let green = new Array(3).fill(0);
-	let blue = new Array(3).fill(0);
+	const red = new Array(3).fill(0);
+	const green = new Array(3).fill(0);
+	const blue = new Array(3).fill(0);
 
 	for(let zone_idx = 0; zone_idx < vLedPositions.length; zone_idx++) {
-		let iX = vLedPositions[zone_idx][0];
-		let iY = vLedPositions[zone_idx][1];
+		const iX = vLedPositions[zone_idx][0];
+		const iY = vLedPositions[zone_idx][1];
 		var col;
 
 		if(shutdown){
@@ -152,8 +152,8 @@ function setDpi(dpi){
 }
 
 function hexToRgb(hex) {
-	let result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
-	let colors = [];
+	const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+	const colors = [];
 	colors[0] = parseInt(result[1], 16);
 	colors[1] = parseInt(result[2], 16);
 	colors[2] = parseInt(result[3], 16);

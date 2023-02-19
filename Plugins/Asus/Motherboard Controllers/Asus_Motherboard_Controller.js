@@ -142,21 +142,18 @@ export function Initialize() {
 	// Set Mainboard to direct Mode
 	SetChannelModeDirect(0);
 
-	if(DeviceInfo.PolymoSupport)
-	{
-			//set all ARGB channels to direct mode
-	for(let channel = 1; channel < DeviceInfo.ARGBChannelCount + 2; channel++){ //I offset the total count to account for polymo.
-		SetChannelModeDirect(channel);
-		ChannelArray.push([`Channel ${channel}`, Device_ChannelLedLimit]);
-	}
-	}
-	else
-	{
-			//set all ARGB channels to direct mode
-	for(let channel = 1; channel < DeviceInfo.ARGBChannelCount + 1; channel++){
-		SetChannelModeDirect(channel);
-		ChannelArray.push([`Channel ${channel}`, Device_ChannelLedLimit]);
-	}
+	if(DeviceInfo.PolymoSupport) {
+		//set all ARGB channels to direct mode
+		for(let channel = 1; channel < DeviceInfo.ARGBChannelCount + 2; channel++){ //I offset the total count to account for polymo.
+			SetChannelModeDirect(channel);
+			ChannelArray.push([`Channel ${channel}`, Device_ChannelLedLimit]);
+		}
+	} else {
+		//set all ARGB channels to direct mode
+		for(let channel = 1; channel < DeviceInfo.ARGBChannelCount + 1; channel++){
+			SetChannelModeDirect(channel);
+			ChannelArray.push([`Channel ${channel}`, Device_ChannelLedLimit]);
+		}
 	}
 
 
@@ -167,21 +164,31 @@ export function Initialize() {
 
 
 export function Shutdown() {
+	SendMainBoardLeds(true);
 
+	if(DeviceInfo.PolymoSupport) {
+		sendPolymoColors();
+
+		for(let channel = 0; channel < DeviceInfo.ARGBChannelCount; channel++){
+			SendARGBChannel(channel, true, true);
+		}
+	} else {
+		for(let channel = 0; channel < DeviceInfo.ARGBChannelCount; channel++){
+			SendARGBChannel(channel, false, true);
+		}
+	}
 }
 
 export function Render() {
 	SendMainBoardLeds();
 
-	if(DeviceInfo.PolymoSupport)
-	{
+	if(DeviceInfo.PolymoSupport) {
 		sendPolymoColors();
+
 		for(let channel = 0; channel < DeviceInfo.ARGBChannelCount; channel++){
 			SendARGBChannel(channel, true);
 		}
-	}
-	else
-	{
+	} else {
 		for(let channel = 0; channel < DeviceInfo.ARGBChannelCount; channel++){
 			SendARGBChannel(channel);
 		}
@@ -193,12 +200,10 @@ const polymoDevice =
 {
 	Names : [ "ROG Logo LED 1", "ROG Logo LED 2", "ROG Logo LED 3", "ROG Logo LED 4", "ROG Logo LED 5", "ROG Logo LED 6", "ROG Logo LED 7", "ROG Logo LED 8", "ROG Logo LED 9", "ROG Logo LED 10", "ROG Logo LED 11", "Hero LED 1", "Hero LED 2", "Hero LED 3", "Hero LED 4", "Hero LED 5", "Hero LED 6", "Hero LED 7" ],
 	Positions : [ [3, 0], [3, 1], [3, 2], [3, 3], [3, 4], [3, 5], [3, 6], [3, 7], [3, 8], [3, 9], [3, 10], [0, 11], [1, 11], [2, 11], [3, 11], [4, 11], [5, 11], [6, 11] ]
-}
+};
 
-function CreatePolymoSubdevice()
-{
-	if(DeviceInfo.PolymoSupport)
-	{
+function CreatePolymoSubdevice() {
+	if(DeviceInfo.PolymoSupport) {
 		device.createSubdevice("Polymo");
 		device.setSubdeviceName("Polymo", `${device.getMotherboardName()} - Polymo Panel`);
 		device.setSubdeviceSize("Polymo", 7, 12);
@@ -206,8 +211,7 @@ function CreatePolymoSubdevice()
 	}
 }
 
-function sendPolymoColors(shutdown = false)
-{
+function sendPolymoColors(shutdown = false) {
 	const RGBData = [];
 
 	for(let polymoLEDs = 0; polymoLEDs < polymoDevice.Positions.length; polymoLEDs++) {
@@ -227,7 +231,7 @@ function sendPolymoColors(shutdown = false)
 		RGBData[ledIdx + 1] = color[1];
 		RGBData[ledIdx + 2] = color[2];
 	}
-	
+
 	StreamDirectColors(0, RGBData, 18);
 }
 
@@ -345,7 +349,7 @@ function Fetch12VHeaderColors(shutdown = false){
 	return [RGBData, TotalLedCount];
 }
 
-function SendARGBChannel(ChannelIdx, polymo = false) {
+function SendARGBChannel(ChannelIdx, polymo = false, shutdown = false) {
 	//Fetch Colors
 	let ChannelLedCount = device.channel(ChannelArray[ChannelIdx][0]).LedCount();
 	const componentChannel = device.channel(ChannelArray[ChannelIdx][0]);
@@ -361,16 +365,15 @@ function SendARGBChannel(ChannelIdx, polymo = false) {
 		const pulseColor = device.getChannelPulseColor(ChannelArray[ChannelIdx][0], ChannelLedCount);
 		RGBData = device.createColorArray(pulseColor, ChannelLedCount, "Inline", RGBconfig);
 
+	}else if(shutdown){
+		RGBData = device.createColorArray(shutdownColor, ChannelLedCount, "Inline", RGBconfig);
 	}else{
 		RGBData = device.channel(ChannelArray[ChannelIdx][0]).getColors("Inline", RGBconfig);
 	}
 
-	if(polymo)
-	{
+	if(polymo) {
 		StreamDirectColors(ChannelIdx + 1, RGBData, ChannelLedCount);
-	}
-	else
-	{
+	} else {
 		StreamDirectColors(ChannelIdx, RGBData, ChannelLedCount);
 	}
 
@@ -406,7 +409,7 @@ function StreamDirectColors(ChannelIdx, RGBData, LedCount){
 
 function SendDirectPacket(channel, start, count, data, apply){
 
-	let packet = [];
+	const packet = [];
 	packet[0] = ASUS_COMMAND;
 	packet[1] = ASUS_COMMAND_DIRECTCONTROL;
 	packet[2] = apply ? 0x80 | channel : channel;
@@ -453,31 +456,26 @@ function ParseConfigTable(){
 		}
 	}
 
-	if(DeviceInfo.ConfigTable[ASUS_CONFIG_ARGB_CHANNELS] === 4)
-	{
+	if(DeviceInfo.ConfigTable[ASUS_CONFIG_ARGB_CHANNELS] === 4) {
 		DeviceInfo.ARGBChannelCount = DeviceInfo.ConfigTable[ASUS_CONFIG_ARGB_CHANNELS] - 1;
 		device.log(`ARGB channel Count ${DeviceInfo.ARGBChannelCount} `, {toFile: true});
 		DeviceInfo.PolymoSupport = 1;
 		device.log("Motherboard has a Polymo Panel.");
-	}
-	else
-	{
+	} else {
 		DeviceInfo.ARGBChannelCount = DeviceInfo.ConfigTable[ASUS_CONFIG_ARGB_CHANNELS];
 		device.log(`ARGB channel Count ${DeviceInfo.ARGBChannelCount} `, {toFile: true});
 	}
 
 	if(DeviceInfo.ConfigTable[ASUS_CONFIG_12V_HEADERS] === 3) //Weird offset edge case.
-	{	
-		device.log("Config Table Returned 3 12 Volt Headers. Board most likely does not have 3 12 Volt Headers. Adjusting counts.")
+	{
+		device.log("Config Table Returned 3 12 Volt Headers. Board most likely does not have 3 12 Volt Headers. Adjusting counts.");
 
 		DeviceInfo.MainChannelLedCount = DeviceInfo.ConfigTable[ASUS_CONFIG_MAINBOARD_LEDS] - 1;
 		device.log(`MainBoard Led Count ${DeviceInfo.MainChannelLedCount} `, {toFile: true});
 
 		DeviceInfo.RGBHeaderCount = 1;
 		device.log(`12V Header Count ${DeviceInfo.RGBHeaderCount} `, {toFile: true});
-	}
-	else
-	{
+	} else {
 		DeviceInfo.MainChannelLedCount = DeviceInfo.ConfigTable[ASUS_CONFIG_MAINBOARD_LEDS] - DeviceInfo.ConfigTable[ASUS_CONFIG_12V_HEADERS];
 		device.log(`MainBoard Led Count ${DeviceInfo.MainChannelLedCount} `, {toFile: true});
 

@@ -1,13 +1,13 @@
 
-let CORSAIR_COMMAND_WRITE       = 0x07;
-let CORSAIR_COMMAND_READ        = 0x0E;
-let CORSAIR_COMMAND_STREAM      = 0x7F;
+const CORSAIR_COMMAND_WRITE       = 0x07;
+const CORSAIR_COMMAND_READ        = 0x0E;
+const CORSAIR_COMMAND_STREAM      = 0x7F;
 
-let CORSAIR_LIGHTING_CONTROL_HARDWARE           = 0x01;
-let CORSAIR_LIGHTING_CONTROL_SOFTWARE           = 0x02;
+const CORSAIR_LIGHTING_CONTROL_HARDWARE           = 0x01;
+const CORSAIR_LIGHTING_CONTROL_SOFTWARE           = 0x02;
 
-let CORSAIR_PROPERTY_SPECIAL_FUNCTION = 0x04;
-let CORSAIR_PROPERTY_SUBMIT_MOUSE_COLOR         = 0x22;
+const CORSAIR_PROPERTY_SPECIAL_FUNCTION = 0x04;
+const CORSAIR_PROPERTY_SUBMIT_MOUSE_COLOR         = 0x22;
 
 
 export function Name() { return "Corsair Glaive Pro RGB Mouse"; }
@@ -36,17 +36,17 @@ export function ControllableParameters(){
 export function Documentation(){ return "troubleshooting/corsair"; }
 
 function hexToRgb(hex) {
-	let result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
-	let colors = [];
+	const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+	const colors = [];
 	colors[0] = parseInt(result[1], 16);
 	colors[1] = parseInt(result[2], 16);
 	colors[2] = parseInt(result[3], 16);
 
 	return colors;
 }
-let vLedNames = ["Mouse"];
+const vLedNames = ["Mouse"];
 
-let vLedPositions = [[1, 1]];
+const vLedPositions = [[1, 1]];
 
 export function LedNames() {
 	return vLedNames;
@@ -57,7 +57,7 @@ export function LedPositions() {
 }
 
 function EnableSoftwareControl() {
-	let packet = [];
+	const packet = [];
 
 	// Lighting ctrl packet.
 	packet[0x00]           = 0x00;
@@ -71,7 +71,7 @@ function EnableSoftwareControl() {
 
 
 function ReturnToHardwareControl() {
-	let packet = [];
+	const packet = [];
 
 	// Lighting ctrl packet.
 	packet[0x00]           = 0x00;
@@ -96,7 +96,7 @@ export function Render() {
 
 function sendColors(shutdown = false){
 
-	let packet = [];
+	const packet = [];
 	packet[0x00]   = 0x00;
 	packet[0x01]   = CORSAIR_COMMAND_WRITE;
 	packet[0x02]   = CORSAIR_PROPERTY_SUBMIT_MOUSE_COLOR;
@@ -104,8 +104,8 @@ function sendColors(shutdown = false){
 	packet[0x04]   = 0x00;
 
 	// Fetch color at 1,1
-	let iX = vLedPositions[0][0];
-	let iY = vLedPositions[0][1];
+	const iX = vLedPositions[0][0];
+	const iY = vLedPositions[0][1];
 	let col;
 
 	if(shutdown){

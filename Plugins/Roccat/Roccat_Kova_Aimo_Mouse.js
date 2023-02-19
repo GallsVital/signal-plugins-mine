@@ -33,13 +33,13 @@ export function ControllableParameters(){
 	];
 }
 
-let vKeys = [ 1, 0 ];
-let vLedNames = [ "Scroll Wheel", "Back" ];
-let vLedPositions = [ [1, 0], [1, 3] ];
+const vKeys = [ 1, 0 ];
+const vLedNames = [ "Scroll Wheel", "Back" ];
+const vLedPositions = [ [1, 0], [1, 3] ];
 
 function hexToRgb(hex) {
-	let result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
-	let colors = [];
+	const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+	const colors = [];
 	colors[0] = parseInt(result[1], 16);
 	colors[1] = parseInt(result[2], 16);
 	colors[2] = parseInt(result[3], 16);
@@ -96,7 +96,7 @@ const PollingDict =
 };
 
 function setDpi() {
-	let packet = [];
+	const packet = [];
 	packet[0] = 0x06;
 	packet[1] = 0x3f;
 	packet[3] = 0x06;
@@ -137,8 +137,8 @@ function setDpi() {
 }
 
 function sendReportString(string, size){
-	let packet= [];
-	let data = string.split(' ');
+	const packet= [];
+	const data = string.split(' ');
 
 	for(let i = 0; i < data.length; i++){
 		packet[parseInt(i, 16)] =parseInt(data[i], 16);//.toString(16)
@@ -149,13 +149,13 @@ function sendReportString(string, size){
 
 function sendZone(shutdown = false){
 
-	let packet = [];
+	const packet = [];
 	packet[0] = 0x0a;
 	packet[1] = 0x08;
 
 	for(let iIdx = 0; iIdx < vKeys.length; iIdx++) {
-		let iPxX = vLedPositions[iIdx][0];
-		let iPxY = vLedPositions[iIdx][1];
+		const iPxX = vLedPositions[iIdx][0];
+		const iPxY = vLedPositions[iIdx][1];
 		var col;
 
 		if(shutdown){

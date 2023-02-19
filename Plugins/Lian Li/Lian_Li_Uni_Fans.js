@@ -24,23 +24,23 @@ export function ControllableParameters(){
 export function LedNames() { return vLedNames; }
 export function LedPositions() { return vLedPos; }
 
-export function DeviceMessages() { 
+export function DeviceMessages() {
 	return [
-	{property: "Limited Frame Rate", message:"Limited Frame Rate", tooltip: "This device's firmware is limited to a slower refresh rate than other device's when using more then 2 channels"},
+		{property: "Limited Frame Rate", message:"Limited Frame Rate", tooltip: "This device's firmware is limited to a slower refresh rate than other device's when using more then 2 channels"},
 	];
 }
 export function SupportsSubdevices(){ return true; }
 export function DefaultComponentBrand() { return "LianLi";}
 
-let ConnectedFans = [];
-let vLedNames = [];
-let vLedPos = [];
+const ConnectedFans = [];
+const vLedNames = [];
+const vLedPos = [];
 let ChannelIndex = 0;
 let savedPollFanTimer = Date.now();
-let PollModeInternal = 3000;
+const PollModeInternal = 3000;
 
 //Channel Name, Led Limit
-let ChannelArray = [
+const ChannelArray = [
 	["Channel 1", 64],
 	["Channel 2", 64],
 	["Channel 3", 64],
@@ -220,7 +220,7 @@ function SendSingleChannel(Channel){
 }
 
 function  getChannelColors(Channel) {
-	let ChannelName = ChannelArray[Channel][0];
+	const ChannelName = ChannelArray[Channel][0];
 	let ChannelLedCount = device.channel(ChannelName).LedCount();
 	let RGBData = [];
 
@@ -231,7 +231,7 @@ function  getChannelColors(Channel) {
 	}else if(device.getLedCount() === 0){
 		ChannelLedCount = DevicePulseLedCount;
 
-		let pulseColor = device.getChannelPulseColor(ChannelName);
+		const pulseColor = device.getChannelPulseColor(ChannelName);
 		RGBData = device.createColorArray(pulseColor, ChannelLedCount, "Inline", "RBG");
 
 	}else{
@@ -242,7 +242,7 @@ function  getChannelColors(Channel) {
 }
 
 function isChannelActive(channelIdx) {
-	let channelName = ChannelArray[channelIdx][0];
+	const channelName = ChannelArray[channelIdx][0];
 
 	return device.channel(channelName).LedCount();
 }
@@ -252,7 +252,7 @@ export function onmoboSyncChanged(){
 }
 
 function SetMoboPassthrough(Enable){
-	let packet = [0x30, Enable];
+	const packet = [0x30, Enable];
 	sendControlPacket(COMMAND_ADDRESS, packet, 2);
 	sendCommit();
 }
@@ -271,7 +271,7 @@ function PollFans(){
 	}
 
 	for(let fan = 0; fan < 4; fan++){
-		let rpm = readFanRPM(fan);
+		const rpm = readFanRPM(fan);
 		device.log(`Fan ${fan}: ${rpm}rpm`);
 
 		if(rpm > 0  && !ConnectedFans.includes(`Fan ${fan}`)){
@@ -282,7 +282,7 @@ function PollFans(){
 		if(FanMode === "SignalRGB" && ConnectedFans.includes(`Fan ${fan}`)){
 			device.setRPM(`Fan ${fan}`, rpm);
 
-			let newSpeed = device.getNormalizedFanlevel(`Fan ${fan}`) * 100;
+			const newSpeed = device.getNormalizedFanlevel(`Fan ${fan}`) * 100;
 			SetFanPercent(fan, newSpeed);
 		}
 	}
@@ -290,7 +290,7 @@ function PollFans(){
 
 
 function readFanRPM(channel){
-	let packet = readControlPacket(ChannelObjectArray[channel].fanRead, [], 2);
+	const packet = readControlPacket(ChannelObjectArray[channel].fanRead, [], 2);
 
 	return packet[0] | (packet[1] << 8);
 }
@@ -309,13 +309,13 @@ function BurstFans(){
 
 
 function SetFanPercent(channel, percent){
-	let rpm = Math.round(1900 * percent/100);
+	const rpm = Math.round(1900 * percent/100);
 	device.log(`Setting Channel ${channel} to ${Math.round(percent)}% Fan Speed, UniFan rpm equivalent: ${rpm}`);
 	SetFanRPM(channel, rpm);
 }
 
 function SetFanRPM(channel, rpm){
-	let packet = [];
+	const packet = [];
 	packet[0] = rpm % 256;
 	packet[1] = Math.floor(rpm / 256);
 	//device.log(`Setting Channel ${channel} to ${rpm}rpm, [${packet[0]}, ${packet[1]}]`)
@@ -339,7 +339,7 @@ function SetFanMode(){
 	}else{
 
 		for(let channel = 0; channel < 4;channel++){
-			let packet = [0];
+			const packet = [0];
 			//Action address for PWM is the same as the commit for Manual RPM control
 			sendControlPacket(ChannelObjectArray[channel].fanCommit, packet, 2);
 			packet[0] = 1;
@@ -352,7 +352,7 @@ function SetFanMode(){
 }
 
 function SendFanControlModePacket(mode){
-	let packet = [LIAN_LI_COMMAND_FAN, mode];
+	const packet = [LIAN_LI_COMMAND_FAN, mode];
 	sendControlPacket(COMMAND_ADDRESS, packet, 2);
 	sendCommit();
 }
@@ -371,7 +371,7 @@ function sendControlPacket(index, data, length){
 }
 
 function sendCommit(){
-	let packet = [0x01];
+	const packet = [0x01];
 	//                  iType, iRequest, iValue, iReqIdx, pBuf, iLen, iTimeout
 	device.control_transfer(0x40, 0x80, 0, COMMIT_ADDRESS, packet, 1, 1000);
 	//device.pause(1)

@@ -25,9 +25,9 @@ export function ControllableParameters(){
 	];
 }
 
-let vLedNames = [ "Led 1", "Led 2", "Led 3", "Led 4", "Led 5", "Led 6", "Led 7", "Led 8", "Led 9", "Led 10", "Led 11", "Led 12", "Led 13", "Led 14", "Led 15", "Led 16", "Led 17", "Led 18", "Led 19", "Led 20" ];
+const vLedNames = [ "Led 1", "Led 2", "Led 3", "Led 4", "Led 5", "Led 6", "Led 7", "Led 8", "Led 9", "Led 10", "Led 11", "Led 12", "Led 13", "Led 14", "Led 15", "Led 16", "Led 17", "Led 18", "Led 19", "Led 20" ];
 
-let vLedPositions = 
+const vLedPositions =
 [
 	//Top Bar
 	[2, 0], [3, 0], [4, 0], [5, 0], [6, 0],
@@ -39,7 +39,7 @@ let vLedPositions =
 	[0, 4], [2, 4], [4, 4], [6, 4], [7, 4],
 ];
 
-let vKeymap = 
+const vKeymap =
 [
 	//Top Bar
 	15, 16, 17, 18, 19,
@@ -51,65 +51,51 @@ let vKeymap =
 	9, 8, 7, 6, 5,
 ];
 
-export function LedNames() 
-{
+export function LedNames() {
 	return vLedNames;
 }
 
-export function LedPositions() 
-{
+export function LedPositions() {
 	return vLedPositions;
 }
 
-export function Initialize() 
-{
+export function Initialize() {
 
 }
 
-export function Render() 
-{
+export function Render() {
 	sendColor();
 }
 
-export function Shutdown() 
-{
+export function Shutdown() {
 	sendColor(true);
 }
 
 
-
-function StartPacket()
-{
+function StartPacket() {
 	device.send_report([0x00, 0x04, 0xF2, 0x00, 0x01], 65);
 }
 
-function sendColor(shutdown = false)
-{
+function sendColor(shutdown = false) {
 	StartPacket();
 
 	//get color data
-	let red = [168];
-	let green = [168];
-	let blue = [168];
+	const red = [168];
+	const green = [168];
+	const blue = [168];
 
 
-	for(let iIdx = 0; iIdx < vKeymap.length; iIdx++) 
-	{
-		let iPxX = vLedPositions[iIdx][0];
-		let iPxY = vLedPositions[iIdx][1];
+	for(let iIdx = 0; iIdx < vKeymap.length; iIdx++) {
+		const iPxX = vLedPositions[iIdx][0];
+		const iPxY = vLedPositions[iIdx][1];
 
 		var color;
 
-		if(shutdown)
-		{
+		if(shutdown) {
 			color = hexToRgb(shutdownColor);
-		}
-		else if (LightingMode === "Forced") 
-		{
+		} else if (LightingMode === "Forced") {
 			color = hexToRgb(forcedColor);
-		}
-		else
-		{
+		} else {
 			color = device.color(iPxX, iPxY);
 		}
 
@@ -118,19 +104,17 @@ function sendColor(shutdown = false)
 		blue[vKeymap[iIdx]] = color[2];
 	}
 
-	let packet = [];
+	const packet = [];
 	packet[0x00]   = 0x00;
 
 	let TotalkeyCount = 128;
 	let sentKeys = 0;
 
-	while(TotalkeyCount > 0)
-	{
+	while(TotalkeyCount > 0) {
 
-		let keys = TotalkeyCount >= 16 ? 16 : TotalkeyCount;
+		const keys = TotalkeyCount >= 16 ? 16 : TotalkeyCount;
 
-		for(let idx = 0; idx < keys; idx++) 
-		{
+		for(let idx = 0; idx < keys; idx++) {
 			packet[(idx * 4) + 1] = 0x81;
 			packet[(idx * 4) + 2] = red[sentKeys];
 			packet[(idx * 4) + 3] = green[sentKeys];
@@ -144,10 +128,9 @@ function sendColor(shutdown = false)
 
 }
 
-function hexToRgb(hex) 
-{
-	let result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
-	let colors = [];
+function hexToRgb(hex) {
+	const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+	const colors = [];
 	colors[0] = parseInt(result[1], 16);
 	colors[1] = parseInt(result[2], 16);
 	colors[2] = parseInt(result[3], 16);
@@ -155,8 +138,7 @@ function hexToRgb(hex)
 	return colors;
 }
 
-export function Validate(endpoint) 
-{
+export function Validate(endpoint) {
 	return endpoint.interface === 0;
 }
 

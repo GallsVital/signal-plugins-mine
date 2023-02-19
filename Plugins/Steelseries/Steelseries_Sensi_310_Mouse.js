@@ -23,11 +23,11 @@ export function ControllableParameters(){
 	];
 }
 
-let vLedNames = [
+const vLedNames = [
 	"Logo", "Scroll"
 ];
 
-let vLedPositions = [
+const vLedPositions = [
 	[1, 2], [1, 0],
 ];
 
@@ -61,9 +61,9 @@ export function Validate(endpoint) {
 }
 
 function SendColorPacket(Position, zone, shutdown = false) {
-	let packet = [];
-	let iPxX = Position[0];
-	let iPxY = Position[1];
+	const packet = [];
+	const iPxX = Position[0];
+	const iPxY = Position[1];
 	let color;
 
 	if(shutdown){
@@ -108,7 +108,7 @@ export function Render() {
 function setDpi(channel, dpi){
 	savedDpi1 = dpi1;
 
-	let packet = [];
+	const packet = [];
 	packet[0] = 0x00;
 	packet[1] = 0x53;
 	packet[2] = 0x00;
@@ -122,8 +122,8 @@ function setDpi(channel, dpi){
 }
 
 function hexToRgb(hex) {
-	let result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
-	let colors = [];
+	const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+	const colors = [];
 	colors[0] = parseInt(result[1], 16);
 	colors[1] = parseInt(result[2], 16);
 	colors[2] = parseInt(result[3], 16);

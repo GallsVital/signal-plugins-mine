@@ -1,8 +1,8 @@
-let ParentDeviceName = "Razer Chroma HDK";
-let vLeds = [];
+const ParentDeviceName = "Razer Chroma HDK";
+const vLeds = [];
 const LedsPerChannel = 16;
 //Channel Name, Led Limit
-let ChannelArray = [
+const ChannelArray = [
 	{ Name:"Channel 1", LedLimit:LedsPerChannel },
 	{ Name:"Channel 2", LedLimit:LedsPerChannel },
 	{ Name:"Channel 3", LedLimit:LedsPerChannel },
@@ -34,7 +34,7 @@ export function ControllableParameters(){
 }
 
 export function LedNames(){
-	let return_value = [];
+	const return_value = [];
 
 	for(let i=0; i < vLeds.length; i++){
 		return_value.push(vLeds[i].Name);
@@ -44,7 +44,7 @@ export function LedNames(){
 }
 
 export function LedPositions(){
-	let return_value = [];
+	const return_value = [];
 
 	for(let i=0; i < vLeds.length; i++){
 		return_value.push(vLeds[i].Position);
@@ -54,7 +54,7 @@ export function LedPositions(){
 }
 
 function GetReport(cmd_class, cmd_id, size){
-	let report = new Array(91).fill(0);
+	const report = new Array(91).fill(0);
 	report[0] = 0;
 	report[1] = 0x00; // Status.
 	report[2] = 0xFF; // Transaction ID.
@@ -82,8 +82,8 @@ function CalculateCrc(report){
 }
 
 function hexToRgb(hex){
-	let result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
-	let colors = [];
+	const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+	const colors = [];
 	colors[0] = parseInt(result[1], 16);
 	colors[1] = parseInt(result[2], 16);
 	colors[2] = parseInt(result[3], 16);
@@ -92,7 +92,7 @@ function hexToRgb(hex){
 }
 
 function EnableSoftwareControl(){
-	let report = GetReport(0x0F, 0x03, 0x47);
+	const report = GetReport(0x0F, 0x03, 0x47);
 	report[2] = 0x3F; // transaction id.
 	report[11] = 0; // row index.
 	report[13] = LedsPerChannel; // led count.
@@ -115,7 +115,7 @@ function ReturnToHardwareControl(){
 function SendChannel(Channel, shutdown=false){
 	let ChannelLedCount = device.channel(ChannelArray[Channel].Name).ledCount;
 	let RGBData = [];
-	let componentChannel = device.channel(ChannelArray[Channel].Name);
+	const componentChannel = device.channel(ChannelArray[Channel].Name);
 
 	if(shutdown){
 		RGBData = device.createColorArray(shutdownColor, ChannelLedCount, "Inline");
@@ -124,7 +124,7 @@ function SendChannel(Channel, shutdown=false){
 	}else if(componentChannel.shouldPulseColors()){
 		ChannelLedCount = LedsPerChannel;
 
-		let pulseColor = device.getChannelPulseColor(ChannelArray[Channel].Name, ChannelLedCount);
+		const pulseColor = device.getChannelPulseColor(ChannelArray[Channel].Name, ChannelLedCount);
 		RGBData = device.createColorArray(pulseColor, ChannelLedCount, "Inline");
 	}else{
 		RGBData = device.channel(ChannelArray[Channel].Name).getColors("Inline");

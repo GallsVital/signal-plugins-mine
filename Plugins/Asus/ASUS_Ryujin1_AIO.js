@@ -20,12 +20,12 @@ export function ControllableParameters() {
 	];
 }
 
-let vLedNames = [
-	"LED 1","LED 2", "LED 3", "LED 4", "LED 5",
+const vLedNames = [
+	"LED 1", "LED 2", "LED 3", "LED 4", "LED 5",
 ];
 
-let vLedPos = [
-	[0,0], [1,0], [2,0], [3,0], [4,0], 
+const vLedPos = [
+	[0, 0], [1, 0], [2, 0], [3, 0], [4, 0],
 ];
 
 export function LedNames() {
@@ -37,7 +37,7 @@ export function LedPositions() {
 }
 
 export function Initialize() {
-	device.write([0xec, 0x3b, 0x00, 0xe3, 0xff], 65)
+	device.write([0xec, 0x3b, 0x00, 0xe3, 0xff], 65);
 }
 
 export function Render() {
@@ -49,7 +49,7 @@ export function Shutdown() {
 }
 
 function sendColors(shutdown = false){
-	let packet = [];
+	const packet = [];
 	let color;
 
 	packet[0x00]   = 0xec;
@@ -58,37 +58,31 @@ function sendColors(shutdown = false){
 	packet[0x03]   = 0x00;
 	packet[0x04]   = 0x05;
 
-	for(var iIdx = 0; iIdx < vLedPos.length; iIdx++)
-    {
-        var iPxX = vLedPos[iIdx][0];
-        var iPxY = vLedPos[iIdx][1];
+	for(let iIdx = 0; iIdx < vLedPos.length; iIdx++) {
+		const iPxX = vLedPos[iIdx][0];
+		const iPxY = vLedPos[iIdx][1];
 
-        if(shutdown)
-        {
-            color = hexToRgb(shutdownColor)
-        }
-        else if (LightingMode == "Forced") 
-        {
-            color = hexToRgb(forcedColor)
-        }
-        else
-        {
-            color = device.color(iPxX, iPxY);
-        }           
+		if(shutdown) {
+			color = hexToRgb(shutdownColor);
+		} else if (LightingMode == "Forced") {
+			color = hexToRgb(forcedColor);
+		} else {
+			color = device.color(iPxX, iPxY);
+		}
 
-		let iLedIdx = (iIdx * 3) + 5;
+		const iLedIdx = (iIdx * 3) + 5;
 
 		packet[iLedIdx]   = color[0];
 		packet[iLedIdx+1] = color[1];
 		packet[iLedIdx+2] = color[2];
-    }
+	}
 
 	device.write(packet, 65);
 }
 
 function hexToRgb(hex) {
-	let result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
-	let colors = [];
+	const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+	const colors = [];
 	colors[0] = parseInt(result[1], 16);
 	colors[1] = parseInt(result[2], 16);
 	colors[2] = parseInt(result[3], 16);

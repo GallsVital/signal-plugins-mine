@@ -138,7 +138,7 @@ export function Initialize() {
 		for(let zone = 0; zone < 8; zone++){
 			Zoneconfig[zone].LedCount = LedCounts[zone];
 
-			if(LedCounts[zone] == 0x1E){
+			if(LedCounts[zone] === 0x1E){
 				Zoneconfig[zone].Enabled = false;
 			}
 		}
@@ -154,8 +154,7 @@ export function Initialize() {
 }
 
 export function Render() {
-	if(modeSwitch === false)
-	{
+	if(modeSwitch === false) {
 		if(ARGBMode === true) {
 			SendRGB();
 		} else {
@@ -169,39 +168,37 @@ export function Render() {
 				[Zone7Color, Zone7Mode, Zone7Speed],
 				[Zone8Color, Zone8Mode, Zone8Speed],
 			];
-	
+
 			for(let zone = 0; zone < SettingArray.length;zone++){
 				let dirtyZone = false;
 				const SelectedZone = Zoneconfig[zone];
-	
+
 				if(SelectedZone.Color != SettingArray[zone][0]){
 					device.log(`Setting Zone ${zone} color from ${SelectedZone.Color} to ${SettingArray[zone][0]}`);
 					SelectedZone.Color = SettingArray[zone][0];
 					dirtyZone = true;
 				}
-	
+
 				if(SelectedZone.Mode != ModeDict[SettingArray[zone][1]]){
 					device.log(`Setting Zone ${zone} mode from ${SelectedZone.Mode} to ${SettingArray[zone][1]}`);
 					SelectedZone.Mode = ModeDict[SettingArray[zone][1]];
 					dirtyZone = true;
 				}
-	
+
 				if(SelectedZone.Speed != SettingArray[zone][2]){
 					device.log(`Setting Zone ${SelectedZone.Name}'s' speed from ${SelectedZone.Speed} to ${SettingArray[zone][2]}`);
 					SelectedZone.Speed = SettingArray[zone][2];
 					dirtyZone = true;
 				}
-	
+
 				if(SelectedZone.Enabled && dirtyZone){
 					SetZone(SelectedZone);
 				}
 			}
-	
+
 			device.pause(3000);
 		}
-	}
-	else
-	{
+	} else {
 		modeSwitch = false;
 	}
 }
@@ -433,8 +430,9 @@ const vPCBPositions =
 ];
 
 let modeSwitch = false;
+
 export function onARGBModeChanged() {
-	removeChannels();
+	device.pause(1000);
 	modeSwitch = true;
 	Initialize();
 }
@@ -557,7 +555,7 @@ const deviceZones =
 	IOShield	: 0,
 	PCB			: 0,
 	ARGBHeader3 : 0
-}
+};
 
 function LEDConfig() {
 	const zoneLEDCounts = ReadConfig(2);
@@ -565,16 +563,15 @@ function LEDConfig() {
 
 
 	device.write([0x00, 0x14, 0x00, 0x01], 65);
+
 	const returnPacket = device.read([0x00], 65);
 	const comparisonValue = returnPacket[5];
 
-	for(let zone = 0; zone < 8; zone++)
-	{
+	for(let zone = 0; zone < 8; zone++) {
 		const disabledZone = isZoneDisabled(comparisonValue, zone);
-		if(!disabledZone)
-		{
-			if(zoneLEDCounts[5 + zone] !== 30)
-			{
+
+		if(!disabledZone) {
+			if(zoneLEDCounts[5 + zone] !== 30) {
 				deviceZones[zone] = zoneLEDCounts[5 + zone];
 			}
 		}
@@ -582,18 +579,15 @@ function LEDConfig() {
 }
 
 function isZoneDisabled(value, bitIndex){
-	return !((value >> bitIndex) & 1)
-}
-
-function removeChannels()
-{
-	for(let i = 0; i < 5; i++){
-		device.removeChannel(ChannelArray[i][0], ChannelArray[i][1]);
-	}
+	return !((value >> bitIndex) & 1);
 }
 
 function SetupChannels(deviceChannels) {
 	device.SetLedLimit(DeviceMaxLedLimit);
+
+	for(let i = 0; i < device.getChannelNames().length; i++){
+		device.removeChannel(ChannelArray[i][0], ChannelArray[i][1]);
+	}
 
 	for(let i = 0; i < deviceChannels; i++){
 		device.addChannel(ChannelArray[i][0], ChannelArray[i][1]);
@@ -831,7 +825,7 @@ function concatRGBData() {
 function SendRGB() {
 	// packet[64] = 0xf0; //this is seemingly arbitrary. No idea what it does, did not change depending on the data in the packet. Every packet had it. B550 had 0x64 or 0x65, and the Z690 was 0xf0.
 	const RGBData = concatRGBData();
-	
+
 	//const initpacket = [0x00, 0x10, 0x00, 0xff, 0xE3, 0x00, 0x00, (TotalDeviceLEDs & 0xff), (TotalDeviceLEDs >> 8 & 0xff)];
 	const initpacket = [0x00, 0x10, 0x00, 0xff, 0xE3, 0x00, 0x00, 0x2f, 0x01];
 	initpacket.push(...RGBData.splice(0, 54));

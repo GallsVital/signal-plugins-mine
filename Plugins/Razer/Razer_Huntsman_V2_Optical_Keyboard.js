@@ -19,7 +19,7 @@ export function ControllableParameters(){
 		{"property":"forcedColor", "group":"lighting", "label":"Forced Color", "min":"0", "max":"360", "type":"color", "default":"009bde"},
 	];
 }
-let vLedNames = [
+const vLedNames = [
 	"LightBar Left 1", "Esc", "F1", "F2", "F3", "F4", "F5", "F6", "F7", "F8", "F9", "F10", "F11", "F12",         "Print Screen", "Scroll Lock", "Pause Break",   "LightBar Right 1",  "Button 1", "Button 2", "Button 3", "Button 4",
 	"LightBar Left 2", "`", "1", "2", "3", "4", "5", "6", "7", "8", "9", "0", "-_", "=+", "Backspace",                        "Insert", "Home", "Page Up",       "NumLock", "Num /", "Num *", "Num -", "LightBar Right 2",
 	"Tab", "Q", "W", "E", "R", "T", "Y", "U", "I", "O", "P", "[", "]", "\\",                               "Del", "End", "Page Down",         "Num 7", "Num 8", "Num 9", "Num +",
@@ -31,7 +31,7 @@ let vLedNames = [
 	"Wrist Rest Bar Left 2", "Wrist Rest Bar Right 2",
 	"Wrist Rest Bar Bottom 1", "Wrist Rest Bar Bottom 2", "Wrist Rest Bar Bottom 3", "Wrist Rest Bar Bottom 4", "Wrist Rest Bar Bottom 5", "Wrist Rest Bar Bottom 6", "Wrist Rest Bar Bottom 7", "Wrist Rest Bar Bottom 8", "Wrist Rest Bar Bottom 9", "Wrist Rest Bar Bottom 10", "Wrist Rest Bar Bottom 11", "Wrist Rest Bar Bottom 12", "Wrist Rest Bar Bottom 13", "Wrist Rest Bar Bottom 14", "Wrist Rest Bar Bottom 15",
 ];
-let vKeymap = [
+const vKeymap = [
 
 
 	144,    1,    3, 4, 5, 6,   7, 8, 9, 10,     11, 12, 13, 14,        15, 16, 17,         18, 19, 20, 21,     149,
@@ -47,7 +47,7 @@ let vKeymap = [
 	153, 154, 155, 156, 157, 158, 159, 160, 161, 162, 163, 164, 165, 166, 167,
 
 ];
-let RowDict = {
+const RowDict = {
 	0: 22,
 	1: 22,
 	2: 22,
@@ -59,7 +59,7 @@ let RowDict = {
 	8: 20,
 	9: 20,
 };
-let vLedPositions = [
+const vLedPositions = [
 	[0, 1],  [1, 0], [2, 0], [3, 0], [4, 0], [5, 0], [6, 0], [7, 0], [8, 0], [9, 0], [10, 0], [11, 0], [12, 0], [13, 0],           [15, 0], [16, 0], [17, 0],   [18, 0], [19, 0], [20, 0], [21, 0], [22, 1],
 	[0, 2],  [1, 1], [2, 1], [3, 1], [4, 1], [5, 1], [6, 1], [7, 1], [8, 1], [9, 1], [10, 1], [11, 1], [12, 1], [13, 1], [14, 1],   [15, 1], [16, 1], [17, 1],   [18, 1], [19, 1], [20, 1], [21, 1], [22, 3],
 	[1, 2], [2, 2], [3, 2], [4, 2], [5, 2], [6, 2], [7, 2], [8, 2], [9, 2], [10, 2], [11, 2], [12, 2], [13, 2], [14, 2],   [15, 2], [16, 2], [17, 2],   [18, 2], [19, 2], [20, 2], [21, 2],
@@ -77,8 +77,8 @@ let vLedPositions = [
 ];
 
 function hexToRgb(hex) {
-	let result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
-	let colors = [];
+	const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+	const colors = [];
 	colors[0] = parseInt(result[1], 16);
 	colors[1] = parseInt(result[2], 16);
 	colors[2] = parseInt(result[3], 16);
@@ -86,62 +86,53 @@ function hexToRgb(hex) {
 	return colors;
 }
 
-export function LedNames() 
-{
+export function LedNames() {
 	return vLedNames;
 }
 
-export function LedPositions() 
-{
+export function LedPositions() {
 	return vLedPositions;
 }
 
 
-export function Initialize() 
-{
+export function Initialize() {
 
 }
 
-export function Render() 
-{
+export function Render() {
 	SendColors();
 }
 
 
-export function Shutdown() 
-{
+export function Shutdown() {
 	SendColors(true);
 }
 
-function packetSend(packet,length) //Wrapper for always including our CRC
+function packetSend(packet, length) //Wrapper for always including our CRC
 {
-	let packetToSend = packet;
+	const packetToSend = packet;
 	packetToSend[89] = CalculateCrc(packet);
-	device.send_report(packetToSend,length)
+	device.send_report(packetToSend, length);
 }
 
-function CalculateCrc(report) 
-{
+function CalculateCrc(report) {
 	let iCrc = 0;
 
-	for (let iIdx = 3; iIdx < 89; iIdx++) 
-	{
+	for (let iIdx = 3; iIdx < 89; iIdx++) {
 		iCrc ^= report[iIdx];
 	}
 
 	return iCrc;
 }
 
-function SendColors(shutdown = false)
-{
+function SendColors(shutdown = false) {
 
-	let RGBData = new Array(586).fill(0);
+	const RGBData = new Array(586).fill(0);
 	let TotalLedCount = 0;
 
-	for(let iIdx = 0; iIdx < vKeymap.length; iIdx++) 
-	{
-		let iPxX = vLedPositions[iIdx][0];
-		let iPxY = vLedPositions[iIdx][1];
+	for(let iIdx = 0; iIdx < vKeymap.length; iIdx++) {
+		const iPxX = vLedPositions[iIdx][0];
+		const iPxY = vLedPositions[iIdx][1];
 		var color;
 
 		if(shutdown){
@@ -158,12 +149,11 @@ function SendColors(shutdown = false)
 		TotalLedCount += 1;
 	}
 
-	let sentLeds = 0;
+	const sentLeds = 0;
 	let PacketCount = 0;
 
-	for(let i = 0; i < Object.keys(RowDict).length ;i++)
-	{
-		let LedsToSend = RowDict[PacketCount];
+	for(let i = 0; i < Object.keys(RowDict).length ;i++) {
+		const LedsToSend = RowDict[PacketCount];
 
 		let packet = [];
 		packet[0] = 0x00;
@@ -179,12 +169,11 @@ function SendColors(shutdown = false)
 		packet[13] = 0x16;
 		packet = packet.concat(RGBData.splice(0, LedsToSend*3));
 
-		packetSend(packet,91);
+		packetSend(packet, 91);
 	}
 }
 
-export function Validate(endpoint) 
-{
+export function Validate(endpoint) {
 	return endpoint.interface === 3;
 }
 

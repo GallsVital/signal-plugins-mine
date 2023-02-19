@@ -1,5 +1,5 @@
 function GetReport(cmd_class, cmd_id, size) {
-	let report = new Array(91).fill(0);
+	const report = new Array(91).fill(0);
 
 	report[0] = 0;
 
@@ -69,8 +69,8 @@ export function ControllableParameters(){
 let savedDpi1;
 
 
-let vLedNames = ["Mouse"];
-let vLedPositions = [[5, 5] ];
+const vLedNames = ["Mouse"];
+const vLedPositions = [[5, 5] ];
 
 export function LedNames() {
 	return vLedNames;
@@ -81,7 +81,7 @@ export function LedPositions() {
 }
 
 function EnableSoftwareControl() {
-	let report = GetReport(0x0F, 0x03, 0x47);
+	const report = GetReport(0x0F, 0x03, 0x47);
 
 	report[2] = 0x3F; // transaction id.
 
@@ -103,7 +103,7 @@ function ReturnToHardwareControl() {
 function setDPIRazer(dpi){
 	savedDpi1 = dpi;
 
-	let packet = [];
+	const packet = [];
 	packet[0] = 0x00;
 	packet[1] = 0x00;
 	packet[2] = 0x1F;
@@ -136,7 +136,7 @@ export function Initialize() {
 function SendPacket(){
 
 
-	let packet = [];
+	const packet = [];
 	packet[0] = 0x00;
 	packet[1] = 0x00;
 	packet[2] = 0x1F;
@@ -150,11 +150,11 @@ function SendPacket(){
 
 	for(let iIdx = 0; iIdx < vLedPositions.length; iIdx++){
 
-		let iPxX = vLedPositions[iIdx][0];
-		let iPxY = vLedPositions[iIdx][1];
-		let col = device.color(iPxX, iPxY);
+		const iPxX = vLedPositions[iIdx][0];
+		const iPxY = vLedPositions[iIdx][1];
+		const col = device.color(iPxX, iPxY);
 
-		let iLedIdx = (iIdx*3) + 14;
+		const iLedIdx = (iIdx*3) + 14;
 		packet[iLedIdx] = col[0];
 		packet[iLedIdx+1] = col[1];
 		packet[iLedIdx+2] = col[2];
@@ -167,7 +167,7 @@ function SendPacket(){
 
 
 function Apply() {
-	let packet = []; //new Array(91).fill(0);
+	const packet = []; //new Array(91).fill(0);
 	packet[0] = 0x00;
 	packet[1] = 0x00;
 	packet[2] = 0x08;

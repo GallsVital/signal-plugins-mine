@@ -23,8 +23,8 @@ export function ControllableParameters(){
 export function Documentation(){ return "troubleshooting/corsair"; }
 
 function hexToRgb(hex) {
-	let result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
-	let colors = [];
+	const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+	const colors = [];
 	colors[0] = parseInt(result[1], 16);
 	colors[1] = parseInt(result[2], 16);
 	colors[2] = parseInt(result[3], 16);
@@ -34,8 +34,8 @@ function hexToRgb(hex) {
 
 
 function sendPacketString(string, size){
-	let packet= [];
-	let data = string.split(' ');
+	const packet= [];
+	const data = string.split(' ');
 
 	for(let i = 0; i < data.length; i++){
 		packet[parseInt(i, 16)] =parseInt(data[i], 16);//.toString(16)
@@ -54,7 +54,7 @@ export function Initialize() {
 
 
 export function Shutdown() {
-	let packet = [];
+	const packet = [];
 
 	packet[0x00]   = 0x00;
 	packet[0x01]   = 0x08;
@@ -68,11 +68,11 @@ export function Shutdown() {
 
 // This array must be the same length as vKeys[], and represents the pixel color position in our pixel matrix that we reference.  For example,
 // item at index 3 [9,0] represents the corsair logo, and the render routine will grab its color from [9,0].
-let vKeyPositions = [
+const vKeyPositions = [
 	[0, 0], [1, 0], [2, 0], [3, 0], [4, 0],
 ];
 
-let vKeyNames = [
+const vKeyNames = [
 
 	"Zone 1", "Zone 2", "Zone 3", "Zone 4", "Zone 5",
 ];
@@ -91,7 +91,7 @@ export function Render() {
 
 function sendColors(shutdown = false){
 
-	let packet = [];
+	const packet = [];
 	packet[0] = 0x00;
 	packet[1] = 0x08;
 	packet[2] = 0x06;
@@ -103,8 +103,8 @@ function sendColors(shutdown = false){
 	packet[8] = 0x00;
 
 	for(let iIdx = 0; iIdx < vKeyPositions.length; iIdx++) {
-		let iPxX = vKeyPositions[iIdx][0];
-		let iPxY = vKeyPositions[iIdx][1];
+		const iPxX = vKeyPositions[iIdx][0];
+		const iPxY = vKeyPositions[iIdx][1];
 		var col;
 
 		if(shutdown){

@@ -19,15 +19,15 @@ export function ControllableParameters() {
 	];
 }
 
-export function DeviceMessages() { 
+export function DeviceMessages() {
 	return [
-	{property: "Limited Functionality", message:"Limited Functionality", tooltip: "Due to firmware limitations this device is limited to Solid Colors only"},
+		{property: "Limited Functionality", message:"Limited Functionality", tooltip: "Due to firmware limitations this device is limited to Solid Colors only"},
 	];
 }
 
 function hexToRgb(hex) {
-	let result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
-	let colors = [];
+	const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+	const colors = [];
 	colors[0] = parseInt(result[1], 16);
 	colors[1] = parseInt(result[2], 16);
 	colors[2] = parseInt(result[3], 16);
@@ -42,8 +42,8 @@ export function Initialize() {
 }
 
 function sendPacketString(string, size) {
-	let packet= [];
-	let data = string.split(' ');
+	const packet= [];
+	const data = string.split(' ');
 
 	for(let i = 0; i < data.length; i++){
 		packet[i] = parseInt(data[i], 16);

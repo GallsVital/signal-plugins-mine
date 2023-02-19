@@ -70,7 +70,7 @@ export function Initialize() {
 	GigabyteMaster.determineWriteLength();
 
 	for(let zones = 0; zones < 8; zones++) {
-		GigabyteMaster.setMode(0x01, zones);
+		GigabyteMaster.setMode(GigabyteMaster.modes.static, zones);
 	}
 
 	GigabyteMaster.BuildLEDs();
@@ -79,7 +79,11 @@ export function Initialize() {
 }
 
 export function Render() {
-	GigabyteMaster.UpdateLEDs();
+	if(GigabyteMaster.config.perLEDSupport) {
+		GigabyteMaster.UpdatePerLED();
+	} else {
+		grabStandardRGB();
+	}
 
 	device.pause(10);
 }
@@ -87,7 +91,26 @@ export function Render() {
 export function Shutdown() {
 }
 
-function grabRGB(zoneId, ZoneInfo, shutdown = false) {
+function grabStandardRGB(shutdown = false) {
+
+	for(let Leds = 0; Leds < vLedPositions.length; Leds++) {
+		let Color;
+		const iPxX = vLedPositions[Leds][0];
+		const iPxY = vLedPositions[Leds][1];
+
+		if(shutdown) {
+			Color = hexToRgb(shutdownColor);
+		} else if(LightingMode === "Forced") {
+			Color = hexToRgb(forcedColor);
+		} else {
+			Color = device.color(iPxX, iPxY);
+		}
+
+		GigabyteMaster.UpdateStandardLED(Color, Leds+1);
+	}
+}
+
+function grabPerLEDRGB(zoneId, ZoneInfo, shutdown = false) {
 	const zonePositions = ZoneInfo.Positions;
 	const RGBData = new Array(24);
 
@@ -109,7 +132,7 @@ function grabRGB(zoneId, ZoneInfo, shutdown = false) {
 		RGBData[zoneLeds * 3 + 2] = Color[2];
 	}
 
-	GigabyteMaster.WriteRGB(RGBData, zoneId);
+	GigabyteMaster.WritePerLEDRGB(RGBData, zoneId);
 }
 
 
@@ -144,7 +167,7 @@ class GigabyteMasterProtocol {
 
 		this.config =
 		{
-			writeLength : 0
+			perLEDSupport : false
 		};
 
 		this.library =
@@ -152,6 +175,7 @@ class GigabyteMasterProtocol {
 			0x40bf :
 			{
 				Size: [5, 3],
+				modeZones : [0], //This is an odd card all the way around.
 				Zones:
 				{
 					0: {Names : [ "Fan 1", "Fan 2", "Fan 3" ], Positions : [ [1, 2], [2, 2], [3, 2] ], Mapping : [ 0, 1, 2 ]},
@@ -160,15 +184,100 @@ class GigabyteMasterProtocol {
 					3: {Names : [ "Logo" ], Positions : [ [3, 1] ], Mapping : [ 0 ]}
 				}
 			},
-			0x40c0 :
+			0x40b2 :
 			{
-				Size: [8, 4],
+				Size: [5, 3],
+				modeZones : [0],
 				Zones:
 				{
-					0: {Names : [ "Placeholder 1", "Placeholder 2", "Placeholder 3", "Placeholder 4", "Placeholder 5", "Placeholder 6", "Placeholder 7", "Placeholder 8",],         Positions : [ [0, 0], [1, 0], [2, 0], [3, 0], [4, 0], [5, 0], [6, 0], [7, 0], ], Mapping : [ 0, 1, 2, 3, 4, 5, 6, 7 ]},
-					1: {Names : [ "Placeholder 9", "Placeholder 10", "Placeholder 11", "Placeholder 12", "Placeholder 13", "Placeholder 14", "Placeholder 15", "Placeholder 16",],  Positions : [ [0, 1], [1, 1], [2, 1], [3, 1], [4, 1], [5, 1], [6, 1], [7, 1], ], Mapping : [ 0, 1, 2, 3, 4, 5, 6, 7 ]},
-					2: {Names : [ "Placeholder 17", "Placeholder 18", "Placeholder 19", "Placeholder 20", "Placeholder 21", "Placeholder 22", "Placeholder 23", "Placeholder 24",], Positions : [ [0, 2], [1, 2], [2, 2], [3, 2], [4, 2], [5, 2], [6, 2], [7, 2], ], Mapping : [ 0, 1, 2, 3, 4, 5, 6, 7 ]},
-					3: {Names : [ "Placeholder 25", "Placeholder 26", "Placeholder 27", "Placeholder 28", "Placeholder 29", "Placeholder 30", "Placeholder 31", "Placeholder 32",], Positions : [ [0, 3], [1, 3], [2, 3], [3, 3], [4, 3], [5, 3], [6, 3], [7, 3], ], Mapping : [ 0, 1, 2, 3, 4, 5, 6, 7 ]}
+					0: {Names : [ "Fan 1", "Fan 2", "Fan 3" ], Positions : [ [1, 2], [2, 2], [3, 2] ], Mapping : [ 0, 1, 2 ]},
+					//1: {Names : [ ], Positions : [ ], Mapping : [ ]},
+					//2: {Names : [ ], Positions : [ ], Mapping : [ ]},
+					3: {Names : [ "Logo" ], Positions : [ [3, 1] ], Mapping : [ 0 ]}
+				}
+			},
+			0x4076 :
+			{
+				Size: [5, 3],
+				modeZones : [0],
+				Zones:
+				{
+					0: {Names : [ "Fan 1", "Fan 2", "Fan 3" ], Positions : [ [1, 2], [2, 2], [3, 2] ], Mapping : [ 0, 1, 2 ]},
+					//1: {Names : [ ], Positions : [ ], Mapping : [ ]},
+					//2: {Names : [ ], Positions : [ ], Mapping : [ ]},
+					3: {Names : [ "Logo" ], Positions : [ [3, 1] ], Mapping : [ 0 ]}
+				}
+			},
+			0x407b :
+			{
+				Size: [5, 3],
+				modeZones : [0],
+				Zones:
+				{
+					0: {Names : [ "Fan 1", "Fan 2", "Fan 3" ], Positions : [ [1, 2], [2, 2], [3, 2] ], Mapping : [ 0, 1, 2 ]},
+					//1: {Names : [ ], Positions : [ ], Mapping : [ ]},
+					//2: {Names : [ ], Positions : [ ], Mapping : [ ]},
+					3: {Names : [ "Logo" ], Positions : [ [3, 1] ], Mapping : [ 0 ]}
+				}
+			},
+			0x40c6 :
+			{
+				Size: [5, 3],
+				modeZones : [0],
+				Zones:
+				{
+					0: {Names : [ "Fan 1", "Fan 2", "Fan 3" ], Positions : [ [1, 2], [2, 2], [3, 2] ], Mapping : [ 0, 1, 2 ]},
+					//1: {Names : [ ], Positions : [ ], Mapping : [ ]},
+					//2: {Names : [ ], Positions : [ ], Mapping : [ ]},
+					3: {Names : [ "Logo" ], Positions : [ [3, 1] ], Mapping : [ 0 ]}
+				}
+			},
+			0x40bc :
+			{
+				Size: [5, 3],
+				modeZones : [0],
+				Zones:
+				{
+					0: {Names : [ "Fan 1", "Fan 2", "Fan 3" ], Positions : [ [1, 2], [2, 2], [3, 2] ], Mapping : [ 0, 1, 2 ]},
+					//1: {Names : [ ], Positions : [ ], Mapping : [ ]},
+					//2: {Names : [ ], Positions : [ ], Mapping : [ ]},
+					3: {Names : [ "Logo" ], Positions : [ [3, 1] ], Mapping : [ 0 ]}
+				}
+			},
+			0x37B1 : //I'm making assumptions with this card. 2080 Extreme
+			{
+				Size: [15, 9],
+				modeZones : [0],
+				Zones:
+				{
+					0: {Names : [ "Fan 1 LED 1", "Fan 1 LED 2", "Fan 1 LED 3", "Fan 1 LED 4", "Fan 1 LED 5", "Fan 1 LED 6", "Fan 1 LED 7", "Fan 1 LED 8",], Positions : [ [0, 5], [1, 4], [2, 3], [3, 4], [4, 5], [3, 6], [2, 7], [1, 8], ], Mapping : [ 0, 1, 2, 3, 4, 5, 6, 7 ]},
+					1: {Names : [ "Fan 2 LED 1", "Fan 2 LED 2", "Fan 2 LED 3", "Fan 2 LED 4", "Fan 2 LED 5", "Fan 2 LED 6", "Fan 2 LED 7", "Fan 2 LED 8",], Positions : [ [5, 5], [6, 4], [7, 3], [8, 4], [9, 5], [8, 6], [7, 7], [6, 8], ], Mapping : [ 0, 1, 2, 3, 4, 5, 6, 7 ]},
+					2: {Names : [ "Fan 3 LED 1", "Fan 3 LED 2", "Fan 3 LED 3", "Fan 3 LED 4", "Fan 3 LED 5", "Fan 3 LED 6", "Fan 3 LED 7", "Fan 3 LED 8",], Positions : [ [10, 5], [11, 4], [12, 3], [13, 4], [14, 5], [13, 6], [12, 7], [11, 8], ], Mapping : [ 0, 1, 2, 3, 4, 5, 6, 7 ]},
+					3: {Names : [ "Side Logo LED 1", "Side Logo LED 2", "Face Logo LED", ], Positions : [ [11, 0], [12, 1], [12, 2],], Mapping : [ 0, 1, 2 ]}
+				}
+			},
+			0x37BD : //I'm making assumptions with this card. 2080TI Extreme
+			{
+				Size: [15, 9],
+				modeZones : [0],
+				Zones:
+				{
+					0: {Names : [ "Fan 1 LED 1", "Fan 1 LED 2", "Fan 1 LED 3", "Fan 1 LED 4", "Fan 1 LED 5", "Fan 1 LED 6", "Fan 1 LED 7", "Fan 1 LED 8",], Positions : [ [0, 5], [1, 4], [2, 3], [3, 4], [4, 5], [3, 6], [2, 7], [1, 8], ], Mapping : [ 0, 1, 2, 3, 4, 5, 6, 7 ]},
+					1: {Names : [ "Fan 2 LED 1", "Fan 2 LED 2", "Fan 2 LED 3", "Fan 2 LED 4", "Fan 2 LED 5", "Fan 2 LED 6", "Fan 2 LED 7", "Fan 2 LED 8",], Positions : [ [5, 5], [6, 4], [7, 3], [8, 4], [9, 5], [8, 6], [7, 7], [6, 8], ], Mapping : [ 0, 1, 2, 3, 4, 5, 6, 7 ]},
+					2: {Names : [ "Fan 3 LED 1", "Fan 3 LED 2", "Fan 3 LED 3", "Fan 3 LED 4", "Fan 3 LED 5", "Fan 3 LED 6", "Fan 3 LED 7", "Fan 3 LED 8",], Positions : [ [10, 5], [11, 4], [12, 3], [13, 4], [14, 5], [13, 6], [12, 7], [11, 8], ], Mapping : [ 0, 1, 2, 3, 4, 5, 6, 7 ]},
+					3: {Names : [ "Side Logo LED 1", "Side Logo LED 2", "Face Logo LED", ], Positions : [ [11, 0], [12, 1], [12, 2],], Mapping : [ 0, 1, 2 ]}
+				}
+			},
+			0x40c0 :
+			{
+				Size: [15, 9],
+				modeZones : [2, 3, 5, 6],
+				Zones:
+				{
+					0: {Names : [ "Fan 1 LED 1", "Fan 1 LED 2", "Fan 1 LED 3", "Fan 1 LED 4", "Fan 1 LED 5", "Fan 1 LED 6", "Fan 1 LED 7", "Fan 1 LED 8",], Positions : [ [0, 5], [1, 4], [2, 3], [3, 4], [4, 5], [3, 6], [2, 7], [1, 8], ], Mapping : [ 0, 1, 2, 3, 4, 5, 6, 7 ]},
+					1: {Names : [ "Fan 2 LED 1", "Fan 2 LED 2", "Fan 2 LED 3", "Fan 2 LED 4", "Fan 2 LED 5", "Fan 2 LED 6", "Fan 2 LED 7", "Fan 2 LED 8",], Positions : [ [5, 5], [6, 4], [7, 3], [8, 4], [9, 5], [8, 6], [7, 7], [6, 8], ], Mapping : [ 0, 1, 2, 3, 4, 5, 6, 7 ]},
+					2: {Names : [ "Fan 3 LED 1", "Fan 3 LED 2", "Fan 3 LED 3", "Fan 3 LED 4", "Fan 3 LED 5", "Fan 3 LED 6", "Fan 3 LED 7", "Fan 3 LED 8",], Positions : [ [10, 5], [11, 4], [12, 3], [13, 4], [14, 5], [13, 6], [12, 7], [11, 8], ], Mapping : [ 0, 1, 2, 3, 4, 5, 6, 7 ]},
+					3: {Names : [ "Side Logo LED 1", "Side Logo LED 2", "Face Logo LED", ], Positions : [ [11, 0], [12, 1], [12, 2],], Mapping : [ 0, 1, 2 ]}
 				}
 			}
 		};
@@ -193,26 +302,45 @@ class GigabyteMasterProtocol {
 		bus.log(`Set Lighting Mode To [${mode}]`);
 	}
 
-	UpdateLEDs() {
+	UpdatePerLED() {
+		this.setMode(this.modes.static, this.library[bus.SubDevice()].modeZones[0]);
+
 		for(const [zoneId, ZoneInfo] of Object.entries(this.library[bus.SubDevice()].Zones)) {
-			grabRGB(zoneId, ZoneInfo);
+			grabPerLEDRGB(zoneId, ZoneInfo);
 		}
+	}
+
+	UpdateStandardLED(RGBData, led) {
+		const packet = [this.registers.Color];
+		packet.push(...RGBData);
+		packet.push(led);
+		this.setMode(this.modes.static, led+1);
+		this.WriteBlockSafe(packet);
 	}
 
 	BuildLEDs() {
 		vLedNames = [];
 		vLedPositions = [];
 
-		for(const [zoneId, ZoneInfo] of Object.entries(this.library[bus.SubDevice()].Zones)) {
-			vLedNames.push(...ZoneInfo.Names);
-			vLedPositions.push(...ZoneInfo.Positions);
+		if(this.library[bus.SubDevice()]) {
+			for(const [zoneId, ZoneInfo] of Object.entries(this.library[bus.SubDevice()].Zones)) {
+				vLedNames.push(...ZoneInfo.Names);
+				vLedPositions.push(...ZoneInfo.Positions);
+				this.perLEDSupport = true;
+			}
+
+			device.setSize(this.library[bus.SubDevice()].Size);
+		} else {  //NonPerLED Cards. Gigglebyte, why the inconsistency?
+			vLedNames.push([ ["Zone 1"], ["Zone 2"], ["Zone 3"], ["Zone 4"] ]);
+			vLedPositions.push([ [2, 1], [3, 1], [4, 1], [5, 1] ]);
+			device.setSize([6, 2]);
 		}
 
-		device.setSize(this.library[bus.SubDevice()].Size);
+
 		device.setControllableLeds(vLedNames, vLedPositions);
 	}
 
-	WriteRGB(RGBData, zone) {
+	WritePerLEDRGB(RGBData, zone) {
 
 		for(let zonePackets = 0; zonePackets < 4; zonePackets++) {
 			const zoneIdx = 0xB0 + ((zone)* 4) + zonePackets;
@@ -230,7 +358,7 @@ class GigabyteMasterProtocol {
 			return -1;
 		}
 
-		return bus.WriteBlockWithoutRegister(this.config.writeLength, Data);
+		return bus.WriteBlockWithoutRegister(8, Data);
 	}
 
 }
@@ -286,7 +414,29 @@ const Nvidia = new NvidiaGPUDeviceIds();
 
 class GigabyteMasterDeviceIds {
 	constructor() {
+		this.RTX2060S_AORUS_P               = 0x3FF8;
+		this.RTX2080S_AORUS                 = 0x3FF3;
+		this.RTX2080S_AORUS_P               = 0x3FF4;
+		this.RTX3060_MASTER_O08G            = 0x4051;
+		this.RTX3070_MASTER                 = 0x4069;
+		this.RTX3070TI_MASTER               = 0x408E;
+		this.RTX3080_XTREME_WATERFORCE      = 0x4038;
+		this.RTX3090_XTREME_WATERFORCE      = 0x403A;
 		this.RTX4090_GAMING_OC_24GB			= 0x40BF;
+		this.RTX4090_AORUS_MASTER 			= 0x40C0;
+
+		//New for 2.2.29
+		this.RTX2080_EXTREME 				= 0x37B1;
+		this.RTX2080TI_EXTREME				= 0x37BD;
+		this.RTX3050_ELITE					= 0x40B2;
+		this.RTX3060_ELITE_REV2 			= 0x407B;
+		this.RTX3060TI_ELITE_REV2			= 0x4076;
+		this.RTX3080_XTREME_WATERFORCE_10G	= 0x4037;
+		this.RTX3080TI_XTREME_WATERFORCE_12G = 0x4082;
+		this.RTX3090_XTREME_WATERFORCE_2	= 0x4039;
+		this.RTX4070TI_GAMING_OC_12G	    = 0x40C6;
+		this.RTX4080_GAMING_OC_16G	    	= 0x40bc;
+		this.RTX4080_XTREME_WATERFORCE		= 0x40c8;
 	}
 }
 
@@ -315,7 +465,31 @@ class GigabyteMasterGPuList {
 		const GigabyteMasterIds  = new GigabyteMasterDeviceIds();
 
 		this.devices = [
+			new GigabyteMasterIdentifier(Nvidia.RTX2060S,       GigabyteMasterIds.RTX2060S_AORUS_P,         0x50, "GIGABYTE AORUS 2060 Super OC"),
+			new GigabyteMasterIdentifier(Nvidia.RTX2080S,       GigabyteMasterIds.RTX2080S_AORUS,         0x50, "GIGABYTE AORUS 2080 Super OC"),
+			new GigabyteMasterIdentifier(Nvidia.RTX2080S,       GigabyteMasterIds.RTX2080S_AORUS_P,         0x50, "GIGABYTE AORUS 2080 Super"),
+			new GigabyteMasterIdentifier(Nvidia.RTX3060TI,        GigabyteMasterIds.RTX3060_MASTER_O08G,         0x66, "GIGABYTE AORUS 3060Ti Master 8GB"),
+			new GigabyteMasterIdentifier(Nvidia.RTX3070,        GigabyteMasterIds.RTX3070_MASTER,         0x66, "GIGABYTE AORUS 3070 Master 8GB"),
+			new GigabyteMasterIdentifier(Nvidia.RTX3070_LHR,        GigabyteMasterIds.RTX3070_MASTER,         0x66, "GIGABYTE AORUS 3070 Master 8GB LHR"),
+			new GigabyteMasterIdentifier(Nvidia.RTX3070TI,        GigabyteMasterIds.RTX3070TI_MASTER,         0x70, "GIGABYTE AORUS 3070Ti Master 8GB"),
+			new GigabyteMasterIdentifier(Nvidia.RTX3080,        GigabyteMasterIds.RTX3080_XTREME_WATERFORCE,         0x64, "GIGABYTE AORUS 3080 XTREME Waterforce 10GB"),
+			new GigabyteMasterIdentifier(Nvidia.RTX3080_LHR,        GigabyteMasterIds.RTX3080_XTREME_WATERFORCE,         0x64, "GIGABYTE AORUS 3080 XTREME Waterforce 10GB LHR"),
+			new GigabyteMasterIdentifier(Nvidia.RTX3090,        GigabyteMasterIds.RTX3090_XTREME_WATERFORCE,         0x64, "GIGABYTE AORUS 3090 XTREME Waterforce 24GB"),
 			new GigabyteMasterIdentifier(Nvidia.RTX4090,        GigabyteMasterIds.RTX4090_GAMING_OC_24GB,         0x71, "GIGABYTE 4090 Gaming OC"),
+			new GigabyteMasterIdentifier(Nvidia.RTX4090, 		GigabyteMasterIds.RTX4090_AORUS_MASTER,           0x71, "GIGABYTE 4090 Aorus Master"),
+
+			//New
+			new GigabyteMasterIdentifier(Nvidia.RTX2080_A, 		GigabyteMasterIds.RTX2080_EXTREME,           0x50, "GIGABYTE 2080 Extreme"),
+			new GigabyteMasterIdentifier(Nvidia.RTX2080TI, 		GigabyteMasterIds.RTX2080TI_EXTREME,           0x50, "GIGABYTE 2080TI Extreme"),
+			new GigabyteMasterIdentifier(Nvidia.RTX3050,  	    GigabyteMasterIds.RTX3050_ELITE,         0x70, "GIGABYTE Aorus 3050 Elite"),
+			new GigabyteMasterIdentifier(Nvidia.RTX3060_LHR,	GigabyteMasterIds.RTX3060_ELITE_REV2, 			0x70, "GIGABYTE Aorus 3060 Elite REV2 LHR"),
+			new GigabyteMasterIdentifier(Nvidia.RTX3060TI_LHR,  GigabyteMasterIds.RTX3060TI_ELITE_REV2,         0x70, "GIGABYTE Aorus 3060TI Elite REV2 LHR"),
+			new GigabyteMasterIdentifier(Nvidia.RTX3080,        GigabyteMasterIds.RTX3080_XTREME_WATERFORCE_10G,         0x65, "GIGABYTE AORUS 3080 XTREME Waterforce 10GB"),
+			new GigabyteMasterIdentifier(Nvidia.RTX3080TI,      GigabyteMasterIds.RTX3080TI_XTREME_WATERFORCE_12G,         0x64, "GIGABYTE AORUS 3080TI XTREME Waterforce 12GB"),
+			new GigabyteMasterIdentifier(Nvidia.RTX3090,        GigabyteMasterIds.RTX3090_XTREME_WATERFORCE_2,         0x65, "GIGABYTE AORUS 3090 XTREME Waterforce 24GB"),
+			new GigabyteMasterIdentifier(Nvidia.RTX4070TI, 		GigabyteMasterIds.RTX4070TI_GAMING_OC_12G,           0x71, "GIGABYTE 4070TI Gaming OC"),
+			new GigabyteMasterIdentifier(Nvidia.RTX4080, 		GigabyteMasterIds.RTX4080_GAMING_OC_16G,           0x71, "GIGABYTE 4080 Gaming OC"),
+			new GigabyteMasterIdentifier(Nvidia.RTX4080, 		GigabyteMasterIds.RTX4080_XTREME_WATERFORCE,           0x64, "GIGABYTE 4080 XTREME Waterforce 16GB"), //This card is single zone. Older ones were multizone. We'll see if it plays ball or not with sending multiple zones.
 		];
 	}
 }
