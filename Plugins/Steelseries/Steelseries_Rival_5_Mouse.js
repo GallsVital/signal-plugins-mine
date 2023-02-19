@@ -23,7 +23,7 @@ export function ControllableParameters() {
 	];
 }
 
-let vLedNames =
+const vLedNames =
 [
 		    "ScrollWheel",
 	"Left1", 		      "Right1",
@@ -33,7 +33,7 @@ let vLedNames =
 			   "Logo"
 ];
 
-let vLedMap =
+const vLedMap =
 [
 	0,
 	1,      2,
@@ -43,7 +43,7 @@ let vLedMap =
 	9,
 ];
 
-let vLedPositions =
+const vLedPositions =
 [
 		  [3, 0],
 	[1, 2],      [5, 2],
@@ -64,7 +64,7 @@ export function LedPositions() {
 }
 
 export function Initialize() {
-	let packet=[];
+	const packet=[];
 	packet[0x00] = 0x00;
 	packet[0x01] = 0x09;
 	device.write(packet, 65);
@@ -87,15 +87,15 @@ export function Shutdown() {
 }
 
 function SendColorPacket(shutdown = false) {
-	let packet = [];
+	const packet = [];
 	packet[0x00] = 0x00;
 	packet[0x01] = 0x21;
 	packet[0x02] = 0xff;
 	packet[0x03] = 0x03;
 
 	for(let iIdx = 0; iIdx < 10; iIdx++) {
-		let iPxX = vLedPositions[iIdx][0];
-		let iPxY = vLedPositions[iIdx][1];
+		const iPxX = vLedPositions[iIdx][0];
+		const iPxY = vLedPositions[iIdx][1];
 		var color;
 
 		if(shutdown) {
@@ -106,7 +106,7 @@ function SendColorPacket(shutdown = false) {
 			color = device.color(iPxX, iPxY);
 		}
 
-		let iLedIdx = 4 + iIdx * 3;
+		const iLedIdx = 4 + iIdx * 3;
 		packet[iLedIdx] = color[0];
 		packet[iLedIdx+1] = color[1];
 		packet[iLedIdx+2] = color[2];
@@ -118,7 +118,7 @@ function SendColorPacket(shutdown = false) {
 function setDpi(dpi) {
 	savedDpi1 = dpi1;
 
-	let packet = [];
+	const packet = [];
 	packet[0x00] = 0x00;
 	packet[0x01] = 0x2d;
 	packet[0x02] = 0x05;
@@ -130,8 +130,8 @@ function setDpi(dpi) {
 }
 
 function hexToRgb(hex) {
-	let result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
-	let colors = [];
+	const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+	const colors = [];
 	colors[0] = parseInt(result[1], 16);
 	colors[1] = parseInt(result[2], 16);
 	colors[2] = parseInt(result[3], 16);

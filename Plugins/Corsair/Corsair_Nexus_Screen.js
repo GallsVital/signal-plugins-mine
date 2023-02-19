@@ -30,8 +30,8 @@ export function Shutdown() {
 }
 
 function sendPacketString(string, size){
-	let packet= [];
-	let data = string.split(' ');
+	const packet= [];
+	const data = string.split(' ');
 
 	for(let i = 0; i < data.length; i++){
 		packet[parseInt(i, 16)] = parseInt(data[i], 16);//.toString(16)
@@ -40,13 +40,13 @@ function sendPacketString(string, size){
 	device.write(packet, size);
 }
 
-let vKeyNames = [
+const vKeyNames = [
 	"Device Wide",
 ];
 
 function sendReportString(string, size){
-	let packet= [];
-	let data = string.split(' ');
+	const packet= [];
+	const data = string.split(' ');
 
 	for(let i = 0; i < data.length; i++){
 		packet[parseInt(i, 16)] =parseInt(data[i], 16);//.toString(16)
@@ -56,7 +56,7 @@ function sendReportString(string, size){
 }
 
 
-let vKeyPositions = [
+const vKeyPositions = [
 	[0, 0]
 ];
 
@@ -67,7 +67,7 @@ export function LedNames() {
 export function LedPositions() {
 	return vKeyPositions;
 }
-let RGBdata = new Array(38000);
+const RGBdata = new Array(38000);
 let offset = 0;
 
 function SendColorData() {
@@ -78,7 +78,7 @@ function SendColorData() {
 
 			col = device.color(iIdx/2, row*4);
 
-			let iLedIdx = (iIdx+row*640) * 4;
+			const iLedIdx = (iIdx+row*640) * 4;
 			RGBdata[iLedIdx] =   col[2];
 			RGBdata[iLedIdx+1] = col[1];
 			RGBdata[iLedIdx+2] = col[0];

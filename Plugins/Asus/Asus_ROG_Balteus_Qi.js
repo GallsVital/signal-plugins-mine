@@ -19,9 +19,9 @@ export function ControllableParameters(){
 	];
 }
 
-let vLedNames = [ "Zone 1", "Zone 2", "Zone 3", "Zone 4", "Zone 5", "Zone 6", "Zone 7", "ROG Logo", "Zone 9", "Zone 10", "Zone 11", "Zone 12", "Zone 13", "Zone 14", "Zone 15", ];
+const vLedNames = [ "Zone 1", "Zone 2", "Zone 3", "Zone 4", "Zone 5", "Zone 6", "Zone 7", "ROG Logo", "Zone 9", "Zone 10", "Zone 11", "Zone 12", "Zone 13", "Zone 14", "Zone 15", ];
 
-let vLedPositions = [ [1, 2], [1, 4], [1, 6], [1, 8], [1, 10], [3, 10], [5, 10], [7, 10], [7, 8], [7, 6], [7, 4], [7, 2], [7, 0], [5, 0], [3, 0], ];
+const vLedPositions = [ [1, 2], [1, 4], [1, 6], [1, 8], [1, 10], [3, 10], [5, 10], [7, 10], [7, 8], [7, 6], [7, 4], [7, 2], [7, 0], [5, 0], [3, 0], ];
 
 export function LedNames() {
 	return vLedNames;
@@ -44,15 +44,15 @@ export function Shutdown() {
 }
 
 function sendZone(shutdown = false) {
-	let packet = [];
+	const packet = [];
 	packet[0x00] = 0xee;
 	packet[0x01] = 0xC0;
 	packet[0x02] = 0x81;
 	packet[0x03] = 0x00;
 
 	for(let iIdx = 0; iIdx < 15; iIdx++) {
-		let iPxX = vLedPositions[iIdx][0];
-		let iPxY = vLedPositions[iIdx][1];
+		const iPxX = vLedPositions[iIdx][0];
+		const iPxY = vLedPositions[iIdx][1];
 		var color;
 
 		if(shutdown) {
@@ -63,7 +63,7 @@ function sendZone(shutdown = false) {
 			color = device.color(iPxX, iPxY);
 		}
 
-		let iLedIdx = 5 + iIdx * 4;
+		const iLedIdx = 5 + iIdx * 4;
 		packet[iLedIdx] = 0x00;
 		packet[iLedIdx+1] = color[0];
 		packet[iLedIdx+2] = color[1];
@@ -78,8 +78,8 @@ export function Validate(endpoint) {
 }
 
 function hexToRgb(hex) {
-	let result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
-	let colors = [];
+	const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+	const colors = [];
 	colors[0] = parseInt(result[1], 16);
 	colors[1] = parseInt(result[2], 16);
 	colors[2] = parseInt(result[3], 16);

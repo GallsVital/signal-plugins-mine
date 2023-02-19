@@ -62,6 +62,18 @@ export function Initialize() {
 	}
 }
 
+export function Render() {
+	SendPacket();
+
+	if(DpiControl) {
+		setDPIRazer(dpi1);
+	}
+}
+
+export function Shutdown() {
+	SendPacket(true);
+}
+
 function SendPacket(shutdown = false){
 
 	const packet = [];
@@ -125,18 +137,6 @@ function setDPIRazer(dpi){
 	packet[89] = CalculateCrc(packet);
 
 	device.send_report(packet, 91);
-}
-
-export function Render() {
-	SendPacket();
-
-	if(DpiControl) {
-		setDPIRazer(dpi1);
-	}
-}
-
-export function Shutdown() {
-	SendPacket(true);
 }
 
 function CalculateCrc(report) {

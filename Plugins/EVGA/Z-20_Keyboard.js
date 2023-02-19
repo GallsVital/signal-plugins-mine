@@ -60,51 +60,39 @@ const vKeyPositions =
 ];
 
 
-export function LedNames() 
-{
+export function LedNames() {
 	return vKeyNames;
 }
 
-export function LedPositions() 
-{
+export function LedPositions() {
 	return vKeyPositions;
 }
 
-export function Initialize() 
-{
+export function Initialize() {
 
 }
 
-export function Render() 
-{
+export function Render() {
 	sendZone();
 }
 
-export function Shutdown() 
-{
+export function Shutdown() {
 	sendZone(true);
 }
 
-function sendZone(shutdown = false) 
-{
-	let packet = [0x06, 0xEA, 0x02, 0x01, 0x00, 0x00, 0x00, 0x02];
+function sendZone(shutdown = false) {
+	const packet = [0x06, 0xEA, 0x02, 0x01, 0x00, 0x00, 0x00, 0x02];
 
-	for(let iIdx = 0; iIdx < vKeys.length; iIdx++)
-	{
-		let iPxX = vKeyPositions[iIdx][0];
-		let iPxY = vKeyPositions[iIdx][1];
+	for(let iIdx = 0; iIdx < vKeys.length; iIdx++) {
+		const iPxX = vKeyPositions[iIdx][0];
+		const iPxY = vKeyPositions[iIdx][1];
 		var color;
 
-		if(shutdown) 
-		{
+		if(shutdown) {
 			color = hexToRgb(shutdownColor);
-		} 
-		else if (LightingMode === "Forced") 
-		{
+		} else if (LightingMode === "Forced") {
 			color = hexToRgb(forcedColor);
-		} 
-		else 
-		{
+		} else {
 			color = device.color(iPxX, iPxY);
 		}
 
@@ -118,10 +106,9 @@ function sendZone(shutdown = false)
 	device.pause(2);
 }
 
-function hexToRgb(hex) 
-{
-	let result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
-	let colors = [];
+function hexToRgb(hex) {
+	const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+	const colors = [];
 	colors[0] = parseInt(result[1], 16);
 	colors[1] = parseInt(result[2], 16);
 	colors[2] = parseInt(result[3], 16);
@@ -129,7 +116,6 @@ function hexToRgb(hex)
 	return colors;
 }
 
-export function Validate(endpoint) 
-{
+export function Validate(endpoint) {
 	return endpoint.interface === 1 && endpoint.usage == 0x004b && endpoint.usage_page == 0x0008;
 }

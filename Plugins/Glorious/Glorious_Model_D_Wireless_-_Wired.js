@@ -16,8 +16,7 @@ dpi3:readonly
 dpi4:readonly
 mousePolling:readonly
 */
-export function ControllableParameters()
-{
+export function ControllableParameters() {
 	return [
 		{"property":"shutdownColor", "group":"lighting", "label":"Shutdown Color", "min":"0", "max":"360", "type":"color", "default":"009bde"},
 		{"property":"LightingMode", "group":"lighting", "label":"Lighting Mode", "type":"combobox", "values":["Grid", "Forced"], "default":"Grid"},
@@ -32,7 +31,7 @@ export function ControllableParameters()
 	];
 }
 
-let pollingDict = 
+const pollingDict =
 {
 	"125Hz" : 8,
 	"250Hz" : 4,
@@ -40,39 +39,34 @@ let pollingDict =
 	"1000Hz": 1
 };
 
-let config = [ 0x04, 0x11 ];
+const config = [ 0x04, 0x11 ];
 
-let vLedNames = [ "Sides", "Logo" ];
+const vLedNames = [ "Sides", "Logo" ];
 
-let vLedPositions = [ [1, 1], [1, 1] ];
+const vLedPositions = [ [1, 1], [1, 1] ];
 
-export function LedNames() 
-{
+export function LedNames() {
 	return vLedNames;
 }
 
-export function LedPositions() 
-{
+export function LedPositions() {
 	return vLedPositions;
 }
 
-export function Initialize() 
-{
-	if(SettingControl)
-	{
+export function Initialize() {
+	if(SettingControl) {
 		setDpi();
 	}
 }
 
-export function Shutdown() 
-{
+export function Shutdown() {
 	sendColors(true);
 }
 
 
 function sendReportString(string, size){
-	let packet= [];
-	let data = string.split(' ');
+	const packet= [];
+	const data = string.split(' ');
 
 	for(let i = 0; i < data.length; i++){
 		packet[parseInt(i, 16)] = parseInt(data[i], 16);//.toString(16)
@@ -100,15 +94,14 @@ let savedDpi2;
 let savedDpi3;
 let savedDpi4;
 
-function setDpi()
-{
+function setDpi() {
 	savedDpi1 = dpi1;
 	savedDpi2 = dpi2;
 	savedDpi3 = dpi3;
 	savedDpi4 = dpi4;
 	savedPollingRate = pollingDict[mousePolling];
 
-	let packet = [];
+	const packet = [];
 	packet[0] = 0x00;
 	packet[1] = 0x00;
 	packet[2] = 0x00;
@@ -145,27 +138,20 @@ function setDpi()
 
 }
 
-function sendColors(shutdown = false)
-{
+function sendColors(shutdown = false) {
 
-	let packet = [0x00, 0x00, 0x00, 0x02, 0x08, 0x02, 0x00, 0x01, 0xff, 0x04, 0x00, 0x09];
+	const packet = [0x00, 0x00, 0x00, 0x02, 0x08, 0x02, 0x00, 0x01, 0xff, 0x04, 0x00, 0x09];
 
-	for(let iIdx = 0; iIdx < 1; iIdx++) 
-	{
-		let iPxX = vLedPositions[iIdx][0];
-		let iPxY = vLedPositions[iIdx][1];
+	for(let iIdx = 0; iIdx < 1; iIdx++) {
+		const iPxX = vLedPositions[iIdx][0];
+		const iPxY = vLedPositions[iIdx][1];
 		var mxPxColor;
 
-		if(shutdown)
-		{
+		if(shutdown) {
 			mxPxColor = hexToRgb(shutdownColor);
-		}
-		else if (LightingMode === "Forced") 
-		{
+		} else if (LightingMode === "Forced") {
 			mxPxColor = hexToRgb(forcedColor);
-		}
-		else
-		{
+		} else {
 			mxPxColor = device.color(iPxX, iPxY);
 		}
 
@@ -180,10 +166,9 @@ function sendColors(shutdown = false)
 
 }
 
-function hexToRgb(hex) 
-{
-	let result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
-	let colors = [];
+function hexToRgb(hex) {
+	const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+	const colors = [];
 	colors[0] = parseInt(result[1], 16);
 	colors[1] = parseInt(result[2], 16);
 	colors[2] = parseInt(result[3], 16);
@@ -191,8 +176,7 @@ function hexToRgb(hex)
 	return colors;
 }
 
-export function Validate(endpoint) 
-{
+export function Validate(endpoint) {
 	return endpoint.interface === 2;
 }
 

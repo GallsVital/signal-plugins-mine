@@ -1,5 +1,5 @@
 function GetReport(cmd_class, cmd_id, size) {
-	let report = new Array(91).fill(0);
+	const report = new Array(91).fill(0);
 
 	report[0] = 0;
 
@@ -83,8 +83,8 @@ const MousePollingDict = {
 };
 
 function hexToRgb(hex) {
-	let result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
-	let colors = [];
+	const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+	const colors = [];
 	colors[0] = parseInt(result[1], 16);
 	colors[1] = parseInt(result[2], 16);
 	colors[2] = parseInt(result[3], 16);
@@ -92,7 +92,7 @@ function hexToRgb(hex) {
 	return colors;
 }
 
-let vLedNames =  [
+const vLedNames =  [
 	"Left Side Bar 1",                 "Right Side Bar 1",
 	"Left Side Bar 2", "ScrollWheel",  "Right Side Bar 2",
 	"Left Side Bar 3",                 "Right Side Bar 3",
@@ -101,7 +101,7 @@ let vLedNames =  [
 	"Left Side Bar 6", "Logo",         "Right Side Bar 6",
 	"Left Side Bar 7",                 "Right Side Bar 7",
 ];
-let vLedMap = [
+const vLedMap = [
 	0,         7,
 	1,   15,   8,
 	2,         9,
@@ -111,7 +111,7 @@ let vLedMap = [
 	6,         13
 ];
 
-let vLedPositions = [
+const vLedPositions = [
 	[0, 0],          [4, 0],
 	[0, 1], [2, 0],   [4, 1],
 	[0, 2],          [4, 2],
@@ -122,7 +122,7 @@ let vLedPositions = [
 ];
 
 export function LedNames() {
-	let MappedPositions = [];
+	const MappedPositions = [];
 
 	for(let i = 0; i < vLedNames.length; i++){
 		MappedPositions[vLedMap[i]] = vLedNames[i];
@@ -132,7 +132,7 @@ export function LedNames() {
 }
 
 export function LedPositions() {
-	let MappedPositions = [];
+	const MappedPositions = [];
 
 	for(let i = 0; i < vLedPositions.length; i++){
 		MappedPositions[vLedMap[i]] = vLedPositions[i];
@@ -193,7 +193,7 @@ function ChangeControlMode(Mode) {
 }
 
 function Apply() {
-	let packet = []; //new Array(91).fill(0);
+	const packet = []; //new Array(91).fill(0);
 	packet[0] = 0x00;
 	packet[1] = 0x00;
 	packet[2] = 0x1F;
@@ -212,8 +212,8 @@ function Apply() {
 }
 
 function sendReportString(string, size){
-	let packet= [];
-	let data = string.split(' ');
+	const packet= [];
+	const data = string.split(' ');
 
 	for(let i = 0; i < data.length; i++){
 		packet[parseInt(i, 16)] =parseInt(data[i], 16);//.toString(16)
@@ -235,7 +235,7 @@ export function Initialize() {
 function setPollingRazer(mousePolling){
 	SavedmousePolling = mousePolling;
 
-	let packet = [];
+	const packet = [];
 	packet[2] = 0xF1;
 	packet[6] = 0x01;
 	packet[8] = 0x05;
@@ -247,7 +247,7 @@ function setPollingRazer(mousePolling){
 function setDPIRazer(dpi){
 	savedDpi1 = dpi;
 
-	let packet = [];
+	const packet = [];
 	packet[0] = 0x00;
 	packet[1] = 0x00;
 	packet[2] = 0x1F;
@@ -270,7 +270,7 @@ function setDPIRazer(dpi){
 function SendPacket(shutdown = false){
 
 
-	let packet = [];
+	const packet = [];
 	packet[0] = 0x00;
 	packet[1] = 0x00;
 	packet[2] = 0x1F;
@@ -284,8 +284,8 @@ function SendPacket(shutdown = false){
 
 	for(let iIdx = 0; iIdx < vLedMap.length; iIdx++){
 
-		let iPxX = vLedPositions[iIdx][0];
-		let iPxY = vLedPositions[iIdx][1];
+		const iPxX = vLedPositions[iIdx][0];
+		const iPxY = vLedPositions[iIdx][1];
 		var col;
 
 		if(shutdown){

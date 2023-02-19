@@ -1,5 +1,5 @@
 function GetReport(cmd_class, cmd_id, size) {
-	let report = new Array(91).fill(0);
+	const report = new Array(91).fill(0);
 
 	report[0] = 0;
 
@@ -68,7 +68,7 @@ export function ControllableParameters(){
 	];
 }
 
-let vLedNames = [
+const vLedNames = [
 	"Esc", "1", "2", "3", "4", "5", "6", "7", "8", "9", "0", "-_", "=+", "Backspace",  "Del",
 	"Tab", "Q", "W", "E", "R", "T", "Y", "U", "I", "O", "P", "[", "]", "\\",           "Page Up",
 	"CapsLock", "A", "S", "D", "F", "G", "H", "J", "K", "L", ";", "'", "Enter",        "Page Down",
@@ -76,7 +76,7 @@ let vLedNames = [
 	"Left Ctrl", "Left Win", "Left Alt", "Space", "Right Alt", "Fn", "Right Ctrl",  "Left Arrow", "Down Arrow", "Right Arrow",
 ];
 
-let vLedPositions = [
+const vLedPositions = [
 	[0, 0], [1, 0], [2, 0], [3, 0], [4, 0], [5, 0], [6, 0], [7, 0], [8, 0], [9, 0], [10, 0], [11, 0], [12, 0], [13, 0], [14, 0],           //15
 	[0, 1], [1, 1], [2, 1], [3, 1], [4, 1], [5, 1], [6, 1], [7, 1], [8, 1], [9, 1], [10, 1], [11, 1], [12, 1], [13, 1], [14, 1],           //15
 	[0, 2], [1, 2], [2, 2], [3, 2], [4, 2], [5, 2], [6, 2], [7, 2], [8, 2], [9, 2], [10, 2], [11, 2], [12, 2], [13, 2],                   //14
@@ -119,7 +119,7 @@ function Battery() //This is out of 255, but the math is wrong somewhere. Packet
 	device.send_report(packet, 91);
 	packet = device.get_report(packet, 91);
 
-	let Battery = (packet[2]/255);
+	const Battery = (packet[2]/255);
 
 	return(Battery);
 }
@@ -143,13 +143,13 @@ function BatteryStatus() //byte 3? is charging status. 1 is charging, 0 is not c
 	device.send_report(packet, 91);
 	packet = device.get_report(packet, 91);
 
-	let BatteryStatus = (packet[3]);
+	const BatteryStatus = (packet[3]);
 
 	return(BatteryStatus);
 }
 
 function SendPacket(idx, shutdown = false) {
-	let packet = [];
+	const packet = [];
 	packet[0] = 0x00;
 	packet[1] = 0x00;
 	packet[2] = 0x9F;
@@ -173,7 +173,7 @@ function SendPacket(idx, shutdown = false) {
 		} else {
 			col = device.color(iIdx, idx);
 		}
-		let iLedIdx = (iIdx*3) + 14;
+		const iLedIdx = (iIdx*3) + 14;
 		packet[iLedIdx] = col[0];
 		packet[iLedIdx+1] = col[1];
 		packet[iLedIdx+2] = col[2];
@@ -204,8 +204,8 @@ export function Shutdown() {
 }
 
 function hexToRgb(hex) {
-	let result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
-	let colors = [];
+	const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+	const colors = [];
 	colors[0] = parseInt(result[1], 16);
 	colors[1] = parseInt(result[2], 16);
 	colors[2] = parseInt(result[3], 16);

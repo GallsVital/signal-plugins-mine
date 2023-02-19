@@ -61,7 +61,7 @@ export function Initialize() {
 }
 
 function SetMotherboardName(){
-	let MotherboardName = device.getMotherboardName();
+	const MotherboardName = device.getMotherboardName();
 
 	if(MotherboardName != "Unknown"){
 		device.setName(`Asus ${MotherboardName} ARGB Headers`);
@@ -70,7 +70,7 @@ function SetMotherboardName(){
 
 function Sendchannel(Channel, shutdown = false) {
 	let ChannelLedCount = device.channel(ChannelArray[Channel][0]).LedCount();
-	let componentChannel = device.channel(ChannelArray[Channel][0]);
+	const componentChannel = device.channel(ChannelArray[Channel][0]);
 
 	let RGBData = [];
 
@@ -80,9 +80,11 @@ function Sendchannel(Channel, shutdown = false) {
 	}else if(componentChannel.shouldPulseColors()){
 		ChannelLedCount = 40;
 
-		let pulseColor = device.getChannelPulseColor(ChannelArray[Channel][0], ChannelLedCount);
+		const pulseColor = device.getChannelPulseColor(ChannelArray[Channel][0], ChannelLedCount);
 		RGBData = device.createColorArray(pulseColor, ChannelLedCount, "Inline");
 
+	}else if(shutdown){
+		RGBData = device.createColorArray(shutdownColor, ChannelLedCount, "Inline");
 	}else{
 		RGBData = device.channel(ChannelArray[Channel][0]).getColors("Inline");
 	}
@@ -104,7 +106,7 @@ function Sendchannel(Channel, shutdown = false) {
 	ChannelLedCount = ChannelLedCount >= 120 ? 120 : ChannelLedCount;
 
 	while(ChannelLedCount > 0){
-		let ledsToSend = ChannelLedCount >= 20 ? 20 : ChannelLedCount;
+		const ledsToSend = ChannelLedCount >= 20 ? 20 : ChannelLedCount;
 		ChannelLedCount -= ledsToSend;
 		sendDirectPacket(Channel, ledsSent, ledsToSend, RGBData.splice(0, ledsToSend*3));
 		ledsSent += ledsToSend;
@@ -135,7 +137,7 @@ function sendDirectPacket(channel, start, count, data){
 
 function sendDirectApply(channel){
 
-	let packet = [];
+	const packet = [];
 	packet[0] = 0xEC;
 	packet[1] = 0x40;
 	packet[2] = 0x80 | channel;
@@ -143,7 +145,7 @@ function sendDirectApply(channel){
 }
 
 function sendChannelStart(channel){
-	let packet = [0xEC, 0x3B, channel, 0x00, 0xFF];
+	const packet = [0xEC, 0x3B, channel, 0x00, 0xFF];
 	device.log(packet);
 	device.write(packet, 65);
 }
@@ -166,7 +168,12 @@ function RequestConfig(){
 	sendPacketString(`EC B0`, 65);
 
 	config = device.read(config, 65);
-	//device.log(config);
+	device.log("Config Table", {toFile: true});
+
+	for(let i = 0; i < config.length; i += 8){
+		device.log(config.slice(i, i+8), {toFile: true});
+	}
+
 	channelCount = 2;//config[6];
 	device.log(`ARGB channel Count ${channelCount} `);
 }
@@ -176,8 +183,8 @@ export function Shutdown() {
 }
 
 function sendPacketString(string, size){
-	let packet= [];
-	let data = string.split(' ');
+	const packet= [];
+	const data = string.split(' ');
 
 	for(let i = 0; i < data.length; i++){
 		packet[i] = parseInt(data[i], 16);

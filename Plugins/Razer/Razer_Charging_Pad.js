@@ -1,5 +1,5 @@
 function GetReport(cmd_class, cmd_id, size) {
-	let report = new Array(91).fill(0);
+	const report = new Array(91).fill(0);
 
 	report[0] = 0;
 
@@ -69,8 +69,8 @@ export function ControllableParameters(){
 }
 
 function hexToRgb(hex) {
-	let result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
-	let colors = [];
+	const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+	const colors = [];
 	colors[0] = parseInt(result[1], 16);
 	colors[1] = parseInt(result[2], 16);
 	colors[2] = parseInt(result[3], 16);
@@ -79,19 +79,19 @@ function hexToRgb(hex) {
 }
 
 
-let vLedNames = [
+const vLedNames = [
 	"Ring Led 1", "Ring Led 2", "Ring Led 3",
 	"Ring Led 10",               "Ring Led 4",
 	"Ring Led 9",                "Ring Led 5",
 	"Ring Led 8", "Ring Led 7", "Ring Led 6"
 ];
-let vLedPositions = [
+const vLedPositions = [
 	[1, 0], [2, 1], [3, 1],
 	[0, 1],              [4, 1],
 	[0, 2],              [4, 2],
 	[1, 3], [2, 3], [3, 3],
 ];
-let vLedMapping = [
+const vLedMapping = [
 	0, 9, 8,
 	1,        7,
 	2,        6,
@@ -107,7 +107,7 @@ export function LedPositions() {
 }
 
 function EnableSoftwareControl() {
-	let report = GetReport(0x0F, 0x03, 0x47);
+	const report = GetReport(0x0F, 0x03, 0x47);
 
 	report[2] = 0x3F; // transaction id.
 
@@ -288,7 +288,7 @@ function SendPacket(shutdown = false) {
 
 
 function Apply() {
-	let packet = []; //new Array(91).fill(0);
+	const packet = []; //new Array(91).fill(0);
 	packet[0] = 0x00;
 	packet[1] = 0x00;
 	packet[2] = 0x3F;
@@ -316,7 +316,7 @@ export function Shutdown() {
 	SendPacket(true);
 
 
-	let packet = [];
+	const packet = [];
 	packet[0] = 0x00;
 	packet[1] = 0x00;
 	packet[2] = 0x1F;

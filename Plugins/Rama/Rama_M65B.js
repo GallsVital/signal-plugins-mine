@@ -19,15 +19,15 @@ export function ControllableParameters(){
 }
 
 function hexToRgb(hex) {
-	let result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
-	let colors = [];
+	const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+	const colors = [];
 	colors[0] = parseInt(result[1], 16);
 	colors[1] = parseInt(result[2], 16);
 	colors[2] = parseInt(result[3], 16);
 
 	return colors;
 }
-let vLedNames = [
+const vLedNames = [
 	"Esc", "F1", "F2", "F3", "F4", "F5", "F6", "F7", "F8", "F9", "F10", "F11", "F12",         "Print Screen", "Scroll Lock", "Pause Break",
 	"`", "1", "2", "3", "4", "5", "6", "7", "8", "9", "0", "-_", "=+", "Backspace",                        "Insert", "Home", "Page Up",
 	"Tab", "Q", "W", "E", "R", "T", "Y", "U", "I", "O", "P", "[", "]", "\\",                               "Del", "End", "Page Down",
@@ -36,7 +36,7 @@ let vLedNames = [
 	"Left Ctrl", "Left Win", "Left Alt", "Space", "Right Alt", "Fn", "Menu", "Right Ctrl",  "Left Arrow", "Down Arrow", "Right Arrow",
 ];
 
-let vLedPositions = [
+const vLedPositions = [
 	[0, 0], [1, 0], [2, 0], [3, 0], [4, 0], [5, 0], [6, 0], [7, 0], [8, 0], [9, 0], [10, 0], [11, 0], [12, 0],           [14, 0], [15, 0], [16, 0],
 	[0, 1], [1, 1], [2, 1], [3, 1], [4, 1], [5, 1], [6, 1], [7, 1], [8, 1], [9, 1], [10, 1], [11, 1], [12, 1], [13, 1],   [14, 1], [15, 1], [16, 1],
 	[0, 2], [1, 2], [2, 2], [3, 2], [4, 2], [5, 2], [6, 2], [7, 2], [8, 2], [9, 2], [10, 2], [11, 2], [12, 2], [13, 2],   [14, 2], [15, 2], [16, 2],
@@ -67,19 +67,19 @@ export function Initialize() {
 }
 
 function SendPacket(offset) {
-	let packet = [];
+	const packet = [];
 	packet[0] = 0x00;
 	packet[1] = 0x07;
 	packet[2] = 0x41;
 	packet[3] = offset;
 
 	for(let iIdx = 0; iIdx < 9; iIdx++){
-		let iLedCoord = offset + iIdx;
-		let iPosX = iLedCoord % 15;
-		let iPosY = iLedCoord / 15;
-		let color = device.color(iPosX, iPosY);
+		const iLedCoord = offset + iIdx;
+		const iPosX = iLedCoord % 15;
+		const iPosY = iLedCoord / 15;
+		const color = device.color(iPosX, iPosY);
 
-		let iLedIdx = (iIdx*3) + 4;
+		const iLedIdx = (iIdx*3) + 4;
 		packet[iLedIdx] = color[0];
 		packet[iLedIdx+1] = color[1];
 		packet[iLedIdx+2] = color[2];
@@ -92,7 +92,7 @@ function SendPacket(offset) {
 
 
 function Apply() {
-	let packet = [];
+	const packet = [];
 	packet[0] = 0x00;
 	packet[1] = 0x07;
 	packet[2] = 0x42;

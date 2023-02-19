@@ -86,7 +86,7 @@ function HeaderConfiguration(){
 // 	0x24, // RGB Header Top "LED_C2"
 // ];
 
-const vDLED_Zones = [];
+let vDLED_Zones = [];
 
 const MotherboardConfigs = {
 	'Auto': {
@@ -175,6 +175,19 @@ const MotherboardConfigs = {
 			0x21: ["12v Header Bottom", HeaderConfiguration],
 			0x23: ["PCIe", MainboardConfiguration],
 			0x24: ["12V Header Top", HeaderConfiguration]
+		}
+	},
+	// Has typo in WMI?
+	"X570S I AORUS PRO AX": {
+		ARGB:{
+			"5v ARGB Header 1": 0x58,
+		},
+		Mainboard:{
+			0x20: ["Back IO", MainboardConfiguration],
+			0x21: ["Mainboard", MainboardConfiguration],
+			0x22: ["PCIe", MainboardConfiguration],
+			0x23: ["South Bridge", HeaderConfiguration],
+			0x24: ["12v Header", HeaderConfiguration],
 		}
 	},
 	"X570 AORUS ULTRA": {
@@ -271,6 +284,8 @@ function InitializeZones(){
 		device.log(`Adding zone [${configuration.Mainboard[zone][0]}], Id: ${zone}`, {toFile: true});
 		CreateZone(zone, ...configuration.Mainboard[zone]);
 	}
+
+	vDLED_Zones = [];
 
 	for(const header in configuration.ARGB){
 		device.log(`Adding ARGB Header [${header}], Id: ${configuration.ARGB[header]}`, {toFile: true});

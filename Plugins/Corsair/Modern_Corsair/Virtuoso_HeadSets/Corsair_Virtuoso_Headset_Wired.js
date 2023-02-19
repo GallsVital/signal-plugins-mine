@@ -22,17 +22,17 @@ export function ControllableParameters(){
 export function Documentation(){ return "troubleshooting/corsair"; }
 
 function hexToRgb(hex) {
-	let result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
-	let colors = [];
+	const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+	const colors = [];
 	colors[0] = parseInt(result[1], 16);
 	colors[1] = parseInt(result[2], 16);
 	colors[2] = parseInt(result[3], 16);
 
 	return colors;
 }
-let vLedNames = ["Left Cans", "Right Can", "Mic"];
+const vLedNames = ["Left Cans", "Right Can", "Mic"];
 
-let vLedPositions = [
+const vLedPositions = [
 	[0, 2], [2, 2], [1, 0]
 ];
 
@@ -50,8 +50,8 @@ function EnableSoftwareControl() {
 }
 
 function sendPacketString(string, size){
-	let packet= [];
-	let data = string.split(' ');
+	const packet= [];
+	const data = string.split(' ');
 
 	for(let i = 0; i < data.length; i++){
 		packet[parseInt(i, 16)] = parseInt(data[i], 16);//.toString(16)
@@ -76,9 +76,9 @@ export function Render() {
 
 function sendColors(shutdown = false){
 
-	let red = new Array(3).fill(0);
-	let green = new Array(3).fill(0);
-	let blue = new Array(3).fill(0);
+	const red = new Array(3).fill(0);
+	const green = new Array(3).fill(0);
+	const blue = new Array(3).fill(0);
 
 
 	let packet = [];
@@ -94,8 +94,8 @@ function sendColors(shutdown = false){
 
 
 	for(let zone_idx = 0; zone_idx < vLedPositions.length; zone_idx++) {
-		let iX = vLedPositions[zone_idx][0];
-		let iY = vLedPositions[zone_idx][1];
+		const iX = vLedPositions[zone_idx][0];
+		const iY = vLedPositions[zone_idx][1];
 		var col;
 
 		//     if(zone_idx = 2 && !micLedControl) {

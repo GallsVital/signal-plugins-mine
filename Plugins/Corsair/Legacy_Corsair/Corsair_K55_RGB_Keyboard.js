@@ -30,7 +30,7 @@ export function Initialize() {
 	let packet = [0x0E, 0x01];
 	packet = device.get_report(packet, 65);
 
-	let firmware = `firmware version = ${packet[10]}.${packet[9].toString(16)}`;
+	const firmware = `firmware version = ${packet[10]}.${packet[9].toString(16)}`;
 	device.log(firmware);
 	//var layout = `layout = ${layoutDict[packet[18]]}`
 	//device.log(layout);
@@ -42,10 +42,10 @@ export function Initialize() {
 	InitScanCodes(); //set key codes to get the keys working again
 }
 let savedLayout;
-let SkippedKeys_ANSI = [
+const SkippedKeys_ANSI = [
 	49, 63, 65, 66, 81, 83, 85, 111, 126, 127, 128, 129,
 ];
-let SkippedKeys_ISO = [
+const SkippedKeys_ISO = [
 	63, 65, 66, 72, 80, 83, 85, 111, 126, 127, 128, 129,
 ];
 const LayoutDict = {
@@ -58,7 +58,7 @@ function InitScanCodes(){
 	savedLayout = layout;
 	device.log(`Setting layout to ${savedLayout}`);
 
-	let ScanCodes = [];
+	const ScanCodes = [];
 
 	for(let ScanCode = 0; ScanCode < 120 +  LayoutDict[layout].length; ScanCode++){
 		if(LayoutDict[layout].includes(ScanCode)){
@@ -87,12 +87,12 @@ export function Shutdown() {
 }
 
 
-let vKeyNames = [
+const vKeyNames = [
 	"Zone1", "Zone2", "Zone3",
 ];
 
 
-let vKeyPositions = [
+const vKeyPositions = [
 	[1, 0], [2, 0], [3, 0]
 ];
 
@@ -111,7 +111,7 @@ export function Render() {
 		InitScanCodes();
 	}
 
-	let packet = [];
+	const packet = [];
 	packet[0x00]           = 0x00;
 	packet[0x01]           = 0x07;
 	packet[0x02]           = 0x25;
@@ -120,9 +120,9 @@ export function Render() {
 
 
 	for(let iIdx = 0; iIdx < vKeyPositions.length; iIdx++) {
-		let iPxX = vKeyPositions[iIdx][0];
-		let iPxY = vKeyPositions[iIdx][1];
-		let mxPxColor = device.color(iPxX, iPxY);
+		const iPxX = vKeyPositions[iIdx][0];
+		const iPxY = vKeyPositions[iIdx][1];
+		const mxPxColor = device.color(iPxX, iPxY);
 		packet[0x05+iIdx*3] = mxPxColor[0];
 		packet[0x05+iIdx*3 +1 ] = mxPxColor[1];
 		packet[0x05+iIdx*3 +2 ] = mxPxColor[2];
@@ -137,8 +137,8 @@ export function Validate(endpoint) {
 }
 
 function sendPacketString(string, size){
-	let packet= [];
-	let data = string.split(' ');
+	const packet= [];
+	const data = string.split(' ');
 
 	for(let i = 0; i < data.length; i++){
 		packet[i] = parseInt(data[i], 16);//.toString(16)
@@ -148,8 +148,8 @@ function sendPacketString(string, size){
 }
 
 function sendReportString(string, size){
-	let packet= [];
-	let data = string.split(' ');
+	const packet= [];
+	const data = string.split(' ');
 
 	for(let i = 0; i < data.length; i++){
 		packet[i] = parseInt(data[i], 16);//.toString(16)
@@ -159,8 +159,8 @@ function sendReportString(string, size){
 }
 
 function hexToRgb(hex) {
-	let result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
-	let colors = [];
+	const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+	const colors = [];
 	colors[0] = parseInt(result[1], 16);
 	colors[1] = parseInt(result[2], 16);
 	colors[2] = parseInt(result[3], 16);

@@ -11,6 +11,9 @@ export function DefaultScale(){return 1.0;}
 shutdownColor:readonly
 LightingMode:readonly
 forcedColor:readonly
+Mainboardconfig:readonly
+Headerconfig:readonly
+RGBconfig:readonly
 Zone1Color:readonly
 Zone1Mode:readonly
 Zone1Speed:readonly
@@ -37,168 +40,174 @@ Zone8Mode:readonly
 Zone8Speed:readonly
 ARGBMode:readonly
 */
-export function ControllableParameters()
-{
+export function ControllableParameters() {
 	return [
 		{"property":"shutdownColor", "group":"lighting", "label":"Shutdown Color", "min":"0", "max":"360", "type":"color", "default":"009bde"},
 		{"property":"LightingMode", "group":"lighting", "label":"Lighting Mode", "type":"combobox", "values":["Canvas", "Forced"], "default":"Canvas"},
 		{"property":"forcedColor", "group":"lighting", "label":"Forced Color", "min":"0", "max":"360", "type":"color", "default":"009bde"},
 
-        {"property":"Zone1Color", "group":"lighing", "label":"12v RGB Header 1 Color", "min":"0", "max":"360", "type":"color", "default":"009bde"},
-		{"property":"Zone1Mode", "group":"lighing", "label":"12v RGB Header 1 Mode", "type":"combobox",
-			"values":["Off", "Static", "Breathing", "Strobe", "Spectrum Cycle", "Wave", "Spring", "Stack", "Cram", "Scan", "Neon", "Water", "Rainbow"], "default":"Static"},
-		{"property":"Zone1Speed", "group":"lighing", "label":"12v RGB Header 1 Speed", "type":"number", "min":"0", "max":"255", "default":"80"},
+		{"property":"Mainboardconfig", "group":"lighting", "label":"MainBoard Configuration", "type":"combobox",   "values":["RGB", "RBG", "BGR", "BRG", "GBR", "GRB"], "default":"RGB"},
+		{"property":"Headerconfig", "group":"lighting", "label":"12v Header Configuration", "type":"combobox",   "values":["RGB", "RBG", "BGR", "BRG", "GBR", "GRB"], "default":"RGB"},
+		{"property":"RGBconfig", "group":"lighting", "label":"ARGB Channel Configuration", "type":"combobox",   "values":["RGB", "RBG", "BGR", "BRG", "GBR", "GRB"], "default":"RGB"},
 
-		{"property":"Zone2Color", "group":"lighing", "label":"12v RGB Header 2 Color", "min":"0", "max":"360", "type":"color", "default":"009bde"},
-		{"property":"Zone2Mode", "group":"lighing", "label":"12v RGB Header 2 Mode", "type":"combobox",
+		{"property":"Zone1Color", "group":"lighting", "label":"12v RGB Header 1 Color", "min":"0", "max":"360", "type":"color", "default":"009bde"},
+		{"property":"Zone1Mode", "group":"lighting", "label":"12v RGB Header 1 Mode", "type":"combobox",
 			"values":["Off", "Static", "Breathing", "Strobe", "Spectrum Cycle", "Wave", "Spring", "Stack", "Cram", "Scan", "Neon", "Water", "Rainbow"], "default":"Static"},
-		{"property":"Zone2Speed", "group":"lighing", "label":"12v RGB Header 2 Speed", "type":"number", "min":"0", "max":"255", "default":"80"},
+		{"property":"Zone1Speed", "group":"lighting", "label":"12v RGB Header 1 Speed", "type":"number", "min":"0", "max":"255", "default":"80"},
 
-		{"property":"Zone3Color", "group":"lighing", "label":"5v ARGB Header 1 Color", "min":"0", "max":"360", "type":"color", "default":"009bde"},
-		{"property":"Zone3Mode", "group":"lighing", "label":"5v ARGB Header 1 Mode", "type":"combobox",
+		{"property":"Zone2Color", "group":"lighting", "label":"12v RGB Header 2 Color", "min":"0", "max":"360", "type":"color", "default":"009bde"},
+		{"property":"Zone2Mode", "group":"lighting", "label":"12v RGB Header 2 Mode", "type":"combobox",
 			"values":["Off", "Static", "Breathing", "Strobe", "Spectrum Cycle", "Wave", "Spring", "Stack", "Cram", "Scan", "Neon", "Water", "Rainbow"], "default":"Static"},
-		{"property":"Zone3Speed", "group":"lighing", "label":"5v ARGB Header 2 Speed", "type":"number", "min":"0", "max":"255", "default":"80"},
+		{"property":"Zone2Speed", "group":"lighting", "label":"12v RGB Header 2 Speed", "type":"number", "min":"0", "max":"255", "default":"80"},
 
-		{"property":"Zone4Color", "group":"lighing", "label":"5v ARGB Header 2 Color", "min":"0", "max":"360", "type":"color", "default":"009bde"},
-		{"property":"Zone4Mode", "group":"lighing", "label":"5v ARGB Header 2 Mode", "type":"combobox",
+		{"property":"Zone3Color", "group":"lighting", "label":"5v ARGB Header 1 Color", "min":"0", "max":"360", "type":"color", "default":"009bde"},
+		{"property":"Zone3Mode", "group":"lighting", "label":"5v ARGB Header 1 Mode", "type":"combobox",
 			"values":["Off", "Static", "Breathing", "Strobe", "Spectrum Cycle", "Wave", "Spring", "Stack", "Cram", "Scan", "Neon", "Water", "Rainbow"], "default":"Static"},
-		{"property":"Zone4Speed", "group":"lighing", "label":"5v ARGB Header 2 Speed", "type":"number", "min":"0", "max":"255", "default":"80"},
+		{"property":"Zone3Speed", "group":"lighting", "label":"5v ARGB Header 2 Speed", "type":"number", "min":"0", "max":"255", "default":"80"},
 
-		{"property":"Zone5Color", "group":"lighing", "label":"PCH Color", "min":"0", "max":"360", "type":"color", "default":"009bde"},
-		{"property":"Zone5Mode", "group":"lighing", "label":"PCH Mode", "type":"combobox",
+		{"property":"Zone4Color", "group":"lighting", "label":"5v ARGB Header 2 Color", "min":"0", "max":"360", "type":"color", "default":"009bde"},
+		{"property":"Zone4Mode", "group":"lighting", "label":"5v ARGB Header 2 Mode", "type":"combobox",
 			"values":["Off", "Static", "Breathing", "Strobe", "Spectrum Cycle", "Wave", "Spring", "Stack", "Cram", "Scan", "Neon", "Water", "Rainbow"], "default":"Static"},
-		{"property":"Zone5Speed", "group":"lighing", "label":"IO Speed", "type":"number", "min":"0", "max":"255", "default":"80"},
+		{"property":"Zone4Speed", "group":"lighting", "label":"5v ARGB Header 2 Speed", "type":"number", "min":"0", "max":"255", "default":"80"},
 
-		{"property":"Zone6Color", "group":"lighing", "label":"IO Color", "min":"0", "max":"360", "type":"color", "default":"009bde"},
-		{"property":"Zone6Mode", "group":"lighing", "label":"IO Mode", "type":"combobox",
+		{"property":"Zone5Color", "group":"lighting", "label":"PCH Color", "min":"0", "max":"360", "type":"color", "default":"009bde"},
+		{"property":"Zone5Mode", "group":"lighting", "label":"PCH Mode", "type":"combobox",
 			"values":["Off", "Static", "Breathing", "Strobe", "Spectrum Cycle", "Wave", "Spring", "Stack", "Cram", "Scan", "Neon", "Water", "Rainbow"], "default":"Static"},
-		{"property":"Zone6Speed", "group":"lighing", "label":"IO Speed", "type":"number", "min":"0", "max":"255", "default":"80"},
+		{"property":"Zone5Speed", "group":"lighting", "label":"IO Speed", "type":"number", "min":"0", "max":"255", "default":"80"},
 
-		{"property":"Zone7Color", "group":"lighing", "label":"PCB Color", "min":"0", "max":"360", "type":"color", "default":"009bde"},
-		{"property":"Zone7Mode", "group":"lighing", "label":"PCB Mode", "type":"combobox",
+		{"property":"Zone6Color", "group":"lighting", "label":"IO Color", "min":"0", "max":"360", "type":"color", "default":"009bde"},
+		{"property":"Zone6Mode", "group":"lighting", "label":"IO Mode", "type":"combobox",
 			"values":["Off", "Static", "Breathing", "Strobe", "Spectrum Cycle", "Wave", "Spring", "Stack", "Cram", "Scan", "Neon", "Water", "Rainbow"], "default":"Static"},
-		{"property":"Zone7Speed", "group":"lighing", "label":"PCB Speed", "type":"number", "min":"0", "max":"255", "default":"80"},
+		{"property":"Zone6Speed", "group":"lighting", "label":"IO Speed", "type":"number", "min":"0", "max":"255", "default":"80"},
 
-		{"property":"Zone8Color", "group":"lighing", "label":"Audio Color", "min":"0", "max":"360", "type":"color", "default":"009bde"},
-		{"property":"Zone8Mode", "group":"lighing", "label":"Audio Mode", "type":"combobox",
+		{"property":"Zone7Color", "group":"lighting", "label":"PCB Color", "min":"0", "max":"360", "type":"color", "default":"009bde"},
+		{"property":"Zone7Mode", "group":"lighting", "label":"PCB Mode", "type":"combobox",
 			"values":["Off", "Static", "Breathing", "Strobe", "Spectrum Cycle", "Wave", "Spring", "Stack", "Cram", "Scan", "Neon", "Water", "Rainbow"], "default":"Static"},
-		{"property":"Zone8Speed", "group":"lighing", "label":"Audio Speed", "type":"number", "min":"0", "max":"255", "default":"80"},
+		{"property":"Zone7Speed", "group":"lighting", "label":"PCB Speed", "type":"number", "min":"0", "max":"255", "default":"80"},
 
-        {"property":"ARGBMode", "group":"lighting", "label":"SignalRGB Support","type":"boolean","default": "true"},
+		{"property":"Zone8Color", "group":"lighting", "label":"Audio Color", "min":"0", "max":"360", "type":"color", "default":"009bde"},
+		{"property":"Zone8Mode", "group":"lighting", "label":"Audio Mode", "type":"combobox",
+			"values":["Off", "Static", "Breathing", "Strobe", "Spectrum Cycle", "Wave", "Spring", "Stack", "Cram", "Scan", "Neon", "Water", "Rainbow"], "default":"Static"},
+		{"property":"Zone8Speed", "group":"lighting", "label":"Audio Speed", "type":"number", "min":"0", "max":"255", "default":"80"},
+
+		{"property":"ARGBMode", "group":"", "label":"SignalRGB Canvas Support", "type":"boolean", "default": "true"},
 	];
 }
 
 const vARGBLedNames = [ ];
 /** @type {LedPosition[]} */
 const vARGBLedPositions = [ ];
+const RGBConfigs = {
+	"RGB" : [0, 1, 2],
+	"RBG" : [0, 2, 1],
+	"BGR" : [2, 1, 0],
+	"BRG" : [2, 0, 1],
+	"GBR" : [1, 2, 0],
+	"GRB" : [1, 0, 2]
+};
 
 export function SupportsSubdevices(){ return true; }
 
-export function LedNames() 
-{
-    return vLedNames;
+export function LedNames() {
+	return vLedNames;
 }
 
-export function LedPositions() 
-{
-    return vLedPositions;
+export function LedPositions() {
+	return vLedPositions;
 }
 
-export function Initialize() 
-{
-    ClearBuffer();
-    if(ARGBMode == true)
-    {
-        device.setControllableLeds(vARGBLedNames, vARGBLedPositions);
-        LEDConfig();
-        CreateRGBHeaders();
-	    SetupChannels();
-        CreateIOShieldZone();
-        CreatePCBZone();
-        CreatePCHZone();
-    }
-    else
-    {
-        
-        device.setControllableLeds(vLedNames, vLedPositions);
-        ReadConfig(1);
+export function Initialize() {
+	ClearBuffer();
+	device.setName(device.getMotherboardName());
 
-        let LedCounts = ReadConfig(2).slice(5, 13);
-    
-        for(let zone = 0; zone < 8; zone++){
-            Zoneconfig[zone].LedCount = LedCounts[zone];
-    
-            if(LedCounts[zone] == 0x1E){
-                Zoneconfig[zone].Enabled = false;
-            }
-        }
-    
-        for(let ZoneId = 0; ZoneId < 8;ZoneId++){
-            let config = ReadZone(ZoneId);
-            Zoneconfig[ZoneId].Mode = config[0];
-            Zoneconfig[ZoneId].Speed = 0xFF - config[4];
-            Zoneconfig[ZoneId].Color = HexToRGB(config[1], config[2], config[3]);
-    
-        }
-    }
+	if(ARGBMode === true) {
+		device.setControllableLeds(vARGBLedNames, vARGBLedPositions);
+		LEDConfig();
+		CreateARGBHeaders();
+		CreateRGBHeaders();
+		CreateIOShieldZone();
+		CreatePCBZone();
+		CreatePCHZone();
+	} else {
+
+		device.setControllableLeds(vLedNames, vLedPositions);
+		ReadConfig(1);
+
+		const LedCounts = ReadConfig(2).slice(5, 13);
+
+		for(let zone = 0; zone < 8; zone++){
+			Zoneconfig[zone].LedCount = LedCounts[zone];
+
+			if(LedCounts[zone] === 0x1E){
+				Zoneconfig[zone].Enabled = false;
+			}
+		}
+
+		for(let ZoneId = 0; ZoneId < 8;ZoneId++){
+			const config = ReadZone(ZoneId);
+			Zoneconfig[ZoneId].Mode = config[0];
+			Zoneconfig[ZoneId].Speed = 0xFF - config[4];
+			Zoneconfig[ZoneId].Color = HexToRGB(config[1], config[2], config[3]);
+
+		}
+	}
 }
 
-export function Render() 
-{
-    if(ARGBMode == true)
-    {
-        SendRGB();
-    }
-    else
-    {
-        let SettingArray = [
-            [Zone1Color, Zone1Mode, Zone1Speed],
-            [Zone2Color, Zone2Mode, Zone2Speed],
-            [Zone3Color, Zone3Mode, Zone3Speed],
-            [Zone4Color, Zone4Mode, Zone4Speed],
-            [Zone5Color, Zone5Mode, Zone5Speed],
-            [Zone6Color, Zone6Mode, Zone6Speed],
-            [Zone7Color, Zone7Mode, Zone7Speed],
-            [Zone8Color, Zone8Mode, Zone8Speed],
-        ];
-    
-        for(let zone = 0; zone < SettingArray.length;zone++){
-            let dirtyZone = false;
-            let SelectedZone = Zoneconfig[zone];
-    
-            if(SelectedZone.Color != SettingArray[zone][0]){
-                device.log(`Setting Zone ${zone} color from ${SelectedZone.Color} to ${SettingArray[zone][0]}`);
-                SelectedZone.Color = SettingArray[zone][0];
-                dirtyZone = true;
-            }
-    
-            if(SelectedZone.Mode != ModeDict[SettingArray[zone][1]]){
-                device.log(`Setting Zone ${zone} mode from ${SelectedZone.Mode} to ${SettingArray[zone][1]}`);
-                SelectedZone.Mode = ModeDict[SettingArray[zone][1]];
-                dirtyZone = true;
-            }
-    
-            if(SelectedZone.Speed != SettingArray[zone][2]){
-                device.log(`Setting Zone ${SelectedZone.Name}'s' speed from ${SelectedZone.Speed} to ${SettingArray[zone][2]}`);
-                SelectedZone.Speed = SettingArray[zone][2];
-                dirtyZone = true;
-            }
-    
-            if(SelectedZone.Enabled && dirtyZone){
-                SetZone(SelectedZone);
-            }
-        }
-    
-        device.pause(3000);
-    }
+export function Render() {
+	if(modeSwitch === false) {
+		if(ARGBMode === true) {
+			SendRGB();
+		} else {
+			const SettingArray = [
+				[Zone1Color, Zone1Mode, Zone1Speed],
+				[Zone2Color, Zone2Mode, Zone2Speed],
+				[Zone3Color, Zone3Mode, Zone3Speed],
+				[Zone4Color, Zone4Mode, Zone4Speed],
+				[Zone5Color, Zone5Mode, Zone5Speed],
+				[Zone6Color, Zone6Mode, Zone6Speed],
+				[Zone7Color, Zone7Mode, Zone7Speed],
+				[Zone8Color, Zone8Mode, Zone8Speed],
+			];
+
+			for(let zone = 0; zone < SettingArray.length;zone++){
+				let dirtyZone = false;
+				const SelectedZone = Zoneconfig[zone];
+
+				if(SelectedZone.Color != SettingArray[zone][0]){
+					device.log(`Setting Zone ${zone} color from ${SelectedZone.Color} to ${SettingArray[zone][0]}`);
+					SelectedZone.Color = SettingArray[zone][0];
+					dirtyZone = true;
+				}
+
+				if(SelectedZone.Mode != ModeDict[SettingArray[zone][1]]){
+					device.log(`Setting Zone ${zone} mode from ${SelectedZone.Mode} to ${SettingArray[zone][1]}`);
+					SelectedZone.Mode = ModeDict[SettingArray[zone][1]];
+					dirtyZone = true;
+				}
+
+				if(SelectedZone.Speed != SettingArray[zone][2]){
+					device.log(`Setting Zone ${SelectedZone.Name}'s' speed from ${SelectedZone.Speed} to ${SettingArray[zone][2]}`);
+					SelectedZone.Speed = SettingArray[zone][2];
+					dirtyZone = true;
+				}
+
+				if(SelectedZone.Enabled && dirtyZone){
+					SetZone(SelectedZone);
+				}
+			}
+
+			device.pause(3000);
+		}
+	} else {
+		modeSwitch = false;
+	}
 }
 
-export function Shutdown() 
-{
+export function Shutdown() {
 
 }
 
-const ModeDict = 
+const ModeDict =
 {
 	"Static" : 1,
 	"Breathing" : 2,
@@ -224,7 +233,7 @@ function Zone(name, enabled, ledCount, color, mode, index, speed){
 	this.Speed = speed;
 }
 
-let Zoneconfig = [
+const Zoneconfig = [
 	new Zone("12v RGB 1", true, 0, "#000000", 1, 0, 0xFF ),
 	new Zone("12v RGB 2", true, 0, "#000000", 1, 1, 0xFF ),
 	new Zone("5v ARGB 1", true, 0, "#000000", 1, 2, 0xFF ),
@@ -235,24 +244,20 @@ let Zoneconfig = [
 	new Zone("Audio", true, 0, "#000000", 1, 7, 0xFF ),
 ];
 
-let vLedNames = [ "PCH", "IO cover", "PCB", "ARGB Header 1", "ARGB Header 2" ];
-/** @type {LedPosition[]} */
-let vLedPositions = [ [2, 0], [3, 0], [4, 0], [0, 0], [1, 0] ];
+const vLedNames = [ "PCH", "IO cover", "PCB", "ARGB Header 1", "ARGB Header 2" ];
+const vLedPositions = [ [2, 0], [3, 0], [4, 0], [0, 0], [1, 0] ];
 
-function HexToRGB(r, g, b)
-{
+function HexToRGB(r, g, b) {
 	return "#" + HexToRGBHelper(r) + HexToRGBHelper(g) + HexToRGBHelper(b);
 }
 
-function HexToRGBHelper(hex)
-{
-	let value = hex.toString(16);
+function HexToRGBHelper(hex) {
+	const value = hex.toString(16);
 
 	return value.length == 1 ? "0" + value : value;
 }
 
-function ReadConfig(ConfigId)
-{
+function ReadConfig(ConfigId) {
 	let packet = [0x00, 0x14, 0x00, ConfigId];
 	device.write(packet, 65);
 	packet = device.read(packet, 64);
@@ -260,8 +265,7 @@ function ReadConfig(ConfigId)
 	return packet;
 }
 
-function ReadZone(ZoneId)
-{
+function ReadZone(ZoneId) {
 	let packet = [0x00, 0x11, 0x00, ZoneId];
 	device.write(packet, 65);
 	packet = device.read(packet, 64);
@@ -269,550 +273,575 @@ function ReadZone(ZoneId)
 	return packet.slice(5, 10);
 }
 
-function SetZone(zone)
-{
-	let colors = hexToRgb(zone.Color);
-	let packet = [0x00, 0x10, 0x00, zone.index, zone.Mode, colors[0], colors[1], colors[2], 0xFF - zone.Speed, 0xFF, 0x00];
+function SetZone(zone) {
+	const colors = hexToRgb(zone.Color);
+	const packet = [0x00, 0x10, 0x00, zone.index, zone.Mode, colors[0], colors[1], colors[2], 0xFF - zone.Speed, 0xFF, 0x00];
 	device.write(packet, 65);
 	device.read(packet, 64);
 }
 
 //ARGB SECTION ----------------------------------------------------------------------
 
-function ClearBuffer()
-{
-    
-    while(device.getLastReadSize() > 0)
-    {
-        device.read([0x00],64);
-    }
+function ClearBuffer() {
+	while(device.getLastReadSize() > 0) {
+		device.read([0x00], 64);
+	}
 }
 
 const vPCHLEDs =
 [
-    "Razer Chroma Logo LED 1",
-    "Razer Chroma Logo LED 2",
-    "Razer Chroma Logo LED 3",
-    "Razer Chroma Logo LED 4",
-    "Razer Chroma Logo LED 5",
-    "Razer Chroma Logo LED 6",
-    "Razer Chroma Logo LED 7",
-    "Razer Chroma Logo LED 8",
-    "Razer Chroma Logo LED 9",
-    "Razer Chroma Logo LED 10",
-    "Razer Chroma Logo LED 11",
-    "Razer Chroma Logo LED 12",
-    "Razer Chroma Logo LED 13",
-    "Razer Chroma Logo LED 14",
-    "Razer Chroma Logo LED 15",
-    "Razer Chroma Logo LED 16",
-    "Razer Chroma Logo LED 17",
-    "Razer Chroma Logo LED 18",
-    "Razer Chroma Logo LED 19",
-    "Chroma Logo Strip Right LED 1",
-    "Chroma Logo Strip Right LED 2",
-    "Chroma Logo Strip Right LED 3",
-    "Chroma Logo Strip Right LED 4",
-    "Chroma Logo Strip Bottom LED 1",
-    "Chroma Logo Strip Bottom LED 2",
-    "Chroma Logo Strip Bottom LED 3",
-    "Chroma Logo Strip Bottom LED 4",
-    "Chroma Logo Strip Bottom LED 5",
-    "Chroma Logo Strip Left LED 1",
-    "Chroma Logo Strip Left LED 2",
-    "Chroma Logo Strip Left LED 3",
-    "Chroma Logo Strip Left LED 4",
-    "Chroma Logo Strip Left LED 5",
-    "Chroma Logo Strip Left LED 6",
-    "Chroma Logo Strip Left LED 7",
-    "Chroma Logo Strip Left LED 8",
-    "Chroma Logo Strip Top Left LED 1",
-    "Chroma Logo Strip Top Left LED 2",
-    "Chroma Logo Strip Top Left LED 3",
-    "Chroma Logo Strip Top Left LED 4",
-    "Chroma Logo Strip Top Left LED 5",
-    "Chroma Logo Strip Top LED 1",
-    "Chroma Logo Strip Top LED 2",
-    "Chroma Logo Strip Top LED 3",
-    "Chroma Logo Strip Top LED 4",
-    "Chroma Logo Strip Top LED 5",
-    "Chroma Logo Strip Top LED 6",
-]
+	"Razer Chroma Logo LED 1",
+	"Razer Chroma Logo LED 2",
+	"Razer Chroma Logo LED 3",
+	"Razer Chroma Logo LED 4",
+	"Razer Chroma Logo LED 5",
+	"Razer Chroma Logo LED 6",
+	"Razer Chroma Logo LED 7",
+	"Razer Chroma Logo LED 8",
+	"Razer Chroma Logo LED 9",
+	"Razer Chroma Logo LED 10",
+	"Razer Chroma Logo LED 11",
+	"Razer Chroma Logo LED 12",
+	"Razer Chroma Logo LED 13",
+	"Razer Chroma Logo LED 14",
+	"Razer Chroma Logo LED 15",
+	"Razer Chroma Logo LED 16",
+	"Razer Chroma Logo LED 17",
+	"Razer Chroma Logo LED 18",
+	"Razer Chroma Logo LED 19",
+	"Chroma Logo Strip Right LED 1",
+	"Chroma Logo Strip Right LED 2",
+	"Chroma Logo Strip Right LED 3",
+	"Chroma Logo Strip Right LED 4",
+	"Chroma Logo Strip Bottom LED 1",
+	"Chroma Logo Strip Bottom LED 2",
+	"Chroma Logo Strip Bottom LED 3",
+	"Chroma Logo Strip Bottom LED 4",
+	"Chroma Logo Strip Bottom LED 5",
+	"Chroma Logo Strip Left LED 1",
+	"Chroma Logo Strip Left LED 2",
+	"Chroma Logo Strip Left LED 3",
+	"Chroma Logo Strip Left LED 4",
+	"Chroma Logo Strip Left LED 5",
+	"Chroma Logo Strip Left LED 6",
+	"Chroma Logo Strip Left LED 7",
+	"Chroma Logo Strip Left LED 8",
+	"Chroma Logo Strip Top Left LED 1",
+	"Chroma Logo Strip Top Left LED 2",
+	"Chroma Logo Strip Top Left LED 3",
+	"Chroma Logo Strip Top Left LED 4",
+	"Chroma Logo Strip Top Left LED 5",
+	"Chroma Logo Strip Top LED 1",
+	"Chroma Logo Strip Top LED 2",
+	"Chroma Logo Strip Top LED 3",
+	"Chroma Logo Strip Top LED 4",
+	"Chroma Logo Strip Top LED 5",
+	"Chroma Logo Strip Top LED 6",
+];
 const vIOShieldLEDs =
 [
-    "IOShield LED 1",
-    "IOShield LED 2",
-    "IOShield LED 3",
-    "IOShield LED 4",
-    "IOShield LED 5",
-    "IOShield LED 6",
-    "IOShield LED 7",
-]
+	"IOShield LED 1",
+	"IOShield LED 2",
+	"IOShield LED 3",
+	"IOShield LED 4",
+	"IOShield LED 5",
+	"IOShield LED 6",
+	"IOShield LED 7",
+];
 
 const vPCBLEDs =
 [
-    "Underglow LED 1",
-    "Underglow LED 2",
-    "Underglow LED 3",
-    "Underglow LED 4",
-    "Underglow LED 5",
-    "Underglow LED 6",
-    "Underglow LED 7",
-    "Underglow LED 8",
-    "Underglow LED 9",
-    "Underglow LED 10",
-    "UnderGlow LED 11",
-    "UnderGlow LED 12",
-    "UnderGlow LED 13",
-    "UnderGlow LED 14",
-    "UnderGlow LED 15",
-]
+	"Underglow LED 1",
+	"Underglow LED 2",
+	"Underglow LED 3",
+	"Underglow LED 4",
+	"Underglow LED 5",
+	"Underglow LED 6",
+	"Underglow LED 7",
+	"Underglow LED 8",
+	"Underglow LED 9",
+	"Underglow LED 10",
+	"UnderGlow LED 11",
+	"UnderGlow LED 12",
+	"UnderGlow LED 13",
+	"UnderGlow LED 14",
+	"UnderGlow LED 15",
+];
 
 const vPCHPositions =
 [
-    [3,1],
-    [3,2],
-    [3,1],
-    [3,1],
-    [4,1],
-    [4,1],
-    [4,1],
-    [3,1],
-    [3,1],
-    [3,1],
-    [2,0],
-    [2,0],
-    [2,0],
-    [2,0],
-    [2,0],
-    [2,0],
-    [2,0],
-    [2,0],
-    [2,0],
-    [4,0],
-    [4,1],
-    [4,2],
-    [3,2],
-    [3,2],
-    [2,2],
-    [2,2],
-    [1,2],
-    [1,2],
-    [1,1],
-    [1,1],
-    [1,0],
-    [1,0],
-    [1,0],
-    [0,0],
-    [0,0],
-    [0,0],
-    [0,0],
-    [1,0],
-    [1,0],
-    [1,1],
-    [1,1],
-    [2,2],
-    [2,2],
-    [2,2],
-    [3,2],
-    [3,2],
-    [3,2],
-]
+	[3, 1],
+	[3, 2],
+	[3, 1],
+	[3, 1],
+	[4, 1],
+	[4, 1],
+	[4, 1],
+	[3, 1],
+	[3, 1],
+	[3, 1],
+	[2, 0],
+	[2, 0],
+	[2, 0],
+	[2, 0],
+	[2, 0],
+	[2, 0],
+	[2, 0],
+	[2, 0],
+	[2, 0],
+	[4, 0],
+	[4, 1],
+	[4, 2],
+	[3, 2],
+	[3, 2],
+	[2, 2],
+	[2, 2],
+	[1, 2],
+	[1, 2],
+	[1, 1],
+	[1, 1],
+	[1, 0],
+	[1, 0],
+	[1, 0],
+	[0, 0],
+	[0, 0],
+	[0, 0],
+	[0, 0],
+	[1, 0],
+	[1, 0],
+	[1, 1],
+	[1, 1],
+	[2, 2],
+	[2, 2],
+	[2, 2],
+	[3, 2],
+	[3, 2],
+	[3, 2],
+];
 
 const vIOShieldPositions =
 [
-    [0,1], [0,2], [1,2], [2,2], [2,3], [2,4], [2,5],
-]
+	[0, 1], [0, 2], [1, 2], [2, 2], [2, 3], [2, 4], [2, 5],
+];
 
 const vPCBPositions =
 [
-    [0,1], [0,2], [0,3], [0,3], [0,4], [0,5], [0,6], [0,6], [0,7], [0,8], [0,9], [0,9], [0,10], [0,11], [0,11]
-]
+	[0, 1], [0, 2], [0, 3], [0, 3], [0, 4], [0, 5], [0, 6], [0, 6], [0, 7], [0, 8], [0, 9], [0, 9], [0, 10], [0, 11], [0, 11]
+];
 
-const vAudioLEDs =
-[
-    "AudioLED1"
-]
+let modeSwitch = false;
 
-export function onRGBHeadersChanged()
-{
-    CreateRGBHeaders();
+export function onARGBModeChanged() {
+	device.pause(1000);
+	modeSwitch = true;
+	Initialize();
 }
 
-export function onARGBModeChanged()
-{
-    Initialize();
-}
-
-const DeviceMaxLedLimit = 160;
+const DeviceMaxLedLimit = 240;
 
 //Channel Name, Led Limit
-let ChannelArray = 
+const ChannelArray =
 [
 	["Channel 1", 80],
 	["Channel 2", 80],
+	["Channel 3", 80]
 ];
 
-let HeaderArray = 
+const HeaderArray =
 [
 	"12v RGB Header 1",
-	"12v RGB Header 2",
+	"12v RGB Header 2"
 ];
 
-let RGBHeader1Exists = 0;
-let RGBHeader2Exists = 0;
-let Header1Length = 0;
-let Header2Length = 0;
-let PCHLength = 0;
-let IOShieldLength = 0;
-let UnderglowLength = 0;
-let AudioLength = 0;
-
-function LEDConfig()
+const ConfigurationOverrides = //Leave this here for now. Just in case
 {
-    let LEDCounts = ReadConfig(2);
-    RGBHeader1Exists = LEDCounts[5];
-    RGBHeader2Exists = LEDCounts[6];
-    Header1Length = LEDCounts[7];
-    Header2Length = LEDCounts[8];
-    PCHLength = LEDCounts[9];
-    device.log("PCH Length:" + PCHLength);
-    if(PCHLength == 30)
-    {
-        PCHLength = 0; //Fallback for poor detection
-    }
-    IOShieldLength = LEDCounts[10];
-    device.log("IOShield Length: " + IOShieldLength);
-    if(IOShieldLength == 30)
-    {
-        IOShieldLength = 0; //Fallback for poor detection
-    }
-    UnderglowLength = LEDCounts[11];
-    device.log("PCB Length: " + UnderglowLength);
-    if(UnderglowLength == 30)
-    {
-        UnderglowLength = 0; //Fallback for poor detection
-    }
-    AudioLength = LEDCounts[12];
+	"B660M-C":
+	{
+		RGBHeader1Exists : 1,
+		RGBHeader2Exists : 0,
+		Header1Length : 80,
+		Header2Length : 80,
+		Header3Length : 80,
+		PCHLength : 0, //30 WHICH IS CORRECT FOR EMPTY
+		IOShieldLength : 0, //30 WHICH IS CORRECT FOR EMPTY
+		PCBLength : 0, //5
+	},
+	"Z690 Taichi Razer Edition": //This is still wrong. I need more testing, but my board committed seppuku.
+	{
+		RGBHeader1Exists : 1,
+		RGBHeader2Exists : 1,
+		Header1Length : 80,
+		Header2Length : 80,
+		Header3Length : 80,
+		PCHLength : 46,
+		IOShieldLength : 6,
+		PCBLength : 12,
+	},
+	"Z690 PG Velocita":
+	{
+		RGBHeader1Exists : 1,
+		RGBHeader2Exists : 0,
+		Header1Length : 80,
+		Header2Length : 80,
+		Header3Length : 80,
+		PCHLength : 6, //6
+		IOShieldLength : 7, //7
+		PCBLength : 0, //13
+	},
+	"Z790-C":
+	{
+		RGBHeader1Exists : 1,
+		RGBHeader2Exists : 0,
+		Header1Length : 80,
+		Header2Length : 80,
+		Header3Length : 80,
+		PCHLength : 0, //5
+		IOShieldLength : 0, //7
+		PCBLength : 0, //13
+	},
+	"Z790 Pro RS":
+	{
+		RGBHeader1Exists : 1,
+		RGBHeader2Exists : 0,
+		Header1Length : 80,
+		Header2Length : 80,
+		Header3Length : 80,
+		PCHLength : 16, //16
+		IOShieldLength : 0, //4
+		PCBLength : 0, //13
+	},
+	"X670E PG Lightning":
+	{
+		RGBHeader1Exists : 1,
+		RGBHeader2Exists : 0,
+		Header1Length : 80,
+		Header2Length : 80,
+		Header3Length : 80,
+		PCHLength : 0,
+		IOShieldLength : 0,
+		PCBLength : 0,
+	},
+	"X670E Steel Legend":
+	{
+		RGBHeader1Exists : 1,
+		RGBHeader2Exists : 0,
+		Header1Length : 80,
+		Header2Length : 80,
+		Header3Length : 80,
+		PCHLength : 6,
+		IOShieldLength : 0, //Detected as 7.
+		PCBLength : 15,
+	},
+	"X670E Taichi":
+	{
+		RGBHeader1Exists : 1,
+		RGBHeader2Exists : 0,
+		Header1Length : 80,
+		Header2Length : 80,
+		Header3Length : 80,
+		PCHLength : 5,
+		IOShieldLength : 0, //Detected as 7.
+		PCBLength : 6,
+	}
+};
+
+const deviceZones =
+{
+	RGBHeader1  : 0,
+	RGBHeader2  : 0,
+	ARGBHeader1 : 0,
+	ARGBHeader2 : 0,
+	PCH			: 0,
+	IOShield	: 0,
+	PCB			: 0,
+	ARGBHeader3 : 0
+};
+
+function LEDConfig() {
+	const zoneLEDCounts = ReadConfig(2);
+	device.log(zoneLEDCounts);
+
+
+	device.write([0x00, 0x14, 0x00, 0x01], 65);
+
+	const returnPacket = device.read([0x00], 65);
+	const comparisonValue = returnPacket[5];
+
+	for(let zone = 0; zone < 8; zone++) {
+		const disabledZone = isZoneDisabled(comparisonValue, zone);
+
+		if(!disabledZone) {
+			if(zoneLEDCounts[5 + zone] !== 30) {
+				deviceZones[zone] = zoneLEDCounts[5 + zone];
+			}
+		}
+	}
 }
 
-function SetupChannels()
-{
+function isZoneDisabled(value, bitIndex){
+	return !((value >> bitIndex) & 1);
+}
+
+function SetupChannels(deviceChannels) {
 	device.SetLedLimit(DeviceMaxLedLimit);
 
-	for(let i = 0; i < ChannelArray.length; i++){
+	for(let i = 0; i < device.getChannelNames().length; i++){
+		device.removeChannel(ChannelArray[i][0], ChannelArray[i][1]);
+	}
+
+	for(let i = 0; i < deviceChannels; i++){
 		device.addChannel(ChannelArray[i][0], ChannelArray[i][1]);
 	}
 }
 
 let RGBHeaders = 0;
+let ARGBHeaders = 0;
 
-function CreateRGBHeaders()
-{
-    RGBHeaders = 0;
-    for(let header = 0; header < 2;header++)
-    {
+function CreateARGBHeaders() {
+	ARGBHeaders = 0; //Let's not have 20 ARGB Headers lol.
+
+	if(deviceZones[2] > 1) {
+		ARGBHeaders++;
+	}
+
+	if(deviceZones[3] > 1) {
+		ARGBHeaders++;
+	}
+
+	if(deviceZones[7] > 30) {
+		ARGBHeaders++;
+	}
+
+	device.log("Device has " + ARGBHeaders + " ARGB headers.");
+	SetupChannels(ARGBHeaders);
+}
+
+function CreateRGBHeaders() {
+	RGBHeaders = 0;
+
+	for(let header = 0; header < 2;header++) {
 		device.removeSubdevice(HeaderArray[header]);
 	}
 
-    if(RGBHeader1Exists == 1)
-    {
+	if(deviceZones[0] === 1) {
 		device.createSubdevice(HeaderArray[0]);
 
 		device.setSubdeviceName(HeaderArray[0], `${"Asrock RGB Controller"} - ${HeaderArray[0]}`);
 
 		device.setSubdeviceSize(HeaderArray[0], 3, 3);
-        RGBHeaders = 1;
-    }
-    if(RGBHeader2Exists == 1)
-    {
+		RGBHeaders = 1;
+	}
+
+	if(deviceZones[1] === 1) {
 		device.createSubdevice(HeaderArray[1]);
 
 		device.setSubdeviceName(HeaderArray[1], `${"Asrock RGB Controller"} - ${HeaderArray[1]}`);
 
 		device.setSubdeviceSize(HeaderArray[1], 3, 3);
-        RGBHeaders = 2;
-    }
+		RGBHeaders = 2;
+	}
 
 }
 
-function CreatePCHZone()
-{
+function CreatePCHZone() {
 
-    let PCHLEDs = vPCHLEDs.slice(0,PCHLength);
-    let PCHPositions = vPCHPositions.slice(0,PCHLength);
-    if(PCHLength > 0)
-    {
-    device.createSubdevice("PCH");
+	const PCHLEDs = vPCHLEDs.slice(0, deviceZones[4]);
+	const PCHPositions = vPCHPositions.slice(0, deviceZones[4]);
 
-    device.setSubdeviceName("PCH", `${"Asrock RGB Controller"} - ${"PCH"}`);
+	if(deviceZones[4] > 0) {
+		device.createSubdevice("PCH");
 
-    device.setSubdeviceSize("PCH", 5, 5);
+		device.setSubdeviceName("PCH", `${"Asrock RGB Controller"} - ${"PCH"}`);
 
-    device.setSubdeviceLeds("PCH",PCHLEDs, PCHPositions);
-    }
+		device.setSubdeviceSize("PCH", 5, 5);
+
+		device.setSubdeviceLeds("PCH", PCHLEDs, PCHPositions);
+	}
 }
 
-function CreateIOShieldZone()
-{
-    let IOShieldLEDs = vIOShieldLEDs.slice(0,IOShieldLength);
-    let IOShieldPositions = vIOShieldPositions.slice(0,IOShieldLength);
+function CreateIOShieldZone() {
+	const IOShieldLEDs = vIOShieldLEDs.slice(0, deviceZones[5]);
+	const IOShieldPositions = vIOShieldPositions.slice(0, deviceZones[5]);
 
-    if(IOShieldLength > 0)
-    {
-    device.createSubdevice("IO Shield");
+	if(deviceZones[5] > 0) {
+		device.createSubdevice("IO Shield");
 
-    device.setSubdeviceName("IO Shield", `${"Asrock RGB Controller"} - ${"IO Shield"}`);
+		device.setSubdeviceName("IO Shield", `${"Asrock RGB Controller"} - ${"IO Shield"}`);
 
-    device.setSubdeviceSize("IO Shield", 6, 6);
-    
-    device.setSubdeviceLeds("IO Shield", IOShieldLEDs, IOShieldPositions)
-    }
+		device.setSubdeviceSize("IO Shield", 6, 6);
+
+		device.setSubdeviceLeds("IO Shield", IOShieldLEDs, IOShieldPositions);
+	}
 }
 
-function CreatePCBZone()
-{
-    let PCBLEDs = vPCBLEDs.slice(0,UnderglowLength);
-    let PCBPositions = vPCBPositions.slice(0,UnderglowLength);
-    if(UnderglowLength > 0)
-    {
-    device.createSubdevice("PCB");
+function CreatePCBZone() {
+	const PCBLEDs = vPCBLEDs.slice(0, deviceZones[6]);
+	const PCBPositions = vPCBPositions.slice(0, deviceZones[6]);
 
-    device.setSubdeviceName("PCB", `${"Asrock RGB Controller"} - ${"PCB"}`);
+	if(deviceZones[6] > 0) {
+		device.createSubdevice("PCB");
 
-    device.setSubdeviceSize("PCB", 2, 13);
+		device.setSubdeviceName("PCB", `${"Asrock RGB Controller"} - ${"PCB"}`);
 
-    device.setSubdeviceLeds("PCB", PCBLEDs, PCBPositions);
-    }
+		device.setSubdeviceSize("PCB", 2, 13);
+
+		device.setSubdeviceLeds("PCB", PCBLEDs, PCBPositions);
+	}
 }
 
-function grabRGBHeaderData(shutdown = false)
-{
-    let RGBHeaderData = new Array(6);
-    RGBHeaderData.fill(0);
+function grabRGBHeaderData(shutdown = false) {
+	const RGBHeaderData = [];
 
-    for(let iIdx = 0; iIdx < RGBHeaders; iIdx++)
-    {
-		var col;
+	for(let iIdx = 0; iIdx < RGBHeaders; iIdx++) {
+		let col;
 
-		if(shutdown)
-        {
+		if(shutdown) {
 			col = hexToRgb(shutdownColor);
-		}
-        else if (LightingMode === "Forced") 
-        {
+		} else if (LightingMode === "Forced") {
 			col = hexToRgb(forcedColor);
-		}
-        else
-        {
+		} else {
 			col = device.subdeviceColor(HeaderArray[iIdx], 1, 1);
 		}
-		let iLedIdx = (iIdx*3);
-		RGBHeaderData[iLedIdx] = col[0];
-		RGBHeaderData[iLedIdx+1] = col[1];
-		RGBHeaderData[iLedIdx+2] = col[2];
+		const iLedIdx = (iIdx*3);
+		RGBHeaderData[iLedIdx] = col[RGBConfigs[Headerconfig][0]];
+		RGBHeaderData[iLedIdx+1] = col[RGBConfigs[Headerconfig][1]];
+		RGBHeaderData[iLedIdx+2] = col[RGBConfigs[Headerconfig][2]];
 	}
-    return RGBHeaderData;
+
+	return RGBHeaderData;
 }
 
-function grabMoboData(shutdown = false)
-{
-    let MoboRGBData = new Array(200);
-    MoboRGBData.fill(0);
-    let PCHData = [];
-    let IOShieldData = [];
-    let PCBData = [];
-    for(let iIdx = 0; iIdx < PCHLength; iIdx++)
-    {
-        let iPxX = vPCHPositions[iIdx][0];
-        let iPxY = vPCHPositions[iIdx][1];
-		var col;
+function grabMoboData(shutdown = false) {
+	const MoboRGBData = [];
 
-		if(shutdown)
-        {
+	const PCHData = [];
+	const IOShieldData = [];
+	const PCBData = [];
+
+	for(let iIdx = 0; iIdx < deviceZones[4]; iIdx++) {
+		const iPxX = vPCHPositions[iIdx][0];
+		const iPxY = vPCHPositions[iIdx][1];
+		let col;
+
+		if(shutdown) {
 			col = hexToRgb(shutdownColor);
-		}
-        else if (LightingMode === "Forced") 
-        {
+		} else if (LightingMode === "Forced") {
 			col = hexToRgb(forcedColor);
-		}
-        else
-        {
+		} else {
 			col = device.subdeviceColor("PCH", iPxX, iPxY);
 		}
-		let iLedIdx = (iIdx*3);
-		PCHData[iLedIdx] = col[0];
-		PCHData[iLedIdx+1] = col[1];
-		PCHData[iLedIdx+2] = col[2];
+		const iLedIdx = (iIdx*3);
+		PCHData[iLedIdx] = col[RGBConfigs[Mainboardconfig][0]];;
+		PCHData[iLedIdx+1] = col[RGBConfigs[Mainboardconfig][1]];;
+		PCHData[iLedIdx+2] = col[RGBConfigs[Mainboardconfig][2]];;
 	}
 
-    for(let iIdx = 0; iIdx < IOShieldLength; iIdx++)
-    {
-        let iPxX = vIOShieldPositions[iIdx][0];
-        let iPxY = vIOShieldPositions[iIdx][1];
-		var col;
+	for(let iIdx = 0; iIdx < deviceZones[5]; iIdx++) {
+		const iPxX = vIOShieldPositions[iIdx][0];
+		const iPxY = vIOShieldPositions[iIdx][1];
+		let col;
 
-		if(shutdown)
-        {
+		if(shutdown) {
 			col = hexToRgb(shutdownColor);
-		}
-        else if (LightingMode === "Forced") 
-        {
+		} else if (LightingMode === "Forced") {
 			col = hexToRgb(forcedColor);
-		}
-        else
-        {
+		} else {
 			col = device.subdeviceColor("IO Shield", iPxX, iPxY);
 		}
-		let iLedIdx = (iIdx*3);
-		IOShieldData[iLedIdx] = col[0];
-		IOShieldData[iLedIdx+1] = col[1];
-		IOShieldData[iLedIdx+2] = col[2];
+		const iLedIdx = (iIdx*3);
+		IOShieldData[iLedIdx] = col[RGBConfigs[Mainboardconfig][0]];;
+		IOShieldData[iLedIdx+1] = col[RGBConfigs[Mainboardconfig][1]];;
+		IOShieldData[iLedIdx+2] = col[RGBConfigs[Mainboardconfig][2]];;
 	}
 
-    for(let iIdx = 0; iIdx < UnderglowLength; iIdx++)
-    {
-        let iPxX = vPCBPositions[iIdx][0];
-        let iPxY = vPCBPositions[iIdx][1];
-		var col;
+	for(let iIdx = 0; iIdx < deviceZones[6]; iIdx++) {
+		const iPxX = vPCBPositions[iIdx][0];
+		const iPxY = vPCBPositions[iIdx][1];
+		let col;
 
-		if(shutdown)
-        {
+		if(shutdown) {
 			col = hexToRgb(shutdownColor);
-		}
-        else if (LightingMode === "Forced") 
-        {
+		} else if (LightingMode === "Forced") {
 			col = hexToRgb(forcedColor);
-		}
-        else
-        {
+		} else {
 			col = device.subdeviceColor("PCB", iPxX, iPxY);
 		}
-		let iLedIdx = (iIdx*3);
-		PCBData[iLedIdx] = col[0];
-		PCBData[iLedIdx+1] = col[1];
-		PCBData[iLedIdx+2] = col[2];
+		const iLedIdx = (iIdx*3);
+		PCBData[iLedIdx] = col[RGBConfigs[Mainboardconfig][0]];;
+		PCBData[iLedIdx+1] = col[RGBConfigs[Mainboardconfig][1]];;
+		PCBData[iLedIdx+2] = col[RGBConfigs[Mainboardconfig][2]];;
 	}
-    MoboRGBData = PCHData.concat(IOShieldData.concat(PCBData));
-    return MoboRGBData.concat(new Array(200 - MoboRGBData.length).fill(0));
+
+	MoboRGBData.push(...PCHData);
+	MoboRGBData.push(...IOShieldData);
+	MoboRGBData.push(...PCBData);
+
+	return MoboRGBData;
 }
 
-function grabRGBData(Channel)
-{
-    let ChannelLedCount = device.channel(ChannelArray[Channel][0]).ledCount;
-	let componentChannel = device.channel(ChannelArray[Channel][0]);
-    let RGBData = [];
-	if(LightingMode === "Forced")
-    {
-		RGBData = device.createColorArray(forcedColor, ChannelLedCount, "Inline");
+function grabRGBData(Channel) {
+	let ChannelLedCount = device.channel(ChannelArray[Channel][0]).LedCount();
+	const componentChannel = device.channel(ChannelArray[Channel][0]);
+	let RGBData = [];
 
-	}
-    else if(componentChannel.shouldPulseColors())
-    {
-		ChannelLedCount = Header1Length;
+	if(LightingMode === "Forced") {
+		RGBData = device.createColorArray(forcedColor, ChannelLedCount, "Inline", RGBconfig);
 
-		let pulseColor = device.getChannelPulseColor(ChannelArray[Channel][0], ChannelLedCount);
-		RGBData = device.createColorArray(pulseColor, ChannelLedCount, "Inline");
+	} else if(componentChannel.shouldPulseColors()) {
+		ChannelLedCount = 80;
 
-	}
-    else
-    {
-		RGBData = device.channel(ChannelArray[Channel][0]).getColors("Inline");
+		const pulseColor = device.getChannelPulseColor(ChannelArray[Channel][0], ChannelLedCount);
+		RGBData = device.createColorArray(pulseColor, ChannelLedCount, "Inline", RGBconfig);
+
+	} else {
+		RGBData = device.channel(ChannelArray[Channel][0]).getColors("Inline", RGBconfig);
 	}
 
-    return RGBData.concat(new Array(240 - RGBData.length).fill(0));
+	return RGBData.concat(new Array(240 - RGBData.length).fill(0));
 }
 
-function SendRGB() 
-{
-    let MoboRGBData = grabMoboData();
-    let Header1RGBData = grabRGBData(0);
-    let Header2RGBData = grabRGBData(1);
-    let RGBHeaderData = grabRGBHeaderData();
+function concatRGBData() {
+	const RGBData = [];
+	const MoboRGBData = grabMoboData();
+	const RGBHeaderData = grabRGBHeaderData();
+	const Header1RGBData = grabRGBData(0);
+	const Header2RGBData = grabRGBData(1);
 
-    let HeaderRGBData = Header1RGBData.concat(Header2RGBData);
+	//Properly Order Everything. RGBHeaders, Headers 1 and 2, Mobo, Header 3.
 
-	let packet = [];
-    packet[0] = 0x00;
-	packet[1] = 0x10;
-	packet[2] = 0x00;
-	packet[3] = 0xff;
-	packet[4] = 0xE3;
-    packet[5] = 0x00;
-    packet[6] = 0x00;
-    packet[7] = 0xdf;
-    packet[8] = 0x00;
+	RGBData.push(...RGBHeaderData);
+	RGBData.push(...Header1RGBData);
+	RGBData.push(...Header2RGBData);
+	RGBData.push(...MoboRGBData);
 
-    packet = packet.concat(RGBHeaderData.splice(0,6));
-    packet = packet.concat(HeaderRGBData.splice(0,48));
+	if(ARGBHeaders > 2) {
+		const header3RGBData = grabRGBData(2);
+		RGBData.push(...header3RGBData);
+	}
 
-	packet[64] = 0x65;
+	return RGBData;
+}
 
-	device.write(packet, 65);
+function SendRGB() {
+	// packet[64] = 0xf0; //this is seemingly arbitrary. No idea what it does, did not change depending on the data in the packet. Every packet had it. B550 had 0x64 or 0x65, and the Z690 was 0xf0.
+	const RGBData = concatRGBData();
 
-    for(var packets = 0; packets < 7; packets++)
-    {
-        let packet = [];
-        packet[1] = 0x10;
-        packet[2] = 0x00;
-        packet[3] = 0xff;
-        packet[4] = 0xE4;
-        packet = packet.concat(HeaderRGBData.splice(0,57));
-        packet[64] = 0x65;
+	//const initpacket = [0x00, 0x10, 0x00, 0xff, 0xE3, 0x00, 0x00, (TotalDeviceLEDs & 0xff), (TotalDeviceLEDs >> 8 & 0xff)];
+	const initpacket = [0x00, 0x10, 0x00, 0xff, 0xE3, 0x00, 0x00, 0x2f, 0x01];
+	initpacket.push(...RGBData.splice(0, 54));
+	device.write(initpacket, 65);
 
-        device.write(packet,65);
-    }
-
-    packet = [];
-    packet[0] = 0x00;
-	packet[1] = 0x10;
-	packet[2] = 0x00;
-	packet[3] = 0xff;
-	packet[4] = 0xE4;
-    packet = packet.concat(HeaderRGBData.splice(0,33));
-    packet = packet.concat(MoboRGBData.splice(0,24));
-
-	packet[64] = 0x65;
-    device.write(packet,65);
-
-
-    packet = [];
-    packet[0] = 0x00;
-    packet[1] = 0x10;
-    packet[2] = 0x00;
-    packet[3] = 0xff;
-    packet[4] = 0xE4;
-    packet = packet.concat(MoboRGBData.splice(0,57));
-    packet[64] = 0x65;
-
-    device.write(packet,65);
-
-    packet = [];
-    packet[0] = 0x00;
-    packet[1] = 0x10;
-    packet[2] = 0x00;
-    packet[3] = 0xff;
-    packet[4] = 0xE4;
-    packet = packet.concat(MoboRGBData.splice(0,57));
-    packet[64] = 0x65;
-
-    device.write(packet,65);
-
-    packet = [];
-    packet[0] = 0x00;
-    packet[1] = 0x10;
-    packet[2] = 0x00;
-    packet[3] = 0xff;
-    packet[4] = 0xE4;
-    packet = packet.concat(MoboRGBData.splice(0,45));
-    packet[64] = 0x65;
-
-    device.write(packet,65);
+	for(let packetsSent = 0; packetsSent < 15; packetsSent++) //I'm still not a fan of hardcoding things, but this works on all of the boards.
+	{
+		const packet = [0x00, 0x10, 0x00, 0xff, 0xE4];
+		packet.push(...RGBData.splice(0, 57));
+		device.write(packet, 65);
+	}
 }
 
 function hexToRgb(hex) {
-	let result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
-	let colors = [];
+	const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+	const colors = [];
 	colors[0] = parseInt(result[1], 16);
 	colors[1] = parseInt(result[2], 16);
 	colors[2] = parseInt(result[3], 16);
@@ -820,8 +849,7 @@ function hexToRgb(hex) {
 	return colors;
 }
 
-export function Validate(endpoint) 
-{
+export function Validate(endpoint) {
 	return endpoint.interface === -1;
 
 }

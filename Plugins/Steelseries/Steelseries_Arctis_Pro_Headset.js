@@ -22,15 +22,15 @@ export function ControllableParameters(){
 }
 
 
-let vLedNames = [
+const vLedNames = [
 	"Left Can", "Right Can", "Mic Led", "Muted Mic Led"
 ];
 
-let vLedPositions = [
+const vLedPositions = [
 	[0, 0], [2, 0], [2, 0], [1, 1]
 ];
 
-let vKeymap = [
+const vKeymap = [
 	0, 2, 3, 1
 ];
 
@@ -47,8 +47,8 @@ export function LedPositions() {
 }
 
 function sendPacketString(string, size){
-	let packet= [];
-	let data = string.split(' ');
+	const packet= [];
+	const data = string.split(' ');
 
 	for(let i = 0; i < data.length; i++){
 		packet[parseInt(i, 16)] = parseInt(data[i], 16);//.toString(16)
@@ -58,8 +58,8 @@ function sendPacketString(string, size){
 }
 
 function sendReportString(string, size){
-	let packet= [];
-	let data = string.split(' ');
+	const packet= [];
+	const data = string.split(' ');
 
 	for(let i = 0; i < data.length; i++){
 		packet[parseInt(i, 16)] =parseInt(data[i], 16);//.toString(16)
@@ -80,8 +80,8 @@ export function Validate(endpoint) {
 }
 
 function hexToRgb(hex) {
-	let result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
-	let colors = [];
+	const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+	const colors = [];
 	colors[0] = parseInt(result[1], 16);
 	colors[1] = parseInt(result[2], 16);
 	colors[2] = parseInt(result[3], 16);
@@ -89,7 +89,7 @@ function hexToRgb(hex) {
 	return colors;
 }
 
-let NoiseCancellingDict = {
+const NoiseCancellingDict = {
 	"None": "FF 7F",
 	"Low" : "FF 4F",
 	"Medium":"00 20",
@@ -117,7 +117,7 @@ export function Render() {
 // 0 is left, 1 is right.
 function sendColors(shutdown = false){
 	for (let index = 0;index < vKeymap.length; index++) {
-		let packet = [];
+		const packet = [];
 		sendPacketString("06 81 43 01 22", 37);
 		//sendPacketString("06 8A 42 00 20 40",37)
 		sendPacketString("06 81 43 01 23", 37);
@@ -132,8 +132,8 @@ function sendColors(shutdown = false){
 		packet[0x06]   = 0x00;
 
 
-		let iPxX = vLedPositions[index][0];
-		let iPxY = vLedPositions[index][1];
+		const iPxX = vLedPositions[index][0];
+		const iPxY = vLedPositions[index][1];
 		var color;
 
 		if(shutdown){

@@ -10,8 +10,7 @@ shutdownColor:readonly
 LightingMode:readonly
 forcedColor:readonly
 */
-export function ControllableParameters()
-{
+export function ControllableParameters() {
 	return [
 		{"property":"shutdownColor", "group":"lighting", "label":"Shutdown Color", "min":"0", "max":"360", "type":"color", "default":"009bde"},
 		{"property":"LightingMode", "group":"lighting", "label":"Lighting Mode", "type":"combobox", "values":["Canvas", "Forced"], "default":"Canvas"},
@@ -19,61 +18,49 @@ export function ControllableParameters()
 	];
 }
 
-let vKeymap = [ 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19 ];
-let vLedNames = [ "Zone 1", "Zone 2", "Zone 3", "Zone 4", "Zone 5", "Zone 6", "Zone 7", "Zone 8", "Zone 9", "Zone 10", "Zone 11", "Zone 12", "Zone 13", "Zone 14", "Zone 15", "Zone 16", "Zone 17", "Zone 18", "Zone 19", "Zone 20" ];
-let vLedPositions = [ [4, 0], [2, 0], [0, 0], [0, 2], [0, 4], [0, 6], [0, 8], [0, 10], [2, 10], [4, 10], [6, 10], [8, 10], [10, 10], [10, 8], [10, 6], [10, 4], [10, 2], [10, 0], [8, 0], [6, 0] ];
+const vKeymap = [ 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19 ];
+const vLedNames = [ "Zone 1", "Zone 2", "Zone 3", "Zone 4", "Zone 5", "Zone 6", "Zone 7", "Zone 8", "Zone 9", "Zone 10", "Zone 11", "Zone 12", "Zone 13", "Zone 14", "Zone 15", "Zone 16", "Zone 17", "Zone 18", "Zone 19", "Zone 20" ];
+const vLedPositions = [ [4, 0], [2, 0], [0, 0], [0, 2], [0, 4], [0, 6], [0, 8], [0, 10], [2, 10], [4, 10], [6, 10], [8, 10], [10, 10], [10, 8], [10, 6], [10, 4], [10, 2], [10, 0], [8, 0], [6, 0] ];
 
-export function LedNames() 
-{
+export function LedNames() {
 	return vLedNames;
 }
 
-export function LedPositions() 
-{
+export function LedPositions() {
 	return vLedPositions;
 }
 
-export function Initialize() 
-{
+export function Initialize() {
 	device.write([0x41, 0x03], 64);
 	device.write([0x12, 0x22], 64);
 }
 
-export function Render() 
-{
+export function Render() {
 	SendPacket(0, 15);
 	SendPacket(0x0f, 5);
 }
 
-export function Shutdown() 
-{
+export function Shutdown() {
 	SendPacket(0, 15, true);
 	SendPacket(0x0f, 5, true);
 }
 
-function SendPacket(startIdx, count, shutdown = false) 
-{
-	let ColorPacket = [0x00, 0xC0, 0x01];
+function SendPacket(startIdx, count, shutdown = false) {
+	const ColorPacket = [0x00, 0xC0, 0x01];
 	ColorPacket[3] = count;
 
-	for(let iIdx = 0; iIdx < count; iIdx++)
-	{
-		let iLedIdx = (iIdx * 4) + 5;
-		let iKeyIdx = startIdx + iIdx;
-		let iKeyPosX = vLedPositions[iKeyIdx][0];
-		let iKeyPosY = vLedPositions[iKeyIdx][1];
+	for(let iIdx = 0; iIdx < count; iIdx++) {
+		const iLedIdx = (iIdx * 4) + 5;
+		const iKeyIdx = startIdx + iIdx;
+		const iKeyPosX = vLedPositions[iKeyIdx][0];
+		const iKeyPosY = vLedPositions[iKeyIdx][1];
 		var color;
 
-		if(shutdown) 
-		{
+		if(shutdown) {
 			color = hexToRgb(shutdownColor);
-		} 
-		else if (LightingMode === "Forced") 
-		{
+		} else if (LightingMode === "Forced") {
 			color = hexToRgb(forcedColor);
-		} 
-		else 
-		{
+		} else {
 			color = device.color(iKeyPosX, iKeyPosY);
 		}
 
@@ -87,10 +74,9 @@ function SendPacket(startIdx, count, shutdown = false)
 	device.pause(1);
 }
 
-function hexToRgb(hex) 
-{
-	let result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
-	let colors = [];
+function hexToRgb(hex) {
+	const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+	const colors = [];
 	colors[0] = parseInt(result[1], 16);
 	colors[1] = parseInt(result[2], 16);
 	colors[2] = parseInt(result[3], 16);
@@ -98,7 +84,6 @@ function hexToRgb(hex)
 	return colors;
 }
 
-export function Validate(endpoint) 
-{
+export function Validate(endpoint) {
 	return endpoint.interface === 1;
 }

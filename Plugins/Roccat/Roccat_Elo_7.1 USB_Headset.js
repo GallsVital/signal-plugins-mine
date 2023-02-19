@@ -19,9 +19,9 @@ export function ControllableParameters(){
 	];
 }
 
-let vKeys = [ 0 ];
-let vLedNames = [ "Cans" ];
-let vLedPositions = [ [1, 0], ];
+const vKeys = [ 0 ];
+const vLedNames = [ "Cans" ];
+const vLedPositions = [ [1, 0], ];
 
 export function LedNames() {
 	return vLedNames;
@@ -54,13 +54,13 @@ export function Shutdown() {
 }
 
 function sendZone(shutdown = false) {
-	let packet = [];
+	const packet = [];
 	packet[0] = 0xFF;
 	packet[1] = 0x04;
 
 	for(let iIdx = 0; iIdx < vKeys.length; iIdx++) {
-		let iPxX = vLedPositions[iIdx][0];
-		let iPxY = vLedPositions[iIdx][1];
+		const iPxX = vLedPositions[iIdx][0];
+		const iPxY = vLedPositions[iIdx][1];
 		var col;
 
 		if(shutdown){
@@ -81,8 +81,8 @@ function sendZone(shutdown = false) {
 }
 
 function sendPacketString(string, size){
-	let packet= [];
-	let data = string.split(' ');
+	const packet= [];
+	const data = string.split(' ');
 
 	for(let i = 0; i < data.length; i++){
 		packet[parseInt(i, 16)] =parseInt(data[i], 16);//.toString(16)
@@ -92,8 +92,8 @@ function sendPacketString(string, size){
 }
 
 function hexToRgb(hex) {
-	let result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
-	let colors = [];
+	const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+	const colors = [];
 	colors[0] = parseInt(result[1], 16);
 	colors[1] = parseInt(result[2], 16);
 	colors[2] = parseInt(result[3], 16);
