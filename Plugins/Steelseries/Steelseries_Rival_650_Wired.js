@@ -86,7 +86,7 @@ function SendColorPacket(Position, shutdown = false) {
 	const packet = [];
 	const iPxX = Position[0];
 	const iPxY = Position[1];
-	var color;
+	let color;
 
 	if(shutdown){
 		color = hexToRgb(shutdownColor);

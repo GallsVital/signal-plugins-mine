@@ -93,8 +93,8 @@ function Batterylevel() {
 	packet = device.read(packet, 22);
 	device.log(packet);
 
-	let Batt = packet[5];
-	let Batterylevel = BatteryDict[Batt];
+	const Batt = packet[5];
+	const Batterylevel = BatteryDict[Batt];
 	device.log("Battery Percentage is : " + Batterylevel + " %");
 	device.set_endpoint(2, 0x0001, 0xff01); // System I
 }
@@ -102,15 +102,15 @@ function Batterylevel() {
 function sendZone(shutdown = false){
 	device.set_endpoint(2, 0x0001, 0xff01); // System I
 
-	let packet = [];
+	const packet = [];
 	packet[0] = 0x08;
 	packet[1] = 0x09;
 	packet[2] = 0x33;
 	packet[3] = 0x00;
 
 	for(let iIdx = 0; iIdx < vKeys.length; iIdx++) {
-		let iPxX = vLedPositions[iIdx][0];
-		let iPxY = vLedPositions[iIdx][1];
+		const iPxX = vLedPositions[iIdx][0];
+		const iPxY = vLedPositions[iIdx][1];
 		var col;
 
 		if(shutdown){
@@ -132,8 +132,8 @@ function sendZone(shutdown = false){
 }
 
 function sendReportString(string, size) {
-	let packet= [];
-	let data = string.split(' ');
+	const packet= [];
+	const data = string.split(' ');
 
 	for(let i = 0; i < data.length; i++){
 		packet[parseInt(i, 16)] =parseInt(data[i], 16);//.toString(16)
@@ -143,8 +143,8 @@ function sendReportString(string, size) {
 }
 
 function hexToRgb(hex) {
-	let result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
-	let colors = [];
+	const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+	const colors = [];
 	colors[0] = parseInt(result[1], 16);
 	colors[1] = parseInt(result[2], 16);
 	colors[2] = parseInt(result[3], 16);

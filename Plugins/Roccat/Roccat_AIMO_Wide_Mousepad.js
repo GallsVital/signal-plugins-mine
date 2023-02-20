@@ -21,8 +21,8 @@ export function ControllableParameters(){
 }
 
 function hexToRgb(hex) {
-	let result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
-	let colors = [];
+	const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+	const colors = [];
 	colors[0] = parseInt(result[1], 16);
 	colors[1] = parseInt(result[2], 16);
 	colors[2] = parseInt(result[3], 16);
@@ -31,8 +31,8 @@ function hexToRgb(hex) {
 }
 
 function sendPacketString(string, size){
-	let packet= [];
-	let data = string.split(' ');
+	const packet= [];
+	const data = string.split(' ');
 
 	for(let i = 0; i < data.length; i++){
 		packet[parseInt(i, 16)] =parseInt(data[i], 16);//.toString(16)
@@ -55,7 +55,7 @@ export function Shutdown() {
 
 
 // This is an array of key indexes for setting colors in our render array, indexed left to right, row top to bottom.
-let vKeys = [
+const vKeys = [
 
 	0, 1
 ];
@@ -63,10 +63,10 @@ let vKeys = [
 
 // This array must be the same length as vKeys[], and represents the pixel color position in our pixel matrix that we reference.  For example,
 // item at index 3 [9,0] represents the corsair logo, and the render routine will grab its color from [9,0].
-let vKeyPositions = [
+const vKeyPositions = [
 	[0, 0], [1, 0]
 ];
-let vKeyNames = [
+const vKeyNames = [
 	"Left Led", "Right Led",
 ];
 
@@ -79,8 +79,8 @@ export function LedPositions() {
 }
 
 function sendReportString(string, size){
-	let packet= [];
-	let data = string.split(' ');
+	const packet= [];
+	const data = string.split(' ');
 
 	for(let i = 0; i < data.length; i++){
 		packet[i] =parseInt(data[i], 16);//.toString(16)
@@ -97,12 +97,12 @@ function sendColors(shutdown = false){
 
 	device.set_endpoint(3, 0, 1);
 
-	let packet = [];
+	const packet = [];
 	packet[0x00]   = 0x03;
 
 	for(let iIdx = 0; iIdx < vKeys.length; iIdx++) {
-		let iPxX = vKeyPositions[iIdx][0];
-		let iPxY = vKeyPositions[iIdx][1];
+		const iPxX = vKeyPositions[iIdx][0];
+		const iPxY = vKeyPositions[iIdx][1];
 		var col;
 
 		if(shutdown){

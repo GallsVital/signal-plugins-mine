@@ -21,7 +21,7 @@ export function ControllableParameters(){
 	];
 }
 
-let vLedNames = [
+const vLedNames = [
 	"Esc", "F1", "F2", "F3", "F4", "F5", "F6", "F7", "F8", "F9", "F10", "F11", "F12",         "Print Screen", "Scroll Lock", "Pause Break",
 	"`", "1", "2", "3", "4", "5", "6", "7", "8", "9", "0", "-_", "=+", "Backspace",                        "Insert", "Home", "Page Up",       "NumLock", "Num /", "Num *", "Num -",  //21
 	"Tab", "Q", "W", "E", "R", "T", "Y", "U", "I", "O", "P", "[", "]", "\\",                               "Del", "End", "Page Down",         "Num 7", "Num 8", "Num 9", "Num +",    //21
@@ -31,7 +31,7 @@ let vLedNames = [
 	"G1", "G2", "G3", "G4", "G5", "G6", "G7", "G8", "G logo", "Bottom Logo"
 ];
 
-let vKeymap = [
+const vKeymap = [
 
 	0x29,   0x3A, 0x3B, 0x3C, 0x3D,   0x3E, 0x3F, 0x40, 0x41,   0x42, 0x43, 0x44, 0x45,      0x46, 0x47, 0x48,
 	0x35, 0x1E, 0x1F, 0x20, 0x21, 0x22, 0x23, 0x24, 0x25, 0x26, 0x27, 0x2D, 0x2E, 0x2A,      0x49, 0x4A, 0x4B,    0x53, 0x54, 0x55, 0x56,
@@ -43,7 +43,7 @@ let vKeymap = [
 	0xD2, 0x9B, 0x9D, 0x9C, 0x9E, 0xB4, 0xB5, 0xB6, 0xB7, 0xB8
 ];
 
-let vLedPositions = [
+const vLedPositions = [
 
 	[1, 1], [2, 1], [3, 1], [4, 1], [5, 1], [6, 1], [7, 1], [8, 1], [9, 1], [10, 1], [11, 1], [12, 1], [13, 1],           [15, 1], [16, 1], [17, 1],            //20
 	[1, 2], [2, 2], [3, 2], [4, 2], [5, 2], [6, 2], [7, 2], [8, 2], [9, 2], [10, 2], [11, 2], [12, 2], [13, 2], [14, 2],   [15, 2], [16, 2], [17, 2],   [18, 2], [19, 2], [20, 2], [21, 2], //21
@@ -54,10 +54,10 @@ let vLedPositions = [
 
 	[0, 0], [0, 0], [0, 0], [0, 0], [0, 0], [0, 0], [0, 0], [0, 0], [0, 0], [0, 0]
 ];
-let vGkeyPositions = [
+const vGkeyPositions = [
 	[0, 2], [0, 3], [0, 4], [0, 5], [0, 6], [0, 7], [2, 0], [3, 0], [4, 0], [5, 0]
 ];
-let vLogoPositions = [
+const vLogoPositions = [
 	[0, 1], [3, 7]
 ];
 export function LedNames() {
@@ -75,7 +75,7 @@ export function Initialize() {
 
 
 function Apply() {
-	let packet = [];
+	const packet = [];
 
 	packet[0] = 0x11;
 	packet[1] = 0xFF;
@@ -87,7 +87,7 @@ function Apply() {
 }
 
 function SendGkeys(shutdown = false) {
-	let packet = [];
+	const packet = [];
 	packet[0] = 0x12;
 	packet[1] = 0xFF;
 	packet[2] = 0x0c;
@@ -98,9 +98,9 @@ function SendGkeys(shutdown = false) {
 	packet[7] = 9; // led count
 
 	for(let iIdx = 0; iIdx < vGkeyPositions.length; iIdx++){
-		let iLedIdx = (iIdx * 4) + 8;
-		let iKeyPosX = vGkeyPositions[iIdx][0];
-		let iKeyPosY = vGkeyPositions[iIdx][1];
+		const iLedIdx = (iIdx * 4) + 8;
+		const iKeyPosX = vGkeyPositions[iIdx][0];
+		const iKeyPosY = vGkeyPositions[iIdx][1];
 		var color;
 
 		if(shutdown){
@@ -124,7 +124,7 @@ function SendGkeys(shutdown = false) {
 }
 
 function SendLogoZones(shutdown = false){
-	let packet = [];
+	const packet = [];
 	packet[0] = 0x11;
 	packet[1] = 0xFF;
 	packet[2] = 0x0c;
@@ -135,9 +135,9 @@ function SendLogoZones(shutdown = false){
 	packet[7] = 0x02;
 
 	for(let iIdx = 0; iIdx < vLogoPositions.length; iIdx++){
-		let iLedIdx = (iIdx * 4) + 8;
-		let iKeyPosX = vLogoPositions[iIdx][0];
-		let iKeyPosY = vLogoPositions[iIdx][1];
+		const iLedIdx = (iIdx * 4) + 8;
+		const iKeyPosX = vLogoPositions[iIdx][0];
+		const iKeyPosY = vLogoPositions[iIdx][1];
 		var color;
 
 		if(shutdown){
@@ -162,8 +162,8 @@ function SendLogoZones(shutdown = false){
 }
 
 function hexToRgb(hex) {
-	let result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
-	let colors = [];
+	const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+	const colors = [];
 	colors[0] = parseInt(result[1], 16);
 	colors[1] = parseInt(result[2], 16);
 	colors[2] = parseInt(result[3], 16);
@@ -172,7 +172,7 @@ function hexToRgb(hex) {
 }
 
 function SendZonePacket(startIdx, count, zone, shutdown = false) {
-	let packet = [];
+	const packet = [];
 	packet[0] = 0x12;
 	packet[1] = 0xFF;
 	packet[2] = 0x0C;
@@ -183,10 +183,10 @@ function SendZonePacket(startIdx, count, zone, shutdown = false) {
 	packet[7] = count; // led count
 
 	for(let iIdx = 0; iIdx < count; iIdx++){
-		let iLedIdx = (iIdx * 4) + 8;
-		let iKeyIdx = startIdx + iIdx;
-		let iKeyPosX = vLedPositions[iKeyIdx][0];
-		let iKeyPosY = vLedPositions[iKeyIdx][1];
+		const iLedIdx = (iIdx * 4) + 8;
+		const iKeyIdx = startIdx + iIdx;
+		const iKeyPosX = vLedPositions[iKeyIdx][0];
+		const iKeyPosY = vLedPositions[iKeyIdx][1];
 		var color;
 
 		if(shutdown){
@@ -209,7 +209,7 @@ function SendZonePacket(startIdx, count, zone, shutdown = false) {
 }
 
 function SendPacket(startIdx, count, shutdown = false) {
-	let packet = [];
+	const packet = [];
 	packet[0] = 0x12;
 	packet[1] = 0xFF;
 	packet[2] = 0x0C;
@@ -220,10 +220,10 @@ function SendPacket(startIdx, count, shutdown = false) {
 	packet[7] = count; // led count
 
 	for(let iIdx = 0; iIdx < count; iIdx++){
-		let iLedIdx = (iIdx * 4) + 8;
-		let iKeyIdx = startIdx + iIdx;
-		let iKeyPosX = vLedPositions[iKeyIdx][0];
-		let iKeyPosY = vLedPositions[iKeyIdx][1];
+		const iLedIdx = (iIdx * 4) + 8;
+		const iKeyIdx = startIdx + iIdx;
+		const iKeyPosX = vLedPositions[iKeyIdx][0];
+		const iKeyPosY = vLedPositions[iKeyIdx][1];
 		var color;
 
 		if(shutdown){

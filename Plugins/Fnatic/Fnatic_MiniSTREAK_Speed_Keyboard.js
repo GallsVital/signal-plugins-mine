@@ -19,7 +19,7 @@ export function ControllableParameters(){
 	];
 }
 
-const vKeys = 
+const vKeys =
 [
 	103,                91, 97, 92,
 
@@ -56,53 +56,41 @@ const vKeyPositions = [
 
 ];
 
-export function LedNames() 
-{
+export function LedNames() {
 	return vKeyNames;
 }
 
-export function LedPositions() 
-{
+export function LedPositions() {
 	return vKeyPositions;
 }
 
-export function Initialize() 
-{
+export function Initialize() {
 
 }
 
-export function Render() 
-{
+export function Render() {
 	sendColors();
 }
 
-export function Shutdown() 
-{
+export function Shutdown() {
 
 }
 
-function sendColors(shutdown = false)
-{
+function sendColors(shutdown = false) {
 
-	let RGBData = new Array(144*3).fill(255);
+	const RGBData = new Array(144*3).fill(255);
 	let TotalLedCount = 0;
 
-	for(let iIdx = 0; iIdx < vKeys.length; iIdx++) 
-	{
-		let iPxX = vKeyPositions[iIdx][0];
-		let iPxY = vKeyPositions[iIdx][1];
+	for(let iIdx = 0; iIdx < vKeys.length; iIdx++) {
+		const iPxX = vKeyPositions[iIdx][0];
+		const iPxY = vKeyPositions[iIdx][1];
 		var mxPxColor;
 
-		if(shutdown)
-		{
+		if(shutdown) {
 			mxPxColor = hexToRgb(shutdownColor);
-		}
-		else if (LightingMode === "Forced") 
-		{
+		} else if (LightingMode === "Forced") {
 			mxPxColor = hexToRgb(forcedColor);
-		}
-		else
-		{
+		} else {
 			mxPxColor = device.color(iPxX, iPxY);
 		}
 
@@ -115,20 +103,16 @@ function sendColors(shutdown = false)
 	let sentLeds = 0;
 	TotalLedCount = 106;
 
-	while(TotalLedCount > 0)
-	{
-		let Leds = TotalLedCount >= 19 ? 19 : TotalLedCount;
+	while(TotalLedCount > 0) {
+		const Leds = TotalLedCount >= 19 ? 19 : TotalLedCount;
 
-		let packet = [0x00, 0x0F, 0x40, 0x01, 0x00, sentLeds, sentLeds >> 8, 0x00];
+		const packet = [0x00, 0x0F, 0x40, 0x01, 0x00, sentLeds, sentLeds >> 8, 0x00];
 
-		if(sentLeds == 0)
-		{
+		if(sentLeds == 0) {
 			packet[8] = 0x0F;
 			packet[9] = 0x03;
 			packet.push(...RGBData.splice(0, Leds*3-2));
-		}
-		else
-		{
+		} else {
 			packet.push(...RGBData.splice(0, Leds*3));
 		}
 
@@ -138,10 +122,9 @@ function sendColors(shutdown = false)
 	}
 }
 
-function hexToRgb(hex) 
-{
-	let result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
-	let colors = [];
+function hexToRgb(hex) {
+	const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+	const colors = [];
 	colors[0] = parseInt(result[1], 16);
 	colors[1] = parseInt(result[2], 16);
 	colors[2] = parseInt(result[3], 16);
@@ -149,8 +132,7 @@ function hexToRgb(hex)
 	return colors;
 }
 
-export function Validate(endpoint) 
-{
+export function Validate(endpoint) {
 	return endpoint.interface === 1;
 }
 

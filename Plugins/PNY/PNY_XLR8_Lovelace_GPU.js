@@ -72,11 +72,10 @@ function SetGPUNameFromBusIds() {
 
 function sendColors(shutdown = false) {
 
-	for(let zone = 0; zone < 3; zone++)
-	{
-        const iPxX = vLedPositions[zone][0];
-        const iPxY = vLedPositions[zone][1];
-        let color;
+	for(let zone = 0; zone < 3; zone++) {
+		const iPxX = vLedPositions[zone][0];
+		const iPxY = vLedPositions[zone][1];
+		let color;
 
 		if(shutdown) {
 			color = hexToRgb(shutdownColor);
@@ -85,8 +84,9 @@ function sendColors(shutdown = false) {
 		} else {
 			color = device.color(iPxX, iPxY);
 		}
+
 		PNYGPU.setRGB(zone, color);
-        device.pause(10);
+		device.pause(10);
 	}
 
 }
@@ -96,12 +96,11 @@ class PNYGPUController {
 		this.registers =
         {
         	Fetch    : 0x82,
-			Lighting : 0x02
+        	Lighting : 0x02
         };
 	}
 
-	setRGB(zone, RGBData)
-	{
+	setRGB(zone, RGBData) {
 		const packet = [0x06, 0xff, zone, 0x00];
 		packet.push(...RGBData);
 		bus.WriteBlock(this.registers.Lighting, 0x07, packet);
@@ -131,6 +130,7 @@ class PNYGPUIdentifier extends GPUIdentifier {
 const PNYGPUIDs =
 [
 	new PNYGPUIdentifier(0x2684, 0x13ad, "PNY RTX 4090 XLR8"),
+	new PNYGPUIdentifier(0x2782, 0x13b1, "PNY RTX 4070TI XLR8")
 ];
 
 function hexToRgb(hex) {

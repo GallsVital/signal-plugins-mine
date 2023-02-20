@@ -52,7 +52,9 @@ export function Scan(bus) {
 export function Initialize() {
 	AsusGPU.getDeviceInformation();
 	SetGPUNameFromBusIds();
-	AsusGPU.setMode(AsusGPU.modes.static);
+	AsusGPU.setDirectMode(0x01);
+	//AsusGPU.auraWriteRegister(0x8024, 0x00); //This is an unknown register. it comes right after direction.
+	AsusGPU.auraWriteRegister(0x802f, 0x01);
 }
 
 export function Render() {
@@ -76,14 +78,14 @@ function SetGPUNameFromBusIds() {
 }
 
 function sendColors(shutdown = false) {
-	bus.WriteBlock(AsusGPU.registers.command, 2, [0x81, 0x60]);
+	bus.WriteBlock(0x00, 2, [0x81, 0x00]);
 
-	const RGBData = new Array(90);
+	const RGBData = [];
 
 	for(let iIdx = 0; iIdx < vLedPositions.length; iIdx++) {
 		const iPxX = vLedPositions[iIdx][0];
 		const iPxY = vLedPositions[iIdx][1];
-		var color;
+		let color;
 
 		if(shutdown) {
 			color = hexToRgb(shutdownColor);
@@ -100,13 +102,11 @@ function sendColors(shutdown = false) {
 	}
 
 	while(RGBData.length > 0) {
-		const packet = [0x1E];
-		packet.push(...RGBData.splice(0, 30));
-		bus.WriteBlock(AsusGPU.registers.color, 31, packet);
+		let packet = [0x0B];
+		packet = packet.concat(RGBData.splice(0, 11));
+		bus.WriteBlock(AsusGPU.registers.color, 0x0C, packet);
 	}
 
-	bus.WriteBlock(AsusGPU.registers.command, 2, [0x80, 0x2F]);
-	bus.WriteByte(AsusGPU.registers.direction, 0x01);
 }
 
 class AsusGPUController {
@@ -152,25 +152,27 @@ class AsusGPUController {
         	directAccess : 0x8020,
         	colorCtlV1   : 0x8000,
         	colorCtlV2   : 0x8100,
-        	apply        : 0x80A0
+        	effectCtlV2  : 0x8160, //This is like an extension of color ctlV2?
+        	apply        : 0x80A0,
+        	ColorApply   : 0x802F,
         };
 	}
 
 	auraReadRegister(reg) {
-		bus.WriteBlock(this.registers.command, 2, [reg >> 8 & 0xFF, reg & 0xff]);
+		bus.WriteBlock(0x00, 2, [reg >> 8 & 0xFF, reg & 0xff]);
 
 		return bus.ReadByte(0x81);
 	}
 
 	auraWriteRegister(reg, value) {
-		bus.WriteBlock(this.registers.command, 2, [reg >> 8 & 0xFF, reg & 0xff]);
+		bus.WriteBlock(0x00, 2, [reg >> 8 & 0xFF, reg & 0xff]);
 
-		bus.WriteByte(this.registers.direction, value);
+		bus.WriteByte(0x01, value);
 	}
 
 	auraWriteRegisterBlock(reg, size, data) {
 		const iWord = bus.WriteBlock(this.registers.command, 2, [reg >> 8 & 0xFF, reg & 0xff]); //The variable here isn't needed for gpus and normal cases. Hence, we aren't making use of it.
-		bus.WriteBlock(this.registers.color, size, data);
+		bus.WriteBlock(0x03, size, data);
 	}
 
 	getDeviceInformation() {
@@ -218,6 +220,10 @@ class AsusGPUController {
 		}
 
 		return configTable;
+	}
+
+	setDirectMode(directMode) {
+		this.auraWriteRegister(this.auraCommands.directAccess, directMode);
 	}
 
 	setMode(deviceMode) {
@@ -355,6 +361,7 @@ class Asus_Ampere_Lovelace_IDs {
 		this.RGB3080_STRIX_GAMING_V2 		   = 0x882F;
 		this.RTX3080_STRIX_GAMING_WHITE_OC_LHR = 0x8830;
 		this.RTX3080_STRIX_GAMING_GUNDAM       = 0x87CE;
+		this.RTX3080_STRIX_GAMING_OC	       = 0x87AA;
 		this.RTX3080_STRIX_GAMING              = 0x87AC;
 		this.RTX3080_STRIX_O10G_GAMING_WHITE_V2= 0x8831; //2216
 		this.RTX3080_TUF_GAMING_V2_LHR         = 0x8822;
@@ -389,9 +396,11 @@ class Asus_Ampere_Lovelace_IDs {
 		this.RTX3090TI_TUF_GAMING				   = 0x8874;
 
 		this.RTX4070TI_TUF_GAMING_OC			   = 0x88A3;
+
 		this.RTX4080_TUF_GAMING					   = 0x88A1;
 		this.RTX4080_STRIX_GAMING				   = 0x889f;
 		this.RTX4080_STRIX_GAMING_OC 			   = 0x88BF;
+		this.RTX4080_STRIX_GAMING_2				   = 0x88C0;
 		this.RTX4080_TUF_GAMING_OC				   = 0x88CA;
 
 		this.RTX4090_STRIX_GAMING                  = 0x889C;
@@ -458,6 +467,7 @@ const Asus3000GPUIDs =
 	new AsusGPUIdentifier(Nvidia.RTX3080_LHR, AsusID.RTX3080_STRIX_GAMING_WHITE_OC_LHR, "Asus ROG Strix 3080 O10G White OC LHR"),
 	new AsusGPUIdentifier(Nvidia.RTX3080, AsusID.RTX3080_STRIX_GAMING_GUNDAM, "Asus ROG Strix 3080 O10G Gundam"),
 	new AsusGPUIdentifier(Nvidia.RTX3080, AsusID.RTX3080_STRIX_GAMING, "Asus ROG Strix 3080 O10G Gaming"),
+	new AsusGPUIdentifier(Nvidia.RTX3080, AsusID.RTX3080_STRIX_GAMING_OC, "Asus ROG Strix 3080 Gaming OC"),
 	new AsusGPUIdentifier(Nvidia.RTX3080_LHR, AsusID.RTX3080_TUF_GAMING_V2_LHR, "Asus TUF 3080 O10G V2 LHR"),
 	new AsusGPUIdentifier(Nvidia.RTX3080_LHR, AsusID.RTX3080_TUF_GAMING_LHR, "Asus TUF 3080 O10G Gaming LHR"),
 
@@ -495,8 +505,10 @@ const Asus3000GPUIDs =
 	new AsusGPUIdentifier(Nvidia.RTX3090TI, AsusID.RTX3090TI_TUF_GAMING, "Asus TUF 3090TI Gaming"),
 
 	new AsusGPUIdentifier(Nvidia.RTX4070TI, AsusID.RTX4070TI_TUF_GAMING_OC, "Asus TUF RTX 4070Ti Gaming OC"),
+
 	new AsusGPUIdentifier(Nvidia.RTX4080, AsusID.RTX4080_TUF_GAMING, "Asus TUF RTX 4080 Gaming"),
 	new AsusGPUIdentifier(Nvidia.RTX4080, AsusID.RTX4080_STRIX_GAMING, "Asus ROG Strix RTX 4080 Gaming"),
+	new AsusGPUIdentifier(Nvidia.RTX4080, AsusID.RTX4080_STRIX_GAMING_2, "Asus ROG Strix RTX 4080 Gaming"),
 	new AsusGPUIdentifier(Nvidia.RTX4080, AsusID.RTX4080_STRIX_GAMING_OC, "Asus ROG Strix 4080 Gaming OC"),
 	new AsusGPUIdentifier(Nvidia.RTX4080, AsusID.RTX4080_TUF_GAMING_OC, "Asus TUF RTX 4080 Gaming OC"),
 

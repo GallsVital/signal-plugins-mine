@@ -38,21 +38,21 @@ let savedDpi3;
 let savedDpi4;
 let savedDpi5;
 let savedPollingRate;
-let vKeys = [
+const vKeys = [
 	0,
 	1
 ];
-let vLedNames = [
+const vLedNames = [
 	"Scroll Wheel", "Logo"
 ];
-let vLedPositions = [
+const vLedPositions = [
 	[1, 0],
 	[1, 2],
 ];
 
 function hexToRgb(hex) {
-	let result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
-	let colors = [];
+	const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+	const colors = [];
 	colors[0] = parseInt(result[1], 16);
 	colors[1] = parseInt(result[2], 16);
 	colors[2] = parseInt(result[3], 16);
@@ -76,7 +76,7 @@ export function Initialize() {
 	}
 }
 
-let SettingReport = [
+const SettingReport = [
 	0x06, 0x3F, 0x00, 0x06, 0x06, 0x1F, 0x04, 0x0A, 0x00, 0x10, 0x00, 0x18, 0x00, 0x20, 0x00, 0x40,
 	0x01, 0x0A, 0x00, 0x10, 0x00, 0x18, 0x00, 0x20, 0x00, 0x40, 0x01, 0x00, 0x00, 0x03, 0x09, 0x06,
 	0xFF, 0x0F, 0x00, 0x00, 0x14, 0xFF, 0xFF, 0x00, 0x00, 0x14, 0xFF, 0xE6, 0x8C, 0x00, 0x14, 0xFF,
@@ -127,8 +127,8 @@ function setDpi(){
 }
 
 function sendReportString(string, size){
-	let packet= [];
-	let data = string.split(' ');
+	const packet= [];
+	const data = string.split(' ');
 
 	for(let i = 0; i < data.length; i++){
 		packet[parseInt(i, 16)] =parseInt(data[i], 16);//.toString(16)
@@ -143,13 +143,13 @@ function Apply() {
 
 function sendZone(shutdown = false){
 
-	let packet = [];
+	const packet = [];
 	packet[0] = 0x0D;
 	packet[1] = 0x0B;
 
 	for(let iIdx = 0; iIdx < vKeys.length; iIdx++) {
-		let iPxX = vLedPositions[iIdx][0];
-		let iPxY = vLedPositions[iIdx][1];
+		const iPxX = vLedPositions[iIdx][0];
+		const iPxY = vLedPositions[iIdx][1];
 		var col;
 
 		if(shutdown){

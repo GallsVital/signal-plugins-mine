@@ -7,7 +7,7 @@ export function DefaultPosition(){return [0, 0];}
 export function DefaultScale(){return 1.0;}
 /* global
 */
-export function ControllableParameters(){
+export function ControllableParameters() {
 	return [
 
 	];
@@ -16,39 +16,34 @@ export function ControllableParameters(){
 export function Documentation(){ return "troubleshooting/corsair"; }
 
 export function Initialize() {
-	sendReportString("03 0F 01", 32);
-	sendReportString("03 10 01", 32);
-	sendReportString("03 01 40 DD 83 1C 32 2E 32 2E 36 2E 30 20", 32);
+	device.send_report([0x03, 0x1d, 0x01, 0x00], 32);
+	device.get_report([0x03, 0x1d, 0x01, 0x00], 32); //Returns literally 3
+	device.send_report([0x03, 0x19], 32);
+	device.get_report([0x03, 0x19], 32);
+	device.send_report([0x03, 0x20, 0x00, 0x19, 0x79, 0xE7, 0x32, 0x2E, 0x30, 0x2E, 0x30, 0x2E, 0x33], 32);
+	device.get_report([0x03, 0x20, 0x00, 0x19, 0x79, 0xE7, 0x32, 0x2E, 0x30, 0x2E, 0x30, 0x2E, 0x33], 32);
+	device.send_report([0x03, 0x0B, 0x40, 0x01, 0x79, 0xE7, 0x32, 0x2e, 0x30, 0x2E, 0x30, 0x2E, 0x33], 32);
+	device.get_report([0x03, 0x0B, 0x40, 0x01, 0x79, 0xE7, 0x32, 0x2e, 0x30, 0x2E, 0x30, 0x2E, 0x33], 32); //THEY ALL RETURN 3
 
+}
+
+export function Render() {
+	//SendColorData();
+	colorgrabber();
 }
 
 export function Shutdown() {
 	sendReportString("03 0D 01 01 78 00 C0 03 2F 2F 2F FF 2F 2F 2F FF 2F 2F 2F FF 2F 2F 2F FF 2F 2F 2F FF 2F 2F 2F FF", 32);
 	sendReportString("03 01 64 01 78 00 C0 03 2F 2F 2F FF 2F 2F 2F FF 2F 2F 2F FF 2F 2F 2F FF 2F 2F 2F FF 2F 2F 2F FF", 32);
-
-
 }
 
-function sendPacketString(string, size){
-	let packet= [];
-	let data = string.split(' ');
+const vKeyNames = [ "Device Wide" ];
 
-	for(let i = 0; i < data.length; i++){
-		packet[parseInt(i, 16)] = parseInt(data[i], 16);//.toString(16)
-	}
+function sendReportString(string, size) {
+	const packet= [];
+	const data = string.split(' ');
 
-	device.write(packet, size);
-}
-
-let vKeyNames = [
-	"Device Wide",
-];
-
-function sendReportString(string, size){
-	let packet= [];
-	let data = string.split(' ');
-
-	for(let i = 0; i < data.length; i++){
+	for(let i = 0; i < data.length; i++) {
 		packet[parseInt(i, 16)] =parseInt(data[i], 16);//.toString(16)
 	}
 
@@ -56,9 +51,7 @@ function sendReportString(string, size){
 }
 
 
-let vKeyPositions = [
-	[0, 0]
-];
+const vKeyPositions = [ [0, 0] ];
 
 export function LedNames() {
 	return vKeyNames;
@@ -67,18 +60,53 @@ export function LedNames() {
 export function LedPositions() {
 	return vKeyPositions;
 }
-let RGBdata = new Array(38000);
+const RGBdata = new Array(38000);
 let offset = 0;
+
+let packetsSent = 0;
+
+function colorgrabber() {
+
+	const RGBData = device.getImageBuffer(0, 0, 319, 199, {flipH: false, outputWidth: 640, outputHeight: 48, format: "BMP"});
+
+	let BytesLeft = RGBData.length;
+
+	packetsSent = 0;
+
+
+	while(BytesLeft > 0) {
+		const BytesToSend = Math.min(1016, BytesLeft);
+
+		if(BytesToSend < 1015) {
+			sendZone(BytesLeft, RGBData.splice(0, BytesToSend), packetsSent, 0x01);
+			device.log(packetsSent);
+		} else {
+			sendZone(BytesToSend, RGBData.splice(0, BytesToSend), packetsSent, 0x00);
+		}
+
+		BytesLeft -= BytesToSend;
+		packetsSent++;
+	}
+
+}
+
+function sendZone(packetRGBDataLength, RGBData, packetsSent, finalPacket) {
+
+	let packet = [0x02, 0x05, 0x40, finalPacket, packetsSent, 0x00, (packetRGBDataLength >> 8 & 0xFF), (packetRGBDataLength & 0xFF)];
+	packet = packet.concat(RGBData);
+
+	const result = device.write(packet, 1024);
+}
 
 function SendColorData() {
 
 	for (let row  = 0; row < 48; row = row + 1) {
-		for(let iIdx= 0 + offset; iIdx < 641; iIdx = iIdx + 2){
+		for(let iIdx= 0 + offset; iIdx < 641; iIdx = iIdx + 2) {
 			var col;
 
 			col = device.color(iIdx/2, row*4);
 
-			let iLedIdx = (iIdx+row*640) * 4;
+			const iLedIdx = (iIdx+row*640) * 4;
 			RGBdata[iLedIdx] =   col[2];
 			RGBdata[iLedIdx+1] = col[1];
 			RGBdata[iLedIdx+2] = col[0];
@@ -88,7 +116,7 @@ function SendColorData() {
 
 	for (let row = 0; row < 121;row++) {
 		let packet = [];
-		packet[0x00]   = 0x02;
+		packet[0x00]   = 0x02; //This looks a bit familiar eh?
 		packet[0x01]   = 0x05;
 		packet[0x02]   = 0x40;
 
@@ -106,9 +134,6 @@ function SendColorData() {
 	}
 }
 
-export function Render() {
-	SendColorData();
-}
 export function Validate(endpoint) {
 	return endpoint.interface === 0;
 }

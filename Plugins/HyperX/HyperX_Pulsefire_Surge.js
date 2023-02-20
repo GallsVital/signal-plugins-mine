@@ -17,12 +17,11 @@ export function ControllableParameters(){
 		{"property":"forcedColor", "group":"lighting", "label":"Forced Color", "min":"0", "max":"360", "type":"color", "default":"009bde"},
 	];
 }
-export function ConflictingProcesses() 
-{
+export function ConflictingProcesses() {
 	return ["NGenuity2.exe"];
 }
 
-let vLedNames = 
+const vLedNames =
 [
 	"Led 1", "Led 2", "Led 3", "Led 4", "Led 5", "Led 6", "Led 7", "Led 8", "Led 9", "Led 10", "Led 11", "Led 12",
 	"Led 13", "Led 14", "Led 15", "Led 16", "Led 17", "Led 18", "Led 19", "Led 20",
@@ -30,7 +29,7 @@ let vLedNames =
 ];
 
 
-let vLedPositions = 
+const vLedPositions =
 [
 	[0, 0], [1, 0], [2, 0], [3, 0], [4, 0], [5, 0], [6, 0], [7, 0]
 	, [0, 1], [7, 1]
@@ -45,7 +44,7 @@ let vLedPositions =
 	, [1, 10], [6, 10]
 	, [2, 11], [3, 11], [4, 11]
 ];
-let vLed = 
+const vLed =
 [
 	4, 3, 2, 1, 31, 30, 29, 28,
 	5,                  27,
@@ -61,55 +60,43 @@ let vLed =
 	15, 16, 17
 ];
 
-export function LedNames() 
-{
+export function LedNames() {
 	return vLedNames;
 }
 
-export function LedPositions() 
-{
+export function LedPositions() {
 	return vLedPositions;
 }
 
-export function Initialize() 
-{
+export function Initialize() {
 
 }
 
-export function Render() 
-{
+export function Render() {
 	sendColors();
 }
 
-export function Shutdown() 
-{
+export function Shutdown() {
 	sendColors(true);
 }
 
-function sendColors(shutdown = false)
-{
-	let packet = [0x07, 0x14, 0x00, 0x0A, 0x00, 0x00, 0x00, 0x00];
+function sendColors(shutdown = false) {
+	const packet = [0x07, 0x14, 0x00, 0x0A, 0x00, 0x00, 0x00, 0x00];
 
-	let red = new Array(32).fill(0);
-	let green = new Array(32).fill(0);
-	let blue = new Array(32).fill(0);
+	const red = new Array(32).fill(0);
+	const green = new Array(32).fill(0);
+	const blue = new Array(32).fill(0);
 
-	for(let iIdx = 0; iIdx < vLed.length; iIdx++) 
-	{
-		let iPxX = vLedPositions[iIdx][0];
-		let iPxY = vLedPositions[iIdx][1];
+	for(let iIdx = 0; iIdx < vLed.length; iIdx++) {
+		const iPxX = vLedPositions[iIdx][0];
+		const iPxY = vLedPositions[iIdx][1];
 		var color;
 
-		if(shutdown)
-		{
+		if(shutdown) {
 			color = hexToRgb(shutdownColor);
-		}
-		else if (LightingMode === "Forced") 
-		{
+		} else if (LightingMode === "Forced") {
 			color = hexToRgb(forcedColor);
-		}
-		else
-		{
+		} else {
 			color = device.color(iPxX, iPxY);
 		}
 
@@ -130,10 +117,9 @@ function sendColors(shutdown = false)
 	device.pause(1);
 }
 
-function hexToRgb(hex) 
-{
-	let result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
-	let colors = [];
+function hexToRgb(hex) {
+	const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+	const colors = [];
 	colors[0] = parseInt(result[1], 16);
 	colors[1] = parseInt(result[2], 16);
 	colors[2] = parseInt(result[3], 16);
@@ -141,8 +127,7 @@ function hexToRgb(hex)
 	return colors;
 }
 
-export function Validate(endpoint) 
-{
+export function Validate(endpoint) {
 	return endpoint.interface === 1  && endpoint.usage === 0x0001 && endpoint.usage_page == 0xff01;
 }
 

@@ -6,11 +6,11 @@ export function Publisher() { return "WhirlwindFX"; }
 export function Size() { return [9, 9]; }
 export function DefaultPosition(){return [165, 60];}
 export function DefaultScale(){return 3.0;}
-let vLedNames = [
+const vLedNames = [
 	"Led 1", "Led 2", "Led 3", "Led 4", "Led 5", "Led 6", "Led 7", "Led 8", "Led 9", "Logo"
 ];
 
-let vLedPositions = [[4, 0], [5, 2], [7, 3], [5, 5], [4, 7],
+const vLedPositions = [[4, 0], [5, 2], [7, 3], [5, 5], [4, 7],
 	[3, 5], [1, 3], [3, 2], [4, 1], [4, 4]];
 
 export function Initialize() {
@@ -19,7 +19,7 @@ export function Initialize() {
 }
 
 export function Shutdown() {
-	let packet = [];
+	const packet = [];
 
 	// Header.
 	packet[0] = 0x02;
@@ -34,7 +34,7 @@ export function Shutdown() {
 
 	// Colors.
 	for(let iIdx=0; iIdx < 9; iIdx++) {
-		let iLedIdx = 0x05 + (iIdx * 3);
+		const iLedIdx = 0x05 + (iIdx * 3);
 		packet[iLedIdx] = 25;
 		packet[iLedIdx+1] = 25;
 		packet[iLedIdx+2] = 25;
@@ -67,7 +67,7 @@ export function Render() {
 
 	// Colors.
 	for(let iIdx=0; iIdx < 9; iIdx++) {
-		let iLedIdx = 0x05 + (iIdx * 3);
+		const iLedIdx = 0x05 + (iIdx * 3);
 		var x = vLedPositions[iIdx][0];
 		var y = vLedPositions[iIdx][1];
 		var col = device.color(x, y);

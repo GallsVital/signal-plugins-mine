@@ -1,13 +1,13 @@
 
-let CORSAIR_COMMAND_WRITE       = 0x07;
-let CORSAIR_COMMAND_READ        = 0x0E;
-let CORSAIR_COMMAND_STREAM      = 0x7F;
+const CORSAIR_COMMAND_WRITE       = 0x07;
+const CORSAIR_COMMAND_READ        = 0x0E;
+const CORSAIR_COMMAND_STREAM      = 0x7F;
 
-let CORSAIR_LIGHTING_CONTROL_HARDWARE           = 0x01;
-let CORSAIR_LIGHTING_CONTROL_SOFTWARE           = 0x02;
+const CORSAIR_LIGHTING_CONTROL_HARDWARE           = 0x01;
+const CORSAIR_LIGHTING_CONTROL_SOFTWARE           = 0x02;
 
-let CORSAIR_PROPERTY_SPECIAL_FUNCTION = 0x04;
-let CORSAIR_PROPERTY_SUBMIT_MOUSE_COLOR         = 0x22;
+const CORSAIR_PROPERTY_SPECIAL_FUNCTION = 0x04;
+const CORSAIR_PROPERTY_SUBMIT_MOUSE_COLOR         = 0x22;
 
 
 export function Name() { return "Corsair Scimitar Elite"; }
@@ -37,17 +37,17 @@ export function ControllableParameters(){
 export function Documentation(){ return "troubleshooting/corsair"; }
 
 function hexToRgb(hex) {
-	let result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
-	let colors = [];
+	const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+	const colors = [];
 	colors[0] = parseInt(result[1], 16);
 	colors[1] = parseInt(result[2], 16);
 	colors[2] = parseInt(result[3], 16);
 
 	return colors;
 }
-let vLedNames = ["Logo Zone", "Side Bar", "Side Keys", "Front Zone", "Scroll Zone"];
+const vLedNames = ["Logo Zone", "Side Bar", "Side Keys", "Front Zone", "Scroll Zone"];
 
-let vLedPositions = [[1, 2], [0, 0], [0, 1], [2, 0], [1, 0]
+const vLedPositions = [[1, 2], [0, 0], [0, 1], [2, 0], [1, 0]
 ];
 
 export function LedNames() {
@@ -95,7 +95,7 @@ function EnableSoftwareControl() {
 
 
 function ReturnToHardwareControl() {
-	let packet = [];
+	const packet = [];
 
 	// Lighting ctrl packet.
 	packet[0x00]           = 0x00;
@@ -119,7 +119,7 @@ export function Render() {
 
 function sendColors(shutdown = false){
 
-	let packet = [];
+	const packet = [];
 	packet[0x00]   = 0x00;
 	packet[0x01]   = CORSAIR_COMMAND_WRITE;
 	packet[0x02]   = CORSAIR_PROPERTY_SUBMIT_MOUSE_COLOR;
@@ -127,13 +127,13 @@ function sendColors(shutdown = false){
 	packet[0x04]   = 0x01;
 
 	//var zoneId = [4,1,5,3,2]
-	let zoneId = [2, 3, 5, 1, 4];
+	const zoneId = [2, 3, 5, 1, 4];
 
 
 	// Single zone - apply to mouse.
 	for(let zone_idx = 0; zone_idx < vLedPositions.length; zone_idx++) {
-		let iX = vLedPositions[zone_idx][0];
-		let iY = vLedPositions[zone_idx][1];
+		const iX = vLedPositions[zone_idx][0];
+		const iY = vLedPositions[zone_idx][1];
 		var col;
 
 		if(shutdown){
@@ -158,21 +158,21 @@ export function Validate(endpoint) {
 }
 
 export function Shutdown() {
-	let packet = [];
+	const packet = [];
 	packet[0x00]   = 0x00;
 	packet[0x01]   = CORSAIR_COMMAND_WRITE;
 	packet[0x02]   = CORSAIR_PROPERTY_SUBMIT_MOUSE_COLOR;
 	packet[0x03]   = 0x05;
 	packet[0x04]   = 0x01;
 
-	let zoneId = [4, 1, 5, 3, 2];
+	const zoneId = [4, 1, 5, 3, 2];
 
 
 	// Single zone - apply to mouse.
 	for(let zone_idx = 0; zone_idx < vLedPositions.length; zone_idx++) {
-		let iX = vLedPositions[zone_idx][0];
-		let iY = vLedPositions[zone_idx][1];
-		let col = device.color(iX, iY);
+		const iX = vLedPositions[zone_idx][0];
+		const iY = vLedPositions[zone_idx][1];
+		const col = device.color(iX, iY);
 		packet[(zone_idx * 4) + 5] = zoneId[zone_idx];
 		packet[(zone_idx * 4) + 6] = 255;
 		packet[(zone_idx * 4) + 7] = 0;

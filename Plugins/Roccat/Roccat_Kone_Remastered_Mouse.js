@@ -41,17 +41,17 @@ let savedDpi4;
 let savedDpi5;
 let savedPollingRate;
 
-let vKeys = [
+const vKeys = [
 	0,
 	1, 2, 3, 4,
 	5, 6, 7, 8,
 	9, 10
 ];
-let vLedNames = [
+const vLedNames = [
 	"Scroll Wheel",
 	"Left Led 1", "Left Led 2", "Left Led 3", "Left Led 4", "Right Led 1", "Right Led 2", "Right Led 3", "Right Led 4", "Left Led 5", "Right Led 5"
 ];
-let vLedPositions = [
+const vLedPositions = [
 	[3, 0],
 	[1, 1], [2, 2], [1, 3], [2, 4],
 	[5, 1], [4, 2], [5, 3], [4, 4],
@@ -59,8 +59,8 @@ let vLedPositions = [
 ];
 
 function hexToRgb(hex) {
-	let result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
-	let colors = [];
+	const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+	const colors = [];
 	colors[0] = parseInt(result[1], 16);
 	colors[1] = parseInt(result[2], 16);
 	colors[2] = parseInt(result[3], 16);
@@ -83,7 +83,7 @@ export function Initialize() {
 		setDpi();
 	}
 }
-let SettingReport = [
+const SettingReport = [
 	0x06, 0x7E, 0x00, 0x06, 0x1F, 0x00, 0x9E, 0x00, 0x5C, 0x00, 0x39, 0x00, 0x52, 0x00, 0x5E, 0x00, 0x9E, 0x00, 0x5C,
 	0x00, 0x39, 0x00, 0x52, 0x00, 0x5E, 0x00, 0x03, 0x00, 0x00, 0x08, 0xFF, 0x07, 0x00, 0x09, 0x06, 0xFF, 0x1D, 0x13,
 	0xFF, 0x00, 0xFF, 0x59, 0xFF, 0x00, 0x00, 0xFF, 0xFD, 0xFD, 0x00, 0x00, 0xFF, 0xF4, 0x64, 0x00, 0x00, 0xFF, 0xF4,
@@ -138,8 +138,8 @@ function setDpi(){
 }
 
 function sendReportString(string, size){
-	let packet= [];
-	let data = string.split(' ');
+	const packet= [];
+	const data = string.split(' ');
 
 	for(let i = 0; i < data.length; i++){
 		packet[parseInt(i, 16)] =parseInt(data[i], 16);//.toString(16)
@@ -154,13 +154,13 @@ function Apply() {
 
 function sendZone(shutdown = false){
 
-	let packet = [];
+	const packet = [];
 	packet[0] = 0x0D;
 	packet[1] = 0x2E;
 
 	for(let iIdx = 0; iIdx < vKeys.length; iIdx++) {
-		let iPxX = vLedPositions[iIdx][0];
-		let iPxY = vLedPositions[iIdx][1];
+		const iPxX = vLedPositions[iIdx][0];
+		const iPxY = vLedPositions[iIdx][1];
 		var col;
 
 		if(shutdown){

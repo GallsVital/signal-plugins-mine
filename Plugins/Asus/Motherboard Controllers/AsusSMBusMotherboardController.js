@@ -24,7 +24,7 @@ export function ControllableParameters() {
 export function Scan(bus) {
 
 	const FoundAddresses = [];
-	const addys = [0x40, 0x4E, 0x4F];
+	const addys = [0x39, 0x40, 0x4E, 0x4F];
 
 	const AsusSMBusInterface = new AsusSMBusInterfaceFree(bus);
 	const AsusMobo = new AsusSMBus(AsusSMBusInterface);
@@ -197,8 +197,6 @@ class AsusSMBus {
         	"AUMA0-E6K5-0105" : "V2",
         	"AUMA0-E6K5-0106" : "V2",
         	"AUMA0-E6K5-0107" : "GPU V2",
-        	"DIMM_LED-0102"   : "V1",
-        	"DIMM_LED-0103"   : "V1"
         };
 	}
 

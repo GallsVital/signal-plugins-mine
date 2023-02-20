@@ -152,8 +152,8 @@ export function ControllableParameters(){
 		{"property":"device18", "label":"Ch3 | Port 6", "type":"combobox",  "values":["None", "AER 2 Fan", "Strip_10Led", "Strip_8Led", "Strip_Underglow_200mm", "Cable_Comb", "Custom"], "default":"None"},
 	];
 }
-let ParentDeviceName = "NZXT Z490";
-let RGBConfigs = {
+const ParentDeviceName = "NZXT Z490";
+const RGBConfigs = {
 	"RGB" : [0, 1, 2],
 	"RBG" : [0, 2, 1],
 	"BGR" : [2, 1, 0],
@@ -190,7 +190,7 @@ function StreamLightingPacketChanneled(packetNumber, count, data, channel) {
 }
 
 function SubmitLightingColors(channel) {
-	let packet = [];
+	const packet = [];
 	packet[0] = 0x22;
 	packet[1] = 0xA0;
 	packet[2] = 1 << channel;
@@ -209,10 +209,10 @@ function SubmitLightingColors(channel) {
 	packet[15] = 0x01;
 	device.write(packet, 64);
 }
-let vKeyNames = [
+const vKeyNames = [
 	"Device Wide",
 ];
-let vKeyPositions = [
+const vKeyPositions = [
 	[0, 0]
 ];
 
@@ -225,8 +225,8 @@ function InitCustomStrip(){
 
 	savedCustomSize = CustomSize;
 
-	let mapping = [];
-	let positioning = [];
+	const mapping = [];
+	const positioning = [];
 
 	for(let i = 0; i < CustomSize;i++){
 		mapping[i] = i;
@@ -238,7 +238,7 @@ function InitCustomStrip(){
 	Custom.width = CustomSize;
 	Custom.ledCount = CustomSize;
 
-	let propertyArray = [device1, device2, device3, device4, device5, device6, device7, device8, device9, device10, device11, device12, device13, device14, device15, device16, device17, device18];
+	const propertyArray = [device1, device2, device3, device4, device5, device6, device7, device8, device9, device10, device11, device12, device13, device14, device15, device16, device17, device18];
 
 	for (let deviceNumber = 0; deviceNumber < 18; deviceNumber++ ) {
 		if(deviceValues[deviceNumber] == "Custom"){
@@ -302,7 +302,7 @@ var deviceArray = [
 
 
 function SetFans(){
-	let propertyArray = [device1, device2, device3, device4, device5, device6, device7, device8, device9, device10, device11, device12, device13, device14, device15, device16, device17, device18];
+	const propertyArray = [device1, device2, device3, device4, device5, device6, device7, device8, device9, device10, device11, device12, device13, device14, device15, device16, device17, device18];
 
 	for (let deviceNumber = 0; deviceNumber < 18; deviceNumber++ ) {
 		if(deviceValues[deviceNumber] != propertyArray[deviceNumber]){
@@ -332,8 +332,8 @@ export function LedPositions() {
 }
 
 function hexToRgb(hex) {
-	let result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
-	let colors = [];
+	const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+	const colors = [];
 	colors[0] = parseInt(result[1], 16);
 	colors[1] = parseInt(result[2], 16);
 	colors[2] = parseInt(result[3], 16);
@@ -343,10 +343,10 @@ function hexToRgb(hex) {
 
 function SendChannel(channel, shutdown = false) {
 
-	let RGBdata = [128];
+	const RGBdata = [128];
 
 	var TotalLedCount = 0;
-	let propertyArray = [device1, device2, device3, device4, device5, device6, device7, device8, device9, device10, device11, device12, device13, device14, device15, device16, device17, device18];
+	const propertyArray = [device1, device2, device3, device4, device5, device6, device7, device8, device9, device10, device11, device12, device13, device14, device15, device16, device17, device18];
 
 
 	for (let deviceNumber = 0+6*channel; deviceNumber < 6+6*channel; deviceNumber++ ) {
@@ -354,8 +354,8 @@ function SendChannel(channel, shutdown = false) {
 		if(deviceValues[deviceNumber] != "None"  && DeviceDict[propertyArray[deviceNumber]] != null){
 
 			for(let iIdx = 0; iIdx < DeviceDict[propertyArray[deviceNumber]].mapping.length; iIdx++){
-				let iPxX = DeviceDict[propertyArray[deviceNumber]].positioning[iIdx][0];
-				let iPxY = DeviceDict[propertyArray[deviceNumber]].positioning[iIdx][1];
+				const iPxX = DeviceDict[propertyArray[deviceNumber]].positioning[iIdx][0];
+				const iPxY = DeviceDict[propertyArray[deviceNumber]].positioning[iIdx][1];
 				var mxPxColor;
 
 				//find colors
@@ -383,7 +383,7 @@ function SendChannel(channel, shutdown = false) {
 	var TotalLedCount = TotalLedCount >= 120 ? 120 : TotalLedCount;
 
 	while(TotalLedCount > 0){
-		let ledsToSend = TotalLedCount >= 60 ? 60 : TotalLedCount;
+		const ledsToSend = TotalLedCount >= 60 ? 60 : TotalLedCount;
 
 		StreamLightingPacketChanneled(packetNumber, ledsToSend, RGBdata.splice(0, ledsToSend), channel);
 
@@ -398,7 +398,7 @@ function SendChannel(channel, shutdown = false) {
 
 function SendRGBHeader(shutdown = false){
 
-	let packet = [
+	const packet = [
 		0x2A, 0x04, 0x08, 0x08, 0x00, 0x32, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x01, 0x00, 0x01, 0x03, 0x00, 0x00, 0x00, 0x00
 	];
 	let col;
@@ -433,7 +433,7 @@ function CheckComponentStatus(){
 	if(ComponentNotificationId == true){
 		return;
 	}
-	let propertyArray = [device1, device2, device3, device4, device5, device6, device7, device8, device9, device10, device11, device12, device13, device14, device15, device16, device17, device18];
+	const propertyArray = [device1, device2, device3, device4, device5, device6, device7, device8, device9, device10, device11, device12, device13, device14, device15, device16, device17, device18];
 
 	for (let deviceNumber = 0; deviceNumber < propertyArray.length; deviceNumber++ ) {
 		if(propertyArray[deviceNumber] != "None"){
