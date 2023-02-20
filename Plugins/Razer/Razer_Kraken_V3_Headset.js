@@ -1,12 +1,12 @@
-export function Name() { return "Razer Kraken 7.1 V2"; }
+export function Name() { return "Razer Kraken V3"; }
 export function VendorId() { return 0x1532; }
-export function ProductId() { return [0x0510, 0x0504]; }
+export function ProductId() { return [0x0533, 0x0537, 0x0549]; }
 export function Publisher() { return "WhirlwindFX"; }
 export function Documentation(){ return "troubleshooting/razer"; }
 export function Size() { return [2, 2]; }
 export function Type() { return "Hid"; }
-export function DefaultPosition() {return [75, 70]; }
-export function DefaultScale(){return 8.0;}
+export function DefaultPosition(){return [145, 85];}
+export function DefaultScale(){return 10.0;}
 /* global
 shutdownColor:readonly
 LightingMode:readonly
@@ -28,7 +28,6 @@ const vLedNames = [
 const vLedPositions = [
 	[0, 0]
 ];
-
 export function LedNames() {
 	return vLedNames;
 }
@@ -51,12 +50,9 @@ export function Shutdown(){
 
 function SendPacket(shutdown = false) {
 	const packet = [];
-	packet[0] = 0x04;
-	packet[1] = 0x40;
-	packet[2] = 0x03;
-	packet[3] = 0x11;
-	packet[4] = 0x89;
-
+	packet[0] = 0x40;
+	packet[1] = 0x03;
+	packet[2] = 0x00;
 
 	let color;
 	const iPxX = vLedPositions[0][0];
@@ -70,11 +66,11 @@ function SendPacket(shutdown = false) {
 		color = device.color(iPxX, iPxY);
 	}
 
-	packet[5] = color[0];
-	packet[6] = color[1];
-	packet[7] = color[2];
+	packet[3] = color[0];
+	packet[4] = color[1];
+	packet[5] = color[2];
 
-	device.write(packet, 37);
+	device.write(packet, 9);
 	device.pause(1); // We need a pause here (between packets), otherwise the ornata can't keep up.
 
 }

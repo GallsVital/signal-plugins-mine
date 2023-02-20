@@ -1,6 +1,6 @@
 export function Name() { return "Razer Ornata V3 X"; }
 export function VendorId() { return 0x1532; }
-export function ProductId() { return 0x0294; }
+export function ProductId() { return [0x0294, 0x02a2]; }
 export function Documentation(){ return "troubleshooting/razer"; }
 export function Publisher() { return "Orcus, Rafee"; }
 export function Size() { return [3, 3]; }

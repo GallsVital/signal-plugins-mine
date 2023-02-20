@@ -1,56 +1,8 @@
-function GetReport(cmd_class, cmd_id, size) {
-	const report = new Array(91).fill(0);
-
-	report[0] = 0;
-
-	// Status.
-	report[1] = 0x00;
-
-	// Transaction ID.
-	report[2] = 0xFF;
-
-	// Remaining packets.
-	report[3] = 0x00;
-	report[4] = 0x00;
-
-	// Protocol type.
-	report[5] = 0x00;
-
-	// Data size.
-	report[6] = size;
-
-	// Command class.
-	report[7] = cmd_class;
-
-	// Command id.
-	report[8] = cmd_id;
-
-	//report[8-87] = data;
-
-	//report[89] = crc;
-
-	//report[89] = reserved;
-
-	return report;
-}
-
-
-function CalculateCrc(report) {
-	let iCrc = 0;
-
-	for (let iIdx = 3; iIdx < 89; iIdx++) {
-		iCrc ^= report[iIdx];
-	}
-
-	return iCrc;
-}
-
-
-export function Name() { return "Razer Huntsman TE"; }
+export function Name() { return "Razer Huntsman"; }
 export function VendorId() { return 0x1532; }
-export function Documentation(){ return "troubleshooting/razer"; }
 export function ProductId() { return 0x0227; }
 export function Publisher() { return "WhirlwindFX"; }
+export function Documentation(){ return "troubleshooting/razer"; }
 export function Size() { return [22, 6]; }
 export function Type() { return "Hid"; }
 export function DefaultPosition(){return [10, 100];}
@@ -69,15 +21,6 @@ export function ControllableParameters(){
 	];
 }
 
-function hexToRgb(hex) {
-	const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
-	const colors = [];
-	colors[0] = parseInt(result[1], 16);
-	colors[1] = parseInt(result[2], 16);
-	colors[2] = parseInt(result[3], 16);
-
-	return colors;
-}
 const vLedNames = [
 	"Esc", "F1", "F2", "F3", "F4", "F5", "F6", "F7", "F8", "F9", "F10", "F11", "F12",         "Print Screen", "Scroll Lock", "Pause Break",
 	"`", "1", "2", "3", "4", "5", "6", "7", "8", "9", "0", "-_", "=+", "Backspace",                        "Insert", "Home", "Page Up",       "NumLock", "Num /", "Num *", "Num -",  //21
@@ -95,6 +38,7 @@ const vLedPositions = [
 	[0, 4], [1, 4], [2, 4], [3, 4], [4, 4], [5, 4], [6, 4], [7, 4], [8, 4], [9, 4], [10, 4],                 [13, 4],           [15, 4],           [17, 4], [18, 4], [19, 4], [20, 4], // 17
 	[0, 5], [1, 5], [2, 5],                      [6, 5],                      [10, 5], [11, 5], [12, 5], [13, 5],   [14, 5], [15, 5], [16, 5],   [17, 5], [19, 5] // 13
 ];
+
 export function LedNames() {
 	return vLedNames;
 }
@@ -102,27 +46,6 @@ export function LedNames() {
 export function LedPositions() {
 	return vLedPositions;
 }
-
-function EnableSoftwareControl() {
-	const report = GetReport(0x0F, 0x03, 0x47);
-
-	report[2] = 0x3F; // transaction id.
-
-	report[11] = 0; // row index.
-
-	report[13] = 15; // led count.
-
-	report[89] = CalculateCrc(report);
-
-
-	device.send_report(report, 91);
-}
-
-
-function ReturnToHardwareControl() {
-
-}
-
 
 export function Initialize() {
 	const packet = [];
@@ -142,6 +65,24 @@ export function Initialize() {
 	packet[13] = 0x01;
 	packet[89] = CalculateCrc(packet);
 	device.send_report(packet, 91);
+}
+
+export function Render() {
+	SendPacket(0);
+	SendPacket(1);
+	SendPacket(2);
+	SendPacket(3);
+	SendPacket(4);
+	SendPacket(5);
+}
+
+export function Shutdown() {
+	SendPacket(0, true);
+	SendPacket(1, true);
+	SendPacket(2, true);
+	SendPacket(3, true);
+	SendPacket(4, true);
+	SendPacket(5, true);
 }
 
 function SendPacket(idx, shutdown = false) {
@@ -181,48 +122,24 @@ function SendPacket(idx, shutdown = false) {
 	device.pause(1); // We need a pause here (between packets), otherwise the ornata can't keep up.
 }
 
+function CalculateCrc(report) {
+	let iCrc = 0;
 
-function Apply() {
-	const packet = []; //new Array(91).fill(0);
-	packet[0] = 0x00;
-	packet[1] = 0x00;
-	packet[2] = 0x1F;
-	packet[3] = 0x00;
-	packet[4] = 0x00;
-	packet[5] = 0x00;
-	packet[6] = 0x32;
-	packet[7] = 0x0F;
-	packet[8] = 0x02;
-	packet[11] = 0x08;
+	for (let iIdx = 3; iIdx < 89; iIdx++) {
+		iCrc ^= report[iIdx];
+	}
 
-	packet[89] = CalculateCrc(packet);
-
-	device.send_report(packet, 91);
+	return iCrc;
 }
 
+function hexToRgb(hex) {
+	const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+	const colors = [];
+	colors[0] = parseInt(result[1], 16);
+	colors[1] = parseInt(result[2], 16);
+	colors[2] = parseInt(result[3], 16);
 
-export function Render() {
-	SendPacket(0);
-	SendPacket(1);
-	SendPacket(2);
-	SendPacket(3);
-	SendPacket(4);
-	SendPacket(5);
-	//SendPacket(6);
-	//SendPacket(7);
-	//SendPacket(8);
-	//Apply();
-
-}
-
-
-export function Shutdown() {
-	SendPacket(0, true);
-	SendPacket(1, true);
-	SendPacket(2, true);
-	SendPacket(3, true);
-	SendPacket(4, true);
-	SendPacket(5, true);
+	return colors;
 }
 
 export function Validate(endpoint) {

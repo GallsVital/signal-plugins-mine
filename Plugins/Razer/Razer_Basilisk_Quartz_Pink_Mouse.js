@@ -1,86 +1,32 @@
-function GetReport(cmd_class, cmd_id, size) {
-	const report = new Array(91).fill(0);
-
-	report[0] = 0;
-
-	// Status.
-	report[1] = 0x00;
-
-	// Transaction ID.
-	report[2] = 0xFF;
-
-	// Remaining packets.
-	report[3] = 0x00;
-	report[4] = 0x00;
-
-	// Protocol type.
-	report[5] = 0x00;
-
-	// Data size.
-	report[6] = size;
-
-	// Command class.
-	report[7] = cmd_class;
-
-	// Command id.
-	report[8] = cmd_id;
-
-	//report[8-87] = data;
-
-	//report[89] = crc;
-
-	//report[89] = reserved;
-
-	return report;
-}
-
-
-function CalculateCrc(report) {
-	let iCrc = 0;
-
-	for (let iIdx = 3; iIdx < 89; iIdx++) {
-		iCrc ^= report[iIdx];
-	}
-
-	return iCrc;
-}
-
-
-export function Name() { return "Razer Basilisk Ultimate"; }
+export function Name() { return "Razer Basilisk Quartz Pink"; }
 export function VendorId() { return 0x1532; }
+export function ProductId() { return 0x0064; }
+export function Publisher() { return "TheDongster"; }
 export function Documentation(){ return "troubleshooting/razer"; }
-export function ProductId() { return 0x0086; }
-export function Publisher() { return "WhirlwindFX"; }
-export function Size() { return [7, 13]; }
+export function Size() { return [3, 3]; }
 export function Type() { return "Hid"; }
 export function DefaultPosition() {return [225, 120]; }
-export function DefaultScale(){return 5.0;}
+export function DefaultScale(){return 15.0;}
 /* global
 shutdownColor:readonly
 LightingMode:readonly
 forcedColor:readonly
+DpiControl:readonly
+dpi1:readonly
 */
 export function ControllableParameters(){
 	return [
 		{"property":"shutdownColor", "group":"lighting", "label":"Shutdown Color", "min":"0", "max":"360", "type":"color", "default":"009bde"},
 		{"property":"LightingMode", "group":"lighting", "label":"Lighting Mode", "type":"combobox", "values":["Canvas", "Forced"], "default":"Canvas"},
 		{"property":"forcedColor", "group":"lighting", "label":"Forced Color", "min":"0", "max":"360", "type":"color", "default":"009bde"},
+		{"property":"DpiControl", "group":"mouse", "label":"Enable Dpi Control", "type":"boolean", "default":"false"},
+		{"property":"dpi1", "group":"mouse", "label":"DPI", "step":"50", "type":"number", "min":"50", "max":"6400", "default":"800"},
 	];
 }
+let savedDpi1;
 
-function hexToRgb(hex) {
-	const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
-	const colors = [];
-	colors[0] = parseInt(result[1], 16);
-	colors[1] = parseInt(result[2], 16);
-	colors[2] = parseInt(result[3], 16);
-
-	return colors;
-}
-
-const vLedNames = ["ScrollWheel", "Logo", "SideBar1", "SideBar2", "SideBar3", "SideBar4", "SideBar5", "SideBar6", "SideBar7", "SideBar8", "SideBar9", "SideBar10", "SideBar11"];
-const vLedPositions = [[3, 0], [3, 11],
-	[0, 1], [0, 2], [0, 3], [0, 4], [0, 5], [0, 6], [0, 7], [0, 8], [0, 9], [0, 10], [0, 11]];
+const vLedNames = ["Scroll", "Logo"];
+const vLedPositions = [[1, 0], [1, 2]];
 
 export function LedNames() {
 	return vLedNames;
@@ -90,33 +36,45 @@ export function LedPositions() {
 	return vLedPositions;
 }
 
-function EnableSoftwareControl() {
-	const report = GetReport(0x0F, 0x03, 0x47);
-
-	report[2] = 0x3F; // transaction id.
-
-	report[11] = 0; // row index.
-
-	report[13] = 15; // led count.
-
-	report[89] = CalculateCrc(report);
-
-
-	device.send_report(report, 91);
-}
-
-
-function ReturnToHardwareControl() {
-
-}
-
-
 export function Initialize() {
+	const packet = [];
+	packet[0] = 0x00;
+	packet[1] = 0x00;
+	packet[2] = 0x1F;
+	packet[3] = 0x00;
+	packet[4] = 0x00;
+	packet[5] = 0x00;
+	packet[6] = 0x06;
+	packet[7] = 0x0F;
+	packet[8] = 0x02;
+	packet[9] = 0x00;
+	packet[10] = 0x00;
+	packet[11] = 0x08;
+	packet[12] = 0x01;
+	packet[13] = 0x01;
 
+	packet[89] = CalculateCrc(packet);
+	device.send_report(packet, 91);
+
+
+	if(DpiControl) {
+		setDPIRazer(dpi1);
+	}
+}
+
+export function Render() {
+	SendPacket();
+
+	if(DpiControl) {
+		setDPIRazer(dpi1);
+	}
+}
+
+export function Shutdown() {
+	SendPacket(true);
 }
 
 function SendPacket(shutdown = false){
-
 
 	const packet = [];
 	packet[0] = 0x00;
@@ -125,13 +83,13 @@ function SendPacket(shutdown = false){
 	packet[3] = 0x00;
 	packet[4] = 0x00;
 	packet[5] = 0x00;
-	packet[6] = 0x2F;
+	packet[6] = 0x0B;
 	packet[7] = 0x0F;
 	packet[8] = 0x03;
 
 	packet[11] = 0x00;
 
-	packet[13] = 0x0D;
+	packet[13] = 0x01;
 
 
 	for(let iIdx = 0; iIdx < vLedPositions.length; iIdx++){
@@ -158,36 +116,47 @@ function SendPacket(shutdown = false){
 	device.send_report(packet, 91);
 }
 
+function setDPIRazer(dpi){
+	savedDpi1 = dpi;
 
-function Apply() {
-	const packet = []; //new Array(91).fill(0);
+	const packet = [];
 	packet[0] = 0x00;
 	packet[1] = 0x00;
-	packet[2] = 0x3F;
+	packet[2] = 0x1F;
 	packet[3] = 0x00;
 	packet[4] = 0x00;
 	packet[5] = 0x00;
-	packet[6] = 0x0C;
-	packet[7] = 0x0F;
-	packet[8] = 0x02;
-	packet[11] = 0x08;
-
+	packet[6] = 0x07;
+	packet[7] = 0x04;
+	packet[8] = 0x05;
+	packet[9] = 0x00;
+	packet[10] = Math.floor(dpi/256);
+	packet[11] = dpi%256;
+	packet[12] = Math.floor(dpi/256);
+	packet[13] = dpi%256;
 	packet[89] = CalculateCrc(packet);
 
 	device.send_report(packet, 91);
-	device.pause(1); // We need a pause here (between packets), otherwise the ornata can't keep up.
-
 }
 
+function CalculateCrc(report) {
+	let iCrc = 0;
 
-export function Render() {
-	SendPacket();
+	for (let iIdx = 3; iIdx < 89; iIdx++) {
+		iCrc ^= report[iIdx];
+	}
+
+	return iCrc;
 }
 
+function hexToRgb(hex) {
+	const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+	const colors = [];
+	colors[0] = parseInt(result[1], 16);
+	colors[1] = parseInt(result[2], 16);
+	colors[2] = parseInt(result[3], 16);
 
-export function Shutdown() {
-	SendPacket(true);
-
+	return colors;
 }
 
 export function Validate(endpoint) {
