@@ -203,7 +203,7 @@ function returnFirmwareType(data) {
 		device.notify("Unsupported Firmware: ", "Click Show Console, and then click on troubleshooting for your keyboard to find out more.", 0);
 	}
 
-	if(FirmwareTypeByte == VIAFirmware){
+	if(FirmwareTypeByte === VIAFirmware){
 		IsViaKeyboard = true;
 	}
 

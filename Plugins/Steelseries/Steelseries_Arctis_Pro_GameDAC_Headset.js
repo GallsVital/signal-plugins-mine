@@ -485,7 +485,7 @@ function sendColors(shutdown = false) {
 
 		const iPxX = vLedPositions[index][0];
 		const iPxY = vLedPositions[index][1];
-		var color;
+		let color;
 
 		if(shutdown){
 			color = hexToRgb(shutdownColor);

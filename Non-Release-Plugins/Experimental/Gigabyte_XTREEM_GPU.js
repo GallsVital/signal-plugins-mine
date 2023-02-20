@@ -1,38 +1,32 @@
-// Modifying SMBUS Plugins is -DANGEROUS- and can -DESTROY- devices.
-export function Name() { return "EVGA Ampere GPU"; }
+export function Name() { return "Gigabyte XTREME GPU"; }
 export function Publisher() { return "WhirlwindFX"; }
-export function Documentation(){ return "troubleshooting/evga"; }
+export function Documentation(){ return "troubleshooting/gigabyte"; }
 export function Type() { return "SMBUS"; }
-export function Size() { return [5, 2]; }
+export function Size() { return [14, 6]; }
 export function DefaultPosition(){return [192, 127];}
 export function DefaultScale(){return 12.5;}
 export function LedNames() { return vLedNames; }
 export function LedPositions() { return vLedPositions; }
+export function ConflictingProcesses() { return ["RGBFusion.exe"]; }
 /* global
 shutdownColor:readonly
 LightingMode:readonly
 forcedColor:readonly
-ARGBLedCount:readonly
-DisableMainBar:readonly
-DisableSideLogo:readonly
-DisableBackLogo:readonly
-DisableARGBHeader:readonly
 */
-export function ControllableParameters(){
+export function ControllableParameters() {
 	return [
 		{"property":"shutdownColor", "group":"lighting", "label":"Shutdown Color", "min":"0", "max":"360", "type":"color", "default":"#009bde"},
 		{"property":"LightingMode", "group":"lighting", "label":"Lighting Mode", "type":"combobox", "values":["Canvas", "Forced"], "default":"Canvas"},
 		{"property":"forcedColor", "group":"lighting", "label":"Forced Color", "min":"0", "max":"360", "type":"color", "default":"#009bde"},
-		{"property":"ARGBLedCount", "group":"lighting", "label":"ARGB Header Led Count", "min":"0", "max":"60", "type":"number", "default":"60"},
-		{"property":"DisableMainBar", "group":"settings", "label":"Disable Main Bar Zone", "type":"boolean", "default":"0"},
-		{"property":"DisableSideLogo", "group":"settings", "label":"Disable Side Logo Zone", "type":"boolean", "default":"0"},
-		{"property":"DisableBackLogo", "group":"settings", "label":"Disable Back Logo Zone", "type":"boolean", "default":"0"},
-		{"property":"DisableARGBHeader", "group":"settings", "label":"Disable ARGB Header Zone", "type":"boolean", "default":"0"},
 	];
 }
 
 let vLedNames = [];
+/** @type {LedPosition[]} */
 let vLedPositions = [];
+
+/** @type {GigabyteXtremeProtocol} */
+let GigabyteXtreme;
 
 /** @param {FreeAddressBus} bus */
 export function Scan(bus) {
@@ -43,182 +37,102 @@ export function Scan(bus) {
 		return [];
 	}
 
-	for(const GPU of new EVGAAmpereGPUList().devices){
-		if(GPU.CheckForIdMatch(bus)){
+	for(const GPU of new GigabyteXtremeGPUList().devices) {
+		if(CheckForIdMatch(bus, GPU)) {
 			// No Quick Write test on Nvidia
 
-			// This read fails after waking the system from sleep until the GPU gets written to atleast once.
-			//if(bus.ReadByteWithoutRegister(GPU.Address) > 0){
-
+			//if(GigabyteVisionGpuCheck(bus, GPU))
+			//{
+			bus.log(`Found Gigabyte XTREME GPU! [${GPU.Name}]`);
 			FoundAddresses.push(GPU.Address);
-			break;
-
-
-			//}else{
-			//	bus.log(`[${GPU.Name}] Failed Read Byte Test on Address [${GPU.Address}]`);
 			//}
+
 		}
 	}
 
 	return FoundAddresses;
 }
 
-function SetGPUNameFromBusIds(GPUList){
-	for(const GPU of GPUList){
-		if(GPU.CheckForIdMatch(bus)){
+function CheckForIdMatch(bus, Gpu) {
+	return Gpu.Vendor === bus.Vendor() &&
+    Gpu.SubVendor === bus.SubVendor() &&
+    Gpu.Device === bus.Product() &&
+    Gpu.SubDevice === bus.SubDevice();
+}
+
+function SetGPUNameFromBusIds(GPUList) {
+	for(const GPU of GPUList) {
+		if(CheckForIdMatch(bus, GPU)) {
 			device.setName(GPU.Name);
 			break;
 		}
 	}
 }
 
-export function onARGBLedCountChanged(){
-	EVGAAmpere.SetARGBLedCount(ARGBLedCount);
-}
-let HardwareModePoll;
-
 export function Initialize() {
-	SetGPUNameFromBusIds(new EVGAAmpereGPUList().devices);
+	GigabyteXtreme = new GigabyteXtremeProtocol();
+	GigabyteXtreme.initializeGPU();
+	buildLEDArray();
+	SetGPUNameFromBusIds(new GigabyteXtremeGPUList().devices);
 
-	EVGAAmpere.FetchFirmwareVersion();
-	EVGAAmpere.SetSoftwareControl(true);
-	EVGAAmpere.ReadCurrentModeData(true);
-	RebuildLedArrays();
-	HandleZoneDisables();
-
-	EVGAAmpere.SetARGBLedCount(ARGBLedCount);
-
-	HardwareModePoll = new PolledFunction(CheckHardwareModeStatus, 5000);
 }
 
 export function Render() {
-	SendRGB();
-
-	HardwareModePoll.Poll();
-
-	// Mimic old Refresh Speed. Noticing slight color blending going from Blue to Red where a Purple color gets flashed
-	device.pause(10);
-
-	//device.log(`Total Packets [${sentPackets + savedPackets}]. Checking RGB values saved us sending [${Math.floor(savedPackets/(savedPackets+sentPackets) * 100)}]% of them`)
-	//device.log(`Saved: [${savedPackets}] Sent: [${sentPackets}]`);
+	WriteRGB();
 }
 
 
 export function Shutdown() {
-	SendRGB(true);
+	WriteRGB(true);
 }
 
-class PolledFunction{
-	constructor(callback, interval){
-		this.callback = callback;
-		this.interval = interval;
-		this.lastPollTime = Date.now();
-	}
-	Poll(){
-		if (Date.now() - this.lastPollTime < this.interval) {
-			return;
-		}
-
-		this.callback();
-
-		this.lastPollTime = Date.now();
-	}
-}
-
-function CheckHardwareModeStatus(){
-	EVGAAmpere.ReadCurrentModeData();
-
-	let InvalidMode = false;
-
-	for(const ZoneId in EVGAAmpere.Config.Zones){
-		const Zone = EVGAAmpere.Config.Zones[ZoneId];
-
-		if(Zone.ledCount > 0 && Zone.mode !== 1 && !Zone.disabled){
-			device.log(`Setting Zone: [${Zone.name}] back to Static Mode! Was in mode: [${Zone.mode}]`);
-			InvalidMode = true;
-			EVGAAmpere.SetZoneMode(ZoneId, 1);
-		}
-	}
-
-	if(InvalidMode){
-		EVGAAmpere.SetSoftwareControl(true);
-	}
-}
-
-export function onDisableMainBarChanged(){
-	HandleZoneDisables();
-}
-export function onDisableSideLogoChanged(){
-	HandleZoneDisables();
-}
-export function onDisableBackLogoChanged(){
-	HandleZoneDisables();
-}
-export function onDisableARGBHeaderChanged(){
-	HandleZoneDisables();
-}
-
-
-function CompareArrays(array1, array2){
-	return array1.length === array2.length &&
-	array1.every(function(value, index) { return value === array2[index];});
-}
-
-function HandleZoneDisables(){
-	EVGAAmpere.Config.Zones.MainBar.disabled = DisableMainBar;
-	EVGAAmpere.Config.Zones.SideLogo.disabled = DisableSideLogo;
-	EVGAAmpere.Config.Zones.BackLogo.disabled = DisableBackLogo;
-	EVGAAmpere.Config.Zones.ARGBHeader.disabled = DisableARGBHeader;
-	RebuildLedArrays();
-}
-
-function SendRGB(shutdown = false){
-
-	for(const ZoneId in EVGAAmpere.Config.Zones){
-		const Zone = EVGAAmpere.Config.Zones[ZoneId];
-
-		if(Zone.ledCount === 0 || Zone.disabled){
-			continue;
-		}
-
-		let Color;
-
-		if(shutdown){
-			Color = hexToRgb(shutdownColor);
-		}else if(LightingMode === "Forced") {
-			Color = hexToRgb(forcedColor);
-		} else {
-			Color = device.color(...Zone.position);
-		}
-
-		if(!CompareArrays(Color, Zone.oldColor)){
-			EVGAAmpere.WriteRGB(Zone, Color);
-		}
-
-		Zone.oldColor = Color;
-	}
-}
-
-function RebuildLedArrays(){
+function buildLEDArray() {
 	vLedNames = [];
 	vLedPositions = [];
 
-	for(const ZoneId in EVGAAmpere.Config.Zones){
-		const Zone = EVGAAmpere.Config.Zones[ZoneId];
-
-		if(Zone.disabled){
-			continue;
-		}
-
-		if(Zone.ledCount > 0){
-			vLedNames.push(Zone.name);
-			vLedPositions.push(Zone.position);
-		}
+	for(let iIdx = 0; iIdx < 5; iIdx++) {
+		const Zone = GigabyteXtreme.LEDZones[iIdx];
+		vLedNames.push(...Zone.Names);
+		vLedPositions.push(...Zone.Positions);
 	}
 
 	device.setControllableLeds(vLedNames, vLedPositions);
 }
 
+function grabColors(Zone, shutdown) {
+	const RGBData = [];
+
+	for(let ledIdx = 0; ledIdx < Zone.Positions.length; ledIdx++) {
+		let Color;
+
+		if(shutdown) {
+			Color = hexToRgb(shutdownColor);
+		} else if(LightingMode === "Forced") {
+			Color = hexToRgb(forcedColor);
+		} else {
+			Color = device.color(Zone.Positions[ledIdx][0], Zone.Positions[ledIdx][1]);
+		}
+
+		RGBData[ledIdx * 3] = Color[0];
+		RGBData[ledIdx * 3 + 1] = Color[1];
+		RGBData[ledIdx * 3 + 2] = Color[2];
+	}
+
+	return RGBData;
+}
+
+function WriteRGB(shutdown) {
+
+	for(let iIdx = 0; iIdx < Object.keys(GigabyteXtreme.LEDZones).length; iIdx++) {
+
+		const Zone = GigabyteXtreme.LEDZones[iIdx];
+		const RGBData = grabColors(Zone, shutdown);
+		const packet = [0xE6, Zone.ZoneIdentifier, 0x01, 0x64, 0x02, 0x03, Zone.Positions.length];
+		packet.push(...RGBData);
+		device.log(packet);
+		bus.WriteBlockWithoutRegister(32, packet);
+	}
+}
 
 function hexToRgb(hex) {
 	const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
@@ -230,179 +144,56 @@ function hexToRgb(hex) {
 	return colors;
 }
 
+class GigabyteXtremeProtocol {
+	constructor() {
+		this.LEDZones =
+        {
+        	0 :
+            {
+            	Names : ["Left Fan Zone 1", "Left Fan Zone 2", "Left Fan Zone 3"],
+            	Positions : [ [0, 2], [0, 1], [0, 0] ],
+            	ZoneIdentifier : 0x02
+            },
+        	1 :
+            {
+            	Names : ["Front Fan Zone 1", "Front Fan Zone 2", "Front Fan Zone 3"],
+            	Positions : [ [7, 4], [8, 4], [9, 4] ],
+            	ZoneIdentifier : 0x03
+            },
+        	2 :
+            {
+            	Names : ["Right Fan Zone 1", "Right Fan Zone 2", "Right Fan Zone 3"],
+            	Positions : [ [13, 0], [13, 1], [13, 2] ],
+            	ZoneIdentifier : 0x04
+            },
+        	3 :
+            {
+            	Names : ["Side Zone 1", "Side Zone 2", "Size Zone 3"],
+            	Positions : [ [13, 5], [11, 5], [10, 5] ],
+            	ZoneIdentifier : 0x05
+            },
+        	4 :
+            {
+            	Names : ["Top Zone 1", "Top Zone 2", "Top Zone 3", "Top Zone 4", "Top Zone 5", "Top Zone 6"],
+            	Positions : [ [7, 5], [8, 4], [9, 3], [10, 2], [11, 1], [11, 0] ],
+            	ZoneIdentifier : 0x06
+            }
+        };
+	}
 
-class EVGAAmpereLedZone{
-	constructor(offset, name, position, mode = -1, ledCount = -1){
-		this.offset = offset;
-		this.name = name;
-		/** @type {LedPosition} */
-		this.position = position;
-		this.mode = mode;
-		this.ledCount = ledCount;
-		this.disabled = false;
-		this.oldColor = [];
+	initializeGPU() {
+		const packet = [0xD6];
+		bus.WriteBlockWithoutRegister(32, packet);
+
+		//const returnpacket = bus.ReadBlockWithoutRegister(4); //We aren't using this for anything but hey it's here for consistency.
+
+		//return returnpacket;
 	}
-	static GetValue(){
-		return 5134;
-	}
+
 }
 
-
-class EVGAAmpereProtocol{
-	constructor(){
-		this.Registers = {
-			Firmware: 0xB1,
-			CurrentMode: 0xC0,
-			StaticColor: 0xC1
-		};
-		this.Config = {
-			FirmwareVersion: "UNKNOWN",
-			ARGBLedCount: 0,
-			Zones: {
-				MainBar: new EVGAAmpereLedZone(0, "Main Bar", [2, 1]),
-				SideLogo: new EVGAAmpereLedZone(1, "Side Logo", [4, 1]),
-				BackLogo: new EVGAAmpereLedZone(2, "Back Logo", [3, 1]),
-				ARGBHeader: new EVGAAmpereLedZone(3, "ARGB Header", [3, 1]),
-			}
-		};
-	};
-	/**
-	 * @returns string
-	 */
-	FetchFirmwareVersion(){
-		const [ReturnCode, Data] = bus.ReadBlockBytes(this.Registers.Firmware, 6);
-
-		if(ReturnCode < 0){
-			device.log(`Failed to read Firmware version. Error Code: [${ReturnCode}]`);
-
-			return "UNKNOWN";
-		}
-
-		const Firmware = `${Data[3]}.${Data[4]}.${Data[5]}`;
-		this.Config.FirmwareVersion = Firmware;
-
-		device.log(`Firmware Version: [${this.Config.FirmwareVersion}]`, {toFile: true});
-
-		return Firmware;
-	}
-
-	ReadCurrentModeData(logData = false){
-		const [ReturnCode, Data] = bus.ReadBlockBytes(this.Registers.CurrentMode, 10);
-
-		if(ReturnCode < 0){
-			device.log(`Failed to read Current Modes. Error Code: [${ReturnCode}]`);
-
-			return;
-		}
-
-		this.Config.Zones.MainBar.mode = Data[1];
-		this.Config.Zones.SideLogo.mode = Data[2];
-		this.Config.Zones.BackLogo.mode = Data[3];
-		this.Config.Zones.ARGBHeader.mode = Data[4];
-		this.Config.Zones.MainBar.ledCount = Data[5];
-		this.Config.Zones.SideLogo.ledCount = Data[6];
-		this.Config.Zones.BackLogo.ledCount = Data[7];
-		this.Config.Zones.ARGBHeader.ledCount = Data[8];
-		this.Config.ARGBLedCount = Data[8];
-
-		if(logData){
-			device.log(`Current Modes:\n Zone 1 Mode: [${this.Config.Zones.MainBar.mode}],\n Zone 2 Mode: [${this.Config.Zones.SideLogo.mode}],\n Zone 3 Mode: [${this.Config.Zones.BackLogo.mode}],\n Zone 4 Mode: [${this.Config.Zones.ARGBHeader.mode}]\n ARGB Led Count: [${this.Config.ARGBLedCount}]`, {toFile: true});
-		}
-	}
-	SetARGBLedCount(Count){
-		device.log(`Setting ARGB Led Count to: [${Count}]`);
-
-		const packet = [
-			0x09,
-			0xFF,
-			0xFF,
-			0xFF,
-			0xFF,
-			0xFF,
-			0xFF,
-			0xFF,
-			Count,
-			0x00,
-		];
-
-		const iRet= bus.WriteBlock(this.Registers.CurrentMode, 10, packet);
-
-		if(iRet < 0){
-			device.log(`Failed to write Current Modes. Error Code: [${iRet}]`);
-		}
-
-		// Read current modes again to confirm the change
-		this.ReadCurrentModeData();
-	}
-	SetZoneMode(ZoneId, Mode){
-		if(!this.Config.Zones.hasOwnProperty(ZoneId)){
-			device.log(`SetZoneMode(): Zone: [${ZoneId}] does not exist!`);
-		}
-		const ZoneObject = this.Config.Zones[ZoneId];
-
-		device.log(`Setting Zone: [${ZoneId}] to mode: [${Mode}]`);
-
-		const packet = [
-			0x09,
-			0xFF,
-			0xFF,
-			0xFF,
-			0xFF,
-			0xFF,
-			0xFF,
-			0xFF,
-			0xFF,
-			0x00,
-		];
-
-		packet[ZoneObject.offset + 1] = Mode;
-
-		const ReturnCode = bus.WriteBlock(this.Registers.CurrentMode, 10, packet);
-
-		if(ReturnCode < 0){
-			device.log(`Failed to write Current Modes. Error Code: [${ReturnCode}]`);
-		}
-
-		// Read current modes again to confirm the change
-		this.ReadCurrentModeData();
-	}
-
-	SyncModesToHardware(){
-
-		const packet = [
-			0x09,
-			this.Config.Zones.MainBar.mode,
-			this.Config.Zones.SideLogo.mode,
-			this.Config.Zones.BackLogo.mode,
-			this.Config.Zones.ARGBHeader.mode
-		];
-		const ReturnCode = bus.WriteBlock(this.Registers.CurrentMode, 10, packet);
-
-		if(ReturnCode < 0){
-			device.log(`Failed to write Current Modes. Error Code: [${ReturnCode}]`);
-		}
-	}
-	SetSoftwareControl(Enabled){
-		if(Enabled){
-			const packet = [0x04, 0xc6, 0xEB, 0xEA, 0x15];
-			bus.WriteBlock(0xB2, 5, packet);
-
-			//packet = [0x07, 0x03, 0x00, 0x00, 0x00, 0x00, 0x00];
-			//bus.WriteBlockBytes(0x52, 8, packet);
-		}
-	}
-	WriteRGB(Zone, Color = []){
-		const packet = [0x04, 0x255];
-		packet.push(...Color);
-
-		bus.WriteBlock(this.Registers.StaticColor + Zone.offset, 5, packet);
-	}
-};
-
-const EVGAAmpere = new EVGAAmpereProtocol();
-
 class NvidiaGPUDeviceIds {
-	constructor(){
+	constructor() {
 		this.GTX1050TI       = 0x1C82;
 		this.GTX1060         = 0x1C03;
 		this.GTX1070         = 0x1B81;
@@ -442,80 +233,21 @@ class NvidiaGPUDeviceIds {
 		this.RTX3080TI       = 0x2208;
 		this.RTX3090         = 0x2204;
 		this.RTX3090TI       = 0x2203;
+		this.RTX4080		 = 0x2704;
+		this.RTX4090		 = 0x2684;
 	}
 };
 
-class EVGAAmpereDeviceIds{
-	constructor(){
-		this.RTX3060TI_FTW3_GAMING              = 0x3665;
-		this.RTX3060TI_FTW3_ULTRA_GAMING        = 0x3667;
-		this.RTX3060TI_FTW3_ULTRA_GAMING_LHR    = 0x4667;
-		this.RTX3070_FTW3_ULTRA_GAMING          = 0x3767;
-		this.RTX3070_FTW3_ULTRA_LHR             = 0x4767;
-		this.RTX3070_FTW3_ULTRA_LHR_2           = 0x4467; // UNTESTED
-		this.RTX3070_XC3_BLACK                  = 0x3751;
-		this.RTX3070_XC3_GAMING                 = 0x3753;
-		this.RTX3070_XC3_GAMING_ULTRA           = 0x3755;
-		this.RTX3070_XC3_ULTRA_LHR				= 0x4455;
-		this.RTX3070_XC3_ULTRA_LHR_2            = 0x4755;
-		//DUPE	this.RTX3070_XC3_ULTRA_LHR              = 0x4755;
-		this.RTX3070TI_FTW3_ULTRA_GAMING        = 0x3797;
-		this.RTX3070TI_FTW3_ULTRA_GAMING_2      = 0x3497; // UNTESTED
-		this.RTX3070TI_XC3_GAMING               = 0x3783;
-		this.RTX3070TI_XC3_ULTRA_GAMING         = 0x3785;
-		this.RTX3080_12G_FTW3_ULTRA             = 0x4877;
-		this.RTX3080_12G_FTW3_ULTRA_HC          = 0x4879;
-		this.RTX3080_12G_FTW3_ULTRA_HYBRID      = 0x4878;
-		this.RTX3080_FTW3_GAMING                = 0x3895;
-		this.RTX3080_FTW3_ULTRA_GAMING          = 0x3897;
-		this.RTX3080_FTW3_ULTRA_GAMING_LHR      = 0x4897;
-		this.RTX3080_FTW3_ULTRA_HC              = 0x3899;
-		this.RTX3080_FTW3_ULTRA_HC_LHR          = 0x4899;
-		this.RTX3080_FTW3_ULTRA_HYBRID          = 0x3898;
-		this.RTX3080_FTW3_ULTRA_HYBRID_LHR      = 0x4898;
-		this.RTX3080_XC3_BLACK                  = 0x3881;
-		this.RTX3080_XC3_BLACK_LHR              = 0x4881;
-		this.RTX3080_XC3_GAMING                 = 0x3883;
-		this.RTX3080_XC3_GAMING_LHR             = 0x4883;
-		this.RTX3080_XC3_ULTRA                  = 0x3885;
-		this.RTX3080_XC3_ULTRA_GAMING_LHR		= 0x4865;
-		this.RTX3080_XC3_ULTRA_HC               = 0x3889;
-		this.RTX3080_XC3_ULTRA_HYBRID           = 0x3888;
-		this.RTX3080_XC3_ULTRA_HYBRID_LHR       = 0x4888;
-		this.RTX3080_XC3_ULTRA_LHR              = 0x4885;
-		this.RTX3080TI_FTW3_ULTRA               = 0x3967;
-		this.RTX3080TI_FTW3_ULTRA_HYBRID        = 0x3968;
-		this.RTX3080TI_FTW3_ULTRA_HYDROCOPPER   = 0x3969;
-		this.RTX3080TI_XC3_GAMING               = 0x3953;
-		this.RTX3080TI_XC3_GAMING_HC            = 0x3959;
-		this.RTX3080TI_XC3_ULTRA_GAMING         = 0x3955;
-		this.RTX3080TI_XC3_ULTRA_HYBRID         = 0x3958;
-		this.RTX3090_FTW3_GAMING                = 0x3985;
-		this.RTX3090_FTW3_ULTRA                 = 0x3987;
-		this.RTX3090_FTW3_ULTRA_2               = 0x3387;
-		this.RTX3090_FTW3_ULTRA_HC              = 0x3989;
-		this.RTX3090_FTW3_ULTRA_HYBRID          = 0x3988;
-		this.RTX3090_FTW3_ULTRA_HYBRID_V2       = 0x3983;
-		this.RTX3090_FTW3_ULTRA_V2              = 0x3982;
-		this.RTX3090_KINGPIN                    = 0x3998;
-		this.RTX3090_KINGPIN_HC                 = 0x3999;
-		this.RTX3090_XC3_BLACK                  = 0x3971;
-		this.RTX3090_XC3_GAMING                 = 0x3973;
-		this.RTX3090_XC3_ULTRA_GAMING           = 0x3975;
-		this.RTX3090_XC3_ULTRA_HC               = 0x3979;
-		this.RTX3090_XC3_ULTRA_HYBRID           = 0x3978;
-		this.RTX3090TI_BLACK_GAMING             = 0x4981;
-		this.RTX3090TI_FTW3_GAMING              = 0x4983;
-		this.RTX3090TI_FTW3_HYBRID              = 0x4988; // UNTESTED
-		this.RTX3090TI_FTW3_ULTRA_GAMING        = 0x4985;
+const Nvidia = new NvidiaGPUDeviceIds();
 
-
+class GigabyteXtremeDeviceIds {
+	constructor() {
+		this.RTX4090_AORUS_MASTER = 0x40C0;
 	}
 }
 
-
-class GPUIdentifier{
-	constructor(Vendor, SubVendor, Device, SubDevice, Address, Name, Model = ""){
+class GPUIdentifier {
+	constructor(Vendor, SubVendor, Device, SubDevice, Address, Name, Model = "") {
 		this.Vendor = Vendor;
 		this.SubVendor = SubVendor;
 		this.Device = Device;
@@ -524,95 +256,23 @@ class GPUIdentifier{
 		this.Name = Name;
 		this.Model = Model;
 	}
-	UID(){
-		return `${this.Vendor}:${this.SubVendor}:${this.Device}:${this.SubDevice}`;
-	}
-	CheckForIdMatch(bus){
-		return this.Vendor === bus.Vendor() &&
-		this.SubVendor === bus.SubVendor() &&
-		this.Device === bus.Product() &&
-		this.SubDevice === bus.SubDevice();
+}
+
+class GigabyteXtremeIdentifier extends GPUIdentifier {
+	constructor(device, SubDevice, Address, Name) {
+		super(0x10DE, 0x1458, device, SubDevice, Address, Name, "");
 	}
 }
 
-class EVGAAmpereIdentifier extends GPUIdentifier{
-	constructor(Device, SubDevice, Name, Model = ""){
-		super(0x10DE, 0x3842, Device, SubDevice, 0x2D, Name, Model);
-	}
-}
-
-export function BrandGPUList(){ return new EVGAAmpereGPUList().devices; }
-
-class EVGAAmpereGPUList{
-	constructor(){
+class GigabyteXtremeGPUList {
+	constructor() {
 		const Nvidia = new NvidiaGPUDeviceIds();
+		const GigabyteVisionIds  = new GigabyteXtremeDeviceIds();
 
-		const EVGAAmpereIds = new EVGAAmpereDeviceIds();
 		this.devices = [
-			new EVGAAmpereIdentifier(Nvidia.RTX3060TI,         EVGAAmpereIds.RTX3060TI_FTW3_ULTRA_GAMING,       "EVGA RTX 3060Ti FTW3 Ultra Gaming"),
-			new EVGAAmpereIdentifier(Nvidia.RTX3060TI_LHR,     EVGAAmpereIds.RTX3060TI_FTW3_ULTRA_GAMING_LHR,   "EVGA RTX 3060Ti FTW3 Ultra Gaming LHR"),
-			new EVGAAmpereIdentifier(Nvidia.RTX3060TI_LHR,     EVGAAmpereIds.RTX3060TI_FTW3_ULTRA_GAMING,       "EVGA RTX 3060Ti FTW3 Ultra Gaming"),
-			new EVGAAmpereIdentifier(Nvidia.RTX3060TI,         EVGAAmpereIds.RTX3060TI_FTW3_GAMING,             "EVGA RTX 3060Ti FTW3 Gaming"),
-			new EVGAAmpereIdentifier(Nvidia.RTX3070,           EVGAAmpereIds.RTX3070_XC3_GAMING_ULTRA,          "EVGA RTX 3070 XC3 Ultra Gaming"),
-			new EVGAAmpereIdentifier(Nvidia.RTX3070,           EVGAAmpereIds.RTX3070_FTW3_ULTRA_GAMING,         "EVGA RTX 3070 FTW3 Ultra Gaming"),
-			new EVGAAmpereIdentifier(Nvidia.RTX3070,           EVGAAmpereIds.RTX3070_XC3_BLACK,                 "EVGA RTX 3070 XC3 Black Edition"),
-			new EVGAAmpereIdentifier(Nvidia.RTX3070_LHR,       EVGAAmpereIds.RTX3070_XC3_ULTRA_LHR,             "EVGA RTX 3070 XC3 Ultra Gaming LHR"),
-			new EVGAAmpereIdentifier(Nvidia.RTX3070,           EVGAAmpereIds.RTX3070_XC3_GAMING,                "EVGA RTX 3070 XC3 Gaming"),
-			new EVGAAmpereIdentifier(Nvidia.RTX3070_LHR,       EVGAAmpereIds.RTX3070_XC3_ULTRA_LHR_2,             "EVGA RTX 3070 XC3 Ultra LHR"),
-			//new EVGAAmpereIdentifier(Nvidia.RTX3070_LHR,       EVGAAmpereIds.RTX3070_FTW3_ULTRA_LHR_2,           "EVGA RTX 3070 FTW3 Ultra LHR"), // UNTESTED
-			new EVGAAmpereIdentifier(Nvidia.RTX3070_LHR,       EVGAAmpereIds.RTX3070_FTW3_ULTRA_LHR,            "EVGA RTX 3070 FTW3 Ultra LHR"),
-			new EVGAAmpereIdentifier(Nvidia.RTX3070TI,         EVGAAmpereIds.RTX3070TI_XC3_GAMING,              "EVGA RTX 3070Ti XC3 Gaming"),
-			new EVGAAmpereIdentifier(Nvidia.RTX3070TI,         EVGAAmpereIds.RTX3070TI_XC3_ULTRA_GAMING,        "EVGA RTX 3070Ti XC3 Ultra Gaming"),
-			new EVGAAmpereIdentifier(Nvidia.RTX3070TI,         EVGAAmpereIds.RTX3070TI_FTW3_ULTRA_GAMING,       "EVGA RTX 3070Ti FTW3 Ultra Gaming"),
-			//new EVGAAmpereIdentifier(Nvidia.RTX3070TI,         EVGAAmpereIds.RTX3070TI_FTW3_ULTRA_GAMING_2,     "EVGA RTX 3070Ti FTW3 Ultra Gaming"), // UNTESTED
-			new EVGAAmpereIdentifier(Nvidia.RTX3080,           EVGAAmpereIds.RTX3080_XC3_BLACK,                 "EVGA RTX 3080 XC3 Black"),
-			new EVGAAmpereIdentifier(Nvidia.RTX3080_LHR,       EVGAAmpereIds.RTX3080_XC3_BLACK_LHR,             "EVGA RTX 3080 XC3 Black LHR"),
-			new EVGAAmpereIdentifier(Nvidia.RTX3080,           EVGAAmpereIds.RTX3080_XC3_GAMING,                "EVGA RTX 3080 XC3 Gaming"),
-			new EVGAAmpereIdentifier(Nvidia.RTX3080_LHR,       EVGAAmpereIds.RTX3080_XC3_GAMING_LHR,            "EVGA RTX 3080 XC3 Gaming LHR"),
-			new EVGAAmpereIdentifier(Nvidia.RTX3080_GA102,     EVGAAmpereIds.RTX3080_XC3_ULTRA_GAMING_LHR,      "EVGA RTX 3080 XC3 Ultra Gaming"),
-
-			new EVGAAmpereIdentifier(Nvidia.RTX3080_LHR,       EVGAAmpereIds.RTX3080_XC3_ULTRA_HYBRID_LHR,      "EVGA RTX 3080 XC3 Ultra Hybrid LHR"),
-			new EVGAAmpereIdentifier(Nvidia.RTX3080,           EVGAAmpereIds.RTX3080_XC3_ULTRA_HC,              "EVGA RTX 3080 XC3 Ultra HydroCopper"),
-			new EVGAAmpereIdentifier(Nvidia.RTX3080,           EVGAAmpereIds.RTX3080_FTW3_GAMING,               "EVGA RTX 3080 FTW3 Gaming"),
-			new EVGAAmpereIdentifier(Nvidia.RTX3080_LHR,       EVGAAmpereIds.RTX3080_FTW3_ULTRA_HYBRID_LHR,     "EVGA RTX 3080 FTW3 Ultra Hybrid LHR"),
-			new EVGAAmpereIdentifier(Nvidia.RTX3080,           EVGAAmpereIds.RTX3080_FTW3_ULTRA_HC,             "EVGA RTX 3080 FTW3 Ultra HydroCopper"),
-			new EVGAAmpereIdentifier(Nvidia.RTX3080_LHR,       EVGAAmpereIds.RTX3080_FTW3_ULTRA_HC_LHR,         "EVGA RTX 3080 FTW3 Ultra HydroCopper LHR"),
-			new EVGAAmpereIdentifier(Nvidia.RTX3080,           EVGAAmpereIds.RTX3080_XC3_ULTRA,                 "EVGA RTX 3080 XC3 Ultra"),
-			new EVGAAmpereIdentifier(Nvidia.RTX3080_LHR,       EVGAAmpereIds.RTX3080_XC3_ULTRA_LHR,             "EVGA RTX 3080 XC3 Ultra LHR"),
-			new EVGAAmpereIdentifier(Nvidia.RTX3080,           EVGAAmpereIds.RTX3080_FTW3_ULTRA_GAMING,         "EVGA RTX 3080 FTW3 Ultra Gaming"),
-			new EVGAAmpereIdentifier(Nvidia.RTX3080_LHR,       EVGAAmpereIds.RTX3080_FTW3_ULTRA_GAMING_LHR,     "EVGA RTX 3080 FTW3 Ultra LHR"),
-			new EVGAAmpereIdentifier(Nvidia.RTX3080,           EVGAAmpereIds.RTX3080_FTW3_ULTRA_HYBRID,         "EVGA RTX 3080 FTW3 Ultra Hybrid"),
-			new EVGAAmpereIdentifier(Nvidia.RTX3080_GA102,     EVGAAmpereIds.RTX3080_12G_FTW3_ULTRA_HYBRID,     "EVGA RTX 3080 FTW3 Ultra Hybrid 12g LHR"),
-			new EVGAAmpereIdentifier(Nvidia.RTX3080_GA102,     EVGAAmpereIds.RTX3080_12G_FTW3_ULTRA_HC,         "EVGA RTX 3080 FTW3 Ultra HydroCopper 12g LHR"),
-			new EVGAAmpereIdentifier(Nvidia.RTX3080_GA102,     EVGAAmpereIds.RTX3080_12G_FTW3_ULTRA,            "EVGA RTX 3080 FTW3 Ultra 12g LHR"),
-			new EVGAAmpereIdentifier(Nvidia.RTX3080TI,         EVGAAmpereIds.RTX3080TI_XC3_ULTRA_HYBRID,        "EVGA RTX 3080Ti XC3 Ultra Hybrid"),
-			new EVGAAmpereIdentifier(Nvidia.RTX3080TI,         EVGAAmpereIds.RTX3080TI_FTW3_ULTRA_HYBRID,       "EVGA RTX 3080Ti XC3 Ultra Hybrid"),
-			new EVGAAmpereIdentifier(Nvidia.RTX3080TI,         EVGAAmpereIds.RTX3080TI_FTW3_ULTRA_HYDROCOPPER,  "EVGA RTX 3080Ti FTW3 Ultra HydroCopper"),
-			new EVGAAmpereIdentifier(Nvidia.RTX3080TI,         EVGAAmpereIds.RTX3080TI_XC3_GAMING,              "EVGA RTX 3080Ti XC3 Gaming"),
-			new EVGAAmpereIdentifier(Nvidia.RTX3080TI,         EVGAAmpereIds.RTX3080TI_XC3_ULTRA_GAMING,        "EVGA RTX 3080Ti XC3 Ultra Gaming"),
-			new EVGAAmpereIdentifier(Nvidia.RTX3080TI,         EVGAAmpereIds.RTX3080TI_XC3_GAMING_HC,           "EVGA RTX 3080Ti XC3 Gaming HydroCopper"),
-			new EVGAAmpereIdentifier(Nvidia.RTX3080TI,         EVGAAmpereIds.RTX3080TI_FTW3_ULTRA,              "EVGA RTX 3080Ti FTW3 Ultra"),
-			new EVGAAmpereIdentifier(Nvidia.RTX3090,           EVGAAmpereIds.RTX3090_XC3_BLACK,                 "EVGA RTX 3090 XC3 Black"),
-			new EVGAAmpereIdentifier(Nvidia.RTX3090,           EVGAAmpereIds.RTX3090_XC3_GAMING,                "EVGA RTX 3090 XC3 Gaming"),
-			new EVGAAmpereIdentifier(Nvidia.RTX3090,           EVGAAmpereIds.RTX3090_FTW3_GAMING,               "EVGA RTX 3090 FTW3 Gaming"),
-			new EVGAAmpereIdentifier(Nvidia.RTX3090,           EVGAAmpereIds.RTX3090_XC3_ULTRA_HYBRID,          "EVGA RTX 3090 XC3 Ultra Hybrid"),
-			new EVGAAmpereIdentifier(Nvidia.RTX3090,           EVGAAmpereIds.RTX3090_XC3_ULTRA_HC,              "EVGA RTX 3090 XC3 Ultra HydroCopper"),
-			new EVGAAmpereIdentifier(Nvidia.RTX3090,           EVGAAmpereIds.RTX3090_FTW3_ULTRA,                "EVGA RTX 3090 FTW3 Ultra"),
-			new EVGAAmpereIdentifier(Nvidia.RTX3090,           EVGAAmpereIds.RTX3090_FTW3_ULTRA_2,              "EVGA RTX 3090 FTW3 Ultra"),
-			new EVGAAmpereIdentifier(Nvidia.RTX3090,           EVGAAmpereIds.RTX3090_FTW3_ULTRA_V2,             "EVGA RTX 3090 FTW3 Ultra v2"),
-			new EVGAAmpereIdentifier(Nvidia.RTX3090,           EVGAAmpereIds.RTX3090_FTW3_ULTRA_HC,             "EVGA RTX 3090 FTW3 Ultra HydroCopper"),
-			new EVGAAmpereIdentifier(Nvidia.RTX3090,           EVGAAmpereIds.RTX3090_XC3_ULTRA_GAMING,          "EVGA RTX 3090 XC3 Ultra Gaming"),
-			new EVGAAmpereIdentifier(Nvidia.RTX3090,           EVGAAmpereIds.RTX3090_FTW3_ULTRA_HYBRID,         "EVGA RTX 3090 FTW3 Ultra Hybrid"),
-			new EVGAAmpereIdentifier(Nvidia.RTX3090,           EVGAAmpereIds.RTX3090_FTW3_ULTRA_HYBRID_V2,      "EVGA RTX 3090 FTW3 Ultra Hybrid V2"),
-			new EVGAAmpereIdentifier(Nvidia.RTX3090,           EVGAAmpereIds.RTX3090_KINGPIN,                   "EVGA RTX 3090 Kingpin"),
-			new EVGAAmpereIdentifier(Nvidia.RTX3090TI,         EVGAAmpereIds.RTX3090TI_FTW3_ULTRA_GAMING,       "EVGA RTX 3090Ti FTW3 Ultra Gaming"),
-			new EVGAAmpereIdentifier(Nvidia.RTX3090TI,         EVGAAmpereIds.RTX3090TI_BLACK_GAMING,            "EVGA RTX 3090TI Black Gaming"),
-			new EVGAAmpereIdentifier(Nvidia.RTX3090TI,         EVGAAmpereIds.RTX3090TI_FTW3_GAMING,             "EVGA RTX 3090TI FTW3 Gaming"),
-			//new EVGAAmpereIdentifier(Nvidia.RTX3090TI,         EVGAAmpereIds.RTX3090TI_FTW3_HYBRID,             "EVGA RTX 3090TI FTW3 Hybrid"), // UNTESTED
-
+			new GigabyteXtremeIdentifier(Nvidia.RTX4090, GigabyteVisionIds.RTX4090_AORUS_MASTER, 0x61, "GIGABYTE RTX4090 Aorus Master"),
 		];
 	}
-
 }
 
 export function Image() {

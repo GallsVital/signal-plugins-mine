@@ -78,7 +78,7 @@ export function Render() {
 }
 
 export function Shutdown() {
-	effectDisable();
+	sendColors(true);
 }
 
 function commandHandler() {
@@ -172,7 +172,11 @@ function returnUniqueIdentifier(data) {
 	const UniqueIdentifierByte1 = data[2];
 	const UniqueIdentifierByte2 = data[3];
 	const UniqueIdentifierByte3 = data[4];
-	device.log("Unique Device Identifier: " + UniqueIdentifierByte1 + UniqueIdentifierByte2 + UniqueIdentifierByte3);
+
+	if(!(UniqueIdentifierByte1 === 0 && UniqueIdentifierByte2 === 0 && UniqueIdentifierByte3 === 0)) {
+		device.log("Unique Device Identifier: " + UniqueIdentifierByte1 + UniqueIdentifierByte2 + UniqueIdentifierByte3);
+	}
+
 	device.pause(30);
 }
 
@@ -198,15 +202,20 @@ function requestFirmwareType() {
 function returnFirmwareType(data) {
 	const FirmwareTypeByte = data[2];
 
-	if(FirmwareTypeByte !== MainlineQMKFirmware || FirmwareTypeByte !== VIAFirmware) {
+	if(!(FirmwareTypeByte === MainlineQMKFirmware || FirmwareTypeByte === VIAFirmware)) {
 		device.notify("Unsupported Firmware: ", "Click Show Console, and then click on troubleshooting for your keyboard to find out more.", 0);
 	}
 
-	if(FirmwareTypeByte == VIAFirmware){
-		IsViaKeyboard = true;
+	if(FirmwareTypeByte === MainlineQMKFirmware) {
+		IsViaKeyboard = false;
+		device.log("Firmware Type: Mainline");
 	}
 
-	device.log("Firmware Type: " + FirmwareTypeByte);
+	if(FirmwareTypeByte === VIAFirmware) {
+		IsViaKeyboard = true;
+		device.log("Firmware Type: VIA");
+	}
+
 	device.pause(30);
 }
 
@@ -247,8 +256,8 @@ function grabColors(shutdown = false) {
 	return rgbdata;
 }
 
-function sendColors() {
-	const rgbdata = grabColors();
+function sendColors(shutdown = false) {
+	const rgbdata = grabColors(shutdown);
 
 	const LedsPerPacket = 9;
 	let BytesSent = 0;

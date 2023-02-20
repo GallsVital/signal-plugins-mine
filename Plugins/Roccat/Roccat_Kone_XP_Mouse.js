@@ -23,7 +23,7 @@ timeoutlength:readonly
 debounce:readonly
 lod:readonly
 */
-export function ControllableParameters(){
+export function ControllableParameters() {
 	return [
 		{"property":"shutdownColor", "group":"lighting", "label":"Shutdown Color", "min":"0", "max":"360", "type":"color", "default":"009bde"},
 		{"property":"LightingMode", "group":"lighting", "label":"Lighting Mode", "type":"combobox", "values":["Canvas", "Forced"], "default":"Canvas"},
@@ -64,7 +64,7 @@ const PollingDict =
 
 const vLedNames =
 [
-	"Led 1", "Led 2", "Led 3", "Led 4", "Led 5", "Led 6", "Led 7", "Led 8", "Led 9", "Led 10", "Led 11", "Led 12", "Led 13", "Led 14", "Led 15", "Led 16", "Led 17", "Led 18", "Led 19", "Led 20",
+	"Left Bar Top", "Left Bar Bottom", "Second Left Bar Top", "Second Left Bar Bottom", "Third Left Bar Top", "Third Left Bar Bottom", "Center Left Bar Top", "Center Left Bar Bottom", "Center Left General", "Center Right General", "Center Right Top Bar", "Center Right Bottom Bar", "Third Right Bar Top", "Third Right Bar Bottom", "Second Right Bar Top", "Second Right Bar Bottom", "Right Bar Top", "Right Bar Bottom", "Scroll Wheel", "Profile Button"
 ];
 
 const vLedPositions =
@@ -182,20 +182,18 @@ function SetDebounce() //for some reason this has its own function?
 
 function SetLiftOffDistance() //also has its own function?
 {
-	const packet = [];
-	packet[0] = 0x0f;
-	packet[1] = 0x06;
+	const packet = [0x0f, 0x06];
 
-	if(lod == "Low") {
+	if(lod === "Low") {
 	 packet[2] = 0x00;
 	}
 
-	if(lod == "High") {
+	if(lod === "High") {
 		packet[2] = 0x01;
 	}
 
 	device.send_report(packet, 6);
-	sendReportString("0E 06 01 00 00 FF", 6);//Software mod
+	sendReportString("0E 06 01 00 00 FF", 6);//Software mode
 
 }
 
@@ -215,9 +213,10 @@ function Setup() {
 	SettingReport[29] = PollingDict[pollingrate];
 	SettingReport[34] = (timeout ? 0x00 : 0xff);
 	SettingReport[33] = timeoutlength;
+	SettingReport[32] = 0xff;
 
 	device.send_report(SettingReport, 174);
-	//sendReportString("0E 04 00 00 05",6);
+	sendReportString("0E 06 00 00 00 FF", 6);
 	sendReportString("0E 06 01 01 00 FF", 6);
 }
 
@@ -229,11 +228,10 @@ function sendZone(shutdown = false) {
 	for(let iIdx = 0; iIdx < 20; iIdx++) {
 		const iPxX = vLedPositions[iIdx][0];
 		const iPxY = vLedPositions[iIdx][1];
-		var col;
+		let col;
 
 		if(shutdown) {
 			col = hexToRgb(shutdownColor);
-
 		} else if (LightingMode === "Forced") {
 			col = hexToRgb(forcedColor);
 		} else {
@@ -253,10 +251,6 @@ function sendZone(shutdown = false) {
 	device.pause(1);
 }
 
-export function Validate(endpoint) {
-	return endpoint.interface === 3;
-}
-
 function hexToRgb(hex) {
 	const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
 	const colors = [];
@@ -265,6 +259,10 @@ function hexToRgb(hex) {
 	colors[2] = parseInt(result[3], 16);
 
 	return colors;
+}
+
+export function Validate(endpoint) {
+	return endpoint.interface === 3;
 }
 
 export function Image() {

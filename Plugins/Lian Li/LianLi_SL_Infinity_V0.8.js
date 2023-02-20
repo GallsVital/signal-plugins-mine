@@ -186,7 +186,7 @@ export function Render() {
 		PollFans();
 	}
 
-	if(!savedMoboPassthrough) {
+	if(!moboSync) {
 		sendColors();
 	}
 
@@ -261,17 +261,9 @@ function sendColors() {
 	device.pause(7);//Users will be able to tweak these because I swear the values that look good to me never look good to users.
 }
 
-let savedMoboPassthrough;
 
 function setMoboPassthrough() {
-	if(savedMoboPassthrough !== moboSync) {
-		savedMoboPassthrough = moboSync;
-
-		const packet = [0xE0, 0x10, 0x61, 0x00];
-		packet[3] = moboSync;
-
-		device.write(packet, 353);
-	}
+	device.write([0xE0, 0x10, 0x61, moboSync], 353);
 }
 
 let savedPollFanTimer = Date.now();

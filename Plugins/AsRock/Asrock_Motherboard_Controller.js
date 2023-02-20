@@ -805,13 +805,21 @@ function concatRGBData() {
 	const MoboRGBData = grabMoboData();
 	const RGBHeaderData = grabRGBHeaderData();
 	const Header1RGBData = grabRGBData(0);
-	const Header2RGBData = grabRGBData(1);
+
 
 	//Properly Order Everything. RGBHeaders, Headers 1 and 2, Mobo, Header 3.
 
 	RGBData.push(...RGBHeaderData);
 	RGBData.push(...Header1RGBData);
-	RGBData.push(...Header2RGBData);
+
+	if(ARGBHeaders > 1) {
+		const Header2RGBData = grabRGBData(1);
+		RGBData.push(...Header2RGBData);
+	} else {
+		const Header2RGBData = new Array(240);
+		RGBData.push(...Header2RGBData);
+	}
+
 	RGBData.push(...MoboRGBData);
 
 	if(ARGBHeaders > 2) {

@@ -93,7 +93,7 @@ function sendColors(shutdown = false) {
 	} else if (LightingMode === "Forced") {
 		color = hexToRgb(forcedColor);
 	} else {
-		color = device.color( vLedPositions[0][0],  vLedPositions[0][1]);
+		color = device.color(vLedPositions[0][0],  vLedPositions[0][1]);
 	}
 
 	MSIGPU.setDeviceMode(MSIGPU.modes.STATIC); //40 Series special.
@@ -277,6 +277,7 @@ class MSIGPUDeviceIDs {
 		this.RTX4090_SUPRRIM_X						 = 0x5102;
 		this.RTX4090_GAMING_TRIO			         = 0x5103;
 		this.RTX4090_SUPRIM_LIQUID_X                 = 0x5104;
+		this.RTX4090_SUPRIM_X_CLASSIC				 = 0x5105;
 	}
 }
 
@@ -293,7 +294,8 @@ class MSIGPUList {
         	new MSIGPUIdentifier(Nvidia.RTX4080, MSIGPUIDs.RTX4080_GAMING_X_TRIO, 0x68, "MSI RTX 4080 GAMING X TRIO"),
         	new MSIGPUIdentifier(Nvidia.RTX4090, MSIGPUIDs.RTX4090_GAMING_TRIO, 0x68, "MSI RTX 4090 GAMING TRIO"),
         	new MSIGPUIdentifier(Nvidia.RTX4090, MSIGPUIDs.RTX4090_SUPRIM_LIQUID_X, 0x68, "MSI RTX 4090 SUPRIM LIQUID X"),
-        	new MSIGPUIdentifier(Nvidia.RTX4090, MSIGPUIDs.RTX4090_SUPRRIM_X, 0x68, "MSI RTX 4090 SUPRIM X")
+        	new MSIGPUIdentifier(Nvidia.RTX4090, MSIGPUIDs.RTX4090_SUPRRIM_X, 0x68, "MSI RTX 4090 SUPRIM X"),
+        	new MSIGPUIdentifier(Nvidia.RTX4090, MSIGPUIDs.RTX4090_SUPRIM_X_CLASSIC, 0x68, "MSI RTX 4090 SUPRIM X Classic")
         ];
 	}
 }

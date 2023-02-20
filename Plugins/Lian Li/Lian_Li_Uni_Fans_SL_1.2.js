@@ -4,8 +4,6 @@ export function ProductId() { return 0xA100;}//0xA100; }
 export function Publisher() { return "WhirlwindFX"; }
 export function Size() { return [1, 1]; }
 export function Type(){return "rawusb";}
-
-;
 /* global
 shutdownColor:readonly
 LightingMode:readonly
@@ -19,13 +17,7 @@ export function ControllableParameters(){
 		{"property":"LightingMode", "group":"lighting", "label":"Lighting Mode", "type":"combobox", "values":["Canvas", "Forced"], "default":"Canvas"},
 		{"property":"forcedColor", "group":"lighting", "label":"Forced Color", "min":"0", "max":"360", "type":"color", "default":"009bde"},
 		{"property":"moboSync", "group":"", "label":"Enable Passthrough Control", "type":"boolean", "default":"false"},
-		// {"property":"Channel1Count", "label":"Channel 1 Fan count","type":"combobox","values":["0","1","2","3","4"],"default":"0"},
-		// {"property":"Channel2Count", "label":"Channel 2 Fan count","type":"combobox","values":["0","1","2","3","4"],"default":"0"},
-		// {"property":"Channel3Count", "label":"Channel 3 Fan count","type":"combobox","values":["0","1","2","3","4"],"default":"0"},
-		// {"property":"Channel4Count", "label":"Channel 4 Fan count","type":"combobox","values":["0","1","2","3","4"],"default":"0"},
 		{"property":"FanMode", "group":"", "label":"Fan Speed Mode", "type":"combobox", "values":["SignalRGB", "Motherboard PWM"], "default":"SignalRGB"},
-		//{"property":"targetRPM", "group":"", "label":"Fan RPM", "step":"50","type":"number","min":"800", "max":"1900","default":"1300"},
-		//{"property":"FanMode", "group":"", "label":"Fan Speed Mode","type":"combobox","values":["Manual","PWM"],"default":"PWM"},
 	];
 }
 export function DeviceMessages() {
@@ -127,7 +119,7 @@ export function Initialize() {
 
 	for(let channel = 0; channel < 4;channel++) {
 
-		packet = [0x00, 0x32, 0x03, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x01];
+		const packet = [0x00, 0x32, 0x03, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x01];
 		packet[2] = 0x10 * channel + 3;
 		sendControlPacket(COMMAND_ADDRESS, packet, 16);
 	}
@@ -135,17 +127,12 @@ export function Initialize() {
 	sendControlPacket(COMMAND_ADDRESS, PACKET_START, 16);
 	setMoboPassthrough();
 
-	var packet = [0x00, 0x01, 0x02, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x01];
-	sendControlPacket(COMMAND_ADDRESS, packet, 16);
+	sendControlPacket(COMMAND_ADDRESS, [0x00, 0x01, 0x02, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x01], 16);
 }
 
 export function Render() {
-	if(FanMode == "SignalRGB") {
+	if(FanMode === "SignalRGB") {
 		PollFans();
-	}
-
-	if(!savedMoboPassthrough) {
-		sendChannels();
 	}
 }
 
@@ -286,28 +273,11 @@ function isChannelActive(channelIdx) {
 	return channelArray[channelIdx].count > 0;
 }
 
-let savedMoboPassthrough;
-
 function setMoboPassthrough() {
-	if(savedMoboPassthrough != moboSync) {
-		savedMoboPassthrough = moboSync;
+	const packet = [0x00, 0x30, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x01];
+	packet[2] = moboSync;
 
-		const packet = [0x00, 0x30, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x01];
-		packet[2] = moboSync;
-
-		sendControlPacket(COMMAND_ADDRESS, packet, 16);
-	}
-}
-
-function sendPacketString(string, size) {
-	const packet= [];
-	const data = string.split(' ');
-
-	for(let i = 0; i < data.length; i++){
-		packet[parseInt(i, 16)] = parseInt(data[i], 16);//.toString(16)
-	}
-
-	device.write(packet, size);
+	sendControlPacket(COMMAND_ADDRESS, packet, 16);
 }
 
 function readControlPacket(index, data, length) {
@@ -319,27 +289,6 @@ function sendControlPacket(index, data, length) {
 	//                  iType, iRequest, iValue, iReqIdx, pBuf, iLen, iTimeout
 	device.control_transfer(0x40, 0x80, 0, index, data, length, 1000);
 	device.pause(1);
-}
-
-// function sendCommit()
-// {
-//     var packet = [0x01];
-//     //                  iType, iRequest, iValue, iReqIdx, pBuf, iLen, iTimeout
-//     device.control_transfer(0x40,0x80,0,COMMIT_ADDRESS,packet,1,1000);
-
-//     // if you have more then 4 or so fans they start to miss commands without this delay or the 'filler' packets.
-//     // adding this to a toggle may be a solution for large numbers of fans
-//     device.pause(1)
-// }
-
-function hexToRgb(hex) {
-	const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
-	const colors = [];
-	colors[0] = parseInt(result[1], 16);
-	colors[1] = parseInt(result[2], 16);
-	colors[2] = parseInt(result[3], 16);
-
-	return colors;
 }
 
 export function Image() {

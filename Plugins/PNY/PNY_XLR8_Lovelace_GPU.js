@@ -129,6 +129,7 @@ class PNYGPUIdentifier extends GPUIdentifier {
 
 const PNYGPUIDs =
 [
+	new PNYGPUIdentifier(0x2782, 0x13b1, "PNY RTX 4070TI XLR8"),
 	new PNYGPUIdentifier(0x2684, 0x13ad, "PNY RTX 4090 XLR8"),
 	new PNYGPUIdentifier(0x2684, 0x13ae, "PNY RTX 4090 XLR8"),
 ];
