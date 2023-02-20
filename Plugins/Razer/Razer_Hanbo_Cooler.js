@@ -3,7 +3,7 @@ export function VendorId() { return 0x1532; }
 export function Documentation(){ return "troubleshooting/razer"; }
 export function ProductId() { return 0x0f35; }
 export function Publisher() { return "WhirlwindFX"; }
-export function Size() { return [8, 8]; }
+export function Size() { return [8, 10]; }
 export function Type() { return "Hid"; }
 export function DefaultPosition() {return [225, 120]; }
 export function DefaultScale(){return 15.0;}
