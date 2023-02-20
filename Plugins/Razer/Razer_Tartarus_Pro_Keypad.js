@@ -1,5 +1,5 @@
 function GetReport(cmd_class, cmd_id, size) {
-	let report = new Array(91).fill(0);
+	const report = new Array(91).fill(0);
 
 	report[0] = 0;
 
@@ -68,8 +68,8 @@ export function ControllableParameters(){
 }
 
 function hexToRgb(hex) {
-	let result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
-	let colors = [];
+	const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+	const colors = [];
 	colors[0] = parseInt(result[1], 16);
 	colors[1] = parseInt(result[2], 16);
 	colors[2] = parseInt(result[3], 16);
@@ -77,21 +77,21 @@ function hexToRgb(hex) {
 	return colors;
 }
 export function Type() { return "Hid"; }
-let vLedNames = [
+const vLedNames = [
 	"Key 1", "Key 2", "Key 3", "Key 4", "Key 5",
 	"Key 5", "Key 6", "Key 7", "Key 8", "Key 9",
 	"Key 10", "Key 11", "Key 12", "Key 13", "Key 14",
 	"Key 15", "Key 16", "Key 17", "Key 18", "Key 19",
 	"Key 20",
 ];
-let vKeymap = [
+const vKeymap = [
 	0, 1, 2, 3, 4,
 	5, 6, 7, 8, 9,
 	10, 11, 12, 13, 14,
 	15, 16, 17, 18, 19,
 	20
 ];
-let vLedPositions = [
+const vLedPositions = [
 	[0, 0], [1, 0], [2, 0], [3, 0], [4, 0],
 	[0, 1], [1, 1], [2, 1], [3, 1], [4, 1],
 	[0, 2], [1, 2], [2, 2], [3, 2], [4, 2],
@@ -113,7 +113,7 @@ export function Initialize() {
 }
 
 function SendPacket(idx, shutdown = false) {
-	let packet = [];
+	const packet = [];
 	packet[0] = 0x00;
 	packet[1] = 0x00;
 	packet[2] = 0x1F;
@@ -127,8 +127,8 @@ function SendPacket(idx, shutdown = false) {
 	packet[13] = 0x14;
 
 	for(let iIdx = 0; iIdx < vKeymap.length; iIdx++) {
-		let iPxX = vLedPositions[iIdx][0];
-		let iPxY = vLedPositions[iIdx][1];
+		const iPxX = vLedPositions[iIdx][0];
+		const iPxY = vLedPositions[iIdx][1];
 		var color;
 
 		if(shutdown){
@@ -138,7 +138,7 @@ function SendPacket(idx, shutdown = false) {
 		}else{
 			color = device.color(iPxX, iPxY);
 		}
-		let iLedIdx = (iIdx*3) + 14;
+		const iLedIdx = (iIdx*3) + 14;
 		packet[iLedIdx] = color[0];
 		packet[iLedIdx+1] = color[1];
 		packet[iLedIdx+2] = color[2];

@@ -165,7 +165,19 @@ export function Initialize() {
 
 
 export function Shutdown() {
+	SendMainBoardLeds(true);
 
+	if(DeviceInfo.PolymoSupport) {
+		sendPolymoColors();
+
+		for(let channel = 0; channel < DeviceInfo.ARGBChannelCount; channel++){
+			SendARGBChannel(channel, true, true);
+		}
+	} else {
+		for(let channel = 0; channel < DeviceInfo.ARGBChannelCount; channel++){
+			SendARGBChannel(channel, false, true);
+		}
+	}
 }
 
 export function Render() {
@@ -339,7 +351,7 @@ function Fetch12VHeaderColors(shutdown = false){
 	return [RGBData, TotalLedCount];
 }
 
-function SendARGBChannel(ChannelIdx, polymo = false) {
+function SendARGBChannel(ChannelIdx, polymo = false, shutdown = false) {
 	//Fetch Colors
 	let ChannelLedCount = device.channel(ChannelArray[ChannelIdx][0]).LedCount();
 	const componentChannel = device.channel(ChannelArray[ChannelIdx][0]);
@@ -355,6 +367,8 @@ function SendARGBChannel(ChannelIdx, polymo = false) {
 		const pulseColor = device.getChannelPulseColor(ChannelArray[ChannelIdx][0], ChannelLedCount);
 		RGBData = device.createColorArray(pulseColor, ChannelLedCount, "Inline", RGBconfig);
 
+	}else if(shutdown){
+		RGBData = device.createColorArray(shutdownColor, ChannelLedCount, "Inline", RGBconfig);
 	}else{
 		RGBData = device.channel(ChannelArray[ChannelIdx][0]).getColors("Inline", RGBconfig);
 	}

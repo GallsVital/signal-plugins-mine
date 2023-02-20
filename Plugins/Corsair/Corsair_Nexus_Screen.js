@@ -37,13 +37,15 @@ export function Shutdown() {
 	sendReportString("03 01 64 01 78 00 C0 03 2F 2F 2F FF 2F 2F 2F FF 2F 2F 2F FF 2F 2F 2F FF 2F 2F 2F FF 2F 2F 2F FF", 32);
 }
 
-const vKeyNames = [ "Device Wide" ];
+const vKeyNames = [
+	"Device Wide",
+];
 
-function sendReportString(string, size) {
+function sendReportString(string, size){
 	const packet= [];
 	const data = string.split(' ');
 
-	for(let i = 0; i < data.length; i++) {
+	for(let i = 0; i < data.length; i++){
 		packet[parseInt(i, 16)] =parseInt(data[i], 16);//.toString(16)
 	}
 
@@ -51,7 +53,9 @@ function sendReportString(string, size) {
 }
 
 
-const vKeyPositions = [ [0, 0] ];
+const vKeyPositions = [
+	[0, 0]
+];
 
 export function LedNames() {
 	return vKeyNames;
@@ -120,7 +124,7 @@ function SendColorData() {
 		packet[0x01]   = 0x05;
 		packet[0x02]   = 0x40;
 
-		packet[0x03]   = row == 120 ? 1 : 0;
+		packet[0x03]   = row === 120 ? 1 : 0;
 		packet[0x04]   = row ;
 		packet[0x05]   = 0x00;
 		packet[0x06]   = 0xF8;
@@ -129,7 +133,7 @@ function SendColorData() {
 		packet  = packet.concat(RGBdata.slice(row*4*254, row*4*254 + 4*254));
 
 		device.write(packet, 1024);
-		offset == 1 ? offset = 1: offset = 0;
+		offset === 1 ? offset = 1: offset = 0;
 
 	}
 }

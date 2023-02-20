@@ -1,8 +1,8 @@
 export function Name() { return "ASUS ROG Keris"; }
 export function VendorId() { return 0x0B05; }
-export function Documentation(){ return "troubleshooting/asus"; }
-export function ProductId() { return 0x195C; }
+export function ProductId() { return [0x195C, 0x1960, 0x195e]; }
 export function Publisher() { return "WhirlwindFX"; }
+export function Documentation(){ return "troubleshooting/asus"; }
 export function Size() { return [7, 8]; }
 export function DefaultPosition() {return [180, 100]; }
 export function DefaultScale(){return 8.0;}
@@ -30,18 +30,16 @@ export function LedNames() {
 export function LedPositions() {
 	return vKeyPositions;
 }
+export function Initialize() {
+
+}
 
 export function Render() {
 	sendColors(0);
 	sendColors(1);
 }
 
-export function Initialize() {
-
-}
-
 export function Shutdown() {
-
 }
 
 function sendColors(zone, shutdown = false) {

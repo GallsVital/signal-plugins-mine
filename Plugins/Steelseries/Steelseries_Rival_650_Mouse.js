@@ -1,11 +1,11 @@
 export function Name() { return "SteelSeries Rival 650"; }
 export function VendorId() { return 0x1038; }
-export function Documentation(){ return "troubleshooting/steelseries"; }
-export function ProductId() { return 0x1726; }
+export function ProductId() { return [0x172B, 0x1726]; }
 export function Publisher() { return "WhirlwindFX"; }
+export function Documentation(){ return "troubleshooting/steelseries"; }
 export function Size() { return [7, 7]; }
-export function DefaultPosition() {return [225, 120]; }
-export function DefaultScale(){return 7.0;}
+export function DefaultPosition(){return [240, 120];}
+export function DefaultScale(){return 1.5;}
 /* global
 shutdownColor:readonly
 LightingMode:readonly
@@ -24,12 +24,12 @@ export function ControllableParameters(){
 		{"property":"send_delay1", "label":"RGB Packet Delay", "step":"1", "type":"number", "min":"0", "max":"200", "default":"60", "tooltip":"Time in milliseconds in between rgb updates. Lower delay increases smoothness, but also increases chance of mouse locking up."}
 	];
 }
-
 export function DeviceMessages() {
 	return [
 		{property: "Limited Frame Rate", message:"Limited Frame Rate", tooltip: "This device's firmware is limited to a slower refresh rate then other devices. Adjusting RGB Packet Delay may help, but may also increase instability"},
 	];
 }
+
 const vLedNames =
 [
 	"Scroll", "Logo",
@@ -85,8 +85,7 @@ function SendColorPacket(Position, shutdown = false) {
 	const packet = [];
 	const iPxX = Position[0];
 	const iPxY = Position[1];
-	var color;
-	var color;
+	let color;
 
 	if(shutdown){
 		color = hexToRgb(shutdownColor);
@@ -141,10 +140,6 @@ function setDpi(channel, dpi) {
 	device.write(packet, 65);
 }
 
-export function Validate(endpoint) {
-	return endpoint.interface === 0;
-}
-
 function hexToRgb(hex) {
 	const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
 	const colors = [];
@@ -153,6 +148,10 @@ function hexToRgb(hex) {
 	colors[2] = parseInt(result[3], 16);
 
 	return colors;
+}
+
+export function Validate(endpoint) {
+	return endpoint.interface === 0;
 }
 
 export function Image() {

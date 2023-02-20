@@ -1,8 +1,8 @@
 export function Name() { return "SteelSeries Arctis Pro GameDAC"; }
 export function VendorId() { return 0x1038; }
-export function Documentation(){ return "troubleshooting/steelseries"; }
 export function ProductId() { return 0x1280; }
 export function Publisher() { return "WhirlwindFX"; }
+export function Documentation(){ return "troubleshooting/steelseries"; }
 export function Size() { return [3, 2]; }
 export function DefaultPosition(){return [145, 85];}
 export function DefaultScale(){return 10.0;}
@@ -42,7 +42,6 @@ export function ControllableParameters(){
 		{"property":"VolumeMic", "group":"", "label":"Mic Mix Volume", "step":"1", "type":"number", "min":"0", "max":"20", "default":"10"},
 	];
 }
-
 
 const vLedNames = [
 	"Left Can", "Right Can", "Mic Led", "Muted Mic Led"
@@ -181,16 +180,6 @@ const VolumeMixDict =
 	20 : "0x00"
 };
 
-export function Initialize() {
-	grabFirmware();
-	sendPacketString(" 00 2c 01 00 ", 4);
-	grabSettings();
-	grabUnknown();
-	grabScreenSettings();
-	sendPacketString(" 00 85 18 00 ", 3);
-	setCustomEQ();
-}
-
 export function LedNames() {
 	return vLedNames;
 }
@@ -199,12 +188,22 @@ export function LedPositions() {
 	return vLedPositions;
 }
 
-export function Shutdown() {
-	sendPacketString(" 00 2c 00 00 ", 4);
+export function Initialize() {
+	grabFirmware();
+	device.write([0x00, 0x2c, 0x01, 0x00], 4);
+	grabSettings();
+	grabUnknown();
+	grabScreenSettings();
+	device.write([0x00, 0x85, 0x18, 0x00], 3);
+	setCustomEQ();
 }
 
 export function Render() {
 	sendColors();
+}
+
+export function Shutdown() {
+	device.write([0x00, 0x2c, 0x00, 0x00], 4);
 }
 
 export function onOLEDTimeoutChanged() {
@@ -334,7 +333,7 @@ function setOLEDBrightness() {
 
 	device.pause(100);
 	device.write(packet, 4);
-	sendPacketString("00 a3 00", 3);
+	device.write([0x00, 0xa3, 0x00], 3);
 }
 
 function setOLEDTimeout() {
@@ -348,7 +347,7 @@ function setOLEDTimeout() {
 
 	device.pause(100);
 	device.write(packet, 6);
-	sendPacketString("00 a3 00", 3);
+	device.write([0x00, 0xa3, 0x00], 3);
 }
 
 function setSidetone() {
@@ -360,7 +359,7 @@ function setSidetone() {
 
 	device.pause(100);
 	device.write(packet, 4);
-	sendPacketString("00 a3 00", 3);
+	device.write([0x00, 0xa3, 0x00], 3);
 }
 
 function setVolume() {
@@ -373,7 +372,7 @@ function setVolume() {
 
 	//device.pause(100);
 	device.write(packet, 7);
-	sendPacketString("00 a3 00", 3);
+	device.write([0x00, 0xa3, 0x00], 3);
 }
 
 function setSurround() {
@@ -385,7 +384,7 @@ function setSurround() {
 
 	device.pause(100);
 	device.write(packet, 4);
-	sendPacketString("00 a3 00", 3);
+	device.write([0x00, 0xa3, 0x00], 3);
 }
 
 function setEQ() {
@@ -397,7 +396,7 @@ function setEQ() {
 
 	device.pause(100);
 	device.write(packet, 4);
-	sendPacketString("00 a3 00", 3);
+	device.write([0x00, 0xa3, 0x00], 3);
 }
 
 //-10 is 00 fb, -9.5 is 40 fb, -9 is 80 fb, -8.5 = C0 FB, -8 is 00 fc, -7.5 is 40 fc, - 7 is 80 fc, - 6.5 is C0 fc, -6 is 00 fd, -5.5 is 40 fd, -5 is 80 fd, -4.5 is 00 00 c0 fd, -4 is 00 00 00 fe, -3.5 is 00 00 40 fe, -3 is 00 00 80 fe, - 2.5 is 00 00 c0 fe, -2 is ff, -1.5 is 40 ff, -1 is 80 ff, -0.5 is  = c0 ff, 0 is 00 00, 0.5 is 00 40, 1 is 00 80, 1.5 is C0 00, 2 is 00 01, 2.5 is 40 01, 3 is 80 01, 3.5 is c0 01, 4 is 00 02, 4.5 is 40 02, 5 is 80 02, 5.5 is c0 02, 6 is 00 03, 6.5 is 40 03, 7 is 80 03, 7.5 is c0 03, 8 is 00 04, 8.5 is 40 04, 9 is 80 04, 9.5 is c0 04, 10 is 00 05.
@@ -433,7 +432,7 @@ function setCustomEQ() {
 
 	device.pause(100);
 	device.write(packet, 64);
-	sendPacketString("00 a3 00", 3);
+	device.write([0x00, 0xa3, 0x00], 3);
 
 }
 
@@ -446,7 +445,7 @@ function setGain() {
 
 	device.pause(100);
 	device.write(packet, 4);
-	sendPacketString("00 a3 00", 3);
+	device.write([0x00, 0xa3, 0x00], 3);
 }
 
 function setMode() {
@@ -458,7 +457,7 @@ function setMode() {
 
 	device.pause(100);
 	device.write(packet, 4);
-	sendPacketString("00 a3 00", 3);
+	device.write([0x00, 0xa3, 0x00], 3);
 }
 
 function setMix() {
@@ -473,9 +472,8 @@ function setMix() {
 
 	device.pause(100);
 	device.write(packet, 7);
-	sendPacketString("00 a3 00", 3);
+	device.write([0x00, 0xa3, 0x00], 3);
 }
-
 
 function sendColors(shutdown = false) {
 	for (let index = 0;index < 4; index++) {
@@ -487,7 +485,7 @@ function sendColors(shutdown = false) {
 
 		const iPxX = vLedPositions[index][0];
 		const iPxY = vLedPositions[index][1];
-		var color;
+		let color;
 
 		if(shutdown){
 			color = hexToRgb(shutdownColor);
@@ -514,16 +512,13 @@ function sendColors(shutdown = false) {
 		device.pause(20);
 	}
 
-	sendPacketString("00 a5 08 0a 00", 5);
-	sendPacketString("00 a5 03 0a 00", 5);
-	sendPacketString("00 a5 04 0a 00", 5);
-	sendPacketString("00 a3 00", 3);//A3 is software saving?
+	device.write([0x00, 0xa5, 0x08, 0x0a, 0x00], 5);
+	device.write([0x00, 0xa5, 0x03, 0x0a, 0x00], 5);
+	device.write([0x00, 0xa5, 0x04, 0x0a, 0x00], 5);
+	device.write([0x00, 0xa3, 0x00], 3);
 	device.pause(150);
 }
 
-export function Validate(endpoint) {
-	return endpoint.interface === 0;
-}
 
 function hexToRgb(hex) {
 	const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
@@ -535,15 +530,8 @@ function hexToRgb(hex) {
 	return colors;
 }
 
-function sendPacketString(string, size){
-	const packet= [];
-	const data = string.split(' ');
-
-	for(let i = 0; i < data.length; i++) {
-		packet[parseInt(i, 16)] = parseInt(data[i], 16);//.toString(16)
-	}
-
-	device.write(packet, size);
+export function Validate(endpoint) {
+	return endpoint.interface === 0;
 }
 
 export function Image() {
