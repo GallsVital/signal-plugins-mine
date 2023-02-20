@@ -130,6 +130,7 @@ class PNYGPUIdentifier extends GPUIdentifier {
 const PNYGPUIDs =
 [
 	new PNYGPUIdentifier(0x2684, 0x13ad, "PNY RTX 4090 XLR8"),
+	new PNYGPUIdentifier(0x2684, 0x13ae, "PNY RTX 4090 XLR8"),
 ];
 
 function hexToRgb(hex) {
