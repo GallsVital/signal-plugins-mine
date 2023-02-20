@@ -51,7 +51,7 @@ export function Scan(bus) {
 
 	for (const address of ENE.potentialXTREEMAddresses) {
 
-		const ValidRegisters = ENE.Interface.TestXTREEMRegisterValues(address);
+		const ValidRegisters = ENE.TestXTREEMRegisterValues(address);
 
 		if(!ValidRegisters){
 			continue;
@@ -88,7 +88,7 @@ export function Initialize() {
 	// We can't set this in the global scope directly as bus doesn't exist when the scan function is called.
 	const Interface = new ENEInterfaceFixed(bus);
 	ENE = new ENERam(Interface);
-	ENE.config.XTREEM = ENE.Interface.TestXTREEMRegisterValues();
+	ENE.config.XTREEM = ENE.TestFixedXTREEMRegisterValues();
 
 	if(ENE.config.XTREEM === false) {
 		device.log(`Device is not XTREEM RAM.`);
@@ -186,66 +186,6 @@ class ENEInterfaceFree extends ENEInterface{
 		this.bus.WriteWord(address, 0x00, ((register << 8) & 0xFF00) | ((register >> 8) & 0x00FF));
 		this.bus.WriteBlock(address, 0x03, data.length, data);
 	}
-
-	getDeviceName(address) {
-		const deviceName = [];
-
-		for(let iIdx = 0; iIdx < 16; iIdx++) {
-			const character = this.ReadRegister(address, this.commands.DeviceName + iIdx);
-
-			if(character > 0) {
-				deviceName.push(character);
-			}
-		}
-
-		return String.fromCharCode(...deviceName);
-	}
-
-	TestXTREEMRegisterValues(address) {
-		// This can only be used while we have a free address bus.
-		// if we do we can't directly call bus. We need to use this.Bus()
-		if(ENE.IsFixedBus()){
-			this.Bus().log("Bus Interface must be a \"Free\" Type to use this function! This can only be done inside of the Scan() export.");
-
-			return false;
-		}
-
-		const Value1 = this.ReadWord(address, 0xF01C);
-
-		if(Value1 !== 0x0000){
-			this.Bus().log(`Check 1 Failed! Returned value: ${Value1}, Expected: 0x0000`, {toFile:true});
-
-			return false;
-		}
-
-		const value2 = this.ReadWord(address, 0x4000);
-
-		if(value2 !== 0x7742){
-			this.Bus().log(`Check 1 Failed! Returned value: ${value2}, Expected: 0x7742`, {toFile:true});
-
-			return false;
-		}
-
-		for(let offset = 0x00; offset < 5; offset++){
-			const val = this.Bus().ReadByte(address, 0x9B + offset);
-
-			if(val != 0x1b + offset){
-				this.Bus().log(`Check 3 Failed! Expected ${0x1b + offset}, Got ${val}`, {toFile:true});
-
-				return false;
-			}
-		}
-
-		const iRet = this.Bus().ReadByte(address, 0xA0);
-
-		if(iRet != 0x20){
-			this.Bus().log(`Check 4 Failed! Expected ${0x20}, Got ${iRet}`, {toFile:true});
-
-			return false;
-		}
-
-		return true;
-	}
 }
 
 class ENEInterfaceFixed extends ENEInterface{
@@ -258,16 +198,10 @@ class ENEInterfaceFixed extends ENEInterface{
 		this.bus.WriteBlock(0x03, data.length, data);
 	}
 
-	WriteWord(register, data){
-		if(data.length !== 2) {
-			device.log(`Incorrect Data Length for a word write. Expected data length: 2, received data length: ${data.length}.`);
-
-			return -1;
-		}
-
+	WriteWord(register){
 		this.bus.WriteWord(0x00, ((register << 8) & 0xFF00) | ((register >> 8) & 0x00FF));
-		this.bus.WriteByte(0x01, data[0]);
-		this.bus.WriteByte(0x01, data[1]);
+		this.bus.WriteByte(0x01, 0x00);
+		this.bus.WriteByte(0x01, 0x01);
 	}
 
 	WriteRegisterWithoutArgument(register) {
@@ -304,51 +238,6 @@ class ENEInterfaceFixed extends ENEInterface{
 		}
 
 		return returnedBytes;
-	}
-
-	getDeviceName() { //This fixes dealing with fixed vs free. If you don't specify an address in a free register though, we're going to have issues.
-		const deviceName = [];
-
-		for(let iIdx = 0; iIdx < 16; iIdx++) {
-			const character = this.ReadRegister(this.commands.DeviceName + iIdx);
-
-			if(character > 0) {
-				deviceName.push(character);
-			}
-		}
-
-		return String.fromCharCode(...deviceName);
-	}
-	/**Function to check if a stick of RAM is T-Force XTREEM.*/
-	TestXTREEMRegisterValues() {
-
-		const Value1 = this.ReadWord(0xF01C);
-
-		if(Value1 !== 0x0000){
-			return false;
-		}
-
-		const value2 = this.ReadWord(0x4000);
-
-		if(value2 !== 0x7742){
-			return false;
-		}
-
-		for(let offset = 0x00; offset < 5; offset++){
-			const val = bus.ReadByte(0x9B + offset);
-
-			if(val != 0x1b + offset){
-				return false;
-			}
-		}
-
-		const iRet = bus.ReadByte(0xA0);
-
-		if(iRet != 0x20){
-			return false;
-		}
-
-		return true;
 	}
 }
 
@@ -410,7 +299,7 @@ class ENERam{
 
 	SetDirectMode(){
 		if(this.config.XTREEM) {
-			this.Interface.WriteWord(this.XTREEMcommands.DirectMode, [0x00, 0x01]);
+			this.Interface.WriteWord(this.XTREEMcommands.DirectMode);
 		} else {
 			this.Interface.WriteRegister(this.commands.DirectMode, 0x01);
 		}
@@ -461,19 +350,47 @@ class ENERam{
 			}
 		}
 	}
-	/** Function to fetch various pieces of info off the device. Device Model, Protocol Version, and Onboard LED Count.*/
+
+	getDeviceName(address) { //This fixes dealing with fixed vs free.
+		const deviceName = [];
+
+		for(let iIdx = 0; iIdx < 16; iIdx++) {
+			const character = this.Interface.ReadRegister(address, this.commands.DeviceName + iIdx);
+
+			if(character > 0) {
+				deviceName.push(character);
+			}
+		}
+
+		return String.fromCharCode(...deviceName);
+	}
+
+	getFixedDeviceName() { //This fixes dealing with fixed vs free. If you don't specify an address in a free register though, we're going to have issues.
+		const deviceName = [];
+
+		for(let iIdx = 0; iIdx < 16; iIdx++) {
+			const character = this.Interface.ReadRegister(this.commands.DeviceName + iIdx);
+
+			if(character > 0) {
+				deviceName.push(character);
+			}
+		}
+
+		return String.fromCharCode(...deviceName);
+	}
+
 	getDeviceInformation() {
-		this.config.deviceName = this.interface.getDeviceName();
+		this.config.deviceName = this.getFixedDeviceName();
 		this.config.deviceProtocolVersion = this.deviceNameDict[this.config.deviceName];
 
-		const configTable = this.getDeviceConfigTable(); //Not putting this into interface as there's no use for it in free range.
+		const configTable = this.getDeviceConfigTable();
 		device.log(configTable);
 		this.config.deviceLEDCount = configTable[2];
 		device.log("Device Type: " + this.config.deviceName);
 		device.log("Device Protocol Version: " + this.config.deviceProtocolVersion);
 		device.log("Device Onboard LED Count: " + this.config.deviceLEDCount);
 	}
-	/**Function to grab the Config Table off of the device.*/
+
 	getDeviceConfigTable() {
 		const configTable = new Array(65);
 
@@ -512,7 +429,7 @@ class ENERam{
 			device.setSize([this.config.deviceLEDCount, 1]);
 		}
 	}
-	/**Function to check which ENE channel IDX's are present.*/
+
 	CheckAttachedSticks() //only way this causes us an issue is if a user somehow manages to have corrupt SPD.
 	{
 		if(this.IsFixedBus()){
@@ -543,7 +460,7 @@ class ENERam{
 
 		return ENESticks;
 	}
-	/**Function to check if the RAM is using any addresses in the 0x70 range. If so, they are most likely mapped together. We don't want this, and will opt to remap each stick individually.*/
+
 	CheckForFreeAddresses(primaryAddress, channels) {
 
 		if(this.IsFixedBus()){
@@ -565,7 +482,7 @@ class ENERam{
 			let freeAddress = 0;
 
 			// Find a free address to remap a stick to
-			const XTREEM = this.Interface.TestXTREEMRegisterValues(primaryAddress);
+			const XTREEM = this.TestXTREEMRegisterValues(primaryAddress);
 
 			if(XTREEM) {
 				for (const address of this.potentialXTREEMAddresses) {
@@ -619,7 +536,84 @@ class ENERam{
 			}
 		}
 	}
-	/**Function to check what ENE Device Model a stick of ram reports. It's used to differentiate Aura Compatible RAM from T-Force XTREEM.*/
+
+	TestXTREEMRegisterValues(address) {
+		// This can only be used while we have a free address bus.
+		// if we do we can't directly call bus. We need to use this.Bus()
+		if(this.IsFixedBus()){
+			this.Bus().log("Bus Interface must be a \"Free\" Type to use this function! This can only be done inside of the Scan() export.");
+
+			return false;
+		}
+
+		const Value1 = this.Interface.ReadWord(address, 0xF01C);
+
+		if(Value1 !== 0x0000){
+			this.Bus().log(`Check 1 Failed! Returned value: ${Value1}, Expected: 0x0000`, {toFile:true});
+
+			return false;
+		}
+
+		const value2 = this.Interface.ReadWord(address, 0x4000);
+
+		if(value2 !== 0x7742){
+			this.Bus().log(`Check 1 Failed! Returned value: ${value2}, Expected: 0x7742`, {toFile:true});
+
+			return false;
+		}
+
+		for(let offset = 0x00; offset < 5; offset++){
+			const val = this.Bus().ReadByte(address, 0x9B + offset);
+
+			if(val != 0x1b + offset){
+				this.Bus().log(`Check 3 Failed! Expected ${0x1b + offset}, Got ${val}`, {toFile:true});
+
+				return false;
+			}
+		}
+
+		const iRet = this.Bus().ReadByte(address, 0xA0);
+
+		if(iRet != 0x20){
+			this.Bus().log(`Check 4 Failed! Expected ${0x20}, Got ${iRet}`, {toFile:true});
+
+			return false;
+		}
+
+		return true;
+	}
+
+	TestFixedXTREEMRegisterValues() {
+
+		const Value1 = this.Interface.ReadWord(0xF01C);
+
+		if(Value1 !== 0x0000){
+			return false;
+		}
+
+		const value2 = this.Interface.ReadWord(0x4000);
+
+		if(value2 !== 0x7742){
+			return false;
+		}
+
+		for(let offset = 0x00; offset < 5; offset++){
+			const val = bus.ReadByte(0x9B + offset);
+
+			if(val != 0x1b + offset){
+				return false;
+			}
+		}
+
+		const iRet = bus.ReadByte(0xA0);
+
+		if(iRet != 0x20){
+			return false;
+		}
+
+		return true;
+	}
+
 	TestDeviceModel(address) {
 		// This can only be used while we have a free address bus.
 		// if we do we can't directly call bus. We need to use this.Bus()
@@ -652,7 +646,7 @@ class ENERam{
 
 		return false;
 	}
-	/**Function to check what ENE Device Manufacturer a stick of ram reports. It's used to differentiate Ballistix RAM from literally anything else.*/
+
 	TestManufactureName(address) {
 		// This can only be used while we have a free address bus.
 		// if we do we can't directly call bus. We need to use this.Bus()
