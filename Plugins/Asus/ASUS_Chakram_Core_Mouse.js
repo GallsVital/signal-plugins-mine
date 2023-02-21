@@ -21,11 +21,11 @@ export function ControllableParameters(){
 }
 
 const vKeyNames = [
-	"Scroll Wheel", "Logo", "Front Zone",
+	"Scroll Wheel", "Logo"
 ];
 
 const vKeyPositions = [
-	[1, 4], [1, 1], [1, 0],
+	[1, 4], [1, 1],
 ];
 
 export function LedNames() {
@@ -43,13 +43,11 @@ export function Initialize() {
 export function Render() {
 	sendColors(0);
 	sendColors(1);
-	sendColors(2);
 }
 
 export function Shutdown() {
 	sendColors(0, true);
 	sendColors(1, true);
-	sendColors(2, true);
 }
 
 function sendColors(zone, shutdown = false){
