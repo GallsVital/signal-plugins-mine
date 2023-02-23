@@ -42,7 +42,7 @@ function CheckForGPUListDuplicates(Plugin, ReportErrorCallback){
 	}
 }
 
-const DuplicateUSBProductSet = new Map();
+const DuplicateUSBProductSet = new Set();
 
 function CheckUSBVendorProductIdPair(Vendor, Product, ReportErrorCallback){
 	const pair = `${Vendor}:${Product}`;
