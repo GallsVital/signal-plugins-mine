@@ -42,6 +42,36 @@ function CheckForGPUListDuplicates(Plugin, ReportErrorCallback){
 	}
 }
 
+const DuplicateUSBProductSet = new Set();
+
+function CheckUSBVendorProductIdPair(Vendor, Product, ReportErrorCallback){
+	const pair = `${Vendor}:${Product}`;
+
+	if(DuplicateUSBProductSet.has(pair)){
+		ReportErrorCallback("Plugin contains duplicate Vendor:Product id pair.");
+	}
+
+	DuplicateUSBProductSet.add(pair);
+}
+
+function CheckForUSBProductIdDuplicates(Plugin, ReportErrorCallback){
+
+
+	if(typeof Plugin.VendorId !== "undefined" && typeof Plugin.ProductId !== "undefined"){
+
+		const VendorId = Plugin.VendorId();
+		const ProductIds = Plugin.ProductId();
+
+		if(typeof ProductIds === "number"){
+			CheckUSBVendorProductIdPair(VendorId, ProductIds, ReportErrorCallback);
+		}else{
+			for(const ProductId of ProductIds){
+				CheckUSBVendorProductIdPair(VendorId, ProductId, ReportErrorCallback);
+			}
+		}
+	}
+}
+
 class PluginValidator {
 	constructor() {
 		this.totalErrors = 0;
@@ -52,6 +82,7 @@ class PluginValidator {
 			CheckThatLEDNameAndPositionLengthsMatch,
 			CheckAllLedPositionsAreWithinBounds,
 			//CheckForGPUListDuplicates,
+			CheckForUSBProductIdDuplicates,
 		];
 		this.excludedFiles = [".test.js"];
 	}
