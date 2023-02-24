@@ -30,7 +30,6 @@ const NZXTSmartDevice2ProductNames = {
 	0x2006: "NZXT Smart Device V2",
 	0x200D: "NZXT Smart Device V2 Case Controller",
 	0x200F: "NZXT Smart Device V2 Case Controller",
-	0x1714: "NZXT RGB and Fan Controller",
 	0x2009: "NZXT RGB and Fan Controller",
 	0x200E: "NZXT RGB and Fan Controller",
 	0x2010: "NZXT RGB and Fan Controller",
