@@ -103,6 +103,7 @@ export function Render() {
 
 export function Shutdown() {
 	grabColors(true);
+	//Razer.setModernMatrixEffect([0x00, 0x00, 0x03]); //Hardware mode baby.
 	Razer.setDeviceMode("HardwareMode");
 }
 
@@ -645,10 +646,10 @@ class RazerProtocol {
 			vLedPositions.push(...layout.vLedPositions);
 
 			device.setControllableLeds(vLedNames, vLedPositions);
-			Razer.getDeviceLEDZones();
+			this.getDeviceLEDZones();
 		} else {
 			device.log("No Valid Library Config found.");
-			Razer.getDeviceLEDZones();
+			this.getDeviceLEDZones();
 		}
 
 		if(layout.hyperflux) {
@@ -923,7 +924,9 @@ class RazerProtocol {
 			if(ledExists !== -1) {
 				device.log(`LED Zone ${zones} Exists`);
 				activeZones.push(zones);
+				this.setModernMouseLEDBrightness(100);
 			}
+			
 		}
 
 		if(activeZones.length > 0) {
@@ -1237,7 +1240,7 @@ class RazerProtocol {
 	}
 	/** Function to set a legacy device's effect. Why is the Mamba TE so special?*/
 	setLegacyMatrixEffect() {
-		this.StandardPacketSend([ 0x02, 0x03, 0x0A, 0x05, 0x00 ]);
+		this.StandardPacketSend([ 0x02, 0x03, 0x0A, 0x05, 0x00 ]); //0x0a, 0x02, 0x0c, 0x01, 0x09 ,0x01, 0x01, 0x01, 0x09 is the Lancehead TE.
 
 		const returnPacket = this.ConfigPacketRead();
 
@@ -1266,7 +1269,7 @@ class RazerProtocol {
 	/** Function to set a modern device's effect*/
 	setModernMatrixEffect(data) {
 		const packet = [ 0x06, 0x0f, 0x02 ]; //6 is length of argument
-		data  = data || [ 0x00, 0x00, 0x00 ];
+		data  = data || [ 0x00, 0x00, 0x00 ]; //flash, zone, effect
 		packet.push(...data);
 		this.StandardPacketSend(packet);
 
@@ -1333,7 +1336,7 @@ class RazerProtocol {
 	}
 	/** Function to set a legacy mouse's led brightness.*/
 	setLegacyMouseLEDBrightness(brightness, led = 0) {
-		this.ConfigPacketSend([ 0x03, 0x03, 0x03, 0x00, led, brightness*100/255]);
+		this.ConfigPacketSend([ 0x03, 0x03, 0x03, 0x00, led, brightness*255/100]);
 
 		const returnPacket = this.ConfigPacketRead();
 
@@ -1363,9 +1366,9 @@ class RazerProtocol {
 
 		return brightness;
 	}
-	/** Function to set a legacy mouse's led brightness. If we use 0, it does all of the zones in the matrix.*/
+	/** Function to set a modern mouse's led brightness. If we use 0, it does all of the zones in the matrix.*/
 	setModernMouseLEDBrightness(brightness, led = 0) {
-		this.ConfigPacketSend([0x03, 0x0f, 0x04, 0x01, led, brightness*100/255]);
+		this.ConfigPacketSend([0x03, 0x0f, 0x04, 0x01, led, brightness*255/100]);
 
 		const returnPacket = this.ConfigPacketRead();
 
