@@ -1,60 +1,73 @@
-function GetReport(cmd_class, cmd_id, size) {
-	const report = new Array(91).fill(0);
-
-	report[0] = 0;
-
-	// Status.
-	report[1] = 0x00;
-
-	// Transaction ID.
-	report[2] = 0xFF;
-
-	// Remaining packets.
-	report[3] = 0x00;
-	report[4] = 0x00;
-
-	// Protocol type.
-	report[5] = 0x00;
-
-	// Data size.
-	report[6] = size;
-
-	// Command class.
-	report[7] = cmd_class;
-
-	// Command id.
-	report[8] = cmd_id;
-
-	//report[8-87] = data;
-
-	//report[89] = crc;
-
-	//report[89] = reserved;
-
-	return report;
+export function Name() { return "Razer Leviathan V2X"; }
+export function VendorId() { return 0x1532; }
+export function Documentation(){ return "troubleshooting/razer"; }
+export function ProductId() { return 0x054a; }
+export function Publisher() { return "WhirlwindFX"; }
+export function Size() { return [14, 1]; }
+export function Type() { return "Hid"; }
+export function DefaultPosition() {return [225, 120]; }
+export function DefaultScale(){return 15.0;}
+/* global
+shutdownColor:readonly
+LightingMode:readonly
+forcedColor:readonly
+*/
+export function ControllableParameters() {
+	return [
+		{"property":"shutdownColor", "group":"lighting", "label":"Shutdown Color", "min":"0", "max":"360", "type":"color", "default":"009bde"},
+		{"property":"LightingMode", "group":"lighting", "label":"Lighting Mode", "type":"combobox", "values":["Canvas", "Forced"], "default":"Canvas"},
+		{"property":"forcedColor", "group":"lighting", "label":"Forced Color", "min":"0", "max":"360", "type":"color", "default":"009bde"},
+	];
 }
 
-function setDPIRazer(dpi){
-	savedDpi1 = dpi;
+const transactionID = 0x1f; //Yes yes autodetection would work here, but I refuse to deal with the header right now.
 
-	const packet = [];
-	packet[0] = 0x00;
-	packet[1] = 0x00;
-	packet[2] = 0x1F;
-	packet[3] = 0x00;
-	packet[4] = 0x00;
-	packet[5] = 0x00;
-	packet[6] = 0x07;
-	packet[7] = 0x04;
-	packet[8] = 0x05;
-	packet[9] = 0x00;
-	packet[10] = Math.floor(dpi/256);
-	packet[11] = dpi%256;
-	packet[12] = Math.floor(dpi/256);
-	packet[13] = dpi%256;
-	packet[89] = CalculateCrc(packet);
+const vLedNames = [ "LED 1", "LED 2", "LED 3", "LED 4", "LED 5", "LED 6", "LED 7", "LED 8", "LED 9", "LED 10", "LED 11", "LED 12", "LED 13", "LED 14" ];
+const vLedPositions = [ [0, 0], [1, 0], [2, 0], [3, 0], [4, 0], [5, 0], [6, 0], [7, 0], [8, 0], [9, 0], [10, 0], [11, 0], [12, 0], [13, 0] ];
 
-	device.send_report(packet, 91);
+export function LedNames() {
+	return vLedNames;
+}
+
+export function LedPositions() {
+	return vLedPositions;
+}
+
+
+export function Initialize() {
+	getDeviceMode();
+	getDeviceFirmwareVersion();
+	getDeviceSerial();
+    packetSend([0x07, 0x00, 0x1f, 0x00, 0x00, 0x00, 0x06, 0x0f, 0x02, 0x00, 0x00, 0x08, 0x00, 0x01], 91);
+    device.pause(20);
+    packetSend([0x07, 0x00, 0x1f, 0x00, 0x00, 0x00, 0x06, 0x0f, 0x02, 0x00, 0x00, 0x08, 0x01, 0x01], 91);
+    device.pause(20);
+    packetSend([0x07, 0x00, 0x1f, 0x00, 0x00, 0x00, 0x2f, 0x0f, 0x03, 0x00, 0x00, 0x00, 0x00, 0x0d], 91);
+    device.pause(20);
+    packetSend([0x07, 0x00, 0x1f, 0x00, 0x00, 0x00, 0x06, 0x0f, 0x02, 0x00, 0x00, 0x08], 91);
+    device.pause(20);
+    packetSend([0x07, 0x00, 0x1f, 0x00, 0x00, 0x00, 0x02, 0x07, 0x03], 91);
+    device.pause(20);
+    packetSend([0x07, 0x00, 0x1f, 0x00, 0x00, 0x00, 0x2f, 0x0f, 0x03, 0x00, 0x00, 0x00, 0x00, 0x0d], 91);
+    device.pause(20);
+    packetSend([0x07, 0x00, 0x1f, 0x00, 0x00, 0x00, 0x03, 0x0f, 0x04, 0x01, 0x00, 0xcc], 91);
+    device.pause(20);
+
+}
+
+export function Render() {
+	setDeviceColor();
+}
+
+export function Shutdown() {
+	setDeviceHardwareMode();
+}
+
+function packetSend(packet, length) //Wrapper for always including our CRC
+{
+	const packetToSend = packet;
+	packetToSend[89] = CalculateCrc(packet);
+	device.send_report(packetToSend, length);
 }
 
 function CalculateCrc(report) {
@@ -67,33 +80,96 @@ function CalculateCrc(report) {
 	return iCrc;
 }
 
+function getDeviceMode() {
+	const packet = [0x07, 0x00, transactionID, 0x00, 0x00, 0x00, 0x02, 0x00, 0x84];
+	packetSend(packet, 91);
 
-export function Name() { return "Razer Naga Trinity"; }
-export function VendorId() { return 0x1532; }
-export function Documentation(){ return "troubleshooting/razer"; }
-export function ProductId() { return 0x0067; }
-export function Publisher() { return "WhirlwindFX"; }
-export function Size() { return [10, 10]; }
-export function Type() { return "Hid"; }
-export function DefaultPosition() {return [225, 120]; }
-export function DefaultScale(){return 5.0;}
-/* global
-shutdownColor:readonly
-LightingMode:readonly
-forcedColor:readonly
-DpiControl:readonly
-dpi1:readonly
-*/
-export function ControllableParameters(){
-	return [
-		{"property":"shutdownColor", "group":"lighting", "label":"Shutdown Color", "min":"0", "max":"360", "type":"color", "default":"009bde"},
-		{"property":"LightingMode", "group":"lighting", "label":"Lighting Mode", "type":"combobox", "values":["Canvas", "Forced"], "default":"Canvas"},
-		{"property":"forcedColor", "group":"lighting", "label":"Forced Color", "min":"0", "max":"360", "type":"color", "default":"009bde"},
-		{"property":"DpiControl", "group":"mouse", "label":"Enable Dpi Control", "type":"boolean", "default":"false"},
-		{"property":"dpi1", "group":"mouse", "label":"DPI", "step":"50", "type":"number", "min":"200", "max":"12400", "default":"800"},
-	];
+	let returnpacket = device.get_report(packet, 91);
+    device.pause(20);
+	returnpacket = device.get_report(packet, 91);
+
+	const deviceMode = returnpacket[9];
+	device.log("Current Device Mode: " + deviceMode);
+
+	if(deviceMode !== 3) {
+		setDeviceSoftwareMode();
+	}
 }
-let savedDpi1;
+
+function setDeviceHardwareMode() {
+	const packet = [0x07, 0x00, transactionID, 0x00, 0x00, 0x00, 0x02, 0x00, 0x04, 0x00];
+	packetSend(packet, 91);
+    device.pause(20);
+
+	let returnpacket = device.get_report(packet, 91);
+	returnpacket = device.get_report(packet, 91);
+}
+
+function setDeviceSoftwareMode() {
+	const packet = [0x07, 0x00, transactionID, 0x00, 0x00, 0x00, 0x02, 0x00, 0x04, 0x03];
+	packetSend(packet, 91);
+    device.pause(20);
+
+	let returnpacket = device.get_report(packet, 91);
+	returnpacket = device.get_report(packet, 91);
+}
+
+function getDeviceSerial() {
+	const packet = [0x07, 0x00, transactionID, 0x00, 0x00, 0x00, 0x16, 0x00, 0x82];
+	packetSend(packet, 91);
+    device.pause(20);
+
+	let returnpacket = device.get_report(packet, 91);
+	returnpacket = device.get_report(packet, 91);
+
+	const Serialpacket = returnpacket.slice(9, 24);
+	const SerialString = String.fromCharCode(...Serialpacket);
+	device.log("Device Serial: " + SerialString);
+}
+
+function getDeviceFirmwareVersion() {
+	const packet = [0x07, 0x00, transactionID, 0x00, 0x00, 0x00, 0x02, 0x00, 0x81];
+	packetSend(packet, 91);
+    device.pause(20);
+
+	let returnpacket = device.get_report(packet, 91);
+	returnpacket = device.get_report(packet, 91);
+
+	const FirmwareByte1 = returnpacket[9];
+	const FirmwareByte2 = returnpacket[10];
+	device.log("Firmware Version: " + FirmwareByte1 + "." + FirmwareByte2);
+}
+
+function getDeviceColor() {
+	const rgbdata = [];
+
+	for(let iIdx = 0; iIdx < vLedPositions.length; iIdx++) {
+		const iPxX = vLedPositions[iIdx][0];
+		const iPxY = vLedPositions[iIdx][1];
+		var col;
+
+		if (LightingMode === "Forced") {
+			col = hexToRgb(forcedColor);
+		} else {
+			col = device.color(iPxX, iPxY);
+		}
+
+		const iLedIdx = (iIdx*3);
+		rgbdata[iLedIdx] = col[0];
+		rgbdata[iLedIdx+1] = col[1];
+		rgbdata[iLedIdx+2] = col[2];
+	}
+    device.log(rgbdata);
+    device.log(rgbdata.length)
+	return rgbdata;
+}
+
+function setDeviceColor() {
+	const rgbdata = getDeviceColor();
+	const colorpacket = [0x07, 0x00, transactionID, 0x00, 0x00, 0x00, 0x2f, 0x0F, 0x03, 0x00, 0x00, 0x00, 0x00, 0x0d]; //Some day I might pull this in line with the class.
+	colorpacket.push(...rgbdata);
+    packetSend(colorpacket, 91);
+}
 
 function hexToRgb(hex) {
 	const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
@@ -105,147 +181,8 @@ function hexToRgb(hex) {
 	return colors;
 }
 
-const vLedNames = ["ScrollWheel", "Logo", "SideBar1"];
-const vLedPositions = [[0, 5], [7, 5], [2, 2]];
-
-export function LedNames() {
-	return vLedNames;
-}
-
-export function LedPositions() {
-	return vLedPositions;
-}
-
-function EnableSoftwareControl() {
-	const report = GetReport(0x0F, 0x03, 0x47);
-
-	report[2] = 0x3F; // transaction id.
-
-	report[11] = 0; // row index.
-
-	report[13] = 15; // led count.
-
-	report[89] = CalculateCrc(report);
-
-
-	device.send_report(report, 91);
-}
-
-
-function ReturnToHardwareControl() {
-
-}
-
-
-export function Initialize() {
-
-	const packet = [];
-	packet[0] = 0x00;
-	packet[1] = 0x00;
-	packet[2] = 0x1F;
-	packet[3] = 0x00;
-	packet[4] = 0x00;
-	packet[5] = 0x00;
-	packet[6] = 0x06;
-	packet[7] = 0x0F;
-	packet[8] = 0x02;
-	packet[9] = 0x00;
-	packet[10] = 0x00;
-	packet[11] = 0x08;
-	packet[12] = 0x00;
-	packet[13] = 0x00;
-	packet[89] = CalculateCrc(packet);
-	device.send_report(packet, 91);
-
-	if(DpiControl) {
-		setDPIRazer(dpi1);
-	}
-}
-
-function SendPacket(shutdown = false){
-
-
-	const packet = [];
-	packet[0] = 0x00;
-	packet[1] = 0x00;
-	packet[2] = 0x1F;
-	packet[3] = 0x00;
-	packet[4] = 0x00;
-	packet[5] = 0x00;
-	packet[6] = 0x0E;
-	packet[7] = 0x0F;
-	packet[8] = 0x03;
-	packet[9] = 0x00;
-	packet[10] = 0x00;
-	packet[11] = 0x00;
-	packet[12] = 0x00;
-	packet[13] = 0x02;
-
-
-	for(let iIdx = 0; iIdx < vLedPositions.length; iIdx++){
-
-		const iPxX = vLedPositions[iIdx][0];
-		const iPxY = vLedPositions[iIdx][1];
-		var col;
-
-		if(shutdown){
-			col = hexToRgb(shutdownColor);
-		}else if (LightingMode === "Forced") {
-			col = hexToRgb(forcedColor);
-		}else{
-			col = device.color(iPxX, iPxY);
-		}
-
-		const iLedIdx = (iIdx*3) + 14;
-		packet[iLedIdx] = col[0];
-		packet[iLedIdx+1] = col[1];
-		packet[iLedIdx+2] = col[2];
-	}
-
-	packet[89] = CalculateCrc(packet);
-
-	device.send_report(packet, 91);
-}
-
-
-function Apply() {
-	const packet = []; //new Array(91).fill(0);
-	packet[0] = 0x00;
-	packet[1] = 0x00;
-	packet[2] = 0x3F;
-	packet[3] = 0x00;
-	packet[4] = 0x00;
-	packet[5] = 0x00;
-	packet[6] = 0x0C;
-	packet[7] = 0x0F;
-	packet[8] = 0x02;
-	packet[11] = 0x08;
-
-	packet[89] = CalculateCrc(packet);
-
-	device.send_report(packet, 91);
-	device.pause(1); // We need a pause here (between packets), otherwise the ornata can't keep up.
-
-}
-
-
-export function Render() {
-	SendPacket();
-
-	if(DpiControl) {
-		setDPIRazer(dpi1);
-	}
-
-}
-
-
-export function Shutdown() {
-	SendPacket(true);
-
-}
-
 export function Validate(endpoint) {
-	return endpoint.interface === 0 && endpoint.usage === 0x0002;
+	return endpoint.interface === 0 && endpoint.usage === 0x0001;
 }
 
 export function Image() {

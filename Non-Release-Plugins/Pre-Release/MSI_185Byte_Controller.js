@@ -468,13 +468,13 @@ class MysticLight {
 			},
 			0x7C95 : //B550-M Bazooka
 			{
-				OnboardLEDs    : 6,
+				OnboardLEDs    : 0,
 				RGBHeaders     : 2,
 				ARGBHeaders    : 2,
 				JPipeLEDs	   : 0,
 				CorsairHeaders : 0,
 				//PERLED
-				PerLEDOnboardLEDs : 6,
+				PerLEDOnboardLEDs : 0,
 				ForceZoneBased	  : false,
 				JARGB_V2		  : false
 			},

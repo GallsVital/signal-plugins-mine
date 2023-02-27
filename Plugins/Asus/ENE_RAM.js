@@ -64,7 +64,7 @@ export function Scan(bus) {
 	for(const address of ENE.potentialAuraAddresses) {
 		const iRet = bus.WriteQuick(address);
 
-		if(iRet < 0){
+		if(iRet !== 0){
 			continue;
 		}
 
