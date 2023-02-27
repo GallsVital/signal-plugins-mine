@@ -199,15 +199,15 @@ export function Render() {
 
 const polymoDevice =
 {
-	Names : [ "ROG Logo LED 1", "ROG Logo LED 2", "ROG Logo LED 3", "ROG Logo LED 4", "ROG Logo LED 5", "ROG Logo LED 6", "ROG Logo LED 7", "ROG Logo LED 8", "ROG Logo LED 9", "ROG Logo LED 10", "ROG Logo LED 11", "Hero LED 1", "Hero LED 2", "Hero LED 3", "Hero LED 4", "Hero LED 5", "Hero LED 6", "Hero LED 7" ],
-	Positions : [ [3, 0], [3, 1], [3, 2], [3, 3], [3, 4], [3, 5], [3, 6], [3, 7], [3, 8], [3, 9], [3, 10], [0, 11], [1, 11], [2, 11], [3, 11], [4, 11], [5, 11], [6, 11] ]
+	Names : [ "ROG Logo LED 1", "ROG Logo LED 2", "ROG Logo LED 3", "ROG Logo LED 4", "ROG Logo LED 5", "ROG Logo LED 6", "ROG Logo LED 7", "ROG Logo LED 8", "ROG Logo LED 9", "ROG Logo LED 10", "ROG Logo LED 11", "Hero LED 1", "Hero LED 2", "Hero LED 3", "Hero LED 4", "Hero LED 5", "Hero LED 6", "Hero LED 7", "Hero LED 8" ],
+	Positions : [ [3, 0], [3, 1], [3, 2], [3, 3], [3, 4], [3, 5], [3, 6], [3, 7], [3, 8], [3, 9], [3, 10], [0, 11], [1, 11], [2, 11], [3, 11], [4, 11], [5, 11], [6, 11], [7, 11] ]
 };
 
 function CreatePolymoSubdevice() {
 	if(DeviceInfo.PolymoSupport) {
 		device.createSubdevice("Polymo");
 		device.setSubdeviceName("Polymo", `${device.getMotherboardName()} - Polymo Panel`);
-		device.setSubdeviceSize("Polymo", 7, 12);
+		device.setSubdeviceSize("Polymo", 8, 12);
 		device.setSubdeviceLeds("Polymo", polymoDevice.Names, polymoDevice.Positions);
 	}
 }
