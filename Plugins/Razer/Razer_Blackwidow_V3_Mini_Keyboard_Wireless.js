@@ -129,8 +129,7 @@ function grabLighting(shutdown = false) {
 		packetCount++;
 	}
 
-	if(Razer.Config.spawnedSubdevices.length > 0)
-	{
+	if(Razer.Config.spawnedSubdevices.length > 0) {
 
 	}
 }
@@ -256,7 +255,7 @@ class RazerLEDLibrary {
 					[0, 4], [1, 4], [2, 4],                         [6, 4],                 [9, 4], [10, 4], [11, 4], [12, 4], [13, 4], [14, 4],           //10
 					// eslint-disable-next-line indent
 																	[6, 5],
-				
+
 				]
 			},
 			"Deathadder Elite" :
@@ -799,7 +798,7 @@ class RazerProtocol {
 				activeZones.push(zones);
 				this.setModernMouseLEDBrightness(100, zones);
 			}
-			
+
 		}
 
 		if(activeZones.length > 0) {
@@ -977,7 +976,7 @@ class RazerProtocol {
 		return 0; //Return 0 until I take the time to parse this properly.
 	}
 	/** Function to set multiple dpi stages. We can set how many stages a device has, and this is saved onboard. This works with hardware buttons.*/
-	setDeviceDPI(stage) {
+	setDeviceDPI(stage = 1, dpiStages = 5, dpi1= 500, dpi2 = 1000, dpi3 = 2000, dpi4 = 3000, dpi5 = 6000) {
 		const packet = [0x26, 0x04, 0x06, 0x01, stage, dpiStages, 0x00];
 
 		packet[7] = Math.floor(dpi1/256);
@@ -1284,7 +1283,9 @@ class RazerProtocol {
 
 			return -1;
 		}
-		device.log(returnPacket)
+
+		device.log(returnPacket);
+
 		const device1ConnectionStatus = returnPacket[9];
 		const device2ConnectionStatus = returnPacket[12];
 
@@ -1310,11 +1311,11 @@ class RazerProtocol {
 			device.log(`Device 2 with PID 0x${PID2} is connected.`);
 		}
 
-		if(device1ConnectionStatus === 0x01 && device2ConnectionStatus === 0x01)
-		{
-			device.notify("Hyperspeed Multipairing is Not Currently Supported", "This Hyperspeed Dongle has more than 1 device connected to it. SignalRGB Currently does not support multiple devices paired to a single dongle. Please use separate dongles for your Hyperspeed devices.", 3); //At current we're not going to 
-			device.log("yeeted notification at user.")
+		if(device1ConnectionStatus === 0x01 && device2ConnectionStatus === 0x01) {
+			device.notify("Hyperspeed Multipairing is Not Currently Supported", "This Hyperspeed Dongle has more than 1 device connected to it. SignalRGB Currently does not support multiple devices paired to a single dongle. Please use separate dongles for your Hyperspeed devices.", 3); //At current we're not going to
+			device.log("yeeted notification at user.");
 		}
+
 		return pairedPids;
 	}
 	/** Function to fetch connected device dongles from the connected dongle?!?!?*/
@@ -1345,12 +1346,10 @@ class RazerProtocol {
 
 	}
 	/** Function to create subdevices for multipaired hyperspeed devices.*/
-	createHyperspeedDevice()
-	{
+	createHyperspeedDevice() {
 		if(this.Config.AdditionalDeviceTransactionIDs.length > 0) //Need to add association logic for mouse vs keeb for a given transaction ID.
 		{
-			for(let devices = 0; devices < 0; devices++)
-			{
+			for(let devices = 0; devices < 0; devices++) {
 				const currentDevice = RazerDevices.LEDLibrary[RazerDevices.PIDLibrary[parseInt(this.Config.HyperspeedPIDs[devices])]];
 				device.createSubdevice(RazerDevices.PIDLibrary[parseInt(this.Config.HyperspeedPIDs[devices])]);
 				// Parent Device + Sub device Name + Ports
@@ -1360,9 +1359,7 @@ class RazerProtocol {
 				device.setSubdeviceLeds(RazerDevices.PIDLibrary[parseInt(this.Config.HyperspeedPIDs[devices])], currentDevice.vLedNames, currentDevice.vLedPositions);
 				this.Config.spawnedSubdevices.push(RazerDevices.PIDLibrary[parseInt(this.Config.HyperspeedPIDs[devices])]);
 			}
-		}
-		else
-		{
+		} else {
 			device.log("No extra hyperspeed devices detected. Aborting addition of subdevices.");
 		}
 	}

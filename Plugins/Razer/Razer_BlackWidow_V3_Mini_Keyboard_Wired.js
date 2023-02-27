@@ -451,17 +451,17 @@ class RazerProtocol {
 		this.ConfigPacketRead();
 	}
 	/** Function to set at what battery percentage a device will enter low power mode.*/
-	setDeviceLowPowerPercentage() {
+	setDeviceLowPowerPercentage(lowPowerPercentage = 15) {
 		const packet = [0x01, 0x07, 0x01, Math.floor(((lowPowerPercentage)*100)/255)];
 		this.ConfigPacketSend(packet);
 	}
 	/** Function to set a device's polling rate.*/
-	setDevicePollingRate() {
+	setDevicePollingRate(pollingRate = 1000) {
 		const packet = [0x01, 0x00, 0x05, 1000/pollingRate];
 		this.ConfigPacketSend(packet);
 	}
 	/** Function to set a device's lift off distance.*/
-	setDeviceLOD() {
+	setDeviceLOD(asymmetricLOD = true, liftOffDistance = 1) {
 		const packet = [0x04, 0x0b, 0x0b, 0x00, 0x04, (asymmetricLOD ? 0x02 : 0x01), (liftOffDistance - 1)];
 		this.ConfigPacketSend(packet);
 	}
@@ -472,7 +472,7 @@ class RazerProtocol {
 		device.pause(20);
 	}
 	/** Function to set multiple dpi stages. We can set how many stages a device has, and this is saved onboard. This works with hardware buttons.*/
-	setDeviceDPI(stage) {
+	setDeviceDPI(stage = 1, dpiStages = 5, dpi1= 500, dpi2 = 1000, dpi3 = 2000, dpi4 = 3000, dpi5 = 6000) {
 		const packet = [0x26, 0x04, 0x06, 0x01, stage, dpiStages, 0x00];
 
 		packet[7] = Math.floor(dpi1/256);
@@ -514,17 +514,17 @@ class RazerProtocol {
 
 	}
 
-	setDeviceScrollMode() {
+	setDeviceScrollMode(ScrollMode = false) {
 		const packet = [0x02, 0x02, 0x14, 0x01, (ScrollMode ? 0x01 : 0x00)];
 		this.ConfigPacketSend(packet);
 	}
 
-	setDeviceScrollAccel() {
+	setDeviceScrollAccel(ScrollAccel = false) {
 		const packet = [0x02, 0x02, 0x16, 0x01, (ScrollAccel ? 0x01 : 0x00)];
 		this.ConfigPacketSend(packet);
 	}
 
-	setDeviceSmartReel() {
+	setDeviceSmartReel(SmartReel = false) {
 		const packet = [0x02, 0x02, 0x17, 0x01, (SmartReel ? 0x01 : 0x00)];
 		this.ConfigPacketSend(packet);
 	}
