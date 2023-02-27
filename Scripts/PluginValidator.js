@@ -42,35 +42,55 @@ function CheckForGPUListDuplicates(Plugin, ReportErrorCallback){
 	}
 }
 
-const DuplicateUSBProductSet = new Set();
-
-function CheckUSBVendorProductIdPair(Vendor, Product, ReportErrorCallback){
-	const pair = `${Vendor}:${Product}`;
-
-	if(DuplicateUSBProductSet.has(pair)){
-		ReportErrorCallback("Plugin contains duplicate Vendor:Product id pair.");
+class DuplicateUSBPluginValidator{
+	constructor(){
+		this.pluginMap = new Map();
 	}
 
-	DuplicateUSBProductSet.add(pair);
-}
+	CheckIDPair(Vendor, Product, ReportErrorCallback, PluginPath){
+		const pair = `${Vendor}:${Product}`;
 
-function CheckForUSBProductIdDuplicates(Plugin, ReportErrorCallback){
+		if(!this.pluginMap.has(pair)){
+			this.pluginMap.set(pair, [PluginPath]);
+
+			return;
+		}
 
 
-	if(typeof Plugin.VendorId !== "undefined" && typeof Plugin.ProductId !== "undefined"){
+		const PluginPaths = this.pluginMap.get(pair);
+		let message = `Plugin contains duplicate Vendor:Product id pair!`;
+
+		for(const path of PluginPaths){
+			message += "\n\t\tPrevious File: " + path;
+		}
+
+		ReportErrorCallback(message);
+
+		PluginPaths.push(PluginPath);
+		this.pluginMap.set(pair, PluginPaths);
+	}
+
+	CheckForUSBProductIdDuplicates(Plugin, ReportErrorCallback, PluginPath){
+		if(typeof Plugin.VendorId === "undefined" || typeof Plugin.ProductId === "undefined"){
+			return;
+		}
 
 		const VendorId = Plugin.VendorId();
 		const ProductIds = Plugin.ProductId();
 
 		if(typeof ProductIds === "number"){
-			CheckUSBVendorProductIdPair(VendorId, ProductIds, ReportErrorCallback);
-		}else{
-			for(const ProductId of ProductIds){
-				CheckUSBVendorProductIdPair(VendorId, ProductId, ReportErrorCallback);
-			}
+			this.CheckIDPair(VendorId, ProductIds, ReportErrorCallback, PluginPath);
+
+			return;
+		}
+
+		for(const ProductId of ProductIds){
+			this.CheckIDPair(VendorId, ProductId, ReportErrorCallback, PluginPath);
 		}
 	}
 }
+
+const DuplicateUSBValidator = new DuplicateUSBPluginValidator();
 
 class PluginValidator {
 	constructor() {
@@ -82,7 +102,7 @@ class PluginValidator {
 			CheckThatLEDNameAndPositionLengthsMatch,
 			CheckAllLedPositionsAreWithinBounds,
 			//CheckForGPUListDuplicates,
-			CheckForUSBProductIdDuplicates,
+			DuplicateUSBValidator.CheckForUSBProductIdDuplicates.bind(DuplicateUSBValidator),
 		];
 		this.excludedFiles = [".test.js"];
 	}
@@ -151,7 +171,7 @@ class PluginValidator {
 
 	async AttemptValidator(validatorCallback, pluginModule, PluginPath) {
 		try {
-			validatorCallback(pluginModule, this.#GetReportErrorCallback(PluginPath, validatorCallback.name));
+			validatorCallback(pluginModule, this.#GetReportErrorCallback(PluginPath, validatorCallback.name), PluginPath);
 		} catch (e) {
 			this.#ReportError(PluginPath, validatorCallback.name, e);
 		}
