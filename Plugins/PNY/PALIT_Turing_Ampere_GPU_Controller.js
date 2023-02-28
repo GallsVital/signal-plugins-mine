@@ -127,6 +127,7 @@ class PALITGPUIdentifier extends GPUIdentifier {
 		super(0x10DE, 0x1569, Device, SubDevice, 0x49, Name, Model);
 	}
 }
+export function BrandGPUList(){ return PALITGPUIDs; }
 
 const PALITGPUIDs =
 [

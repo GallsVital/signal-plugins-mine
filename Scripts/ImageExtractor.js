@@ -26,7 +26,7 @@ for(const Path of DirectoryWalker.walkPaths(["../Plugins"])){
 		const Base64 = "data:image/png;base64," + await GetImageFromPlugin(Path);
 
 		let RelativePath = pathLib.relative(process.cwd(), url.fileURLToPath(Path));
-		RelativePath = RelativePath.replace("Plugins\\", "ImageOut\\");
+		RelativePath = RelativePath.replace("Plugins\\", "ImageOut\\Plugins\\");
 
 		const FileNames = RelativePath.split("\\");
 		RelativePath = process.cwd() + "\\" + RelativePath;

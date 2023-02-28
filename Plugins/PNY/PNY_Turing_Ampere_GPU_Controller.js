@@ -126,6 +126,7 @@ class PNYGPUIdentifier extends GPUIdentifier {
 		super(0x10DE, 0x196E, Device, SubDevice, 0x49, Name, Model);
 	}
 }
+export function BrandGPUList(){ return PNYGPUIDs; }
 
 const PNYGPUIDs =
 [

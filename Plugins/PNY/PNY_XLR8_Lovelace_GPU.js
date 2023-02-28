@@ -127,6 +127,8 @@ class PNYGPUIdentifier extends GPUIdentifier {
 	}
 }
 
+export function BrandGPUList(){ return PNYGPUIDs; }
+
 const PNYGPUIDs =
 [
 	new PNYGPUIdentifier(0x2782, 0x13b1, "PNY RTX 4070TI XLR8"),
