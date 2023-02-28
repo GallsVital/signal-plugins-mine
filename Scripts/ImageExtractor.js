@@ -13,6 +13,10 @@ async function GetImageFromPlugin(PluginPath){
 
 	const Base64ImageString = pluginModule.Image();
 
+	if(Base64ImageString == ""){
+		throw `${PluginPath}\n\tPlugin Exports an empty Image!`;
+	}
+
 	return Base64ImageString;
 }
 
@@ -20,10 +24,6 @@ async function GetImageFromPlugin(PluginPath){
 for(const Path of DirectoryWalker.walkPaths(["../Plugins"])){
 	try{
 		const Base64 = "data:image/png;base64," + await GetImageFromPlugin(Path);
-
-		if(Base64 == ""){
-			throw `${Path}\n\tPlugin Exports an empty Image!`;
-		}
 
 		let RelativePath = pathLib.relative(process.cwd(), url.fileURLToPath(Path));
 		RelativePath = RelativePath.replace("Plugins\\", "ImageOut\\");
@@ -35,7 +35,7 @@ for(const Path of DirectoryWalker.walkPaths(["../Plugins"])){
 		//console.log(RelativePath);
 
 		if(!fs.existsSync(RelativePath)){
-			fs.mkdirSync(RelativePath);
+			fs.mkdirSync(RelativePath, { recursive: true});
 		}
 
 		const FileName = FileNames[FileNames.length - 1].replace(".js", "").replace(".", "");
