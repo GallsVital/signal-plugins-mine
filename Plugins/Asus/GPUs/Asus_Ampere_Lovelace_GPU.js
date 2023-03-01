@@ -346,6 +346,7 @@ class Asus_Ampere_Lovelace_IDs {
 		this.RTX3070_STRIX_GAMING_LHR          = 0x883A;
 		this.RTX3070_STRIX_KO_V2               = 0x8842; //LHR
 		this.RTX3070_TUF_GAMING                = 0x87B9;
+		this.RTX3070_TUF_GAMING_2			   = 0x87C2;
 		this.RTX3070_TUF_GAMING_OC             = 0x87E1;
 		this.RTX3070_TUF_GAMING_OC_2           = 0x87C1;
 		this.RTX3070_TUF_GAMING_OC_LHR         = 0x8825;
@@ -451,6 +452,7 @@ const Asus3000GPUIDs =
 	new AsusGPUIdentifier(Nvidia.RTX3070_LHR, AsusID.RTX3070_STRIX_GAMING_OC_WHITE_V2, "Asus ROG Strix 3070 Gaming OC White V2"),
 	new AsusGPUIdentifier(Nvidia.RTX3070_LHR, AsusID.RTX3070_STRIX_GAMING_OC_LHR, "Asus ROG Strix 3070 Gaming OC LHR"),
 	new AsusGPUIdentifier(Nvidia.RTX3070, AsusID.RTX3070_TUF_GAMING, "Asus TUF 3070 Gaming"),
+	new AsusGPUIdentifier(Nvidia.RTX3070, AsusID.RTX3070_TUF_GAMING_2, "Asus TUF 3070 Gaming"),
 	new AsusGPUIdentifier(Nvidia.RTX3070, AsusID.RTX3070_TUF_GAMING_OC, "Asus TUF 3070 Gaming OC"),
 	new AsusGPUIdentifier(Nvidia.RTX3070_LHR, AsusID.RTX3070_STRIX_KO_V2, "Asus 3070 KO V2 OC"),
 	new AsusGPUIdentifier(Nvidia.RTX3070, AsusID.RTX3070_TUF_GAMING_OC_2, "Asus TUF 3070 Gaming OC 2"),
