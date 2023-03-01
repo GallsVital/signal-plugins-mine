@@ -16,7 +16,6 @@ declare type ScanExport = (bus: FreeAddressBus) => number[];
 
 declare type SupportsFanControl = () => boolean;
 declare type DefaultComponentBrand  = () => string;
-declare type SystemResumeDelay  = () => number;
 
 declare type IOMethod = "HID" | "RAWUSB" | "SMBUS";
 declare interface HidEndpoint{

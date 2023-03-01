@@ -47,5 +47,8 @@
 		"classNameTemplate": "{classname}",
 		"titleTemplate": "{title}",
 		"ancestorSeparator": " › "
+	},
+	"dependencies": {
+		"base64-to-image": "^1.0.2"
 	}
 }

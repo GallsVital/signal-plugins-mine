@@ -2,6 +2,7 @@
 /docs
 /dist
 /coverage
+/ImageOut
 junit.xml
 settings.json
 
