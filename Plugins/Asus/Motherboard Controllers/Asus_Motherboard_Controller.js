@@ -104,6 +104,7 @@ const ASUS_MODE_DIRECT = 0xFF;
 const ConfigurationOverrides = {
 	"AULA3-AR32-0207":{MainboardCount: 3, ARGBChannelCount:3, RGBHeaderCount: 1}, // THIS HAS A SPACE AT THE END?!?!?!
 	"AULA3-AR32-0213":{MainboardCount: 1, ARGBChannelCount:3, RGBHeaderCount: 1},
+	//"AULA3-6K75-0210":{MainboardCount: 0, ARGBChannelCount:4, RGBHeaderCount: 1},
 	//"AULA3-6K75-0206":{MainboardCount: 7, ARGBChannelCount:3, RGBHeaderCount: 1},
 	//"AULA3-AR42-0207":{MainboardCount: 3, ARGBChannelCount:1, RGBHeaderCount: 2},
 	"TUF GAMING X570-PRO (WI-FI)": {MainboardCount: 3, ARGBChannelCount:1, RGBHeaderCount: 2},
@@ -233,7 +234,7 @@ function sendPolymoColors(shutdown = false) {
 		RGBData[ledIdx + 2] = color[2];
 	}
 
-	StreamDirectColors(0, RGBData, 18);
+	StreamDirectColors(0, RGBData, polymoDevice.Positions.length);
 }
 
 function SetMotherboardName(){

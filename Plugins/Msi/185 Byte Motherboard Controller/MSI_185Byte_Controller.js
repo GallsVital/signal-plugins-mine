@@ -27,14 +27,14 @@ export function ConflictingProcesses() {
 
 const devicePIDs =
 [
-	0x7B93, 0x7C34, 0x7C35, 0x7C36, 0x7C37, 0x7C56, 0x7C59, 0x7C70, 0x7C71, 0x7C73, 0x7C75, 0x7C76, 0x7C77, 0x7C79, 0x7C80, 0x7C81, 0x7C82, 0x7C83, 0x7C84, 0x7C85, 0x7C86, 0x7C88, 0x7C89, 0x7C90, 0x7C91, 0x7C92, 0x7C94, 0x7C95, 0x7C98, 0x7C99, 0x7D03, 0x7D04, 0x7D05, 0x7D06, 0x7D07, 0x7D08, 0x7D09, 0x7D10, 0x7D11, 0x7D12, 0x7D13, 0x7D14, 0x7D15, 0x7D16, 0x7D17, 0x7D18, 0x7D19, 0x7D20, 0x7D21, 0x7D22, 0x7D25, 0x7D27, 0x7D28, 0x7D29, 0x7D30, 0x7D31, 0x7D32, 0x7D36, 0x7D37, 0x7D38, 0x7D40, 0x7D41, 0x7D42, 0x7D43, 0x7D45, 0x7D46, 0x7D50, 0x7D52, 0x7D53, 0x7D54, 0x7D59
+	0x7B93, 0x7C34, 0x7C35, 0x7C36, 0x7C37, 0x7C56, 0x7C59, 0x7C70, 0x7C71, 0x7C73, 0x7C75, 0x7C76, 0x7C77, 0x7C79, 0x7C80, 0x7C81, 0x7C82, 0x7C83, 0x7C84, 0x7C85, 0x7C86, 0x7C88, 0x7C89, 0x7C90, 0x7C91, 0x7C92, 0x7C94, 0x7C95, 0x7C98, 0x7C99, 0x7D03, 0x7D04, 0x7D05, 0x7D06, 0x7D07, 0x7D08, 0x7D09, 0x7D10, 0x7D11, 0x7D12, 0x7D13, 0x7D14, 0x7D15, 0x7D16, 0x7D17, 0x7D18, 0x7D19, 0x7D20, 0x7D21, 0x7D22, 0x7D25, 0x7D27, 0x7D28, 0x7D29, 0x7D30, 0x7D31, 0x7D32, 0x7D36, 0x7D37, 0x7D38, 0x7D40, 0x7D41, 0x7D42, 0x7D43, 0x7D45, 0x7D46, 0x7D50, 0x7D52, 0x7D53, 0x7D54, 0x7D59, 0x7D74, 0x7D67, 0x7D69, 0x7D70, 0x7D86, 0x7D89, 0x7D91, 0x7D97, 0x7D99, 0x7E03, 0x7E07
 ];
-//Temporarily Axed. 0x7D67, 0x7D69, 0x7D70, 0x7D74, 0x7D86, 0x7D91, 0x7D97, 0x7E07
+//Temporarily Axed.
 const ParentDeviceName = "Mystic Light Controller";
 
 export function SupportsSubdevices(){ return true; }
 
-const DeviceMaxLedLimit = 270;
+const DeviceMaxLedLimit = 360;
 
 //Channel Name, Led Limit
 const ChannelArray = [];
@@ -48,6 +48,7 @@ let ARGBHeaders = 0;
 let OnboardLEDs = 0;
 let JPipeLEDs = 0;
 let RGBHeaders = 0;
+let gen2Support = false;
 
 export function LedNames() {
 	return vLedNames;
@@ -58,19 +59,25 @@ export function LedPositions() {
 }
 
 export function Initialize() {
+	MSIMotherboard.detectGen2Support(); //Kind of cheating to call this detection, but welcome to MSI. Abandon all hope of autodetection.
 	MSIMotherboard.checkPerLEDSupport();
 	MSIMotherboard.createLEDs();
+
 	device.setName(device.getMotherboardName());
-	device.write([0x01, 0xbb], 64);
+	device.write([0x01, 0xbb, 0x00, 0x00, 0x00, 0x00, 0x01], 64); //Let's make sure users have their leds on in bios.
 }
 
 export function Render() {
 	if(perLED === true) {
 		if(ARGBHeaders > 1 && CorsairHeaders > 0) {
-			//MSIMotherboard.sendSplitPacketARGB();
-			MSIMotherboard.sendARGB(); //I'm leaving the logic here for later. I will fix this.
+			MSIMotherboard.sendGen1SplitPacketARGB();//Gen 1 boards have JCorsair headers and therefore use a new zone register.
 		} else {
-			MSIMotherboard.sendARGB();
+			if(gen2Support) { ///MMM Nesting
+				MSIMotherboard.sendGen2SplitPacketARGB(); //Gen 2 boards use a 3rd register on the 0x04 zone as that's still a JRainbow.
+			} else {
+				MSIMotherboard.sendGen1ARGB(); //This is the older ARGB Send style. It uses a single packet for all zones. I may deprecate this.
+			}
+
 		}
 	} else {
 		if(MSIMotherboard.CheckPacketLength() !== 185) {
@@ -108,7 +115,19 @@ class MysticLight {
 
 		this.ConfigurationOverrides =
 		{
-			"MSI Z790 TOMAHAWK DDR4":
+			"MAG Z790 TOMAHAWK DDR4 WIFI (MS-7D91)":
+			{
+				OnboardLEDs    : 0,
+				RGBHeaders     : 1,
+				ARGBHeaders    : 3,
+				JPipeLEDs	   : 0,
+				CorsairHeaders : 0,
+				//PERLED
+				PerLEDOnboardLEDs : 0,
+				ForceZoneBased	  : false,
+			},
+
+			"MAG Z790 TOMAHAWK WIFI (MS-7D91)":
 			{
 				OnboardLEDs    : 0,
 				RGBHeaders     : 1,
@@ -134,6 +153,7 @@ class MysticLight {
 				//PERLED
 				PerLEDOnboardLEDs : 8,
 				ForceZoneBased	  : true,
+				JARGB_V2		  : false
 			},
 			0x7C34 : //X570 Godlike
 			{
@@ -144,7 +164,8 @@ class MysticLight {
 				CorsairHeaders : 1,
 				//PERLED
 				PerLEDOnboardLEDs : 20,
-				ForceZoneBased	  : true, //WHY ARE YOU LIKE THIS
+				ForceZoneBased	  : true,
+				JARGB_V2		  : false //WHY ARE YOU LIKE THIS
 			},
 			0x7C35 : //X570 Ace
 			{
@@ -156,6 +177,7 @@ class MysticLight {
 				//PERLED
 				PerLEDOnboardLEDs : 17,
 				ForceZoneBased	  : true,
+				JARGB_V2		  : false
 			},
 			0x7C36 : //X570 Creation
 			{
@@ -167,6 +189,7 @@ class MysticLight {
 				//PERLED
 				PerLEDOnboardLEDs : 12,
 				ForceZoneBased	  : true,
+				JARGB_V2		  : false
 			},
 			0x7C37 : //X570 Gaming Edge
 			{
@@ -178,6 +201,7 @@ class MysticLight {
 				//PERLED
 				PerLEDOnboardLEDs : 6,
 				ForceZoneBased	  : true,
+				JARGB_V2		  : false
 			},
 			0x7C56 : //B550 Gaming Plus
 			{
@@ -189,6 +213,7 @@ class MysticLight {
 				//PERLED
 				PerLEDOnboardLEDs : 6,
 				ForceZoneBased	  : false,
+				JARGB_V2		  : false
 			},
 			0x7C59 : //Creator TRX40
 			{
@@ -200,6 +225,7 @@ class MysticLight {
 				//PERLED
 				PerLEDOnboardLEDs : 8,
 				ForceZoneBased	  : false,
+				JARGB_V2		  : false
 			},
 			0x7C70 : //Z490 Godlike
 			{
@@ -211,6 +237,7 @@ class MysticLight {
 				//PERLED
 				PerLEDOnboardLEDs : 26,
 				ForceZoneBased	  : false,
+				JARGB_V2		  : false
 			},
 			0x7C71 : //Z490 Ace
 			{
@@ -222,6 +249,7 @@ class MysticLight {
 				//PERLED
 				PerLEDOnboardLEDs : 12,
 				ForceZoneBased	  : false,
+				JARGB_V2		  : false
 			},
 			0x7C73 : //Z490 Gaming Carbon
 			{
@@ -233,6 +261,7 @@ class MysticLight {
 				//PERLED
 				PerLEDOnboardLEDs : 10,
 				ForceZoneBased	  : false,
+				JARGB_V2		  : false
 			},
 			0x7C75 : //Z490 Gaming Plus
 			{
@@ -244,6 +273,7 @@ class MysticLight {
 				//PERLED
 				PerLEDOnboardLEDs : 6,
 				ForceZoneBased	  : false,
+				JARGB_V2		  : false
 			},
 			0x7C76 : //Z490M Gaming Edge
 			{
@@ -255,6 +285,7 @@ class MysticLight {
 				//PERLED
 				PerLEDOnboardLEDs : 6,
 				ForceZoneBased	  : false,
+				JARGB_V2		  : false
 			},
 			0x7C77 : //Z490 Ace
 			{
@@ -266,6 +297,7 @@ class MysticLight {
 				//PERLED
 				PerLEDOnboardLEDs : 6,
 				ForceZoneBased	  : false,
+				JARGB_V2		  : false
 			},
 			0x7C79 : //Z490 Gaming Edge
 			{
@@ -277,6 +309,7 @@ class MysticLight {
 				//PERLED
 				PerLEDOnboardLEDs : 6,
 				ForceZoneBased	  : false,
+				JARGB_V2		  : false
 			},
 			0x7C80 : //Z490 Tomahawk
 			{
@@ -288,6 +321,7 @@ class MysticLight {
 				//PERLED
 				PerLEDOnboardLEDs : 6,
 				ForceZoneBased	  : false,
+				JARGB_V2		  : false
 			},
 			0x7C81 : //B460 Tomahawk
 			{
@@ -299,6 +333,7 @@ class MysticLight {
 				//PERLED
 				PerLEDOnboardLEDs : 6,
 				ForceZoneBased	  : false,
+				JARGB_V2		  : false
 			},
 			0x7C82 : //B460 M Mortar
 			{
@@ -310,6 +345,7 @@ class MysticLight {
 				//PERLED
 				PerLEDOnboardLEDs : 6,
 				ForceZoneBased	  : false,
+				JARGB_V2		  : false
 			},
 			0x7C83 : //Mag B460 M Bazooka
 			{
@@ -321,6 +357,7 @@ class MysticLight {
 				//PERLED
 				PerLEDOnboardLEDs : 6,
 				ForceZoneBased	  : false,
+				JARGB_V2		  : false
 			},
 			0x7C84 : //Mag X570 Tomahawk Wifi
 			{
@@ -332,6 +369,7 @@ class MysticLight {
 				//PERLED
 				PerLEDOnboardLEDs : 6,
 				ForceZoneBased	  : false,
+				JARGB_V2		  : false
 			},
 			0x7C85 : //B460-A Pro
 			{
@@ -343,6 +381,7 @@ class MysticLight {
 				//PERLED
 				PerLEDOnboardLEDs : 6,
 				ForceZoneBased	  : false,
+				JARGB_V2		  : false
 			},
 			0x7C86 : //B460I Gaming Edge
 			{
@@ -354,6 +393,7 @@ class MysticLight {
 				//PERLED
 				PerLEDOnboardLEDs : 6,
 				ForceZoneBased	  : false,
+				JARGB_V2		  : false
 			},
 			0x7C88 : //B460M Pro
 			{
@@ -365,6 +405,7 @@ class MysticLight {
 				//PERLED
 				PerLEDOnboardLEDs : 6,
 				ForceZoneBased	  : false,
+				JARGB_V2		  : false
 			},
 			0x7C89 : //H410M Pro
 			{
@@ -376,6 +417,7 @@ class MysticLight {
 				//PERLED
 				PerLEDOnboardLEDs : 6,
 				ForceZoneBased	  : false,
+				JARGB_V2		  : false
 			},
 			0x7C90 : //B550 Gaming Carbon Wifi
 			{
@@ -387,6 +429,7 @@ class MysticLight {
 				//PERLED
 				PerLEDOnboardLEDs : 10,
 				ForceZoneBased	  : false,
+				JARGB_V2		  : false
 			},
 			0x7C91 : //B550 Gaming Edge Max Wifi
 			{
@@ -398,6 +441,7 @@ class MysticLight {
 				//PERLED
 				PerLEDOnboardLEDs : 6,
 				ForceZoneBased	  : false,
+				JARGB_V2		  : false
 			},
 			0x7C92 : //B550I Gaming Edge Wifi
 			{
@@ -409,6 +453,7 @@ class MysticLight {
 				//PERLED
 				PerLEDOnboardLEDs : 6,
 				ForceZoneBased	  : false,
+				JARGB_V2		  : false
 			},
 			0x7C94 : //B550M Mortar
 			{
@@ -420,17 +465,19 @@ class MysticLight {
 				//PERLED
 				PerLEDOnboardLEDs : 6,
 				ForceZoneBased	  : false,
+				JARGB_V2		  : false
 			},
 			0x7C95 : //B550-M Bazooka
 			{
-				OnboardLEDs    : 6,
+				OnboardLEDs    : 0,
 				RGBHeaders     : 2,
 				ARGBHeaders    : 2,
 				JPipeLEDs	   : 0,
 				CorsairHeaders : 0,
 				//PERLED
-				PerLEDOnboardLEDs : 6,
+				PerLEDOnboardLEDs : 0,
 				ForceZoneBased	  : false,
+				JARGB_V2		  : false
 			},
 			0x7C98 : //Z490-S01
 			{
@@ -442,6 +489,7 @@ class MysticLight {
 				//PERLED
 				PerLEDOnboardLEDs : 6,
 				ForceZoneBased	  : false,
+				JARGB_V2		  : false
 			},
 			0x7C99 : //Z490M
 			{
@@ -453,6 +501,7 @@ class MysticLight {
 				//PERLED
 				PerLEDOnboardLEDs : 6,
 				ForceZoneBased	  : false,
+				JARGB_V2		  : false
 			},
 			0x7D03 : //Z590 GODLIKE
 			{
@@ -464,6 +513,7 @@ class MysticLight {
 				//PERLED
 				PerLEDOnboardLEDs : 32, //?!?!?!?
 				ForceZoneBased	  : false,
+				JARGB_V2		  : false
 			},
 			0x7D04 : //Z590 Ace
 			{
@@ -475,6 +525,7 @@ class MysticLight {
 				//PERLED
 				PerLEDOnboardLEDs : 21,
 				ForceZoneBased	  : false,
+				JARGB_V2		  : false
 			},
 			0x7D05 : //Z590I Unify
 			{
@@ -486,6 +537,7 @@ class MysticLight {
 				//PERLED
 				PerLEDOnboardLEDs : 6,
 				ForceZoneBased	  : false,
+				JARGB_V2		  : false
 			},
 			0x7D06 : //Z590 Carbon Wifi/Z590 Gaming Force
 			{
@@ -497,6 +549,7 @@ class MysticLight {
 				//PERLED
 				PerLEDOnboardLEDs : 8,
 				ForceZoneBased	  : false,
+				JARGB_V2		  : false
 			},
 			0x7D07 : //Z590 Gaming Edge
 			{
@@ -508,6 +561,7 @@ class MysticLight {
 				//PERLED
 				PerLEDOnboardLEDs : 8,
 				ForceZoneBased	  : false,
+				JARGB_V2		  : false
 			},
 			0x7D08 : //Z590 Tomahawk
 			{
@@ -518,7 +572,8 @@ class MysticLight {
 				CorsairHeaders : 0,
 				//PERLED
 				PerLEDOnboardLEDs : 6,
-				ForceZoneBased	  : true,
+				ForceZoneBased	  : false,
+				JARGB_V2		  : false
 			},
 			0x7D09 : //Z590 Pro
 			{
@@ -530,6 +585,7 @@ class MysticLight {
 				//PERLED
 				PerLEDOnboardLEDs : 6,
 				ForceZoneBased	  : false,
+				JARGB_V2		  : false
 			},
 			0x7D10 : //Z590-A Pro
 			{
@@ -541,6 +597,7 @@ class MysticLight {
 				//PERLED
 				PerLEDOnboardLEDs : 6,
 				ForceZoneBased	  : false,
+				JARGB_V2		  : false
 			},
 			0x7D11 : //Z590 Plus
 			{
@@ -552,6 +609,7 @@ class MysticLight {
 				//PERLED
 				PerLEDOnboardLEDs : 6,
 				ForceZoneBased	  : false,
+				JARGB_V2		  : false
 			},
 			0x7D12 : //Z690M Gaming Edge Wifi
 			{
@@ -563,6 +621,7 @@ class MysticLight {
 				//PERLED
 				PerLEDOnboardLEDs : 10,
 				ForceZoneBased	  : false,
+				JARGB_V2		  : false
 			},
 			0x7D13 : //B550 Unify-X
 			{
@@ -574,6 +633,7 @@ class MysticLight {
 				//PERLED
 				PerLEDOnboardLEDs : 6,
 				ForceZoneBased	  : false,
+				JARGB_V2		  : false
 			},
 			0x7D14 : //B550 Gaming Carbon Wifi
 			{
@@ -585,6 +645,7 @@ class MysticLight {
 				//PERLED
 				PerLEDOnboardLEDs : 6,
 				ForceZoneBased	  : false,
+				JARGB_V2		  : false
 			},
 			0x7D15 : //B560 Tomahawk Wifi
 			{
@@ -596,6 +657,7 @@ class MysticLight {
 				//PERLED
 				PerLEDOnboardLEDs : 6,
 				ForceZoneBased	  : false,
+				JARGB_V2		  : false
 			},
 			0x7D16 : //B560 Tomahawk
 			{
@@ -607,6 +669,7 @@ class MysticLight {
 				//PERLED
 				PerLEDOnboardLEDs : 6,
 				ForceZoneBased	  : false,
+				JARGB_V2		  : false
 			},
 			0x7D17 : //B560M Mortar
 			{
@@ -618,6 +681,7 @@ class MysticLight {
 				//PERLED
 				PerLEDOnboardLEDs : 6,
 				ForceZoneBased	  : false,
+				JARGB_V2		  : false
 			},
 			0x7D18 : //B560M Bazooka
 			{
@@ -629,6 +693,7 @@ class MysticLight {
 				//PERLED
 				PerLEDOnboardLEDs : 6,
 				ForceZoneBased	  : false,
+				JARGB_V2		  : false
 			},
 			0x7D19 : //B560I Gaming Edge
 			{
@@ -640,6 +705,7 @@ class MysticLight {
 				//PERLED
 				PerLEDOnboardLEDs : 6,
 				ForceZoneBased	  : false,
+				JARGB_V2		  : false
 			},
 			0x7D20 : //B560M Pro
 			{
@@ -651,6 +717,7 @@ class MysticLight {
 				//PERLED
 				PerLEDOnboardLEDs : 6,
 				ForceZoneBased	  : false,
+				JARGB_V2		  : false
 			},
 			0x7D21 : //B560M Pro Wifi
 			{
@@ -673,6 +740,7 @@ class MysticLight {
 				//PERLED
 				PerLEDOnboardLEDs : 6,
 				ForceZoneBased	  : false,
+				JARGB_V2		  : false
 			},
 			0x7D25 : //Pro Z690-A
 			{
@@ -684,6 +752,7 @@ class MysticLight {
 				//PERLED
 				PerLEDOnboardLEDs : 6,
 				ForceZoneBased	  : false,
+				JARGB_V2		  : false
 			},
 			0x7D27 : //MEG Z690 Ace
 			{
@@ -695,6 +764,7 @@ class MysticLight {
 				//PERLED
 				PerLEDOnboardLEDs : 6,
 				ForceZoneBased	  : false,
+				JARGB_V2		  : false
 			},
 			0x7D28 : //MEG Z690 Unify
 			{
@@ -706,6 +776,7 @@ class MysticLight {
 				//PERLED
 				PerLEDOnboardLEDs : 6,
 				ForceZoneBased	  : false,
+				JARGB_V2		  : false
 			},
 			0x7D29 : //MEG Z690I Unify
 			{
@@ -717,6 +788,7 @@ class MysticLight {
 				//PERLED
 				PerLEDOnboardLEDs : 6,
 				ForceZoneBased	  : false,
+				JARGB_V2		  : false
 			},
 			0x7D30 : //MPG Z690 Carbon
 			{
@@ -728,6 +800,7 @@ class MysticLight {
 				//PERLED
 				PerLEDOnboardLEDs : 11,
 				ForceZoneBased	  : false,
+				JARGB_V2		  : false
 			},
 			0x7D31 : //MPG Z690 Edge
 			{
@@ -739,6 +812,7 @@ class MysticLight {
 				//PERLED
 				PerLEDOnboardLEDs : 8,
 				ForceZoneBased	  : false,
+				JARGB_V2		  : false
 			},
 			0x7D32 : //MAG Z690 Tomahawk
 			{
@@ -750,6 +824,7 @@ class MysticLight {
 				//PERLED
 				PerLEDOnboardLEDs : 6,
 				ForceZoneBased	  : false,
+				JARGB_V2		  : false
 			},
 			0x7D36 : //Pro Z690-P
 			{
@@ -761,6 +836,7 @@ class MysticLight {
 				//PERLED
 				PerLEDOnboardLEDs : 6,
 				ForceZoneBased	  : false,
+				JARGB_V2		  : false
 			},
 			0x7D37 : //B660M-A CEC
 			{
@@ -772,6 +848,7 @@ class MysticLight {
 				//PERLED
 				PerLEDOnboardLEDs : 6,
 				ForceZoneBased	  : false,
+				JARGB_V2		  : false
 			},
 			0x7D38 : //Z590 Unify
 			{
@@ -783,6 +860,7 @@ class MysticLight {
 				//PERLED
 				PerLEDOnboardLEDs : 6,
 				ForceZoneBased	  : false,
+				JARGB_V2		  : false
 			},
 			0x7D40 : //B660I Gaming Edge Wifi
 			{
@@ -794,6 +872,7 @@ class MysticLight {
 				//PERLED
 				PerLEDOnboardLEDs : 6,
 				ForceZoneBased	  : false,
+				JARGB_V2		  : true
 			},
 			0x7D41 : //B660 Tomahawk
 			{
@@ -805,6 +884,7 @@ class MysticLight {
 				//PERLED
 				PerLEDOnboardLEDs : 6,
 				ForceZoneBased	  : false,
+				JARGB_V2		  : false
 			},
 			0x7D42 : //Z690M Mortar
 			{
@@ -816,6 +896,7 @@ class MysticLight {
 				//PERLED
 				PerLEDOnboardLEDs : 6,
 				ForceZoneBased	  : false,
+				JARGB_V2		  : false
 			},
 			0x7D43 : //B660M Bazooka
 			{
@@ -827,6 +908,7 @@ class MysticLight {
 				//PERLED
 				PerLEDOnboardLEDs : 6,
 				ForceZoneBased	  : false,
+				JARGB_V2		  : false
 			},
 			0x7D45 : //B660M-G
 			{
@@ -838,6 +920,7 @@ class MysticLight {
 				//PERLED
 				PerLEDOnboardLEDs : 6,
 				ForceZoneBased	  : false,
+				JARGB_V2		  : false
 			},
 			0x7D46 : //H610M-G
 			{
@@ -849,6 +932,7 @@ class MysticLight {
 				//PERLED
 				PerLEDOnboardLEDs : 6,
 				ForceZoneBased	  : false,
+				JARGB_V2		  : false
 			},
 			0x7D50 : //X570S Ace Max
 			{
@@ -860,6 +944,7 @@ class MysticLight {
 				//PERLED
 				PerLEDOnboardLEDs : 18,
 				ForceZoneBased	  : false,
+				JARGB_V2		  : false
 			},
 			0x7D52 : //X570 Carbon Max Wifi
 			{
@@ -871,6 +956,7 @@ class MysticLight {
 				//PERLED
 				PerLEDOnboardLEDs : 20, //REDEMPTION!
 				ForceZoneBased	  : false,
+				JARGB_V2		  : false
 			},
 			0x7D53 : //X570 Edge Max Wifi
 			{
@@ -882,6 +968,7 @@ class MysticLight {
 				//PERLED
 				PerLEDOnboardLEDs : 6,
 				ForceZoneBased	  : false,
+				JARGB_V2		  : false
 			},
 			0x7D54 : //X570S Tomahawk
 			{
@@ -893,6 +980,7 @@ class MysticLight {
 				//PERLED
 				PerLEDOnboardLEDs : 6,
 				ForceZoneBased	  : false,
+				JARGB_V2		  : false
 			},
 			0x7D59 : //Pro B660-A
 			{
@@ -904,6 +992,7 @@ class MysticLight {
 				//PERLED
 				PerLEDOnboardLEDs : 6,
 				ForceZoneBased	  : false,
+				JARGB_V2		  : false
 			},
 			0x7D67 : //Pro X670
 			{
@@ -913,7 +1002,9 @@ class MysticLight {
 				JPipeLEDs	   : 0,
 				CorsairHeaders : 0,
 				//PERLED
-				PerLEDOnboardLEDs : 0
+				PerLEDOnboardLEDs : 0,
+				ForceZoneBased	  : false,
+				JARGB_V2		  : true,
 			},
 			0x7D69 : //X670E Ace
 			{
@@ -925,6 +1016,7 @@ class MysticLight {
 				//PERLED
 				PerLEDOnboardLEDs : 12,
 				ForceZoneBased	  : false,
+				JARGB_V2		  : true,
 			},
 			0x7D70 : //X670E Carbon Wifi
 			{
@@ -936,6 +1028,7 @@ class MysticLight {
 				//PERLED
 				PerLEDOnboardLEDs : 6,
 				ForceZoneBased	  : false,
+				JARGB_V2		  : true,
 			},
 			0x7D74 : //B650 Carbon Wifi
 			{
@@ -947,6 +1040,19 @@ class MysticLight {
 				//PERLED
 				PerLEDOnboardLEDs : 6,
 				ForceZoneBased	  : false,
+				JARGB_V2		  : true,
+			},
+			0x7D75 : //B650 Tomahawk WIFI
+			{
+				OnboardLEDs    : 0,
+				RGBHeaders     : 2,
+				ARGBHeaders    : 2,
+				JPipeLEDs	   : 0,
+				CorsairHeaders : 0,
+				//PERLED
+				PerLEDOnboardLEDs : 0,
+				ForceZoneBased	  : false,
+				JARGB_V2		  : true
 			},
 			0x7D86 : //Z790 Ace
 			{
@@ -956,7 +1062,21 @@ class MysticLight {
 				JPipeLEDs	   : 0,
 				CorsairHeaders : 0,
 				//PERLED
-				PerLEDOnboardLEDs : 12
+				PerLEDOnboardLEDs : 12,
+				ForceZoneBase	  : false,
+				JARGB_V2		  : true,
+			},
+			0x7D89 : //Z790 Carbon Wifi
+			{
+				OnboardLEDs    : 6,
+				RGBHeaders     : 1,
+				ARGBHeaders    : 2,
+				JPipeLEDs	   : 0,
+				CorsairHeaders : 0,
+				//PERLED
+				PerLEDOnboardLEDs : 6,
+				ForceZoneBased	  : false,
+				JARGB_V2		  : true,
 			},
 			0x7D91 : //Z790 Edge
 			{
@@ -968,6 +1088,7 @@ class MysticLight {
 				//PERLED
 				PerLEDOnboardLEDs : 6,
 				ForceZoneBased	  : false,
+				JARGB_V2		  : true,
 			},
 			0x7D97 : //B660M Mortar Max
 			{
@@ -979,7 +1100,44 @@ class MysticLight {
 				//PERLED
 				PerLEDOnboardLEDs : 0,
 				ForceZoneBased	  : false,
-			}
+				JARGB_V2		  : true,
+			},
+			0x7D99 : //B760M-A Wifi
+			{
+				OnboardLEDs    : 0,
+				RGBHeaders     : 1,
+				ARGBHeaders    : 2,
+				JPipeLEDs	   : 0,
+				CorsairHeaders : 0,
+				//PERLED
+				PerLEDOnboardLEDs : 0,
+				ForceZoneBased	  : false,
+				JARGB_V2		  : true,
+			},
+			0x7E03 : //Z790-I Edge
+			{
+				OnboardLEDs    : 0,
+				RGBHeaders     : 0,
+				ARGBHeaders    : 1,
+				JPipeLEDs	   : 0,
+				CorsairHeaders : 0,
+				//PERLED
+				PerLEDOnboardLEDs : 0,
+				ForceZoneBased	  : false,
+				JARGB_V2		  : true,
+			},
+			0x7E07 : //Z790-A Pro DDR4
+			{
+				OnboardLEDs    : 0,
+				RGBHeaders     : 1,
+				ARGBHeaders    : 3,
+				JPipeLEDs	   : 0,
+				CorsairHeaders : 0,
+				//PERLED
+				PerLEDOnboardLEDs : 0,
+				ForceZoneBased	  : false,
+				JARGB_V2		  : true,
+			},
 		};
 
 		this.OffsetDict =
@@ -1049,9 +1207,9 @@ class MysticLight {
 		{
 			JRainbowArray :
 			[
-				["JRainbow 1", 75],
-				["JRainbow 2", 75],
-				["Jrainbow 3", 75]
+				["JRainbow 1", 120],
+				["JRainbow 2", 120],
+				["Jrainbow 3", 120]
 			],
 
 			JCorsairArray :
@@ -1113,26 +1271,26 @@ class MysticLight {
 
 		this.initialPacket =
 		[
-			0x52,
-			0x01, 0xff, 0x00, 0x00, 0x2a, 0xff, 0x00, 0x00, 0x80, 0x00,
-			0x01, 0xff, 0x00, 0x00, 0x2a, 0xff, 0x00, 0x00, 0x80, 0x00,
-			0x01, 0xff, 0x00, 0x00, 0x2a, 0xff, 0x00, 0x00, 0x80, 0x00,
-			0x1a, 0xff, 0x00, 0x00, 0x2a, 0xff, 0x00, 0x00, 0x00, 0x00, 0x64,
-			0x1a, 0xff, 0x00, 0x00, 0x2a, 0xff, 0x00, 0x00, 0x00, 0x00, 0x64,
-			0x1a, 0xff, 0x00, 0x00, 0x2a, 0xff, 0x00, 0x00, 0x02, 0x24, 0x0a,
-			0x01, 0xff, 0x00, 0x00, 0x28, 0xff, 0x00, 0x00, 0x80, 0x00,
-			0x01, 0xff, 0x0e, 0x1a, 0x2a, 0xff, 0x0e, 0x1a, 0x81, 0x00,
-			0x01, 0x7c, 0x00, 0xff, 0x28, 0xff, 0x00, 0x00, 0x00, 0x00,
-			0x01, 0x7c, 0x00, 0xff, 0x28, 0xff, 0x00, 0x00, 0x00, 0x00,
-			0x01, 0x7c, 0x00, 0xff, 0x28, 0xff, 0x00, 0x00, 0x00, 0x00,
-			0x01, 0x7c, 0x00, 0xff, 0x28, 0xff, 0x00, 0x00, 0x00, 0x00,
-			0x01, 0x7c, 0x00, 0xff, 0x28, 0x00, 0x00, 0x00, 0x00, 0x00,
-			0x01, 0xff, 0x00, 0x00, 0x2a, 0xff, 0x00, 0x00, 0x80, 0x00,
-			0x01, 0xff, 0x00, 0x00, 0x28, 0xff, 0x00, 0x00, 0x00, 0x00,
-			0x01, 0xff, 0x00, 0x00, 0x28, 0xff, 0x00, 0x00, 0x00, 0x00,
-			0x01, 0xff, 0x00, 0x00, 0x28, 0xff, 0x00, 0x00, 0x00, 0x00,
-			0x01, 0x7c, 0x00, 0xff, 0x28, 0xff, 0x00, 0x00, 0x00, 0x00,
-			0x00, //No saving
+			0x52, //Header
+			0x01, 0xFF, 0x00, 0x00, 0x28, 0xFF, 0x00, 0x00, 0x00, 0x00, //JRGB1
+			0x01, 0xFF, 0x00, 0x00, 0x28, 0xFF, 0x00, 0x00, 0x00, 0x00,
+			0x01, 0xFF, 0x00, 0x00, 0x28, 0xFF, 0x00, 0x00, 0x00, 0x00,
+			0x01, 0xFF, 0x00, 0x00, 0x28, 0xFF, 0x00, 0x00, 0x00, 0x00, 0x64,
+			0x01, 0xFF, 0x00, 0x00, 0x28, 0xFF, 0x00, 0x00, 0x00, 0x00, 0x64,
+			0x01, 0xFF, 0x00, 0x00, 0x28, 0xFF, 0x00, 0x00, 0x82, 0x54, 0x0A,
+			0x01, 0xFF, 0x00, 0x00, 0x28, 0xFF, 0x00, 0x00, 0x80, 0x00,
+			0x01, 0xFF, 0x00, 0x00, 0x28, 0xFF, 0x00, 0x00, 0x00, 0x00,
+			0x01, 0xFF, 0x00, 0x00, 0x28, 0xFF, 0x00, 0x00, 0x00, 0x00,
+			0x01, 0xFF, 0x00, 0x00, 0x28, 0xFF, 0x00, 0x00, 0x00, 0x00,
+			0x01, 0xFF, 0x00, 0x00, 0x28, 0xFF, 0x00, 0x00, 0x00, 0x00,
+			0x01, 0xFF, 0x00, 0x00, 0x28, 0xFF, 0x00, 0x00, 0x00, 0x00,
+			0x01, 0xFF, 0x00, 0x00, 0x28, 0xFF, 0x00, 0x00, 0x00, 0x00,
+			0x01, 0xFF, 0x00, 0x00, 0x28, 0xFF, 0x00, 0x00, 0x00, 0x00,
+			0x01, 0xFF, 0x00, 0x00, 0x28, 0xFF, 0x00, 0x00, 0x00, 0x00,
+			0x01, 0xFF, 0x00, 0x00, 0x28, 0xFF, 0x00, 0x00, 0x00, 0x00,
+			0x01, 0xFF, 0x00, 0x00, 0x28, 0xFF, 0x00, 0x00, 0x00, 0x00,
+			0x01, 0xFF, 0x00, 0x00, 0x28, 0xFF, 0x00, 0x00, 0x00, 0x00, //JRGB2
+			0x00 //No saving
 		];
 
 		this.perledpacket =
@@ -1165,11 +1323,11 @@ class MysticLight {
 			0x01, 0x00, 0x00, 0x00, 0x08, 0x00, 0x00, 0x00, 0x80, 0x00, //JRGB1
 			0x01, 0x00, 0x00, 0x00, 0x2a, 0x00, 0x00, 0x00, 0x80, 0x00, //JPipe1
 			0x01, 0x00, 0x00, 0x00, 0x2a, 0x00, 0x00, 0x00, 0x80, 0x00, //JPipe2
-			0x25, 0x00, 0x00, 0x00, 0x29, 0x00, 0x00, 0x00, 0x80, 0x00, 0xC8, //JRainbow1 //Extra Byte determines number of leds We're keeping these capped at 75 for now. No boom. This does give headroom for up to 200.
-			0x25, 0x00, 0x00, 0x00, 0x29, 0x00, 0x00, 0x00, 0x80, 0x00, 0xF0, //JRainbow2
-			0x25, 0x00, 0x00, 0x00, 0x29, 0x00, 0x00, 0x00, 0x82, 0x00, 0xF0, //JRainbow3 or Corsair?
+			0x25, 0x00, 0x00, 0x00, 0x29, 0x00, 0x00, 0x00, 0x80, 0x00, 0x78, //JRainbow1 //Extra Byte determines number of leds We're keeping these capped at 75 for now. No boom. This does give headroom for up to 200.
+			0x25, 0x00, 0x00, 0x00, 0x29, 0x00, 0x00, 0x00, 0x80, 0x00, 0x78, //JRainbow2
+			0x25, 0x00, 0x00, 0x00, 0x29, 0x00, 0x00, 0x00, 0x82, 0x00, 0x78, //JRainbow3 or Corsair?
 			0x01, 0x00, 0x00, 0x00, 0x28, 0x00, 0x00, 0x00, 0x80, 0x00, //JCorsair other?
-			0x25, 0x00, 0x00, 0x00, 0xa9, 0x00, 0x00, 0x00, 0x9f, 0x00, //JOnboard1
+			0x25, 0x00, 0x00, 0x00, 0xa9, 0x00, 0x00, 0x00, 0xb1, 0x00, //JOnboard1
 			0x01, 0x00, 0x00, 0x00, 0x28, 0x00, 0x00, 0x00, 0x80, 0x00, //JOnboard2
 			0x01, 0x00, 0x00, 0x00, 0x28, 0x00, 0x00, 0x00, 0x80, 0x00, //JOnboard3
 			0x01, 0x00, 0x00, 0x00, 0x28, 0x00, 0x00, 0x00, 0x80, 0x00, //JOnboard4
@@ -1359,9 +1517,8 @@ class MysticLight {
 
 	///////////////////////////////////////////////////////////////////////PERLED
 	PerLEDInit() {
-		if(ARGBHeaders > 1 && CorsairHeaders > 0) {
-			//device.send_report(this.splitPerLEDPacket, 185);
-			device.send_report(this.perledpacket, 185); //Same. Will come back later for you.
+		if(gen2Support || ARGBHeaders > 1 && CorsairHeaders > 0) {
+			device.send_report(this.splitPerLEDPacket, 185);
 		} else {
 			device.send_report(this.perledpacket, 185);
 		}
@@ -1398,7 +1555,6 @@ class MysticLight {
 
 	grabChannelRGBData(Channel) {
     	let ChannelLedCount = device.channel(ChannelArray[Channel][0]).LedCount();
-		const ChannelLedLimit = device.channel(ChannelArray[Channel][0]).LedLimit();
 		const componentChannel = device.channel(ChannelArray[Channel][0]);
 
 		let RGBData = [];
@@ -1406,7 +1562,7 @@ class MysticLight {
 		if(LightingMode === "Forced") {
 			RGBData = device.createColorArray(forcedColor, ChannelLedCount, "Inline");
 		} else if(componentChannel.shouldPulseColors()) {
-			ChannelLedCount = 75;
+			ChannelLedCount = 80;
 
 			const pulseColor = device.getChannelPulseColor(ChannelArray[Channel][0], ChannelLedCount);
 			RGBData = device.createColorArray(pulseColor, ChannelLedCount, "Inline");
@@ -1414,7 +1570,71 @@ class MysticLight {
 			RGBData = device.channel(ChannelArray[Channel][0]).getColors("Inline");
 		}
 
-    	return RGBData.concat(new Array((ChannelLedLimit*3) - RGBData.length).fill(0));
+    	return RGBData.concat(new Array((120*3) - RGBData.length).fill(0));
+	}
+
+	detectGen2Support() {
+		if(this.Library[device.productId()]["JARGB_V2"] === true) {
+			gen2Support = true;
+			device.log("Gen 2 Supported.");
+		}
+
+	}
+
+	detectGen2Devices() {
+		let ARGBGen2Strips = 0;
+		device.clearReadBuffer();
+
+		for(let ports = 0; ports < this.Library[device.productId()]["ARGBHeaders"]; ports++) {
+			const portStrips = this.detectARGBGen2(ports);
+			ARGBGen2Strips = ARGBGen2Strips + portStrips;
+		}
+
+		const Gen2InfoPacket = device.get_report([0x80], 242); //0x80 is for first port. If I want accurate counts from second port I need to do 0x81. Probably 0x82 for 3rd port.
+
+		for(let gen2Strips = 0; gen2Strips < ARGBGen2Strips; gen2Strips++) {
+			device.log(`Gen 2 Strip ${gen2Strips} has ${Gen2InfoPacket[15 + 16 * gen2Strips]} LEDs in it.`);
+		}
+	}
+
+	detectARGBGen2(port) {
+		device.write([0x01, 0x82, 0x00, 0x00, 0x00, 0x00, port], 64);
+
+		const returnPacket = device.read([0x01, 0x82], 64);
+		const gen2DeviceSupport = false;
+
+		if(returnPacket[7] !== 0) {
+			device.log(`Port ${port} has ${returnPacket[7]} Gen 2 Devices Connected to it.`);
+
+			return returnPacket[7];
+		}
+
+		device.log(`Port ${port} has no Gen 2 Devices Connected.`);
+
+		return 0;
+
+		//device.log(returnPacket[6]); //Port
+		//device.log(returnPacket[7]); //Gen 2 Strips.
+
+	}
+
+	setGen2Strip() {
+
+	}
+
+	getARGBGen2Mode(port) {
+		device.write([0x01, 0x80, 0x00, 0x00, 0x00, 0x00, port], 64);
+
+		const returnPacket = device.read([0x01, 0x80], 64);
+		device.log(returnPacket);
+
+		const Gen2Enabled = returnPacket[7];
+
+		return Gen2Enabled;
+	}
+
+	setARGBGen2Mode(port, enable) {
+		device.write([0x01, 0x84, 0x00, 0x00, 0x00, 0x00, port, enable], 64);
 	}
 
 	grabZones() {
@@ -1432,11 +1652,11 @@ class MysticLight {
 		return [ OnboardLEDData, RGBHeaderData ];
 	}
 
-	sendARGB() {
+	sendGen1ARGB() {
 		const [OnboardLEDData, RGBHeaderData] = this.grabZones();
-		const packet = [0x53, 0x25, 0x06, 0x00, 0x00];
-		packet.push(...OnboardLEDData.splice(0, 3*OnboardLEDs));
-		packet.push(...RGBHeaderData.splice(0, 3*RGBHeaders));
+		const packet = [0x53, 0x25, 0x06, 0x00, 0x00]; //Header for RGB Sends
+		packet.push(...OnboardLEDData.splice(0, 3*OnboardLEDs)); //Push Onboard LEDs First.
+		packet.push(...RGBHeaderData.splice(0, 3*RGBHeaders)); //Push Data From RGB Headers.
 
 		for(let jRainbowHeaders = 0; jRainbowHeaders < ARGBHeaders; jRainbowHeaders++) {
 			const jRainbowHeaderRGBData = this.grabChannelRGBData(jRainbowHeaders);
@@ -1452,19 +1672,64 @@ class MysticLight {
 		device.send_report(packet, 725);
 	}
 
-	sendSplitPacketARGB()//This only gets called if a user has 2 argb headers AND a Corsair header, meaning I can safely hardcode some things.
-	{
+	sendGen1SplitPacketARGB() {
 		const [OnboardLEDData, RGBHeaderData] = this.grabZones();
 		OnboardLEDData.push(...RGBHeaderData); //Why did I separate these in the first place?
 
-		const jRainbow1Data = this.grabChannelRGBData(0);
-		const jRainbow2Data = this.grabChannelRGBData(1);
-		const jCorsairData = this.grabChannelRGBData(2);
+		const header1Data = this.grabChannelRGBData(0);
+		const header2Data = this.grabChannelRGBData(1);
+		const header3Data = this.grabChannelRGBData(2);
 
-		device.send_report([0x53, 0x25, 0x04, 0x00, 0x00].concat(jRainbow1Data), 725);
-		device.send_report([0x53, 0x25, 0x04, 0x01, 0x00].concat(jRainbow2Data), 725);
-		device.send_report([0x53, 0x25, 0x05, 0x00, 0x00].concat(jCorsairData), 725);
-		device.send_report([0x53, 0x25, 0x06, 0x00, 0x00].concat(OnboardLEDData), 725);
+		if(header1Data.length > 0) {
+			device.send_report([0x53, 0x25, 0x04, 0x00, 0x00].concat(header1Data), 725);
+			device.pause(10);
+		}
+
+		if(header2Data.length > 0) {
+			device.send_report([0x53, 0x25, 0x04, 0x01, 0x00].concat(header2Data), 725);
+			device.pause(10);
+		}
+
+		if(header3Data.length > 0) {
+			device.send_report([0x53, 0x25, 0x05, 0x00, 0x00].concat(header3Data), 725);
+			device.pause(10);
+		}
+
+		if(OnboardLEDData.length > 0) {
+			device.send_report([0x53, 0x25, 0x06, 0x00, 0x00].concat(OnboardLEDData), 725);
+			device.pause(10);
+		}
+	}
+	sendGen2SplitPacketARGB() {
+		const [OnboardLEDData, RGBHeaderData] = this.grabZones();
+		OnboardLEDData.push(...RGBHeaderData); //Why did I separate these in the first place?
+
+		const header1Data = this.grabChannelRGBData(0);
+		const header2Data = this.grabChannelRGBData(1);
+
+		if(header1Data.length > 0) {
+			device.send_report([0x53, 0x25, 0x04, 0x00, 0x00].concat(header1Data), 725);
+			device.pause(13);
+		}
+
+		if(header2Data.length > 0) {
+			device.send_report([0x53, 0x25, 0x04, 0x01, 0x00].concat(header2Data), 725);
+			device.pause(13);
+		}
+
+		if(ARGBHeaders > 2) {
+			const header3Data = this.grabChannelRGBData(2);
+
+			if(header3Data.length > 0) {
+				device.send_report([0x53, 0x25, 0x04, 0x02, 0x00].concat(header3Data), 725);
+				device.pause(13);
+			}
+		}
+
+		if(OnboardLEDData.length > 0) {
+			device.send_report([0x53, 0x25, 0x06, 0x00, 0x00].concat(OnboardLEDData), 725);
+			device.pause(13);
+		}
 	}
 }
 
