@@ -455,94 +455,17 @@ const HeaderArray =
 
 const ConfigurationOverrides = //Leave this here for now. Just in case
 {
-	"B660M-C":
-	{
-		RGBHeader1Exists : 1,
-		RGBHeader2Exists : 0,
-		Header1Length : 80,
-		Header2Length : 80,
-		Header3Length : 80,
-		PCHLength : 0, //30 WHICH IS CORRECT FOR EMPTY
-		IOShieldLength : 0, //30 WHICH IS CORRECT FOR EMPTY
-		PCBLength : 0, //5
-	},
-	"Z690 Taichi Razer Edition": //This is still wrong. I need more testing, but my board committed seppuku.
-	{
-		RGBHeader1Exists : 1,
-		RGBHeader2Exists : 1,
-		Header1Length : 80,
-		Header2Length : 80,
-		Header3Length : 80,
-		PCHLength : 46,
-		IOShieldLength : 6,
-		PCBLength : 12,
-	},
-	"Z690 PG Velocita":
-	{
-		RGBHeader1Exists : 1,
-		RGBHeader2Exists : 0,
-		Header1Length : 80,
-		Header2Length : 80,
-		Header3Length : 80,
-		PCHLength : 6, //6
-		IOShieldLength : 7, //7
-		PCBLength : 0, //13
-	},
-	"Z790-C":
-	{
-		RGBHeader1Exists : 1,
-		RGBHeader2Exists : 0,
-		Header1Length : 80,
-		Header2Length : 80,
-		Header3Length : 80,
-		PCHLength : 0, //5
-		IOShieldLength : 0, //7
-		PCBLength : 0, //13
-	},
-	"Z790 Pro RS":
-	{
-		RGBHeader1Exists : 1,
-		RGBHeader2Exists : 0,
-		Header1Length : 80,
-		Header2Length : 80,
-		Header3Length : 80,
-		PCHLength : 16, //16
-		IOShieldLength : 0, //4
-		PCBLength : 0, //13
-	},
-	"X670E PG Lightning":
-	{
-		RGBHeader1Exists : 1,
-		RGBHeader2Exists : 0,
-		Header1Length : 80,
-		Header2Length : 80,
-		Header3Length : 80,
-		PCHLength : 0,
-		IOShieldLength : 0,
-		PCBLength : 0,
-	},
-	"X670E Steel Legend":
-	{
-		RGBHeader1Exists : 1,
-		RGBHeader2Exists : 0,
-		Header1Length : 80,
-		Header2Length : 80,
-		Header3Length : 80,
-		PCHLength : 6,
-		IOShieldLength : 0, //Detected as 7.
-		PCBLength : 15,
-	},
-	"X670E Taichi":
-	{
-		RGBHeader1Exists : 1,
-		RGBHeader2Exists : 0,
-		Header1Length : 80,
-		Header2Length : 80,
-		Header3Length : 80,
-		PCHLength : 5,
-		IOShieldLength : 0, //Detected as 7.
-		PCBLength : 6,
-	}
+	"X570 Taichi Razer Edition":
+    {
+    	RGBHeader1  : 1,
+    	RGBHeader2  : 1,
+    	ARGBHeader1 : 80,
+    	ARGBHeader2 : 80,
+    	PCH         : 30,
+    	IOShield    : 7,
+    	PCB         : 12,
+    	ARGBHeader3 : 0
+    },
 };
 
 const deviceZones =
@@ -561,11 +484,25 @@ function LEDConfig() {
 	const zoneLEDCounts = ReadConfig(2);
 	device.log(zoneLEDCounts);
 
-
 	device.write([0x00, 0x14, 0x00, 0x01], 65);
 
 	const returnPacket = device.read([0x00], 65);
 	const comparisonValue = returnPacket[5];
+
+	if(device.getMotherboardName() in ConfigurationOverrides) {
+		device.log(`Using magic of Tables for this mobo. MSI would be proud.`);
+
+		deviceZones["RGBHeader1"] = ConfigurationOverrides[device.getMotherboardName()]["RGBHeader1"];
+		deviceZones["RGBHeader2"] = ConfigurationOverrides[device.getMotherboardName()]["RGBHeader2"];
+		deviceZones["ARGBHeader1"] = ConfigurationOverrides[device.getMotherboardName()]["ARGBHeader1"];
+		deviceZones["ARGBHeader2"] = ConfigurationOverrides[device.getMotherboardName()]["ARGBHeader2"];
+		deviceZones["PCH"] = ConfigurationOverrides[device.getMotherboardName()]["PCH"];
+		deviceZones["IOShield"] = ConfigurationOverrides[device.getMotherboardName()]["IOShield"];
+		deviceZones["PCB"] = ConfigurationOverrides[device.getMotherboardName()]["PCB"];
+		deviceZones["ARGBHeader3"] = ConfigurationOverrides[device.getMotherboardName()]["ARGBHeader3"];
+
+		return;
+	}
 
 	for(let zone = 0; zone < 8; zone++) {
 		const disabledZone = isZoneDisabled(comparisonValue, zone);
@@ -647,6 +584,7 @@ function CreatePCHZone() {
 
 	const PCHLEDs = vPCHLEDs.slice(0, deviceZones[4]);
 	const PCHPositions = vPCHPositions.slice(0, deviceZones[4]);
+	device.log("PCH Length New Scheme:" + PCHLEDs.length);
 
 	if(deviceZones[4] > 0) {
 		device.createSubdevice("PCH");
@@ -662,6 +600,7 @@ function CreatePCHZone() {
 function CreateIOShieldZone() {
 	const IOShieldLEDs = vIOShieldLEDs.slice(0, deviceZones[5]);
 	const IOShieldPositions = vIOShieldPositions.slice(0, deviceZones[5]);
+	device.log("IOShield Length New Scheme:" + IOShieldLEDs.length);
 
 	if(deviceZones[5] > 0) {
 		device.createSubdevice("IO Shield");
@@ -677,6 +616,7 @@ function CreateIOShieldZone() {
 function CreatePCBZone() {
 	const PCBLEDs = vPCBLEDs.slice(0, deviceZones[6]);
 	const PCBPositions = vPCBPositions.slice(0, deviceZones[6]);
+	device.log("PCB Length New Scheme:" + PCBLEDs.length);
 
 	if(deviceZones[6] > 0) {
 		device.createSubdevice("PCB");

@@ -346,6 +346,7 @@ class Asus_Ampere_Lovelace_IDs {
 		this.RTX3070_STRIX_GAMING_LHR          = 0x883A;
 		this.RTX3070_STRIX_KO_V2               = 0x8842; //LHR
 		this.RTX3070_TUF_GAMING                = 0x87B9;
+		this.RTX3070_TUF_GAMING_2			   = 0x87C2;
 		this.RTX3070_TUF_GAMING_OC             = 0x87E1;
 		this.RTX3070_TUF_GAMING_OC_2           = 0x87C1;
 		this.RTX3070_TUF_GAMING_OC_LHR         = 0x8825;
@@ -409,6 +410,7 @@ class Asus_Ampere_Lovelace_IDs {
 		this.RTX4080_TUF_GAMING_OC				   = 0x88CA;
 
 		this.RTX4090_STRIX_GAMING                  = 0x889C;
+		this.RTX4090_STRIX_GAMING_2                = 0x889D;
 		this.RTX4090_STRIX_GAMING_WHITE_OC		   = 0x88C3;
 		this.RTX4090_TUF_GAMING                    = 0x889A;
 		this.RTX4090_TUF_GAMING_2                  = 0x889B;
@@ -451,6 +453,7 @@ const Asus3000GPUIDs =
 	new AsusGPUIdentifier(Nvidia.RTX3070_LHR, AsusID.RTX3070_STRIX_GAMING_OC_WHITE_V2, "Asus ROG Strix 3070 Gaming OC White V2"),
 	new AsusGPUIdentifier(Nvidia.RTX3070_LHR, AsusID.RTX3070_STRIX_GAMING_OC_LHR, "Asus ROG Strix 3070 Gaming OC LHR"),
 	new AsusGPUIdentifier(Nvidia.RTX3070, AsusID.RTX3070_TUF_GAMING, "Asus TUF 3070 Gaming"),
+	new AsusGPUIdentifier(Nvidia.RTX3070, AsusID.RTX3070_TUF_GAMING_2, "Asus TUF 3070 Gaming"),
 	new AsusGPUIdentifier(Nvidia.RTX3070, AsusID.RTX3070_TUF_GAMING_OC, "Asus TUF 3070 Gaming OC"),
 	new AsusGPUIdentifier(Nvidia.RTX3070_LHR, AsusID.RTX3070_STRIX_KO_V2, "Asus 3070 KO V2 OC"),
 	new AsusGPUIdentifier(Nvidia.RTX3070, AsusID.RTX3070_TUF_GAMING_OC_2, "Asus TUF 3070 Gaming OC 2"),
@@ -522,6 +525,7 @@ const Asus3000GPUIDs =
 	new AsusGPUIdentifier(Nvidia.RTX4080, AsusID.RTX4080_TUF_GAMING_OC, "Asus TUF RTX 4080 Gaming OC"),
 
 	new AsusGPUIdentifier(Nvidia.RTX4090, AsusID.RTX4090_STRIX_GAMING, "Asus ROG Strix 4090 Gaming OC"),
+	new AsusGPUIdentifier(Nvidia.RTX4090, AsusID.RTX4090_STRIX_GAMING_2, "Asus ROG Strix 4090 Gaming"),
 	new AsusGPUIdentifier(Nvidia.RTX4090, AsusID.RTX4090_STRIX_GAMING_WHITE_OC, "Asus ROG Strix 4090 Gaming White OC"),
 	new AsusGPUIdentifier(Nvidia.RTX4090, AsusID.RTX4090_TUF_GAMING, "Asus TUF RTX 4090 Gaming"),
 	new AsusGPUIdentifier(Nvidia.RTX4090, AsusID.RTX4090_TUF_GAMING_2, "Asus TUF RTX 4090 Gaming")
