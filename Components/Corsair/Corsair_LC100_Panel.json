@@ -4,8 +4,8 @@
     "Brand" : "Corsair",
     "Type" : "Strip",
     "LedCount" : 9,
-    "Width": 3,
-    "Height": 3,
+    "Width": 7,
+    "Height": 4,
     "LedMapping" : [
       0,1,2,3,4,5,6,7,8
     ],

@@ -1,7 +1,7 @@
 export function Name() { return "Razer Mouse"; }
 export function VendorId() { return 0x1532; }
 export function Documentation(){ return "troubleshooting/razer"; }
-export function ProductId() { return [ 0x006B, 0x0065, 0x0086, 0x0088, 0x0085, 0x00aa, 0x00ab, 0x005C, 0x008C, 0x0084, 0x007C, 0x007D, 0x0059, 0x0070, 0x006f, 0x0060, 0x006c, 0x0073, 0x0072, 0x0046, 0x0053, 0x008D, 0x008F, 0x0090, 0x0067, 0x0096, 0x0091, 0x008a, 0x0078, 0x007A, 0x007B, 0x0068 ]; }
+export function ProductId() { return Object.keys(Razer.PIDLibrary); }
 export function Publisher() { return "WhirlwindFX"; }
 export function Size() { return [3, 3]; }
 export function Type() { return "Hid"; }
@@ -37,11 +37,11 @@ export function ControllableParameters() {
 		{"property":"DPIRollover", "group":"mouse", "label":"DPI Stage Rollover", "type":"boolean", "default": "true"},
 		{"property":"OnboardDPI", "group":"mouse", "label":"Save DPI to Onboard Storage", "type":"boolean", "default": "false"},
 		{"property":"dpiStages", "group":"mouse", "label":"Number of DPI Stages", "step":"1", "type":"number", "min":"1", "max":"5", "default":"5"},
-		{"property":"dpi1", "group":"mouse", "label":"DPI 1", "step":"50", "type":"number", "min":"200", "max":"20000", "default":"400"},
-		{"property":"dpi2", "group":"mouse", "label":"DPI 2", "step":"50", "type":"number", "min":"200", "max":"20000", "default":"800"},
-		{"property":"dpi3", "group":"mouse", "label":"DPI 3", "step":"50", "type":"number", "min":"200", "max":"20000", "default":"1200"},
-		{"property":"dpi4", "group":"mouse", "label":"DPI 4", "step":"50", "type":"number", "min":"200", "max":"20000", "default":"1600"},
-		{"property":"dpi5", "group":"mouse", "label":"DPI 5", "step":"50", "type":"number", "min":"200", "max":"20000", "default":"2000"},
+		{"property":"dpi1", "group":"mouse", "label":"DPI 1", "step":"50", "type":"number", "min":"200", "max":Razer.LEDLibrary[Razer.PIDLibrary[device.productId()]]["maxDPI"], "default":"400"},
+		{"property":"dpi2", "group":"mouse", "label":"DPI 2", "step":"50", "type":"number", "min":"200", "max":Razer.LEDLibrary[Razer.PIDLibrary[device.productId()]]["maxDPI"], "default":"800"},
+		{"property":"dpi3", "group":"mouse", "label":"DPI 3", "step":"50", "type":"number", "min":"200", "max":Razer.LEDLibrary[Razer.PIDLibrary[device.productId()]]["maxDPI"], "default":"1200"},
+		{"property":"dpi4", "group":"mouse", "label":"DPI 4", "step":"50", "type":"number", "min":"200", "max":Razer.LEDLibrary[Razer.PIDLibrary[device.productId()]]["maxDPI"], "default":"1600"},
+		{"property":"dpi5", "group":"mouse", "label":"DPI 5", "step":"50", "type":"number", "min":"200", "max":Razer.LEDLibrary[Razer.PIDLibrary[device.productId()]]["maxDPI"], "default":"2000"},
 		{"property":"dpi6", "group":"mouse", "label":"Sniper Button DPI", "step":"50", "type":"number", "min":"200", "max":"20000", "default":"200"},
 		{"property":"pollingRate", "group":"mouse", "label":"Polling Rate", "type":"combobox", "values":[ "1000", "500", "100" ], "default":"1000"},
 		{"property":"liftOffDistance", "group":"mouse", "label":"Lift Off Distance (MM)", "step":"1", "type":"number", "min":"1", "max":"3", "default":"1"},
@@ -67,8 +67,8 @@ export function LedPositions() {
 }
 
 export function Initialize() {
-	device.set_endpoint(0, 0x0002, 0x0001);
-
+	Razer.detectDeviceEndpoint();
+	device.set_endpoint(Razer.Config.deviceEndpoint[`interface`], Razer.Config.deviceEndpoint[`usage`], Razer.Config.deviceEndpoint[`usage_page`]);
 	Razer.getDeviceTransactionID();
 	Razer.detectSupportedFeatures();
 	Razer.setDeviceLightingProperties();
@@ -211,7 +211,7 @@ function detectInputs() {
 		}
 	}
 
-	device.set_endpoint(0, 0x0002, 0x0001);
+	device.set_endpoint(Razer.Config.deviceEndpoint[`interface`], Razer.Config.deviceEndpoint[`usage`], Razer.Config.deviceEndpoint[`usage_page`]);
 }
 
 function processInputs(Added, Removed) {
@@ -222,12 +222,12 @@ function processInputs(Added, Removed) {
 		switch(input) {
 		case 0x20:
 			device.log("DPI Up");
-			device.set_endpoint(0, 0x0002, 0x0001);
+			device.set_endpoint(Razer.Config.deviceEndpoint[`interface`], Razer.Config.deviceEndpoint[`usage`], Razer.Config.deviceEndpoint[`usage_page`]);
 			DpiHandler.increment();
 			break;
 		case 0x21:
 			device.log("DPI Down");
-			device.set_endpoint(0, 0x0002, 0x0001);
+			device.set_endpoint(Razer.Config.deviceEndpoint[`interface`], Razer.Config.deviceEndpoint[`usage`], Razer.Config.deviceEndpoint[`usage_page`]);
 			DpiHandler.decrement();
 			break;
 		case 0x50:
@@ -235,17 +235,17 @@ function processInputs(Added, Removed) {
 			break;
 		case 0x51:
 			device.log("DPI Clutch Hit.");
-			device.set_endpoint(0, 0x0002, 0x0001);
+			device.set_endpoint(Razer.Config.deviceEndpoint[`interface`], Razer.Config.deviceEndpoint[`usage`], Razer.Config.deviceEndpoint[`usage_page`]);
 			DpiHandler.SetSniperMode(true);
 			break;
 		case 0x52:
 			device.log("DPI Cycle Hit.");
-			device.set_endpoint(0, 0x0002, 0x0001);
+			device.set_endpoint(Razer.Config.deviceEndpoint[`interface`], Razer.Config.deviceEndpoint[`usage`], Razer.Config.deviceEndpoint[`usage_page`]);
 			DpiHandler.increment();
 			break;
 		case 0x54:
 			device.log("Scroll Accel Button Hit.");
-			device.set_endpoint(0, 0x0002, 0x0001);
+			device.set_endpoint(Razer.Config.deviceEndpoint[`interface`], Razer.Config.deviceEndpoint[`usage`], Razer.Config.deviceEndpoint[`usage_page`]);
 			break;
 		}
 	}
@@ -255,7 +255,7 @@ function processInputs(Added, Removed) {
 
 		if(input === 0x51) {
 			device.log("DPI Clutch Released.");
-			device.set_endpoint(0, 0x0002, 0x0001);
+			device.set_endpoint(Razer.Config.deviceEndpoint[`interface`], Razer.Config.deviceEndpoint[`usage`], Razer.Config.deviceEndpoint[`usage_page`]);
 			DpiHandler.SetSniperMode(false);
 		}
 	}
@@ -366,6 +366,7 @@ class RazerProtocol {
 			0x0086 : "Basilisk Ultimate",
 			0x0088 : "Basilisk Ultimate",
 			0x0085 : "Basilisk V2",
+			0x0099 : "Basilisk V3",
 			0x00aa : "Basilisk V3 Pro",
 			0x00ab : "Basilisk V3 Pro",
 			0x005C : "Deathadder Elite",
@@ -386,11 +387,14 @@ class RazerProtocol {
 			0x008D : "Naga Lefthand",
 			0x008F : "Naga Pro",
 			0x0090 : "Naga Pro",
+			0x00a8 : "Naga Pro V2",
 			0x0067 : "Naga Trinity",
 			0x0096 : "Naga X",
 			0x0091 : "Viper 8KHz",
 			0x008a : "Viper Mini",
 			0x0078 : "Viper",
+			0x00a6 : "Viper V2 Pro",
+			0x00a5 : "Viper V2 Pro",
 			0x007A : "Viper Ultimate",
 			0x007B : "Viper Ultimate"
 		};
@@ -424,6 +428,13 @@ class RazerProtocol {
 				vLedNames : [ "ScrollWheel", "Logo" ],
 				vLedPositions : [ [1, 0], [1, 2] ],
 				maxDPI : 12400
+			},
+			"Basilisk V3" :
+			{
+				size : [7, 8],
+				vLedNames : [ "Logo", "Scrollwheel", "UnderLeft1", "UnderLeft2", "UnderLeft3", "UnderLeft4", "UnderLeft5", "UnderRight1", "UnderRight2", "UnderRight3", "UnderRight4" ],
+				vLedPositions : [ [3, 5], [3, 1], [1, 1], [0, 2], [0, 3], [0, 4], [2, 6], [4, 6], [5, 3], [6, 2], [6, 1] ],
+				maxDPI : 26000
 			},
 			"Basilisk V3 Pro" :
 			{
@@ -523,6 +534,13 @@ class RazerProtocol {
 				vLedPositions : [ [1, 0], [1, 2], [0, 1] ],
 				maxDPI : 18000
 			},
+			"Naga Pro V2" :
+			{
+				size : [3, 3],
+				vLedNames : [ "ScrollWheel", "Logo", "Side Panel" ],
+				vLedPositions : [ [1, 0], [1, 2], [0, 1] ],
+				maxDPI : 30000
+			},
 			"Naga Lefthand" :
 			{
 				size : [3, 3],
@@ -557,6 +575,13 @@ class RazerProtocol {
 				vLedNames : ["Mouse"],
 				vLedPositions : [ [1, 1] ],
 				maxDPI : 12400
+			},
+			"Viper V2 Pro" :
+			{
+				size : [0, 0],
+				vLedNames : [],
+				vLedPositions : [],
+				maxDPI : 30000
 			},
 			"Viper Mini" :
 			{
@@ -603,6 +628,8 @@ class RazerProtocol {
 			LastSerial: [],
 			/** Array to hold discovered legacy led zones. */
 			LegacyLEDsFound : [],
+			/** Object for the device endpoint to use. Basilisk V3 Uses interface 3 because screw your standardization. */
+			deviceEndpoint : { "interface" : 0, "usage" : 0x0002, "usage_page" : 0x0001 },
 
 			SupportedFeatures :
 			{
@@ -726,6 +753,21 @@ class RazerProtocol {
 		}
 
 		this.determineMouseType();
+	}
+	detectDeviceEndpoint()//Oh look at me. I'm a basilisk V3. I'm special
+	{
+		const deviceEndpoints = device.getHidEndpoints();
+
+		for(let endpoints = 0; endpoints < deviceEndpoints.length; endpoints++) {
+			if(deviceEndpoints[endpoints][`interface`] === 3)
+			{
+				this.Config.deviceEndpoint[`interface`] = deviceEndpoints[endpoints][`interface`];
+				this.Config.deviceEndpoint[`usage`] = deviceEndpoints[endpoints][`usage`];
+				this.Config.deviceEndpoint[`usage_page`] = deviceEndpoints[endpoints][`usage_page`];
+				device.log("Basilisk V3 Found.");
+			}
+
+		}
 	}
 	/** Autodetect if a mouse is modern or legacy.*/
 	determineMouseType() {
@@ -926,7 +968,7 @@ class RazerProtocol {
 				activeZones.push(zones);
 				this.setModernMouseLEDBrightness(100);
 			}
-			
+
 		}
 
 		if(activeZones.length > 0) {
@@ -1606,7 +1648,7 @@ class ByteTracker {
 };
 
 export function Validate(endpoint) {
-	return endpoint.interface === 0 && endpoint.usage === 0x0002 || endpoint.interface === 1 && endpoint.usage === 0x0000;
+	return endpoint.interface === 0 && endpoint.usage === 0x0002 || endpoint.interface === 1 && endpoint.usage === 0x0000 || endpoint.interface === 3 && endpoint.usage === 0x0001;
 }
 
 export function Image() {
