@@ -134,6 +134,10 @@ export function Render() {
 	if(FanMode === "SignalRGB") {
 		PollFans();
 	}
+
+	if(!moboSync) {
+		sendChannels();
+	}
 }
 
 export function Shutdown() {
