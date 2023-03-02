@@ -29,7 +29,7 @@ export function UsesCorsairMutex(){ return true; }
 
 export function DefaultComponentBrand() { return "Corsair"; }
 export function Documentation(){ return "troubleshooting/corsair"; }
-export function SystemResumeDelay() { return 9000; }
+
 /** @type {ValidateExport} */
 export function Validate(endpoint) {
 	return endpoint.interface === 0x0000 && endpoint.usage === 0x0001 && endpoint.usage_page === 0xFF42;

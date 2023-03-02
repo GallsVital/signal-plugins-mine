@@ -20,25 +20,24 @@ export function ControllableParameters() {
 
 	];
 }
-let ParentDeviceName = "Corsair Lighting Commander Core";
+const ParentDeviceName = "Corsair Lighting Commander Core";
 export function LedNames() { return vKeyNames; }
 export function LedPositions() { return vKeyPositions; }
 
 export function SupportsSubdevices() { return true; }
 export function DefaultComponentBrand() { return "Corsair"; }
-export function SystemResumeDelay() { return 9000; }
 export function Validate(endpoint) {
 	return endpoint.interface === 0;
 }
 
 
-let vKeyNames = [];
-let vKeyPositions = [];
+const vKeyNames = [];
+const vKeyPositions = [];
 
-let deviceValues = [
+const deviceValues = [
 	"",
 ];
-let deviceArray = [
+const deviceArray = [
 	"Elite Capellix Pump",
 ];
 
@@ -48,23 +47,24 @@ function SetupChannels() {
 	for(let i = 0; i < ChannelArray.length; i++) {
 		device.addChannel(ChannelArray[i][0], ChannelArray[i][1]);
 	}
-	device.log("test")
-	device.log(`${Corsair.property.pollingRate}`)
+
+	device.log("test");
+	device.log(`${Corsair.property.pollingRate}`);
 
 }
 
 //Global Variables
-let ChannelArray = [
+const ChannelArray = [
 	["Channel 1", 233],
 ];
 let ConnectedFans = [];
 let savedPollFanTimer = Date.now();
-let PollModeInternal = 3000;
+const PollModeInternal = 3000;
 let pump;
 let savedPumpToggle;
 let savedCpuCooler;
 
-let FanControllerArray = [
+const FanControllerArray = [
 	"Pump",
 	"Fan 1",
 	"Fan 2",
@@ -100,7 +100,7 @@ class ModernCorsairProtocol{
 		};
 	}
 }
-let Corsair = new ModernCorsairProtocol();
+const Corsair = new ModernCorsairProtocol();
 
 // Protocol Constants
 const CORSAIR_COMMAND = 0x08;
@@ -197,27 +197,27 @@ export function Render() {
 
 function UpdateRGB(shutdown = false){
 
-	let [RGBData, TotalLedCount] = GetColors(shutdown);
+	const [RGBData, TotalLedCount] = GetColors(shutdown);
 
 	Corsair_Send_RGBData(RGBData, TotalLedCount);
 
 }
 
 function Corsair_Get_Firmware(){
-	let data = Corsair_GetPacket(CORSAIR_FIRMWARE);
+	const data = Corsair_GetPacket(CORSAIR_FIRMWARE);
 
 	if(Corsair_Check_Error(data, "Get Firmware")){
 		return;
 	}
 
-	let firmwareString = `${data[4]}.${data[5]}.${data[6]}`;
+	const firmwareString = `${data[4]}.${data[5]}.${data[6]}`;
 	device.log(`Firmware Version: ${firmwareString}`);
 	device.log(`Developed on Firmware ${DevFirmwareVersion}`);
 
 }
 
 function Corsair_Check_Error(Data, Context){
-	let isError = Data[3] === 3;
+	const isError = Data[3] === 3;
 
 	if(isError){
 		device.log(`${Context} Packet Error!`);
@@ -238,7 +238,7 @@ function SetFans() {
 		}
 	}
 
-	let propertyArray = [pump];
+	const propertyArray = [pump];
 
 	for(let deviceNumber = 0; deviceNumber < 1; deviceNumber++) {
 		if(deviceValues[deviceNumber] !== propertyArray[deviceNumber]) {
@@ -274,7 +274,7 @@ function GetColors() {
 	if(deviceValues[0] !== "None" && DeviceDict[pump] !== null) {
 
 		for(let iIdx = 0; iIdx < DeviceDict[pump].mapping.length; iIdx++) {
-			let [iPxX, iPxY] = DeviceDict[pump].positioning[iIdx];
+			const [iPxX, iPxY] = DeviceDict[pump].positioning[iIdx];
 			let mxPxColor;
 
 			//find colors
@@ -303,15 +303,15 @@ function GetColors() {
 	} else if(device.getLedCount() === 0) {
 		ChannelLedCount = 36 * 3;
 
-		let pulseColor = device.getChannelPulseColor(ChannelArray[0][0], ChannelLedCount);
+		const pulseColor = device.getChannelPulseColor(ChannelArray[0][0], ChannelLedCount);
 		ColorData = device.createColorArray(pulseColor, ChannelLedCount, "Inline");
 
 	} else {
-		let components = device.channel(ChannelArray[0][0]).getComponentNames();
+		const components = device.channel(ChannelArray[0][0]).getComponentNames();
 		ChannelLedCount = components.length * 34;
 
 		for(let i = 0; i < components.length; i++) {
-			let ComponentColors = device.channel(ChannelArray[0][0]).getComponentColors(components[i], "Inline");
+			const ComponentColors = device.channel(ChannelArray[0][0]).getComponentColors(components[i], "Inline");
 
 			for(let j = ComponentColors.length; j < 34 * 3; j++) {
 				ComponentColors.push(0);
@@ -328,11 +328,11 @@ function GetColors() {
 }
 
 function Corsair_Send_RGBData(RGBData, LedCount){
-	let LedsPerPacket = 1015/3;
+	const LedsPerPacket = 1015/3;
 	let LedsSent = 0;
 
 	while(LedCount > 0){
-		let ledsToSend = Math.min(LedsPerPacket, LedCount);
+		const ledsToSend = Math.min(LedsPerPacket, LedCount);
 
 		if(LedsSent === 0){
 			SendInitialColorPacket(RGBData.length, RGBData.splice(0, ledsToSend * 3));
@@ -381,8 +381,8 @@ function StreamLightingData(colorData) {
 
 function SetFanLedCount() {
 	// Configure Fan Ports to use QL Fan size grouping. 34 Leds
-	let FanSettings = [0x00, 0x08, 0x06, 0x01, 0x11, 0x00, 0x00, 0x00, 0x0D, 0x00, 0x07];
-	let offset = 11;
+	const FanSettings = [0x00, 0x08, 0x06, 0x01, 0x11, 0x00, 0x00, 0x00, 0x0D, 0x00, 0x07];
+	const offset = 11;
 
 	for(let iIdx = 0; iIdx < 7; iIdx++) {
 		FanSettings[offset + iIdx * 2] = 0x01;
@@ -433,7 +433,7 @@ function GetFanSettings() {
 
 
 	if(FanSettings[4] === 9 && FanSettings[5] === 0) {
-		let allFanData = FanSettings.slice(7, 7 + MAX_FAN_COUNT);
+		const allFanData = FanSettings.slice(7, 7 + MAX_FAN_COUNT);
 
 		for(let i = 0; i < MAX_FAN_COUNT; i++) {
 			if(allFanData[i] === 0x04) {
@@ -455,15 +455,15 @@ function GetFanSettings() {
 function GetFanSpeeds() {
 	device.log(`Reading Fan Data`);
 
-	let CoolingData = Corsair_Read_Data(CORSAIR_ENDPOINT_FAN_RPM, CORSAIR_BACKGROUND_ENDPOINT_INDEX, 0x06);
+	const CoolingData = Corsair_Read_Data(CORSAIR_ENDPOINT_FAN_RPM, CORSAIR_BACKGROUND_ENDPOINT_INDEX, 0x06);
 
 
 	if(CoolingData[4] === 6 && CoolingData[5] === 0) {
-		let allFanData = CoolingData.slice(7, 7 + 2 * CoolingData[6]);
+		const allFanData = CoolingData.slice(7, 7 + 2 * CoolingData[6]);
 
 		for(let i = 0; i < MAX_FAN_COUNT; i++) {
-			let fanData = allFanData.splice(0, 2);
-			let fanRPM = fanData[0] + (fanData[1] << 8);
+			const fanData = allFanData.splice(0, 2);
+			const fanRPM = fanData[0] + (fanData[1] << 8);
 
 			if(fanRPM > 0) {
 				device.log(`${FanControllerArray[i]} rpm ${fanRPM}`);
@@ -480,7 +480,7 @@ function GetFanSpeeds() {
 //00 08 06 01 1B 00 00 00 07 00 06 00 00 29 00 01 00 00 00 02 00 00 00 03 00 00 00 04 00 00 00 05 00 00 00 00 00
 function SendCoolingdata() {
 
-	let CoolingData = [
+	const CoolingData = [
 		0x00, 0x08, 0x06, 0x01, 0x1F, 0x00, 0x00, 0x00, 0x07, 0x00, 0x07,
 		0x00, 0x00, 0x32, 0x00,
 		0x01, 0x00, 0x32, 0x00,
@@ -492,7 +492,7 @@ function SendCoolingdata() {
 	];
 
 	for(let fan = 0; fan < ConnectedFans.length; fan++) {
-		let fanLevel = (device.getNormalizedFanlevel(FanControllerArray[ConnectedFans[fan]]) * 100).toFixed(0);
+		const fanLevel = (device.getNormalizedFanlevel(FanControllerArray[ConnectedFans[fan]]) * 100).toFixed(0);
 		device.log(`${FanControllerArray[ConnectedFans[fan]]} level set to ${fanLevel}%`);
 		CoolingData[13 + ConnectedFans[fan] * 4] = fanLevel;
 	}
@@ -504,16 +504,16 @@ function SendCoolingdata() {
 function GetTemps() {
 	device.log(`Reading Temp Data`);
 
-	let TempData = Corsair_Read_Data(CORSAIR_ENDPOINT_GET_TEMPS, CORSAIR_BACKGROUND_ENDPOINT_INDEX, 0x16);
+	const TempData = Corsair_Read_Data(CORSAIR_ENDPOINT_GET_TEMPS, CORSAIR_BACKGROUND_ENDPOINT_INDEX, 0x16);
 
 
 	if(TempData[4] === 0x10 && TempData[5] === 0) {
-		let ProbeCount = TempData[6];
-		let TempValues = TempData.slice(7, 7 + 3 * ProbeCount);
+		const ProbeCount = TempData[6];
+		const TempValues = TempData.slice(7, 7 + 3 * ProbeCount);
 
 		for(let i = 0; i < TempData[6]; i++) {
-			let probe = TempValues.slice(i * 3 + 1, i * 3 + 3);
-			let temp = Convert_To_16Bit(probe) / 10;
+			const probe = TempValues.slice(i * 3 + 1, i * 3 + 3);
+			const temp = Convert_To_16Bit(probe) / 10;
 
 			device.log(`Temp ${i+1} is ${temp}C`);
 		}
@@ -609,7 +609,7 @@ function Corsair_Write_Packet(Endpoint, Index, Command, Data) {
 
 	device.write(Data, Device_Write_Length);
 
-	let packet = device.read([0x00], Device_Read_Length);
+	const packet = device.read([0x00], Device_Read_Length);
 
 	if(packet[3] === 3) {
 		device.log(`Set Packet Error`);
@@ -622,8 +622,8 @@ function Corsair_Write_Packet(Endpoint, Index, Command, Data) {
 
 // Helper Functions
 function sendPacketString(string, size, read = true) {
-	let packet = [];
-	let data = string.split(' ');
+	const packet = [];
+	const data = string.split(' ');
 
 	for(let i = 0; i < data.length; i++) {
 		packet[i] = parseInt(data[i], 16);
@@ -647,7 +647,7 @@ function Convert_To_16Bit(values) {
 }
 
 function Convert_From_16Bit(value, LittleEndian = false) {
-	let returnValue = [];
+	const returnValue = [];
 
 	while(value > 0){
 		returnValue.push(value & 0xFF);
@@ -658,8 +658,8 @@ function Convert_From_16Bit(value, LittleEndian = false) {
 }
 
 function hexToRgb(hex) {
-	let result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
-	let colors = [];
+	const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+	const colors = [];
 	colors[0] = parseInt(result[1], 16);
 	colors[1] = parseInt(result[2], 16);
 	colors[2] = parseInt(result[3], 16);
