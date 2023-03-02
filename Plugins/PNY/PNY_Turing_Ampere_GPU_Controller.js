@@ -122,17 +122,31 @@ class GPUIdentifier {
 }
 
 class PNYGPUIdentifier extends GPUIdentifier {
-	constructor(Device, SubDevice, Name, Model = "") {
-		super(0x10DE, 0x196E, Device, SubDevice, 0x49, Name, Model);
+	constructor(Device, Brand, SubDevice, Name, Model = "") {
+		super(0x10DE, Brand, Device, SubDevice, 0x49, Name, Model);
 	}
 }
 export function BrandGPUList(){ return PNYGPUIDs; }
 
 const PNYGPUIDs =
 [
-	new PNYGPUIdentifier(0x2216, 0x138B, "PNY RTX 3080 XLR8"),
-	new PNYGPUIdentifier(0x2208, 0x1385, "PNY RTX 3080TI Revel"),
-	new PNYGPUIdentifier(0x2206, 0x136b, "PNY RTX 3080 XLR8 Gaming REVEL EPIC-X RGB Triple Fan Edition"),
+	new PNYGPUIdentifier(0x2482, 0x10B0, 0x2482, "Gainward Phoenix RTX 3070TI"),
+
+	new PNYGPUIdentifier(0x2486, 0x1569, 0x2486, "PALIT RTX 3060TI Dual OC"),
+	new PNYGPUIdentifier(0x2482, 0x1569, 0xf278, "PALIT RTX 3070TI GameRock"),
+	new PNYGPUIdentifier(0x2482, 0x1569, 0x2482, "PALIT RTX 3070TI Gaming Pro"),
+	new PNYGPUIdentifier(0x2204, 0x1569, 0xf278, "PALIT RTX 3090 GameRock"),
+	new PNYGPUIdentifier(0x2204, 0x1569, 0x2204, "PALIT RTX 3090 Gaming Pro"),
+	new PNYGPUIdentifier(0x2216, 0x1569, 0x2216, "PALIT RTX 3080 Gaming Pro"),
+	new PNYGPUIdentifier(0x2206, 0x1569, 0x2206, "PALIT RTX 3080 Gaming Pro"),
+	new PNYGPUIdentifier(0x2484, 0x1569, 0x2484, "PALIT RTX 3070 Gaming Pro"),
+	new PNYGPUIdentifier(0x2488, 0x1569, 0x2488, "PALIT RTX 3070 Gaming Pro"),
+	new PNYGPUIdentifier(0x2484, 0x1569, 0xf280, "PALIT RTX 3070 JetStream"),
+
+
+	new PNYGPUIdentifier(0x2216, 0x196E, 0x138B, "PNY RTX 3080 XLR8"),
+	new PNYGPUIdentifier(0x2208, 0x196E, 0x1385, "PNY RTX 3080TI Revel"),
+	new PNYGPUIdentifier(0x2206, 0x196E, 0x136b, "PNY RTX 3080 XLR8 Gaming REVEL EPIC-X RGB Triple Fan Edition"),
 ];
 
 function hexToRgb(hex) {

@@ -40,13 +40,12 @@ export function Scan(bus) {
 	ENE = new ENERam(ENEInterface);
 
 	const FoundAddresses = [];
-	const startingAddresses = [0x70, 0x71, 0x72, 0x73, 0x74, 0x75, 0x76, 0x77];
-	const attachedSticks = ENE.CheckAttachedSticks();
+	const startingAddresses = [ 0x70, 0x71, 0x72, 0x73, 0x75, 0x76, 0x77]; // 0x74 This is gone because it explodes on Gigglebyte boards.
 
 	// Teamgroup Xtreem Ram like Aura/ENE ram needs to have its address remapped by the first program that touches it.
 	// If we have a device on 0x77 then we need to attempt to remap them.
 	for(const address of startingAddresses) {
-		ENE.CheckForFreeAddresses(address, attachedSticks);
+		ENE.CheckForFreeAddresses(address);
 	}
 
 	for (const address of ENE.potentialXTREEMAddresses) {
@@ -88,11 +87,12 @@ export function Initialize() {
 	// We can't set this in the global scope directly as bus doesn't exist when the scan function is called.
 	const Interface = new ENEInterfaceFixed(bus);
 	ENE = new ENERam(Interface);
+	ENE.getDeviceInformation();
 	ENE.config.XTREEM = ENE.TestFixedXTREEMRegisterValues();
 
 	if(ENE.config.XTREEM === false) {
 		device.log(`Device is not XTREEM RAM.`);
-		ENE.getDeviceInformation();
+		device.pause(100);
 	}
 
 	ENE.setLEDArrays();
@@ -101,8 +101,8 @@ export function Initialize() {
 }
 
 export function Render() {
-	//
 	UpdateColors();
+	device.pause(10);
 }
 
 export function Shutdown() {
@@ -228,6 +228,12 @@ class ENEInterfaceFixed extends ENEInterface{
 		return returnValue;
 	}
 
+	ReadBytes(length) {
+		for(let bytesToRead = 0; bytesToRead < length; bytesToRead++) {
+			this.bus.ReadByte(0x81);
+		}
+	}
+
 	ReadBlockByBytes(register, length){
 		this.bus.WriteWord(0x00, ((register << 8) & 0xFF00) | ((register >> 8) & 0x00FF));
 
@@ -252,8 +258,8 @@ class ENERam{
 			XTREEM : false,
 			deviceLEDCount : 0
 		};
-		this.potentialAuraAddresses = [ 0x39, 0x3A, 0x3B, 0x3C, 0x3D, 0x3E, 0x3F, 0x40, 0x4F, 0x66, 0x67 ];
-		this.potentialXTREEMAddresses = [0x39, 0x3A, 0x67, 0x70, 0x71, 0x72, 0x73, 0x74, 0x75, 0x76, 0x77 ];
+		this.potentialAuraAddresses = [ 0x39, 0x3A, 0x3B, 0x3C, 0x3D, 0x3E, 0x3F, 0x40, 0x4F, 0x66, 0x67, 0x70, 0x71, 0x72, 0x73, 0x74, 0x75, 0x76, 0x77 ];
+		this.potentialXTREEMAddresses = [0x39, 0x3A, 0x67, 0x70, 0x71, 0x72, 0x73, 0x75, 0x76, 0x77 ];
 
 		this.commands = {
 			DeviceName: 		0x1000,
@@ -365,7 +371,7 @@ class ENERam{
 		return String.fromCharCode(...deviceName);
 	}
 
-	getFixedDeviceName() { //This fixes dealing with fixed vs free. If you don't specify an address in a free register though, we're going to have issues.
+	getFixedDeviceName() { //This fixes dealing with fixed vs free.
 		const deviceName = [];
 
 		for(let iIdx = 0; iIdx < 16; iIdx++) {
@@ -380,12 +386,27 @@ class ENERam{
 	}
 
 	getDeviceInformation() {
+
 		this.config.deviceName = this.getFixedDeviceName();
 		this.config.deviceProtocolVersion = this.deviceNameDict[this.config.deviceName];
 
-		const configTable = this.getDeviceConfigTable();
+		let configTable = this.getDeviceConfigTable();
 		device.log(configTable);
 		this.config.deviceLEDCount = configTable[2];
+
+		if(this.config.deviceName in this.deviceNameDict && this.config.deviceLEDCount < 15) {
+			device.log("Init hit properly the first time.");
+		} else {
+			this.config.deviceName = this.getFixedDeviceName();
+			this.config.deviceProtocolVersion = this.deviceNameDict[this.config.deviceName];
+
+			configTable = this.getDeviceConfigTable();
+			device.log(configTable);
+
+			this.config.deviceLEDCount = configTable[2];
+			device.log("Chance stop breaking things.");
+		}
+
 		device.log("Device Type: " + this.config.deviceName);
 		device.log("Device Protocol Version: " + this.config.deviceProtocolVersion);
 		device.log("Device Onboard LED Count: " + this.config.deviceLEDCount);
@@ -430,38 +451,7 @@ class ENERam{
 		}
 	}
 
-	CheckAttachedSticks() //only way this causes us an issue is if a user somehow manages to have corrupt SPD.
-	{
-		if(this.IsFixedBus()){
-			this.Bus().log("Bus Interface must be a \"Free\" Type to use this function! This can only be done inside of the Scan() export.");
-
-			return;
-		}
-		const ENESticks = [];
-
-		for(let address = 0; address < 8; address++) {
-			this.Bus().WriteByte(0x36, 0x00, 0x00);
-
-			const return1 = this.Bus().ReadByte(0x50 + address, 0x02);
-			const return2 = this.Bus().ReadByte(0x50 + address, 0x00);
-
-			if(return1 === 0x0c && return2 === 0x23) {
-				ENESticks.push(address);
-				continue;
-			}
-
-			if(return1 >= 0 || return2 >= 0) {
-				this.Bus().log(`SPD Check 1 Failed! Returned value: ${return1}, ${return2}, Expected: 0x0C on address [${address}]`, {toFile: true});
-			}
-
-		}
-
-		this.Bus().log("ENE RAM Sticks Found on ChannelIDX's: " + ENESticks, {toFile: true});
-
-		return ENESticks;
-	}
-
-	CheckForFreeAddresses(primaryAddress, channels) {
+	CheckForFreeAddresses(primaryAddress) {
 
 		if(this.IsFixedBus()){
 			this.Bus().log("Bus Interface must be a \"Free\" Type to use this function! This can only be done inside of the Scan() export.");
@@ -469,7 +459,7 @@ class ENERam{
 			return;
 		}
 
-		for (let iChannelIdx = 0; iChannelIdx < channels.length; iChannelIdx++) {
+		for (let iChannelIdx = 0; iChannelIdx < 8; iChannelIdx++) {
 			const iRet = this.Bus().WriteQuick(primaryAddress);
 
 			if (iRet < 0) {
@@ -504,7 +494,7 @@ class ENERam{
 
 				const busAddress = freeAddress << 1;
 
-				this.Interface.WriteRegister(primaryAddress, 0xE0f8, channels[iChannelIdx]);
+				this.Interface.WriteRegister(primaryAddress, 0xE0f8, iChannelIdx);
 				this.Interface.WriteRegister(primaryAddress, 0xE0f9, busAddress);
 
 				this.Bus().log(`Remapping Address from [${busAddress}] to [${freeAddress}]`, {toFile: true});
@@ -528,7 +518,7 @@ class ENERam{
 
 				const busAddress = freeAddress << 1;
 
-				this.Interface.WriteRegister(primaryAddress, 0x80f8, channels[iChannelIdx]);
+				this.Interface.WriteRegister(primaryAddress, 0x80f8, iChannelIdx);
 				this.Interface.WriteRegister(primaryAddress, 0x80f9, busAddress);
 
 				this.Bus().log(`Remapping Address from [${primaryAddress}] to [${freeAddress}]`, {toFile: true});
