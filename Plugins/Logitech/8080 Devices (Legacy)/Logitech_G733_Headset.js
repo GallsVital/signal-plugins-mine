@@ -1,7 +1,7 @@
 export function Name() { return "Logitech G733 Headset"; }
 export function VendorId() { return 0x046d; }
 export function Documentation(){ return "troubleshooting/logitech"; }
-export function ProductId() { return 0x0AB5;}
+export function ProductId() { return [0x0AB5, 0x0AFE]; }
 export function Publisher() { return "WhirlwindFX"; }
 export function Size() { return [3, 3]; }
 export function DefaultPosition(){return [145, 85];}
