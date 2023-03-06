@@ -537,15 +537,15 @@ let ARGBHeaders = 0;
 function CreateARGBHeaders() {
 	ARGBHeaders = 0; //Let's not have 20 ARGB Headers lol.
 
-	if(deviceZones[2] > 1) {
+	if(deviceZones["ARGBHeader1"] > 1) {
 		ARGBHeaders++;
 	}
 
-	if(deviceZones[3] > 1) {
+	if(deviceZones["ARGBHeader2"] > 1) {
 		ARGBHeaders++;
 	}
 
-	if(deviceZones[7] > 30) {
+	if(deviceZones["ARGBHeader3"] > 30) {
 		ARGBHeaders++;
 	}
 

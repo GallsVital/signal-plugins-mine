@@ -1,13 +1,11 @@
-// Modifing SMBUS Plugins is -DANGEROUS- and can -DESTROY- devices.
-export function Name() { return "ENE RAM"; }
+// Modifying SMBUS Plugins is -DANGEROUS- and can -DESTROY- devices.
+export function Name() { return "Corsair Vengenace Pro Ram"; }
 export function Publisher() { return "WhirlwindFX"; }
-export function Documentation(){ return "troubleshooting"; }
+export function Documentation(){ return "troubleshooting/corsair"; }
+export function Size() { return [2, 10]; }
+export function DefaultPosition(){return [40, 30];}
+export function DefaultScale(){return 10.0;}
 export function Type() { return "SMBUS"; }
-export function Size() { return [8, 2]; }
-export function DefaultPosition(){return [150, 40];}
-export function DefaultScale(){return 12.0;}
-export function LedNames() { return vLedNames; }
-export function LedPositions() { return vLedPositions; }
 /* global
 shutdownColor:readonly
 LightingMode:readonly
@@ -17,64 +15,35 @@ export function ControllableParameters(){
 	return [
 		{"property":"shutdownColor", "group":"lighting", "label":"Shutdown Color", "min":"0", "max":"360", "type":"color", "default":"009bde"},
 		{"property":"LightingMode", "group":"lighting", "label":"Lighting Mode", "type":"combobox", "values":["Canvas", "Forced"], "default":"Canvas"},
-		{"property":"forcedColor", "group":"lighting", "label":"Forced Color", "min":"0", "max":"360", "type":"color", "default":"009bde"},
+		{"property":"forcedColor", "group":"lighting", "label":"Forced Color", "min":"0", "max":"360", "type":"color", "default":"009bde"}
 	];
 }
-
-// TODO: up these to 15, and try to detect it via the config table if it still exists on these sticks
-let vLedNames = [ ];
-let vLedPositions = [ ];
-let ENE;
-
-/** @param {FreeAddressBus} bus */
 export function Scan(bus) {
+
+	const PossibleAddresses = [0x58, 0x59, 0x5A, 0x5B, 0x5C, 0x5D, 0x5E, 0x5F];
+	const FoundAddresses = [];
 
 	// Skip any non AMD / INTEL Busses
 	if (!bus.IsSystemBus()) {
 		return [];
 	}
 
-	// Interface here must be of a Free Address Type.
-	// We can't set this in the global scope directly as bus doesn't exist in the global scope for this function.
-	const ENEInterface = new ENEInterfaceFree(bus);
-	ENE = new ENERam(ENEInterface);
+	for (const address of PossibleAddresses) {
+		if (bus.IsSystemBus()) {
 
-	const FoundAddresses = [];
-	const startingAddresses = [ 0x70, 0x71, 0x72, 0x73, 0x75, 0x76, 0x77]; // 0x74 This is gone because it explodes on Gigglebyte boards.
+			// Skip any address that fails a quick write
+			if (bus.WriteQuick(address) !== 0){
+				continue;
+			}
+			const vendor = bus.ReadByte(address, 0x43);
 
-	// Teamgroup Xtreem Ram like Aura/ENE ram needs to have its address remapped by the first program that touches it.
-	// If we have a device on 0x77 then we need to attempt to remap them.
-	for(const address of startingAddresses) {
-		ENE.CheckForFreeAddresses(address);
-	}
+			if (vendor === 0x1C){
+				const model = bus.ReadByte(address, 0x44);
 
-	for (const address of ENE.potentialXTREEMAddresses) {
-
-		const ValidRegisters = ENE.TestXTREEMRegisterValues(address);
-
-		if(!ValidRegisters){
-			continue;
-		}
-
-		bus.log(`Found T-Force Ram on Address: [${address}]`, {toFile:true});
-		FoundAddresses.push(address);
-	}
-
-	for(const address of ENE.potentialAuraAddresses) {
-		const iRet = bus.WriteQuick(address);
-
-		if(iRet !== 0){
-			continue;
-		}
-
-		bus.log(`Address [${address}] has something on it`, {toFile:true});
-
-		if(ENE.TestDeviceModel(address)) {
-			if(ENE.TestManufactureName(address)) {
-				bus.log(`Found ENE Ram on Address: [${address}]`, {toFile:true});
-				FoundAddresses.push(address);
-			} else {
-				bus.log(`Found Ballistix Sticks on [${address}], ignoring.`, {toFile:true});
+				if (model === 0x03 || model === 0x04){
+					bus.log("Vengeance Pro Ram found at: "+ address, {toFile : true});
+					FoundAddresses.push(address);
+				}
 			}
 		}
 	}
@@ -82,40 +51,60 @@ export function Scan(bus) {
 	return FoundAddresses;
 }
 
+const vLedNames = [ "Led 1", "Led 2", "Led 3", "Led 4", "Led 5", "Led 6", "Led 7", "Led 8", "Led 9", "Led 10" ];
+const vLedPositions = [ [0, 0], [0, 1], [0, 2], [0, 3], [0, 4], [0, 5], [0, 6], [0, 7], [0, 8], [0, 9] ];
+let iRamVersion = 0;
+
+export function LedNames() {
+	return vLedNames;
+}
+
+export function LedPositions() {
+	return vLedPositions;
+}
+
 export function Initialize() {
-	// Interface here must be of a Fixed Type.
-	// We can't set this in the global scope directly as bus doesn't exist when the scan function is called.
-	const Interface = new ENEInterfaceFixed(bus);
-	ENE = new ENERam(Interface);
-	ENE.getDeviceInformation();
-	ENE.config.XTREEM = ENE.TestFixedXTREEMRegisterValues();
-
-	if(ENE.config.XTREEM === false) {
-		device.log(`Device is not XTREEM RAM.`);
-		device.pause(100);
-	}
-
-	ENE.setLEDArrays();
-	ENE.SetDirectMode();
-
+	GetRamVersion();
 }
 
 export function Render() {
-	UpdateColors();
-	device.pause(10);
+	WritePacket();
 }
+
 
 export function Shutdown() {
-
+	WritePacket(true);
 }
 
-//TODO: find out if these take rgb data blocks like normal ENE Sticks.
-function UpdateColors(shutdown = false){
-	const RGBData = [];
+function GetRamVersion() {
+	iRamVersion = bus.ReadByte(0x44);
+	device.log("Vengeance Ram Version: "+iRamVersion);
+}
 
-	//Fetch Colors
-	for(let iIdx = 0; iIdx < vLedPositions.length; iIdx++){
- 		let Color;
+const vPecTable = [
+	0,   7,   14,  9,   28,  27,  18,  21,  56,  63,  54,  49,  36,  35,  42,  45,  112, 119, 126, 121, 108, 107, 98,  101, 72,  79,
+	70,  65,  84,  83,  90,  93,  224, 231, 238, 233, 252, 251, 242, 245, 216, 223, 214, 209, 196, 195, 202, 205, 144, 151, 158, 153,
+	140, 139, 130, 133, 168, 175, 166, 161, 180, 179, 186, 189, 199, 192, 201, 206, 219, 220, 213, 210, 255, 248, 241, 246, 227, 228,
+	237, 234, 183, 176, 185, 190, 171, 172, 165, 162, 143, 136, 129, 134, 147, 148, 157, 154, 39,  32,  41,  46,  59,  60,  53,  50,
+	31,  24,  17,  22,  3,   4,   13,  10,  87,  80,  89,  94,  75,  76,  69,  66,  111, 104, 97,  102, 115, 116, 125, 122, 137, 142,
+	135, 128, 149, 146, 155, 156, 177, 182, 191, 184, 173, 170, 163, 164, 249, 254, 247, 240, 229, 226, 235, 236, 193, 198, 207, 200,
+	221, 218, 211, 212, 105, 110, 103, 96,  117, 114, 123, 124, 81,  86,  95,  88,  77,  74,  67,  68,  25,  30,  23,  16,  5,   2,
+	11,  12,  33,  38,  47,  40,  61,  58,  51,  52,  78,  73,  64,  71,  82,  85,  92,  91,  118, 113, 120, 127, 106, 109, 100, 99,
+	62,  57,  48,  55,  34,  37,  44,  43,  6,   1,   8,   15,  26,  29,  20,  19,  174, 169, 160, 167, 178, 181, 188, 187, 150, 145,
+	152, 159, 138, 141, 132, 131, 222, 217, 208, 215, 194, 197, 204, 203, 230, 225, 232, 239, 250, 253, 244, 243];
+
+
+function WritePacket(shutdown = false) {
+	if (iRamVersion === 4) { WritePacketV4(shutdown); }
+}
+
+function WritePacketV4(shutdown) {
+	const vLedPacket = [0x0A];
+
+	// Set Colors.
+	for (let iIdx = 0; iIdx < 10; iIdx++){
+
+		let Color;
 
 		if(shutdown){
 			Color = hexToRgb(shutdownColor);
@@ -125,561 +114,27 @@ function UpdateColors(shutdown = false){
 			Color = device.color(vLedPositions[iIdx][0], vLedPositions[iIdx][1]);
 		}
 
-
-		const iLedIdx = iIdx * 3;
-		RGBData[iLedIdx] = Color[0];;
-		RGBData[iLedIdx+1] = Color[2];
-		RGBData[iLedIdx+2] = Color[1];
- 	}
-
-	 ENE.SendRGBData(RGBData);
-
-}
-
-class ENEInterface{
-	constructor(bus){
-		this.bus = bus;
-	}
-	ReadRegister(){ this.bus.log("Unimplimented Virtual Function!"); }
-	ReadWord(){ this.bus.log("Unimplimented Virtual Function!"); }
-	ReadBlockByBytes(){ this.bus.log("Unimplimented Virtual Function!"); }
-	WriteRegister(){ this.bus.log("Unimplimented Virtual Function!"); }
-	WriteBlock(){ this.bus.log("Unimplimented Virtual Function!"); }
-}
-
-class ENEInterfaceFree extends ENEInterface{
-	constructor(bus){
-		super(bus);
+		vLedPacket.push(...Color);
 	}
 
-	ReadRegister(address, register){
-		this.bus.WriteWord(address, 0x00, ((register << 8) & 0xFF00) | ((register >> 8) & 0x00FF));
+	// Calc CRC.
+	let iCrc = 0;
 
-		return this.bus.ReadByte(address, 0x81);
-	}
-	ReadWord(address, register){
-		this.bus.WriteWord(address, 0x00, ((register << 8) & 0xFF00) | ((register >> 8) & 0x00FF));
-
-		let returnValue = (this.bus.ReadByte(address, 0x81) << 8) & 0xFF00;
-		returnValue |= this.bus.ReadByte(address, 0x81) & 0xFF;
-
-		return returnValue;
-	}
-
-	ReadBlockByBytes(address, register, length){
-		this.bus.WriteWord(address, 0x00, ((register << 8) & 0xFF00) | ((register >> 8) & 0x00FF));
-
-		const returnedBytes = [];
-
-		for(let bytesToRead = 0; bytesToRead < length; bytesToRead++) {
-			returnedBytes[bytesToRead] = this.bus.ReadByte(address, 0x81);
-		}
-
-		return returnedBytes;
-	}
-
-	WriteRegister(address, register, value){
-		this.bus.WriteWord(address, 0x00, ((register << 8) & 0xFF00) | ((register >> 8) & 0x00FF));
-		this.bus.WriteByte(address, 0x01, value);
-	}
-	WriteBlock(address, register, data){
-		this.bus.WriteWord(address, 0x00, ((register << 8) & 0xFF00) | ((register >> 8) & 0x00FF));
-		this.bus.WriteBlock(address, 0x03, data.length, data);
-	}
-}
-
-class ENEInterfaceFixed extends ENEInterface{
-	constructor(bus){
-		super(bus);
-	}
-
-	WriteBlock(register, data){
-		this.bus.WriteWord(0x00, ((register << 8) & 0xFF00) | ((register >> 8) & 0x00FF));
-		this.bus.WriteBlock(0x03, data.length, data);
-	}
-
-	WriteWord(register){
-		this.bus.WriteWord(0x00, ((register << 8) & 0xFF00) | ((register >> 8) & 0x00FF));
-		this.bus.WriteByte(0x01, 0x00);
-		this.bus.WriteByte(0x01, 0x01);
-	}
-
-	WriteRegisterWithoutArgument(register) {
-		this.bus.WriteWord(0x00, ((register << 8) & 0xFF00) | ((register >> 8) & 0x00FF));
-	}
-
-	WriteRegister(register, value){
-		this.bus.WriteWord(0x00, ((register << 8) & 0xFF00) | ((register >> 8) & 0x00FF));
-		this.bus.WriteByte(0x01, value);
-	}
-
-	ReadRegister(register){
-		this.bus.WriteWord(0x00, ((register << 8) & 0xFF00) | ((register >> 8) & 0x00FF));
-
-		return this.bus.ReadByte(0x81);
-	}
-
-	ReadWord(register){
-		this.bus.WriteWord(0x00, ((register << 8) & 0xFF00) | ((register >> 8) & 0x00FF));
-
-		let returnValue = (this.bus.ReadByte(0x81) << 8) & 0xFF00;
-		returnValue |= this.bus.ReadByte(0x81) & 0xFF;
-
-		return returnValue;
-	}
-
-	ReadBytes(length) {
-		for(let bytesToRead = 0; bytesToRead < length; bytesToRead++) {
-			this.bus.ReadByte(0x81);
+	for (let iIdx = 0; iIdx < 31; iIdx++) {
+		if (iIdx < 31) {
+			const iTableIdx = iCrc ^ vLedPacket[iIdx];
+			iCrc = vPecTable[iTableIdx];
 		}
 	}
 
-	ReadBlockByBytes(register, length){
-		this.bus.WriteWord(0x00, ((register << 8) & 0xFF00) | ((register >> 8) & 0x00FF));
+	vLedPacket[31] = iCrc;
 
-		const returnedBytes = [];
-
-		for(let bytesToRead = 0; bytesToRead < length; bytesToRead++) {
-			returnedBytes[bytesToRead] = this.bus.ReadByte(0x81);
-		}
-
-		return returnedBytes;
-	}
-}
-
-class ENERam{
-	constructor(Interface){
-		this.Interface = Interface;
-
-		this.config = {
-			PreviousRGBData: [],
-			deviceProtocolVersion : "",
-			deviceName : "",
-			XTREEM : false,
-			deviceLEDCount : 0
-		};
-		this.potentialAuraAddresses = [ 0x39, 0x3A, 0x3B, 0x3C, 0x3D, 0x3E, 0x3F, 0x40, 0x4F, 0x66, 0x67, 0x70, 0x71, 0x72, 0x73, 0x74, 0x75, 0x76, 0x77 ];
-		this.potentialXTREEMAddresses = [0x39, 0x3A, 0x67, 0x70, 0x71, 0x72, 0x73, 0x75, 0x76, 0x77 ];
-
-		this.commands = {
-			DeviceName: 		0x1000,
-			ConfigTable: 		0x1C00,
-			ManufacturerName:	0x1030,
-			DirectMode: 		0x8020, //Is this interchageable for ENE RAM?
-			SetChannelIdx: 		0x80f8,
-			SetStickAddress: 	0x80F9, //0x80 based. Let's see if they play ball.
-			ColorCtlV1:			0x8000,
-			ColorCtlV2:			0x8100,
-			effectCtlV2:		0x8160,
-			ColorApply:			0x802F,
-		};
-
-		this.XTREEMcommands = {
-			DirectMode: 		0xE020, //Is this interchageable for ENE RAM?
-			ColorApply:			0xE02F,
-			SetChannelIdx: 		0xE0f8,
-			SetStickAddress: 	0xE0F9,
-			XTREEMColorsStart: 	0xE300,
-		};
-
-		this.deviceNameDict = //Used for Aura Compatible ENE Devices. XTREEM is special.
-        {
-        	"LED-0116"        : "V1",
-        	"AUMA0-E8K4-0101" : "V1",
-        	"AUDA0-E6K5-0101" : "V2",
-        	"AUMA0-E6K5-0104" : "V2",
-        	"AUMA0-E6K5-0105" : "V2",
-        	"AUMA0-E6K5-0106" : "V2",
-        	"AUMA0-E6K5-0107" : "GPU V2",
-        	"DIMM_LED-0102"   : "V1",
-        	"DIMM_LED-0103"   : "V1"
-        };
-	}
-	Bus(){
-		return this.Interface.bus;
-	}
-
-	IsFixedBus(){
-		return this.Interface instanceof ENEInterfaceFixed;
-	}
-
-	SetDirectMode(){
-		if(this.config.XTREEM) {
-			this.Interface.WriteWord(this.XTREEMcommands.DirectMode);
-		} else {
-			this.Interface.WriteRegister(this.commands.DirectMode, 0x01);
-		}
-	}
-
-	SendRGBData(RGBData){
-		if(this.config.XTREEM) {
-			let bytesWritten = 0;
-
-			while(RGBData.length > 0) {
-				const DataLength = Math.min(30, RGBData.length);
-
-				const packet = RGBData.splice(0, DataLength);
-				this.Interface.WriteBlock(this.XTREEMcommands.XTREEMColorsStart + bytesWritten, packet);
-				bytesWritten += DataLength;
-
-		   }
-
-		   this.Interface.WriteRegister(this.XTREEMcommands.ColorApply, 0xa0);
-		} else {
-			if(this.config.deviceProtocolVersion === "V1") {
-
-				let bytesWritten = 0;
-
-				while(RGBData.length > 0) {
-					const DataLength = Math.min(15, RGBData.length);
-
-					const packet = RGBData.splice(0, DataLength);
-					this.Interface.WriteBlock(this.commands.ColorCtlV1 + bytesWritten, packet);
-					bytesWritten += DataLength;
-			   }
-
-				this.Interface.WriteRegister(this.commands.ColorApply, 0x01);
-
-			} else if(this.config.deviceProtocolVersion === "V2") {
-
-				let bytesWritten = 0;
-
-				while(RGBData.length > 0) {
-					const DataLength = Math.min(15, RGBData.length);
-
-					const packet = RGBData.splice(0, DataLength);
-					this.Interface.WriteBlock(this.commands.ColorCtlV2 + bytesWritten, packet);
-					bytesWritten += DataLength;
-			   }
-
-				this.Interface.WriteRegister(this.commands.ColorApply, 0x01);
-			}
-		}
-	}
-
-	getDeviceName(address) { //This fixes dealing with fixed vs free.
-		const deviceName = [];
-
-		for(let iIdx = 0; iIdx < 16; iIdx++) {
-			const character = this.Interface.ReadRegister(address, this.commands.DeviceName + iIdx);
-
-			if(character > 0) {
-				deviceName.push(character);
-			}
-		}
-
-		return String.fromCharCode(...deviceName);
-	}
-
-	getFixedDeviceName() { //This fixes dealing with fixed vs free.
-		const deviceName = [];
-
-		for(let iIdx = 0; iIdx < 16; iIdx++) {
-			const character = this.Interface.ReadRegister(this.commands.DeviceName + iIdx);
-
-			if(character > 0) {
-				deviceName.push(character);
-			}
-		}
-
-		return String.fromCharCode(...deviceName);
-	}
-
-	getDeviceInformation() {
-
-		this.config.deviceName = this.getFixedDeviceName();
-		this.config.deviceProtocolVersion = this.deviceNameDict[this.config.deviceName];
-
-		let configTable = this.getDeviceConfigTable();
-		device.log(configTable);
-		this.config.deviceLEDCount = configTable[2];
-
-		if(this.config.deviceName in this.deviceNameDict && this.config.deviceLEDCount < 15) {
-			device.log("Init hit properly the first time.");
-		} else {
-			this.config.deviceName = this.getFixedDeviceName();
-			this.config.deviceProtocolVersion = this.deviceNameDict[this.config.deviceName];
-
-			configTable = this.getDeviceConfigTable();
-			device.log(configTable);
-
-			this.config.deviceLEDCount = configTable[2];
-			device.log("Second Init Results:");
-		}
-
-		device.log("Device Type: " + this.config.deviceName);
-		device.log("Device Protocol Version: " + this.config.deviceProtocolVersion);
-		device.log("Device Onboard LED Count: " + this.config.deviceLEDCount);
-	}
-
-	getDeviceConfigTable() {
-		const configTable = new Array(65);
-
-		for(let iIdx = 0; iIdx < 64; iIdx++) {
-			configTable[iIdx] = this.Interface.ReadRegister(this.commands.ConfigTable + iIdx);
-		}
-
-		return configTable;
-	}
-
-	setLEDArrays() {
-		vLedNames = [];
-		vLedPositions = [];
-
-		if(this.config.XTREEM) {
-			vLedNames = [
-				"LED 1", "LED 2", "LED 3", "LED 4", "LED 5",
-				"LED 6", "LED 7", "LED 8", "LED 9", "LED 10",
-				"LED 11", "LED 12", "LED 13", "LED 14", "LED 15"
-			];
-			vLedPositions = [
-				[0, 0], [1, 0], [2, 0], [3, 0], [4, 0], [5, 0], [6, 0], [7, 0],
-				[6, 1], [5, 1], [4, 1], [3, 1], [2, 1], [1, 1], [0, 1]
-			  ];
-
-			  device.setControllableLeds(vLedNames, vLedPositions);
-			  device.setSize([8, 2]);
-			  device.setName("T-Force XTREEM RAM");
-		} else {
-			for(let i = 0; i < this.config.deviceLEDCount; i++) {
-				vLedNames.push(`LED ${i + 1}`);
-				vLedPositions.push([ (this.config.deviceLEDCount - 1) - i, 0 ]);
-			}
-
-			device.setControllableLeds(vLedNames, vLedPositions);
-			device.setSize([this.config.deviceLEDCount, 1]);
-		}
-	}
-
-	CheckForFreeAddresses(primaryAddress) {
-
-		if(this.IsFixedBus()){
-			this.Bus().log("Bus Interface must be a \"Free\" Type to use this function! This can only be done inside of the Scan() export.");
-
-			return;
-		}
-
-		for (let iChannelIdx = 0; iChannelIdx < 8; iChannelIdx++) {
-			const iRet = this.Bus().WriteQuick(primaryAddress);
-
-			if (iRet < 0) {
-				this.Bus().log(`Address [${primaryAddress}] is unpopulated. Avoiding Ram address remap.`, {toFile:true});
-				break;
-			}
-
-			this.Bus().log(`Address [${primaryAddress}] is populated. Attempting to remap Ram addresses.`, {toFile:true});
-
-			let freeAddress = 0;
-
-			// Find a free address to remap a stick to
-			const XTREEM = this.TestXTREEMRegisterValues(primaryAddress);
-
-			if(XTREEM) {
-				for (const address of this.potentialXTREEMAddresses) {
-					const iRet = this.Bus().WriteQuick(address);
-
-					if (iRet < 0) {
-						this.Bus().log(`Remapping XTREEM RAM on address ${address}.`, {toFile: true});
-						this.Bus().log(`Found Free Address on [${address}]`, {toFile: true});
-						freeAddress = address;
-						break;
-
-					}
-				}
-
-				if(freeAddress === 0){
-					this.Bus().log(`Didn't find a free address. Aborting any further remap attempts.`, {toFile: true});
-					break;
-				}
-
-				const busAddress = freeAddress << 1;
-
-				this.Interface.WriteRegister(primaryAddress, 0xE0f8, iChannelIdx);
-				this.Interface.WriteRegister(primaryAddress, 0xE0f9, busAddress);
-
-				this.Bus().log(`Remapping Address from [${busAddress}] to [${freeAddress}]`, {toFile: true});
-
-			} else {
-				for (const address of this.potentialAuraAddresses) {
-					const iRet = this.Bus().WriteQuick(address);
-
-					if (iRet < 0) {
-						this.Bus().log(`Found Free Address on [${address}]`, {toFile: true});
-						freeAddress = address;
-						break;
-
-					}
-				}
-
-				if(freeAddress === 0){
-					this.Bus().log(`Didn't find a free address. Aborting any further remap attempts.`, {toFile: true});
-					break;
-				}
-
-				const busAddress = freeAddress << 1;
-
-				this.Interface.WriteRegister(primaryAddress, 0x80f8, iChannelIdx);
-				this.Interface.WriteRegister(primaryAddress, 0x80f9, busAddress);
-
-				this.Bus().log(`Remapping Address from [${primaryAddress}] to [${freeAddress}]`, {toFile: true});
-
-			}
-		}
-	}
-
-	TestXTREEMRegisterValues(address) {
-		// This can only be used while we have a free address bus.
-		// if we do we can't directly call bus. We need to use this.Bus()
-		if(this.IsFixedBus()){
-			this.Bus().log("Bus Interface must be a \"Free\" Type to use this function! This can only be done inside of the Scan() export.");
-
-			return false;
-		}
-
-		const Value1 = this.Interface.ReadWord(address, 0xF01C);
-
-		if(Value1 !== 0x0000){
-			this.Bus().log(`Check 1 Failed! Returned value: ${Value1}, Expected: 0x0000`, {toFile:true});
-
-			return false;
-		}
-
-		const value2 = this.Interface.ReadWord(address, 0x4000);
-
-		if(value2 !== 0x7742){
-			this.Bus().log(`Check 1 Failed! Returned value: ${value2}, Expected: 0x7742`, {toFile:true});
-
-			return false;
-		}
-
-		for(let offset = 0x00; offset < 5; offset++){
-			const val = this.Bus().ReadByte(address, 0x9B + offset);
-
-			if(val != 0x1b + offset){
-				this.Bus().log(`Check 3 Failed! Expected ${0x1b + offset}, Got ${val}`, {toFile:true});
-
-				return false;
-			}
-		}
-
-		const iRet = this.Bus().ReadByte(address, 0xA0);
-
-		if(iRet != 0x20){
-			this.Bus().log(`Check 4 Failed! Expected ${0x20}, Got ${iRet}`, {toFile:true});
-
-			return false;
-		}
-
-		return true;
-	}
-
-	TestFixedXTREEMRegisterValues() {
-
-		const Value1 = this.Interface.ReadWord(0xF01C);
-
-		if(Value1 !== 0x0000){
-			return false;
-		}
-
-		const value2 = this.Interface.ReadWord(0x4000);
-
-		if(value2 !== 0x7742){
-			return false;
-		}
-
-		for(let offset = 0x00; offset < 5; offset++){
-			const val = bus.ReadByte(0x9B + offset);
-
-			if(val != 0x1b + offset){
-				return false;
-			}
-		}
-
-		const iRet = bus.ReadByte(0xA0);
-
-		if(iRet != 0x20){
-			return false;
-		}
-
-		return true;
-	}
-
-	TestDeviceModel(address) {
-		// This can only be used while we have a free address bus.
-		// if we do we can't directly call bus. We need to use this.Bus()
-		if(this.IsFixedBus()) {
-			this.Bus().log("Bus Interface must be a \"Free\" Type to use this function! This can only be done inside of the Scan() export.");
-
-			return false;
-		}
-
-		const Characters = [];
-
-		for (let iIdx = 0; iIdx < 16; iIdx++) {
-			const iRet = this.Interface.ReadRegister(address, 0x1000 + iIdx);
-
-			if(iRet > 0) {
-				Characters.push(iRet);
-			}
-		}
-
-		const DeviceModel = String.fromCharCode(...Characters);
-
-
-		if(DeviceModel in this.deviceNameDict) {
-			this.Bus().log(`Address: [${address}], Found Valid Device Model: [${DeviceModel}]`, {toFile:true});
-
-			return true;
-		}
-
-		this.Bus().log(`Address: [${address}], Found Invalid Device Model: [${DeviceModel}]`, {toFile:true});
-
-		return false;
-	}
-
-	TestManufactureName(address) {
-		// This can only be used while we have a free address bus.
-		// if we do we can't directly call bus. We need to use this.Bus()
-		if(this.IsFixedBus()) {
-			this.Bus().log("Bus Interface must be a \"Free\" Type to use this function! This can only be done inside of the Scan() export.");
-
-			return false;
-		}
-
-		const Characters = [];
-
-		for (let iIdx = 0; iIdx < 21; iIdx++) {
-			const iRet = this.Interface.ReadRegister(address, this.commands.ManufacturerName + iIdx);
-
-			if(iRet > 0) {
-				Characters.push(iRet);
-			}
-		}
-
-		const ManufactureName = String.fromCharCode(...Characters);
-
-		const InvalidManufactureString = ManufactureName.includes("Micron");
-
-		if(InvalidManufactureString) {
-			this.Bus().log(`Address: [${address}], Found Micron Manufacturer Name: [${ManufactureName}]`);
-
-			return false;
-		}
-
-		this.Bus().log(`Valid Manufacture Name on address: [${address}]. Address Found: [${ManufactureName}]`, {toFile:true});
-
-		return true;
-
-	}
+	// Write block.
+	bus.WriteBlock(0x31, 32, vLedPacket);
 }
 
 function hexToRgb(hex) {
 	const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
-
-	if(result === null){
-		return [0, 0, 0];
-	}
-
 	const colors = [];
 	colors[0] = parseInt(result[1], 16);
 	colors[1] = parseInt(result[2], 16);

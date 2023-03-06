@@ -49,6 +49,8 @@ export function Scan(bus) {
 	return FoundAddresses;
 }
 
+const OldRGBData = [];
+
 export function Initialize() {
 	AsusGPU.getDeviceInformation();
 	SetGPUNameFromBusIds();
@@ -77,8 +79,9 @@ function SetGPUNameFromBusIds() {
 	}
 }
 
+let refreshColors = false;
+
 function sendColors(shutdown = false) {
-	bus.WriteBlock(0x00, 2, [0x81, 0x00]);
 
 	const RGBData = [];
 
@@ -99,12 +102,26 @@ function sendColors(shutdown = false) {
 		RGBData[iLedIdx] = color[0];
 		RGBData[iLedIdx+1] = color[2];
 		RGBData[iLedIdx+2] = color[1];
+
+		if(OldRGBData[iLedIdx] !== RGBData[iLedIdx] || OldRGBData[iLedIdx+1] !== RGBData[iLedIdx+1] || OldRGBData[iLedIdx+2] !== RGBData[iLedIdx+2]) {
+			refreshColors = true;
+			OldRGBData[iLedIdx] = RGBData[iLedIdx];
+			OldRGBData[iLedIdx+1] = RGBData[iLedIdx+1];
+			OldRGBData[iLedIdx+2] = RGBData[iLedIdx+2];
+		}
 	}
 
-	while(RGBData.length > 0) {
-		let packet = [0x0B];
-		packet = packet.concat(RGBData.splice(0, 11));
-		bus.WriteBlock(AsusGPU.registers.color, 0x0C, packet);
+	if(refreshColors) {
+
+		bus.WriteBlock(0x00, 2, [0x81, 0x00]);
+
+		while(RGBData.length > 0) {
+			let packet = [0x0B];
+			packet = packet.concat(RGBData.splice(0, 11));
+			bus.WriteBlock(AsusGPU.registers.color, 0x0C, packet);
+		}
+
+		refreshColors = false;
 	}
 
 }
