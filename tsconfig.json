@@ -39,7 +39,7 @@
 		"./types/ComponentChannel.d.ts",
 		"./types/ControllableParameters.d.ts"
     ],
-	"include": ["Plugins/**/*"],
+	"include": ["CodeSnippets/**/*","Non-Release-Plugins/**/*", "Plugins/**/*"],
 	"exclude": [
 		"node_modules",
 		"**/node_modules/*",
