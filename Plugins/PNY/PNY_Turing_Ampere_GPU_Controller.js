@@ -147,6 +147,8 @@ const PNYGPUIDs =
 	new PNYGPUIdentifier(0x2216, 0x196E, 0x138B, "PNY RTX 3080 XLR8"),
 	new PNYGPUIdentifier(0x2208, 0x196E, 0x1385, "PNY RTX 3080TI Revel"),
 	new PNYGPUIdentifier(0x2206, 0x196E, 0x136b, "PNY RTX 3080 XLR8 Gaming REVEL EPIC-X RGB Triple Fan Edition"),
+
+	new PNYGPUIdentifier(0x2782, 0x1569, 0xF298, "Palit RTX 4070TI Gaming Pro")
 ];
 
 function hexToRgb(hex) {
