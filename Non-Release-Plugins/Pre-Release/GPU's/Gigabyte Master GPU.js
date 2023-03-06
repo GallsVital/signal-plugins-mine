@@ -172,7 +172,7 @@ class GigabyteMasterProtocol {
 
 		this.library =
 		{ //So it begins.
-			0x40bd :
+			0x000A : //0x40bd :
 			{
 				Size: [5, 3],
 				modeZones : [0], //This is an odd card all the way around.
@@ -196,7 +196,7 @@ class GigabyteMasterProtocol {
 					3: {Names : [ "Logo" ], Positions : [ [3, 1] ], Mapping : [ 0 ]}
 				}
 			},
-			0x40b2 :
+			0x0009 : //0x40b2 :
 			{
 				Size: [5, 3],
 				modeZones : [0],
@@ -208,7 +208,7 @@ class GigabyteMasterProtocol {
 					3: {Names : [ "Logo" ], Positions : [ [3, 1] ], Mapping : [ 0 ]}
 				}
 			},
-			0x4076 :
+			0x0008 : //0x4076 :
 			{
 				Size: [5, 3],
 				modeZones : [0],
@@ -220,7 +220,7 @@ class GigabyteMasterProtocol {
 					3: {Names : [ "Logo" ], Positions : [ [3, 1] ], Mapping : [ 0 ]}
 				}
 			},
-			0x407b :
+			0x0007 : //0x407b :
 			{
 				Size: [5, 3],
 				modeZones : [0],
@@ -232,7 +232,7 @@ class GigabyteMasterProtocol {
 					3: {Names : [ "Logo" ], Positions : [ [3, 1] ], Mapping : [ 0 ]}
 				}
 			},
-			0x40c6 :
+			0x0006 ://0x40c6 :
 			{
 				Size: [5, 3],
 				modeZones : [0],
@@ -244,7 +244,7 @@ class GigabyteMasterProtocol {
 					3: {Names : [ "Logo", "Placeholder 1", "Placeholder 2" ], Positions : [ [3, 1], [0, 0], [1, 1] ], Mapping : [ 0 ]}
 				}
 			},
-			0x40bc :
+			0x0005 ://0x40bc :
 			{
 				Size: [5, 3],
 				modeZones : [0],
@@ -256,7 +256,7 @@ class GigabyteMasterProtocol {
 					3: {Names : [ "Logo" ], Positions : [ [3, 1] ], Mapping : [ 0 ]}
 				}
 			},
-			0x37B1 : //I'm making assumptions with this card. 2080 Extreme
+			0x0004 ://0x37B1 : //I'm making assumptions with this card. 2080 Extreme
 			{
 				Size: [15, 9],
 				modeZones : [0],
@@ -268,7 +268,7 @@ class GigabyteMasterProtocol {
 					3: {Names : [ "Side Logo LED 1", "Side Logo LED 2", "Face Logo LED", ], Positions : [ [11, 0], [12, 1], [12, 2],], Mapping : [ 0, 1, 2 ]}
 				}
 			},
-			0x37BD : //I'm making assumptions with this card. 2080TI Extreme
+			0x0003 ://0x37BD : //I'm making assumptions with this card. 2080TI Extreme
 			{
 				Size: [15, 9],
 				modeZones : [0],
@@ -292,7 +292,7 @@ class GigabyteMasterProtocol {
 					3: {Names : [ "Side Logo LED 1", "Side Logo LED 2", "Face Logo LED", ], Positions : [ [11, 0], [12, 1], [12, 2],], Mapping : [ 0, 1, 2 ]}
 				}
 			},
-			0x3FF8 :
+			0x0001 ://0x3FF8 :
 			{
 				Size: [15, 9],
 				modeZones : [2, 3, 5, 6],
@@ -304,7 +304,7 @@ class GigabyteMasterProtocol {
 					3: {Names : [ "Side Logo LED 1", "Side Logo LED 2", "Face Logo LED", ], Positions : [ [11, 0], [12, 1], [12, 2],], Mapping : [ 0, 1, 3 ]}
 				}
 			},
-			0x40C9 :
+			0x0000 ://0x40C9 :
 			{
 				Size: [15, 9],
 				modeZones : [2, 5, 6],
