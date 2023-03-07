@@ -1,6 +1,6 @@
 export function Name() { return "Razer Ornata V3"; }
 export function VendorId() { return 0x1532; }
-export function ProductId() { return 0x028f; }
+export function ProductId() { return [0x028f, 0x02a1]; }
 export function Publisher() { return "WhirlwindFX"; }
 export function Documentation(){ return "troubleshooting/razer"; }
 export function Size() { return [21, 6]; }
