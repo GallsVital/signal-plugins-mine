@@ -17,6 +17,13 @@ declare class BusBase{
 	
 		public log(Data: any, options?: LogOptions): void
 	
+		/**
+		 * Requests a thread sleep for the desired duration in ms. Due to how Windows handles thread sleeps this is not a precise function and may be +- ~10%.
+		 * @see {@link https://docs.signalrgb.com/plugins/utilities#devicepause SignalRGB Documentation}
+		 * @param Duration 
+		 */
+		public pause(Duration: number): void
+
 		public FetchRamInfo(): string
 }
 declare class FreeAddressBus extends BusBase{
