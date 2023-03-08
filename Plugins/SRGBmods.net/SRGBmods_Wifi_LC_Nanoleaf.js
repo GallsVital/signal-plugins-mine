@@ -21,7 +21,7 @@ export function ControllableParameters()
 		{"property":"UpdateRate", "label":"Update rate", "type":"combobox", "values":["10fps","30fps"], "default":"10fps", "tooltip":"Not all Nanoleaf panels support more than 10fps!"},
 		{"property":"shutdownColor", "label":"Shutdown Color","min":"0","max":"360","type":"color","default":"000000"},
 		{"property":"LightingMode", "label":"Lighting Mode", "type":"combobox", "values":["Canvas","Forced"], "default":"Canvas"},
-		{"property":"forcedColor", "label":"Forced Color","min":"0","max":"360","type":"color","default":"009bde"},
+		{"property":"forcedColor", "label":"Forced Color","min":"0","max":"360","type":"color","default":"#009bde"},
 	];
 }
 

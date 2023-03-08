@@ -15,9 +15,9 @@ BreathingSpd:readonly
 */
 export function ControllableParameters(){
 	return [
-		{"property":"shutdownColor", "label":"Shutdown Color", "min":"0", "max":"360", "type":"color", "default":"009bde"},
+		{"property":"shutdownColor", "label":"Shutdown Color", "min":"0", "max":"360", "type":"color", "default":"#009bde"},
 		{"property":"LightingMode", "label":"Lighting Mode", "type":"combobox", "values":["Canvas", "Forced"], "default":"Canvas"},
-		{"property":"forcedColor", "label":"Forced Color", "min":"0", "max":"360", "type":"color", "default":"009bde"},
+		{"property":"forcedColor", "label":"Forced Color", "min":"0", "max":"360", "type":"color", "default":"#009bde"},
 		{"property":"LogoMode", "group":"lighting", "label":"Logo Mode", "type":"combobox", "values":["On", "Off", "Breathing"], "default":"On"},
 		{"property":"BreathingSpd", "group":"lighting", "label":"Breathing Speed", "type":"number", "min":"1", "max":"10", "default":"3"},
 	];

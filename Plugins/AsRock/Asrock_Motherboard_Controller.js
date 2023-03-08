@@ -42,50 +42,50 @@ ARGBMode:readonly
 */
 export function ControllableParameters() {
 	return [
-		{"property":"shutdownColor", "group":"lighting", "label":"Shutdown Color", "min":"0", "max":"360", "type":"color", "default":"009bde"},
+		{"property":"shutdownColor", "group":"lighting", "label":"Shutdown Color", "min":"0", "max":"360", "type":"color", "default":"#009bde"},
 		{"property":"LightingMode", "group":"lighting", "label":"Lighting Mode", "type":"combobox", "values":["Canvas", "Forced"], "default":"Canvas"},
-		{"property":"forcedColor", "group":"lighting", "label":"Forced Color", "min":"0", "max":"360", "type":"color", "default":"009bde"},
+		{"property":"forcedColor", "group":"lighting", "label":"Forced Color", "min":"0", "max":"360", "type":"color", "default":"#009bde"},
 
 		{"property":"Mainboardconfig", "group":"lighting", "label":"MainBoard Configuration", "type":"combobox",   "values":["RGB", "RBG", "BGR", "BRG", "GBR", "GRB"], "default":"RGB"},
 		{"property":"Headerconfig", "group":"lighting", "label":"12v Header Configuration", "type":"combobox",   "values":["RGB", "RBG", "BGR", "BRG", "GBR", "GRB"], "default":"RGB"},
 		{"property":"RGBconfig", "group":"lighting", "label":"ARGB Channel Configuration", "type":"combobox",   "values":["RGB", "RBG", "BGR", "BRG", "GBR", "GRB"], "default":"RGB"},
 
-		{"property":"Zone1Color", "group":"lighting", "label":"12v RGB Header 1 Color", "min":"0", "max":"360", "type":"color", "default":"009bde"},
+		{"property":"Zone1Color", "group":"lighting", "label":"12v RGB Header 1 Color", "min":"0", "max":"360", "type":"color", "default":"#009bde"},
 		{"property":"Zone1Mode", "group":"lighting", "label":"12v RGB Header 1 Mode", "type":"combobox",
 			"values":["Off", "Static", "Breathing", "Strobe", "Spectrum Cycle", "Wave", "Spring", "Stack", "Cram", "Scan", "Neon", "Water", "Rainbow"], "default":"Static"},
 		{"property":"Zone1Speed", "group":"lighting", "label":"12v RGB Header 1 Speed", "type":"number", "min":"0", "max":"255", "default":"80"},
 
-		{"property":"Zone2Color", "group":"lighting", "label":"12v RGB Header 2 Color", "min":"0", "max":"360", "type":"color", "default":"009bde"},
+		{"property":"Zone2Color", "group":"lighting", "label":"12v RGB Header 2 Color", "min":"0", "max":"360", "type":"color", "default":"#009bde"},
 		{"property":"Zone2Mode", "group":"lighting", "label":"12v RGB Header 2 Mode", "type":"combobox",
 			"values":["Off", "Static", "Breathing", "Strobe", "Spectrum Cycle", "Wave", "Spring", "Stack", "Cram", "Scan", "Neon", "Water", "Rainbow"], "default":"Static"},
 		{"property":"Zone2Speed", "group":"lighting", "label":"12v RGB Header 2 Speed", "type":"number", "min":"0", "max":"255", "default":"80"},
 
-		{"property":"Zone3Color", "group":"lighting", "label":"5v ARGB Header 1 Color", "min":"0", "max":"360", "type":"color", "default":"009bde"},
+		{"property":"Zone3Color", "group":"lighting", "label":"5v ARGB Header 1 Color", "min":"0", "max":"360", "type":"color", "default":"#009bde"},
 		{"property":"Zone3Mode", "group":"lighting", "label":"5v ARGB Header 1 Mode", "type":"combobox",
 			"values":["Off", "Static", "Breathing", "Strobe", "Spectrum Cycle", "Wave", "Spring", "Stack", "Cram", "Scan", "Neon", "Water", "Rainbow"], "default":"Static"},
 		{"property":"Zone3Speed", "group":"lighting", "label":"5v ARGB Header 2 Speed", "type":"number", "min":"0", "max":"255", "default":"80"},
 
-		{"property":"Zone4Color", "group":"lighting", "label":"5v ARGB Header 2 Color", "min":"0", "max":"360", "type":"color", "default":"009bde"},
+		{"property":"Zone4Color", "group":"lighting", "label":"5v ARGB Header 2 Color", "min":"0", "max":"360", "type":"color", "default":"#009bde"},
 		{"property":"Zone4Mode", "group":"lighting", "label":"5v ARGB Header 2 Mode", "type":"combobox",
 			"values":["Off", "Static", "Breathing", "Strobe", "Spectrum Cycle", "Wave", "Spring", "Stack", "Cram", "Scan", "Neon", "Water", "Rainbow"], "default":"Static"},
 		{"property":"Zone4Speed", "group":"lighting", "label":"5v ARGB Header 2 Speed", "type":"number", "min":"0", "max":"255", "default":"80"},
 
-		{"property":"Zone5Color", "group":"lighting", "label":"PCH Color", "min":"0", "max":"360", "type":"color", "default":"009bde"},
+		{"property":"Zone5Color", "group":"lighting", "label":"PCH Color", "min":"0", "max":"360", "type":"color", "default":"#009bde"},
 		{"property":"Zone5Mode", "group":"lighting", "label":"PCH Mode", "type":"combobox",
 			"values":["Off", "Static", "Breathing", "Strobe", "Spectrum Cycle", "Wave", "Spring", "Stack", "Cram", "Scan", "Neon", "Water", "Rainbow"], "default":"Static"},
 		{"property":"Zone5Speed", "group":"lighting", "label":"IO Speed", "type":"number", "min":"0", "max":"255", "default":"80"},
 
-		{"property":"Zone6Color", "group":"lighting", "label":"IO Color", "min":"0", "max":"360", "type":"color", "default":"009bde"},
+		{"property":"Zone6Color", "group":"lighting", "label":"IO Color", "min":"0", "max":"360", "type":"color", "default":"#009bde"},
 		{"property":"Zone6Mode", "group":"lighting", "label":"IO Mode", "type":"combobox",
 			"values":["Off", "Static", "Breathing", "Strobe", "Spectrum Cycle", "Wave", "Spring", "Stack", "Cram", "Scan", "Neon", "Water", "Rainbow"], "default":"Static"},
 		{"property":"Zone6Speed", "group":"lighting", "label":"IO Speed", "type":"number", "min":"0", "max":"255", "default":"80"},
 
-		{"property":"Zone7Color", "group":"lighting", "label":"PCB Color", "min":"0", "max":"360", "type":"color", "default":"009bde"},
+		{"property":"Zone7Color", "group":"lighting", "label":"PCB Color", "min":"0", "max":"360", "type":"color", "default":"#009bde"},
 		{"property":"Zone7Mode", "group":"lighting", "label":"PCB Mode", "type":"combobox",
 			"values":["Off", "Static", "Breathing", "Strobe", "Spectrum Cycle", "Wave", "Spring", "Stack", "Cram", "Scan", "Neon", "Water", "Rainbow"], "default":"Static"},
 		{"property":"Zone7Speed", "group":"lighting", "label":"PCB Speed", "type":"number", "min":"0", "max":"255", "default":"80"},
 
-		{"property":"Zone8Color", "group":"lighting", "label":"Audio Color", "min":"0", "max":"360", "type":"color", "default":"009bde"},
+		{"property":"Zone8Color", "group":"lighting", "label":"Audio Color", "min":"0", "max":"360", "type":"color", "default":"#009bde"},
 		{"property":"Zone8Mode", "group":"lighting", "label":"Audio Mode", "type":"combobox",
 			"values":["Off", "Static", "Breathing", "Strobe", "Spectrum Cycle", "Wave", "Spring", "Stack", "Cram", "Scan", "Neon", "Water", "Rainbow"], "default":"Static"},
 		{"property":"Zone8Speed", "group":"lighting", "label":"Audio Speed", "type":"number", "min":"0", "max":"255", "default":"80"},

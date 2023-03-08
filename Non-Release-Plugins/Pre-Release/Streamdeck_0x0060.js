@@ -7,19 +7,27 @@ export function Documentation() { return "troubleshooting/corsair"; }
 export function Size() { return [5, 3]; }
 export function DefaultPosition(){return [240, 120];}
 export function DefaultScale(){return 8.0;}
+/* global
+shutdownColor:readonly
+LightingMode:readonly
+forcedColor:readonly
+hwresetdevice:readonly
+buttontimeout:readonly
+hwbrightness:readonly
+*/
 export function ControllableParameters(){
 	return [
-		{"property":"shutdownColor", "group":"lighting", "label":"Shutdown Color", "min":"0", "max":"360", "type":"color", "default":"009bde"},
+		{"property":"shutdownColor", "group":"lighting", "label":"Shutdown Color", "min":"0", "max":"360", "type":"color", "default":"#009bde"},
 		{"property":"LightingMode", "group":"lighting", "label":"Lighting Mode", "type":"combobox", "values":["Canvas", "Forced"], "default":"Canvas"},
-		{"property":"forcedColor", "group":"lighting", "label":"Forced Color", "min":"0", "max":"360", "type":"color", "default":"009bde"},
-		{"property":"hwresetdevice", "label":"Reset Device","type":"boolean","default":"false"},
+		{"property":"forcedColor", "group":"lighting", "label":"Forced Color", "min":"0", "max":"360", "type":"color", "default":"#009bde"},
+		{"property":"hwresetdevice", "label":"Reset Device", "type":"boolean", "default":"false"},
 		{"property":"buttontimeout", "group":"", "label":"Button Press Timeout", "step":"1", "type":"number", "min":"1", "max":"50", "default":"5"},
 		{"property":"hwbrightness", "group":"", "label":"Hardware Brightness", "step":"1", "type":"number", "min":"1", "max":"100", "default":"25"},
 	];
 }
 
-let vLedNames = [ "LED 1", "LED 2", "LED 3", "LED 4", "LED 5", "LED 6", "LED 7", "LED 8", "LED 9", "LED 10", "LED 11", "LED 12", "LED 13", "LED 14", "LED 15" ];
-let vLedPositions =
+const vLedNames = [ "LED 1", "LED 2", "LED 3", "LED 4", "LED 5", "LED 6", "LED 7", "LED 8", "LED 9", "LED 10", "LED 11", "LED 12", "LED 13", "LED 14", "LED 15" ];
+const vLedPositions =
 [
 	[4, 0], [3, 0], [2, 0], [1, 0], [0, 0],
 	[4, 1], [3, 1], [2, 1], [1, 1], [0, 1],
@@ -55,10 +63,11 @@ export function onhwresetdeviceChanged()
 
 function resetDevice()
 {
-	let packet = [];
+	const packet = [];
 	packet[0] = 0x02;
 	device.write(packet, 8191);
-	let rpacket = [];
+
+	const rpacket = [];
 	rpacket[0] = 0x0b;
 	rpacket[1] = 0x63;
 	device.send_report(rpacket, 17);
@@ -73,7 +82,7 @@ export function onhwbrightnessChanged()
 
 function setBrightness()
 {
-	let packet = [];
+	const packet = [];
 	packet[0] = 0x05;
 	packet[1] = 0x55;
 	packet[2] = 0xaa;
@@ -112,8 +121,8 @@ function grabColors(shutdown)
 	{
 		let RGBData = [];
 		let RGBData2ElectricBoogaloo = [];
-		let iPxX = vLedPositions[iIdx][0];
-		let iPxY = vLedPositions[iIdx][1];
+		const iPxX = vLedPositions[iIdx][0];
+		const iPxY = vLedPositions[iIdx][1];
 		let color;
 
 		if(shutdown)
@@ -158,8 +167,8 @@ function grabColors(shutdown)
 
 function hexToRgb(hex)
 {
-	let result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
-	let colors = [];
+	const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+	const colors = [];
 	colors[0] = parseInt(result[1], 16);
 	colors[1] = parseInt(result[2], 16);
 	colors[2] = parseInt(result[3], 16);

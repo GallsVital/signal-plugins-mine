@@ -15,9 +15,9 @@ forcedColor:readonly
 export function ControllableParameters() {
 	return [
 		{ "property":"monitorSelected", "group":"", "label":"Monitor Selected", "type":"combobox", "values":["MAG271CQR", "MAG272CR", "MAG272CQR", "MAG273R2", "MAG274QRFQD", "MAG301CR2" ], "default":"MAG274QRFQD" },
-		{ "property":"shutdownColor", "label":"Shutdown Color", "min":"0", "max":"360", "type":"color", "default":"009bde" },
+		{ "property":"shutdownColor", "label":"Shutdown Color", "min":"0", "max":"360", "type":"color", "default":"#009bde" },
 		{ "property":"LightingMode", "label":"Lighting Mode", "type":"combobox", "values":["Canvas", "Forced"], "default":"Canvas" },
-		{ "property":"forcedColor", "label":"Forced Color", "min":"0", "max":"360", "type":"color", "default":"009bde" }
+		{ "property":"forcedColor", "label":"Forced Color", "min":"0", "max":"360", "type":"color", "default":"#009bde" }
 	];
 }
 
