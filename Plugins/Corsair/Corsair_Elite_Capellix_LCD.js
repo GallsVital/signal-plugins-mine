@@ -30,6 +30,11 @@ export function Initialize() {
 
 export function Render() {
 	colorgrabber();
+
+	if(renderFrames > 9000 && unstableController === false) {
+		frameBufferReset();
+		renderFrames = 0;
+	}
 }
 
 export function onscreenSizeChanged() {
@@ -72,6 +77,8 @@ function colorgrabber() {
 }
 
 let failedPacket = false;
+let unstableController = false;
+let renderFrames = 0;
 
 function sendZone(packetRGBDataLength, RGBData, packetsSent, finalPacket) {
 	const BackupRGBData = RGBData;
@@ -92,8 +99,14 @@ function sendZone(packetRGBDataLength, RGBData, packetsSent, finalPacket) {
 		//Only other option we have is to clear the device buffer out. This is what the MCU really wants.
 
 		device.pause(6000); //let the device breathe.
-		failedPacket = false; //Mitigation results are highly dependent on the effect. Smoothness is also highly dependent on the number of packets we're spamming at the device
+		failedPacket = false; //Mitigation results are highly dependent on the effect. Smoothness is also highly dependent on the number of packets we're spamming at the device.
+		unstableController = true; //If we failed like this, trying to continually clear the buffer isn't going to fix our problems.
 	}
+}
+
+function frameBufferReset() {
+	device.send_report([0x03, 0x0D, 0x01, 0x01, 0x78, 0x00, 0xC0, 0x03, 0x2F, 0x2F, 0x2F, 0xFF, 0x2F, 0x2F, 0x2F, 0xFF, 0x2F, 0x2F, 0x2F, 0xFF, 0x2F, 0x2F, 0x2F, 0xFF, 0x2F, 0x2F, 0x2F, 0xFF, 0x2F, 0x2F, 0x2F, 0xFF], 32); // or this one?
+	device.pause(100);
 }
 
 export function Validate(endpoint) {
