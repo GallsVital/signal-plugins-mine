@@ -394,17 +394,19 @@ class ENERam{
 		device.log(configTable);
 		this.config.deviceLEDCount = configTable[2];
 
-		if(this.config.deviceName in this.deviceNameDict && this.config.deviceLEDCount < 15) {
-			device.log("Init hit properly the first time.");
-		} else {
-			this.config.deviceName = this.getFixedDeviceName();
-			this.config.deviceProtocolVersion = this.deviceNameDict[this.config.deviceName];
+		for(let attempts = 0; attempts < 20; attempts++) {
+			if(this.config.deviceName in this.deviceNameDict && this.config.deviceLEDCount < 15) {
+				device.log(`Init hit on attempt: ${attempts}.`);
+				break;
+			} else {
+				this.config.deviceName = this.getFixedDeviceName();
+				this.config.deviceProtocolVersion = this.deviceNameDict[this.config.deviceName];
 
-			configTable = this.getDeviceConfigTable();
-			device.log(configTable);
+				configTable = this.getDeviceConfigTable();
+				device.log(configTable);
 
-			this.config.deviceLEDCount = configTable[2];
-			device.log("Second Init Results:");
+				this.config.deviceLEDCount = configTable[2];
+			}
 		}
 
 		device.log("Device Type: " + this.config.deviceName);

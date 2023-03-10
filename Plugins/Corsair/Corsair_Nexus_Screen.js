@@ -28,8 +28,9 @@ export function Initialize() {
 }
 
 export function Render() {
-	//SendColorData();
-	colorgrabber();
+	SendColorData();
+	//colorgrabber();
+	getInput();
 }
 
 export function Shutdown() {
@@ -68,6 +69,17 @@ const RGBdata = new Array(38000);
 let offset = 0;
 
 let packetsSent = 0;
+
+function getInput()
+{
+	const packet = device.read([0x00], 512, 1);
+
+	if(packet[0] === 0x01 && packet[1] === 0x02 && packet[2] === 0x21)
+	{
+		const position = (packet[7] << 8) + (packet[6] & 0xff);
+		device.log(`Position: ${position}`);
+	}
+}
 
 function colorgrabber() {
 

@@ -420,11 +420,27 @@ class AsusAuraSMBusController {
 		deviceProtocolVersion = this.deviceNameDict[deviceName];
 		configTable = this.getDeviceConfigTable();
 		deviceLEDCount = configTable[2];
-		device.log("Device Type: " + deviceName, {toFile: true});
-		device.log("Device Protocol Version: " + deviceProtocolVersion, {toFile: true});
-		device.log("Device Onboard LED Count: " + deviceLEDCount, {toFile: true});
 
-		if(deviceName in this.deviceNameDict) { this.ValidDeviceID = true; } else { device.log("Invalid Model Returned, Aborting Render Loop"); }
+		for(let attempts = 0; attempts < 20; attempts++) {
+			if(deviceName in this.deviceNameDict && deviceLEDCount < 15) {
+				device.log(`Init hit on attempt: ${attempts}.`);
+				break;
+			} else {
+				deviceName = this.getDeviceName();
+				deviceProtocolVersion = this.deviceNameDict[deviceName];
+
+				configTable = this.getDeviceConfigTable();
+				device.log(configTable);
+
+				deviceLEDCount = configTable[2];
+			}
+
+			if(deviceName in this.deviceNameDict) { this.ValidDeviceID = true; } else { device.log("Invalid Model Returned, Aborting Render Loop"); }
+
+			device.log("Device Type: " + deviceName, {toFile: true});
+			device.log("Device Protocol Version: " + deviceProtocolVersion, {toFile: true});
+			device.log("Device Onboard LED Count: " + deviceLEDCount, {toFile: true});
+		}
 	}
 
 	getDeviceName() {
