@@ -216,7 +216,7 @@ function grabLighting(shutdown = false) {
 		const ledsToSend = TotalLedCount >= 16 ? 16 : TotalLedCount;
 		TotalLedCount -= ledsToSend;
 		Razer.setLianLiCaseColor(RGBData.splice(0, (ledsToSend+1)*3), packetCount);
-		device.pause(1);
+		device.pause(2);
 		packetCount++;
 	}
 
