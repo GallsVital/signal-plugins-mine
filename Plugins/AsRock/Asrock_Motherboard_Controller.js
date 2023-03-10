@@ -492,14 +492,14 @@ function LEDConfig() {
 	if(device.getMotherboardName() in ConfigurationOverrides) {
 		device.log(`Using magic of Tables for this mobo. MSI would be proud.`);
 
-		deviceZones["RGBHeader1"] = ConfigurationOverrides[device.getMotherboardName()]["RGBHeader1"];
-		deviceZones["RGBHeader2"] = ConfigurationOverrides[device.getMotherboardName()]["RGBHeader2"];
-		deviceZones["ARGBHeader1"] = ConfigurationOverrides[device.getMotherboardName()]["ARGBHeader1"];
-		deviceZones["ARGBHeader2"] = ConfigurationOverrides[device.getMotherboardName()]["ARGBHeader2"];
-		deviceZones["PCH"] = ConfigurationOverrides[device.getMotherboardName()]["PCH"];
-		deviceZones["IOShield"] = ConfigurationOverrides[device.getMotherboardName()]["IOShield"];
-		deviceZones["PCB"] = ConfigurationOverrides[device.getMotherboardName()]["PCB"];
-		deviceZones["ARGBHeader3"] = ConfigurationOverrides[device.getMotherboardName()]["ARGBHeader3"];
+		deviceZones[0] = ConfigurationOverrides[device.getMotherboardName()]["RGBHeader1"];
+		deviceZones[1] = ConfigurationOverrides[device.getMotherboardName()]["RGBHeader2"];
+		deviceZones[2] = ConfigurationOverrides[device.getMotherboardName()]["ARGBHeader1"];
+		deviceZones[3] = ConfigurationOverrides[device.getMotherboardName()]["ARGBHeader2"];
+		deviceZones[4] = ConfigurationOverrides[device.getMotherboardName()]["PCH"];
+		deviceZones[5] = ConfigurationOverrides[device.getMotherboardName()]["IOShield"];
+		deviceZones[6] = ConfigurationOverrides[device.getMotherboardName()]["PCB"];
+		deviceZones[7] = ConfigurationOverrides[device.getMotherboardName()]["ARGBHeader3"];
 
 		return;
 	}
@@ -537,15 +537,15 @@ let ARGBHeaders = 0;
 function CreateARGBHeaders() {
 	ARGBHeaders = 0; //Let's not have 20 ARGB Headers lol.
 
-	if(deviceZones["ARGBHeader1"] > 1) {
+	if(deviceZones[2] > 1) {
 		ARGBHeaders++;
 	}
 
-	if(deviceZones["ARGBHeader2"] > 1) {
+	if(deviceZones[3] > 1) {
 		ARGBHeaders++;
 	}
 
-	if(deviceZones["ARGBHeader3"] > 30) {
+	if(deviceZones[7] > 30) {
 		ARGBHeaders++;
 	}
 
