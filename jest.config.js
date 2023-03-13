@@ -11,7 +11,8 @@ const config = {
 	// },
 	//moduleDirectories: ["node_modules", "<rootDir>/tests"],
 	transform: {
-		"^.+\\.[t|j]sx?$": "babel-jest"
+		"^.+\\.jsx?$": "babel-jest", // Adding this line solved the issue
+		"^.+\\.tsx?$": "ts-jest"
 	},
 	coveragePathIgnorePatterns: ["/node_modules/", "/tests/mocks.js", "/tests/Mocks/*"],
 };

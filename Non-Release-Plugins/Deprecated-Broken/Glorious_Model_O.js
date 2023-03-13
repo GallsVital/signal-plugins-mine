@@ -12,9 +12,9 @@ forcedColor:readonly
 */
 export function ControllableParameters(){
 	return [
-		{"property":"shutdownColor", "group":"lighting", "label":"Shutdown Color", "min":"0", "max":"360", "type":"color", "default":"009bde"},
+		{"property":"shutdownColor", "group":"lighting", "label":"Shutdown Color", "min":"0", "max":"360", "type":"color", "default":"#009bde"},
 		{"property":"LightingMode", "group":"lighting", "label":"Lighting Mode", "type":"combobox", "values":["Grid", "Forced"], "default":"Grid"},
-		{"property":"forcedColor", "group":"lighting", "label":"Forced Color", "min":"0", "max":"360", "type":"color", "default":"009bde"},
+		{"property":"forcedColor", "group":"lighting", "label":"Forced Color", "min":"0", "max":"360", "type":"color", "default":"#009bde"},
 		//{"property":"SettingControl", "group":"mouse", "label":"Enable Setting Control","type":"boolean","default":"false"},
 		// {"property":"dpi1", "group":"mouse", "label":"DPI 1", "step":"100","type":"number","min":"400", "max":"12000","default":"1500"},
 		// {"property":"dpi2", "group":"mouse", "label":"DPI 2", "step":"100","type":"number","min":"400", "max":"12000","default":"1500"},

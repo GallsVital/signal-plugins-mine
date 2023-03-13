@@ -39,7 +39,7 @@ export function ControllableParameters() {
 		"min": "0",
 		"max": "360",
 		"type": "color",
-		"default": "009bde"
+		"default":"#009bde"
 	}, {
 		"property": "LightingMode",
 		"group": "lighting",
@@ -54,7 +54,7 @@ export function ControllableParameters() {
 		"min": "0",
 		"max": "360",
 		"type": "color",
-		"default": "009bde"
+		"default":"#009bde"
 	}, ];
 }
 

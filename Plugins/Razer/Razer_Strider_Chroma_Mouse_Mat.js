@@ -15,9 +15,9 @@ ShutdownBehavior:readonly
 */
 export function ControllableParameters(){
 	return [
-		{"property":"shutdownColor", "group":"lighting", "label":"Shutdown Color", "min":"0", "max":"360", "type":"color", "default":"009bde"},
+		{"property":"shutdownColor", "group":"lighting", "label":"Shutdown Color", "min":"0", "max":"360", "type":"color", "default":"#009bde"},
 		{"property":"LightingMode", "group":"lighting", "label":"Lighting Mode", "type":"combobox", "values":["Canvas", "Forced"], "default":"Canvas"},
-		{"property":"forcedColor", "group":"lighting", "label":"Forced Color", "min":"0", "max":"360", "type":"color", "default":"009bde"},
+		{"property":"forcedColor", "group":"lighting", "label":"Forced Color", "min":"0", "max":"360", "type":"color", "default":"#009bde"},
 		{"property":"ShutdownBehavior", "group":"lighting", "label":"Shutdown behavior", "type":"combobox", "values":["ShutdownColor", "HardwareMode"], "default":"ShutdownColor", "tooltip":"Select shutdown behavior!"},
 	];
 }

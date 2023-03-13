@@ -21,9 +21,9 @@ declare let forceRam: boolean;
 declare let forcedRamType: string;
 export function ControllableParameters(){
 	return [
-		{"property":"shutdownColor", "group":"lighting", "label":"Shutdown Color", "min":"0", "max":"360", "type":"color", "default":"009bde"},
+		{"property":"shutdownColor", "group":"lighting", "label":"Shutdown Color", "min":"0", "max":"360", "type":"color", "default":"#009bde"},
 		{"property":"LightingMode", "group":"lighting", "label":"Lighting Mode", "type":"combobox", "values":["Canvas", "Forced"], "default":"Canvas"},
-		{"property":"forcedColor", "group":"lighting", "label":"Forced Color", "min":"0", "max":"360", "type":"color", "default":"009bde"},
+		{"property":"forcedColor", "group":"lighting", "label":"Forced Color", "min":"0", "max":"360", "type":"color", "default":"#009bde"},
 		{"property":"forceRam", "group":"settings", "label":"Force Ram Model", "type":"boolean", "default":"false"},
 		{"property":"forcedRamType", "group":"settings", "label":"Forced Ram Model", "type":"combobox", "values": DominatorProtocol.ModelNames, "default":"Dominator Platinum"}
 	];

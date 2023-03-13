@@ -15,7 +15,7 @@ ArduinoCompatibilityMode:readonly
 export function ControllableParameters(){
 	return [
 		{"property":"LightingMode", "group":"lighting", "label":"Lighting Mode", "type":"combobox", "values":["Canvas", "Forced"], "default":"Canvas"},
-		{"property":"forcedColor", "group":"lighting", "label":"Forced Color", "min":"0", "max":"360", "type":"color", "default":"009bde"},
+		{"property":"forcedColor", "group":"lighting", "label":"Forced Color", "min":"0", "max":"360", "type":"color", "default":"#009bde"},
 		{"property":"ArduinoCompatibilityMode", "group":"", "label":"Arduino Compatibility Mode", "type":"boolean", "default":"false", "tooltip":"This is required for Arduino Based Models. Enabling will lower frame rate on Official Corsair Models."},
 	];
 }

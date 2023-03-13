@@ -25,9 +25,9 @@ pollingrate:readonly
 */
 export function ControllableParameters(){
 	return [
-		{"property":"shutdownColor", "group":"lighting", "label":"Shutdown Color", "min":"0", "max":"360", "type":"color", "default":"009bde"},
+		{"property":"shutdownColor", "group":"lighting", "label":"Shutdown Color", "min":"0", "max":"360", "type":"color", "default":"#009bde"},
 		{"property":"LightingMode", "group":"lighting", "label":"Lighting Mode", "type":"combobox", "values":["Canvas", "Forced"], "default":"Canvas"},
-		{"property":"forcedColor", "group":"lighting", "label":"Forced Color", "min":"0", "max":"360", "type":"color", "default":"009bde"},
+		{"property":"forcedColor", "group":"lighting", "label":"Forced Color", "min":"0", "max":"360", "type":"color", "default":"#009bde"},
 		{"property":"ARGBMode", "group":"lighting", "label":"PERLED Mode (Experimental)", "type":"boolean", "default":"false"},
 		{"property":"send_delay1", "group":"lighting", "label":"RGB Packet Delay", "step":"1", "type":"number", "min":"0", "max":"200", "default":"60", "tooltip":"Time in milliseconds in between rgb updates. Lower delay increases smoothness, but also increases chance of mouse locking up."},
 		{"property":"DpiControl", "group":"mouse", "label":"Enable Dpi Control", "type":"boolean", "default":"false"},

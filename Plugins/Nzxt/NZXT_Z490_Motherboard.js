@@ -127,9 +127,9 @@ device18:readonly
 */
 export function ControllableParameters(){
 	return [
-		{"property":"shutdownColor", "group":"lighting", "label":"Shutdown Color", "min":"0", "max":"360", "type":"color", "default":"009bde"},
+		{"property":"shutdownColor", "group":"lighting", "label":"Shutdown Color", "min":"0", "max":"360", "type":"color", "default":"#009bde"},
 		{"property":"LightingMode", "group":"lighting", "label":"Lighting Mode", "type":"combobox", "values":["Canvas", "Forced"], "default":"Canvas"},
-		{"property":"forcedColor", "group":"lighting", "label":"Forced Color", "min":"0", "max":"360", "type":"color", "default":"009bde"},
+		{"property":"forcedColor", "group":"lighting", "label":"Forced Color", "min":"0", "max":"360", "type":"color", "default":"#009bde"},
 		{"property":"RGBconfig", "group":"lighting", "label":"12V RGB Channel Configuration", "type":"combobox",   "values":["RGB", "RBG", "BGR", "BRG", "GBR", "GRB"], "default":"GRB"},
 		{"property":"CustomSize", "group":"", "label":"Custom Strip Size", "type":"number", "min":"1", "max":"80", "default":"10"},
 		{"property":"device1", "label":"Ch1 | Port 1", "type":"combobox",   "values":["None", "AER 2 Fan", "Strip_10Led", "Strip_8Led", "Strip_Underglow_200mm", "Cable_Comb", "Custom"], "default":"None"},

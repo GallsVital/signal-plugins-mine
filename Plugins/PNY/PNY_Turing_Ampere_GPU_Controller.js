@@ -137,6 +137,7 @@ const PNYGPUIDs =
 	new PNYGPUIdentifier(0x2482, 0x1569, 0x2482, "PALIT RTX 3070TI Gaming Pro"),
 	new PNYGPUIdentifier(0x2204, 0x1569, 0xf278, "PALIT RTX 3090 GameRock"),
 	new PNYGPUIdentifier(0x2204, 0x1569, 0x2204, "PALIT RTX 3090 Gaming Pro"),
+	new PNYGPUIdentifier(0x2208, 0x1569, 0x2208, "PALIT RTX 3080TI Gaming Pro"),
 	new PNYGPUIdentifier(0x2216, 0x1569, 0x2216, "PALIT RTX 3080 Gaming Pro"),
 	new PNYGPUIdentifier(0x2206, 0x1569, 0x2206, "PALIT RTX 3080 Gaming Pro"),
 	new PNYGPUIdentifier(0x2484, 0x1569, 0x2484, "PALIT RTX 3070 Gaming Pro"),
