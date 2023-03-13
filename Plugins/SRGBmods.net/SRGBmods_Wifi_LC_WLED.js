@@ -4,10 +4,11 @@ export function ProductId() { return 0x113B; }
 export function Publisher() { return "FeuerSturm"; }
 export function Documentation() { return "gettingstarted/srgbmods-net-info"; }
 export function Size() { return [1, 1]; }
-export function DefaultPosition(){return [0, 0];}
-export function DefaultScale(){return 1.0;}
+export function DefaultPosition(){return [0, 0]; }
+export function DefaultScale(){return 1.0; }
 export function Type() { return "Hid"; }
 export function SupportsSubdevices(){ return true; }
+export function DefaultComponentBrand() { return "CompGen"; }
 /* global
 shutdownColor:readonly
 LightingMode:readonly
@@ -16,17 +17,20 @@ forcedColor:readonly
 export function ControllableParameters()
 {
 	return [
-		{"property":"shutdownColor", "label":"Shutdown Color", "min":"0", "max":"360", "type":"color", "default":"000000"},
+		{"property":"ColorCompression_enable", "group":"", "label":"Enable Color Compression (reduces color spectrum & raises frame rate)", "type":"boolean", "default":"false", "tooltip":"Not suitable for low brightness or fast effects!"},
+		{"property":"shutdownColor", "label":"Shutdown Color", "min":"0", "max":"360", "type":"color", "default":"#000000"},
 		{"property":"LightingMode", "label":"Lighting Mode", "type":"combobox", "values":["Canvas", "Forced"], "default":"Canvas"},
 		{"property":"forcedColor", "label":"Forced Color", "min":"0", "max":"360", "type":"color", "default":"#009bde"},
 	];
 }
 
-const DeviceMaxLedLimit = 600;
+const DeviceMaxLedLimit = 800;
 let ChannelArray = 
 [
-	["Channel 1", 300],
-	["Channel 2", 300]
+	["Channel 1", 200],
+	["Channel 2", 200],
+	["Channel 3", 200],
+	["Channel 4", 200]
 ];
 
 function SetupChannels()
@@ -38,6 +42,8 @@ function SetupChannels()
 		device.addChannel(ChannelArray[i][0], ChannelArray[i][1]);
 	}
 }
+
+const PluginVersion = "1.1.0";
 
 const vKeyNames = [];
 const vKeyPositions = [];
@@ -56,6 +62,27 @@ export function LedPositions()
 export function Initialize()
 {
 	SetupChannels();
+	requestFirmwareVersion();
+}
+
+function compareFirmwareVersion()
+{
+	let firmwarePacket = device.read([0x00], 4, 10);
+	let FirmwareVersion = firmwarePacket[1] + "." + firmwarePacket[2] + "." + firmwarePacket[3]
+	device.log("SRGBmods Wifi LC Firmware version: " + FirmwareVersion);
+	device.log("SRGBmods Wifi LC Plugin version:   " + PluginVersion);
+	if(FirmwareVersion !== PluginVersion)
+	{
+		device.log("Firmware <-> Plugin version mismatch! Make sure to use matching versions!");
+		device.notify(`Firmware ${FirmwareVersion} <-> Plugin ${PluginVersion} version mismatch!`, `Make sure to use matching versions!`, 0);
+	}
+}
+
+function requestFirmwareVersion()
+{
+	let packet = [ 0x00, 0x00, 0x00, 0x00, 0xCC ];
+	device.write(packet, 65);
+	compareFirmwareVersion();
 }
 
 export function Shutdown()
@@ -64,13 +91,15 @@ export function Shutdown()
 	{
 		SendChannel(i, true);
 	}
-
-	device.pause(1);
 }
 
 function SendChannel(Channel, shutdown = false)
 {
-	let ChannelLedCount = device.channel(ChannelArray[Channel][0]).ledCount > ChannelArray[Channel][1] ? ChannelArray[Channel][1] : device.channel(ChannelArray[Channel][0]).ledCount;
+	let componentChannel = device.channel(ChannelArray[Channel][0]);
+	let ChannelLedCount = componentChannel.ledCount > ChannelArray[Channel][1] ? ChannelArray[Channel][1] : componentChannel.ledCount;
+	
+	let multiplier = ColorCompression_enable ? 2 : 1;
+	let compressedRGB = [];
 
 	let RGBData = [];
 
@@ -82,24 +111,33 @@ function SendChannel(Channel, shutdown = false)
 	{
 		RGBData = device.createColorArray(forcedColor, ChannelLedCount, "Inline");
 	}
-	else if(device.getLedCount() === 0)
+	else if(componentChannel.shouldPulseColors())
 	{
-		ChannelLedCount = 90;
-
-		let pulseColor = device.getChannelPulseColor(ChannelArray[Channel][0], ChannelLedCount);
+		ChannelLedCount = 200;
+		const pulseColor = device.getChannelPulseColor(ChannelArray[Channel][0]);
 		RGBData = device.createColorArray(pulseColor, ChannelLedCount, "Inline");
 	}
 	else
 	{
-		RGBData = device.channel(ChannelArray[Channel][0]).getColors("Inline");
+		RGBData = componentChannel.getColors("Inline");
+	}
+	
+	if(ColorCompression_enable)
+	{
+		for(let runCount = 0; runCount < ChannelLedCount * 3 / multiplier; runCount++)
+		{
+			compressedRGB[(runCount*3)] = (((RGBData[(runCount*6)] & 0xFF) >> 4) | ((((RGBData[(runCount*6)+1] & 0xFF) >> 4) & 0xFF) << 4));
+			compressedRGB[(runCount*3)+1] = (((RGBData[(runCount*6)+2] & 0xFF) >> 4) | ((((RGBData[(runCount*6)+3] & 0xFF) >> 4) & 0xFF) << 4));
+			compressedRGB[(runCount*3)+2] = (((RGBData[(runCount*6)+4] & 0xFF) >> 4) | ((((RGBData[(runCount*6)+5] & 0xFF) >> 4) & 0xFF) << 4));
+		}
 	}
 
-	let NumPackets = Math.ceil(ChannelLedCount / MaxLedsInPacket);
+	let NumPackets = Math.ceil(ChannelLedCount / MaxLedsInPacket / multiplier);
 
 	for(let CurrPacket = 1; CurrPacket <= NumPackets; CurrPacket++)
 	{
-		let packet = [0x00, CurrPacket, 0xFF, NumPackets, Channel + 1];
-		packet = packet.concat(RGBData.splice(0, 60));
+		let packet = [0x00, CurrPacket, ColorCompression_enable ? 0xDD : 0xFF, NumPackets, Channel + 1];
+		packet = packet.concat(ColorCompression_enable ? compressedRGB.splice(0, 60) : RGBData.splice(0, 60));
 		device.write(packet, 65);
 	}
 }
@@ -110,8 +148,6 @@ export function Render()
 	{
 		SendChannel(i);
 	}
-
-	device.pause(1);
 }
 
 export function Validate(endpoint)
