@@ -4,36 +4,41 @@ export function VendorId() { return 0x0fd9; }
 export function ProductId() { return 0x0060; }
 export function Publisher() { return "WhirlwindFX"; }
 export function Documentation() { return "troubleshooting/corsair"; }
-export function Size() { return [5, 3]; }
+export function Size() {  return [ButtonSize * RowWidth + 1, ButtonSize * ColHeight + 1]; }
 export function DefaultPosition(){return [240, 120];}
 export function DefaultScale(){return 8.0;}
-/* global
-shutdownColor:readonly
-LightingMode:readonly
-forcedColor:readonly
-hwresetdevice:readonly
-buttontimeout:readonly
-hwbrightness:readonly
-*/
 export function ControllableParameters(){
 	return [
-		{"property":"shutdownColor", "group":"lighting", "label":"Shutdown Color", "min":"0", "max":"360", "type":"color", "default":"#009bde"},
+		{"property":"shutdownColor", "group":"lighting", "label":"Shutdown Color", "min":"0", "max":"360", "type":"color", "default":"009bde"},
 		{"property":"LightingMode", "group":"lighting", "label":"Lighting Mode", "type":"combobox", "values":["Canvas", "Forced"], "default":"Canvas"},
-		{"property":"forcedColor", "group":"lighting", "label":"Forced Color", "min":"0", "max":"360", "type":"color", "default":"#009bde"},
-		{"property":"hwresetdevice", "label":"Reset Device", "type":"boolean", "default":"false"},
+		{"property":"forcedColor", "group":"lighting", "label":"Forced Color", "min":"0", "max":"360", "type":"color", "default":"009bde"},
+        {"property":"hwbrightness", "group":"lighting", "label":"Hardware Brightness", "step":"1", "type":"number", "min":"1", "max":"100", "default":"25"},
 		{"property":"buttontimeout", "group":"", "label":"Button Press Timeout", "step":"1", "type":"number", "min":"1", "max":"50", "default":"5"},
-		{"property":"hwbrightness", "group":"", "label":"Hardware Brightness", "step":"1", "type":"number", "min":"1", "max":"100", "default":"25"},
+        {"property":"hwresetdevice", "label":"Reset Device","type":"boolean","default":"false"},
+        {"property":"elgatoFriendly", "label":"Elgato Friendly Mode","type":"boolean","default":"false"},
+
 	];
 }
 
-const vLedNames = [ "LED 1", "LED 2", "LED 3", "LED 4", "LED 5", "LED 6", "LED 7", "LED 8", "LED 9", "LED 10", "LED 11", "LED 12", "LED 13", "LED 14", "LED 15" ];
-const vLedPositions =
+let vLedNames = [ "LED 1", "LED 2", "LED 3", "LED 4", "LED 5", "LED 6", "LED 7", "LED 8", "LED 9", "LED 10", "LED 11", "LED 12", "LED 13", "LED 14", "LED 15" ];
+let vLedPositions =
 [
 	[4, 0], [3, 0], [2, 0], [1, 0], [0, 0],
 	[4, 1], [3, 1], [2, 1], [1, 1], [0, 1],
 	[4, 2], [3, 2], [2, 2], [1, 2], [0, 2]
 ];
+
+let vKeys = [
+    4, 3, 2, 1, 0,
+    9, 8, 7, 6, 5,
+    14, 13, 12, 11, 10
+];
+
 let lastButtonRGB;
+
+const ButtonSize = 36;
+const RowWidth = 5;
+const ColHeight = 3;
 
 export function LedNames()
 {
@@ -47,13 +52,20 @@ export function LedPositions()
 
 export function Initialize()
 {
-	lastButtonRGB = Array.from(Array(vLedNames.length), () => Array(3).fill(0));
-	setBrightness();
+    lastButtonRGB = Array.from(Array(vLedNames.length), () => Array(3).fill(0));
 }
 
 export function Render()
 {
-	grabColors();
+    if(elgatoFriendly)
+    {
+        grabColors();
+    }
+    else
+    {
+        colorgrabber();
+    }
+   
 }
 
 export function onhwresetdeviceChanged()
@@ -61,35 +73,67 @@ export function onhwresetdeviceChanged()
 	resetDevice();
 }
 
-function resetDevice()
-{
-	const packet = [];
-	packet[0] = 0x02;
-	device.write(packet, 8191);
-
-	const rpacket = [];
-	rpacket[0] = 0x0b;
-	rpacket[1] = 0x63;
-	device.send_report(rpacket, 17);
-	//device.log("reseting device");
-	setBrightness();
-}
-
 export function onhwbrightnessChanged()
 {
 	setBrightness();
 }
 
+export function onbuttonSizeChanged()
+{
+    buildPixels(buttonSize, buttonSize);
+    device.log(pixels.length);
+}
+
+function resetDevice()
+{
+	device.write([0x02], 8191);
+	device.send_report([0x0b, 0x63], 17);
+	device.log("Reseting device.");
+	setBrightness();
+}
+
 function setBrightness()
 {
-	const packet = [];
-	packet[0] = 0x05;
-	packet[1] = 0x55;
-	packet[2] = 0xaa;
-	packet[3] = 0xd1;
-	packet[4] = 0x01;
-	packet[5] = hwbrightness;
-	device.send_report(packet, 8191);
+	device.send_report([0x05, 0x55, 0xaa, 0xd1, 0x01, hwbrightness], 8191);
+}
+
+function colorgrabber()
+{
+	for(let iIdx = 0; iIdx < 15; iIdx++)
+	{
+		let RGBData = [];
+
+		let iXoffset = (iIdx % 5) * ButtonSize;
+		let iYoffset = Math.floor(iIdx / 5) * ButtonSize;
+
+		RGBData = device.getImageBuffer(iXoffset, iYoffset, ButtonSize, ButtonSize,{flipV: true, flipH: true, outputWidth: 72, outputHeight : 72, format: "BMP"});
+
+		sendZone(vKeys[iIdx], RGBData);
+	}
+}
+
+function sendZone(iIdx, RGBData)
+{
+	let packet =
+	[
+		0x02, 0x01, 0x01, 0x00, 0x00, iIdx+1, 0x00, 0x00,
+		0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+	];
+
+
+	packet = packet.concat(RGBData.splice(0, 7804));
+
+	device.write(packet, 8191);
+
+	let packet2ElectricBoogaloo =
+	[
+		0x02, 0x01, 0x02, 0x00, 0x01, iIdx+1, 0x00, 0x00,
+		0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+	];
+
+	packet2ElectricBoogaloo = packet2ElectricBoogaloo.concat(RGBData.splice(0, 7804));
+
+	device.write(packet2ElectricBoogaloo, 8191);
 }
 
 function makeHexString(ColorArray)
@@ -119,10 +163,12 @@ function grabColors(shutdown)
 {
 	for(let iIdx = 0; iIdx < 15; iIdx++)
 	{
-		let RGBData = [];
-		let RGBData2ElectricBoogaloo = [];
-		const iPxX = vLedPositions[iIdx][0];
-		const iPxY = vLedPositions[iIdx][1];
+		let RGBData = [	0x42, 0x4d, 0xf6, 0x3c, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x36, 0x00, 0x00, 0x00, 0x28, 0x00,
+            0x00, 0x00, 0x48, 0x00, 0x00, 0x00, 0x48, 0x00, 0x00, 0x00, 0x01, 0x00, 0x18, 0x00, 0x00, 0x00,
+            0x00, 0x00, 0xC0, 0x3C, 0x00, 0x00, 0x13, 0x0E,	0x00, 0x00, 0x13, 0x0E, 0x00, 0x00, 0x00, 0x00,
+            0x00, 0x00, 0x00, 0x00, 0x00, 0x00 ];
+		let iPxX = vLedPositions[iIdx][0];
+		let iPxY = vLedPositions[iIdx][1];
 		let color;
 
 		if(shutdown)
@@ -146,65 +192,32 @@ function grabColors(shutdown)
 
 			if(shutdown)
 			{
-				RGBData = device.createColorArray(shutdownColor, 5184, "Inline", "BGR"); //NEEDS TO BE HEX String
-				RGBData2ElectricBoogaloo = device.createColorArray(shutdownColor, 2601, "Inline", "BGR");
+				RGBData = RGBData.concat(device.createColorArray(shutdownColor, 5184, "Inline", "BGR")); //NEEDS TO BE HEX String
 			}
 			else if (LightingMode === "Forced")
 			{
-				RGBData = device.createColorArray(forcedColor, 5184, "Inline", "BGR"); //NEEDS TO BE HEX String
-				RGBData2ElectricBoogaloo = device.createColorArray(forcedColor, 2601, "Inline", "BGR");
+				RGBData = RGBData.concat(device.createColorArray(forcedColor, 5184, "Inline", "BGR")); //NEEDS TO BE HEX String
 			}
 			else
 			{
-				RGBData = device.createColorArray(makeHexString(device.color(iPxX, iPxY)), 2583, "Inline", "BGR"); //NEEDS TO BE HEX String
-				RGBData2ElectricBoogaloo = device.createColorArray(makeHexString(device.color(iPxX, iPxY)), 2601, "Inline", "BGR");
+				RGBData = RGBData.concat(device.createColorArray(makeHexString(device.color(iPxX, iPxY)), 5184, "Inline", "BGR")); //NEEDS TO BE HEX String
 			}
 
-			sendZone(iIdx, RGBData, RGBData2ElectricBoogaloo);
+			sendZone(vKeys[iIdx], RGBData);
 		}
 	}
 }
 
 function hexToRgb(hex)
 {
-	const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
-	const colors = [];
+	let result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+	let colors = [];
 	colors[0] = parseInt(result[1], 16);
 	colors[1] = parseInt(result[2], 16);
 	colors[2] = parseInt(result[3], 16);
 
 	return colors;
 }
-
-
-function sendZone(iIdx, RGBData, RGBData2ElectricBoogaloo)
-{
-	let packet =
-	[
-		0x02, 0x01, 0x01, 0x00, 0x00, iIdx+1, 0x00, 0x00,
-		0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-		0x42, 0x4d, 0xf6, 0x3c, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x36, 0x00, 0x00, 0x00, 0x28, 0x00,
-		0x00, 0x00, 0x48, 0x00, 0x00, 0x00, 0x48, 0x00, 0x00, 0x00, 0x01, 0x00, 0x18, 0x00, 0x00, 0x00,
-		0x00, 0x00, 0xC0, 0x3C, 0x00, 0x00, 0x13, 0x0E,	0x00, 0x00, 0x13, 0x0E, 0x00, 0x00, 0x00, 0x00,
-		0x00, 0x00, 0x00, 0x00, 0x00, 0x00
-	];
-
-
-	packet = packet.concat(RGBData.splice(0, 7750));
-
-	device.write(packet, 8191);
-
-	let packet2electricboogaloo =
-	[
-		0x02, 0x01, 0x02, 0x00, 0x01, iIdx+1, 0x00, 0x00,
-		0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-	];
-
-	packet2electricboogaloo = packet2electricboogaloo.concat(RGBData2ElectricBoogaloo.splice(0, 7804));
-
-	device.write(packet2electricboogaloo, 8191);
-}
-
 
 export function Validate(endpoint)
 {
