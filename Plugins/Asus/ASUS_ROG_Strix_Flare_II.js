@@ -1,6 +1,6 @@
-export function Name() { return "ASUS ROG Strix Flare II Animate"; }
+export function Name() { return "ASUS ROG Strix Flare II"; }
 export function VendorId() { return 0x0B05; }
-export function ProductId() { return 0x19fc; }
+export function ProductId() { return Object.keys(PIDLibrary); }
 export function Publisher() { return "TheDark1337 & TheDordo"; }
 export function Documentation(){ return "troubleshooting/asus"; }
 export function Size() { return [24, 7]; }
@@ -14,13 +14,16 @@ layout:readonly
 */
 export function ControllableParameters(){
 	return [
-		{"property":"shutdownColor", "group":"lighting", "label":"Shutdown Color", "min":"0", "max":"360", "type":"color", "default":"#009bde"},
+		{"property":"shutdownColor", "group":"lighting", "label":"Shutdown Color", "min":"0", "max":"360", "type":"color", "default":"009bde"},
 		{"property":"LightingMode", "group":"lighting", "label":"Lighting Mode", "type":"combobox", "values":["Canvas", "Forced"], "default":"Canvas"},
-		{"property":"forcedColor", "group":"lighting", "label":"Forced Color", "min":"0", "max":"360", "type":"color", "default":"#009bde"},
+		{"property":"forcedColor", "group":"lighting", "label":"Forced Color", "min":"0", "max":"360", "type":"color", "default":"009bde"},
 		{"property":"layout", "group":"", "label":"Keyboard Layout", "type":"combobox", "values":["ANSI", "ISO"], "default":"ANSI"},
 	];
 }
-
+const PIDLibrary = {
+	0x19fc: "Strix Flare II Animate",
+	0x19fe: "Strix Flare II"
+};
 let vKeys = [];
 let vKeyNames = [];
 let vKeyPositions = [];
@@ -129,7 +132,9 @@ export function onlayoutChanged() {
 }
 
 export function Initialize() {
+	const deviceName = PIDLibrary[device.productId()] || "Strix Flare II";
 
+	device.setName(deviceName);
 }
 
 export function Render() {
