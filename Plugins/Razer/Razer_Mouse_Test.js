@@ -211,9 +211,11 @@ function getDeviceBatteryStatus() {
 function detectInputs() {
 	device.set_endpoint(1, 0x0000, 0x0001);
 
-	const packet = device.read([0x00], 16, 0);
+	const packet = device.read([0x00], 16, 1);
 
 	const currentMacroArray = packet.slice(1, 10);
+
+	device.set_endpoint(Razer.Config.deviceEndpoint[`interface`], Razer.Config.deviceEndpoint[`usage`], Razer.Config.deviceEndpoint[`usage_page`]);
 
 	if(!macroTracker) { macroTracker = new ByteTracker(currentMacroArray);  device.log("Macro Tracker Spawned.");}
 
@@ -223,7 +225,6 @@ function detectInputs() {
 		}
 	}
 
-	device.set_endpoint(Razer.Config.deviceEndpoint[`interface`], Razer.Config.deviceEndpoint[`usage`], Razer.Config.deviceEndpoint[`usage_page`]);
 }
 
 function processInputs(Added, Removed) {
@@ -234,30 +235,33 @@ function processInputs(Added, Removed) {
 		switch(input) {
 		case 0x20:
 			device.log("DPI Up");
-			device.set_endpoint(Razer.Config.deviceEndpoint[`interface`], Razer.Config.deviceEndpoint[`usage`], Razer.Config.deviceEndpoint[`usage_page`]);
 			DpiHandler.increment();
 			break;
 		case 0x21:
 			device.log("DPI Down");
-			device.set_endpoint(Razer.Config.deviceEndpoint[`interface`], Razer.Config.deviceEndpoint[`usage`], Razer.Config.deviceEndpoint[`usage_page`]);
 			DpiHandler.decrement();
+			break;
+		case 0x22:
+			device.log("Right Back Button");
+			DpiHandler.decrement();
+			break;
+		case 0x23:
+			device.log("Right Forward Button");
+			DpiHandler.increment();
 			break;
 		case 0x50:
 			device.log("Profile Button Hit.");
 			break;
 		case 0x51:
 			device.log("DPI Clutch Hit.");
-			device.set_endpoint(Razer.Config.deviceEndpoint[`interface`], Razer.Config.deviceEndpoint[`usage`], Razer.Config.deviceEndpoint[`usage_page`]);
 			DpiHandler.SetSniperMode(true);
 			break;
 		case 0x52:
 			device.log("DPI Cycle Hit.");
-			device.set_endpoint(Razer.Config.deviceEndpoint[`interface`], Razer.Config.deviceEndpoint[`usage`], Razer.Config.deviceEndpoint[`usage_page`]);
 			DpiHandler.increment();
 			break;
 		case 0x54:
 			device.log("Scroll Accel Button Hit.");
-			device.set_endpoint(Razer.Config.deviceEndpoint[`interface`], Razer.Config.deviceEndpoint[`usage`], Razer.Config.deviceEndpoint[`usage_page`]);
 			break;
 		}
 	}
@@ -267,10 +271,10 @@ function processInputs(Added, Removed) {
 
 		if(input === 0x51) {
 			device.log("DPI Clutch Released.");
-			device.set_endpoint(Razer.Config.deviceEndpoint[`interface`], Razer.Config.deviceEndpoint[`usage`], Razer.Config.deviceEndpoint[`usage_page`]);
 			DpiHandler.SetSniperMode(false);
 		}
 	}
+
 }
 
 function grabColors(shutdown = false) {
