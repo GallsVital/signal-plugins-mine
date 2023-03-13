@@ -26,7 +26,7 @@
 		"paths": {
 			"@Mock/*": ["tests/*"],
 			"@Types/*":["types/*"],
-			"performance": ["./types/performance.d.ts"]
+			//"performance": ["./types/performance.d.ts"]
 		},
 	},
 	"files": [
@@ -37,7 +37,8 @@
 		"./types/battery.d.ts",
 		"./types/Exports.d.ts",
 		"./types/ComponentChannel.d.ts",
-		"./types/ControllableParameters.d.ts"
+		"./types/ControllableParameters.d.ts",
+		"./types/performance.d.ts" // Can be removed in QT6
     ],
 	"include": ["CodeSnippets/**/*","Non-Release-Plugins/**/*", "Plugins/**/*"],
 	"exclude": [
