@@ -323,6 +323,7 @@ class GigabyteVisionDeviceIds {
 		this.RTX3080_EAGLE_OC				= 0x4040;
 		this.RTX3090_VISION_OC_24G			= 0x4044;
 		this.RTX4070TI_MASTER_12G           = 0x40bb;
+		this.RTX4080_GAMING_OC	            = 0x40bc;
 		this.RTX4080_AERO_OC_16G			= 0x40C5;
 		this.RTX4080_EAGLE_OC               = 0x40be; //confirmed.
 
@@ -369,7 +370,7 @@ class GigabyteVisionGPuList {
 			new GigabyteVisionIdentifier(Nvidia.RTX3060,        GigabyteVisionIds.RTX3060_EAGLE_OC_REV2,         0x63, "GIGABYTE 3060 Eagle OC Rev 2.0"),
 			new GigabyteVisionIdentifier(Nvidia.RTX3060_LHR,    GigabyteVisionIds.RTX3060_EAGLE_OC_REV2,         0x62, "GIGABYTE 3060 Eagle OC Rev 2.0 LHR"),
 			new GigabyteVisionIdentifier(Nvidia.RTX3060,        GigabyteVisionIds.RTX3060_GAMING_OC_12GB,        0x62, "GIGABYTE 3060 Gaming OC"),
-			new GigabyteVisionIdentifier(Nvidia.RTX3060_LHR,    GigabyteVisionIds.RTX3060_GAMING_OC_12GB,        0x62, "GIGABYTE 3060 Gaming OC LHR"), //0x32?!?!?
+			new GigabyteVisionIdentifier(Nvidia.RTX3060_LHR,    GigabyteVisionIds.RTX3060_GAMING_OC_12GB,        0x62, "GIGABYTE 3060 Gaming OC LHR"), //0x32?!?!? https://discord.com/channels/951628333504925756/1075662357805678613
 			new GigabyteVisionIdentifier(Nvidia.RTX3060,        GigabyteVisionIds.RTX3060_VISION_OC_12GB,        0x63, "GIGABYTE 3060 Vision OC"),
 			new GigabyteVisionIdentifier(Nvidia.RTX3060_LHR,    GigabyteVisionIds.RTX3060_VISION_OC_12GB,        0x63, "GIGABYTE 3060 Vision OC LHR"),
 			new GigabyteVisionIdentifier(Nvidia.RTX3060_GA104,  GigabyteVisionIds.RTX3060_VISION_OC_12GB,        0x63, "GIGABYTE 3060 Vision OC LHR (GA104)"),
@@ -417,10 +418,11 @@ class GigabyteVisionGPuList {
 			new GigabyteVisionIdentifier(Nvidia.RTX3070,        GigabyteVisionIds.RTX3070_EAGLE_OC,              0x63, "GIGABYTE 3070 Eagle OC"),
 			new GigabyteVisionIdentifier(Nvidia.RTX3080_LHR,    GigabyteVisionIds.RTX3080_EAGLE_OC,    		 	 0x63, "GIGABYTE 3080 Eagle OC LHR"),
 			new GigabyteVisionIdentifier(Nvidia.RTX3090,        GigabyteVisionIds.RTX3090_VISION_OC_24G,         0x63, "GIGABYTE 3090 Vision OC"),
+			//new GigabyteVisionIdentifier(Nvidia.RTX3090,        GigabyteVisionIds.RTX3090_GAMING_OC_24GB,         0x63, "GIGABYTE 3090 Gaming OC 24G"), https://discord.com/channels/951628333504925756/1001482270743478404
 			new GigabyteVisionIdentifier(Nvidia.RTX4070TI,      GigabyteVisionIds.RTX4070TI_MASTER_12G,			 0x71, "GIGABYTE 4070Ti Master 12G"), //Confirmed
-			//new GigabyteVisionIdentifier(Nvidia.RTX4070TI,      GigabyteVisionIds.RTX4070TI_GAMING_OC,			 0x71, "GIGABYTE 4070Ti Gaming OC"),
 			new GigabyteVisionIdentifier(Nvidia.RTX4080,        GigabyteVisionIds.RTX4080_AERO_OC_16G,           0x71, "GIGABYTE 4080 Aero OC"),
 			new GigabyteVisionIdentifier(Nvidia.RTX4080,        GigabyteVisionIds.RTX4080_EAGLE_OC,          	 0x71, "GIGABYTE 4080 Eagle OC"), //Confirmed
+			//new GigabyteVisionIdentifier(Nvidia.RTX4080,        GigabyteVisionIds.RTX4080_GAMING_OC,          	 0x71, "GIGABYTE 4080 Gaming OC"), https://discord.com/channels/951628333504925756/1084181151033335839
 		];
 	}
 }

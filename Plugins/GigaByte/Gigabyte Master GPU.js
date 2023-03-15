@@ -232,7 +232,7 @@ class GigabyteMasterProtocol {
 					3: {Names : [ "Logo" ], Positions : [ [3, 1] ], Mapping : [ 0 ]}
 				}
 			},
-			0x0006 ://0x40c6 :
+			0x40c6 ://RTX4070TI_GAMING_OC_12G
 			{
 				Size: [5, 3],
 				modeZones : [0],
@@ -304,7 +304,7 @@ class GigabyteMasterProtocol {
 					3: {Names : [ "Side Logo LED 1", "Side Logo LED 2", "Face Logo LED", ], Positions : [ [11, 0], [12, 1], [12, 2],], Mapping : [ 0, 1, 3 ]}
 				}
 			},
-			0x0000 ://0x40C9 :
+			0x40c9 ://0x40C9 :
 			{
 				Size: [15, 9],
 				modeZones : [2, 5, 6],
@@ -464,6 +464,7 @@ class GigabyteMasterDeviceIds {
 		//New for 2.2.29
 		this.RTX2080_EXTREME 				= 0x37B1;
 		this.RTX2080TI_EXTREME				= 0x37BD;
+		this.RTX2080TI_EXTREME_11G			= 0x37BC;
 		this.RTX2080TI_WATERFORCE			= 0x37b9;
 		this.RTX3050_ELITE					= 0x40B2;
 		this.RTX3060_ELITE_REV2 			= 0x407B;
@@ -521,6 +522,7 @@ class GigabyteMasterGPuList {
 			//New
 			new GigabyteMasterIdentifier(Nvidia.RTX2080_A, 		GigabyteMasterIds.RTX2080_EXTREME,           0x50, "GIGABYTE 2080 Extreme"),
 			new GigabyteMasterIdentifier(Nvidia.RTX2080TI, 		GigabyteMasterIds.RTX2080TI_EXTREME,           0x50, "GIGABYTE 2080TI Extreme"),
+			//new GigabyteMasterIdentifier(Nvidia.RTX2080TI, 		GigabyteMasterIds.RTX2080TI_EXTREME_11G,           0x50, "GIGABYTE 2080TI Extreme 11G"), https://discord.com/channels/951628333504925756/1084435323938951168
 			new GigabyteMasterIdentifier(Nvidia.RTX2080TI, 		GigabyteMasterIds.RTX2080TI_WATERFORCE,           0x52, "GIGABYTE 2080TI XTREME Waterforce"),
 			new GigabyteMasterIdentifier(Nvidia.RTX3050,  	    GigabyteMasterIds.RTX3050_ELITE,         0x70, "GIGABYTE Aorus 3050 Elite"),
 			new GigabyteMasterIdentifier(Nvidia.RTX3060_LHR,	GigabyteMasterIds.RTX3060_ELITE_REV2, 			0x70, "GIGABYTE Aorus 3060 Elite REV2 LHR"),
@@ -528,7 +530,8 @@ class GigabyteMasterGPuList {
 			new GigabyteMasterIdentifier(Nvidia.RTX3080,        GigabyteMasterIds.RTX3080_XTREME_WATERFORCE_10G,         0x65, "GIGABYTE AORUS 3080 XTREME Waterforce 10GB"),
 			new GigabyteMasterIdentifier(Nvidia.RTX3080TI,      GigabyteMasterIds.RTX3080TI_XTREME_WATERFORCE_12G,         0x64, "GIGABYTE AORUS 3080TI XTREME Waterforce 12GB"), //Confirmed
 			new GigabyteMasterIdentifier(Nvidia.RTX3090,        GigabyteMasterIds.RTX3090_XTREME_WATERFORCE_2,         0x65, "GIGABYTE AORUS 3090 XTREME Waterforce 24GB"),
-			new GigabyteMasterIdentifier(Nvidia.RTX4070TI, 		GigabyteMasterIds.RTX4070TI_GAMING_OC_12G,           0x71, "GIGABYTE 4070TI Gaming OC"), //Confirmed
+			//new GigabyteMasterIdentifier(Nvidia.RTX4070TI, 		GigabyteMasterIds.RTX4070TI_GAMING_OC_12G,           0x71, "GIGABYTE 4070TI Gaming OC"), //Confirmed
+			//new GigabyteMasterIdentifier(Nvidia.RTX4070TI, 		GigabyteMasterIds.RTX4070TI_ELITE,           0x71, "GIGABYTE 4070TI Elite 12G"), //Confirmed single color
 			new GigabyteMasterIdentifier(Nvidia.RTX4080, 		GigabyteMasterIds.RTX4080_GAMING_OC_16G,           0x71, "GIGABYTE 4080 Gaming OC"),
 			new GigabyteMasterIdentifier(Nvidia.RTX4080, 		GigabyteMasterIds.RTX4080_GAMING_OC_16G_2,           0x71, "GIGABYTE 4080 Gaming OC"), //Confirmed
 			new GigabyteMasterIdentifier(Nvidia.RTX4080, 		GigabyteMasterIds.RTX4080_XTREME_WATERFORCE,           0x64, "GIGABYTE 4080 XTREME Waterforce 16GB"), //This card is single zone. Older ones were multizone. We'll see if it plays ball or not with sending multiple zones.
