@@ -55,6 +55,7 @@ export function Initialize() {
 }
 
 export function Shutdown() {
+
 	//channel 0
 	let packet = [0x00, CORSAIR_LIGHTING_CONTROLLER_MODE, 0x00, CORSAIR_HARDWARE_MODE];
 	device.write(packet, 65);
@@ -118,6 +119,8 @@ function SendChannel(Channel) {
 
 
 export function Render() {
+	device.clearReadBuffer();
+
 	SendChannel(0);
 	device.pause(1);
 
@@ -132,7 +135,6 @@ function InitChannel(channel){
 	const packet = [0x00, CORSAIR_LIGHTING_CONTROLLER_MODE, channel, CORSAIR_SOFTWARE_MODE];
 
 	device.write(packet, 65);
-	device.read(packet, 17);
 
 }
 
@@ -143,7 +145,6 @@ function StreamLightingPacketChanneled(start, count, colorChannel, data, channel
 	packet = packet.concat(data);
 
 	device.write(packet, 65);
-	device.read(packet, 17);
 }
 
 function channelStart(channel){
@@ -151,14 +152,12 @@ function channelStart(channel){
 	const packet = [0x00, CORSAIR_LIGHTING_CONTROLLER_START, channel];
 
 	device.write(packet, 65);
-	device.read(packet, 17);
 }
 
 function channelReset(channel){
 	const packet = [0x00, CORSAIR_LIGHTING_CONTROLLER_RESET, channel];
 
 	device.write(packet, 65);
-	device.read(packet, 17);
 }
 
 
@@ -166,10 +165,9 @@ function SubmitLightingColors() {
 	const packet = [0x00, CORSAIR_LIGHTING_CONTROLLER_COMMIT, 0xFF];
 
 	device.write(packet, 65);
-	device.read(packet, 17);
 }
 export function Validate(endpoint) {
-	return endpoint.interface === -1 | 2;
+	return endpoint.interface === -1;
 }
 
 
