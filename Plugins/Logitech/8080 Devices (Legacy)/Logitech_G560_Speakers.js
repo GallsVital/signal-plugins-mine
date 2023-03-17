@@ -109,7 +109,7 @@ function sendZone(zone, shutdown = false) //TODO Come back and fix this. It woul
 	packet[0x09] = 0x02;
 
 	device.write(packet, 20);
-	device.pause(5);
+	device.pause(15);
 }
 
 export function Render() {
