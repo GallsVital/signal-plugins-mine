@@ -133,6 +133,7 @@ const PNYGPUIDs =
 [
 	new PNYGPUIdentifier(0x2782, 0x13b1, "PNY RTX 4070TI XLR8"),
 	new PNYGPUIdentifier(0x2782, 0x13b2, "PNY RTX 4070 Ti 12GB XLR8 Gaming VERTO™ EPIC-X RGB Triple Fan"),
+	new PNYGPUIdentifier(0x2704, 0x13b0, "PNY RTX 4080 XLR8 Gaming VERTO™ OC"),
 	new PNYGPUIdentifier(0x2684, 0x13ad, "PNY RTX 4090 XLR8"),
 	new PNYGPUIdentifier(0x2684, 0x13ae, "PNY RTX 4090 XLR8"),
 
