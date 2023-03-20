@@ -14,6 +14,7 @@ export class MockDevice{
 	send_report = jest.fn().mockImplementation((data, length) => {});
 	get_report = jest.fn().mockImplementation((data, length) => { return new Array(length).fill(0);});
 
+	getHidInfo = jest.fn().mockImplementation(() => {});
 	getLastReadSize = jest.fn().mockImplementation(() => { });
 
 	set_endpoint = jest.fn().mockImplementation((Interface, Usage, UsagePage, Collection) => {});

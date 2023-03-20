@@ -1,25 +1,5 @@
+const {BinaryUtils} = require("../CodeSnippets/BinaryUtils");
 
-
-function Convert_To_16Bit(values) {
-	let returnValue = 0;
-
-	for(let i = 0; i < values.length; i++) {
-		returnValue += values[i] << (8 * i);
-	}
-
-	return returnValue;
-}
-
-function Convert_From_16Bit(value, LittleEndian = false) {
-	const returnValue = [];
-
-	while(value > 0){
-		returnValue.push(value & 0xFF);
-		value = value >> 8;
-	}
-
-	return LittleEndian ? returnValue : returnValue.reverse();
-}
 
 function decimalToHex(d, padding) {
 	let hex = Number(d).toString(16);
@@ -38,6 +18,15 @@ function getKeyByValue(object, value) {
 	return parseInt(Key);
 }
 
+const FanControllerArray = [
+	"Fan 1",
+	"Fan 2",
+	"Fan 3",
+	"Fan 4",
+	"Fan 5",
+	"Fan 6",
+];
+const ConnectedFans = [];
 
 /**
  * @typedef Options
@@ -63,11 +52,6 @@ export class ModernCorsairProtocol{
 	 * @param {Options} options - Options object containing device specific configuration values
 	 */
 	constructor(options = {}) {
-		/**
-		 * Use {@link ModernCorsairProtocol#GetBufferSize} instead
-		 * @private
-		 * */
-		this.DeviceBufferSize = 1280;
 		this.ConfiguredDeviceBuffer = false;
 
 		/**
@@ -79,6 +63,8 @@ export class ModernCorsairProtocol{
 			IsLightingController: typeof options.IsLightingController === "boolean" ? options.IsLightingController : false,
 			developmentFirmwareVersion: typeof options.developmentFirmwareVersion === "string" ? options.developmentFirmwareVersion : "Unknown",
 			LedChannelSpacing: typeof options.LedChannelSpacing === "number" ? options.LedChannelSpacing : 0,
+			WriteLength: 0,
+			ReadLength: 0
 		};
 
 		this.KeyCodes = [];
@@ -220,6 +206,10 @@ export class ModernCorsairProtocol{
 			0x22: "DPI Y",
 			0x37: "Idle Mode Timeout",
 			0x41: "HW Layout",
+			0x44: "Brightness Level",
+			0x45: "WinLock Enabled",
+			0x4a: "WinLock Disabled Shortcuts",
+			0x5f: "MultipointConnectionSupport",
 			0x96: "Max Polling Rate",
 		});
 
@@ -229,8 +219,8 @@ export class ModernCorsairProtocol{
 		 *
 		 * Helper Functions to interact with these exist as the following:
 		 * <ul style="list-style: none;">
-		 * <li> {@link ModernCorsairProtocol#WriteEndpoint|WriteEndpoint(HandleId, EndpointId, CommandId)}
-		 * <li> {@link ModernCorsairProtocol#ReadEndpoint|ReadEndpoint(HandleId, EndpointId, CommandId)}
+		 * <li> {@link ModernCorsairProtocol#WriteToEndpoint|WriteEndpoint(HandleId, EndpointId, CommandId)}
+		 * <li> {@link ModernCorsairProtocol#ReadFromEndpoint|ReadEndpoint(HandleId, EndpointId, CommandId)}
 		 * <li> {@link ModernCorsairProtocol#CloseHandle|CloseHandle(HandleId)}
 		 * <li> {@link ModernCorsairProtocol#CheckHandle|CheckHandle(HandleId)}
 		 * </ul>
@@ -265,13 +255,14 @@ export class ModernCorsairProtocol{
 		this.EndpointNames = Object.freeze({
 			0x01: "Lighting",
 			0x02: "Buttons",
-			0x17: "Fan RPMs",
-			0x08: "Fan Speeds",
+			0x17: "Fan RPM",
+			0x18: "Fan Speeds",
 			0x1A: "Fan States",
 			0x1D: "3Pin Led Count",
 			0x1E: "4Pin Led Count",
 			0x21: "Temperature Probes",
 			0x22: "Lighting Controller",
+			0x27: "Error Log"
 		});
 
 		this.ChargingStates = Object.freeze({
@@ -281,15 +272,15 @@ export class ModernCorsairProtocol{
 		});
 
 
-		this.ResponseIds = Object.freeze({
-			firmware: 0x02,
-			command: 0x06,
-			openEndpoint: 0x0D,
-			closeEndpoint: 0x05,
-			getRpm: 0x06,
-			fanConfig: 0x09,
-			temperatureData: 0x10,
+		this.DataTypes = Object.freeze({
+			FanRPM: 0x06,
+			FanDuty: 0x07,
+			FanStates: 0x09,
+			TemperatureProbes: 0x10,
+			LedCount3Pin: 0x0C,
+			FanTypes: 0x0D,
 			LedConfig: 0x0F,
+			LightingController: 0x12
 		});
 
 		/**
@@ -301,8 +292,8 @@ export class ModernCorsairProtocol{
 		 *
 		 * Helper Functions to interact with these exist as the following:
 		 * <ul style="list-style: none;">
-		 * <li> {@link ModernCorsairProtocol#WriteEndpoint|WriteEndpoint(HandleId, EndpointId, CommandId)}
-		 * <li> {@link ModernCorsairProtocol#ReadEndpoint|ReadEndpoint(HandleId, EndpointId, CommandId)}
+		 * <li> {@link ModernCorsairProtocol#WriteToEndpoint|WriteEndpoint(HandleId, EndpointId, CommandId)}
+		 * <li> {@link ModernCorsairProtocol#ReadFromEndpoint|ReadEndpoint(HandleId, EndpointId, CommandId)}
 		 * <li> {@link ModernCorsairProtocol#CloseHandle|CloseHandle(HandleId)}
 		 * <li> {@link ModernCorsairProtocol#CheckHandle|CheckHandle(HandleId)}
 		 * </ul>
@@ -367,7 +358,6 @@ export class ModernCorsairProtocol{
 		});
 	}
 
-
 	GetNameOfHandle(Handle){
 		if(this.HandleNames.hasOwnProperty(Handle)){
 			return this.HandleNames[Handle];
@@ -375,9 +365,10 @@ export class ModernCorsairProtocol{
 
 		return "Unknown Handle";
 	}
+
 	/** Logging wrapper to prepend the proper context to anything logged within this class. */
 	log(Message){
-	//device.log(`CorsairProtocol:` + Message);
+		//device.log(`CorsairProtocol:` + Message);
 		device.log(Message);
 	}
 	/**
@@ -388,8 +379,8 @@ export class ModernCorsairProtocol{
 	 */
 	PingDevice(){
 		let packet = [0x00, this.ConnectionType, this.CommandIds.pingDevice];
-		device.write(packet, this.GetBufferSize());
-		packet = device.read(packet, this.GetBufferSize());
+		device.write(packet, this.GetWriteLength());
+		packet = device.read(packet, this.GetReadLength());
 
 		if(packet[2] !== 0x12){
 			return false;
@@ -406,57 +397,129 @@ export class ModernCorsairProtocol{
 			this.KeyCodes.push(Enabled);
 		}
 
-		this.WriteEndpoint("Background", this.Endpoints.Buttons, this.KeyCodes);
+		this.WriteToEndpoint("Background", this.Endpoints.Buttons, this.KeyCodes);
 	}
 
 	SetSingleKey(KeyID, Enabled){
 		this.KeyCodes[KeyID - 1] = Enabled;
 
-		this.WriteEndpoint("Background", this.Endpoints.Buttons, this.KeyCodes);
+		this.WriteToEndpoint("Background", this.Endpoints.Buttons, this.KeyCodes);
+	}
+
+	GetWriteLength(){
+		if(!this.ConfiguredDeviceBuffer){
+			this.FindBufferLengths();
+		}
+
+		return this.config.WriteLength;
+	}
+	GetReadLength(){
+		if(!this.ConfiguredDeviceBuffer){
+			this.FindBufferLengths();
+		}
+
+		return this.config.ReadLength;
 	}
 
 	/**
-	 * This function can be used to manually set the devices buffer length instead of attempting auto detection. This value must be set for any other functions in this Protocol to work.
-	 * @param {number} BufferSize Desired buffer size in bytes.
+	 * Finds and sets the device's buffer lengths for internal use within the class. This should be the first function called when using this Protocol class as all other interactions with the device rely on the buffer size being set properly.
+	 *
+	 * This is automatically called on the first write/read operation.
 	 */
-	SetDeviceBufferSize(BufferSize){
-		this.DeviceBufferSize = BufferSize;
+	FindBufferLengths(){
+
+		if(this.ConfiguredDeviceBuffer){
+			return;
+		}
+
+		const HidInfo = device.getHidInfo();
+		this.log(`Setting up device Buffer Lengths...`);
+
+		if(HidInfo.writeLength != 0){
+			this.config.WriteLength = HidInfo.writeLength;
+			this.log(`Write length set to ${this.config.WriteLength}`);
+		}
+
+		if(HidInfo.readLength != 0){
+			this.config.ReadLength = HidInfo.readLength;
+			this.log(`Read length set to ${this.config.ReadLength}`);
+		}
+
 		this.ConfiguredDeviceBuffer = true;
 	}
-	/** Calling this function to get the write/read length will auto detect it the first time its needed if it hasn't been detected yet.*/
-	GetBufferSize(){
-		if(!this.ConfiguredDeviceBuffer){
-			this.FindBufferLength();
-		}
+	FetchDeviceInformation(){
 
-		return this.DeviceBufferSize;
+		device.log(`Vid: [${decimalToHex(this.FetchProperty(this.Properties.vid), 4)}]`);
+		device.log(`Pid: [${decimalToHex(this.FetchProperty(this.Properties.pid), 4)}]`);
+
+		this.FetchFirmware();
+
+		//DumpAllSupportedProperties();
+		//DumpAllSupportedEndpoints();
 	}
-	/**
-	 * Finds and sets the device's buffer size for internal use within the Protocol. This should be the first function called when using this Protocol class as all other interactions with the device rely on the buffer size being set properly.
-	 *
-	 * This is automatically called on the first write operation, or can be set manually by {@link ModernCorsairProtocol#SetDeviceBufferSize|SetDeviceBufferSize(BufferSize)}.
-	 */
-	FindBufferLength(){
-		if(this.DeviceBufferSize === 1280 || !this.ConfiguredDeviceBuffer){
-			this.log(`Device Buffer Length Unknown. Attempting to read it from device!`);
+	FindLightingEndpoint(){
+		let SupportedLightingEndpoint = -1;
 
-			// Using a proxy Device Ping request to get a packet to read. Write length is a placeholder value as we're relying on HidAPI
-			// to sort out the proper write length.
-			device.write([0x00, this.ConnectionType, this.CommandIds.pingDevice], 1024);
-			device.read([0x00], 1024);
-
-			const ReadLength = device.getLastReadSize();
-
-			if(ReadLength !== 0){
-				this.DeviceBufferSize = ReadLength;
-				this.log(`Buffer length set to ${this.DeviceBufferSize}`);
-				this.ConfiguredDeviceBuffer = true;
-
-				return;
-			}
-
-			this.log(`Failed to read from the device. We'll attempt to refetch write/read lengths later...`);
+		if(this.IsEndpointSupported(this.Endpoints.Lighting)){
+			SupportedLightingEndpoint = this.Endpoints.Lighting;
+		}else if(this.IsEndpointSupported(this.Endpoints.LightingController)){
+			SupportedLightingEndpoint = this.Endpoints.LightingController;
 		}
+
+		device.log(`Supported Lighting Style: [${this.EndpointNames[SupportedLightingEndpoint]}]`, {toFile: true});
+
+		return SupportedLightingEndpoint;
+	}
+
+	IsPropertySupported(PropertyId){
+		return this.FetchProperty(PropertyId) !== -1;
+	}
+
+	DumpAllSupportedProperties(){
+		const SupportedProperties = [];
+
+		for(let i = 0; i < 0x64; i++){
+			if(this.IsPropertySupported(i)){
+				SupportedProperties.push(i);
+			}
+		}
+
+		for(const property of SupportedProperties){
+			device.log(`Supports Property: [${decimalToHex(property, 2)}], ${this.PropertyNames[property]}`, {toFile: true});
+		}
+
+		return SupportedProperties;
+
+	}
+
+	IsEndpointSupported(Endpoint){
+
+		this.CloseHandleIfOpen("Background");
+
+		const isHandleSupported = this.OpenHandle("Background", Endpoint) === 0;
+
+		// Clean up after if the handle is now open.
+		if(isHandleSupported){
+			this.CloseHandle("Background");
+		}
+
+		return isHandleSupported;
+	}
+
+	DumpAllSupportedEndpoints(){
+		const SupportedEndpoints = [];
+
+		for(let i = 0; i < 0x80; i++){
+			if(this.IsEndpointSupported(i)){
+				SupportedEndpoints.push(i);
+			}
+		}
+
+		for(const endpoint of SupportedEndpoints){
+			device.log(`Supports Endpoint: [${decimalToHex(endpoint, 2)}], ${this.EndpointNames[endpoint]}`, {toFile: true});
+		}
+
+		return SupportedEndpoints;
 	}
 	/**
 	 * Helper function to read and properly format the device's firmware version.
@@ -542,8 +605,8 @@ export class ModernCorsairProtocol{
 			break;
 		case 13:
 		case 55:
-		// Value still gets set properly?
-		//device.log(`${caller_context} CorsairProtocol Unknown Error Code [${hasError}]: ${Context}. This may not be an error.`);
+			// Value still gets set properly?
+			//device.log(`${caller_context} CorsairProtocol Unknown Error Code [${hasError}]: ${Context}. This may not be an error.`);
 			return 0;
 		default:
 			device.log(`${caller_context} CorsairProtocol Error [${hasError}]: ${Context}`);
@@ -569,7 +632,7 @@ export class ModernCorsairProtocol{
 			device.log(`Device ${this.PropertyNames[PropertyId]} is currently [${CurrentValue}]. Desired Value is [${Value}]. Setting Property!`);
 
 			this.SetProperty(PropertyId, Value);
-			device.read([0x00], this.GetBufferSize(), 5);
+			device.read([0x00], this.GetReadLength(), 5);
 
 			const NewValue = this.FetchProperty(PropertyId);
 			device.log(`Device ${this.PropertyNames[PropertyId]} is now [${NewValue}]`);
@@ -597,7 +660,7 @@ export class ModernCorsairProtocol{
 			return -1;
 		}
 
-		return Convert_To_16Bit(data.slice(4, 7));
+		return BinaryUtils.ReadInt32LittleEndian(data.slice(4, 7));
 	}
 
 	/**
@@ -612,8 +675,8 @@ export class ModernCorsairProtocol{
 		}
 
 		let packet = [0x00, this.ConnectionType, this.CommandIds.setProperty, PropertyId, 0x00, (Value & 0xFF), (Value >> 8 & 0xFF), (Value >> 16 & 0xFF)];
-		device.write(packet, this.GetBufferSize());
-		packet = device.read(packet, this.GetBufferSize());
+		device.write(packet, this.GetWriteLength());
+		packet = device.read(packet, this.GetReadLength());
 
 		const ErrorCode = this.CheckError(packet, `SetProperty`);
 
@@ -644,14 +707,11 @@ export class ModernCorsairProtocol{
 	 * @returns The packet data read from the device.
 	 */
 	ReadProperty(PropertyId) {
-	//Clear read buffer
-		do{
-			device.read([0x00], 65, 3);
-		}while(device.getLastReadSize() > 0);
 
 		let packet = [0x00, this.ConnectionType, this.CommandIds.getProperty, PropertyId, 0x00];
-		device.write(packet, this.GetBufferSize());
-		packet = device.read(packet, this.GetBufferSize());
+		device.clearReadBuffer();
+		device.write(packet, this.GetWriteLength());
+		packet = device.read(packet, this.GetReadLength());
 
 		const ErrorCode = this.CheckError(packet, `ReadProperty`);
 
@@ -664,6 +724,23 @@ export class ModernCorsairProtocol{
 		return packet;
 	}
 
+	SendCommand(data){
+		device.clearReadBuffer();
+
+		const SubDeviceId = 0;
+
+		const packet = [0x00, (0x08 | SubDeviceId)];
+
+		packet.push(...data);
+
+		device.write(packet, this.GetWriteLength());
+
+		const returnPacket = device.read([0x00], this.GetReadLength());
+
+		// Error Check here?
+
+		return returnPacket;
+	}
 	/**
 	 * Opens a Endpoint on the device. Only one Endpoint can be open on a Handle at a time so if the handle is already open this function will fail.
 	 * @param {Handle} Handle The Handle to open the Endpoint on. Default is 0.
@@ -674,11 +751,14 @@ export class ModernCorsairProtocol{
 		if(typeof Handle === "string"){
 			Handle = this.Handles[Handle];
 		}
-		let packet = [0x00, this.ConnectionType, this.CommandIds.openEndpoint, Handle, Endpoint];
-		device.write(packet, this.GetBufferSize());
-		packet = device.read(packet, this.GetBufferSize());
 
-		const ErrorCode = this.CheckError(packet, `OpenEndpoint`);
+		const packet = [0x00, this.ConnectionType, this.CommandIds.openEndpoint, Handle, Endpoint];
+		device.clearReadBuffer();
+		device.write(packet, this.GetWriteLength());
+
+		const returnPacket = device.read(packet, this.GetReadLength());
+
+		const ErrorCode = this.CheckError(returnPacket, `OpenEndpoint`);
 
 		if(ErrorCode){
 			device.log(`Failed to open Endpoint [${this.EndpointNames[Endpoint]}, ${decimalToHex(Endpoint, 2)}] on Handle [${this.GetNameOfHandle(Handle)}, ${decimalToHex(Handle, 2)}]. Are you sure it's supported and wasn't already open?`);
@@ -696,8 +776,9 @@ export class ModernCorsairProtocol{
 			Handle = this.Handles[Handle];
 		}
 		let packet = [0x00, this.ConnectionType, this.CommandIds.closeHandle, 1, Handle];
-		device.write(packet, this.GetBufferSize());
-		packet = device.read(packet, this.GetBufferSize());
+		device.clearReadBuffer();
+		device.write(packet, this.GetWriteLength());
+		packet = device.read(packet, this.GetReadLength());
 
 		const ErrorCode = this.CheckError(packet, `CloseEndpoint`);
 
@@ -731,16 +812,18 @@ export class ModernCorsairProtocol{
 		if(typeof Handle === "string"){
 			Handle = this.Handles[Handle];
 		}
+
+		device.clearReadBuffer();
+
 		let packet = [0x00, this.ConnectionType, this.CommandIds.checkHandle, Handle, 0x00];
-		device.read(packet, this.GetBufferSize());
-		device.write(packet, this.GetBufferSize());
-		packet = device.read(packet, this.GetBufferSize());
+		device.write(packet, this.GetWriteLength());
+		packet = device.read(packet, this.GetReadLength());
 
 		const isOpen = packet[3] !== 3;
 
 		return isOpen;
-
 	}
+
 	/**
 	 * Performs a Check Command on the HandleId given and returns the packet from the device.
 	 * This function will return an Error Code if the Handle is not open.
@@ -754,8 +837,9 @@ export class ModernCorsairProtocol{
 			Handle = this.Handles[Handle];
 		}
 		let packet = [0x00, this.ConnectionType, this.CommandIds.checkHandle, Handle, 0x00];
-		device.write(packet, this.GetBufferSize());
-		packet = device.read(packet, this.GetBufferSize());
+		device.clearReadBuffer();
+		device.write(packet, this.GetWriteLength());
+		packet = device.read(packet, this.GetReadLength());
 
 		const ErrorCode = this.CheckError(packet, `CheckHandle`);
 
@@ -777,7 +861,7 @@ export class ModernCorsairProtocol{
 	 * @param {number} Command - CommandId that is contained in the return packet to verify the correct packet was read from the device.
 	 * @returns The entire packet read from the device.
 	 */
-	ReadEndpoint(Handle, Endpoint, Command) {
+	ReadFromEndpoint(Handle, Endpoint, Command) {
 		if(typeof Handle === "string"){
 			Handle = this.Handles[Handle];
 		}
@@ -796,23 +880,25 @@ export class ModernCorsairProtocol{
 			return [];
 		}
 
-		device.write([0x00, this.ConnectionType, this.CommandIds.readEndpoint, Handle], this.GetBufferSize());
+		device.clearReadBuffer();
+
+		device.write([0x00, this.ConnectionType, this.CommandIds.readEndpoint, Handle], this.GetWriteLength());
 
 		let Data = [];
-		Data = device.read([0x00], this.GetBufferSize());
+		Data = device.read([0x00], this.GetReadLength());
 
 		let RetryCount = 4;
 
 		do {
 			RetryCount--;
-			device.write([0x00, this.ConnectionType, this.CommandIds.readEndpoint, Handle], this.GetBufferSize());
-			Data = device.read(Data, this.GetBufferSize());
+			device.write([0x00, this.ConnectionType, this.CommandIds.readEndpoint, Handle], this.GetWriteLength());
+			Data = device.read(Data, this.GetReadLength());
 
-			if(this.ResponseIds[Data[4]] !== this.ResponseIds[Command]) {
-				device.log(`Invalid Command Read: Got [${this.ResponseIds[Data[2]]}][${Data[4]}], Wanted [${this.ResponseIds[Command]}][${Command}]`);
+			if(this.DataTypes[Data[4]] !== this.DataTypes[Command]) {
+				device.log(`Invalid Command Read: Got [${this.DataTypes[Data[2]]}][${Data[4]}], Wanted [${this.DataTypes[Command]}][${Command}]`);
 			}
 
-		} while(this.ResponseIds[Data[4]] !== this.ResponseIds[Command] && RetryCount > 0);
+		} while(this.DataTypes[Data[4]] !== this.DataTypes[Command] && RetryCount > 0);
 
 		this.CloseHandle(Handle);
 
@@ -829,7 +915,7 @@ export class ModernCorsairProtocol{
 	 * @param {number[]} Data - Data to be written to the Endpoint.
 	 * @returns {number} 0 on success, otherwise an error code value.
 	 */
-	WriteEndpoint(Handle, Endpoint, Data) {
+	WriteToEndpoint(Handle, Endpoint, Data) {
 		if(typeof Handle === "string"){
 			Handle = this.Handles[Handle];
 		}
@@ -848,14 +934,14 @@ export class ModernCorsairProtocol{
 			return ErrorCode;
 		}
 
-		let packet = [0x00, this.ConnectionType, this.CommandIds.writeEndpoint, Handle, Data.length & 0xff, (Data.length >> 8) & 0xFF, 0x00, 0x00];
+		let packet = [0x00, this.ConnectionType, this.CommandIds.writeEndpoint, Handle];
+		packet.push(...BinaryUtils.WriteInt32LittleEndian(Data.length));
 		packet.push(...Data);
 
-		device.write(packet, this.GetBufferSize());
-		// Extra read to skip an empty packet.
-		device.read([0x00], this.GetBufferSize());
+		device.clearReadBuffer();
+		device.write(packet, this.GetWriteLength());
 
-		packet = device.read([0x00], this.GetBufferSize());
+		packet = device.read([0x00], this.GetReadLength());
 
 		ErrorCode = this.CheckError(packet, `WriteEndpoint`);
 
@@ -883,11 +969,11 @@ export class ModernCorsairProtocol{
 
 		// All packets sent to the LightingController Endpoint have these 2 values added before any other data.
 		if(this.config.IsLightingController){
-			RGBData.splice(0, 0, ...[0x12, 0x00]);
+			RGBData.splice(0, 0, ...[this.DataTypes.LightingController, 0x00]);
 		}
 
 		let TotalBytes = RGBData.length;
-		const InitialPacketSize = this.GetBufferSize() - InitialHeaderSize;
+		const InitialPacketSize = this.GetWriteLength() - InitialHeaderSize;
 
 		this.WriteLighting(RGBData.length, RGBData.splice(0, InitialPacketSize));
 
@@ -895,40 +981,29 @@ export class ModernCorsairProtocol{
 		BytesSent += InitialPacketSize;
 
 		while(TotalBytes > 0){
-			const BytesToSend = Math.min(this.GetBufferSize() - HeaderSize, TotalBytes);
+			const BytesToSend = Math.min(this.GetWriteLength() - HeaderSize, TotalBytes);
 			this.StreamLighting(RGBData.splice(0, BytesToSend));
 
 			TotalBytes -= BytesToSend;
 			BytesSent += BytesToSend;
 		}
 	}
-	/**
-	 * @private
-	 */
+
+	/** @private */
 	WriteLighting(LedCount, RGBData){
 
-		const packet = [];
-		packet[0x00] = 0x00;
-		packet[0x01] = this.ConnectionType;
-		packet[0x02] = this.CommandIds.writeEndpoint;
-		packet[0x03] = 0x00;
-		packet[0x04] = (LedCount) & 0xFF;
-		packet[0x05] = (LedCount) >> 8;
-		packet[0x06] = 0x00;
-		packet[0x07] = 0x00;
-
+		const packet = [0x00, this.ConnectionType, this.CommandIds.writeEndpoint, 0x00];
+		packet.push(...BinaryUtils.WriteInt32LittleEndian(LedCount));
 		packet.push(...RGBData);
 
-		device.write(packet, this.GetBufferSize());
+		device.write(packet, this.GetWriteLength());
 
-		const response = device.read([0x00], this.GetBufferSize());
+		const response = device.read([0x00], this.GetReadLength());
 
 		this.CheckError(response, "WriteLighting");
 	}
 
-	/**
-	 * @private
-	 */
+	/** @private */
 	StreamLighting(RGBData) {
 
 		const packet = [];
@@ -938,9 +1013,9 @@ export class ModernCorsairProtocol{
 		packet[0x03] = 0x00;
 		packet.push(...RGBData);
 
-		device.write(packet, this.GetBufferSize());
+		device.write(packet, this.GetWriteLength());
 
-		const response = device.read([0x00], this.GetBufferSize());
+		const response = device.read([0x00], this.GetReadLength());
 
 		this.CheckError(response, "StreamLighting");
 	}
@@ -996,12 +1071,12 @@ export class ModernCorsairProtocol{
 	 * @param {boolean} AngleSnapping boolean Status to be set for Angle Snapping.
 	 */
 	SetAngleSnapping(AngleSnapping){
-		const HardwareAngleSnap =  this.FetchProperty(this.Properties.angleSnap);
+		const HardwareAngleSnap = this.FetchProperty(this.Properties.angleSnap);
 
-		if(HardwareAngleSnap !== AngleSnapping){
+		if(!!HardwareAngleSnap !== AngleSnapping){
 			device.log(`Device Angle Snapping is set to [${HardwareAngleSnap ? "True" : "False"}]`);
 
-			this.SetProperty(this.Properties.angleSnap, AngleSnapping);
+			this.SetProperty(this.Properties.angleSnap, AngleSnapping ? 1 : 0);
 
 			const NewAngleSnap = this.FetchProperty(this.Properties.angleSnap);
 			device.log(`Device Angle Snapping is now [${NewAngleSnap ? "True" : "False"}]`);
@@ -1010,7 +1085,7 @@ export class ModernCorsairProtocol{
 
 	/** */
 	FetchFanRPM() {
-	//device.log("CorsairProtocol: Reading Fan RPM's.");
+		//device.log("CorsairProtocol: Reading Fan RPM's.");
 
 		if(device.fanControlDisabled()) {
 			device.log("Fan Control is Disabled! Are you sure you want to try this?");
@@ -1018,10 +1093,10 @@ export class ModernCorsairProtocol{
 			return [];
 		}
 
-		const data = this.ReadEndpoint("Background", this.Endpoints.FanRPM, 0x06);
+		const data = this.ReadFromEndpoint("Background", this.Endpoints.FanRPM, 0x06);
 
 		if(data.length === 0){
-			device.log(`CorsairProtocol: Failed To Read Fan RPM's.`);
+			this.log("Failed To Read Fan RPM's.");
 
 			return [];
 		}
@@ -1031,32 +1106,22 @@ export class ModernCorsairProtocol{
 		if(data[4] !== 6 && data[5] !== 0) {
 			device.log("Failed to get Fan RPM's");
 		}
-		const fanCount = data[6];
-		device.log(`CorsairProtocol: Device Reported [${fanCount}] Fan RPM's`);
 
+		const fanCount = data[6] ?? 0;
+		this.log(`Device Reported [${fanCount}] Fan RPM's`);
 
 		const fanSpeeds = data.slice(7, 7 + 2 * fanCount);
 
 		for(let i = 0; i < fanCount; i++) {
-			const fanData = fanSpeeds.splice(0, 2);
-			const fanRPM = fanData[0] + (fanData[1] << 8);
-
-			FanSpeeds[i] = fanRPM;
+			const rpmData = fanSpeeds.splice(0, 2);
+			FanSpeeds[i] = BinaryUtils.ReadInt16LittleEndian(rpmData);
 		}
 
 		return FanSpeeds;
 	}
 	/** */
 	FetchFanStates() {
-	//device.log("CorsairProtocol: Reading Fan States.");
-
-		// if(device.fanControlDisabled()) {
-		// 	device.log("Fan Control is Disabled! Are you sure you want to try this?");
-
-		// 	return [];
-		// }
-
-		const data = this.ReadEndpoint("Background", this.Endpoints.FanStates, 0x09);
+		const data = this.ReadFromEndpoint("Background", this.Endpoints.FanStates, 0x09);
 
 		if(data.length === 0){
 			device.log(`CorsairProtocol: Failed To Read Fan States.`);
@@ -1070,8 +1135,8 @@ export class ModernCorsairProtocol{
 			return [];
 		}
 
-		const FanCount = data[6];
-		//device.log(`CorsairProtocol: Device Reported [${FanCount}] Fans`);
+		const FanCount = data[6] ?? 0;
+		device.log(`CorsairProtocol: Device Reported [${FanCount}] Fans`);
 
 		const FanData = data.slice(7, 7 + FanCount);
 
@@ -1079,50 +1144,72 @@ export class ModernCorsairProtocol{
 	}
 	/** */
 	SetFanType() {
-	// Configure Fan Ports to use QL Fan size grouping. 34 Leds
-		const FanSettings = [0x00, 0x08, 0x06, 0x01, 0x11, 0x00, 0x00, 0x00, 0x0D, 0x00, 0x07];
-		const offset = 11;
+		// Configure Fan Ports to use QL Fan size grouping. 34 Leds
+		const FanCount = 7;
 
-		for(let iIdx = 0; iIdx < 7; iIdx++) {
-			FanSettings[offset + iIdx * 2] = 0x01;
-			FanSettings[offset + iIdx * 2 + 1] = iIdx === 0 ? 0x01 : this.FanTypes.QL; // 1 for nothing, 0x08 for pump?
+		const FanSettings = [this.DataTypes.FanTypes, 0x00, FanCount];
+
+		for(let iIdx = 0; iIdx < FanCount; iIdx++) {
+			FanSettings.push(0x01);
+			FanSettings.push(iIdx === 0 ? 0x01 : this.FanTypes.QL); // 1 for nothing, 0x08 for pump?
 		}
 
-		this.OpenHandle("Background", this.Endpoints.LedCount_4Pin);
-
-		device.write(FanSettings, this.GetBufferSize());
-		device.read([0x00], this.GetBufferSize());
-
-		this.CloseHandle("Background");
-
-	//sendPacketString("00 08 15 01", Device_Write_Length); //apply changes
+		this.WriteToEndpoint("Background", this.Endpoints.LedCount_4Pin, FanSettings);
 	}
+
+	SetFanSpeeds() {
+		const FanCount = 6;
+		const DefaultFanSpeed = 0x32;
+
+		const FanSpeedData = [
+			this.DataTypes.FanDuty, 0x00, FanCount,
+		];
+
+		for(let FanId = 0; FanId < FanCount; FanId++) {
+			const FanData = [FanId, 0x00, DefaultFanSpeed, 0x00];
+
+			if(ConnectedFans.includes(FanId)){
+
+				const fanLevel = device.getFanlevel(FanControllerArray[FanId]);
+				device.log(`Setting Fan ${FanId + 1} Level to ${fanLevel}%`);
+				FanData[2] = fanLevel;
+			}
+
+			FanSpeedData.push(...FanData);
+		}
+
+		this.WriteToEndpoint("Background", this.Endpoints.FanSpeeds, FanSpeedData);
+	}
+
 	/** */
 	FetchTemperatures() {
-	//device.log(`CorsairProtocol: Reading Temp Data.`);
+		//device.log(`CorsairProtocol: Reading Temp Data.`);
 
-		const data = this.ReadEndpoint("Background", this.Endpoints.TemperatureData, 0x16);
+		const data = this.ReadFromEndpoint("Background", this.Endpoints.TemperatureData, 0x10);
 
 		if(data.length === 0){
-			device.log(`CorsairProtocol: Failed To Read Temp Data.`);
+			device.log(`CorsairProtocol: Failed To Read Temperature Data.`);
+
+			return [];
+		}
+
+		if(data[4] !== this.DataTypes.TemperatureProbes || data[5] !== 0) {
+			device.log("Failed to get Temperature Data", {toFile: true});
 
 			return [];
 		}
 
 		const ProbeTemps = [];
+		const ProbeCount = data[6] ?? 0;
+		this.log(`Device Reported [${ProbeCount}] Temperature Probes`);
 
-		if(data[4] === this.ResponseIds.temperatureData && data[5] === 0) {
-			const ProbeCount = data[6];
-			//device.log(`CorsairProtocol: Device Reported [${ProbeCount}] Temperature Probes`);
+		const TempValues = data.slice(7, 7 + 3 * ProbeCount);
 
-			const TempValues = data.slice(7, 7 + 3 * ProbeCount);
+		for(let i = 0; i < ProbeCount; i++) {
+			const probe = TempValues.slice(i * 3 + 1, i * 3 + 3);
+			const temp = BinaryUtils.ReadInt16LittleEndian(probe) / 10;
 
-			for(let i = 0; i < data[6]; i++) {
-				const probe = TempValues.slice(i * 3 + 1, i * 3 + 3);
-				const temp = Convert_To_16Bit(probe) / 10;
-
-				ProbeTemps[i] = temp;
-			}
+			ProbeTemps[i] = temp;
 		}
 
 		return ProbeTemps;
