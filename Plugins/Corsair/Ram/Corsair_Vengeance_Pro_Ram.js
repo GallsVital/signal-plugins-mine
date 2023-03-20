@@ -1,5 +1,5 @@
 // Modifying SMBUS Plugins is -DANGEROUS- and can -DESTROY- devices.
-export function Name() { return "Corsair Vengenace Pro Ram"; }
+export function Name() { return "Corsair Vengeance Pro Ram"; }
 export function Publisher() { return "WhirlwindFX"; }
 export function Documentation(){ return "troubleshooting/corsair"; }
 export function Size() { return [2, 10]; }
