@@ -38,7 +38,10 @@
 		"./types/Exports.d.ts",
 		"./types/ComponentChannel.d.ts",
 		"./types/ControllableParameters.d.ts",
-		"./types/performance.d.ts" // Can be removed in QT6
+		"./types/performance.d.ts", // Can be removed in QT6
+		"./types/NanoLeaf.d.ts",
+		"./types/PhilipsHue.d.ts",
+
     ],
 	"include": ["CodeSnippets/**/*","Non-Release-Plugins/**/*", "Plugins/**/*"],
 	"exclude": [
