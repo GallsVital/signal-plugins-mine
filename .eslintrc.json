@@ -30,7 +30,8 @@
         "device": "readonly", 
         "bus": "readonly",
         "battery": "readonly",
-        "mouse": "readonly"
+        "mouse": "readonly",
+        "udp": "readonly"
     },
     "rules": {
         "semi":"warn",

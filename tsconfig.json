@@ -41,7 +41,7 @@
 		"./types/performance.d.ts", // Can be removed in QT6
 		"./types/NanoLeaf.d.ts",
 		"./types/PhilipsHue.d.ts",
-
+		"./types/Udp.d.ts",
     ],
 	"include": ["CodeSnippets/**/*","Non-Release-Plugins/**/*", "Plugins/**/*"],
 	"exclude": [
