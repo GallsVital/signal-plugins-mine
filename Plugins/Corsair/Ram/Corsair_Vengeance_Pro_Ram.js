@@ -95,7 +95,59 @@ const vPecTable = [
 
 
 function WritePacket(shutdown = false) {
-	if (iRamVersion === 4) { WritePacketV4(shutdown); }
+	if (iRamVersion === 4) { WritePacketV4(shutdown); } else if (iRamVersion === 3) {
+		device.notify("Update RAM Firmware Through ICUE", "The Current Firmware version of your RAM is out of date. Please update using ICUE to use it with SignalRGB.", 1);
+	}
+}
+
+function WritePacketV3(shutdown) {
+	bus.WriteByte(0x10, 0x64);
+	bus.WriteByte(0x28, 0x49);
+
+	const packet = [ 0xB0, 0x00, 0xB0, 0x00, 0xB0, 0x00, 0xB0, 0x00, 0xB0, 0x00, 0xB0, 0x00, 0xB0, 0x00,
+		0xB0, 0x00, 0xB0, 0x00, 0xB0, 0x00, 0xB0, 0xFC, 0xB0, 0xFE, 0xB0, 0xFC, 0xB0, 0xFE,
+		0xB0, 0xFC, 0xB0, 0xFE, 0xB0, 0xFC, 0xB0, 0xFE, 0xB0, 0x00, 0xB0, 0xFF ];
+
+	// Set Colors.
+	for (let iIdx = 0; iIdx < 10; iIdx++){
+
+		const iRedIdx = iIdx * 4 + 1;
+		const iBlueIdx = iIdx * 4 + 3;
+		const iGreenIdxA = iIdx * 4;
+		const iGreenIdxB = iIdx * 4 + 2;
+
+		let Color;
+
+		if(shutdown){
+			Color = hexToRgb(shutdownColor);
+		}else if(LightingMode === "Forced") {
+			Color = hexToRgb(forcedColor);
+		} else {
+			Color = device.color(vLedPositions[iIdx][0], vLedPositions[iIdx][1]);
+		}
+
+		packet[iRedIdx] = Color[0];
+		packet[iBlueIdx] = Color[1];
+		packet[iGreenIdxA] = 0xB0 | Color[2] & 0x0F;
+		packet[iGreenIdxB] = 0xB0 | Color[2] >> 4;
+	}
+
+	// Calc CRC.
+	let iCrc = 0;
+
+	for (let iIdx = 0; iIdx < 40; iIdx += 2) {
+		if (iIdx < 40) {
+			let iTableIdx = iCrc ^ packet[iIdx];
+			iCrc = vPecTable[iTableIdx];
+
+			iTableIdx = iCrc ^ packet[iIdx + 1];
+			iCrc = vPecTable[iTableIdx];
+		}
+
+		bus.WriteByte(packet[iIdx], packet[iIdx + 1]);
+	}
+
+	bus.WriteByte(0x28, iCrc);
 }
 
 function WritePacketV4(shutdown) {
