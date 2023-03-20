@@ -1,7 +1,7 @@
-const { RazerProtocol } = require("./Razer_Mouse_Test.js");
-const { MockDevice, MockBus } = require("../../tests/mocks.js");
+const { RazerProtocol } = require("./Razer_Modern_Mouse.js");
+const { MockDevice } = require("../../tests/mocks.js");
 
-const pluginPath = "./Razer_Mouse_Test.js"; // we could make this fetched from the current file path?
+const pluginPath = "./Razer_Modern_Mouse.js"; // we could make this fetched from the current file path?
 
 let Plugin;
 beforeEach(() => {
