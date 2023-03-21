@@ -1,9 +1,9 @@
 export function Name() { return "ASUS ROG Azoth"; }
 export function VendorId() { return 0x0B05; }
-export function ProductId() { return 0x1a85;}
+export function ProductId() { return [0x1a83, 0x1a85];}
 export function Publisher() { return "WhirlwindFX"; }
 export function Documentation(){ return "troubleshooting/asus"; }
-export function Size() { return [18, 6]; }
+export function Size() { return [15, 6]; }
 export function DefaultPosition(){return [10, 100];}
 const DESIRED_HEIGHT = 85;
 export function DefaultScale(){return Math.floor(DESIRED_HEIGHT/Size()[1]);}
