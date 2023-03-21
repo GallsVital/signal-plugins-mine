@@ -101,7 +101,7 @@ function sendColors(shutdown = false){
 		packet[0] = 0x00;
 		packet[1] = 0xC0;
 		packet[2] = 0x81;
-		packet[3] = 0x69 - (0x0F * packetCount++);
+		packet[3] = 0x53 - (0x0F * packetCount++);
 		packet[4] = 0x00;
 		packet = packet.concat(RGBData.splice(0, ledsToSend*4));
 		device.write(packet, 65);
