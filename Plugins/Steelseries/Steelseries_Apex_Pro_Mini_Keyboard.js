@@ -1,6 +1,6 @@
 export function Name() { return "SteelSeries Apex Pro Mini"; }
 export function VendorId() { return 0x1038; }
-export function ProductId() { return 0x1626; }
+export function ProductId() { return [0x1626, 0x161e]; }
 export function Publisher() { return "WhirlwindFX"; }
 export function Documentation(){ return "troubleshooting/steelseries"; }
 export function Size() { return [14, 5]; }
