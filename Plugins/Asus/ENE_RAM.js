@@ -40,7 +40,7 @@ export function Scan(bus) {
 	ENE = new ENERam(ENEInterface);
 
 	const FoundAddresses = [];
-	const startingAddresses = [ 0x70, 0x71, 0x72, 0x73, 0x75, 0x76, 0x77]; // 0x74 This is gone because it explodes on Gigglebyte boards.
+	const startingAddresses = [ 0x70, 0x77]; // 0x74 This is gone because it explodes on Gigglebyte boards.
 
 	// Teamgroup Xtreem Ram like Aura/ENE ram needs to have its address remapped by the first program that touches it.
 	// If we have a device on 0x77 then we need to attempt to remap them.
@@ -106,7 +106,7 @@ export function Render() {
 }
 
 export function Shutdown() {
-
+	UpdateColors(true);
 }
 
 //TODO: find out if these take rgb data blocks like normal ENE Sticks.
