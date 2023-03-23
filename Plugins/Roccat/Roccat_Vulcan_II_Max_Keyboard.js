@@ -11,6 +11,7 @@ export function DefaultScale(){return Math.floor(DESIRED_HEIGHT/Size()[1]);}
 shutdownColor:readonly
 LightingMode:readonly
 forcedColor:readonly
+layout:readonly
 dualLedControl:readonly
 */
 export function ControllableParameters() {
@@ -18,11 +19,15 @@ export function ControllableParameters() {
 		{"property":"shutdownColor", "group":"lighting", "label":"Shutdown Color", "min":"0", "max":"360", "type":"color", "default":"#009bde"},
 		{"property":"LightingMode", "group":"lighting", "label":"Lighting Mode", "type":"combobox", "values":["Canvas", "Forced"], "default":"Canvas"},
 		{"property":"forcedColor", "group":"lighting", "label":"Forced Color", "min":"0", "max":"360", "type":"color", "default":"#009bde"},
+		{"property":"layout", "group":"", "label":"Keyboard Layout", "type":"combobox", "values":["ANSI", "ISO"], "default":"ANSI"},
 		{"property":"dualLedControl", "group":"lighting", "label":"Enable SignalRGB Control of Secondary LEDs", "type":"boolean", "default":"true"},
 	];
 }
 
-const vKeys =
+let vKeys = [];
+let vDualKeys = [];
+
+const vKeysANSI =
 [
 	2,     13, 20, 25, 31,     35, 47, 53, 59, 65, 71, 77, 79,     83, 87, 92,     114, 115, 116,
 	3, 8,  14, 21, 26, 30, 36, 41, 48, 54, 60, 66, 72,     80,     84, 88, 93,     96,  101, 105, 110,
@@ -55,7 +60,7 @@ const vKeyPositions =
 	[0, 6],  [1, 6], [2, 6], [3, 6],         [5, 6],         [7, 6],         [9, 6], [10, 6], [11, 6], [12, 6], [13, 6],              [15, 6], [16, 6],   [17, 6], [18, 6],          [20, 6],
 ];
 
-const vDualKeys =
+const vDualKeysANSI =
 [
 	2,     13, 20, 25, 31,     35, 47, 53, 59, 65, 71, 77, 79,     83, 87, 92,     114, 115, 116,
 	3, 8,  14, 21, 26, 30, 36, 41, 48, 54, 60, 66, 72,     80,     84, 88, 93,     96,  101, 105, 110,
@@ -104,6 +109,35 @@ const vDualKeyNames =
 	"CapsLock Dual",
 ];
 
+const vKeysISO =
+[
+	2,     13, 20, 25, 31,     35, 47, 53, 59, 65, 71, 77, 79,     83, 87, 92,     114, 115, 116,
+	3, 8,  14, 21, 26, 30, 36, 41, 48, 54, 60, 66, 72,     80,     84, 88, 93,     96,  101, 105, 110,
+	4, 9,  15, 22, 27, 32, 37, 61, 49, 55, 42, 67, 73,     81,     85, 89, 94,     97,  102, 106, 111,
+	5, 10, 16, 23, 28, 29, 38, 43, 50, 56, 62, 68, 74,     82,                     98,  103, 107,
+	0, 6,  11, 17, 24, 33, 34, 39, 44, 51, 57, 63,         75,         90,         108, 104, 99, 113,
+	1, 7,  12,         40,             58, 64, 70, 76,             86, 91, 95,     100, 109,
+	150, 173, 167, 161, 155, 149, 172, 166, 160, 154, 148, 171, 165, 159, 153, 147,
+];
+
+const vDualKeysISO =
+[
+	2,     13, 20, 25, 31,     35, 47, 53, 59, 65, 71, 77, 79,     83, 87, 92,     114, 115, 116,
+	3, 8,  14, 21, 26, 30, 36, 41, 48, 54, 60, 66, 72,     80,     84, 88, 93,     96,  101, 105, 110,
+	4, 9,  15, 22, 27, 32, 37, 61, 49, 55, 42, 67, 73,     81,     85, 89, 94,     97,  102, 106, 111,
+	5, 10, 16, 23, 28, 29, 38, 43, 50, 56, 62, 68, 74,     82,                     98,  103, 107,
+	0, 6,  11, 17, 24, 33, 34, 39, 44, 51, 57, 63,         75,         90,         108, 104, 99, 113,
+	1, 7,  12,         40,             58, 64, 70, 76,             86, 91, 95,     100, 109,
+	150, 173, 167, 161, 155, 149, 172, 166, 160, 154, 148, 171, 165, 159, 153, 147,
+
+	137, 123, 129, 135, 141, 118, 124, 130, 136, 142, 122, 128, 134, 140, 146,
+	// eslint-disable-next-line indent
+																117, 126, 132, 139,
+	// eslint-disable-next-line indent
+																120, 144, 138,
+	125
+];
+
 export function LedNames() {
 	return vKeyNames;
 }
@@ -112,7 +146,21 @@ export function LedPositions() {
 	return vKeyPositions;
 }
 
+export function onlayoutChanged() {
+	if (layout === "ANSI") {
+		vKeys = vKeysANSI;
+		vDualKeys = vDualKeysANSI;
+	} else {
+		vKeys = vKeysISO;
+		vDualKeys = vDualKeysISO;
+	}
+
+	device.log(`Layout changed to ${layout}`);
+	device.setControllableLeds(vKeyNames, vKeyPositions);
+}
+
 export function Initialize() {
+	onlayoutChanged();
 
 	if(dualLedControl) {
 		device.setControllableLeds(vDualKeyNames, vDualKeyPositions);
