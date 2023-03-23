@@ -28,6 +28,7 @@ ScrollMode:readonly
 ScrollAccel:readonly
 SmartReel:readonly
 idleTimeout:readonly
+lowPowerPercentage:readonly
 */
 export function ControllableParameters() {
 	const DeviceInfo = razerDeviceLibrary.LEDLibrary[razerDeviceLibrary.PIDLibrary[device.productId()]];
@@ -36,9 +37,9 @@ export function ControllableParameters() {
 		{ "property": "shutdownColor", "group": "lighting", "label": "Shutdown Color", "min": "0", "max": "360", "type": "color", "default": "009bde" },
 		{ "property": "LightingMode", "group": "lighting", "label": "Lighting Mode", "type": "combobox", "values": ["Canvas", "Forced"], "default": "Canvas" },
 		{ "property": "forcedColor", "group": "lighting", "label": "Forced Color", "min": "0", "max": "360", "type": "color", "default": "#009bde" },
-		{ "property": "SettingControl", "group": "mouse", "label": "Enable Setting Control", "type": "boolean", "default": "false" },
-		{ "property": "DPIRollover", "group": "mouse", "label": "DPI Stage Rollover", "type": "boolean", "default": "true" },
-		{ "property": "OnboardDPI", "group": "mouse", "label": "Save DPI to Onboard Storage", "type": "boolean", "default": "false" },
+		{ "property": "SettingControl", "group": "mouse", "label": "Enable Setting Control", "type": "boolean", "default": "false", "tooltip":"Enable SignalRGB control of device settings." },
+		{ "property": "DPIRollover", "group": "mouse", "label": "DPI Stage Rollover", "type": "boolean", "default": "true", "tooltip":"Make the DPI Stage rollover to the lowest when cycling the highest stage and vice versa." },
+		{ "property": "OnboardDPI", "group": "mouse", "label": "Save DPI to Onboard Storage", "type": "boolean", "default": "false", "tooltip":"Make DPI settings persist when SignalRGB is closed." },
 		{ "property": "dpiStages", "group": "mouse", "label": "Number of DPI Stages", "step": "1", "type": "number", "min": "1", "max": "5", "default": "5" },
 		{ "property": "dpi1", "group": "mouse", "label": "DPI 1", "step": "50", "type": "number", "min": "200", "max": DeviceInfo.maxDPI, "default": "400" },
 		{ "property": "dpi2", "group": "mouse", "label": "DPI 2", "step": "50", "type": "number", "min": "200", "max": DeviceInfo.maxDPI, "default": "800" },
@@ -54,6 +55,7 @@ export function ControllableParameters() {
 	if (DeviceInfo.wireless) {
 		UserProps.push(...[
 			{ "property": "idleTimeout", "group": "", "label": "Device Idle Timeout Length (S)", "step": "15", "type": "number", "min": "60", "max": "900", "default": "60" }, //This may need to be switched over to a combobox.
+			{ "property": "lowPowerPercentage", "group": "", "label": "Device Low Power Mode Percentage", "step": "1", "type": "number", "min": "1", "max": "100", "default": "15" },
 		]);
 	}
 
@@ -100,6 +102,7 @@ export function Render() {
 export function Shutdown() {
 	grabColors(true);
 	//Razer.setModernMatrixEffect([0x00, 0x00, 0x03]); //Hardware mode baby.
+	RazerMouse.setDeviceDPIToHardware();
 	Razer.setDeviceMode("Hardware Mode");
 }
 
@@ -143,20 +146,29 @@ export function ondpi6Changed() {
 }
 
 export function onOnboardDPIChanged() {
-	if (OnboardDPI) {
-		Razer.setDeviceMode("Hardware Mode");
-		DpiHandler.setEnableControl(false);
-		RazerMouse.setDeviceDPI(1, dpiStages);
-	} else {
-		Razer.setDeviceMode("Software Mode");
-		DpiHandler.setEnableControl(true);
-		DpiHandler.setDpi();
+	if(SettingControl) {
+		if (OnboardDPI) {
+			Razer.setDeviceMode("Hardware Mode");
+			DpiHandler.setEnableControl(false);
+			RazerMouse.setDeviceDPI(1, dpiStages, true);
+		} else {
+			Razer.setDeviceMode("Software Mode");
+			DpiHandler.setEnableControl(true);
+			DpiHandler.setDpi();
+		}
 	}
+
 }
 
 export function onidleTimeoutChanged() {
 	if (SettingControl) {
 		Razer.setDeviceIdleTimeout(idleTimeout);
+	}
+}
+
+export function onlowPowerPercentageChanged() {
+	if (SettingControl) {
+		Razer.setDeviceLowPowerPercentage(lowPowerPercentage);
 	}
 }
 
@@ -188,12 +200,21 @@ function deviceInitialization(wake = false) {
 		Razer.setNumberOfLEDs(vLedPositions.length);
 
 		if (OnboardDPI) {
-			Razer.setDeviceMode("Hardware Mode");
-		} else {
-			Razer.setDeviceMode("Software Mode");
-		}
 
-		Razer.setSoftwareLightingMode();
+
+			Razer.setSoftwareLightingMode();
+
+			if (SettingControl) {
+				if (OnboardDPI) {
+					Razer.setDeviceMode("Hardware Mode");
+					DpiHandler.setEnableControl(false);
+					RazerMouse.setDeviceDPI(1, dpiStages, true);
+					Razer.setDeviceMode("Hardware Mode");
+				} else {
+					Razer.setDeviceMode("Software Mode");
+				}
+			}
+		}
 	}
 
 	device.set_endpoint(Razer.Config.deviceEndpoint[`interface`], Razer.Config.deviceEndpoint[`usage`], Razer.Config.deviceEndpoint[`usage_page`]);
@@ -207,6 +228,7 @@ function deviceInitialization(wake = false) {
 
 		if (razerDeviceLibrary.LEDLibrary[razerDeviceLibrary.PIDLibrary[device.productId()]]["wireless"]) {
 			Razer.setDeviceIdleTimeout(idleTimeout);
+			Razer.setDeviceLowPowerPercentage(lowPowerPercentage);
 		}
 
 		RazerMouse.setDeviceLOD(asymmetricLOD, liftOffDistance);
@@ -215,11 +237,7 @@ function deviceInitialization(wake = false) {
 		DpiHandler.maxDPIStage = dpiStages;
 		DpiHandler.dpiRollover = DPIRollover;
 
-		if (OnboardDPI) {
-			Razer.setDeviceMode("Hardware Mode");
-			DpiHandler.setEnableControl(false);
-			RazerMouse.setDeviceDPI(1, dpiStages);
-		} else {
+		if (!OnboardDPI) {
 			Razer.setDeviceMode("Software Mode");
 			DpiHandler.setEnableControl(true);
 			DpiHandler.setDpi();
@@ -279,6 +297,7 @@ function detectInputs() {
 	if (!macroTracker) { macroTracker = new ByteTracker(currentMacroArray); device.log("Macro Tracker Spawned."); }
 
 	if (packet[0] === 0x04) {
+
 		if (macroTracker.Changed(currentMacroArray)) {
 			processInputs(macroTracker.Added(), macroTracker.Removed());
 		}
@@ -301,11 +320,9 @@ function processInputs(Added, Removed) {
 			break;
 		case 0x22:
 			device.log("Right Back Button");
-			DpiHandler.decrement();
 			break;
 		case 0x23:
 			device.log("Right Forward Button");
-			DpiHandler.increment();
 			break;
 		case 0x50:
 			device.log("Profile Button Hit.");
@@ -1018,7 +1035,7 @@ export class RazerProtocol {
 					this.ConfigPacketRead(TransactionID);
 				}
 
-				device.pause(500);
+				device.pause(400);
 			}
 		}
 		while (devicesFound === 0);
@@ -1049,7 +1066,7 @@ export class RazerProtocol {
 
 		if (errorCode !== 2) {
 
-			device.log("Error fetching Device Charging Status. Error Code: " + errorCode, { toFile: true });
+			device.log("Error fetching Device Charging Status. Error Code: " + this.DeviceResponses[errorCode], { toFile: true });
 
 			if (errorCode === 1) {
 				return -2;
@@ -1084,7 +1101,7 @@ export class RazerProtocol {
 			[returnPacket, errorCode] = this.ConfigPacketSend([0x02, 0x07, 0x80]);
 
 			if(errorCode !== 2) {
-			   device.pause(50);
+			   device.pause(10);
 			   attempts++;
 			}
 	   }
@@ -1093,7 +1110,7 @@ export class RazerProtocol {
 
 		if (errorCode !== 2) {
 
-			device.log("Error fetching Device Battery Level. Error Code: " + errorCode, { toFile: true });
+			device.log("Error fetching Device Battery Level. Error Code: " + this.DeviceResponses[errorCode], { toFile: true });
 
 			if (errorCode === 1) {
 				return -2;
@@ -1106,9 +1123,14 @@ export class RazerProtocol {
 			if (returnPacket[9] !== undefined) {
 
 				const batteryLevel = Math.floor(((returnPacket[9]) * 100) / 255);
-				device.log("Device Battery Level: " + batteryLevel);
 
-				return batteryLevel;
+				if(batteryLevel > 0) {
+					device.log("Device Battery Level: " + batteryLevel);
+
+					return batteryLevel;
+				}
+
+				return -1;
 			}
 
 			return -1;
@@ -1126,7 +1148,7 @@ export class RazerProtocol {
 			 [returnPacket, errorCode] = this.ConfigPacketSend([0x16, 0x00, 0x82]);
 
 			 if(errorCode !== 2) {
-				device.pause(50);
+				device.pause(10);
 				attempts++;
 			 }
 		}
@@ -1135,7 +1157,7 @@ export class RazerProtocol {
 
 		if (errorCode !== 2) {
 
-			device.log("Error fetching Device Serial. Error Code: " + errorCode, { toFile: true });
+			device.log("Error fetching Device Serial. Error Code: " + this.DeviceResponses[errorCode], { toFile: true });
 
 			if (errorCode === 1) {
 				return -2;
@@ -1166,7 +1188,7 @@ export class RazerProtocol {
 			 [returnPacket, errorCode] = this.ConfigPacketSend([0x02, 0x00, 0x81]);
 
 			 if(errorCode !== 2) {
-				device.pause(50);
+				device.pause(10);
 				attempts++;
 			 }
 		}
@@ -1175,7 +1197,7 @@ export class RazerProtocol {
 
 		if (errorCode !== 2) {
 
-			device.log("Error fetching Device Firmware Version. Error Code: " + errorCode, { toFile: true });
+			device.log("Error fetching Device Firmware Version. Error Code: " + this.DeviceResponses[errorCode], { toFile: true });
 
 			if (errorCode === 1) {
 				return -2;
@@ -1231,7 +1253,7 @@ export class RazerProtocol {
 			 [returnPacket, errorCode] = this.ConfigPacketSend([0x02, 0x00, 0x84]); //2,3,1
 
 			 if(errorCode !== 2) {
-				device.pause(50);
+				device.pause(10);
 				attempts++;
 			 }
 		}
@@ -1240,7 +1262,7 @@ export class RazerProtocol {
 
 		if (errorCode !== 2) {
 
-			device.log("Error fetching Current Device Mode. Error Code: " + errorCode, { toFile: true });
+			device.log("Error fetching Current Device Mode. Error Code: " + this.DeviceResponses[errorCode], { toFile: true });
 
 			if (errorCode === 1) {
 				return -2;
@@ -1268,7 +1290,7 @@ export class RazerProtocol {
 			errorCode = returnValues[1];
 
 			if(errorCode !== 2) {
-			   device.pause(50);
+			   device.pause(10);
 			   attempts++;
 			}
 	   }
@@ -1278,7 +1300,7 @@ export class RazerProtocol {
 
 		if (errorCode !== 2) {
 
-			device.log("Error Setting Device Mode. Error Code: " + errorCode, { toFile: true });
+			device.log("Error Setting Device Mode. Error Code: " + this.DeviceResponses[errorCode], { toFile: true });
 
 			if (errorCode === 1) {
 				return -2;
@@ -1299,7 +1321,7 @@ export class RazerProtocol {
 			 [returnPacket, errorCode] = this.ConfigPacketSend([0x01, 0x07, 0x81]);
 
 			 if(errorCode !== 2) {
-				device.pause(50);
+				device.pause(10);
 				attempts++;
 			 }
 		}
@@ -1308,7 +1330,7 @@ export class RazerProtocol {
 
 		if (errorCode !== 2) {
 
-			device.log("Error fetching Device Low Power Percentage. Error Code: " + errorCode, { toFile: true });
+			device.log("Error fetching Device Low Power Percentage. Error Code: " + this.DeviceResponses[errorCode], { toFile: true });
 
 			if (errorCode === 1) {
 				return -2;
@@ -1317,10 +1339,11 @@ export class RazerProtocol {
 			return -1;
 		}
 
-		if (returnPacket !== undefined) {
-			device.log("Low Battery Return Packet" + returnPacket); //Most likely it's in slot 2.
+		if (returnPacket[8] !== undefined) {
+			const lowPowerPercentage = Math.ceil((returnPacket[8]*100)/255);
+			device.log(`Low Battery Mode Percentage: ${lowPowerPercentage}%`);
 
-			return 0;
+			return lowPowerPercentage;
 		}
 
 		return -3;
@@ -1331,11 +1354,11 @@ export class RazerProtocol {
 		let attempts = 0;
 
 		do {
-			const returnValues = this.ConfigPacketSend([0x01, 0x07, 0x01, Math.floor(((lowPowerPercentage) * 100) / 255)]);
+			const returnValues = this.ConfigPacketSend([0x01, 0x07, 0x01, Math.floor(((lowPowerPercentage) * 255) / 100)]);
 			errorCode = returnValues[1];
 
 			if(errorCode !== 2) {
-			   device.pause(50);
+			   device.pause(10);
 			   attempts++;
 			}
 	   }
@@ -1344,7 +1367,7 @@ export class RazerProtocol {
 
 		if (errorCode !== 2) {
 
-			device.log("Error setting Device Low Power Percentage. Error Code: " + errorCode, { toFile: true });
+			device.log("Error setting Device Low Power Percentage. Error Code: " + this.DeviceResponses[errorCode], { toFile: true });
 
 			if (errorCode === 1) {
 				return -2;
@@ -1362,7 +1385,7 @@ export class RazerProtocol {
 
 		if (errorCode !== 2) {
 
-			device.log("Error fetching Current Device Polling Rate. Error Code: " + errorCode, { toFile: true });
+			device.log("Error fetching Current Device Polling Rate. Error Code: " + this.DeviceResponses[errorCode], { toFile: true });
 
 			if (errorCode === 1) {
 				return -2;
@@ -1415,7 +1438,7 @@ export class RazerProtocol {
 
 		if (errorCode !== 2) {
 
-			device.log("Error fetching Current Device Polling Rate. Error Code: " + errorCode, { toFile: true });
+			device.log("Error fetching Current Device Polling Rate. Error Code: " + this.DeviceResponses[errorCode], { toFile: true });
 
 			if (errorCode === 1) {
 				return -2;
@@ -1433,7 +1456,7 @@ export class RazerProtocol {
 
 		if (errorCode !== 2) {
 
-			device.log("Error fetching Current Device Polling Rate. Error Code: " + errorCode, { toFile: true });
+			device.log("Error fetching Current Device Polling Rate. Error Code: " + this.DeviceResponses[errorCode], { toFile: true });
 
 			if (errorCode === 1) {
 				return -2;
@@ -1463,7 +1486,7 @@ export class RazerProtocol {
 
 		if (errorCode !== 2) {
 
-			device.log("Error fetching Current Device Idle Timeout Setting. Error Code: " + errorCode, { toFile: true });
+			device.log("Error fetching Current Device Idle Timeout Setting. Error Code: " + this.DeviceResponses[errorCode], { toFile: true });
 
 			if (errorCode === 1) {
 				return -2;
@@ -1484,13 +1507,13 @@ export class RazerProtocol {
 	/** Function to set the device idle timeout on supported devices. */
 	setDeviceIdleTimeout(timeout) {
 		const returnValues = this.ConfigPacketSend([0x02, 0x07, 0x03, (timeout >> 8 & 0xff), (timeout & 0xff)]);
-		device.pause(500);
+		device.pause(10);
 
 		const errorCode = returnValues[1];
 
 		if (errorCode !== 2) {
 
-			device.log("Error setting Current Device Idle Timeout Setting. Error Code: " + errorCode, { toFile: true });
+			device.log("Error setting Current Device Idle Timeout Setting. Error Code: " + this.DeviceResponses[errorCode], { toFile: true });
 
 			if (errorCode === 1) {
 				return -2;
@@ -1519,7 +1542,7 @@ export class RazerProtocol {
 
 		if (errorCode !== 2) {
 
-			device.log("Error setting Legacy Matrix Effect. Error Code: " + errorCode, { toFile: true });
+			device.log("Error setting Legacy Matrix Effect. Error Code: " + this.DeviceResponses[errorCode], { toFile: true });
 
 			if (errorCode === 1) {
 				return -2;
@@ -1538,7 +1561,7 @@ export class RazerProtocol {
 
 		if (errorCode !== 2) {
 
-			device.log("Error fetching Modern Matrix Effect. Error Code: " + errorCode, { toFile: true });
+			device.log("Error fetching Modern Matrix Effect. Error Code: " + this.DeviceResponses[errorCode], { toFile: true });
 
 			if (errorCode === 1) {
 				return -2;
@@ -1561,7 +1584,7 @@ export class RazerProtocol {
 
 		if (errorCode !== 2) {
 
-			device.log("Error setting Modern Matrix Effect. Error Code: " + errorCode, { toFile: true });
+			device.log("Error setting Modern Matrix Effect. Error Code: " + this.DeviceResponses[errorCode], { toFile: true });
 
 			if (errorCode === 1) {
 				return -2;
@@ -1582,7 +1605,7 @@ export class RazerProtocol {
 
 		if (errorCode !== 2) {
 
-			device.log("Error fetching Charging Dock Brightness. Error Code: " + errorCode, { toFile: true });
+			device.log("Error fetching Charging Dock Brightness. Error Code: " + this.DeviceResponses[errorCode], { toFile: true });
 
 			if (errorCode === 1) {
 				return -2;
@@ -1607,7 +1630,7 @@ export class RazerProtocol {
 
 		if (errorCode !== 2) {
 
-			device.log("Error setting Charging Dock Brightness. Error Code: " + errorCode, { toFile: true });
+			device.log("Error setting Charging Dock Brightness. Error Code: " + this.DeviceResponses[errorCode], { toFile: true });
 
 			if (errorCode === 1) {
 				return -2;
@@ -1626,7 +1649,7 @@ export class RazerProtocol {
 
 		if (errorCode !== 2) {
 
-			device.log("Error setting Hyperspeed Dongle to Pairing Mode. Error Code: " + errorCode, { toFile: true });
+			device.log("Error setting Hyperspeed Dongle to Pairing Mode. Error Code: " + this.DeviceResponses[errorCode], { toFile: true });
 
 			if (errorCode === 1) {
 				return -2;
@@ -1644,7 +1667,7 @@ export class RazerProtocol {
 
 		if (errorCode !== 2) {
 
-			device.log("Error fetching Devices Currently Connected to Hyperspeed Dongle. Error Code: " + errorCode, { toFile: true });
+			device.log("Error fetching Devices Currently Connected to Hyperspeed Dongle. Error Code: " + this.DeviceResponses[errorCode], { toFile: true });
 
 			if (errorCode === 1) {
 				return -2;
@@ -1696,7 +1719,7 @@ export class RazerProtocol {
 
 		if (errorCode !== 2) {
 
-			device.log("Error fetching number of devices current paired to dongle. Error Code: " + errorCode, { toFile: true });
+			device.log("Error fetching number of devices current paired to dongle. Error Code: " + this.DeviceResponses[errorCode], { toFile: true });
 
 			if (errorCode === 1) {
 				return -2;
@@ -1738,7 +1761,7 @@ class RazerMouseFunctions {
 
 		if (errorCode !== 2) {
 
-			device.log("Error setting Device Lift Off Distance. Error Code: " + errorCode, { toFile: true });
+			device.log("Error setting Device Lift Off Distance. Error Code: " + Razer.DeviceResponses[errorCode], { toFile: true });
 
 			if (errorCode === 1) {
 				return -2;
@@ -1755,7 +1778,7 @@ class RazerMouseFunctions {
 
 		if (errorCode !== 2) {
 
-			device.log("Error fetching Current Device DPI. Error Code: " + errorCode, { toFile: true });
+			device.log("Error fetching Current Device DPI. Error Code: " + Razer.DeviceResponses[errorCode], { toFile: true });
 
 			if (errorCode === 1) {
 				return -2;
@@ -1784,13 +1807,13 @@ class RazerMouseFunctions {
 	/** Function to set a device's current stage dpi. We leverage this with software buttons to emulate multiple stages.*/
 	setDeviceSoftwareDPI(dpi) {
 		const returnValues = Razer.ConfigPacketSend([0x07, 0x04, 0x05, 0x00, dpi >> 8, dpi & 0xff, dpi >> 8, dpi & 0xff]);
-		device.pause(500);
+		device.pause(10);
 
 		const errorCode = returnValues[1];
 
 		if (errorCode !== 2) {
 
-			device.log("Error setting Device Software DPI. Error Code: " + errorCode, { toFile: true });
+			device.log("Error setting Device Software DPI. Error Code: " + Razer.DeviceResponses[errorCode], { toFile: true });
 
 			if (errorCode === 1) {
 				return -2;
@@ -1799,9 +1822,115 @@ class RazerMouseFunctions {
 			return -1;
 		}
 
-		device.pause(20);
+		device.pause(10);
+
+		const currentStage = DpiHandler.getCurrentStage();
+		const maxDPIStage = DpiHandler.getMaxStage();
+		this.setDeviceDPI(currentStage, maxDPIStage); //Yay for the stupid dpi light. Insert rant here.
 
 		return 0;
+	}
+	/** Function to fix the edge case we create by fixing the dpi button/light on shutdown.*/
+	setDeviceDPIToHardware(retryAttempts = 5) {
+		let errorCode = 0;
+		let returnPacket = [];
+		let attempts = 0;
+
+		do {
+			 [returnPacket, errorCode] = Razer.ConfigPacketSend([0x26, 0x04, 0x86, 0x01]);
+
+			 if(errorCode !== 2) {
+				device.pause(10);
+				attempts++;
+			 }
+		}
+
+		while(errorCode !== 2 && attempts < retryAttempts);
+
+		if (errorCode !== 2) {
+
+			device.log("Error fetching Device Onboard DPI Stages. Error Code: " + Razer.DeviceResponses[errorCode], { toFile: true });
+
+			if (errorCode === 1) {
+				return -2;
+			}
+
+			return -1;
+		}
+
+		if (returnPacket !== undefined) {
+			const currentStage = returnPacket[9];
+			const numberOfStages = returnPacket[10];
+
+			const dpi1X = BinaryUtils.ReadInt16BigEndian([returnPacket[12], returnPacket[13]]); //This is technically unnecessary as we get the returns, but this is more organized.
+			const dpi1Y = BinaryUtils.ReadInt16BigEndian([returnPacket[14], returnPacket[15]]);
+			const dpi2X = BinaryUtils.ReadInt16BigEndian([returnPacket[19], returnPacket[20]]);
+			const dpi2Y = BinaryUtils.ReadInt16BigEndian([returnPacket[21], returnPacket[22]]);
+			const dpi3X = BinaryUtils.ReadInt16BigEndian([returnPacket[26], returnPacket[27]]);
+			const dpi3Y = BinaryUtils.ReadInt16BigEndian([returnPacket[28], returnPacket[29]]);
+			const dpi4X = BinaryUtils.ReadInt16BigEndian([returnPacket[33], returnPacket[34]]);
+			const dpi4Y = BinaryUtils.ReadInt16BigEndian([returnPacket[35], returnPacket[36]]);
+			const dpi5X = BinaryUtils.ReadInt16BigEndian([returnPacket[40], returnPacket[41]]);
+			const dpi5Y = BinaryUtils.ReadInt16BigEndian([returnPacket[42], returnPacket[43]]);
+
+			const packet = [0x26, 0x04, 0x06, 0x00, currentStage, numberOfStages, 0x00];
+
+			packet[7] = dpi1X >> 8;
+			packet[8] = dpi1X & 0xff;
+			packet[9] = dpi1Y >> 8;
+			packet[10] = dpi1Y & 0xff;
+			packet[13] = 0x01;
+			packet[14] = dpi2X >> 8;
+			packet[15] = dpi2X & 0xff;
+			packet[16] = dpi2Y >> 8;
+			packet[17] = dpi2Y & 0xff;
+			packet[20] = 0x02;
+			packet[21] = dpi3X >> 8;
+			packet[22] = dpi3X & 0xff;
+			packet[23] = dpi3Y >> 8;
+			packet[24] = dpi3Y & 0xff;
+			packet[27] = 0x03;
+			packet[28] = dpi4X >> 8;
+			packet[29] = dpi4X & 0xff;
+			packet[30] = dpi4Y >> 8;
+			packet[31] = dpi4Y & 0xff;
+			packet[34] = 0x04;
+			packet[35] = dpi5X >> 8;
+			packet[36] = dpi5X & 0xff;
+			packet[37] = dpi5Y >> 8;
+			packet[38] = dpi5Y & 0xff;
+
+			let errorCode = 0;
+			let attempts = 0;
+
+			do {
+			 const returnValues = Razer.ConfigPacketSend(packet);
+			 errorCode = returnValues[1];
+
+			 if(errorCode !== 2) {
+					device.pause(10);
+					attempts++;
+			 }
+			}
+
+			while(errorCode !== 2 && attempts < retryAttempts);
+
+
+			if (errorCode !== 2) {
+
+				device.log("Error setting Onboard Device DPI Stages. Error Code: " + Razer.DeviceResponses[errorCode], { toFile: true });
+
+				if (errorCode === 1) {
+					return -2;
+				}
+
+				return -1;
+			}
+
+			device.pause(10);
+		}
+
+		return -3;
 	}
 	/** Function to fetch a device's onboard DPI levels.*/
 	getDeviceDPIStages(retryAttempts = 5) {//DPI6 does not get included in here.
@@ -1811,10 +1940,10 @@ class RazerMouseFunctions {
 		let attempts = 0;
 
 		do {
-			 [returnPacket, errorCode] = Razer.ConfigPacketSend([0x26, 0x04, 0x86, 0x00]);
+			 [returnPacket, errorCode] = Razer.ConfigPacketSend([0x26, 0x04, 0x86, 0x01]);
 
 			 if(errorCode !== 2) {
-				device.pause(50);
+				device.pause(10);
 				attempts++;
 			 }
 		}
@@ -1823,7 +1952,7 @@ class RazerMouseFunctions {
 
 		if (errorCode !== 2) {
 
-			device.log("Error fetching Device Onboard DPI Stages. Error Code: " + errorCode, { toFile: true });
+			device.log("Error fetching Device Onboard DPI Stages. Error Code: " + Razer.DeviceResponses[errorCode], { toFile: true });
 
 			if (errorCode === 1) {
 				return -2;
@@ -1838,7 +1967,8 @@ class RazerMouseFunctions {
 			//const stage3Flag = returnPacket[25];
 			//const stage4Flag = returnPacket[32];
 			//const stage5Flag = returnPacket[39];
-			//const numberOfStages = returnPacket[10];
+			const numberOfStages = returnPacket[10];
+			const currentStage = returnPacket[9];
 
 			const dpi1X = BinaryUtils.ReadInt16BigEndian([returnPacket[12], returnPacket[13]]);
 			const dpi1Y = BinaryUtils.ReadInt16BigEndian([returnPacket[14], returnPacket[15]]);
@@ -1851,6 +1981,8 @@ class RazerMouseFunctions {
 			const dpi5X = BinaryUtils.ReadInt16BigEndian([returnPacket[40], returnPacket[41]]);
 			const dpi5Y = BinaryUtils.ReadInt16BigEndian([returnPacket[42], returnPacket[43]]);
 
+			device.log("Current Hardware DPI Stage: " + currentStage, { toFile: true });
+			device.log("Number of Hardware DPI Stages: " + numberOfStages, { toFile: true });
 			device.log("DPI Stage 1 X Value: " + dpi1X, { toFile: true });
 			device.log("DPI Stage 1 Y Value: " + dpi1Y, { toFile: true });
 			device.log("DPI Stage 2 X Value: " + dpi2X, { toFile: true });
@@ -1862,14 +1994,14 @@ class RazerMouseFunctions {
 			device.log("DPI Stage 5 X Value: " + dpi5X, { toFile: true });
 			device.log("DPI Stage 5 Y Value: " + dpi5Y, { toFile: true });
 
-			return 0; //Return 0 until I take the time to parse this properly.
+			return [numberOfStages, currentStage, dpi1X, dpi1Y, dpi2X, dpi2Y, dpi3X, dpi3Y, dpi4X, dpi4Y, dpi5X, dpi5Y]; //Return 0 until I take the time to parse this properly.
 		}
 
 		return -3;
 	}
 	/** Function to set multiple dpi stages. We can set how many stages a device has, and this is saved onboard. This works with hardware buttons.*/
-	setDeviceDPI(stage, dpiStages, retryAttempts = 5) {
-		const packet = [0x26, 0x04, 0x06, 0x01, stage, dpiStages, 0x00];
+	setDeviceDPI(stage, dpiStages, saveToFlash = false, retryAttempts = 5) {
+		const packet = [0x26, 0x04, 0x06, saveToFlash, stage, dpiStages, 0x00];
 
 		packet[7] = dpi1 >> 8;
 		packet[8] = dpi1 & 0xff;
@@ -1904,7 +2036,7 @@ class RazerMouseFunctions {
 			 errorCode = returnValues[1];
 
 			 if(errorCode !== 2) {
-				device.pause(50);
+				device.pause(10);
 				attempts++;
 			 }
 		}
@@ -1914,7 +2046,7 @@ class RazerMouseFunctions {
 
 		if (errorCode !== 2) {
 
-			device.log("Error setting Onboard Device DPI Stages. Error Code: " + errorCode, { toFile: true });
+			device.log("Error setting Onboard Device DPI Stages. Error Code: " + Razer.DeviceResponses[errorCode], { toFile: true });
 
 			if (errorCode === 1) {
 				return -2;
@@ -1923,7 +2055,7 @@ class RazerMouseFunctions {
 			return -1;
 		}
 
-		device.pause(50);
+		device.pause(10);
 
 		return 0;
 	}
@@ -1937,7 +2069,7 @@ class RazerMouseFunctions {
 			 [returnPacket, errorCode] = Razer.ConfigPacketSend([0x02, 0x02, 0x94]);
 
 			 if(errorCode !== 2) {
-				device.pause(50);
+				device.pause(10);
 				attempts++;
 			 }
 		}
@@ -1946,7 +2078,7 @@ class RazerMouseFunctions {
 
 		if (errorCode !== 2) {
 
-			device.log("Error fetching Current Device Scroll Mode. Error Code: " + errorCode, { toFile: true });
+			device.log("Error fetching Current Device Scroll Mode. Error Code: " + Razer.DeviceResponses[errorCode], { toFile: true });
 
 			if (errorCode === 1) {
 				return -2;
@@ -1974,7 +2106,7 @@ class RazerMouseFunctions {
 			 errorCode = returnValues[1];
 
 			 if(errorCode !== 2) {
-				device.pause(50);
+				device.pause(10);
 				attempts++;
 			 }
 		}
@@ -1983,7 +2115,7 @@ class RazerMouseFunctions {
 
 		if (errorCode !== 2) {
 
-			device.log("Error setting Current Device Scroll Mode. Error Code: " + errorCode, { toFile: true });
+			device.log("Error setting Current Device Scroll Mode. Error Code: " + Razer.DeviceResponses[errorCode], { toFile: true });
 
 			if (errorCode === 1) {
 				return -2;
@@ -2004,7 +2136,7 @@ class RazerMouseFunctions {
 			 [returnPacket, errorCode] = Razer.ConfigPacketSend([0x02, 0x02, 0x96]);
 
 			 if(errorCode !== 2) {
-				device.pause(50);
+				device.pause(10);
 				attempts++;
 			 }
 		}
@@ -2013,7 +2145,7 @@ class RazerMouseFunctions {
 
 		if (errorCode !== 2) {
 
-			device.log("Error fetching Current Scroll Acceleration Setting. Error Code: " + errorCode, { toFile: true });
+			device.log("Error fetching Current Scroll Acceleration Setting. Error Code: " + Razer.DeviceResponses[errorCode], { toFile: true });
 
 			if (errorCode === 1) {
 				return -2;
@@ -2045,7 +2177,7 @@ class RazerMouseFunctions {
 			 errorCode = returnValues[1];
 
 			 if(errorCode !== 2) {
-				device.pause(50);
+				device.pause(10);
 				attempts++;
 			 }
 		}
@@ -2054,7 +2186,7 @@ class RazerMouseFunctions {
 
 		if (errorCode !== 2) {
 
-			device.log("Error setting Device Scroll Acceleration Mode. Error Code: " + errorCode, { toFile: true });
+			device.log("Error setting Device Scroll Acceleration Mode. Error Code: " + Razer.DeviceResponses[errorCode], { toFile: true });
 
 			if (errorCode === 1) {
 				return -2;
@@ -2075,7 +2207,7 @@ class RazerMouseFunctions {
 			 [returnPacket, errorCode] = Razer.ConfigPacketSend([0x02, 0x02, 0x97]);
 
 			 if(errorCode !== 2) {
-				device.pause(50);
+				device.pause(10);
 				attempts++;
 			 }
 		}
@@ -2084,7 +2216,7 @@ class RazerMouseFunctions {
 
 		if (errorCode !== 2) {
 
-			device.log("Error fetching Current Device Smart Reel Setting. Error Code: " + errorCode, { toFile: true });
+			device.log("Error fetching Current Device Smart Reel Setting. Error Code: " + Razer.DeviceResponses[errorCode], { toFile: true });
 
 			if (errorCode === 1) {
 				return -2;
@@ -2114,7 +2246,7 @@ class RazerMouseFunctions {
 		 errorCode = returnValues[1];
 
 		 if(errorCode !== 2) {
-				device.pause(50);
+				device.pause(10);
 				attempts++;
 		 }
 		}
@@ -2123,7 +2255,7 @@ class RazerMouseFunctions {
 
 		if (errorCode !== 2) {
 
-			device.log("Error setting Device Smart Reel Mode. Error Code: " + errorCode, { toFile: true });
+			device.log("Error setting Device Smart Reel Mode. Error Code: " + Razer.DeviceResponses[errorCode], { toFile: true });
 
 			if (errorCode === 1) {
 				return -2;
@@ -2151,7 +2283,7 @@ class RazerMouseFunctions {
 			 [returnPacket, errorCode] =  Razer.ConfigPacketSend([0x03, 0x0f, 0x84, 0x00, led]);
 
 			 if(errorCode !== 2) {
-				device.pause(50);
+				device.pause(10);
 				attempts++;
 			 }
 		}
@@ -2161,7 +2293,7 @@ class RazerMouseFunctions {
 		if (errorCode !== 2) {
 
 			if(!detection) {
-				device.log("Error fetching Modern Mouse LED Brightness. Error Code: " + errorCode, { toFile: true });
+				device.log("Error fetching Modern Mouse LED Brightness. Error Code: " + Razer.DeviceResponses[errorCode], { toFile: true });
 			}
 
 			if (errorCode === 1) {
@@ -2190,7 +2322,7 @@ class RazerMouseFunctions {
 			 errorCode = returnValues[1];
 
 			 if(errorCode !== 2) {
-				device.pause(50);
+				device.pause(10);
 				attempts++;
 			 }
 		}
@@ -2200,7 +2332,7 @@ class RazerMouseFunctions {
 		if (errorCode !== 2) {
 
 			if(!detection) {
-				device.log("Error setting Modern Mouse LED Brightness. Error Code: " + errorCode, { toFile: true });
+				device.log("Error setting Modern Mouse LED Brightness. Error Code: " + Razer.DeviceResponses[errorCode], { toFile: true });
 			}
 
 			if (errorCode === 1) {
@@ -2239,6 +2371,12 @@ class DPIManager {
 			device.log("No Set DPI Callback given. DPI Handler cannot function!");
 		}
 	}
+	getCurrentStage() {
+		return this.currentStage;
+	}
+	getMaxStage() {
+		return this.maxDPIStage;
+	}
 	/** Enables or Disables the DPIHandler*/
 	setEnableControl(EnableDpiControl) {
 		this.enableDpiControl = EnableDpiControl;
@@ -2261,7 +2399,6 @@ class DPIManager {
 		if (this.sniperMode) {
 			this.DPISetCallback(this.getDpiValue(6));
 		} else {
-
 			this.DPISetCallback(this.getDpiValue(this.currentStage));
 		}
 	}
