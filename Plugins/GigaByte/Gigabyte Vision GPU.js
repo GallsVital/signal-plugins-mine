@@ -282,6 +282,7 @@ class GigabyteVisionDeviceIds {
 		this.RTX2070S_GAMING_OC_3X          = 0x4008;
 		this.RTX2070S_GAMING_OC_3X_WHITE    = 0x400D;
 		this.RTX3050_EAGLE_OC               = 0x40AA;
+		this.RTX3060_EAGLE_OC_REV          	= 0x4071;
 		this.RTX3060_EAGLE_OC_REV2          = 0x4072;
 		this.RTX3060_VISION_OC_12GB         = 0x4073;
 		this.RTX3060_GAMING_OC_12GB         = 0x4074;
@@ -367,6 +368,7 @@ class GigabyteVisionGPuList {
 			new GigabyteVisionIdentifier(Nvidia.RTX2070S,       GigabyteVisionIds.RTX2070S_GAMING_OC_3X,         0x47, "GIGABYTE 2070 Super Gaming OC 3x"),
 			new GigabyteVisionIdentifier(Nvidia.RTX2070S,       GigabyteVisionIds.RTX2070S_GAMING_OC_3X_WHITE,   0x47, "GIGABYTE 2070 Super Gaming OC 3x White Edition"),
 			new GigabyteVisionIdentifier(Nvidia.RTX3050,        GigabyteVisionIds.RTX3050_EAGLE_OC,              0x62, "GIGABYTE 3050 Eagle OC"),
+			new GigabyteVisionIdentifier(Nvidia.RTX3060_LHR,    GigabyteVisionIds.RTX3060_EAGLE_OC_REV,          0x63, "GIGABYTE 3060 Eagle OC LHR"),
 			new GigabyteVisionIdentifier(Nvidia.RTX3060,        GigabyteVisionIds.RTX3060_EAGLE_OC_REV2,         0x63, "GIGABYTE 3060 Eagle OC Rev 2.0"),
 			new GigabyteVisionIdentifier(Nvidia.RTX3060_LHR,    GigabyteVisionIds.RTX3060_EAGLE_OC_REV2,         0x62, "GIGABYTE 3060 Eagle OC Rev 2.0 LHR"),
 			new GigabyteVisionIdentifier(Nvidia.RTX3060,        GigabyteVisionIds.RTX3060_GAMING_OC_12GB,        0x62, "GIGABYTE 3060 Gaming OC"),
