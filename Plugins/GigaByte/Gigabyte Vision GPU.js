@@ -256,7 +256,6 @@ class GigabyteVisionDeviceIds {
 		this.GTX1070_XTREME                 = 0x3778;
 		this.GTX1070TI_GAMING               = 0x3794;
 		this.GTX1080_G1_GAMING              = 0x3702;
-		this.GTX1080TI                      = 0x3752;
 		this.GTX1080TI_GAMING_OC            = 0x374C;
 		this.GTX1080TI_GAMING_OC_BLACK      = 0x377A;
 		this.GTX1080TI_XTREME               = 0x3751;
@@ -312,7 +311,7 @@ class GigabyteVisionDeviceIds {
 		//NEW GPUS
 		this.GTX1070_GAMING                 = 0x3772;
 		this.GTX1080_G1_GAMING				= 0x3702;
-		this.GTX1080TI_11G            		= 0x3752;
+		this.GTX1080TI_AORUS_11G       		= 0x3752;
 		this.RTX2060_GAMING_OC_PRO          = 0x3FC9;
 		this.RTX2060S_GAMING_OC_3X_8GB		= 0x4009;
 		this.RTX2070S_GAMING_OC_3X_2		= 0x4010;
@@ -403,7 +402,7 @@ class GigabyteVisionGPuList {
 			//New GPUs for 2.2.29 -------------------------------------------------------------------
 			new GigabyteVisionIdentifier(Nvidia.GTX1070,        GigabyteVisionIds.GTX1070_GAMING,                0x47, "GIGABYTE 1070 Gaming"),
 			new GigabyteVisionIdentifier(Nvidia.GTX1080,      GigabyteVisionIds.GTX1080_G1_GAMING,               0x48, "GIGABYTE 1080 G1 Gaming"), //Confirmed!
-			new GigabyteVisionIdentifier(Nvidia.GTX1080TI,      GigabyteVisionIds.GTX1080TI_11G,              	 0x47, "GIGABYTE 1080Ti Gaming OC"), //Confirmed
+			new GigabyteVisionIdentifier(Nvidia.GTX1080TI,      GigabyteVisionIds.GTX1080TI_AORUS_11G,         	 0x47, "GIGABYTE 1080Ti AORUS"), //Confirmed
 			new GigabyteVisionIdentifier(Nvidia.RTX2060_TU104,  GigabyteVisionIds.RTX2060_GAMING_OC_PRO,         0x47, "GIGABYTE 2060 Gaming OC Pro"), //Very iffy.
 			new GigabyteVisionIdentifier(Nvidia.RTX2060S_OC,    GigabyteVisionIds.RTX2060S_GAMING_OC,     		 0x47, "GIGABYTE 2060 Super Gaming OC"), //Confirmed.
 			new GigabyteVisionIdentifier(Nvidia.RTX2060S_OC,    GigabyteVisionIds.RTX2060S_GAMING_OC_3X_8GB,     0x47, "GIGABYTE 2060 Super Gaming OC Windforce"), //Confirmed.
