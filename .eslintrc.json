@@ -31,7 +31,9 @@
         "bus": "readonly",
         "battery": "readonly",
         "mouse": "readonly",
-        "udp": "readonly"
+        "udp": "readonly",
+        "service": "readonly",
+        "dtls": "readonly",
     },
     "rules": {
         "semi":"warn",
