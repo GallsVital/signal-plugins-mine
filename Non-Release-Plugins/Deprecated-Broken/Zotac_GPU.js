@@ -40,8 +40,8 @@ export function Scan(bus) {
 	for(const GPU of new ZotacGPUList().devices) {
 		if(CheckForIdMatch(bus, GPU)) {
 
-				bus.log(`Found Zotac GPU! [${GPU.Name}]`, {toFile : true});
-				FoundAddresses.push(GPU.Address);
+			bus.log(`Found Zotac GPU! [${GPU.Name}]`, {toFile : true});
+			FoundAddresses.push(GPU.Address);
 		}
 	}
 
@@ -70,7 +70,7 @@ export function Initialize() {
 	Zotac.SetActive(1);
 	SetGPUNameFromBusIds(new ZotacGPUList().devices);
 
-}                                                                     //active, zone,            //rgb,                 brightness, direction,?,  sync,                 ?,   
+}                                                                     //active, zone,            //rgb,                 brightness, direction,?,  sync,                 ?,
 
 export function Render() {
 	Zotac.UpdateLEDs();
@@ -82,28 +82,55 @@ export function Shutdown() {
 	Zotac.SetActive(0);
 }
 
+const lastZoneRGBData =
+{
+	0 : [],
+	1 : [],
+	2 : [],
+	3 : [],
+	4 : [],
+	5 : [],
+	6 : [],
+	7 : [],
+	8 : []
+};
+let refresh = false;
+
 function grabRGB(zoneId, ZoneInfo, shutdown = false) {
 	const zonePositions = ZoneInfo.Positions;
 	const RGBData = new Array(zonePositions.length*3);
-	for(let zoneLeds = 0; zoneLeds < zonePositions.length; zoneLeds++)
-	{
+
+	for(let zoneLeds = 0; zoneLeds < zonePositions.length; zoneLeds++) {
 		let Color;
 		const iPxX = zonePositions[zoneLeds][0];
 		const iPxY = zonePositions[zoneLeds][1];
 
-        if(shutdown) {
-            Color = hexToRgb(shutdownColor);
-        } else if(LightingMode === "Forced") {
-            Color = hexToRgb(forcedColor);
-        } else {
-            Color = device.color(iPxX, iPxY);
-        }
-		RGBData[zoneLeds * 3] = Color[0];
-		RGBData[zoneLeds * 3 + 1] = Color[1];
-		RGBData[zoneLeds * 3 + 2] = Color[2];
+		if(shutdown) {
+			Color = hexToRgb(shutdownColor);
+		} else if(LightingMode === "Forced") {
+			Color = hexToRgb(forcedColor);
+		} else {
+			Color = device.color(iPxX, iPxY);
+		}
+
+		RGBData[0] = Color[0];
+		RGBData[1] = Color[1];
+		RGBData[2] = Color[2];
+
+		if(lastZoneRGBData[zoneId][0] !== Color[0] || lastZoneRGBData[zoneId][1] !== Color[1] || lastZoneRGBData[zoneId][2] !== Color[2]) {
+			refresh = true;
+		}
+
+		lastZoneRGBData[zoneId][0] = Color[0];
+		lastZoneRGBData[zoneId][1] = Color[1];
+		lastZoneRGBData[zoneId][2] = Color[2];
 	}
 
-	Zotac.WriteRGB(RGBData, zoneId, true);
+	if(refresh) {
+		Zotac.WriteRGB(RGBData, zoneId, true);
+		refresh = false;
+	}
+
 }
 
 function hexToRgb(hex) {
@@ -122,7 +149,7 @@ class ZotacGPUProtocol {
 		this.registers =
 		{
 			Color: 0xA0,
-            ActivityIndicator : 0xA2
+			ActivityIndicator : 0xA2
 		};
 
 		this.library =
@@ -130,7 +157,7 @@ class ZotacGPUProtocol {
 			0x1653 :
 			{
 				Size: [5, 3],
-				Zones: 
+				Zones:
 				{
 					0: { Names : [ "Side Logo" ], Positions : [ [1, 1] ] },
 					1: { Names : [ "Backplate" ], Positions : [ [3, 0] ] },
@@ -139,13 +166,26 @@ class ZotacGPUProtocol {
 			0x1696 :
 			{
 				Size: [5, 3],
-				Zones: 
+				Zones:
 				{
 					0: { Names : [ "Side Logo" ], Positions : [ [1, 1] ] },
 					1: { Names : [ "Backplate" ], Positions : [ [3, 0] ] },
 				}
+			},
+			0x2688 :
+			{
+				Size: [6, 4],
+				Zones:
+				{
+					0: { Names : [ "Side Logo" ], Positions : [ [3, 1] ] },
+					1: { Names : [ "Bottom Strip 1" ], Positions : [ [3, 2] ] },
+					2: { Names : [ "Bottom Strip 2" ], Positions : [ [3, 3] ] },
+					3: { Names : [ "Side Strip" ], Positions : [ [5, 0] ] },
+					4: { Names : [ "Backplate" ], Positions : [ [1, 0] ] },
+					5: { Names : [ "PCB Strip" ], Positions : [ [3, 0] ] },
+				}
 			}
-		}
+		};
 	}
 
 	BuildLEDs() //Kinda overkill but I wanna do this right. Zotac only has 3 or 4 different layouts I believe.
@@ -153,25 +193,22 @@ class ZotacGPUProtocol {
 		vLedNames = [];
 		vLedPositions = [];
 
-		for(const [zoneId, ZoneInfo] of Object.entries(this.library[bus.SubDevice()].Zones))
-		{
+		for(const [zoneId, ZoneInfo] of Object.entries(this.library[bus.SubDevice()].Zones)) {
 			vLedNames.push(...ZoneInfo.Names);
 			vLedPositions.push(...ZoneInfo.Positions);
 		}
+
 		device.setSize(this.library[bus.SubDevice()].Size);
 		device.setControllableLeds(vLedNames, vLedPositions);
 	}
 
-	UpdateLEDs()
-	{
-		for(const [zoneId, ZoneInfo] of Object.entries(this.library[bus.SubDevice()].Zones))
-		{
+	UpdateLEDs() {
+		for(const [zoneId, ZoneInfo] of Object.entries(this.library[bus.SubDevice()].Zones)) {
 			grabRGB(zoneId, ZoneInfo);
 		}
 	}
 
-	SetActive(active)
-	{
+	SetActive(active) {
 		bus.WriteByte(this.registers.ActivityIndicator, active);
 	}
 
@@ -182,7 +219,7 @@ class ZotacGPUProtocol {
 			return;
 		}
 
-		bus.WriteBlock(this.registers.Color, 0x1E, [0x01, 0x00, 0x00, 0x00, active, zone, 0x00, RGBData[0], RGBData[1], RGBData[2], 0x00, 0x64, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00])
+		bus.WriteBlock(this.registers.Color, 0x20, [0x01, 0x00, 0x00, 0x00, active, zone, 0x00, RGBData[0], RGBData[1], RGBData[2], 0x00, 0x64, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00]);
 	}
 
 }
@@ -241,6 +278,7 @@ class ZotacGPUDeviceIDs {
 		this.RTX3070TI_AMP_HOLO_GDDR6X = 0x1653;
 		this.RTX3090TI_AMP_HOLO_EXTREME_24G = 0x4666;
 		this.RTX4070TI_TRINITY_OC_12G  = 0x1696;
+		this.RTX4080_AIRO              = 0x2688;
 	}
 }
 
@@ -271,8 +309,9 @@ class ZotacGPUList {
 		this.devices = [
 			new ZotacIdentifier(Nvidia.RTX3070TI,      ZotacDeviceIDs.RTX3070TI_AMP_HOLO_GDDR6X,              0x49, "Zotac RTX 3070TI AMP Holo"),
 			new ZotacIdentifier(Nvidia.RTX3090TI,      ZotacDeviceIDs.RTX3090TI_AMP_HOLO_EXTREME_24G,              0x49, "Zotac RTX 3090TI AMP Holo Extreme"),
-			new ZotacIdentifier(Nvidia.RTX4070TI,      ZotacDeviceIDs.RTX4070TI_TRINITY_OC_12G,              0x49, "Zotac RTX 4070TI Trinity OC 12G")
-		
+			new ZotacIdentifier(Nvidia.RTX4070TI,      ZotacDeviceIDs.RTX4070TI_TRINITY_OC_12G,              0x49, "Zotac RTX 4070TI Trinity OC 12G"),
+			new ZotacIdentifier(Nvidia.RTX4080,      ZotacDeviceIDs.RTX4080_AIRO,              0x49, "Zotac RTX 4080 AIRO"),
+
 		];
 	}
 }
