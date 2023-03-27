@@ -1,6 +1,6 @@
 export function Name() { return "SteelSeries Apex Pro Mini"; }
 export function VendorId() { return 0x1038; }
-export function ProductId() { return 0x1626; }
+export function ProductId() { return [0x1626, 0x161e]; }
 export function Publisher() { return "WhirlwindFX"; }
 export function Documentation(){ return "troubleshooting/steelseries"; }
 export function Size() { return [14, 5]; }
@@ -72,7 +72,13 @@ function sendColorPacket(shutdown = false){
 	const green = [];
 	const blue = [];
 	packet[0x00]   = 0x00;
-	packet[0x01]   = 0x21;
+
+	if(device.productId() === 0x1626){
+		packet[0x01]   = 0x21;
+	}else{
+		packet[0x01]   = 0x40;
+	}
+
 	packet[0x02]   = vKeymap.length;
 
 	for (let idx = 0; idx < vKeymap.length; idx++) {
@@ -115,7 +121,12 @@ function hexToRgb(hex) {
 }
 
 export function Validate(endpoint) {
-	return endpoint.interface === 3;
+	if(device.productId() === 0x1626){
+		return endpoint.interface === 3;
+	}
+
+	return endpoint.interface === 1;
+
 }
 
 export function Image() {

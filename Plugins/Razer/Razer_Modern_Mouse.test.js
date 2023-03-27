@@ -12,11 +12,6 @@ beforeEach(() => {
 		// Reset any mocked functions
 		jest.resetModules();
 
-		// Set User Props
-		//global.forceRam = false;
-		//global.forcedRamType = "Vengeance Pro SL";
-
-		// Set Global Values ( Device, Bus, Battery, etc)
 		global.device = new MockDevice();
 
 	});
@@ -80,7 +75,7 @@ describe("Razer Mice", () => {
 			[
 				0x3f,
 				0x00,
-				0,
+				-1,
 			],
 		])("Battery Level Fetch", (TransactionId, inputPercentage, expectedBatteryPercentage) => {
 		const Razer = new RazerProtocol();
