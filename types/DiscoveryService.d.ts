@@ -10,5 +10,6 @@ declare class service{
     public static getSetting(Id: string, key: string): any;
     public static saveSetting(Id: string, key: string, value: any);
     public static announceController(instance: any);
+    public static resolve(HostName: string, callback: Function): void
     //public broadcast(QJSValue xMessage);
 }

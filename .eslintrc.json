@@ -33,7 +33,7 @@
         "mouse": "readonly",
         "udp": "readonly",
         "service": "readonly",
-        "dtls": "readonly",
+        "dtls": "readonly"
     },
     "rules": {
         "semi":"warn",
