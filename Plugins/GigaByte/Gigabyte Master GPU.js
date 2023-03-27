@@ -293,7 +293,7 @@ class GigabyteMasterProtocol {
 					3: {Names : [ "Side Logo LED 1", "Side Logo LED 2", "Face Logo LED", ], Positions : [ [11, 0], [12, 1], [12, 2],], Mapping : [ 0, 1, 2 ]}
 				}
 			},
-			0x0001 ://0x3FF8 :
+			0x3FF8 :// : 0x0001
 			{
 				Size: [15, 9],
 				modeZones : [2, 3, 5, 6],
