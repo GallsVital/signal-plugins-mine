@@ -86,6 +86,7 @@ export function Render() {
 	}
 
 	device.pause(10);
+
 }
 
 export function Shutdown() {
@@ -208,7 +209,7 @@ class GigabyteMasterProtocol {
 					3: {Names : [ "Logo" ], Positions : [ [3, 1] ], Mapping : [ 0 ]}
 				}
 			},
-			0x0008 : //0x4076 :
+			0x4076 : //0x0008 :
 			{
 				Size: [5, 3],
 				modeZones : [0],
@@ -335,7 +336,7 @@ class GigabyteMasterProtocol {
 			return;
 		}
 
-		bus.log(`Set Lighting Mode To [${mode}]`);
+		bus.log(`Set Lighting Mode To [${mode}] and zone [${zone}]`);
 	}
 
 	UpdatePerLED() {
@@ -359,10 +360,11 @@ class GigabyteMasterProtocol {
 		vLedPositions = [];
 
 		if(this.library[bus.SubDevice()]) {
+			this.config.perLEDSupport = true;
+
 			for(const [zoneId, ZoneInfo] of Object.entries(this.library[bus.SubDevice()].Zones)) {
 				vLedNames.push(...ZoneInfo.Names);
 				vLedPositions.push(...ZoneInfo.Positions);
-				this.perLEDSupport = true;
 			}
 
 			device.setSize(this.library[bus.SubDevice()].Size);
