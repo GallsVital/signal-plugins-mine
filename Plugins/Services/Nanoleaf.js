@@ -26,50 +26,57 @@ class NanoleafStream {
 		this.hostname = value.hostname;
 		this.port = value.port;
 		this.key = value.key;
+		this.ip = value.ip;
 		device.log("Created stream w/key "+this.key);
-	}
-
-	getClusterInfo() {
-		const instance = this;
-
-		const xhr = new XMLHttpRequest();
-		xhr.open("GET", `http://${this.hostname}:${this.port}/api/v1/${this.key}/`, false);
-		xhr.setRequestHeader("Accept", "application/json");
-		xhr.setRequestHeader("Content-Type", "application/json");
-		xhr.send();
-
-		device.log("Res: " + xhr.responseText);
 	}
 
 	startStream() {
 		const instance = this;
+		XmlHttp.Put(`http://${this.ip}:${this.port}/api/v1/${this.key}/effects`, (xhr) => {
+			//device.log(`State: ${xhr.readyState}, Status: ${xhr.status}`);
 
-		const xhr = new XMLHttpRequest();
-		xhr.open("PUT", `http://${this.hostname}:${this.port}/api/v1/${this.key}/effects`, false);
-		xhr.setRequestHeader("Accept", "application/json");
-		xhr.setRequestHeader("Content-Type", "application/json");
-
-		const request = {
+			if (xhr.readyState === 4 && xhr.status === 200) {
+				const result = JSON.parse(xhr.response);
+				device.log(result);
+				streamingAddress = result.streamControlIpAddr;
+				streamingPort = result.streamControlPort;
+				canStream = true;
+			}
+		},
+		{
 			"write":{
 				"command":"display",
 				"animType":"extControl",
 				"extControlVersion":"v1"
 			}
-		};
-		device.log(`Requesting Stream Start for ${this.hostname}:${this.port}`);
-		xhr.send(JSON.stringify(request));
+		});
 
-		device.log("Status: "+xhr.status);
-		device.log("Res: " + xhr.response);
+		// const xhr = new XMLHttpRequest();
+		// xhr.open("PUT", `http://${this.ip}:${this.port}/api/v1/${this.key}/effects`, false);
+		// xhr.setRequestHeader("Accept", "application/json");
+		// xhr.setRequestHeader("Content-Type", "application/json");
 
-		if (xhr.status === 200) {
-			const result = JSON.parse(xhr.response);
-			streamingAddress = result.streamControlIpAddr;
-			streamingPort = result.streamControlPort;
-			canStream = true;
-		}else{
-			device.log(`Failed to Start Stream! Status: ${xhr.status}`);
-		}
+		// const request = {
+		// 	"write":{
+		// 		"command":"display",
+		// 		"animType":"extControl",
+		// 		"extControlVersion":"v1"
+		// 	}
+		// };
+		// device.log(`Requesting Stream Start for ${this.ip}:${this.port}`);
+		// xhr.send(JSON.stringify(request));
+
+		// device.log("Status: "+xhr.status);
+		// device.log("Res: " + xhr.response);
+
+		// if (xhr.status === 200) {
+		// 	const result = JSON.parse(xhr.response);
+		// 	streamingAddress = result.streamControlIpAddr;
+		// 	streamingPort = result.streamControlPort;
+		// 	canStream = true;
+		// }else{
+		// 	device.log(`Failed to Start Stream! Status: ${xhr.status}`);
+		// }
 	}
 }
 
@@ -197,13 +204,16 @@ export function DiscoveryService() {
 
 	this.Initialize = function(){
 		//service.log("Initializing plugin!");
+		//const value = {"hostname":"Nanoleaf-Light-Panels-54-08-7B.local.", "id":"32:F1:DA:C3:5C:C4", "md":"NL22", "name":"Nanoleaf Light Panels 54:08:7B", "port":16021, "srcvers":"5.1.0"};
 
+		//service.addController(new NanoleafBridge(value));
 	};
 
 	this.Update = function() {
 		for(const cont of service.controllers){
 			cont.obj.update();
 		}
+
 	};
 
 	this.Discovered = function(value) {
@@ -327,8 +337,11 @@ class NanoleafBridge {
 		this.key = service.getSetting(this.id, "key");
 		this.connected = this.key != "";
 		this.retriesleft = 40;
+		this.ip = "";
 
 		service.log("Constructed: "+this.name);
+
+		this.ResolveIpAddress();
 
 		if (this.connected){
 			this.getClusterInfo();
@@ -344,6 +357,27 @@ class NanoleafBridge {
 		this.id = value.id;
 		service.log("Updated: "+this.name);
 		service.updateController(this);
+	}
+
+	ResolveIpAddress(){
+		service.log("Attempting to resolve IPV4 address...");
+
+		const instance = this;
+		service.resolve(this.hostname, (host) => {
+			if(host.protocol === "IPV4"){
+				instance.ip = host.ip;
+				service.log(`Found IPV4 address: ${host.ip}`);
+				//service.saveSetting(instance.id, "ip", instance.ip);
+				//instance.RequestBridgeConfig();
+				service.updateController(instance); //notify ui.
+			}else if(host.protocol === "IPV6"){
+				service.log(`Skipping IPV6 address: ${host.ip}`);
+			}else{
+				service.log(`unknown IP config: [${JSON.stringify(host)}]`);
+			}
+
+			//service.log(host);
+		});
 	}
 
 	update() {
@@ -376,44 +410,24 @@ class NanoleafBridge {
 
 	getClusterInfo() {
 		const instance = this;
-
-		const xhr = new XMLHttpRequest();
-		xhr.open("GET", 'http://'+this.hostname+':'+this.port+'/api/v1/'+this.key+'/');
-		xhr.setRequestHeader("Accept", "application/json");
-		xhr.setRequestHeader("Content-Type", "application/json");
-
-		xhr.onreadystatechange = function () {
-			if (xhr.readyState === 4) {
-				if (xhr.status === 200){
-					instance.setDetails(JSON.parse(xhr.response));
-				}
+		XmlHttp.Get(`http://${this.ip}:${this.port}/api/v1/${this.key}/`, (xhr) => {
+			if (xhr.readyState === 4 && xhr.status === 200) {
+				instance.setDetails(JSON.parse(xhr.response));
 			}
-		};
-
-		xhr.send();
+		});
 	}
 
 	makeRequest(){
 		const instance = this;
-
-		const xhr = new XMLHttpRequest();
-		xhr.open("POST", 'http://'+this.hostname+':'+this.port+'/api/v1/new');
-		xhr.setRequestHeader("Accept", "application/json");
-		xhr.setRequestHeader("Content-Type", "application/json");
-
-		xhr.onreadystatechange = function () {
+		XmlHttp.Post(`http://${this.ip}:${this.port}/api/v1/new`, (xhr) => {
 			service.log(`Make Request: State: ${xhr.readyState}, Status: ${xhr.status}`);
 
-			if (xhr.readyState === 4) {
-				if (xhr.status === 200){
-					instance.setKey(JSON.parse(xhr.response));
-				}
+			if (xhr.readyState === 4 && xhr.status === 200) {
+				instance.setKey(JSON.parse(xhr.response));
 			}
-		};
-
-		xhr.send();
+		},
+		{/* No Data*/});
 	}
-
 
 	setDetails(response) {
 		// Capture panel and light information.
@@ -425,12 +439,62 @@ class NanoleafBridge {
 		service.announceController(this);
 	}
 
-
 	startLink() {
 		//service.log("Pushlink test for "+this.name);
 		this.retriesleft = 40;
 		this.waitingforlink = true; //pretend we're connected.
 
 		service.updateController(this); //notify ui.
+	}
+}
+
+
+// Swiper no XMLHttpRequest boilerplate!
+class XmlHttp{
+	static Get(url, callback){
+		const xhr = new XMLHttpRequest();
+		xhr.open("GET", url, false);
+
+		xhr.setRequestHeader("Accept", "application/json");
+		xhr.setRequestHeader("Content-Type", "application/json");
+
+		xhr.onreadystatechange = callback.bind(null, xhr);
+
+		xhr.send();
+	}
+
+	static Post(url, callback, data){
+		const xhr = new XMLHttpRequest();
+		xhr.open("POST", url, false);
+
+		xhr.setRequestHeader("Accept", "application/json");
+		xhr.setRequestHeader("Content-Type", "application/json");
+
+		xhr.onreadystatechange = callback.bind(null, xhr);
+
+		xhr.send(JSON.stringify(data));
+	}
+	static Delete(url, callback, data){
+		const xhr = new XMLHttpRequest();
+		xhr.open("DELETE", url, false);
+
+		xhr.setRequestHeader("Accept", "application/json");
+		xhr.setRequestHeader("Content-Type", "application/json");
+
+		xhr.onreadystatechange = callback.bind(null, xhr);
+
+		xhr.send(JSON.stringify(data));
+	}
+
+	static Put(url, callback, data){
+		const xhr = new XMLHttpRequest();
+		xhr.open("PUT", url, false);
+
+		xhr.setRequestHeader("Accept", "application/json");
+		xhr.setRequestHeader("Content-Type", "application/json");
+
+		xhr.onreadystatechange = callback.bind(null, xhr);
+
+		xhr.send(JSON.stringify(data));
 	}
 }
