@@ -221,7 +221,7 @@ class GigabyteMasterProtocol {
 					3: {Names : [ "Logo" ], Positions : [ [3, 1] ], Mapping : [ 0 ]}
 				}
 			},
-			0x0007 : //0x407b :
+			0x407b : // : 0x0007
 			{
 				Size: [5, 3],
 				modeZones : [0],
