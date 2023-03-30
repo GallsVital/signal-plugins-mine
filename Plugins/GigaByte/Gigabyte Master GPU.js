@@ -528,6 +528,7 @@ class GigabyteMasterGPuList {
 			new GigabyteMasterIdentifier(Nvidia.RTX2080TI, 		GigabyteMasterIds.RTX2080TI_WATERFORCE,           0x52, "GIGABYTE 2080TI XTREME Waterforce"),
 			new GigabyteMasterIdentifier(Nvidia.RTX3050,  	    GigabyteMasterIds.RTX3050_ELITE,         0x70, "GIGABYTE Aorus 3050 Elite"),
 			new GigabyteMasterIdentifier(Nvidia.RTX3060_LHR,	GigabyteMasterIds.RTX3060_ELITE_REV2, 			0x70, "GIGABYTE Aorus 3060 Elite REV2 LHR"),
+			new GigabyteMasterIdentifier(Nvidia.RTX3060_GA104,	GigabyteMasterIds.RTX3060_ELITE_REV2, 			0x70, "GIGABYTE Aorus 3060 Elite REV2 LHR"),
 			new GigabyteMasterIdentifier(Nvidia.RTX3060TI_LHR,  GigabyteMasterIds.RTX3060TI_ELITE_REV2,         0x70, "GIGABYTE Aorus 3060TI Elite REV2 LHR"),
 			new GigabyteMasterIdentifier(Nvidia.RTX3080,        GigabyteMasterIds.RTX3080_XTREME_WATERFORCE_10G,         0x65, "GIGABYTE AORUS 3080 XTREME Waterforce 10GB"),
 			new GigabyteMasterIdentifier(Nvidia.RTX3080TI,      GigabyteMasterIds.RTX3080TI_XTREME_WATERFORCE_12G,         0x64, "GIGABYTE AORUS 3080TI XTREME Waterforce 12GB"), //Confirmed
