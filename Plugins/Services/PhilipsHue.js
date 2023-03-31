@@ -3,7 +3,7 @@ export function Name() { return "Philips Hue"; }
 export function Version() { return "1.1.0"; }
 export function Type() { return "network"; }
 export function Publisher() { return "WhirlwindFX"; }
-export function Size() { return [32, 32]; }
+export function Size() { return [3, 3]; }
 export function DefaultPosition() {return [75, 70]; }
 export function DefaultScale(){return 8.0;}
 export function SupportsSubdevices(){ return true;}

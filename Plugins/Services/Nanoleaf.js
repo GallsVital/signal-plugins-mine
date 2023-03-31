@@ -9,38 +9,144 @@ export function DefaultScale(){return 1.0;}
 controller:readonly
 */
 
-const BIG_ENDIAN = 1;
-let canStream = false;
-let streamRetries = 0;
-const MaxAttemptsToOpenStream = 5;
-let streamingAddress = "";
-let streamingPort = "";
+const BIG_ENDIAN = true;
 let lightcount = 0;
 /** @type {NanoLeafPanelInfo[] } */
 let positions;
-let stream = undefined;
 const ScaleFactor = 12;
 
-class NanoleafStream {
-	constructor(value){
-		this.hostname = value.hostname;
-		this.port = value.port;
-		this.key = value.key;
-		this.ip = value.ip;
-		device.log("Created stream w/key "+this.key);
+class NanoleafDevice{
+	constructor(controller){
+		this.ip = controller.ip;
+		this.key = controller.key;
+		this.port = controller.port;
+		this.streamingPort = 0;
+		this.streamOpen = false;
+		this.protocol = new NanoleafProtocol(controller);
+		this.openAttempts = 0;
+		this.MaxAttemptsToOpenStream = 5;
+		this.config = {
+			originalBrightness: 100,
+			originalEffect: ""
+		};
 	}
 
-	startStream() {
-		const instance = this;
+	InitializeDevice(){
+		device.log(`Fetching Current Hardware Config...`);
+
+		const currentBrightness = this.protocol.GetBrightness();
+
+		if(currentBrightness.value !== undefined){
+			this.config.originalBrightness = currentBrightness.value;
+		}else{
+			device.log("Failed to read device brightness. Defaulting to 100...");
+			this.config.originalBrightness = 100;
+		}
+
+		device.log(`Current Brightness: ${this.config.originalBrightness}`);
+
+		const currentEffect = this.protocol.GetCurrentEffect();
+
+		if(typeof currentEffect !== "string"){
+			this.config.originalEffect = "Unknown";
+		}else{
+			this.config.originalEffect = currentEffect;
+		}
+
+		device.log(`Current Effect: ${this.config.originalEffect}`);
+
+		this.protocol.SetBrightness(100);
+
+		this.StartStream();
+	}
+
+	StartStream(){
+		device.log(`Starting Stream with key: [${this.key}]`);
+
+		const result = this.protocol.StartStreamV2();
+
+		if(result){
+			this.streamOpen = true;
+			this.streamingPort = result.streamingPort;
+		}
+
+	}
+
+	Shutdown(){
+		device.log(`Setting device back to previous settings...`);
+		device.log(`Orignal Brightness: ${this.config.originalBrightness}`);
+		this.protocol.SetBrightness(this.config.originalBrightness);
+		device.log(`Orignal Effect: ${this.config.originalEffect}`);
+		this.protocol.SetCurrentEffect(this.config.originalEffect);
+	}
+
+	SendColorsv1(){
+		const packet = [];
+		packet[0] = lightcount;
+
+		for(const [iIdx, lightinfo] of positions.entries()) {
+			const startidx = 1 + (iIdx * 7);
+			packet[startidx + 0] = lightinfo.panelId;
+			packet[startidx + 1] = 1; // reserved
+
+			const x = lightinfo.x / ScaleFactor;
+			const y = lightinfo.y / ScaleFactor;
+			const col = device.color(x, y);
+			packet[startidx + 2] = col[0]; //r
+			packet[startidx + 3] = col[1]; //g
+			packet[startidx + 4] = col[2]; //b
+			packet[startidx + 5] = 0; //w
+			packet[startidx + 6] = 0; //transition time * 100ms
+		}
+
+		if (this.streamOpen) {
+			udp.send(this.ip, this.streamingPort, packet, BIG_ENDIAN);
+		}
+	}
+
+	SendColorsv2(){
+		const packet = [];
+		packet[0] = 0;
+		packet[1] = lightcount;
+
+		for(const [iIdx, lightinfo] of positions.entries()) {
+			const startidx = 2 + (iIdx * 8);
+			packet[startidx] = (lightinfo.panelId << 8) & 0xFF;
+			packet[startidx + 1] = lightinfo.panelId & 0xFF; // reserved
+
+			const x = lightinfo.x / ScaleFactor;
+			const y = lightinfo.y / ScaleFactor;
+			const col = device.color(x, y);
+			packet[startidx + 2] = col[0]; //r
+			packet[startidx + 3] = col[1]; //g
+			packet[startidx + 4] = col[2]; //b
+			packet[startidx + 5] = 0; //w
+			packet[startidx + 6] = 0; //transition time * 100ms
+			packet[startidx + 7] = 1;
+		}
+
+		if (this.streamOpen) {
+			udp.send(this.ip, this.streamingPort, packet, BIG_ENDIAN);
+		}
+	}
+}
+class NanoleafProtocol{
+	constructor(controller){
+		this.ip = controller.ip;
+		this.port = controller.port;
+		this.key = controller.key;
+		//device.log("Created stream w/key "+this.key);
+	}
+
+	StartStreamV1(){
+		let output = {};
 		XmlHttp.Put(`http://${this.ip}:${this.port}/api/v1/${this.key}/effects`, (xhr) => {
 			//device.log(`State: ${xhr.readyState}, Status: ${xhr.status}`);
+			//device.log(`${xhr.response}`);
 
 			if (xhr.readyState === 4 && xhr.status === 200) {
 				const result = JSON.parse(xhr.response);
-				device.log(result);
-				streamingAddress = result.streamControlIpAddr;
-				streamingPort = result.streamControlPort;
-				canStream = true;
+				output = result;
 			}
 		},
 		{
@@ -51,35 +157,172 @@ class NanoleafStream {
 			}
 		});
 
-		// const xhr = new XMLHttpRequest();
-		// xhr.open("PUT", `http://${this.ip}:${this.port}/api/v1/${this.key}/effects`, false);
-		// xhr.setRequestHeader("Accept", "application/json");
-		// xhr.setRequestHeader("Content-Type", "application/json");
+		return output;
+	}
+	StartStreamV2(){
+		const instance = this;
+		let output = {};
+		XmlHttp.Put(`http://${this.ip}:${this.port}/api/v1/${this.key}/effects`, (xhr) => {
+			if (xhr.readyState === 4 && xhr.status === 204) {
+				output = {
+					streamingAddress: instance.ip,
+					streamingPort: 60222,
+				};
+			}
+		},
+		{
+			"write":{
+				"command":"display",
+				"animType":"extControl",
+				"extControlVersion":"v2"
+			}
+		});
 
-		// const request = {
-		// 	"write":{
-		// 		"command":"display",
-		// 		"animType":"extControl",
-		// 		"extControlVersion":"v1"
-		// 	}
-		// };
-		// device.log(`Requesting Stream Start for ${this.ip}:${this.port}`);
-		// xhr.send(JSON.stringify(request));
+		return output;
+	}
 
-		// device.log("Status: "+xhr.status);
-		// device.log("Res: " + xhr.response);
+	GetCurrentEffect(){
+		let output = {error: true};
+		XmlHttp.Get(`http://${this.ip}:${this.port}/api/v1/${this.key}/effects/select`, (xhr) => {
+			if (xhr.readyState === 4) {
+				//device.log(`State: ${xhr.readyState}, Status: ${xhr.status}`);
+				if(xhr.responseText) {
+					output = JSON.parse(xhr.responseText);
+				}else{
+					device.log(`GetCurrentEffect(): Command Failed with status: ${xhr.status}`);
+				}
+			}
+		});
 
-		// if (xhr.status === 200) {
-		// 	const result = JSON.parse(xhr.response);
-		// 	streamingAddress = result.streamControlIpAddr;
-		// 	streamingPort = result.streamControlPort;
-		// 	canStream = true;
-		// }else{
-		// 	device.log(`Failed to Start Stream! Status: ${xhr.status}`);
-		// }
+		return output;
+	}
+	SetCurrentEffect(effectName){
+		let output = false;
+		device.log(`Setting current effect: ${effectName}`);
+
+		XmlHttp.Put(`http://${this.ip}:${this.port}/api/v1/${this.key}/effects`, (xhr) => {
+			//device.log(`State: ${xhr.readyState}, Status: ${xhr.status}`);
+
+			if (xhr.readyState === 4) {
+				if(xhr.status === 204) {
+					output = true;
+				}else{
+					device.log(`SetCurrentEffect(): Command Failed with status: ${xhr.status}`);
+				}
+			}
+		},
+		{
+		  "select" : effectName
+		});
+
+		return output;
+	}
+
+	GetCurrentState(){
+		let output = {error: true};
+		XmlHttp.Get(`http://${this.ip}:${this.port}/api/v1/${this.key}/state`, (xhr) => {
+			if (xhr.readyState === 4) {
+				//device.log(`State: ${xhr.readyState}, Status: ${xhr.status}`);
+				if(xhr.responseText) {
+					output = JSON.parse(xhr.responseText);
+				}else{
+					device.log(`GetCurrentState(): Command Failed with status: ${xhr.status}`);
+				}
+			}
+		});
+
+		return output;
+	}
+	GetCurrentOnOffState(){
+		let output = {value: false};
+		XmlHttp.Get(`http://${this.ip}:${this.port}/api/v1/${this.key}/state/on`, (xhr) => {
+			if (xhr.readyState === 4) {
+				//device.log(`State: ${xhr.readyState}, Status: ${xhr.status}`);
+				if(xhr.responseText) {
+					output = JSON.parse(xhr.responseText);
+				}else{
+					device.log(`GetCurrentOnOffState(): Command Failed with status: ${xhr.status}`);
+				}
+			}
+		});
+
+		return output.value;
+	}
+	TurnOn(){
+		let output = false;
+		XmlHttp.Put(`http://${this.ip}:${this.port}/api/v1/${this.key}/state`, (xhr) => {
+			if (xhr.readyState === 4) {
+				//device.log(`State: ${xhr.readyState}, Status: ${xhr.status}`);
+
+				if(xhr.status === 204) {
+					output = true;
+				}else{
+					device.log(`TurnOn(): Command Failed with status: ${xhr.status}`);
+				}
+			}
+		},
+		{"on" : {"value": true}}
+		);
+
+		return output;
+	}
+	TurnOff(){
+		let output = false;
+		XmlHttp.Put(`http://${this.ip}:${this.port}/api/v1/${this.key}/state`, (xhr) => {
+			if (xhr.readyState === 4) {
+				//device.log(`State: ${xhr.readyState}, Status: ${xhr.status}`);
+
+				if(xhr.status == 204) {
+					output = true;
+				}else{
+					device.log(`TurnOff(): Command Failed with status: ${xhr.status}`);
+				}
+			}
+		},
+		{"on" : {"value": false}}
+		);
+
+
+		return output;
+	}
+	GetBrightness(){
+		let output = {error: true};
+		XmlHttp.Get(`http://${this.ip}:${this.port}/api/v1/${this.key}/state/brightness`, (xhr) => {
+			if (xhr.readyState === 4) {
+
+				if(xhr.responseText) {
+					output = JSON.parse(xhr.responseText);
+				}else{
+					device.log(`GetBrightness(): Command Failed with status: ${xhr.status}`);
+				}
+			}
+		});
+
+		return output;
+	}
+	SetBrightness(brightness){
+		let output = false;
+		XmlHttp.Put(`http://${this.ip}:${this.port}/api/v1/${this.key}/state/brightness`, (xhr) => {
+			//device.log(`State: ${xhr.readyState}, Status: ${xhr.status}`);
+
+			if (xhr.readyState === 4){
+				if(xhr.status === 204) {
+					output = true;
+				}else{
+					device.log(`SetBrightness(): Command Failed with status: ${xhr.status}`);
+				}
+			}
+		},
+		{
+		  "brightness" : {"value":brightness}
+		});
+
+		return output;
 	}
 }
 
+/** @type {NanoleafDevice} */
+let Nanoleaf;
 
 export function Initialize() {
 	device.setName(controller.name);
@@ -93,16 +336,20 @@ export function Initialize() {
 	device.log("Number of lights: " + lightcount);
 
 	NormalizeDeviceSize();
-	//DumpPanelInfo();
 
-	stream = new NanoleafStream(controller);
-	stream.startStream();
-}
+	Nanoleaf = new NanoleafDevice(controller);
 
-function DumpPanelInfo(){
-	for(const panel of positions){
-		device.log(panel);
-	}
+	//device.log(Nanoleaf.protocol.GetBrightness().value);
+	//device.log(Nanoleaf.protocol.SetBrightness(75));
+	//device.log(Nanoleaf.protocol.GetCurrentOnOffState());
+	//device.log(Nanoleaf.protocol.GetCurrentState());
+
+	//device.log(Nanoleaf.protocol.SetCurrentEffect("Snowfall"));
+	//device.log(["TurnOff", false, true, Nanoleaf.protocol.TurnOff()]); // fuckery...
+	//device.log(Nanoleaf.protocol.TurnOff());
+	//device.log(Nanoleaf.protocol.TurnOn());
+
+	Nanoleaf.InitializeDevice();
 }
 
 function NormalizeDeviceSize(){
@@ -121,75 +368,57 @@ function NormalizeDeviceSize(){
 	//device.log(`Nanoleaf Canvas TopLeft Point: {${minX},${minY}}.`);
 	//device.log(`Nanoleaf Canvas BottomRight Point: {${maxX},${maxY}}.`);
 
-	const size = [Math.ceil((maxX - minX) / ScaleFactor), Math.ceil((maxY - minY) / ScaleFactor)];
+	const size = [Math.ceil((maxX - minX) / ScaleFactor) + 1, Math.ceil((maxY - minY) / ScaleFactor) + 1];
 	//device.log(`Scale Factor: ${ScaleFactor}, Ending Size ${size}`);
 	device.setSize(size);
 }
 
 
 export function Render() {
+	// TODO: Nanoleaf docs say to limit to 10fps?
 
-	if(canStream){
-		SendColors();
-	}else if(streamRetries < MaxAttemptsToOpenStream){
-		streamRetries++;
-		stream.startStream();
+	if(Nanoleaf.streamOpen){
+		Nanoleaf.SendColorsv2();
+	}else if(Nanoleaf.openAttempts < Nanoleaf.MaxAttemptsToOpenStream){
+		Nanoleaf.openAttempts++;
+
+		Nanoleaf.StartStream();
 	}else{
 		// Alert User....
-		device.log(`Failed To Open Stream after ${streamRetries} Attempts! Aborting Rendering...`);
+		device.log(`Failed To Open Stream after ${Nanoleaf.openAttempts} Attempts! Aborting Rendering...`);
 	}
 }
 
-function SendColors(){
-	const packet = [];
+// function Blackoutv1() {
+// 	const packet = [];
 
-	packet[0] = lightcount;
+// 	packet[0] = lightcount;
 
-	for(const [iIdx, lightinfo] of positions.entries()) {
-		const startidx = 1 + (iIdx * 7);
-		packet[startidx + 0] = lightinfo.panelId;
-		packet[startidx + 1] = 1; // reserved
+// 	for(const [iIdx, lightinfo] of positions.entries()) {
 
-		const x = lightinfo.x / ScaleFactor;
-		const y = lightinfo.y / ScaleFactor;
-		const col = device.color(x, y);
-		packet[startidx + 2] = col[0]; //r
-		packet[startidx + 3] = col[1]; //g
-		packet[startidx + 4] = col[2]; //b
-		packet[startidx + 5] = 0; //w
-		packet[startidx + 6] = 0; //transition time * 100ms
+// 		const startidx = 1 + (iIdx * 7);
+// 		packet[startidx + 0] = lightinfo.panelId;
+// 		packet[startidx + 1] = 1; // reserved
+// 		packet[startidx + 2] = 0; //r
+// 		packet[startidx + 3] = 0; //g
+// 		packet[startidx + 4] = 0; //b
+// 		packet[startidx + 5] = 0; //w
+// 		packet[startidx + 6] = 0; //transition time * 100ms
+// 	}
+
+// 	if (canStream) {
+// 		udp.send(streamingAddress, streamingPort, packet, BIG_ENDIAN);
+// 	}
+// }
+
+export function Shutdown(suspend) {
+	if(suspend){
+		//Blackoutv1();
+		return;
 	}
 
-	if (canStream) {
-		udp.send(streamingAddress, streamingPort, packet, BIG_ENDIAN);
-	}
-}
+	Nanoleaf.Shutdown();
 
-function Blackout() {
-	const packet = [];
-
-	packet[0] = lightcount;
-
-	for(const [iIdx, lightinfo] of positions.entries()) {
-
-		const startidx = 1 + (iIdx * 7);
-		packet[startidx + 0] = lightinfo.panelId;
-		packet[startidx + 1] = 1; // reserved
-		packet[startidx + 2] = 0; //r
-		packet[startidx + 3] = 0; //g
-		packet[startidx + 4] = 0; //b
-		packet[startidx + 5] = 0; //w
-		packet[startidx + 6] = 0; //transition time * 100ms
-	}
-
-	if (canStream) {
-		udp.send(streamingAddress, streamingPort, packet, BIG_ENDIAN);
-	}
-}
-
-
-export function Shutdown() {
-	Blackout();
 }
 
 // -------------------------------------------<( Discovery Service )>--------------------------------------------------
@@ -328,24 +557,18 @@ export function DiscoveryService() {
 
 class NanoleafBridge {
 	constructor(value){
-		this.hostname = value.hostname;
-		this.name = value.name;
-		this.port = value.port;
-		this.firmwareVersion = value.srcvers;
-		this.model = value.md;
-		this.id = value.id;
+		this.updateWithValue(value);
+
 		this.key = service.getSetting(this.id, "key");
 		this.connected = this.key != "";
 		this.retriesleft = 40;
 		this.ip = "";
+		this.deviceCreated = false;
+		this.panelinfo = {};
 
 		service.log("Constructed: "+this.name);
 
 		this.ResolveIpAddress();
-
-		if (this.connected){
-			this.getClusterInfo();
-		}
 	}
 
 	updateWithValue(value) {
@@ -367,8 +590,13 @@ class NanoleafBridge {
 			if(host.protocol === "IPV4"){
 				instance.ip = host.ip;
 				service.log(`Found IPV4 address: ${host.ip}`);
+
 				//service.saveSetting(instance.id, "ip", instance.ip);
 				//instance.RequestBridgeConfig();
+				if (instance.connected && !this.panelinfo){
+					instance.getClusterInfo();
+				}
+
 				service.updateController(instance); //notify ui.
 			}else if(host.protocol === "IPV6"){
 				service.log(`Skipping IPV6 address: ${host.ip}`);
@@ -410,11 +638,17 @@ class NanoleafBridge {
 
 	getClusterInfo() {
 		const instance = this;
+		service.log(`Requesting Panel Info...`);
+		service.log(`http://${this.ip}:${this.port}/api/v1/${this.key}/`);
 		XmlHttp.Get(`http://${this.ip}:${this.port}/api/v1/${this.key}/`, (xhr) => {
+			service.log(`getClusterInfo(): State: ${xhr.readyState}, Status: ${xhr.status}`);
+
 			if (xhr.readyState === 4 && xhr.status === 200) {
 				instance.setDetails(JSON.parse(xhr.response));
 			}
 		});
+		service.log(`Panel Info Grabbed`);
+
 	}
 
 	makeRequest(){
@@ -430,13 +664,19 @@ class NanoleafBridge {
 	}
 
 	setDetails(response) {
+
 		// Capture panel and light information.
 		this.panelinfo = response;
+		service.log(this.panelinfo);
+
 		service.updateController(this);
 		//service.log("DEETS: "+JSON.stringify(response));
 
 		// Instantiate device in SignalRGB, and pass 'this' object to device.
-		service.announceController(this);
+		if(!this.deviceCreated){
+			this.deviceCreated = true;
+			service.announceController(this);
+		}
 	}
 
 	startLink() {
