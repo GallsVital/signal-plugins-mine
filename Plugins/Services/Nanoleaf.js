@@ -111,7 +111,7 @@ class NanoleafDevice{
 
 		for(const [iIdx, lightinfo] of positions.entries()) {
 			const startidx = 2 + (iIdx * 8);
-			packet[startidx] = (lightinfo.panelId << 8) & 0xFF;
+			packet[startidx] = (lightinfo.panelId >> 8) & 0xFF;
 			packet[startidx + 1] = lightinfo.panelId & 0xFF; // reserved
 
 			const x = lightinfo.x / ScaleFactor;
