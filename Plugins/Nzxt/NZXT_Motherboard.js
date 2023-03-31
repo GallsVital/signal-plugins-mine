@@ -47,7 +47,7 @@ export function Initialize() {
 }
 
 export function Render() {
-
+	NZXT.sendRGB();
 }
 
 export function Shutdown() {
