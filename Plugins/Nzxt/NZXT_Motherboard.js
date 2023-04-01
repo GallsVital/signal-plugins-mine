@@ -146,14 +146,17 @@ export class NZXTProtocol {
 	}
 
 	grabRGBData(Channel) {
-		const ChannelID = Channel + 1;
+		let ChannelID = Channel + 1;
 		let ChannelName = "";
 
 		if(Channel < NZXT.ChannelLibrary[device.productId()].nzxtchannels){
 			ChannelName = `NZXT Header ${ChannelID}`;
 		}else{
+			ChannelID = Channel - NZXT.ChannelLibrary[device.productId()].nzxtchannels + 1;
 			ChannelName = `ARGB Header ${ChannelID}`;
 		}
+
+		device.log(ChannelName);
 
 		let ChannelLedCount = device.channel(ChannelName).LedCount();
 		const componentChannel = device.channel(ChannelName);
