@@ -107,6 +107,7 @@ export class NZXTProtocol {
 
 	InitializeNZXT() {
 		device.setName("NZXT " + NZXT.PIDLibrary[device.productId()]);
+		device.log(`Device model found: ` + NZXT.PIDLibrary[device.productId()]);
 
 		for(let RGB = 0; RGB < NZXT.ChannelLibrary[device.productId()].rgbchannels; RGB++) {
 			const RGB_count = RGB + 1;
@@ -116,8 +117,13 @@ export class NZXTProtocol {
 			device.setSubdeviceSize(`12v RGB Header ${RGB_count}`, 3, 3);
 		}
 
+		device.log(`Device has: ` + NZXT.ChannelLibrary[device.productId()].rgbchannels + " 12v RGB Channels");
+
 		const totalchannels = NZXT.ChannelLibrary[device.productId()].nzxtchannels + NZXT.ChannelLibrary[device.productId()].argbchannels;
 		device.SetLedLimit(totalchannels * 40);
+		device.log(`Device has: ` + NZXT.ChannelLibrary[device.productId()].argbchannels + " ARGB Channels");
+		device.log(`Device has: ` + NZXT.ChannelLibrary[device.productId()].nzxtchannels + " NZXT Channels");
+		device.log(`LED Limit set to: ` + totalchannels * 40);
 
 		for(let i = 0; i < NZXT.ChannelLibrary[device.productId()].nzxtchannels; i++) {
 			const NZXT_count = i + 1;
@@ -141,13 +147,13 @@ export class NZXTProtocol {
 		}
 
 		for(let i = 0; i < NZXT.ChannelLibrary[device.productId()].rgbchannels; i++){
-			this.SendRGBHeader(0);
+			this.SendRGBHeader(i);
 		}
 	}
 
 	grabRGBData(Channel) {
 		let ChannelID = Channel + 1;
-		let ChannelName = "";
+		let ChannelName = "ARGB Header";
 
 		if(Channel < NZXT.ChannelLibrary[device.productId()].nzxtchannels){
 			ChannelName = `NZXT Header ${ChannelID}`;
@@ -156,7 +162,7 @@ export class NZXTProtocol {
 			ChannelName = `ARGB Header ${ChannelID}`;
 		}
 
-		device.log(ChannelName);
+		device.log(`Sending RGB to : ${ChannelName}`);
 
 		let ChannelLedCount = device.channel(ChannelName).LedCount();
 		const componentChannel = device.channel(ChannelName);
