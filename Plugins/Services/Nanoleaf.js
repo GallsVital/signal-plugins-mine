@@ -10,10 +10,6 @@ controller:readonly
 */
 
 const BIG_ENDIAN = true;
-let lightcount = 0;
-/** @type {NanoLeafPanelInfo[] } */
-let positions;
-const ScaleFactor = 12;
 
 class NanoleafDevice{
 	constructor(controller){
@@ -29,6 +25,50 @@ class NanoleafDevice{
 			originalBrightness: 100,
 			originalEffect: ""
 		};
+		this.ScaleFactor = 12;
+		this.lightCount = 0;
+		/** @type {NanoLeafPanelInfo[]} */
+		this.panels = [];
+
+		this.firmwareVerion = "0.0.0";
+	}
+
+	NormalizeDeviceSize(){
+		let minX = Infinity;
+		let minY = Infinity;
+		let maxX = -Infinity;
+		let maxY = -Infinity;
+
+		for(const panel of this.panels){
+			minX = Math.min(minX, panel.x);
+			minY = Math.min(minY, panel.y);
+			maxX = Math.max(maxX, panel.x);
+			maxY = Math.max(maxY, panel.y);
+		}
+
+		device.log(`Nanoleaf Canvas TopLeft Point: {${minX},${minY}}.`);
+		device.log(`Nanoleaf Canvas BottomRight Point: {${maxX},${maxY}}.`);
+
+		const size = [Math.ceil((maxX) / this.ScaleFactor) + 1, Math.ceil((maxY) / this.ScaleFactor) + 1];
+		device.log(`Scale Factor: ${this.ScaleFactor}, Ending Size ${size}`);
+		device.setSize(size);
+	}
+
+	ExtractPanelInformation(panelConfig){
+		this.lightCount = panelConfig.panelLayout.layout.numPanels;
+		device.log("Number of lights: " + this.lightCount);
+
+		this.panels = panelConfig.panelLayout.layout.positionData;
+
+		this.firmwareVerion = panelConfig.firmwareVersion;
+		device.log(`Controller Firmware Version: ${this.firmwareVerion}`);
+
+		//if(firmware < "6.5.1"){
+		// is Gen 1 Lighting Panels.
+		// TODO: FPS should be limited to 10fps according to docs.
+		// Not throttling fps gives periodic soft locks for 3-5 seconds.
+		//}
+		this.NormalizeDeviceSize();
 	}
 
 	InitializeDevice(){
@@ -69,28 +109,31 @@ class NanoleafDevice{
 			this.streamOpen = true;
 			this.streamingPort = result.streamingPort;
 		}
-
 	}
 
 	Shutdown(){
 		device.log(`Setting device back to previous settings...`);
 		device.log(`Orignal Brightness: ${this.config.originalBrightness}`);
 		this.protocol.SetBrightness(this.config.originalBrightness);
+
+		//TODO: if previous effect is *dynamic* or *ExtControl* we should pick something else.
+		// reverting back to that will just lock up the panels.
+		// Grab first effect from the effect list?
 		device.log(`Orignal Effect: ${this.config.originalEffect}`);
 		this.protocol.SetCurrentEffect(this.config.originalEffect);
 	}
 
 	SendColorsv1(){
 		const packet = [];
-		packet[0] = lightcount;
+		packet[0] = this.lightCount;
 
-		for(const [iIdx, lightinfo] of positions.entries()) {
+		for(const [iIdx, lightinfo] of this.panels.entries()) {
 			const startidx = 1 + (iIdx * 7);
 			packet[startidx + 0] = lightinfo.panelId;
 			packet[startidx + 1] = 1; // reserved
 
-			const x = lightinfo.x / ScaleFactor;
-			const y = lightinfo.y / ScaleFactor;
+			const x = lightinfo.x / this.ScaleFactor;
+			const y = lightinfo.y / this.ScaleFactor;
 			const col = device.color(x, y);
 			packet[startidx + 2] = col[0]; //r
 			packet[startidx + 3] = col[1]; //g
@@ -107,15 +150,15 @@ class NanoleafDevice{
 	SendColorsv2(){
 		const packet = [];
 		packet[0] = 0;
-		packet[1] = lightcount;
+		packet[1] = this.lightCount;
 
-		for(const [iIdx, lightinfo] of positions.entries()) {
+		for(const [iIdx, lightinfo] of this.panels.entries()) {
 			const startidx = 2 + (iIdx * 8);
 			packet[startidx] = (lightinfo.panelId >> 8) & 0xFF;
 			packet[startidx + 1] = lightinfo.panelId & 0xFF; // reserved
 
-			const x = lightinfo.x / ScaleFactor;
-			const y = lightinfo.y / ScaleFactor;
+			const x = lightinfo.x / this.ScaleFactor;
+			const y = lightinfo.y / this.ScaleFactor;
 			const col = device.color(x, y);
 			packet[startidx + 2] = col[0]; //r
 			packet[startidx + 3] = col[1]; //g
@@ -324,58 +367,25 @@ class NanoleafProtocol{
 /** @type {NanoleafDevice} */
 let Nanoleaf;
 
+
 export function Initialize() {
 	device.setName(controller.name);
 
 	device.addFeature("udp");
 
-	lightcount = controller.panelinfo.panelLayout.layout.numPanels;
-	positions = controller.panelinfo.panelLayout.layout.positionData;
-
 	device.log("Obj host "+controller.hostname+":"+controller.port+"@"+controller.key);
-	device.log("Number of lights: " + lightcount);
-
-	NormalizeDeviceSize();
 
 	Nanoleaf = new NanoleafDevice(controller);
 
-	//device.log(Nanoleaf.protocol.GetBrightness().value);
-	//device.log(Nanoleaf.protocol.SetBrightness(75));
-	//device.log(Nanoleaf.protocol.GetCurrentOnOffState());
-	//device.log(Nanoleaf.protocol.GetCurrentState());
-
-	//device.log(Nanoleaf.protocol.SetCurrentEffect("Snowfall"));
+	// TODO: Fix logging of booleans inside of array objects
 	//device.log(["TurnOff", false, true, Nanoleaf.protocol.TurnOff()]); // fuckery...
-	//device.log(Nanoleaf.protocol.TurnOff());
-	//device.log(Nanoleaf.protocol.TurnOn());
 
+	Nanoleaf.ExtractPanelInformation(controller.panelinfo);
 	Nanoleaf.InitializeDevice();
-}
-
-function NormalizeDeviceSize(){
-	let minX = Infinity;
-	let minY = Infinity;
-	let maxX = -Infinity;
-	let maxY = -Infinity;
-
-	for(const panel of positions){
-		minX = Math.min(minX, panel.x);
-		minY = Math.min(minY, panel.y);
-		maxX = Math.max(maxX, panel.x);
-		maxY = Math.max(maxY, panel.y);
-	}
-
-	//device.log(`Nanoleaf Canvas TopLeft Point: {${minX},${minY}}.`);
-	//device.log(`Nanoleaf Canvas BottomRight Point: {${maxX},${maxY}}.`);
-
-	const size = [Math.ceil((maxX - minX) / ScaleFactor) + 1, Math.ceil((maxY - minY) / ScaleFactor) + 1];
-	//device.log(`Scale Factor: ${ScaleFactor}, Ending Size ${size}`);
-	device.setSize(size);
 }
 
 
 export function Render() {
-	// TODO: Nanoleaf docs say to limit to 10fps?
 
 	if(Nanoleaf.streamOpen){
 		Nanoleaf.SendColorsv2();
@@ -389,27 +399,6 @@ export function Render() {
 	}
 }
 
-// function Blackoutv1() {
-// 	const packet = [];
-
-// 	packet[0] = lightcount;
-
-// 	for(const [iIdx, lightinfo] of positions.entries()) {
-
-// 		const startidx = 1 + (iIdx * 7);
-// 		packet[startidx + 0] = lightinfo.panelId;
-// 		packet[startidx + 1] = 1; // reserved
-// 		packet[startidx + 2] = 0; //r
-// 		packet[startidx + 3] = 0; //g
-// 		packet[startidx + 4] = 0; //b
-// 		packet[startidx + 5] = 0; //w
-// 		packet[startidx + 6] = 0; //transition time * 100ms
-// 	}
-
-// 	if (canStream) {
-// 		udp.send(streamingAddress, streamingPort, packet, BIG_ENDIAN);
-// 	}
-// }
 
 export function Shutdown(suspend) {
 	if(suspend){
