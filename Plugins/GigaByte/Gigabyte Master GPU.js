@@ -302,7 +302,7 @@ class GigabyteMasterProtocol {
 					0: {Names : [ "Fan 1 LED 1", "Fan 1 LED 2", "Fan 1 LED 3", "Fan 1 LED 4", "Fan 1 LED 5", "Fan 1 LED 6", "Fan 1 LED 7", "Fan 1 LED 8",], Positions : [ [0, 5], [1, 4], [2, 3], [3, 4], [4, 5], [3, 6], [2, 7], [1, 8], ], Mapping : [ 0, 1, 2, 3, 4, 5, 6, 7 ]},
 					1: {Names : [ "Fan 2 LED 1", "Fan 2 LED 2", "Fan 2 LED 3", "Fan 2 LED 4", "Fan 2 LED 5", "Fan 2 LED 6", "Fan 2 LED 7", "Fan 2 LED 8",], Positions : [ [5, 5], [6, 4], [7, 3], [8, 4], [9, 5], [8, 6], [7, 7], [6, 8], ], Mapping : [ 0, 1, 2, 3, 4, 5, 6, 7 ]},
 					2: {Names : [ "Fan 3 LED 1", "Fan 3 LED 2", "Fan 3 LED 3", "Fan 3 LED 4", "Fan 3 LED 5", "Fan 3 LED 6", "Fan 3 LED 7", "Fan 3 LED 8",], Positions : [ [10, 5], [11, 4], [12, 3], [13, 4], [14, 5], [13, 6], [12, 7], [11, 8], ], Mapping : [ 0, 1, 2, 3, 4, 5, 6, 7 ]},
-					3: {Names : [ "Side Logo LED 1", "Side Logo LED 2", "Face Logo LED", ], Positions : [ [11, 0], [12, 1], [12, 2],], Mapping : [ 0, 1, 3 ]}
+					3: {Names : [ "Side Logo LED 1", "Side Logo LED 2", "Face Logo LED 1",  "Face Logo LED 2", "Face Logo LED 3", "Face Logo LED 4", "Face Logo LED 5", "Face Logo LED 6", ], Positions : [ [11, 0], [12, 1], [12, 2], [12, 2], [12, 2], [12, 2], [12, 2], [12, 2],], Mapping : [ 0, 1, 2, 3, 4, 5, 6, 7 ]}
 				}
 			},
 			0x40c9 ://0x40C9 :
