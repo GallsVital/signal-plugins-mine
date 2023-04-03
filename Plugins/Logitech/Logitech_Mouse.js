@@ -192,7 +192,7 @@ function DetectInputs() {
 	do {
 		device.set_endpoint(Logitech.GetDeviceEndpoint([`interface`]), Logitech.MessageTypeEndpoints.LongMessageEndpoint, 0xff00);
 
-    	const packet = device.read([0x00], 9, 10);
+    	const packet = device.read([0x00], 9, 1);
 
 		macroInputArray.update(ProcessInputs(packet));
 	}
@@ -1012,8 +1012,10 @@ export class LogitechProtocol {
 	}
 
 	/** Send Short Data. */
-	setShortFeature(data, NoResponse, forceWired, callingFunction){
-		this.clearShortReadBuffer();
+	setShortFeature(data, NoResponse, forceWired, callingFunction, noDelay = false){
+		device.set_endpoint(this.Config.deviceEndpoint[`interface`], this.MessageTypeEndpoints.ShortMessageEndpoint, 0xff00);
+
+		if(!noDelay) { device.pause(30); this.clearShortReadBuffer(); }
 
 		device.write([this.MessageTypes.ShortMessage, forceWired? this.ConnectionType["Wired"] : this.Config.ConnectionMode, ...data], 7);
 
@@ -1032,8 +1034,10 @@ export class LogitechProtocol {
 		return response;
 	}
 	/** Send Long Data. */
-	setLongFeature(data, NoResponse, callingFunction){
-		this.clearLongReadBuffer();
+	setLongFeature(data, NoResponse, callingFunction, noDelay = false){
+		device.set_endpoint(this.Config.deviceEndpoint[`interface`], this.MessageTypeEndpoints.LongMessageEndpoint, 0xff00);
+
+		if(!noDelay) { device.pause(30); this.clearLongReadBuffer(); }
 
 	   const packet = [this.MessageTypes.LongMessage, this.Config.ConnectionMode, ...data];
 	   device.write(packet, 20);
@@ -1542,7 +1546,7 @@ export class LogitechProtocol {
 				packet[14] = 0x01;
 			}
 
-			this.setLongFeature(packet, true);
+			this.setLongFeature(packet, true, "RGB Send", true);
 		}
 
 		if(this.DeviceID === "4079" || this.DeviceID === "405d") {
@@ -1556,7 +1560,7 @@ export class LogitechProtocol {
 
 			const DataLength = Math.min(16, RGBData.length);
 			packet = packet.concat(RGBData.splice(0, DataLength));
-			this.setLongFeature(packet, true);
+			this.setLongFeature(packet, true, "PerKey Send", true);
 		}
 
 		this.PerKeyLightingApply();
@@ -1564,12 +1568,12 @@ export class LogitechProtocol {
 	/** Apply PerLED Lighting. */
 	PerKeyLightingApply() {
 		const packet = [this.FeatureIDs.PerKeyLightingV2ID, 0x70];
-		this.setLongFeature(packet, true);
+		this.setLongFeature(packet, true, "Perkey RGB Apply", true);
 	}
 	/** Packet Apply For Devices That Require It. */
 	Apply() {
 		const packet = [0x00, 0x20, 0x01];
-		this.setLongFeature(packet, true);
+		this.setLongFeature(packet, true, "RGB Apply", true);
 	}
 }
 
@@ -1597,10 +1601,10 @@ export class LogitechMouseDevice {
 	setDpi(dpi, stage = 0) {
 		if(stage === 0) {
 			const dpiStage = DPIHandler.getCurrentStage();
-			Logitech.setLongFeature([ Logitech.FeatureIDs.DPIID, 0x30, 0x00, Math.floor(dpi/256), dpi%256, dpiStage ], true);
+			Logitech.setLongFeature([ Logitech.FeatureIDs.DPIID, 0x30, 0x00, Math.floor(dpi/256), dpi%256, dpiStage ], true, "DPI", true);
 			this.SetDPILights(dpiStage);
 		} else {
-			Logitech.setLongFeature([ Logitech.FeatureIDs.DPIID, 0x30, 0x00, Math.floor(dpi/256), dpi%256, stage ], true);
+			Logitech.setLongFeature([ Logitech.FeatureIDs.DPIID, 0x30, 0x00, Math.floor(dpi/256), dpi%256, stage ], true, "DPI", true);
 			this.SetDPILights(stage);
 		}
 	}
@@ -1611,9 +1615,9 @@ export class LogitechMouseDevice {
 	   }
 
 	   if(Logitech.UsesHeroProtocol()) {
-			Logitech.setShortFeature([Logitech.FeatureIDs.RGB8071ID, 0x20, 0x00, stage]);
+			Logitech.setShortFeature([Logitech.FeatureIDs.RGB8071ID, 0x20, 0x00, stage], false, false, "Hero DPI Lights", true);
 	   } else {
-			Logitech.setSpecificFeature([Logitech.FeatureIDs.LEDControlID, 0x50, 0x01, 0x00, 0x02, 0x00, stage ], "Long", "Long", Logitech.FeatureIDs.LEDControlID, 5, "DPI Lights!"); //Setting State!
+			Logitech.setLongFeature([Logitech.FeatureIDs.LEDControlID, 0x50, 0x01, 0x00, 0x02, 0x00, stage ], false, "DPI Lights", true); //Setting State!
 		}
 
 		if(this.getheroDPILightAlwaysOn() === false && Logitech.UsesHeroProtocol()) {
