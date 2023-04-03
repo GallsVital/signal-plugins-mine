@@ -10,17 +10,57 @@ export function SupportsSubdevices(){ return true;}
 /* global
 controller:readonly
 */
+export function ControllableParameters() {
+	return [
+		{"property":"TakeActiveStream", "group":"settings", "label":"Override active stream", "type":"boolean", "default":"false"},
+	];
+}
 let CurrentArea = "";
 let isStreamOpen = false;
+let isStreamActive = false;
+
 let isDtlsConnectionAlive = false;
 const lastConnectionAttemptTime = Date.now();
 
 export function Initialize() {
-	createLightsForArea(controller.selectedArea);
-
 	device.addFeature("dtls");
 
-	StartStream();
+	createLightsForArea(controller.selectedArea);
+
+	const AreaInfo = GetAreaInfo(controller.selectedArea);
+
+	if(AreaInfo.stream.active){
+		device.log("Bridge has an active stream!");
+		isStreamActive = true;
+
+		if(AreaInfo.stream.owner === controller.username){
+			device.log(`We own the active stream??? Lets bash it!`);
+			StopStream();
+		}else{
+			device.log(`We don't own the active stream!`);
+
+			if(TakeActiveStream){
+				device.log(`Stealing Active Stream!`);
+
+				StopStream();
+			}
+		}
+	}
+}
+
+function GetAreaInfo(areaId){
+	let output = {};
+	XmlHttp.Get(`http://${controller.ip}/api/${controller.username}/groups/${areaId}`,
+		(xhr) => {
+			if (xhr.readyState === 4 && xhr.status === 200){
+				//device.log(xhr.responseText);
+
+				const response = JSON.parse(xhr.response);
+				output = response;
+			}
+		});
+
+	return output;
 }
 
 function onConnectionMade(){
@@ -29,7 +69,7 @@ function onConnectionMade(){
 }
 
 function onConnectionClosed(){
-	device.log("Connection Closed!");
+	device.log("Connection Lost!");
 	isDtlsConnectionAlive = false;
 }
 
@@ -43,8 +83,10 @@ function onStreamStarted(){
 		return;
 	}
 
+	device.log(`Stream Started!`);
+
 	isStreamOpen = true;
-	device.log("Starting Dtls Handshake..");
+	device.log("Starting Dtls Handshake...");
 
 	dtls.onConnectionEstablished(onConnectionMade);
 	dtls.onConnectionClosed(onConnectionClosed);
@@ -54,7 +96,9 @@ function onStreamStarted(){
 }
 
 function onStreamStopped(){
+	device.log(`Stream Stopped!`);
 	isStreamOpen = false;
+	isStreamActive = false;
 }
 
 function getColors(){
@@ -110,7 +154,7 @@ function createHuePacket(RGBData){
 }
 
 function StartStream(){
-	XmlHttp.Put(`http://${controller.ip}/api/${controller.username}/groups/${controller.selectedArea}`,
+	XmlHttp.Put(`http://${controller.ip}/api/${controller.username}/groups/${CurrentArea}`,
 		(xhr) => {
 			if (xhr.readyState === 4 && xhr.status === 200){
 				device.log(xhr.responseText);
@@ -129,7 +173,7 @@ function StartStream(){
 }
 
 function StopStream(){
-	XmlHttp.Put(`http://${controller.ip}/api/${controller.username}/groups/${controller.selectedArea}`,
+	XmlHttp.Put(`http://${controller.ip}/api/${controller.username}/groups/${CurrentArea}`,
 		(xhr) => {
 			if (xhr.readyState === 4 && xhr.status === 200){
 				device.log(xhr.responseText);
@@ -146,17 +190,50 @@ function StopStream(){
 		{stream: {active: false}}
 	);
 }
-
+let waitingForConnectionClose = false;
+let LastStreamCheck;
+const STREAM_CHECK_INTERVAL = 5000;
 
 export function Render() {
+	if(isStreamActive){
+		if(LastStreamCheck >= Date.now() - STREAM_CHECK_INTERVAL){
+			return;
+		}
+
+		const AreaInfo = GetAreaInfo(CurrentArea);
+
+		if(!AreaInfo.stream.active){
+			isStreamActive = false;
+		}
+
+		if(TakeActiveStream){
+			device.log(`Stealing Active Stream!`);
+			StopStream();
+		}
+
+		LastStreamCheck = Date.now();
+
+		return;
+	}
+
+	// if(waitingForConnectionClose){
+	// 	device.log(`Waiting for Connection Closure!`);
+
+	// 	if(!isStreamOpen && !isDtlsConnectionAlive){
+	// 		waitingForConnectionClose = false;
+	// 	}
+
+	// 	return;
+	// }
 
 	if(CurrentArea != controller.selectedArea){
 		device.log([CurrentArea, controller.selectedArea]);
+
+		device.log(`Selected Area Changed! Closing Connection!`);
+		CloseDtlsSocket();
+		waitingForConnectionClose = true;
 		device.log(`Selected Area Changed! Recreating Subdevices!`);
-		StopStream();
 		createLightsForArea(controller.selectedArea);
-		device.log("Waiting for connection to close...");
-		dtls.CloseConnection();
 
 		return;
 	}
@@ -172,26 +249,34 @@ export function Render() {
 			device.log(`send(): Returned ${iRet}!`);
 		}
 	}
-
 }
 
 function mapu8Tou16(byte){
 	return Math.floor((byte / 0xFF) * 0xFFFF);
 }
 
-export function Shutdown() {
-	dtls.CloseConnection();
-	isDtlsConnectionAlive = false;
+function CloseDtlsSocket(){
+	device.log(`Closing Dtls connection!`);
 
-	isStreamOpen = false;
-	StopStream();
+	if(isStreamOpen && isDtlsConnectionAlive){
+		StopStream();
+	}
+
+	if(isDtlsConnectionAlive){
+		dtls.CloseConnection();
+	}
+
+}
+
+export function Shutdown() {
+	CloseDtlsSocket();
 }
 
 function createLightsForArea(AreaId){
 
-	for(const light of device.getCurrentSubdevices()){
-		device.log(`Removing Light: ${light}`);
-		device.removeSubdevice(`Philip's Hue Light: ${light}`);
+	for(const subdeviceId of device.getCurrentSubdevices()){
+		device.log(`Removing Light: ${subdeviceId}`);
+		device.removeSubdevice(subdeviceId);
 	}
 
 	device.log(`Lights in current area: [${controller.areas[AreaId].lights}]`);
@@ -620,7 +705,7 @@ class HueBridge {
 
 					service.log(`Light: ${light.id}`);
 					service.log(`\tName: ${light.name}`);
-					service.log(`\Product Name: ${light.productname}`);
+					service.log(`\tProduct Name: ${light.productname}`);
 					service.log(`\tType: ${light.type}`);
 				}
 			}

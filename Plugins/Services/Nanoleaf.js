@@ -8,7 +8,11 @@ export function DefaultScale(){return 1.0;}
 /* global
 controller:readonly
 */
-
+export function ControllableParameters() {
+	return [
+		{"property":"turnOffOnShutdown", "group":"settings", "label":"Turn Panels off on Shutdown", "type":"boolean", "default":"false"},
+	];
+}
 const BIG_ENDIAN = true;
 
 class NanoleafDevice{
@@ -29,8 +33,9 @@ class NanoleafDevice{
 		this.lightCount = 0;
 		/** @type {NanoLeafPanelInfo[]} */
 		this.panels = [];
-
+		this.effectList = [];
 		this.firmwareVerion = "0.0.0";
+		this.isGen1 = false;
 	}
 
 	NormalizeDeviceSize(){
@@ -46,8 +51,8 @@ class NanoleafDevice{
 			maxY = Math.max(maxY, panel.y);
 		}
 
-		device.log(`Nanoleaf Canvas TopLeft Point: {${minX},${minY}}.`);
-		device.log(`Nanoleaf Canvas BottomRight Point: {${maxX},${maxY}}.`);
+		//device.log(`Nanoleaf Canvas TopLeft Point: {${minX},${minY}}.`);
+		//device.log(`Nanoleaf Canvas BottomRight Point: {${maxX},${maxY}}.`);
 
 		const size = [Math.ceil((maxX) / this.ScaleFactor) + 1, Math.ceil((maxY) / this.ScaleFactor) + 1];
 		device.log(`Scale Factor: ${this.ScaleFactor}, Ending Size ${size}`);
@@ -63,12 +68,26 @@ class NanoleafDevice{
 		this.firmwareVerion = panelConfig.firmwareVersion;
 		device.log(`Controller Firmware Version: ${this.firmwareVerion}`);
 
-		//if(firmware < "6.5.1"){
-		// is Gen 1 Lighting Panels.
-		// TODO: FPS should be limited to 10fps according to docs.
+		// FPS on Gen 1 panels (firmware < 6.5.1) should be limited to 10fps according to docs.
 		// Not throttling fps gives periodic soft locks for 3-5 seconds.
-		//}
+		if(Semver.isLessThan(this.firmwareVerion, "6.5.1")){
+			device.log(`Panels with firmware lower than 6.5.1 have limited frame rate.`);
+			this.isGen1 = true;
+		}
+
 		this.NormalizeDeviceSize();
+
+		const effectsList = [];
+
+		for(let i = 0; i < panelConfig.effects.effectsList.length; i ++){
+			const effect = panelConfig.effects.effectsList[i];
+
+			if(effect != "*Dynamic*" && effect !== "*ExtControl*"){
+				effectsList.push(effect);
+			}
+		}
+
+		this.effectList = effectsList;
 	}
 
 	InitializeDevice(){
@@ -89,7 +108,7 @@ class NanoleafDevice{
 
 		if(typeof currentEffect !== "string"){
 			this.config.originalEffect = "Unknown";
-		}else{
+		}else if(currentEffect !== "*Dynamic*" && currentEffect !== "*ExtControl*"){
 			this.config.originalEffect = currentEffect;
 		}
 
@@ -120,6 +139,14 @@ class NanoleafDevice{
 		// reverting back to that will just lock up the panels.
 		// Grab first effect from the effect list?
 		device.log(`Orignal Effect: ${this.config.originalEffect}`);
+
+		if(this.config.originalEffect === "" && this.effectList.length > 0){
+			device.log(`Shutdown(): invalid original effect. Setting to first effect found: [${this.effectList[0]}]`);
+			this.protocol.SetCurrentEffect(this.effectList[0]);
+
+			return;
+		}
+
 		this.protocol.SetCurrentEffect(this.config.originalEffect);
 	}
 
@@ -366,6 +393,7 @@ class NanoleafProtocol{
 
 /** @type {NanoleafDevice} */
 let Nanoleaf;
+let lastUpdateTime = Date.now();
 
 
 export function Initialize() {
@@ -377,18 +405,23 @@ export function Initialize() {
 
 	Nanoleaf = new NanoleafDevice(controller);
 
-	// TODO: Fix logging of booleans inside of array objects
-	//device.log(["TurnOff", false, true, Nanoleaf.protocol.TurnOff()]); // fuckery...
-
 	Nanoleaf.ExtractPanelInformation(controller.panelinfo);
 	Nanoleaf.InitializeDevice();
+
 }
 
 
 export function Render() {
 
 	if(Nanoleaf.streamOpen){
-		Nanoleaf.SendColorsv2();
+		// Gen 1 Panels require a frame rate limiter.
+		if(!Nanoleaf.isGen1){
+			Nanoleaf.SendColorsv2();
+		}else if(lastUpdateTime < Date.now() - 50){
+			Nanoleaf.SendColorsv2();
+			lastUpdateTime = Date.now();
+		}
+
 	}else if(Nanoleaf.openAttempts < Nanoleaf.MaxAttemptsToOpenStream){
 		Nanoleaf.openAttempts++;
 
@@ -401,13 +434,17 @@ export function Render() {
 
 
 export function Shutdown(suspend) {
-	if(suspend){
-		//Blackoutv1();
-		return;
-	}
+
+	// if(suspend){
+	// 	//Blackoutv1();
+	// 	return;
+	// }
 
 	Nanoleaf.Shutdown();
 
+	if(turnOffOnShutdown){
+		Nanoleaf.protocol.TurnOff();
+	}
 }
 
 // -------------------------------------------<( Discovery Service )>--------------------------------------------------
@@ -547,7 +584,6 @@ export function DiscoveryService() {
 class NanoleafBridge {
 	constructor(value){
 		this.updateWithValue(value);
-
 		this.key = service.getSetting(this.id, "key");
 		this.connected = this.key != "";
 		this.retriesleft = 40;
@@ -637,7 +673,6 @@ class NanoleafBridge {
 			}
 		});
 		service.log(`Panel Info Grabbed`);
-
 	}
 
 	makeRequest(){
@@ -680,9 +715,9 @@ class NanoleafBridge {
 
 // Swiper no XMLHttpRequest boilerplate!
 class XmlHttp{
-	static Get(url, callback){
+	static Get(url, callback, async = false){
 		const xhr = new XMLHttpRequest();
-		xhr.open("GET", url, false);
+		xhr.open("GET", url, async);
 
 		xhr.setRequestHeader("Accept", "application/json");
 		xhr.setRequestHeader("Content-Type", "application/json");
@@ -725,5 +760,51 @@ class XmlHttp{
 		xhr.onreadystatechange = callback.bind(null, xhr);
 
 		xhr.send(JSON.stringify(data));
+	}
+}
+
+class Semver{
+	static isEqualTo(a, b){
+		return this.compare(a, b) === 0;
+	}
+	static isGreaterThan(a, b){
+		return this.compare(a, b) > 0;
+	}
+	static isLessThan(a, b){
+		return this.compare(a, b) < 0;
+	}
+	static isGreaterThanOrEqual(a, b){
+		return this.compare(a, b) >= 0;
+	}
+	static isLessThanOrEqual(a, b){
+		return this.compare(a, b) <= 0;
+	}
+
+	static compare(a, b){
+		const parsedA = a.split(".").map((x) => parseInt(x));
+		const parsedB = b.split(".").map((x) => parseInt(x));
+
+		return this.recursiveCompare(parsedA, parsedB);
+	}
+
+	static recursiveCompare(a, b){
+		if (a.length === 0) { a = [0]; }
+
+		if (b.length === 0) { b = [0]; }
+
+		if (a[0] !== b[0] || (a.length === 1 && b.length === 1)) {
+			if(a[0] < b[0]){
+				return -1;
+			}
+
+			if(a[0] > b[0]){
+				return 1;
+			}
+
+			return 0;
+
+		}
+
+		return this.recursiveCompare(a.slice(1), b.slice(1));
 	}
 }

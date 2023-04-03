@@ -32,10 +32,10 @@ describe("Semver", () => {
 		expect(Semver.isGreaterThan("1.0.0", "1.0.1")).toBe(false);
 	});
 	it("1.0.1 !isEqualTo 1.0.0", () => {
-		expect(Semver.isEqual("1.0.1", "1.0.0")).toBe(false);
+		expect(Semver.isEqualTo("1.0.1", "1.0.0")).toBe(false);
 	});
 	it("1.0.0 !isEqualTo 1.0.0", () => {
-		expect(Semver.isEqual("1.0.0", "1.0.0")).toBe(true);
+		expect(Semver.isEqualTo("1.0.0", "1.0.0")).toBe(true);
 	});
 	it("1.0.1 isLessThan 1.0.0", () => {
 		expect(Semver.isLessThan("1.0.1", "1.0.0")).toBe(false);
