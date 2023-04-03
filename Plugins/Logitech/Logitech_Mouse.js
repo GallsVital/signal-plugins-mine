@@ -441,8 +441,8 @@ export class LogitechDeviceLibrary {
 				"button7" : "Top",
 				"button8" : "DPI_UP",
 				"button9" : "DPI_Down",
-				"button10" : "Scroll_Right",
-				"button11" : "Scroll_Left",
+				"button10" : "Scroll_Left",
+				"button11" : "Scroll_Right",
 			},
 			G502XPlusBody :
 			{
@@ -1414,6 +1414,7 @@ export class LogitechProtocol {
 
 	   return this.Config.DefaultFriendlyName;
 	}
+
 	/** Overcomplicated Wrapper to Handle Unified vs Battery Voltage and Properly Reference Them to SignalRGB Values. */
 	GetBatteryCharge() {
 		if(this.FeatureIDs.UnifiedBatteryID !== 0) {
@@ -1516,9 +1517,9 @@ export class LogitechProtocol {
 			return;
 		}
 
-		this.setShortFeature([this.FeatureIDs.RGB8070ID, 0x80, 0x01, 0x01]); //Standard Device LEDs
+		this.setShortFeature([this.FeatureIDs.RGB8070ID, 0x80, 0x01, 0x01], false, false, "Onboard Lighting Control."); //Standard Device LEDs
 
-		this.setShortFeature([this.FeatureIDs.LEDCtrlID, 0x30, OnboardState ? 0x01 : 0x00]); //DPI LEDs counts on 8070 Devices.
+		this.setShortFeature([this.FeatureIDs.LEDControlID, 0x30, OnboardState ? 0x00 : 0x01], false, false, "Onboard DPI Light Control."); //DPI LEDs counts on 8070 Devices.
 	}
 	/** Handler to Write Pretty Lights to Device. */
 	SendLighting(RGBData) {
@@ -1596,8 +1597,8 @@ export class LogitechMouseDevice {
 	setDpi(dpi, stage = 0) {
 		if(stage === 0) {
 			const dpiStage = DPIHandler.getCurrentStage();
-			this.SetDPILights(dpiStage);
 			Logitech.setLongFeature([ Logitech.FeatureIDs.DPIID, 0x30, 0x00, Math.floor(dpi/256), dpi%256, dpiStage ], true);
+			this.SetDPILights(dpiStage);
 		} else {
 			Logitech.setLongFeature([ Logitech.FeatureIDs.DPIID, 0x30, 0x00, Math.floor(dpi/256), dpi%256, stage ], true);
 			this.SetDPILights(stage);
@@ -1612,10 +1613,10 @@ export class LogitechMouseDevice {
 	   if(Logitech.UsesHeroProtocol()) {
 			Logitech.setShortFeature([Logitech.FeatureIDs.RGB8071ID, 0x20, 0x00, stage]);
 	   } else {
-			Logitech.setLongFeature([ Logitech.FeatureIDs.LEDControlID, 0x50, 0x01, 0x00, 0x02, 0x00, stage ]);
+			Logitech.setSpecificFeature([Logitech.FeatureIDs.LEDControlID, 0x50, 0x01, 0x00, 0x02, 0x00, stage ], "Long", "Long", Logitech.FeatureIDs.LEDControlID, 5, "DPI Lights!"); //Setting State!
 		}
 
-		if(this.getheroDPILightAlwaysOn() === false) {
+		if(this.getheroDPILightAlwaysOn() === false && Logitech.UsesHeroProtocol()) {
 			this.setEnabledDPILights(true);
 			savedDPITimer = Date.now();
 		}
@@ -1637,14 +1638,7 @@ export class LogitechMouseDevice {
 		}
 
 		const DPILightTogglepacket = [Logitech.FeatureIDs.LEDControlID, 0x70, 0x01, (DPILight ? 0x02 : 0x04)];
-		Logitech.setShortFeature(DPILightTogglepacket);
-
-		const UnknownPacket1 = [Logitech.FeatureIDs.LEDControlID, 0x50, 0x01, 0x00, 0x02, 0x00, 0x02];
-		Logitech.setLongFeature(UnknownPacket1);
-
-		const UnknownPacket2 = [Logitech.FeatureIDs.LEDControlID, 0x60, 0x01];
-		Logitech.setLongFeature(UnknownPacket2);
-
+		Logitech.setShortFeature(DPILightTogglepacket, false, false, "DPI Light Toggle"); //Fun fact: this is the only function that mattered anyway
 	}
 	/** Enable or Disable Software Button Listener. */
 	SetButtonSpy(OnboardState) {
