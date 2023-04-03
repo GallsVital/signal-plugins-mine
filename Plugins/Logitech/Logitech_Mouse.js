@@ -2064,6 +2064,8 @@ class BitArray {
 						LogitechMouse.SetDPILights(1);
 					}
 
+					break;
+
 				default: {
 					// Skip keys only windows should handle.
 					if(pressedKey === 0){
