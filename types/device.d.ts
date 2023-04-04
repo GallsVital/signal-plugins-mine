@@ -182,7 +182,7 @@ declare class Device{
 
 	public GetComponentData(ComponentId: string): void
 	public AvailableComponents(): void
-	public getCurrentSubdevices(): void
+	public getCurrentSubdevices(): String[]
 
 	/**
 	 * Sets the upper Led Count shown to the user in the Component UI. Has no effect if there are no configured Component Channels.
