@@ -318,6 +318,8 @@ class GigabyteMasterProtocol {
 				}
 			}
 		};
+
+		this.model = this.library[bus.SubDevice()];
 	}
 
 	determineWriteLength() {
@@ -340,9 +342,9 @@ class GigabyteMasterProtocol {
 	}
 
 	UpdatePerLED() {
-		this.setMode(this.modes.static, this.library[bus.SubDevice()].modeZones[0]);
+		this.setMode(this.modes.static, this.library[GigabyteMaster.model].modeZones[0]);
 
-		for(const [zoneId, ZoneInfo] of Object.entries(this.library[bus.SubDevice()].Zones)) {
+		for(const [zoneId, ZoneInfo] of Object.entries(this.library[GigabyteMaster.model].Zones)) {
 			grabPerLEDRGB(zoneId, ZoneInfo);
 		}
 	}
@@ -362,12 +364,12 @@ class GigabyteMasterProtocol {
 		if(this.library[bus.SubDevice()]) {
 			this.config.perLEDSupport = true;
 
-			for(const [zoneId, ZoneInfo] of Object.entries(this.library[bus.SubDevice()].Zones)) {
+			for(const [zoneId, ZoneInfo] of Object.entries(this.library[GigabyteMaster.model].Zones)) {
 				vLedNames.push(...ZoneInfo.Names);
 				vLedPositions.push(...ZoneInfo.Positions);
 			}
 
-			device.setSize(this.library[bus.SubDevice()].Size);
+			device.setSize(this.library[GigabyteMaster.model].Size);
 		} else {  //NonPerLED Cards. Gigglebyte, why the inconsistency?
 			vLedNames.push([ ["Zone 1"], ["Zone 2"], ["Zone 3"], ["Zone 4"] ]);
 			vLedPositions.push([ [2, 1], [3, 1], [4, 1], [5, 1] ]);
