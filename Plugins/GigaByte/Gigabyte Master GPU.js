@@ -314,10 +314,12 @@ class GigabyteMasterProtocol {
 					0: {Names : [ "Fan 1 LED 1", "Fan 1 LED 2", "Fan 1 LED 3", "Fan 1 LED 4", "Fan 1 LED 5", "Fan 1 LED 6", "Fan 1 LED 7", "Fan 1 LED 8",], Positions : [ [0, 5], [1, 4], [2, 3], [3, 4], [4, 5], [3, 6], [2, 7], [1, 8], ], Mapping : [ 0, 1, 2, 3, 4, 5, 6, 7 ]},
 					1: {Names : [ "Fan 2 LED 1", "Fan 2 LED 2", "Fan 2 LED 3", "Fan 2 LED 4", "Fan 2 LED 5", "Fan 2 LED 6", "Fan 2 LED 7", "Fan 2 LED 8",], Positions : [ [5, 5], [6, 4], [7, 3], [8, 4], [9, 5], [8, 6], [7, 7], [6, 8], ], Mapping : [ 0, 1, 2, 3, 4, 5, 6, 7 ]},
 					2: {Names : [ "Fan 3 LED 1", "Fan 3 LED 2", "Fan 3 LED 3", "Fan 3 LED 4", "Fan 3 LED 5", "Fan 3 LED 6", "Fan 3 LED 7", "Fan 3 LED 8",], Positions : [ [10, 5], [11, 4], [12, 3], [13, 4], [14, 5], [13, 6], [12, 7], [11, 8], ], Mapping : [ 0, 1, 2, 3, 4, 5, 6, 7 ]},
-					3: {Names : [ "Side Logo LED 1", "Face Logo LED", ], Positions : [ [11, 0], [12, 1], [12, 2],], Mapping : [ 1, 4 ]}
+					3: {Names : [ "Side Logo LED 1", "Top Logo LED 1", "Unknown LED 1", "Unknown LED 2", "Unknown LED 3", ], Positions : [ [11, 0], [12, 2], [12, 2], [12, 2], [12, 2], ], Mapping : [ 0, 2, 3, 4, 5 ]}
 				}
 			}
 		};
+
+		this.model = this.library[bus.SubDevice()];
 	}
 
 	determineWriteLength() {
@@ -332,17 +334,15 @@ class GigabyteMasterProtocol {
 
 		if(iRet < 0) {
 			bus.log("Failed To Set Mode");
-
-			return;
 		}
 
-		bus.log(`Set Lighting Mode To [${mode}] and zone [${zone}]`);
+		//bus.log(`Set Lighting Mode To [${mode}] and zone [${zone}]`);
 	}
 
 	UpdatePerLED() {
-		this.setMode(this.modes.static, this.library[bus.SubDevice()].modeZones[0]);
+		this.setMode(this.modes.static, GigabyteMaster.model.modeZones[0]);
 
-		for(const [zoneId, ZoneInfo] of Object.entries(this.library[bus.SubDevice()].Zones)) {
+		for(const [zoneId, ZoneInfo] of Object.entries(GigabyteMaster.model.Zones)) {
 			grabPerLEDRGB(zoneId, ZoneInfo);
 		}
 	}
@@ -362,12 +362,12 @@ class GigabyteMasterProtocol {
 		if(this.library[bus.SubDevice()]) {
 			this.config.perLEDSupport = true;
 
-			for(const [zoneId, ZoneInfo] of Object.entries(this.library[bus.SubDevice()].Zones)) {
+			for(const [zoneId, ZoneInfo] of Object.entries(GigabyteMaster.model.Zones)) {
 				vLedNames.push(...ZoneInfo.Names);
 				vLedPositions.push(...ZoneInfo.Positions);
 			}
 
-			device.setSize(this.library[bus.SubDevice()].Size);
+			device.setSize(GigabyteMaster.model.Size);
 		} else {  //NonPerLED Cards. Gigglebyte, why the inconsistency?
 			vLedNames.push([ ["Zone 1"], ["Zone 2"], ["Zone 3"], ["Zone 4"] ]);
 			vLedPositions.push([ [2, 1], [3, 1], [4, 1], [5, 1] ]);
@@ -534,7 +534,7 @@ class GigabyteMasterGPuList {
 			new GigabyteMasterIdentifier(Nvidia.RTX3080TI,      GigabyteMasterIds.RTX3080TI_XTREME_WATERFORCE_12G,         0x64, "GIGABYTE AORUS 3080TI XTREME Waterforce 12GB"), //Confirmed
 			new GigabyteMasterIdentifier(Nvidia.RTX3090,        GigabyteMasterIds.RTX3090_XTREME_WATERFORCE_2,         0x65, "GIGABYTE AORUS 3090 XTREME Waterforce 24GB"),
 			new GigabyteMasterIdentifier(Nvidia.RTX4070TI, 		GigabyteMasterIds.RTX4070TI_GAMING_OC_12G,           0x71, "GIGABYTE 4070TI Gaming OC"), //Confirmed
-			//new GigabyteMasterIdentifier(Nvidia.RTX4070TI, 		GigabyteMasterIds.RTX4070TI_ELITE,           0x71, "GIGABYTE 4070TI Elite 12G"), //Confirmed single color
+			new GigabyteMasterIdentifier(Nvidia.RTX4070TI, 		GigabyteMasterIds.RTX4070TI_ELITE,           0x71, "GIGABYTE 4070TI Elite 12G"), //Confirmed single color
 			new GigabyteMasterIdentifier(Nvidia.RTX4080, 		GigabyteMasterIds.RTX4080_GAMING_OC_16G,           0x71, "GIGABYTE 4080 Gaming OC"),
 			new GigabyteMasterIdentifier(Nvidia.RTX4080, 		GigabyteMasterIds.RTX4080_GAMING_OC_16G_2,           0x71, "GIGABYTE 4080 Gaming OC"), //Confirmed
 			new GigabyteMasterIdentifier(Nvidia.RTX4080, 		GigabyteMasterIds.RTX4080_XTREME_WATERFORCE,           0x64, "GIGABYTE 4080 XTREME Waterforce 16GB"), //This card is single zone. Older ones were multizone. We'll see if it plays ball or not with sending multiple zones.

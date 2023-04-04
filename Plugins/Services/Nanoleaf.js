@@ -7,6 +7,7 @@ export function DefaultPosition() {return [75, 70]; }
 export function DefaultScale(){return 1.0;}
 /* global
 controller:readonly
+turnOffOnShutdown:readonly
 */
 export function ControllableParameters() {
 	return [

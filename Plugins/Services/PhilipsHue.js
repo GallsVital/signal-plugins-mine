@@ -9,6 +9,7 @@ export function DefaultScale(){return 8.0;}
 export function SupportsSubdevices(){ return true;}
 /* global
 controller:readonly
+TakeActiveStream:readonly
 */
 export function ControllableParameters() {
 	return [
