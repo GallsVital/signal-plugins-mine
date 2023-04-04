@@ -184,7 +184,7 @@ function dpiLightAlwaysOnTimeHandler() {
 		return;
 	}
 
-	Logitech.setShortFeature([Logitech.FeatureIDs.RGB8071ID, 0x20, 0x00, 0x00]); //bypassing the logging I added for DPI Lights.
+	Logitech.setShortFeature([Logitech.FeatureIDs.RGB8071ID, 0x20, 0x00, 0x00], false, false, "Hero DPI Light", true); //bypassing the logging I added for DPI Lights.
 	LogitechMouse.setEnabledDPILights(false);
 }
 
@@ -418,12 +418,12 @@ export class LogitechDeviceLibrary {
 		{
 			G200Body :
 			{
-				"button1" : "Left_Click",
-				"button2" : "Right_Click",
-				"button3" : "Middle_Click",
+				"button1" : "Left Click",
+				"button2" : "Right Click",
+				"button3" : "Middle Click",
 				"button4" : "Backward",
 				"button5" : "Forward",
-				"button6" : "DPI_UP",
+				"button6" : "DPI UP",
 				"button7" : "Null",
 				"button8" : "Null",
 				"button9" : "Null",
@@ -432,62 +432,62 @@ export class LogitechDeviceLibrary {
 			},
 			G500Body :
 			{
-				"button1" : "Left_Click",
-				"button2" : "Right_Click",
-				"button3" : "Middle_Click",
+				"button1" : "Left Click",
+				"button2" : "Right Click",
+				"button3" : "Middle Click",
 				"button4" : "Backward",
 				"button5" : "Forward",
 				"button6" : "Sniper",
 				"button7" : "Top",
-				"button8" : "DPI_UP",
-				"button9" : "DPI_Down",
-				"button10" : "Scroll_Left",
-				"button11" : "Scroll_Right",
+				"button8" : "DPI UP",
+				"button9" : "DPI Down",
+				"button10" : "Scroll Left",
+				"button11" : "Scroll Right",
 			},
 			G502XPlusBody :
 			{
-				"button1" : "Left_Click",
-				"button2" : "Right_Click",
-				"button3" : "Middle_Click",
+				"button1" : "Left Click",
+				"button2" : "Right Click",
+				"button3" : "Middle Click",
 				"button4" : "Backward",
 				"button5" : "Sniper",
 				"button6" : "Forward",
 				"button7" : "Top",
-				"button8" : "Scroll_Right",
-				"button9" : "Scroll_Left",
-				"button10" : "DPI_UP",
-				"button11" : "DPI_Down"
+				"button8" : "Scroll Right",
+				"button9" : "Scroll Left",
+				"button10" : "DPI UP",
+				"button11" : "DPI Down"
 			},
 			G900Body :
 			{
-				"button1" : "Left_Click",
-				"button2" : "Right_Click",
-				"button3" : "Middle_Click",
+				"button1" : "Left Click",
+				"button2" : "Right Click",
+				"button3" : "Middle Click",
 				"button4" : "Backward",
 				"button5" : "Forward",
-				"button6" : "Right_Back",
-				"button7" : "DPI_UP",
-				"button8" : "DPI_Down",
-				"button9" : "Right_Forward",
-				"button10" : "Scroll_Right",
-				"button11" : "Scroll_Left",
+				"button6" : "Right Back",
+				"button7" : "DPI UP",
+				"button8" : "DPI Down",
+				"button9" : "Right Forward",
+				"button10" : "Scroll Right",
+				"button11" : "Scroll Left",
 				"button12" : "Profile"
 			},
 		};
 
 		this.buttonMapDict =
 		{
-			"Left_Click"    : 0,
-			"Right_Click"   : 0,
-			"Middle_Click"  : 0,
+			"Left Click"    : 0,
+			"Right Click"   : 0,
+			"Middle Click"  : 0,
 			"Backward"      : 4,
 			"Forward"       : 5,
-			"DPI_Down"		: 6,
-			"DPI_UP"		: 7,
-			"Scroll_Left"   : 8,
-			"Scroll_Right"  : 9,
-			"Right_Forward" : 10,
-			"Right_Back"    : 11,
+			"DPI Down"		: 6,
+			"DPI UP"		: 7,
+			"Scroll Left"   : 8,
+			"Scroll Right"  : 9,
+			"Right Forward" : 10,
+			"Right Back"    : 11,
 			"Top"           : 12,
 			"Sniper"        : 13,
 			"Profile"		: 14,
@@ -1462,6 +1462,8 @@ export class LogitechProtocol {
 	}
 	/** Fetch Unified Battery Percentage. Returns Status and Battery Percentage. */
 	GetUnifiedBatteryPercentage() {
+		DetectInputs(); //Clear Buffer I hope.
+
 		const BatteryArray = this.setSpecificFeature([this.FeatureIDs.UnifiedBatteryID, 0x10], "Short", "Long", this.FeatureIDs.UnifiedBatteryID, 5, "Unified Battree").data;
 
 		const BatteryPercentage = (BatteryArray[1]);
@@ -1474,6 +1476,8 @@ export class LogitechProtocol {
 	}
 	/** Fetch Battery Voltage That Needs Parsed With the Voltage Table. */
 	GetBatteryVoltage() {
+		DetectInputs(); //Clear the buffer I hope.
+
 	   const BatteryArray = this.setSpecificFeature([this.FeatureIDs.BatteryVoltageID, 0x00, 0x10], "Long", "Long", this.FeatureIDs.BatteryVoltageID, 5, "Battree Voltage").data;
 
 	   if(BatteryArray[1] !== undefined && BatteryArray[2] !== undefined) {
@@ -1957,6 +1961,7 @@ class DPIManager {
 	/** Set Sniper Mode on or off. */
 	SetSniperMode(sniperMode) {
 		this.sniperMode = sniperMode;
+		device.log("Sniper Mode: " + sniperMode);
 		this.setDpi();
 	}
 
