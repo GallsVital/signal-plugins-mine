@@ -47,7 +47,7 @@ export function Initialize() {
 }
 
 export function Render() {
-	//NZXT.sendRGB();
+	NZXT.sendRGB();
 }
 
 export function Shutdown() {
@@ -167,8 +167,6 @@ export class NZXTProtocol {
 			ChannelID = Channel - NZXT.NZXTCHL + 1;
 			ChannelName = `ARGB Header ${ChannelID}`;
 		}
-
-		device.log(`Sending RGB to: ${ChannelName}`);
 
 		let ChannelLedCount = device.channel(ChannelName).LedCount();
 		const componentChannel = device.channel(ChannelName);
