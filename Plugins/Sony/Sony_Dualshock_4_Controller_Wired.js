@@ -1,7 +1,7 @@
 export function Name() { return "Sony Dualshock 4"; }
 export function VendorId() { return 0x054C; }
-export function ProductId() { return 0x09CC; }
-export function Publisher() { return "Rafee"; }
+export function ProductId() { return [0x05C4, 0x09CC]; }
+export function Publisher() { return "Rafee/Derek Huber"; }
 export function Size() { return [3, 3]; }
 export function DefaultPosition(){return [240, 120];}
 export function DefaultScale(){return 8.0;}
@@ -58,8 +58,7 @@ function SendColorPacket(shutdown = false) {
 	}
 	const packet = [0x05, 0x07, 0x00, 0x00, 0x00, 0x00, color[0], color[1], color[2]];
 
-	device.write(packet, 59);
-	device.pause(1);
+	device.write(packet, 32);
 }
 
 function hexToRgb(hex) {
@@ -73,7 +72,9 @@ function hexToRgb(hex) {
 }
 
 export function Validate(endpoint) {
-	return endpoint.interface === 3;
+	// 0x05C4 first revision, 0x09CC second revision - different interface values intentional
+	return (endpoint.interface === -1 && device.productId() === 0x05C4) ||
+		(endpoint.interface === 3 && device.productId() === 0x09CC);
 }
 
 export function Image() {
