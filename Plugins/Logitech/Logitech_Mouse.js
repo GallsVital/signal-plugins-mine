@@ -216,10 +216,16 @@ function ProcessInputs(packet) {
 	return[];
 }
 
+const PreviousFrameColors = [];
+
 function grabColors(shutdown = false) {
-	const RGBData = [];
+	performance.StartTimer();
+
 	const ledPositions = Logitech.GetDeviceLedPositions();
 	const ledIndexes = Logitech.GetDeviceLedIndexes();
+	const RGBData = new Array(ledPositions.length * 3);
+	const isPerLedLightingV2 = Logitech.UsesPerLedLightingV2();
+	let packetidx = 0;
 
 	for (let iIdx = 0; iIdx < ledPositions.length; iIdx++) {
 		const iX = ledPositions[iIdx][0];
@@ -234,19 +240,30 @@ function grabColors(shutdown = false) {
 			color = device.color(iX, iY);
 		}
 
-		if(Logitech.FeatureIDs.PerKeyLightingV2ID !== 0) {//PerkeylightingV2 uses a different packet structure than the 8070 and 8071 standards.
-			const iLedIdx = ((ledIndexes[iIdx]-1) * 4);
-			RGBData[iLedIdx] = iIdx+1;
-			RGBData[iLedIdx+1] = color[0];
-			RGBData[iLedIdx+2] = color[1];
-			RGBData[iLedIdx+3] = color[2];
+		if(isPerLedLightingV2) { //PerkeylightingV2 uses a different packet structure than the 8070 and 8071 standards.
+			if(PreviousFrameColors[iIdx] && Logitech.CompareArrays(PreviousFrameColors[iIdx], color)){
+				PreviousFrameColors[iIdx] = color;
+				continue;
+			}
+
+
+			// Update previous color
+			PreviousFrameColors[iIdx] = color;
+
+			RGBData[packetidx] = ledIndexes[iIdx];
+			RGBData[packetidx + 1] = color[0];
+			RGBData[packetidx + 2] = color[1];
+			RGBData[packetidx + 3] = color[2];
+
+			packetidx += 4;
+			// const LedInfo = [ledIndexes[iIdx]].concat(color);
+			// RGBData = RGBData.concat(LedInfo);
 		} else {
 			const iLedIdx = ((ledIndexes[iIdx]-1) * 3);
 			RGBData[iLedIdx] =   color[0];
 			RGBData[iLedIdx+1] = color[1];
 			RGBData[iLedIdx+2] = color[2];
 		}
-
 	}
 
 	Logitech.SendLighting(RGBData);
