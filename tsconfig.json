@@ -9,8 +9,8 @@
 		"composite": true,
 		"incremental": true,
 		"assumeChangesOnlyAffectDirectDependencies": true,
-		//"declaration": true,
-		//"declarationMap": true,
+		"declaration": true,
+		"declarationMap": true,
 		"outDir": "dist",
 		//"noEmit": true,
 		"esModuleInterop": true,
@@ -42,6 +42,9 @@
 		"./types/NanoLeaf.d.ts",
 		"./types/PhilipsHue.d.ts",
 		"./types/Udp.d.ts",
+		"./types/DiscoveryService.d.ts",
+		"./types/mouse.d.ts",
+		"./types/keyboard.d.ts"
     ],
 	"include": ["CodeSnippets/**/*","Non-Release-Plugins/**/*", "Plugins/**/*"],
 	"exclude": [

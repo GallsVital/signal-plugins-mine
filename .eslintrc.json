@@ -31,7 +31,11 @@
         "bus": "readonly",
         "battery": "readonly",
         "mouse": "readonly",
-        "udp": "readonly"
+        "keyboard": "readonly",
+        "udp": "readonly",
+        "service": "readonly",
+        "dtls": "readonly",
+        "XMLHttpRequest": "readonly"
     },
     "rules": {
         "semi":"warn",
