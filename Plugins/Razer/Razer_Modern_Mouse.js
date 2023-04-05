@@ -153,6 +153,7 @@ export function onOnboardDPIChanged() {
 			RazerMouse.setDeviceDPI(1, dpiStages, true);
 		} else {
 			Razer.setDeviceMode("Software Mode");
+			device.addFeature("mouse");
 			DpiHandler.setEnableControl(true);
 			DpiHandler.setDpi();
 		}
@@ -212,6 +213,7 @@ function deviceInitialization(wake = false) {
 					Razer.setDeviceMode("Hardware Mode");
 				} else {
 					Razer.setDeviceMode("Software Mode");
+					device.addFeature("mouse");
 				}
 			}
 		}
@@ -239,6 +241,7 @@ function deviceInitialization(wake = false) {
 
 		if (!OnboardDPI) {
 			Razer.setDeviceMode("Software Mode");
+			device.addFeature("mouse");
 			DpiHandler.setEnableControl(true);
 			DpiHandler.setDpi();
 		}
@@ -304,6 +307,7 @@ function detectInputs() {
 	}
 }
 
+/* eslint-disable complexity */
 function processInputs(Added, Removed) {
 
 	for (let values = 0; values < Added.length; values++) {
@@ -318,15 +322,7 @@ function processInputs(Added, Removed) {
 			device.log("DPI Down");
 			DpiHandler.decrement();
 			break;
-		case 0x22:
-			device.log("Right Back Button");
-			break;
-		case 0x23:
-			device.log("Right Forward Button");
-			break;
-		case 0x50:
-			device.log("Profile Button Hit.");
-			break;
+
 		case 0x51:
 			device.log("DPI Clutch Hit.");
 			DpiHandler.SetSniperMode(true);
@@ -335,23 +331,29 @@ function processInputs(Added, Removed) {
 			device.log("DPI Cycle Hit.");
 			DpiHandler.increment();
 			break;
-		case 0x54:
-			device.log("Scroll Accel Button Hit.");
-			break;
+		default:
+			const eventData = { "buttonCode": 0, "released": false, "name": razerDeviceLibrary.inputDict[input] };
+			device.log(razerDeviceLibrary.inputDict[input] + " hit.");
+			mouse.sendEvent(eventData, "Button Press");
 		}
 	}
 
 	for (let values = 0; values < Removed.length; values++) {
 		const input = Removed.pop();
 
-		if (input === 0x51) {
+		if(input === 0x51) {
 			device.log("DPI Clutch Released.");
 			DpiHandler.SetSniperMode(false);
+		} else {
+			const eventData = { "buttonCode": 0, "released": true, "name": razerDeviceLibrary.inputDict[input] };
+			device.log(razerDeviceLibrary.inputDict[input] + " released.");
+			mouse.sendEvent(eventData, "Button Press");
 		}
-	}
 
+	}
 }
 
+/* eslint-enable complexity */
 function grabColors(shutdown = false) {
 
 
@@ -446,6 +448,18 @@ function hexToRgb(hex) {
 
 export class deviceLibrary {
 	constructor() {
+
+		this.inputDict = {
+			0x20 : "DPI Up",
+			0x21 : "DPI Down",
+			0x22 : "Right Back Button",
+			0x23 : "Right Forward Button",
+			0x50 : "Profile Button",
+			0x51 : "DPI Clutch",
+			0x52 : "DPI Cycle",
+			0x54 : "Scroll Accel Button"
+		};
+
 		this.PIDLibrary =
 		{
 			0x006B: "Abyssus Essential",
@@ -478,6 +492,7 @@ export class deviceLibrary {
 			0x008F: "Naga Pro",
 			0x0090: "Naga Pro",
 			0x00a8: "Naga Pro V2",
+			0x00a7: "Naga Pro V2",
 			0x0067: "Naga Trinity",
 			0x0096: "Naga X",
 			0x0094: "Orochi V2",
@@ -2465,10 +2480,10 @@ class ByteTracker {
 
 	Changed(avCurr) {
 		// Assign Previous value before we pull new one.
-		this.vPrev = this.vCurrent;
+		this.vPrev = this.vCurrent; //Assign previous to current.
 		// Fetch changes.
-		this.vAdded = avCurr.filter(x => !this.vPrev.includes(x));
-		this.vRemoved = this.vPrev.filter(x => !avCurr.includes(x));
+		this.vAdded = avCurr.filter(x => !this.vPrev.includes(x)); //Check if we have anything in Current that wasn't in previous.
+		this.vRemoved = this.vPrev.filter(x => !avCurr.includes(x)); //Check if there's anything in previous not in Current. That's removed.
 
 		// Reassign current.
 		this.vCurrent = avCurr;
