@@ -43,8 +43,8 @@
 		"./types/PhilipsHue.d.ts",
 		"./types/Udp.d.ts",
 		"./types/DiscoveryService.d.ts",
-		"./types/mouse.d.ts"
-
+		"./types/mouse.d.ts",
+		"./types/keyboard.d.ts"
     ],
 	"include": ["CodeSnippets/**/*","Non-Release-Plugins/**/*", "Plugins/**/*"],
 	"exclude": [

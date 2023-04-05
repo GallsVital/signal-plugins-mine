@@ -460,21 +460,42 @@ export function DiscoveryService() {
 
 	this.Initialize = function(){
 		//service.log("Initializing plugin!");
-		//const value = {"hostname":"Nanoleaf-Light-Panels-54-08-7B.local.", "id":"32:F1:DA:C3:5C:C4", "md":"NL22", "name":"Nanoleaf Light Panels 54:08:7B", "port":16021, "srcvers":"5.1.0"};
+		// const cache = service.getSetting("base", "cache");
+		// service.log(cache);
 
-		//service.addController(new NanoleafBridge(value));
+		// for(let i = 0; i < cache.length; i++){
+		// 	service.log(cache[i]);
+		// 	this.Discovered(cache[i]);
+		// }
 	};
 
 	this.Update = function() {
 		for(const cont of service.controllers){
 			cont.obj.update();
 		}
-
 	};
 
 	this.Discovered = function(value) {
 		service.log(value);
 
+		// const cache = service.getSetting("base", "cache") || [];
+		// let hostExists = false;
+
+		// for(let i = 0; i < cache.length; i++){
+		// 	if(value.hostname === cache[i].hostname){
+		// 		hostExists = true;
+		// 	}
+		// }
+
+		// if(!hostExists){
+		// 	cache.push(value);
+		// 	service.saveSetting("base", "cache", cache);
+		// }
+
+		this.CreateController(value);
+	};
+
+	this.CreateController = function(value){
 		const controller = service.getController(value.id);
 
 		if (controller === undefined) {
@@ -584,6 +605,7 @@ export function DiscoveryService() {
 
 class NanoleafBridge {
 	constructor(value){
+
 		this.updateWithValue(value);
 		this.key = service.getSetting(this.id, "key");
 		this.connected = this.key != "";
@@ -591,7 +613,7 @@ class NanoleafBridge {
 		this.ip = "";
 		this.deviceCreated = false;
 		this.panelinfo = {};
-
+		this.lastPollTime = 0;
 		service.log("Constructed: "+this.name);
 
 		this.ResolveIpAddress();
@@ -604,6 +626,7 @@ class NanoleafBridge {
 		this.firmwareVersion = value.srcvers;
 		this.model = value.md;
 		this.id = value.id;
+		//this.serviceValue = value;
 		service.log("Updated: "+this.name);
 		service.updateController(this);
 	}
@@ -613,8 +636,23 @@ class NanoleafBridge {
 
 		const instance = this;
 		service.resolve(this.hostname, (host) => {
+			// Only fire on the first valid ip resolved.
+			if(instance.ip != ""){
+				return;
+			}
+
 			if(host.protocol === "IPV4"){
 				instance.ip = host.ip;
+
+				// let ipcache = service.getSetting("base", "ipcache") || [];
+				// service.log(ipcache);
+				// ipcache.push(instance.ip);
+				// ipcache = ipcache.filter((c, index) => {
+				// 	return ipcache.indexOf(c) === index;
+				// });
+				// service.log(ipcache);
+				// service.saveSetting("base", "ipcache", ipcache);
+
 				service.log(`Found IPV4 address: ${host.ip}`);
 
 				//service.saveSetting(instance.id, "ip", instance.ip);
@@ -645,7 +683,18 @@ class NanoleafBridge {
 			}
 
 			service.updateController(this);
+
+			return;
 		}
+
+
+		if(this.connected && !this.panelinfo){
+			if(this.lastPollTime < Date.now() - 5000){
+				this.getClusterInfo();
+				this.lastPollTime = Date.now();
+			}
+		}
+
 	}
 
 	setKey(response) {

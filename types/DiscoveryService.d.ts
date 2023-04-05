@@ -12,4 +12,5 @@ declare class service{
     public static announceController(instance: any);
     public static resolve(HostName: string, callback: Function): void
     //public broadcast(QJSValue xMessage);
+    public static controllers: Object[];
 }
