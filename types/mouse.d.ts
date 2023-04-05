@@ -11,6 +11,6 @@ declare type mouseHidOptions = {
 }
 
 declare class mouse{
-    public static sendHid(mouseButtonCode: MouseButtonCode, options: mouseHidOptions): void
+    public static sendHid(mouseButtonCode: MouseButtonCode, options?: mouseHidOptions): void
     public static sendEvent(event: mouseEvent, type: MouseEventType): void
 }

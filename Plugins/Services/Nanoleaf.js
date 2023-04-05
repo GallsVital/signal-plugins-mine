@@ -408,7 +408,6 @@ export function Initialize() {
 
 	Nanoleaf.ExtractPanelInformation(controller.panelinfo);
 	Nanoleaf.InitializeDevice();
-
 }
 
 
