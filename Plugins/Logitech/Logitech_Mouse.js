@@ -219,6 +219,7 @@ function ProcessInputs(packet) {
 function grabColors(shutdown = false) {
 	const RGBData = [];
 	const ledPositions = Logitech.GetDeviceLedPositions();
+	const ledIndexes = Logitech.GetDeviceLedIndexes();
 
 	for (let iIdx = 0; iIdx < ledPositions.length; iIdx++) {
 		const iX = ledPositions[iIdx][0];
@@ -234,13 +235,13 @@ function grabColors(shutdown = false) {
 		}
 
 		if(Logitech.FeatureIDs.PerKeyLightingV2ID !== 0) {//PerkeylightingV2 uses a different packet structure than the 8070 and 8071 standards.
-			const iLedIdx = (iIdx * 4);
+			const iLedIdx = ((ledIndexes[iIdx]-1) * 4);
 			RGBData[iLedIdx] = iIdx+1;
 			RGBData[iLedIdx+1] = color[0];
 			RGBData[iLedIdx+2] = color[1];
 			RGBData[iLedIdx+3] = color[2];
 		} else {
-			const iLedIdx = (iIdx * 3);
+			const iLedIdx = ((ledIndexes[iIdx]-1) * 3);
 			RGBData[iLedIdx] =   color[0];
 			RGBData[iLedIdx+1] = color[1];
 			RGBData[iLedIdx+2] = color[2];
@@ -491,7 +492,7 @@ export class LogitechDeviceLibrary {
 			"Top"           : 12,
 			"Sniper"        : 13,
 			"Profile"		: 14,
-			"Null"          : 0x00,
+			"Null"          : 0,
 		};
 
 	   this.PhysicalButtonIds =
@@ -513,7 +514,7 @@ export class LogitechDeviceLibrary {
 	   this.deviceLibrary = {
 			"G203 Prodigy" : {
 				bodyStyle : "G200Body",
-				ledStyle : "TwoZoneMouse",
+				ledStyle : "SingleZoneMouse",
 				maxDPI : "8000",
 				Size : [3, 3]
 			},
@@ -601,14 +602,30 @@ export class LogitechDeviceLibrary {
 				Size : [3, 3],
 				hasDPILights : true
 			},
+			"GPro Wired" : {
+				bodyStyle : "G200Body",
+				ledStyle : "SingleZoneMouse",
+				maxDPI : "25600",
+				Size : [3, 3],
+			},
 			"GPro X Superlight" : {
 				bodyStyle : "G200Body",
 				ledStyle : "Null",
 				maxDPI : "25600",
 				Size : [0, 0]
 			},
-	   };
 
+			"G915" : {
+				bodyStyle : "null",
+				ledStyle : "G915",
+				Size : [22, 7],
+			},
+			"G915 TKL" : {
+				bodyStyle : "null",
+				ledStyle : "G915 TKL",
+				Size : [17, 7],
+	   		}
+		};
 	   this.BatteryVoltageStatusDict =
 	   {
 		   0 : "Discharging",
@@ -916,6 +933,7 @@ export class LogitechProtocol {
 
 	SetDeviceID(DeviceID) {
 		this.DeviceID = DeviceID;
+		this.SetDeviceProperties(DeviceID);
 	}
 
 	SetDeviceProperties(DeviceID) {
@@ -930,9 +948,9 @@ export class LogitechProtocol {
 		this.Config.MouseBodyStyle = deviceLibrary.bodyStyle;
 		this.Config.LedIndexes = LogitechDevice.vLedsDict[deviceLibrary.ledStyle];
 		this.Config.DeviceLEDNames = LogitechDevice.vLedNameDict[deviceLibrary.ledStyle];
+		this.Config.DeviceLedIndexes = LogitechDevice.vLedsDict[deviceLibrary.ledStyle];
 		this.Config.DeviceLEDPositions = LogitechDevice.vLedPositionDict[deviceLibrary.ledStyle];
 		device.setControllableLeds(this.Config.DeviceLEDNames, this.Config.DeviceLEDPositions);
-
 	}
 	GetDeviceLedNames(){
 		return this.Config.DeviceLEDNames;
@@ -1124,8 +1142,6 @@ export class LogitechProtocol {
 	   }
 
 	   this.SetDeviceResetMode();
-
-	   this.SetDeviceProperties(CommunicationID);
 
 	   this.FetchDeviceName();
 	   this.FetchDeviceType();
