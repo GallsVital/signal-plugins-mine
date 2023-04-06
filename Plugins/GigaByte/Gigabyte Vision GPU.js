@@ -326,8 +326,6 @@ class GigabyteVisionDeviceIds {
 		this.RTX4070TI_MASTER_12G           = 0x40bb;
 		this.RTX4080_GAMING_OC	            = 0x40bc;
 		this.RTX4080_AERO_OC_16G			= 0x40C5;
-		this.RTX4080_EAGLE_OC               = 0x40be; //confirmed.
-
 	}
 }
 
@@ -425,7 +423,6 @@ class GigabyteVisionGPuList {
 			new GigabyteVisionIdentifier(Nvidia.RTX3090,        GigabyteVisionIds.RTX3090_GAMING_OC_24GB,        0x62, "GIGABYTE 3090 Gaming OC 24G"), // Confirmed
 			new GigabyteVisionIdentifier(Nvidia.RTX4070TI,      GigabyteVisionIds.RTX4070TI_MASTER_12G,			 0x71, "GIGABYTE 4070Ti Master 12G"), //Confirmed
 			new GigabyteVisionIdentifier(Nvidia.RTX4080,        GigabyteVisionIds.RTX4080_AERO_OC_16G,           0x71, "GIGABYTE 4080 Aero OC"),
-			new GigabyteVisionIdentifier(Nvidia.RTX4080,        GigabyteVisionIds.RTX4080_EAGLE_OC,          	 0x71, "GIGABYTE 4080 Eagle OC"), //Confirmed
 		];
 	}
 }
