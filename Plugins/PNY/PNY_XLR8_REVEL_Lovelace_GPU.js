@@ -107,7 +107,7 @@ class PNYGPUController {
 	constructor() {
 		this.registers =
         {
-			Init	   : 0xEF,
+        	Init	   : 0xEF,
         	Control    : 0xE0,
         	Mode       : 0x60,
         	Command	   : 0xB0,
@@ -140,6 +140,7 @@ class PNYGPUIdentifier extends GPUIdentifier {
 		super(0x10DE, 0x196E, Device, SubDevice, 0x49, Name, Model);
 	}
 }
+export function BrandGPUList(){ return PNYGPUIDs; }
 
 const PNYGPUIDs =
 [

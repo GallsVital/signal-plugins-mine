@@ -343,7 +343,7 @@ class EVGATuringIdentifier extends GPUIdentifier{
 	}
 }
 
-export function BrandGPUList(){ return new EVGATuringGPUList(); }
+export function BrandGPUList(){ return new EVGATuringGPUList().devices; }
 
 class EVGATuringGPUList extends GPUList{
 	constructor(){
