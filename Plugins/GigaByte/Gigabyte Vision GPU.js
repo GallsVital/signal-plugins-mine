@@ -349,6 +349,7 @@ class GigabyteVisionIdentifier extends GPUIdentifier {
 		super(0x10DE, 0x1458, device, SubDevice, Address, Name, "");
 	}
 }
+export function BrandGPUList(){ return new GigabyteVisionGPuList().devices; }
 
 class GigabyteVisionGPuList {
 	constructor() {

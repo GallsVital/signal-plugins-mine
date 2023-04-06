@@ -500,6 +500,7 @@ class GigabyteMasterIdentifier extends GPUIdentifier {
 		super(0x10DE, 0x1458, device, SubDevice, Address, Name, "");
 	}
 }
+export function BrandGPUList(){ return new GigabyteMasterGPuList().devices; }
 
 class GigabyteMasterGPuList {
 	constructor() {
