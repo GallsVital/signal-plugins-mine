@@ -1,4 +1,3 @@
-
 export function Name() { return "GIGABYTE Motherboard LED Controller"; }
 export function VendorId() { return  0x048D; }
 export function ProductId() { return [0x5702, 0x8297];}
@@ -139,6 +138,17 @@ const MotherboardConfigs = {
 			0x21: ["12v Header Bottom", HeaderConfiguration],
 			0x23: ["PCIe", MainboardConfiguration],
 			0x24: ["12V Header Top", HeaderConfiguration]
+		}
+	},
+	"B760M AORUS ELITE AX": {
+		ARGB:{
+			"5v ARGB Header 1": 0x58,
+			"5v ARGB Header 2": 0x59,
+		},
+		Mainboard:{
+			0x20: ["12V Header 1", MainboardConfiguration],
+			0x21: ["12V Header 2", HeaderConfiguration],
+			0x22: ["Chipset", MainboardConfiguration],
 		}
 	},
 	"X570 AORUS ELITE": {
