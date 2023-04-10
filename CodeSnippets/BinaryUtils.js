@@ -1,4 +1,4 @@
-export class BinaryUtils{
+export default class BinaryUtils{
 	static WriteInt16LittleEndian(value){
 		return [value & 0xFF, (value >> 8) & 0xFF];
 	}

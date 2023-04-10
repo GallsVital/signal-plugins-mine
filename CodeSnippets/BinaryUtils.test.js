@@ -1,4 +1,5 @@
-const {BinaryUtils} = require("./BinaryUtils.js");
+import BinaryUtils from "./BinaryUtils.js";
+
 
 describe("BinaryUtils", () => {
 	it("WriteInt16LittleEndian handles typical input", () => {
