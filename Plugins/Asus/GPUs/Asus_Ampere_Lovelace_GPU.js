@@ -421,7 +421,6 @@ class Asus_Ampere_Lovelace_IDs {
 		this.RTX4080_STRIX_GAMING				   = 0x889f;
 		this.RTX4080_TUF_GAMING_2				   = 0x88A2;
 		this.RTX4080_TUF_GAMING_3                  = 0x88CB;
-		this.RTX4080_STRIX_GAMING				   = 0x889f;
 		this.RTX4080_STRIX_GAMING_OC 			   = 0x88BF;
 		this.RTX4080_STRIX_GAMING_2				   = 0x88C0;
 		this.RTX4080_STRIX_GAMING_OC_WHITE		   = 0x88C8;
