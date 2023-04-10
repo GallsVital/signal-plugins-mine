@@ -26,6 +26,10 @@ const lastConnectionAttemptTime = Date.now();
 export function Initialize() {
 	device.addFeature("dtls");
 
+	if(controller.name){
+		device.setName(controller.name);
+	}
+
 	createLightsForArea(controller.selectedArea);
 
 	const AreaInfo = GetAreaInfo(controller.selectedArea);
@@ -339,6 +343,43 @@ export function DiscoveryService() {
         width: parent.width
         height: parent.height
 
+		Rectangle{
+			id: scanningItem
+			height: 50
+			width: childrenRect.width + 10
+			visible: service.controllers.length == 0
+			color: theme.background3
+			radius: theme.radius
+
+			BusyIndicator {
+				id: scanningIndicator
+				height: 30
+				anchors.verticalCenter: parent.verticalCenter
+				width: parent.height
+				Material.accent: "#88FFFFFF"
+				running: scanningItem.visible
+			}  
+
+			Column{
+				width: childrenRect.width
+				anchors.left: scanningIndicator.right
+				anchors.verticalCenter: parent.verticalCenter
+
+				Text{
+					color: theme.secondarytextcolor
+					text: "Searching network for Philip's Hue Bridges" 
+					font.pixelSize: 14
+					font.family: "Montserrat"
+				}
+				Text{
+					color: theme.secondarytextcolor
+					text: "This may take several minutes..." 
+					font.pixelSize: 14
+					font.family: "Montserrat"
+				}
+			}
+		}
+
         Repeater {
           model: service.controllers          
           delegate: Item {
@@ -440,6 +481,14 @@ export function DiscoveryService() {
                 } 
 			  }
 
+			  Text{
+				width: parent.width
+				color: theme.warn
+				text: "This bridge has no Entertainment zones. You'll need to create on in the Phillip's Hue app."
+				visible: bridge.connected && bridge.supportsStreaming && Object.keys(bridge.areas) == 0
+				wrapMode: Text.WrapAtWordBoundaryOrAnywhere
+			  }
+
 			  ComboBox{
 				id: areaComboBox
 				width: parent.width
@@ -447,7 +496,7 @@ export function DiscoveryService() {
 				textRole: "name"
 				valueRole: "id"
 				property bool ready: false
-				visible: bridge.connected && bridge.supportsStreaming
+				visible: bridge.connected && bridge.supportsStreaming && areaComboBox.model.length > 0
 				onCurrentValueChanged: {
 					if(!ready) return;
 					console.log(areaComboBox.currentText, areaComboBox.currentValue)
@@ -472,6 +521,9 @@ export function DiscoveryService() {
 }
 
 
+// TODO: Show linking instructions
+// TODO: can we do something with the xy positions hue gives us?
+
 class HueBridge {
 	constructor(value){
 		this.updateWithValue(value);
@@ -488,7 +540,7 @@ class HueBridge {
 		this.selectedAreaName = service.getSetting(this.id, "selectedAreaName") ?? "";
 		this.instantiated = false;
 		this.lastPollingTimeStamp = 0;
-		this.pollingInterval = 10000;
+		this.pollingInterval = 20000;
 		this.supportsStreaming = false;
 		this.apiversion = "";
 
@@ -534,6 +586,8 @@ class HueBridge {
 
 	CreateBridgeDevice(){
 		service.updateController(this);
+
+		// TODO: only annouce if we have entertainment zones.
 		// Instantiate device in SignalRGB, and pass 'this' object to device.
 		service.announceController(this);
 	}
@@ -576,8 +630,8 @@ class HueBridge {
 		this.connected = true;
 		service.updateController(this);
 
-		this.RequestLightInfo();
-		this.RequestAreaInfo();
+		//this.RequestLightInfo();
+		//this.RequestAreaInfo();
 	}
 
 	requestLink(){
@@ -603,7 +657,7 @@ class HueBridge {
 
 	startLink() {
 		service.log("Pushlink test for "+this.name);
-		this.retriesleft = 40;
+		this.retriesleft = 60;
 		this.waitingforlink = true; //pretend we're connected.
 
 		service.updateController(this); //notify ui.
@@ -626,22 +680,32 @@ class HueBridge {
 			return;
 		}
 
-		if(!this.instantiated){
+		// if(!this.instantiated){
+		// 	this.RequestLightInfo();
+		// 	this.RequestAreaInfo();
+
+		// 	if(Object.keys(this.areas).length > 0){
+		// 		this.CreateBridgeDevice();
+		// 		this.instantiated = true;
+		// 	}
+
+		// 	this.lastPollingTimeStamp = Date.now();
+		// }
+
+		if(Date.now() - this.lastPollingTimeStamp > this.pollingInterval){
+			service.log("Polling bridge Info...");
 			this.RequestLightInfo();
 			this.RequestAreaInfo();
 
-			this.CreateBridgeDevice();
-			this.instantiated = true;
+			if(!this.instantiated && Object.keys(this.areas).length > 0){
+				this.CreateBridgeDevice();
+				this.instantiated = true;
+			}else{
+				service.updateController(this);
+			}
+
 			this.lastPollingTimeStamp = Date.now();
 		}
-
-		// if(Date.now() - this.lastPollingTimeStamp > this.pollingInterval){
-		// 	service.log("Polling bridge Info...");
-		// 	this.RequestLightInfo();
-		// 	this.RequestAreaInfo();
-		// 	service.updateController(this);
-		// 	this.lastPollingTimeStamp = Date.now();
-		// }
 	}
 
 	RequestAreaInfo(){
@@ -727,6 +791,7 @@ class HueBridge {
 	}
 
 	StreamableAPIVersion(apiversion){
+		// TODO: use semver util
 		const version = (apiversion ?? "0.0.0").split(".");
 
 		return (parseInt(version[0]) >= 1 && parseInt(version[1]) >= 22);

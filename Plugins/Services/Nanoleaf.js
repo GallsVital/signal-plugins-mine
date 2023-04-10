@@ -511,6 +511,45 @@ export function DiscoveryService() {
       Column{
         width: parent.width
         height: parent.height
+		
+		Rectangle{
+			id: scanningItem
+			height: 50
+			width: childrenRect.width + 10
+			visible: service.controllers.length == 0
+			color: theme.background3
+			radius: theme.radius
+
+			BusyIndicator {
+				id: scanningIndicator
+				height: 30
+				anchors.verticalCenter: parent.verticalCenter
+				width: parent.height
+				Material.accent: "#88FFFFFF"
+				running: scanningItem.visible
+			}  
+
+			Column{
+				width: childrenRect.width
+				anchors.left: scanningIndicator.right
+				anchors.verticalCenter: parent.verticalCenter
+
+				Text{
+					color: theme.secondarytextcolor
+					text: "Searching network for Nanoleaf Controllers" 
+					font.pixelSize: 14
+					font.family: "Montserrat"
+				}
+				Text{
+					color: theme.secondarytextcolor
+					text: "This may take several minutes..." 
+					font.pixelSize: 14
+					font.family: "Montserrat"
+				}
+			}
+		}
+		
+
 
         Repeater {
           model: service.controllers          
