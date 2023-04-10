@@ -271,7 +271,8 @@ declare class Device{
 	public setName(Name: string): void
 	public setControllableLeds(LedNames: string[], LedPositions: LedPosition[]): void
 	public setSize(Size: number[]): void
-
+	public setImageFromBase64(base64Image: string): void
+	
 	/**
 	 * Creates a device message for the user.
 	 * @see {@link https://docs.signalrgb.com/plugins/utilities#deviceaddmessage SignalRGB Documentation}
