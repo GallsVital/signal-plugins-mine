@@ -486,6 +486,7 @@ class EVGAAmpereDeviceIds{
 		this.RTX3080_XC3_ULTRA_HYBRID_LHR       = 0x4888;
 		this.RTX3080_XC3_ULTRA_LHR              = 0x4885;
 		this.RTX3080TI_FTW3_ULTRA               = 0x3967;
+		this.RTX3080TI_FTW3_ULTRA_2             = 0x3367;
 		this.RTX3080TI_FTW3_ULTRA_HYBRID        = 0x3968;
 		this.RTX3080TI_FTW3_ULTRA_HYDROCOPPER   = 0x3969;
 		this.RTX3080TI_XC3_GAMING               = 0x3953;
@@ -598,6 +599,7 @@ class EVGAAmpereGPUList{
 			new EVGAAmpereIdentifier(Nvidia.RTX3080TI,         EVGAAmpereIds.RTX3080TI_XC3_ULTRA_GAMING,        "EVGA RTX 3080Ti XC3 Ultra Gaming"),
 			new EVGAAmpereIdentifier(Nvidia.RTX3080TI,         EVGAAmpereIds.RTX3080TI_XC3_GAMING_HC,           "EVGA RTX 3080Ti XC3 Gaming HydroCopper"),
 			new EVGAAmpereIdentifier(Nvidia.RTX3080TI,         EVGAAmpereIds.RTX3080TI_FTW3_ULTRA,              "EVGA RTX 3080Ti FTW3 Ultra"),
+			new EVGAAmpereIdentifier(Nvidia.RTX3080TI,         EVGAAmpereIds.RTX3080TI_FTW3_ULTRA_2,            "EVGA RTX 3080Ti FTW3 Ultra"),
 			new EVGAAmpereIdentifier(Nvidia.RTX3090,           EVGAAmpereIds.RTX3090_XC3_BLACK,                 "EVGA RTX 3090 XC3 Black"),
 			new EVGAAmpereIdentifier(Nvidia.RTX3090,           EVGAAmpereIds.RTX3090_XC3_GAMING,                "EVGA RTX 3090 XC3 Gaming"),
 			new EVGAAmpereIdentifier(Nvidia.RTX3090,           EVGAAmpereIds.RTX3090_FTW3_GAMING,               "EVGA RTX 3090 FTW3 Gaming"),
