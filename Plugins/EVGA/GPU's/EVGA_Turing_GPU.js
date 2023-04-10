@@ -381,7 +381,6 @@ class EVGATuringGPUList extends GPUList{
 			new EVGATuringIdentifier(Nvidia.RTX2080_SUPER,      EVGATuringIds.RTX2080_SUPER_XC_HYBRID,          "EVGA RTX 2080 Super XC Hybrid"),
 			new EVGATuringIdentifier(Nvidia.RTX2080_SUPER,      EVGATuringIds.RTX2080_SUPER_XC_HYDRO_COPPER,    "EVGA RTX 2080 Super XC Hydro Copper"),
 			new EVGATuringIdentifier(Nvidia.RTX2080_SUPER,      EVGATuringIds.RTX2080_SUPER_FTW3_HYBRID_GAMING, "EVGA RTX 2080 Super FTW3 Hybrid Gaming"),
-			new EVGATuringIdentifier(Nvidia.RTX2080_SUPER,      EVGATuringIds.RTX2080_SUPER_FTW3_HYBRID_GAMING, "EVGA RTX 2080 Super FTW3 Hybrid Gaming"),
 
 			//new EVGATuringIdentifier(Nvidia.RTX2080_SUPER,      EVGATuringIds.RTX2080_SUPER_FTW3_HYDRO_COPPER,  "EVGA RTX 2080 Super FTW3 Hydro Copper"), // UNTESTED
 		];
