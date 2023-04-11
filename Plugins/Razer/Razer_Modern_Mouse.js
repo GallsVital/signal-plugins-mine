@@ -199,22 +199,17 @@ function deviceInitialization(wake = false) {
 		Razer.detectSupportedFeatures();
 		Razer.setDeviceLightingProperties();
 		Razer.setNumberOfLEDs(vLedPositions.length);
+		Razer.setSoftwareLightingMode();
 
-		if (OnboardDPI) {
-
-
-			Razer.setSoftwareLightingMode();
-
-			if (SettingControl) {
-				if (OnboardDPI) {
-					Razer.setDeviceMode("Hardware Mode");
-					DpiHandler.setEnableControl(false);
-					RazerMouse.setDeviceDPI(1, dpiStages, true);
-					Razer.setDeviceMode("Hardware Mode");
-				} else {
-					Razer.setDeviceMode("Software Mode");
-					device.addFeature("mouse");
-				}
+		if (SettingControl) {
+			if (OnboardDPI) {
+				Razer.setDeviceMode("Hardware Mode");
+				DpiHandler.setEnableControl(false);
+				RazerMouse.setDeviceDPI(1, dpiStages, true);
+				Razer.setDeviceMode("Hardware Mode");
+			} else {
+				Razer.setDeviceMode("Software Mode");
+				device.addFeature("mouse");
 			}
 		}
 	}
