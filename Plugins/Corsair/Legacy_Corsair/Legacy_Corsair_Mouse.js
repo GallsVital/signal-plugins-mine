@@ -1,41 +1,265 @@
-
-const CORSAIR_COMMAND_WRITE       = 0x07;
-const CORSAIR_COMMAND_READ        = 0x0E;
-const CORSAIR_COMMAND_STREAM      = 0x7F;
-
-const CORSAIR_LIGHTING_CONTROL_HARDWARE           = 0x01;
-const CORSAIR_LIGHTING_CONTROL_SOFTWARE           = 0x02;
-
-const CORSAIR_PROPERTY_SPECIAL_FUNCTION = 0x04;
-const CORSAIR_PROPERTY_SUBMIT_MOUSE_COLOR         = 0x22;
-
-
-export function Name() { return "Corsair Dark Core"; }
+export function Name() { return "Legacy Corsair Mouse"; }
 export function VendorId() { return 0x1b1c; }
-export function ProductId() { return 0x1B51; }
+export function ProductId() { return Object.keys(deviceLibrary.PIDLibrary); }
 export function Publisher() { return "WhirlwindFX"; }
 export function Size() { return [3, 3]; }
 export function DefaultPosition() {return [225, 120]; }
 export function DefaultScale(){return 15.0;}
+export function Documentation(){ return "troubleshooting/corsair"; }
 /* global
 shutdownColor:readonly
 LightingMode:readonly
 forcedColor:readonly
 DpiControl:readonly
+dpiStages:readonly
+dpiRollover:readonly
 dpi1:readonly
+dpi2:readonly
+dpi3:readonly
+dpi4:readonly
+dpi5:readonly
+dpi6:readonly
 */
 export function ControllableParameters(){
+	const config = deviceLibrary.getDeviceByProductId(device.productId());
+
 	return [
 		{"property":"shutdownColor", "group":"lighting", "label":"Shutdown Color", "min":"0", "max":"360", "type":"color", "default":"#009bde"},
 		{"property":"LightingMode", "group":"lighting", "label":"Lighting Mode", "type":"combobox", "values":["Canvas", "Forced"], "default":"Canvas"},
 		{"property":"forcedColor", "group":"lighting", "label":"Forced Color", "min":"0", "max":"360", "type":"color", "default":"#009bde"},
 		{"property":"DpiControl", "group":"mouse", "label":"Enable Dpi Control", "type":"boolean", "default":"false"},
-		{"property":"dpi1", "group":"mouse", "label":"DPI", "type":"number", "min":"200", "max":"16000", "default":"800"},
+		{"property":"dpiStages", "group":"mouse", "label":"Number of DPI Stages", "step":"1", "type":"number", "min":"1", "max":"5", "default":"5"},
+		{"property":"dpiRollover", "group":"mouse", "label":"DPI Stage Rollover", "type":"boolean", "default": "false"},
+		{"property":"dpi1", "group":"mouse", "label":"DPI Stage 1", "step":"50", "type":"number", "min":"100", "max": config.maxDPI, "default":"400"},
+		{"property":"dpi2", "group":"mouse", "label":"DPI Stage 2", "step":"50", "type":"number", "min":"100", "max": config.maxDPI, "default":"800"},
+		{"property":"dpi3", "group":"mouse", "label":"DPI Stage 3", "step":"50", "type":"number", "min":"100", "max": config.maxDPI, "default":"1600"},
+		{"property":"dpi4", "group":"mouse", "label":"DPI Stage 4", "step":"50", "type":"number", "min":"100", "max": config.maxDPI, "default":"2400"},
+		{"property":"dpi5", "group":"mouse", "label":"DPI Stage 5", "step":"50", "type":"number", "min":"100", "max": config.maxDPI, "default":"3200"},
+		{"property":"dpi6", "group":"mouse", "label":"DPI Sniper Stage", "step":"50", "type":"number", "min":"100", "max": config.maxDPI, "default":"400"},
 	];
 }
-export function Documentation(){ return "troubleshooting/corsair"; }
 
-let savedDpi1;
+let savedPollTimer = Date.now();
+const PollModeInternal = 15000;
+
+export function LedNames() {
+	return LegacyCorsair.getvKeyNames();
+}
+
+export function LedPositions() {
+	return LegacyCorsair.getvLedPositions();
+}
+
+
+export function Initialize(configRequired = false) {
+	device.set_endpoint(1, 0x0004, 0xffc2);
+
+	if(!configRequired) {
+		const DeviceInformation = LegacyCorsair.getFirmwareInformation();
+		LegacyCorsair.setDeviceInfo();
+
+		LegacyCorsair.setDeviceType(DeviceInformation[5]);
+
+		if(LegacyCorsair.getWirelessDevice()) {
+			LegacyCorsair.checkWakeStatus();
+		} else {
+			LegacyCorsair.setWakeStatus(true); //Wired devices will never have a wake status
+		}
+
+		device.addFeature("mouse");
+	}
+
+	if(configRequired || !LegacyCorsair.getWirelessDevice()) {
+		device.log("Device Requires Config as it has woken from sleep or has been rebooted");
+		LegacyCorsair.setLightingControlMode(LegacyCorsair.modes.SoftwareMode);
+		LegacyCorsair.setSpecialFunctionControlMode(LegacyCorsair.modes.SoftwareMode);
+
+		if(LegacyCorsair.getWirelessDevice()) {
+			LegacyCorsair.wirelessDeviceSetup();
+		}
+
+		if(DpiControl) {
+			DpiHandler.setEnableControl(true);
+			DpiHandler.maxDPIStage = dpiStages;
+			DpiHandler.dpiRollover = dpiRollover;
+			DpiHandler.setDpi();
+		}
+
+		if(LegacyCorsair.getDeviceName() === "Nightsword") { //is mine just a special snowflake? Probably, but also edge cases.
+			device.write([0x00, 0x07, 0x05, 0x02, 0x00, 0x03], 65);
+		}
+
+		device.write([0x00, 0x07, 0x40, 0x16, 0x00, 0x01, 0x80, 0x02, 0x80, 0x03, 0x80, 0x04, 0x80, 0x05, 0x80, 0x06, 0x40, 0x07, 0x40, 0x08, 0x40, 0x09, 0x40, 0x0a, 0x40, 0x0b, 0x40, 0x0c, 0x40, 0x0d, 0x40, 0x0e, 0x40, 0x0f, 0x40, 0x10, 0x40, 0x11, 0x40, 0x12, 0x40, 0x13, 0x40, 0x14, 0x40, 0x15, 0x40, 0x16, 0x40, 0x17, 0x40, 0x18, 0x40, 0x19, 0x40, 0x1a, 0x40], 65);
+	}
+}
+
+export function Render() {
+	readInputs();
+
+	if(!LegacyCorsair.getWakeStatus()) {
+		return;
+	}
+
+	sendColors();
+	getDeviceBatteryStatus();
+}
+
+export function Shutdown() {
+	LegacyCorsair.setLightingControlMode(LegacyCorsair.modes.HardwareMode);
+	LegacyCorsair.setSpecialFunctionControlMode(LegacyCorsair.modes.HardwareMode);
+}
+
+export function onDpiControlChanged() {
+	DpiHandler.setEnableControl(DpiControl);
+}
+
+export function ondpiStagesChanged() {
+	DpiHandler.maxDPIStage = dpiStages;
+}
+
+export function ondpiRolloverChanged() {
+	DpiHandler.dpiRollover = dpiRollover;
+}
+
+export function ondpi1Changed() {
+	DpiHandler.DPIStageUpdated(1);
+}
+
+export function ondpi2Changed() {
+	DpiHandler.DPIStageUpdated(2);
+}
+
+export function ondpi3Changed() {
+	DpiHandler.DPIStageUpdated(3);
+}
+
+export function ondpi4Changed() {
+	DpiHandler.DPIStageUpdated(4);
+}
+
+export function ondpi5Changed() {
+	DpiHandler.DPIStageUpdated(5);
+}
+
+export function ondpi6Changed() {
+	DpiHandler.DPIStageUpdated(6);
+}
+
+function getDeviceBatteryStatus() {
+	if (Date.now() - savedPollTimer < PollModeInternal) {
+		return;
+	}
+
+	savedPollTimer = Date.now();
+
+	if (LegacyCorsair.getWirelessDevice()) {
+		const [batteryLevel, batteryStatus] = LegacyCorsair.getBatteryLevel();
+
+		battery.setBatteryState(batteryStatus);
+		battery.setBatteryLevel(batteryLevel);
+	}
+}
+
+function readInputs() {
+	if(LegacyCorsair.getWirelessDevice()) { //also future me could use this to detect if we have a dongle or not?
+		device.set_endpoint(0, 0x0002, 0xffc3); //Device Wake Endpoint. WHY DO WE NEED 3 ENDPOINTS
+
+		do {
+			const packet = device.read([0x00], 64, 0);
+			processInputs(packet);
+		}
+		while(device.getLastReadSize() > 0);
+	}
+
+
+	device.set_endpoint(0, 0x0002, 0xffc1); // Macro input endpoint
+
+	do {
+    	const packet = device.read([0x00], 64, 0);
+    	processInputs(packet);
+	}
+	while(device.getLastReadSize() > 0);
+
+}
+
+function processInputs(packet) {
+	device.set_endpoint(1, 0x0004, 0xffc2);
+
+	if(packet[0] === 0x04) {
+		LegacyCorsair.checkWakeStatus();
+	}
+
+	if(packet[0] === 0x03) {
+    	macroInputArray.update(packet.slice(1, 5));
+	}
+
+}
+
+function grabColors(shutdown) {
+	const RGBData = [];
+	const vKeys = LegacyCorsair.getvKeys();
+	const vLedPositions = LegacyCorsair.getvLedPositions();
+
+	for(let leds = 0; leds < vLedPositions.length; leds++) {
+		const iX = vLedPositions[leds][0];
+		const iY = vLedPositions[leds][1];
+		let col;
+
+		if(shutdown){
+			col = hexToRgb(shutdownColor);
+		}else if (LightingMode === "Forced") {
+			col = hexToRgb(forcedColor);
+		}else{
+			col = device.color(iX, iY);
+		}
+
+		RGBData[(leds * 4)] = vKeys[leds];
+		RGBData[(leds * 4) + 1] = col[0];
+		RGBData[(leds * 4) + 2] = col[1];
+		RGBData[(leds * 4) + 3] = col[2];
+	}
+
+	return RGBData;
+}
+
+function grabDarkCoreColors(shutdown) {
+	const RGBData = [];
+	const vKeys = LegacyCorsair.getvKeys();
+	const vLedPositions = LegacyCorsair.getvLedPositions();
+
+	for(let leds = 0; leds < vLedPositions.length; leds++) {
+		const iX = vLedPositions[leds][0];
+		const iY = vLedPositions[leds][1];
+		let col;
+
+		if(shutdown){
+			col = hexToRgb(shutdownColor);
+		}else if (LightingMode === "Forced") {
+			col = hexToRgb(forcedColor);
+		}else{
+			col = device.color(iX, iY);
+		}
+
+		RGBData[(vKeys[leds] * 3)] = col[0];
+		RGBData[(vKeys[leds] * 3) + 1] = col[1];
+		RGBData[(vKeys[leds] * 3) + 2] = col[2];
+	}
+
+	return RGBData;
+}
+
+function sendColors(shutdown = false){
+
+	if(LegacyCorsair.getDeviceName() === "Dark Core SE" || LegacyCorsair.getDeviceName() === "Dark Core") {
+		const RGBData = grabDarkCoreColors(shutdown);
+		LegacyCorsair.setDarkCoreLighting(RGBData);
+
+		return;
+	}
+
+	const RGBData = grabColors(shutdown);
+	LegacyCorsair.setSoftwareMouseLighting(RGBData);
+}
 
 function hexToRgb(hex) {
 	const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
@@ -47,146 +271,670 @@ function hexToRgb(hex) {
 	return colors;
 }
 
-function setDpi(dpi){
+class LegacyCorsairLibrary {
+	constructor() {
+		this.PIDLibrary = {
+			0x1B35 : "Dark Core",
+			0x1B51 : "Dark Core SE",
+			0x1B4B : "Dark Core SE",
+			0x1B34 : "Glaive RGB",
+			0x1B74 : "Glaive Pro",
+			0x1B3C : "Harpoon RGB",
+			0x1B75 : "Harpoon Pro",
+			0x1B5D : "Ironclaw RGB",
+			0x1B5A : "M65 Elite",
+			0x1B2E : "M65 Pro",
+			0x1B5C : "Nightsword",
+			0x1B1E : "Scimitar",
+			0x1B8B : "Scimitar Elite",
+			0x1B3E : "Scimitar Pro"
+		};
+		this.DeviceLibrary = {
+			"Dark Core" : {
+				vLedNames : [ "Front Zone", "Logo Zone" ],
+				vLedPositions : [ [1, 0], [1, 2], [0, 1] ],
+				vKeys : [ 1, 0 ],
+				size : [3, 3],
+				maxDPI : 16000,
+				wireless : true
+			},
 
-	savedDpi1 = dpi;
-
-	var packet = [];
-	packet[0] = 0x00;
-	packet[1] = 0x07;
-	packet[2] = 0x13;
-	packet[3] = 0xD1;
-	packet[4] = 0x00;
-	packet[5] = 0x00;
-	packet[6] = dpi%256;
-	packet[7] = Math.floor(dpi/256);
-	packet[8] = dpi%256;
-	packet[9] = Math.floor(dpi/256);
-	packet[10] = 0xFF;
-	device.write(packet, 65);
-
-	var packet = [];
-	packet[0] = 0x00;
-	packet[1] = 0x07;
-	packet[2] = 0x13;
-	packet[3] = 0x02;
-	packet[4] = 0x00;
-	packet[5] = 0x01;
-	device.write(packet, 65);
-
-}
-const vLedNames = ["Front Zone", "Logo Zone"];
-
-const vLedPositions = [[1, 0], [1, 2]
-];
-
-export function LedNames() {
-	return vLedNames;
-}
-
-export function LedPositions() {
-	return vLedPositions;
-}
-
-function EnableSoftwareControl() {
-	const packet = [];
-
-	// Lighting ctrl packet.
-	packet[0x00]           = 0x00;
-	packet[0x01]           = CORSAIR_COMMAND_WRITE;
-	packet[0x02]           = CORSAIR_PROPERTY_SPECIAL_FUNCTION;
-	packet[0x03]           = CORSAIR_LIGHTING_CONTROL_SOFTWARE;
-
-	// Send.
-	device.write(packet, 65);
-}
-
-
-function ReturnToHardwareControl() {
-	const packet = [];
-
-	// Lighting ctrl packet.
-	packet[0x00]           = 0x00;
-	packet[0x01]           = CORSAIR_COMMAND_WRITE;
-	packet[0x02]           = CORSAIR_PROPERTY_SPECIAL_FUNCTION;
-	packet[0x03]           = CORSAIR_LIGHTING_CONTROL_HARDWARE;
-
-	// Send packet.
-	device.write(packet, 65);
-}
-
-
-export function Initialize() {
-	EnableSoftwareControl();
-
-	if(savedDpi1 != dpi1 && DpiControl){
-		setDpi(dpi1);
-	}
-}
-
-
-export function Render() {
-	sendColors();
-
-	if(savedDpi1 != dpi1 && DpiControl){
-		setDpi(dpi1);
-	}
-}
-
-function sendColors(shutdown = false){
-
-	const zones = [0, 1, 2, 3, 7];
-
-	const packet = [];
-	packet[0x00]   = 0x00;
-	packet[0x01]   = CORSAIR_COMMAND_WRITE;
-	packet[0x02]   = 0xAA;
-	packet[0x03]   = 0x00;
-	packet[0x04]   = 0x00;
-	packet[0x05]   = 0x07;
-	packet[0x06]   = 0x07;
-	packet[0x07]   = 0x00;
-	packet[0x08]   = 0x00;
-
-
-	for(let zone_idx = 0; zone_idx < 2; zone_idx++) {
-		const iX = vLedPositions[zone_idx][0];
-		const iY = vLedPositions[zone_idx][1];
-		var col;
-
-		if(shutdown){
-			col = hexToRgb(shutdownColor);
-		}else if (LightingMode === "Forced") {
-			col = hexToRgb(forcedColor);
-		}else{
-			col = device.color(iX, iY);
-		}
-
-
-		if(zone_idx == 0){
-			packet[0x09]   = 0x64;
-		}
-
-		packet[(zone_idx * 3) + 10] = col[0];
-		packet[(zone_idx * 3) + 11] = col[1];
-		packet[(zone_idx * 3) + 12] = col[2];
-
-		if(zone_idx == 1){
-			packet[16]   = 0x05;
-		}
+			"Dark Core SE" : {
+				vLedNames : [ "Front Zone", "Logo Zone", "Sniper pew pew!" ],
+				vLedPositions : [ [1, 0], [1, 2], [0, 1] ],
+				vKeys : [ 2, 0, 1 ],
+				size : [2, 3],
+				maxDPI : 16000,
+				wireless : true
+			},
+			"Glaive RGB" : {
+				vLedNames : [ "Logo Zone", "Front Zone", "Light Zone" ],
+				vLedPositions : [ [1, 2], [1, 0], [1, 1] ],
+				vKeys : [ 2, 6, 1 ],
+				size : [3, 3],
+				maxDPI : 12400
+			},
+			"Glaive Pro" : {
+				vLedNames : [ "Mouse" ],
+				vLedPositions : [ [1, 1] ],
+				vKeys : [ 1 ],
+				size : [3, 3],
+				maxDPI : 12400
+			},
+			"Harpoon RGB" : {
+				vLedNames : [ "Mouse" ],
+				vLedPositions : [ [1, 1] ],
+				vKeys : [ 3 ],
+				size : [3, 3],
+				maxDPI : 6000
+			},
+			"Harpoon Pro" : {
+				vLedNames : [ "Mouse" ],
+				vLedPositions : [ [1, 1] ],
+				vKeys : [ 1 ],
+				size : [3, 3],
+				maxDPI : 12400
+			},
+			"Ironclaw RGB" : {
+				vLedNames : [ "Logo Zone", "Scroll Zone" ],
+				vLedPositions : [ [1, 2], [1, 0] ],
+				vKeys : [ 2, 4 ],
+				size : [3, 3],
+				maxDPI : 12400
+			},
+			"M65 Elite" : {
+				vLedNames : [ "Scroll Zone", "Dpi Zone", "Logo Zone" ],
+				vLedPositions : [ [1, 0], [1, 1], [1, 2] ],
+				vKeys : [ 1, 3, 2 ],
+				size : [3, 3],
+				maxDPI : 18000
+			},
+			"M65 Pro" : {
+				vLedNames : [ "Scroll Zone", "Dpi Zone", "Logo Zone" ],
+				vLedPositions : [ [1, 0], [1, 1], [1, 2] ],
+				vKeys : [ 1, 3, 2 ],
+				size : [3, 3],
+				maxDPI : 12400
+			},
+			"Nightsword" : {
+				vLedNames : ["Logo Zone", "Rear Zone", "Front Zone", "Scroll Zone"],
+				vLedPositions : [[2, 2], [2, 3], [1, 0], [0, 0]],
+				vKeys : [ 2, 6, 1, 4 ],
+				size : [3, 4],
+				maxDPI : 12400
+			},
+			"Scimitar" : {
+				vLedNames : [ "Logo Zone", "Side Bar", "Side Keys", "Front Zone", "Scroll Zone" ],
+				vLedPositions : [ [2, 2], [0, 0], [0, 1], [2, 0], [1, 0] ],
+				vKeys : [ 2, 3, 5, 1, 4 ],
+				size : [3, 4],
+				maxDPI : 12400
+			},
+			"Scimitar Elite" : {
+				vLedNames : [ "Logo Zone", "Side Bar", "Side Keys", "Front Zone", "Scroll Zone" ],
+				vLedPositions : [ [2, 2], [0, 0], [0, 1], [2, 0], [1, 0] ],
+				vKeys : [ 2, 3, 5, 1, 4 ],
+				size : [3, 4],
+				maxDPI : 12400
+			},
+			"Scimitar Pro" : {
+				vLedNames : [ "Logo Zone", "Side Bar", "Side Keys", "Front Zone", "Scroll Zone" ],
+				vLedPositions : [ [2, 2], [0, 0], [0, 1], [2, 0], [1, 0] ],
+				vKeys : [ 2, 3, 5, 1, 4 ],
+				size : [3, 4],
+				maxDPI : 12400
+			},
+		};
 	}
 
+	getDeviceByProductId(productId) {
+		return this.DeviceLibrary[this.PIDLibrary[productId]];
+	}
+}
+const deviceLibrary = new LegacyCorsairLibrary();
 
-	device.write(packet, 65);
+class LegacyCorsairProtocol {
+	constructor() {
+		/** Write command to device, and recieves no response. */
+		this.write = 0x07;
+		/** Get data from the device. */
+		this.read = 0x0E;
+		/** Used to Send Streaming lighting packets. */
+		this.stream = 0x7f;
+
+		this.modes = {
+			"HardwareMode"    : 0x01,
+			"SoftwareMode"    : 0x02,
+			"StrafeSidelight" : 0x08,
+			"WinlockControl"  : 0x09
+		};
+
+		this.Commands =
+		{
+			/** Control for software versus hardware button event/mapping. */
+			specialFunctionControl : 0x04,
+			/** Control for software versus hardware lighting control. */
+			lightingControl		   : 0x05,
+			/** Control for a device's Polling/Refresh rate. */
+			pollingRate 		   : 0x0a,
+			/** Command for anything mouse specific*/
+			mouseFunctions : 0x13,
+			/** Command for setting Software Mouse Lighting Zones.*/
+			softwareMouseColorChange : 0x22,
+			/** Command for setting Software Mousepad Lighting Zones.*/ //slightly differing formatting from mouse writes
+			softwareMousepadColorChange : 0x22,
+			/** Command for setting K55 Lighting Zones.*/
+			softwareK55ColorChange : 0x25,
+			/** Command for setting 9 Bit Software Keyboard Lighting Zones.*/
+			softwareKeyboard9BitColorChange : 0x27,
+			/** Command for setting 24 Bit Software Keyboard Lighting Zones.*/
+			softwareKeyboard24BitColorChange : 0x28,
+			/** Command for determining what write type a keyboard will output (HID, Corsair, Both).*/
+			keyInputMode : 0x40,
+			/** Command for reading Battery.*/
+			batteryStaus : 0x50,
+		};
+
+		this.Config =
+		{
+			deviceType : 0x00,
+			wirelessDevice : false,
+			deviceAwake : false,
+			deviceName : "",
+			vKeys : [],
+			vKeyPositions : [],
+			vKeyNames : []
+		};
+
+		this.DeviceTypes =
+		{
+			"Mouse" : 0x01,
+			"Keyboard" : 0x03,
+			"Mousepad" : 0x04,
+			"Headset Stand" : 0x05
+		};
+
+		this.DeviceIdentifiers =
+		{
+			0xc0 : "Keyboard",
+			0xc1 : "Mouse",
+			0xc2 : "Mousepad"
+		};
+
+		this.batteryDict = {
+			0x05 : 100,
+			0x04 : 50,
+			0x03 : 30,
+			0x02 : 15,
+			0x01 : 0
+		};
+
+		this.mouseSubcommands =
+		{
+			dpi : 0x02,
+			liftOffDistance : 0x03,
+			angleSnapping : 0x04 //0x00, snapping
+		};
+
+		this.keyboardColorDict =
+		{
+			red : 0x01,
+			green : 0x02,
+			blue : 0x03
+		};
+
+		this.keyIdx = {
+			0 : "Left Click",
+			1 : "Right Click",
+			2 : "Middle Click",
+			3 : "Backwards",
+			4 : "Forwards",
+			5 : "null 5",
+			6 : "null 6",
+			7 : "null 7",
+			8 : "Keypad 1",
+			9 : "Keypad 2",
+			10 : "Keypad 3",
+			11 : "Keypad 4",
+			12 : "Keypad 5",
+			13 : "Keypad 6",
+			14 : "Keypad 7",
+			15 : "Keypad 8",
+			16 : "Keypad 9",
+			17 : "Keypad 10",
+			18 : "Keypad 11",
+			19 : "Keypad 12",
+			20 : "null 20",
+			24 : "Profile Up",
+			25 : "Profile Down"
+		};
+	}
+
+	getPressedKey(keyIdx) { return this.keyIdx[keyIdx]; }
+
+	getDeviceName() { return this.Config.deviceName; }
+	setDeviceName(deviceName) { this.Config.deviceName = deviceName; }
+
+	setDeviceType(deviceType) { this.Config.deviceType = this.DeviceTypes[deviceType]; }
+
+	getWirelessDevice() { return this.Config.wirelessDevice; }
+	setWirelessDevice(wireless) { this.Config.wirelessDevice = wireless; }
+
+	getWakeStatus() { return this.Config.deviceAwake; }
+	setWakeStatus(wakeStatus) { this.Config.deviceAwake = wakeStatus; }
+
+	getvKeys() { return this.Config.vKeys; }
+	setvKeys(vKeys) { this.Config.vKeys = vKeys; }
+	getvKeyNames() { return this.Config.vKeyNames; }
+	setvKeyNames(vKeyNames) { this.Config.vKeyNames = vKeyNames; }
+	getvLedPositions() { return this.Config.vKeyPositions; }
+	setvLedPositions(vKeyPositions) { this.Config.vKeyPositions = vKeyPositions; }
+
+	setDeviceInfo() {
+		const config = deviceLibrary.getDeviceByProductId(device.productId());
+
+		if(config.wireless) {
+			this.setWirelessDevice(true);
+		}
+
+		this.setvKeys(config.vKeys);
+		this.setvKeyNames(config.vLedNames);
+		this.setvLedPositions(config.vLedPositions);
+		this.setDeviceName(deviceLibrary.PIDLibrary[device.productId()]); //WJY DID THIS WORK WITHOUT THIS?!?!?!?
+		device.setName("Corsair " + deviceLibrary.PIDLibrary[device.productId()]);
+		device.setSize(config.size);
+		device.setControllableLeds(this.Config.vKeyNames, this.Config.vKeyPositions);
+	}
+
+	/** Legacy Corsair Write Command*/
+	setCommand(data) {
+		const packet = [0x00, this.write];
+		data  = data || [0x00, 0x00, 0x00];
+		packet.push(...data);
+		device.write(packet, 65);
+	}
+	/** Legacy Corsair Read Command*/
+	getCommand(data) {
+		const packet = [0x00, this.read];
+		packet.push(...data);
+		device.send_report(packet, 65);
+
+		const returnpacket = device.get_report(packet, 65);
+
+		return returnpacket.slice(4, 64);
+	}
+	/** Legacy Corsair Streaming Command, used exclusively on keyboards iirc*/
+	streamCommand(data) {
+		const packet = [0x00, this.stream];
+		packet.push(...data);
+		device.write(packet, 65);
+	}
+	wirelessDeviceSetup() { //good way to make sure users pair the right device to the right receiver
+		const wirelessFirmwarePacket = this.getCommand([0xae]);
+
+		device.log("Full Wireless Info Packet: " + wirelessFirmwarePacket);
+
+		const VendorID = wirelessFirmwarePacket[2].toString(16) + wirelessFirmwarePacket[1].toString(16);
+		device.log("Wireless Device Vendor ID: " + VendorID);
+
+		const ProductID = wirelessFirmwarePacket[4].toString(16) + wirelessFirmwarePacket[3].toString(16);
+		device.log("Wireless Device Product ID: " + ProductID);
+
+		const unknownWirelessPacket = this.getCommand([0x4a]);
+		device.addFeature("battery");
+
+		this.setCommand([0xAD, 0x00, 0x00, 0x64]); //Crank the brightness
+
+		getDeviceBatteryStatus();
+	}
+	/** Grab Relevant Information off of the Device.*/
+	getFirmwareInformation() {
+		const returnpacket = this.getCommand([0x01, 0x00]);
+		//device.log("Full Return Packet: " + returnpacket);
+
+		const firmwareVersion = returnpacket[6].toString(16) + returnpacket[5].toString(16);
+		device.log("Device Firmware Version:" + firmwareVersion, {toFile: true});
+
+		const bootloaderVersion = returnpacket[8].toString(16) + returnpacket[7].toString(16);
+		device.log("Device Bootloader Version:" + bootloaderVersion, {toFile: true});
+
+		const VendorID = returnpacket[10].toString(16) + returnpacket[9].toString(16);
+		device.log("Device Vendor ID: " + VendorID, {toFile: true});
+
+		const ProductID = returnpacket[12].toString(16) + returnpacket[11].toString(16);
+		device.log("Device Product ID: " + ProductID, {toFile: true});
+
+		const pollingRate = 1000 / returnpacket[13];
+		device.log("Device Polling Rate: " + pollingRate + "Hz", {toFile: true});
+
+		const layout = returnpacket[20];
+
+		let deviceType = this.DeviceIdentifiers[returnpacket[17]];
+
+		if(layout !== undefined) {
+			if(layout > 5 && deviceType === "Keyboard") {
+				device.log("Mouse misidentified as a keyboard.", {toFile: true});
+				deviceType = "Mouse"; //something something Dark Core identifies as a keyboard
+			}
+
+			device.log("Keyboard Layout Byte: " + layout);
+			device.log("Device Type: " + deviceType, {toFile: true});
+		}
+
+		const ledMask = returnpacket[21];
+		device.log("LED Mask: " + ledMask, {toFile: true}); //this is about as reliable as autodection on MSI boards. Half the mice just straight up ignore it, or they give me values that make ZERO SENSE.
+
+		return [firmwareVersion, bootloaderVersion, VendorID, ProductID, pollingRate, deviceType];
+	}
+	/** Grab Battery Level off of the Device.*/
+	getBatteryLevel() {
+		const batteryPacket = this.getCommand([0x50]);
+		const batteryLevel = this.batteryDict[batteryPacket[1]];
+		const batteryStatus = batteryPacket[2];
+
+		if(batteryLevel !== 0) {
+			device.log("Battery Level: " + batteryLevel + "%");
+
+			return [batteryLevel, batteryStatus];
+		}
+
+		device.log("Error Fetching Battery Level");
+
+		return [-1, -1];
+	}
+	/** Check if a device is awake using the battery level as a gauge.*/
+	checkWakeStatus() {
+		const wakeStatus = this.getBatteryLevel();
+
+		if(wakeStatus[0] !== undefined) {
+			this.setWakeStatus(true);
+			Initialize(true);
+		} else {
+			this.setWakeStatus(false);
+			device.log("Device is taking a nap.");
+		}
+	}
+	/** Set Device to Function Control Mode.*/
+	setSpecialFunctionControlMode(mode) {
+		const packet = [this.Commands.specialFunctionControl, mode];
+		this.setCommand(packet);
+	}
+	/** Set Device Lighting Mode.*/
+	setLightingControlMode(mode) {
+		const packet = [this.Commands.lightingControl, mode, 0x00, this.Config.deviceType];
+		this.setCommand(packet);
+	}
+	/** Set Software Lighting on the Dark Core and Dark Core SE. Things use a wacky packet send.*/
+	setDarkCoreLighting(RGBData) {
+		//this.setCommand([0xAA, 0x00, 0x00, 0x07, 0x07, 0x00, 0x00, 0x64].concat(RGBData).concat(0x05));
+		device.write([0x00, 0x07, 0xaa, 0x00, 0x00, 0x01, 0x07, 0x00, 0x00, 0x64].concat(RGBData.splice(0, 3)).concat([0x00, 0x00, 0x00, 0x05]), 65); //no idea what second arg is
+		device.pause(5);
+		device.write([0x00, 0x07, 0xaa, 0x00, 0x00, 0x02, 0x07, 0x00, 0x00, 0x64].concat(RGBData.splice(0, 3)).concat([0x00, 0x00, 0x00, 0x04]), 65);
+		device.pause(5);
+		device.write([0x00, 0x07, 0xaa, 0x00, 0x00, 0x04, 0x07, 0x00, 0x00, 0x64].concat(RGBData.splice(0, 3)).concat([0x00, 0x00, 0x00, 0x03]), 65);
+		device.pause(5);
+	}
+
+	/** Set Device's Software Mouse Lighting Zones.*/
+	setSoftwareMouseLighting(RGBData) {
+		this.setCommand([this.Commands.softwareMouseColorChange, this.getvLedPositions().length, 0x01].concat(RGBData));
+	}
+	/** Set Device's Software Mousepad Lighting Zones.*/
+	setSoftwareMousepadLighting(RGBData) {
+		this.setCommand([this.Commands.softwareMousepadColorChange, this.getvLedPositions().length, 0x00].concat(RGBData));
+	}
+	/** Set Device's Software Keyboard Lighting Zones.*/
+	setSoftwareLightingStream(packetID, keys, RGBData) {
+		this.streamCommand([packetID, keys, 0x00].concat(RGBData));
+	}
+	/** Set Device's Polling Rate.*/
+	setDevicePollingRate(pollingRate) {
+		this.setCommand([this.Commands.pollingRate, 0x00, 0x00, 1000 / pollingRate]);
+	}
+	/** Set Device's Angle Snapping on or off.*/
+	setDeviceAngleSnap(angleSnapping) {
+		this.setCommand([this.Commands.mouseFunctions, this.mouseSubcommands.angleSnapping, 0x00, angleSnapping]);
+	}
+	/** Apply Device's Software Keyboard Lighting Zones.*/
+	ApplyLightingStream(colorChannel, packetCount, finishValue) {
+		this.setCommand([this.Commands.softwareKeyboard24BitColorChange, colorChannel, packetCount, finishValue]);
+	}
+	/** Set Which Output Method a Given Array of Keys Will Use.*/
+	setKeyOutputType(keys) { //In this method we feed in the keys and the type they'll use in case we want to split them (Which we will.)
+		while(keys > 0) {
+			const keysToSend = Math.min(keys.length, 30);
+			this.setCommand([this.Commands.keyInputMode, keysToSend].concat(keys.splice(0, keysToSend*2)));
+		}
+	}
+	/** Set Device's Software DPI.*/
+	setDPI(deviceDPI) {//There is another more complicated handler to do this properly. For now we're manipulating a single stage. Bright side is that we can do infinite zones even if a mouse only supports 2 or 3.
+
+		const LowDpi = deviceDPI%256;
+    	const HighDpi = deviceDPI/256;
+    	this.setCommand([LegacyCorsair.Commands.mouseFunctions, 0xD1, 0x00, 0x00, LowDpi, HighDpi, LowDpi, HighDpi, 0x00, 0x00, 0x00]); //this is jank, why am I doing it like this ?.
+		this.setCommand([LegacyCorsair.Commands.mouseFunctions, 0x02, 0x00, 0x01]);
+	}//Double edged sword because of indicators. We render DPI Indicators useless by these means if a device won't let you change them individually. Namely the Dark Core.
+}
+
+const LegacyCorsair = new LegacyCorsairProtocol();
+
+class DPIManager {
+	constructor(DPIConfig) {
+		this.currentStage = 1;
+		this.sniperStage = 6;
+
+		this.DPISetCallback = function () { device.log("No Set DPI Callback given. DPI Handler cannot function!"); };
+
+		if (DPIConfig.hasOwnProperty("callback")) {
+			this.DPISetCallback = DPIConfig.callback;
+		}
+
+		this.sniperMode = false;
+		this.enableDpiControl = false;
+		this.maxDPIStage = 5; //Default to 5 as it's most common if not defined
+		this.dpiRollover = false;
+		this.dpiStageValues = {};
+
+		if (DPIConfig.hasOwnProperty("callback")) {
+			this.dpiStageValues = DPIConfig.stages;
+		} else {
+			device.log("No Set DPI Callback given. DPI Handler cannot function!");
+		}
+	}
+	getCurrentStage() {
+		return this.currentStage;
+	}
+	getMaxStage() {
+		return this.maxDPIStage;
+	}
+	/** Enables or Disables the DPIHandler*/
+	setEnableControl(EnableDpiControl) {
+		this.enableDpiControl = EnableDpiControl;
+	}
+	/** GetDpi Value for a given stage.*/
+	getDpiValue(stage) {
+		// TODO - Bounds check
+		// This is a dict of functions, make sure to call them
+		device.log("Current DPI Stage: " + stage);
+		device.log("Current DPI: " + this.dpiStageValues[stage]());
+
+		return this.dpiStageValues[stage]();
+	}
+	/** SetDpi Using Callback. Bypasses setStage.*/
+	setDpi() {
+		if (!this.enableDpiControl) {
+			return;
+		}
+
+		if (this.sniperMode) {
+			this.DPISetCallback(this.getDpiValue(6));
+		} else {
+			this.DPISetCallback(this.getDpiValue(this.currentStage));
+		}
+	}
+	/** Increment DPIStage */
+	increment() {
+		this.setStage(this.currentStage + 1);
+	}
+	/** Decrement DPIStage */
+	decrement() {
+		this.setStage(this.currentStage - 1);
+	}
+	/** Set DPIStage and then set DPI to that stage.*/
+	setStage(stage) {
+		if (stage > this.maxDPIStage) {
+			this.currentStage = this.dpiRollover ? 1 : this.maxDPIStage;
+		} else if (stage < 1) {
+			this.currentStage = this.dpiRollover ? this.maxDPIStage : 1;
+		} else {
+			this.currentStage = stage;
+		}
+
+		this.setDpi();
+	}
+	/** Stage update check to update DPI if current stage values are changed.*/
+	DPIStageUpdated(stage) {
+		// if the current stage's value was changed by the user
+		// reapply the current stage with the new value
+		if (stage === this.currentStage) {
+			this.setDpi();
+		}
+	}
+	/** Set Sniper Mode on or off. */
+	SetSniperMode(sniperMode) {
+		this.sniperMode = sniperMode;
+		this.setDpi();
+	}
 
 }
+
+const DPIConfig =
+{
+	stages:
+	{
+		1: function () { return dpi1; },
+		2: function () { return dpi2; },
+		3: function () { return dpi3; },
+		4: function () { return dpi4; },
+		5: function () { return dpi5; },
+		6: function () { return dpi6; }
+	},
+	callback: function (dpi) { return LegacyCorsair.setDPI(dpi); }
+};
+
+const DpiHandler = new DPIManager(DPIConfig);
+
+class BitArray {
+	constructor(length) {
+		// Create Backing Array
+		this.buffer = new ArrayBuffer(length);
+		// Byte View
+		this.bitArray = new Uint8Array(this.buffer);
+		// Constant for width of each index
+		this.byteWidth = 8;
+	}
+
+	toArray() {
+		return [...this.bitArray];
+	}
+
+	get(bitIdx) {
+		return this.bitArray[bitIdx / this.byteWidth | 0] === 1 << (bitIdx % this.byteWidth);
+	}
+
+	set(bitIdx) {
+		this.bitArray[bitIdx / this.byteWidth | 0] |= 1 << (bitIdx % this.byteWidth);
+	}
+
+	clear(bitIdx) {
+		this.bitArray[bitIdx / this.byteWidth | 0] &= ~(1 << (bitIdx % this.byteWidth));
+	}
+
+	toggle(bitIdx) {
+		this.bitArray[bitIdx / this.byteWidth | 0] ^= 1 << (bitIdx % this.byteWidth);
+	}
+
+	compareByte(index, value) {
+		return this.bitArray[index] === value;
+	}
+
+	setState(bitIdx, state) {
+		if(state) {
+			this.set(bitIdx);
+		} else {
+			this.clear(bitIdx);
+		}
+	}
+	/* eslint-disable complexity */
+	update(newArray) {
+		for(let byteIdx = 0; byteIdx < newArray.length; byteIdx++) {
+			if(this.compareByte(byteIdx, newArray[byteIdx])) {
+				continue;
+			}
+
+			for (let bit = 0; bit < this.byteWidth; bit++) {
+				const isPressed = (1 << (bit % this.byteWidth) === (newArray[byteIdx] & (1 << (bit % this.byteWidth))));
+
+				const bitIdx = byteIdx * 8 + bit;
+
+				if(isPressed === this.get(byteIdx * 8 + bit)) {
+					continue;
+				}
+
+				device.log("Bit IDX:" + bitIdx);
+				this.setState(bitIdx, isPressed);
+
+				switch(bitIdx){
+				case 5:
+					if(!isPressed) {break;}
+
+					DpiHandler.increment();
+					device.log("DPI Up");
+					break;
+
+				case 6:
+					if(!isPressed) {break;}
+
+					device.log("DPI Down");
+					DpiHandler.decrement();
+					break;
+				case 7:
+					device.log("Sniper Pew Pew!");
+					device.log("pressed: " + isPressed);
+					DpiHandler.SetSniperMode(isPressed);
+					break;
+
+				default: {
+					// Skip keys only windows should handle.
+					//if(pressedKey === 0){
+					//	continue;
+					//}
+					// Send Events for any keys we don't handle above
+					const buttonName = LegacyCorsair.getPressedKey(bitIdx);
+					const eventData = {
+						"buttonCode": 0,
+						"released": !isPressed,
+						"name":buttonName
+					};
+
+					device.log(eventData);
+					mouse.sendEvent(eventData, "Button Press");
+
+				}
+				}
+			}
+
+		}
+	}
+}
+/* eslint-enable complexity */
+const macroInputArray = new BitArray(4);
+
 
 export function Validate(endpoint) {
-	return endpoint.interface === 1;
-}
-
-export function Shutdown() {
-	ReturnToHardwareControl();
+	return (endpoint.interface === 1 && endpoint.usage === 0x0004 && endpoint.usage_page === 0xffc2)  //Normal Endpoint
+	    || (endpoint.interface === 0 && endpoint.usage === 0x0002 && endpoint.usage_page === 0xffc1) //Macro Endpoint
+		|| (endpoint.interface === 0 && endpoint.usage === 0x0002 && endpoint.usage_page === 0xffc3);
 }
 
 export function Image() {
