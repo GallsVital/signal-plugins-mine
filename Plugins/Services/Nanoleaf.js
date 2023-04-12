@@ -479,7 +479,9 @@ export function DiscoveryService() {
 	];
 
 	this.Initialize = function(){
-		//service.log("Initializing plugin!");
+		service.log("Initializing Plugin!");
+		service.log("Searching for network devices...");
+
 		// const cache = service.getSetting("base", "cache");
 		// service.log(cache);
 
@@ -496,7 +498,7 @@ export function DiscoveryService() {
 	};
 
 	this.Discovered = function(value) {
-		service.log(value);
+		//service.log(value);
 
 		// const cache = service.getSetting("base", "cache") || [];
 		// let hostExists = false;
@@ -679,10 +681,9 @@ class NanoleafBridge {
 		this.retriesleft = 60;
 		this.ip = "";
 		this.deviceCreated = false;
-		this.panelinfo = {};
+		this.panelinfo = undefined;
 		this.lastPollTime = 0;
 		service.log("Constructed: "+this.name);
-
 
 		this.ResolveIpAddress();
 	}
@@ -725,10 +726,6 @@ class NanoleafBridge {
 
 				//service.saveSetting(instance.id, "ip", instance.ip);
 				//instance.RequestBridgeConfig();
-				if (instance.connected && !this.panelinfo){
-					instance.getClusterInfo();
-				}
-
 				service.updateController(instance); //notify ui.
 			}else if(host.protocol === "IPV6"){
 				service.log(`Skipping IPV6 address: ${host.ip}`);
@@ -741,6 +738,7 @@ class NanoleafBridge {
 	}
 
 	update() {
+		// Connect if we arent
 		if (this.waitingforlink){
 			this.retriesleft--;
 			this.makeRequest();
@@ -755,14 +753,18 @@ class NanoleafBridge {
 			return;
 		}
 
-
+		// Grab panel info if we don't have it.
+		// This creates the network device
 		if(this.connected && !this.panelinfo){
-			if(this.lastPollTime < Date.now() - 5000){
-				this.getClusterInfo();
-				this.lastPollTime = Date.now();
-			}
+			this.getClusterInfo();
 		}
 
+		// if(this.connected && !this.panelinfo){
+		// 	if(this.lastPollTime < Date.now() - 5000){
+		// 		this.getClusterInfo();
+		// 		this.lastPollTime = Date.now();
+		// 	}
+		// }
 	}
 
 	setKey(response) {
@@ -776,7 +778,6 @@ class NanoleafBridge {
 		this.waitingforlink = 0;
 		this.connected = true;
 		service.updateController(this);
-		this.getClusterInfo();
 	}
 
 	getClusterInfo() {
@@ -787,10 +788,10 @@ class NanoleafBridge {
 			service.log(`getClusterInfo(): State: ${xhr.readyState}, Status: ${xhr.status}`);
 
 			if (xhr.readyState === 4 && xhr.status === 200) {
+				service.log(`Panel Info Grabbed`);
 				instance.setDetails(JSON.parse(xhr.response));
 			}
-		});
-		service.log(`Panel Info Grabbed`);
+		}, true);
 	}
 
 	makeRequest(){
@@ -802,7 +803,8 @@ class NanoleafBridge {
 				instance.setKey(JSON.parse(xhr.response));
 			}
 		},
-		{/* No Data*/});
+		{/* No Data*/},
+		 true);
 	}
 
 	setDetails(response) {
@@ -830,7 +832,6 @@ class NanoleafBridge {
 	}
 }
 
-
 // Swiper no XMLHttpRequest boilerplate!
 class XmlHttp{
 	static Get(url, callback, async = false){
@@ -845,9 +846,9 @@ class XmlHttp{
 		xhr.send();
 	}
 
-	static Post(url, callback, data){
+	static Post(url, callback, data, async = false){
 		const xhr = new XMLHttpRequest();
-		xhr.open("POST", url, false);
+		xhr.open("POST", url, async);
 
 		xhr.setRequestHeader("Accept", "application/json");
 		xhr.setRequestHeader("Content-Type", "application/json");
@@ -856,9 +857,9 @@ class XmlHttp{
 
 		xhr.send(JSON.stringify(data));
 	}
-	static Delete(url, callback, data){
+	static Delete(url, callback, data, async = false){
 		const xhr = new XMLHttpRequest();
-		xhr.open("DELETE", url, false);
+		xhr.open("DELETE", url, async);
 
 		xhr.setRequestHeader("Accept", "application/json");
 		xhr.setRequestHeader("Content-Type", "application/json");
@@ -867,10 +868,9 @@ class XmlHttp{
 
 		xhr.send(JSON.stringify(data));
 	}
-
-	static Put(url, callback, data){
+	static Put(url, callback, data, async = false){
 		const xhr = new XMLHttpRequest();
-		xhr.open("PUT", url, false);
+		xhr.open("PUT", url, async);
 
 		xhr.setRequestHeader("Accept", "application/json");
 		xhr.setRequestHeader("Content-Type", "application/json");

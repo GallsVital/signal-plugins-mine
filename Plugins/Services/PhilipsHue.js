@@ -310,8 +310,8 @@ export function DiscoveryService() {
 	this.Bridges = [];
 
 	this.Initialize = function(){
-		//service.log("Initializing plugin!");
-
+		service.log("Initializing Plugin!");
+		service.log("Searching for network devices...");
 	};
 
 	this.Update = function(){
@@ -638,9 +638,6 @@ class HueBridge {
 		this.waitingforlink = false;
 		this.connected = true;
 		service.updateController(this);
-
-		//this.RequestLightInfo();
-		//this.RequestAreaInfo();
 	}
 
 	requestLink(){
@@ -701,17 +698,16 @@ class HueBridge {
 		// 	this.lastPollingTimeStamp = Date.now();
 		// }
 
+		if(!this.instantiated && this.lights && this.areas && Object.keys(this.areas).length > 0){
+			this.CreateBridgeDevice();
+			this.instantiated = true;
+		}
+
+
 		if(Date.now() - this.lastPollingTimeStamp > this.pollingInterval){
 			service.log("Polling bridge Info...");
 			this.RequestLightInfo();
 			this.RequestAreaInfo();
-
-			if(!this.instantiated && Object.keys(this.areas).length > 0){
-				this.CreateBridgeDevice();
-				this.instantiated = true;
-			}else{
-				service.updateController(this);
-			}
 
 			this.lastPollingTimeStamp = Date.now();
 		}
@@ -751,8 +747,11 @@ class HueBridge {
 					}
 
 				}
+
+				service.updateController(instance);
+
 			}
-		}, false);
+		}, true);
 	}
 
 	RequestLightInfo(){
@@ -782,8 +781,10 @@ class HueBridge {
 					service.log(`\tProduct Name: ${light.productname}`);
 					service.log(`\tType: ${light.type}`);
 				}
+
+				service.updateController(instance);
 			}
-		}, false);
+		}, true);
 	}
 
 	SetConfig(response){
@@ -814,7 +815,7 @@ class HueBridge {
 			if (xhr.readyState === 4 && xhr.status === 200) {
 				instance.SetConfig(JSON.parse(xhr.response));
 			}
-		}, false);
+		}, true);
 	}
 }
 
