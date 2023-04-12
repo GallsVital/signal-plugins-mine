@@ -7,8 +7,11 @@ declare class service{
     public static updateController(instance: any): void;
     public static hasController(Id: string): void;
     public static getController(Id: string);
+    
     public static getSetting(Id: string, key: string): any;
     public static saveSetting(Id: string, key: string, value: any);
+    public static removeSetting(Id: string, key: string);
+
     public static announceController(instance: any);
     public static resolve(HostName: string, callback: Function): void
     //public broadcast(QJSValue xMessage);

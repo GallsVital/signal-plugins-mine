@@ -339,6 +339,7 @@ export function DiscoveryService() {
 		return `
     Item {
       anchors.fill: parent
+
       Column{
         width: parent.width
         height: parent.height
@@ -346,7 +347,7 @@ export function DiscoveryService() {
 		Rectangle{
 			id: scanningItem
 			height: 50
-			width: childrenRect.width + 10
+			width: childrenRect.width + 15
 			visible: service.controllers.length == 0
 			color: theme.background3
 			radius: theme.radius
@@ -380,8 +381,9 @@ export function DiscoveryService() {
 			}
 		}
 
-        Repeater {
+        Repeater{
           model: service.controllers          
+
           delegate: Item {
             width: 300
             height: content.height + 30 //margins plus space
@@ -440,6 +442,9 @@ export function DiscoveryService() {
 
 			  Item{
 				visible: !bridge.connected && bridge.supportsStreaming
+						width: parent.width
+						height: 60
+
                 Rectangle {
                   width: parent.width
 				  anchors.verticalCenter: parent.verticalCenter
@@ -447,8 +452,7 @@ export function DiscoveryService() {
                   color: "#22ffffff"
                   radius: 5
                 }
-                width: parent.width
-                height: 60
+
                 Text{
 					x: 10
 					height: parent.height
@@ -462,9 +466,9 @@ export function DiscoveryService() {
                   width: parent.width
                   anchors.verticalCenter: parent.verticalCenter
                   font.family: "Poppins"
-                  font.bold: true 
+							font.weight: Font.Bold
                   visible: !bridge.connected && !bridge.waitingforlink  
-                  text: "Link"
+							text: "Start Link"
                   anchors.right: parent.right
                   onClicked: {
                     bridge.startLink();
@@ -480,11 +484,18 @@ export function DiscoveryService() {
                   visible: bridge.waitingforlink === true
                 } 
 			  }
-
+					Text{
+						width: parent.width
+						verticalAlignment: Text.AlignVCenter
+						color: theme.secondarytextcolor
+						visible: !bridge.connected
+						text: "To link this Bridge start the linking process above and then click the bridge's center button."
+						wrapMode: Text.WrapAtWordBoundaryOrAnywhere
+					}
 			  Text{
 				width: parent.width
 				color: theme.warn
-				text: "This bridge has no Entertainment zones. You'll need to create on in the Phillip's Hue app."
+						text: "This bridge has no Entertainment zones. You'll need to create on in the Philip's Hue app."
 				visible: bridge.connected && bridge.supportsStreaming && Object.keys(bridge.areas) == 0
 				wrapMode: Text.WrapAtWordBoundaryOrAnywhere
 			  }
@@ -520,8 +531,6 @@ export function DiscoveryService() {
 	};
 }
 
-
-// TODO: Show linking instructions
 // TODO: can we do something with the xy positions hue gives us?
 
 class HueBridge {
@@ -650,8 +659,8 @@ class HueBridge {
 				}
 			}
 		},
-		{devicetype: "SignalRGB", generateclientkey: true}
-		);
+		{devicetype: "SignalRGB", generateclientkey: true},
+		true);
 
 	}
 
@@ -736,14 +745,14 @@ class HueBridge {
 					service.log(`\tLights: ${Area.lights}`);
 					service.log(`\tType: ${Area.type}`);
 
-					if(Area.type != "Entertainment"){
+					if(Area.type !== "Entertainment"){
 						service.log(`Skipping Area [${Area.name}:${Area.id}] because it's not a streamable entertainment area...`);
 						delete instance.areas[Area.id];
 					}
 
 				}
 			}
-		});
+		}, false);
 	}
 
 	RequestLightInfo(){
@@ -774,7 +783,7 @@ class HueBridge {
 					service.log(`\tType: ${light.type}`);
 				}
 			}
-		});
+		}, false);
 	}
 
 	SetConfig(response){
@@ -787,14 +796,15 @@ class HueBridge {
 			this.supportsStreaming = true;
 		}
 
+		if(this.config.name && this.config.name !== "Philips hue"){
+			this.name = this.config.name;
+		}
+
 		service.updateController(this);
 	}
 
 	StreamableAPIVersion(apiversion){
-		// TODO: use semver util
-		const version = (apiversion ?? "0.0.0").split(".");
-
-		return (parseInt(version[0]) >= 1 && parseInt(version[1]) >= 22);
+		return Semver.isGreaterThanOrEqual(apiversion, "1.22.0");
 	}
 
 	RequestBridgeConfig(){
@@ -804,15 +814,15 @@ class HueBridge {
 			if (xhr.readyState === 4 && xhr.status === 200) {
 				instance.SetConfig(JSON.parse(xhr.response));
 			}
-		});
+		}, false);
 	}
 }
 
 // Swiper no XMLHttpRequest boilerplate!
 class XmlHttp{
-	static Get(url, callback){
+	static Get(url, callback, async = false){
 		const xhr = new XMLHttpRequest();
-		xhr.open("GET", url, false);
+		xhr.open("GET", url, async);
 
 		xhr.setRequestHeader("Accept", "application/json");
 		xhr.setRequestHeader("Content-Type", "application/json");
@@ -822,9 +832,9 @@ class XmlHttp{
 		xhr.send();
 	}
 
-	static Post(url, callback, data){
+	static Post(url, callback, data, async = false){
 		const xhr = new XMLHttpRequest();
-		xhr.open("POST", url, false);
+		xhr.open("POST", url, async);
 
 		xhr.setRequestHeader("Accept", "application/json");
 		xhr.setRequestHeader("Content-Type", "application/json");
@@ -834,9 +844,9 @@ class XmlHttp{
 		xhr.send(JSON.stringify(data));
 	}
 
-	static Put(url, callback, data){
+	static Put(url, callback, data, async = false){
 		const xhr = new XMLHttpRequest();
-		xhr.open("PUT", url, false);
+		xhr.open("PUT", url, async);
 
 		xhr.setRequestHeader("Accept", "application/json");
 		xhr.setRequestHeader("Content-Type", "application/json");
@@ -844,5 +854,51 @@ class XmlHttp{
 		xhr.onreadystatechange = callback.bind(null, xhr);
 
 		xhr.send(JSON.stringify(data));
+	}
+}
+
+class Semver{
+	static isEqualTo(a, b){
+		return this.compare(a, b) === 0;
+	}
+	static isGreaterThan(a, b){
+		return this.compare(a, b) > 0;
+	}
+	static isLessThan(a, b){
+		return this.compare(a, b) < 0;
+	}
+	static isGreaterThanOrEqual(a, b){
+		return this.compare(a, b) >= 0;
+	}
+	static isLessThanOrEqual(a, b){
+		return this.compare(a, b) <= 0;
+	}
+
+	static compare(a, b){
+		const parsedA = a.split(".").map((x) => parseInt(x));
+		const parsedB = b.split(".").map((x) => parseInt(x));
+
+		return this.recursiveCompare(parsedA, parsedB);
+	}
+
+	static recursiveCompare(a, b){
+		if (a.length === 0) { a = [0]; }
+
+		if (b.length === 0) { b = [0]; }
+
+		if (a[0] !== b[0] || (a.length === 1 && b.length === 1)) {
+			if(a[0] < b[0]){
+				return -1;
+			}
+
+			if(a[0] > b[0]){
+				return 1;
+			}
+
+			return 0;
+
+		}
+
+		return this.recursiveCompare(a.slice(1), b.slice(1));
 	}
 }

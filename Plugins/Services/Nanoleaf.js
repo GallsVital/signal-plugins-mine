@@ -15,6 +15,60 @@ export function ControllableParameters() {
 	];
 }
 const BIG_ENDIAN = true;
+/** @type {NanoleafDevice} */
+let Nanoleaf;
+let lastUpdateTime = Date.now();
+
+
+export function Initialize() {
+	device.setName(controller.name);
+
+	device.addFeature("udp");
+
+	device.log("Obj host "+controller.hostname+":"+controller.port+"@"+controller.key);
+
+	Nanoleaf = new NanoleafDevice(controller);
+
+	Nanoleaf.ExtractPanelInformation(controller.panelinfo);
+	Nanoleaf.InitializeDevice();
+}
+
+
+export function Render() {
+
+	if(Nanoleaf.streamOpen){
+		// Gen 1 Panels require a frame rate limiter.
+		if(!Nanoleaf.isGen1){
+			Nanoleaf.SendColorsv2();
+		}else if(lastUpdateTime < Date.now() - 50){
+			Nanoleaf.SendColorsv2();
+			lastUpdateTime = Date.now();
+		}
+
+	}else if(Nanoleaf.openAttempts < Nanoleaf.MaxAttemptsToOpenStream){
+		Nanoleaf.openAttempts++;
+
+		Nanoleaf.StartStream();
+	}else{
+		// Alert User....
+		device.log(`Failed To Open Stream after ${Nanoleaf.openAttempts} Attempts! Aborting Rendering...`);
+	}
+}
+
+export function Shutdown(suspend) {
+
+	// if(suspend){
+	// 	//Blackoutv1();
+	// 	return;
+	// }
+	Nanoleaf.streamOpen = false;
+
+	Nanoleaf.Shutdown();
+
+	if(turnOffOnShutdown){
+		Nanoleaf.protocol.TurnOff();
+	}
+}
 
 class NanoleafDevice{
 	constructor(controller){
@@ -37,6 +91,8 @@ class NanoleafDevice{
 		this.effectList = [];
 		this.firmwareVerion = "0.0.0";
 		this.isGen1 = false;
+		this.ledNames = [];
+		this.ledPositions = [];
 	}
 
 	NormalizeDeviceSize(){
@@ -46,6 +102,10 @@ class NanoleafDevice{
 		let maxY = -Infinity;
 
 		for(const panel of this.panels){
+			// if(panel.panelId === 0){
+			// 	continue;
+			// }
+
 			minX = Math.min(minX, panel.x);
 			minY = Math.min(minY, panel.y);
 			maxX = Math.max(maxX, panel.x);
@@ -78,12 +138,27 @@ class NanoleafDevice{
 
 		this.NormalizeDeviceSize();
 
+		this.ledNames = [];
+		this.ledPositions = [];
+
+		for(const panel of this.panels){
+			// Skip controller
+			if(panel.panelId === 0){
+				continue;
+			}
+
+			this.ledNames.push(`Panel: ${panel.panelId.toString()}`);
+			this.ledPositions.push([Math.floor(panel.x / this.ScaleFactor), Math.floor(panel.y / this.ScaleFactor)]);
+		}
+
+		device.setControllableLeds(this.ledNames, this.ledPositions);
+
 		const effectsList = [];
 
 		for(let i = 0; i < panelConfig.effects.effectsList.length; i ++){
 			const effect = panelConfig.effects.effectsList[i];
 
-			if(effect != "*Dynamic*" && effect !== "*ExtControl*"){
+			if(effect !== "*Dynamic*" && effect !== "*ExtControl*"){
 				effectsList.push(effect);
 			}
 		}
@@ -136,9 +211,6 @@ class NanoleafDevice{
 		device.log(`Orignal Brightness: ${this.config.originalBrightness}`);
 		this.protocol.SetBrightness(this.config.originalBrightness);
 
-		//TODO: if previous effect is *dynamic* or *ExtControl* we should pick something else.
-		// reverting back to that will just lock up the panels.
-		// Grab first effect from the effect list?
 		device.log(`Orignal Effect: ${this.config.originalEffect}`);
 
 		if(this.config.originalEffect === "" && this.effectList.length > 0){
@@ -156,6 +228,7 @@ class NanoleafDevice{
 		packet[0] = this.lightCount;
 
 		for(const [iIdx, lightinfo] of this.panels.entries()) {
+
 			const startidx = 1 + (iIdx * 7);
 			packet[startidx + 0] = lightinfo.panelId;
 			packet[startidx + 1] = 1; // reserved
@@ -181,12 +254,14 @@ class NanoleafDevice{
 		packet[1] = this.lightCount;
 
 		for(const [iIdx, lightinfo] of this.panels.entries()) {
+
 			const startidx = 2 + (iIdx * 8);
 			packet[startidx] = (lightinfo.panelId >> 8) & 0xFF;
 			packet[startidx + 1] = lightinfo.panelId & 0xFF; // reserved
 
 			const x = lightinfo.x / this.ScaleFactor;
 			const y = lightinfo.y / this.ScaleFactor;
+
 			const col = device.color(x, y);
 			packet[startidx + 2] = col[0]; //r
 			packet[startidx + 3] = col[1]; //g
@@ -194,6 +269,7 @@ class NanoleafDevice{
 			packet[startidx + 5] = 0; //w
 			packet[startidx + 6] = 0; //transition time * 100ms
 			packet[startidx + 7] = 1;
+
 		}
 
 		if (this.streamOpen) {
@@ -343,7 +419,7 @@ class NanoleafProtocol{
 			if (xhr.readyState === 4) {
 				//device.log(`State: ${xhr.readyState}, Status: ${xhr.status}`);
 
-				if(xhr.status == 204) {
+				if(xhr.status === 204) {
 					output = true;
 				}else{
 					device.log(`TurnOff(): Command Failed with status: ${xhr.status}`);
@@ -389,61 +465,6 @@ class NanoleafProtocol{
 		});
 
 		return output;
-	}
-}
-
-/** @type {NanoleafDevice} */
-let Nanoleaf;
-let lastUpdateTime = Date.now();
-
-
-export function Initialize() {
-	device.setName(controller.name);
-
-	device.addFeature("udp");
-
-	device.log("Obj host "+controller.hostname+":"+controller.port+"@"+controller.key);
-
-	Nanoleaf = new NanoleafDevice(controller);
-
-	Nanoleaf.ExtractPanelInformation(controller.panelinfo);
-	Nanoleaf.InitializeDevice();
-}
-
-
-export function Render() {
-
-	if(Nanoleaf.streamOpen){
-		// Gen 1 Panels require a frame rate limiter.
-		if(!Nanoleaf.isGen1){
-			Nanoleaf.SendColorsv2();
-		}else if(lastUpdateTime < Date.now() - 50){
-			Nanoleaf.SendColorsv2();
-			lastUpdateTime = Date.now();
-		}
-
-	}else if(Nanoleaf.openAttempts < Nanoleaf.MaxAttemptsToOpenStream){
-		Nanoleaf.openAttempts++;
-
-		Nanoleaf.StartStream();
-	}else{
-		// Alert User....
-		device.log(`Failed To Open Stream after ${Nanoleaf.openAttempts} Attempts! Aborting Rendering...`);
-	}
-}
-
-
-export function Shutdown(suspend) {
-
-	// if(suspend){
-	// 	//Blackoutv1();
-	// 	return;
-	// }
-
-	Nanoleaf.Shutdown();
-
-	if(turnOffOnShutdown){
-		Nanoleaf.protocol.TurnOff();
 	}
 }
 
@@ -506,16 +527,16 @@ export function DiscoveryService() {
 
 	this.Interface = function() {
 		return `
-    Item {
-      anchors.fill: parent
-      Column{
+Item {
+	anchors.fill: parent
+	Column{
         width: parent.width
         height: parent.height
 		
 		Rectangle{
 			id: scanningItem
 			height: 50
-			width: childrenRect.width + 10
+			width: childrenRect.width + 15
 			visible: service.controllers.length == 0
 			color: theme.background3
 			radius: theme.radius
@@ -550,93 +571,101 @@ export function DiscoveryService() {
 		}
 		
 
-
         Repeater {
-          model: service.controllers          
-          delegate: Item {
-            width: 300
-            height: 250
-            Rectangle {
-              width: parent.width
-              height: parent.height - 10
-              color: "#3baf29"
-              radius: 5
-            }
-            Image {
-              x: 10
-              y: 10
-              height: 50                
-              source: "https://marketplace.signalrgb.com/brands/products/nanoleaf/dark_logo.png"
-              fillMode: Image.PreserveAspectFit
-              antialiasing: true
-              mipmap:true
-            }
-            Column {
-              x: 10
-              y: 80
-              width: parent.width - 20
-              spacing: 10
-              
-              Text{
-                color: theme.primarytextcolor
-                text: model.modelData.obj.name
-                font.pixelSize: 16
-                font.family: "Poppins"
-                font.bold: true
-              }
-              Text{
-                color: theme.primarytextcolor
-                text: "Id: " + model.modelData.obj.id
-              }
-              Text{
-                color: theme.primarytextcolor
-                text: "Firmware v"+model.modelData.obj.firmwareVersion
-              }    
-              Item{
-                Rectangle {
-                  width: parent.width
-                  height: parent.height
-                  color: "#22ffffff"
-                  radius: 5
-                }
-                width: parent.width
-                height: 50
-                Text{
-                  x: 10
-                  height: parent.height
-                  verticalAlignment: Text.AlignVCenter
-                  color: theme.primarytextcolor
-                  text: (model.modelData.obj.connected === true) ? "Linked" : (model.modelData.obj.waitingforlink === true) ? "Waiting For Link..."+model.modelData.obj.retriesleft : "Not Linked"
-                }
-                ToolButton {        
-                  height: 50
-                  width: 120
-                  anchors.verticalCenter: parent.verticalCenter
-                  font.family: "Poppins"
-                  font.bold: true 
-                  visible: !model.modelData.obj.connected && !model.modelData.obj.waitingforlink  
-                  text: "Link"
-                  anchors.right: parent.right
-                  onClicked: {
-                    model.modelData.obj.startLink();
-                  }
-                }
-                BusyIndicator {
-                  y: 10
-                  height: 30
-                  width: parent.height
-                  Material.accent: "#88FFFFFF"
-                  anchors.right: parent.right
-                  visible: model.modelData.obj.waitingforlink === true
-                }
+			model: service.controllers          
+			delegate: Item {
+				width: 300
+            	height: content.height + 100 //margins plus space
 
-              }          
-            }
-            
-          }  
+				Rectangle {
+					width: parent.width
+					height: parent.height - 10
+					color: "#3baf29"
+					radius: 5
+				}
+				Image {
+					x: 10
+					y: 10
+					height: 50                
+					source: "https://marketplace.signalrgb.com/brands/products/nanoleaf/dark_logo.png"
+					fillMode: Image.PreserveAspectFit
+					antialiasing: true
+					mipmap:true
+				}
+				Column {
+					id: content
+					x: 10
+					y: 80
+					width: parent.width - 20
+					spacing: 10
+					
+					Text{
+						color: theme.primarytextcolor
+						text: model.modelData.obj.name
+						font.pixelSize: 16
+						font.family: "Poppins"
+						font.bold: true
+					}
+					Text{
+						color: theme.primarytextcolor
+						text: "Id: " + model.modelData.obj.id
+					}
+					Text{
+						color: theme.primarytextcolor
+						text: "Firmware v"+model.modelData.obj.firmwareVersion
+					}    
+					Item{
+						width: parent.width
+						height: 50
+
+						Rectangle {
+							width: parent.width
+							height: parent.height
+							color: "#22ffffff"
+							radius: 5
+						}
+						Text{
+							height: parent.height
+							x: 10
+							color: theme.primarytextcolor
+							verticalAlignment: Text.AlignVCenter
+							text: (model.modelData.obj.connected === true) ? "Linked" : (model.modelData.obj.waitingforlink === true) ? "Waiting For Link..."+model.modelData.obj.retriesleft : "Not Linked"
+						}
+						ToolButton {        
+							height: 50
+							width: 120
+							anchors.verticalCenter: parent.verticalCenter
+							font.family: "Poppins"
+							font.bold: true 
+							visible: !model.modelData.obj.connected && !model.modelData.obj.waitingforlink  
+							text: "Link"
+							anchors.right: parent.right
+							onClicked: {
+								model.modelData.obj.startLink();
+							}
+						}
+						BusyIndicator {
+							y: 10
+							height: 30
+							width: parent.height
+							Material.accent: "#88FFFFFF"
+							anchors.right: parent.right
+							visible: model.modelData.obj.waitingforlink === true
+						}
+					}    
+					Text{
+						width: parent.width
+						color: theme.primarytextcolor
+						verticalAlignment: Text.AlignVCenter
+						visible: !model.modelData.obj.connected
+						text: "To link this controller start the linking process above and then put the controller into pairing mode."
+						wrapMode: Text.WrapAtWordBoundaryOrAnywhere
+					}      
+				}
+			}  
         }
-      }
-    }`;
+    }
+}`;
 	};
 }
 
@@ -647,12 +676,13 @@ class NanoleafBridge {
 		this.updateWithValue(value);
 		this.key = service.getSetting(this.id, "key");
 		this.connected = this.key != "";
-		this.retriesleft = 40;
+		this.retriesleft = 60;
 		this.ip = "";
 		this.deviceCreated = false;
 		this.panelinfo = {};
 		this.lastPollTime = 0;
 		service.log("Constructed: "+this.name);
+
 
 		this.ResolveIpAddress();
 	}
@@ -793,7 +823,7 @@ class NanoleafBridge {
 
 	startLink() {
 		//service.log("Pushlink test for "+this.name);
-		this.retriesleft = 40;
+		this.retriesleft = 60;
 		this.waitingforlink = true; //pretend we're connected.
 
 		service.updateController(this); //notify ui.
