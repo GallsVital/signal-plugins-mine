@@ -5,7 +5,7 @@ export function Documentation(){ return "troubleshooting/msi"; }
 export function ProductId() { return devicePIDs;}
 // YOU CAN BRICK THESE MOTHERBOARDS RGB CONTROLLER WITH ONE WRONG PACKET
 export function Publisher() { return "WhirlwindFX"; }
-export function Size() { return [1, 1]; }
+export function Size() { return [0, 0]; }
 export function Type() { return "Hid"; }
 export function DefaultPosition(){return [0, 0];}
 export function DefaultScale(){return 8.0;}
@@ -13,12 +13,14 @@ export function DefaultScale(){return 8.0;}
 shutdownColor:readonly
 LightingMode:readonly
 forcedColor:readonly
+advancedMode:readonly
 */
 export function ControllableParameters() {
 	return [
 		{"property":"shutdownColor", "group":"lighting", "label":"Shutdown Color", "min":"0", "max":"360", "type":"color", "default":"#009bde"},
 		{"property":"LightingMode", "group":"lighting", "label":"Lighting Mode", "type":"combobox", "values":["Canvas", "Forced"], "default":"Canvas"},
 		{"property":"forcedColor", "group":"lighting", "label":"Forced Color", "min":"0", "max":"360", "type":"color", "default":"#009bde"},
+		{"property":"advancedMode", "group":"", "label":"Advanced Onboard LED Placement", "type":"boolean", "default": "false"},
 	];
 }
 export function ConflictingProcesses() {
@@ -27,20 +29,19 @@ export function ConflictingProcesses() {
 
 const devicePIDs =
 [
-	0x7B93, 0x7C34, 0x7C35, 0x7C36, 0x7C37, 0x7C56, 0x7C59, 0x7C70, 0x7C71, 0x7C73, 0x7C75, 0x7C76, 0x7C77, 0x7C79, 0x7C80, 0x7C81, 0x7C82, 0x7C83, 0x7C84, 0x7C85, 0x7C86, 0x7C88, 0x7C89, 0x7C90, 0x7C91, 0x7C92, 0x7C94, 0x7C95, 0x7C98, 0x7C99, 0x7D03, 0x7D04, 0x7D05, 0x7D06, 0x7D07, 0x7D08, 0x7D09, 0x7D10, 0x7D11, 0x7D12, 0x7D13, 0x7D14, 0x7D15, 0x7D16, 0x7D17, 0x7D18, 0x7D19, 0x7D20, 0x7D21, 0x7D22, 0x7D25, 0x7D27, 0x7D28, 0x7D29, 0x7D30, 0x7D31, 0x7D32, 0x7D36, 0x7D37, 0x7D38, 0x7D40, 0x7D41, 0x7D42, 0x7D43, 0x7D45, 0x7D46, 0x7D50, 0x7D52, 0x7D53, 0x7D54, 0x7D59, 0x7D74, 0x7D67, 0x7D69, 0x7D70, 0x7D86, 0x7D89, 0x7D91, 0x7D97, 0x7D99, 0x7E03, 0x7E07
+	0x7B93, 0x7C34, 0x7C35, 0x7C36, 0x7C37, 0x7C56, 0x7C59, 0x7C70, 0x7C71, 0x7C73, 0x7C75, 0x7C76, 0x7C77, 0x7C79, 0x7C80, 0x7C81, 0x7C82, 0x7C83, 0x7C84, 0x7C85, 0x7C86, 0x7C88, 0x7C89, 0x7C90, 0x7C91, 0x7C92, 0x7C94, 0x7C95, 0x7C98, 0x7C99, 0x7D03, 0x7D04, 0x7D05, 0x7D06, 0x7D07, 0x7D08, 0x7D09, 0x7D10, 0x7D11, 0x7D12, 0x7D13, 0x7D14, 0x7D15, 0x7D16, 0x7D17, 0x7D18, 0x7D19, 0x7D20, 0x7D21, 0x7D22, 0x7D25, 0x7D27, 0x7D28, 0x7D29, 0x7D30, 0x7D31, 0x7D32, 0x7D36, 0x7D37, 0x7D38, 0x7D40, 0x7D41, 0x7D42, 0x7D43, 0x7D45, 0x7D46, 0x7D50, 0x7D52, 0x7D53, 0x7D54, 0x7D59, 0x7D74, 0x7D67, 0x7D69, 0x7D70, 0x7D73, 0x7D76, 0x7D86, 0x7D89, 0x7D91, 0x7D97, 0x7D99, 0x7E03, 0x7E07, 0x7E10
 ];
-//Temporarily Axed.
+
 const ParentDeviceName = "Mystic Light Controller";
 
-export function SupportsSubdevices(){ return true; }
 
 const DeviceMaxLedLimit = 360;
 
 //Channel Name, Led Limit
 const ChannelArray = [];
 
-const vLedNames = [];
-const vLedPositions = [];
+let vLedNames = [];
+let vLedPositions = [];
 
 let perLED = false;
 let CorsairHeaders = 0;
@@ -64,7 +65,7 @@ export function Initialize() {
 	MSIMotherboard.createLEDs();
 
 	device.setName(device.getMotherboardName());
-	device.write([0x01, 0xbb, 0x00, 0x00, 0x00, 0x00, 0x01], 64); //Let's make sure users have their leds on in bios.
+	//device.write([0x01, 0xbb, 0x00, 0x00, 0x00, 0x00, 0x01], 64); //Let's make sure users have their leds on in bios.
 }
 
 export function Render() {
@@ -95,6 +96,9 @@ export function Shutdown() {
 
 }
 
+export function onadvancedModeChanged() {
+	MSIMotherboard.createLEDs();
+}
 
 function hexToRgb(hex) {
 	const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
@@ -876,25 +880,25 @@ class MysticLight {
 			},
 			0x7D41 : //B660 Tomahawk
 			{
-				OnboardLEDs    : 6,
+				OnboardLEDs    : 0,
 				RGBHeaders     : 2,
 				ARGBHeaders    : 2,
 				JPipeLEDs	   : 0,
 				CorsairHeaders : 0,
 				//PERLED
-				PerLEDOnboardLEDs : 6,
+				PerLEDOnboardLEDs : 0,
 				ForceZoneBased	  : false,
 				JARGB_V2		  : false
 			},
 			0x7D42 : //Z690M Mortar
 			{
-				OnboardLEDs    : 6,
+				OnboardLEDs    : 0,
 				RGBHeaders     : 1,
 				ARGBHeaders    : 2,
 				JPipeLEDs	   : 0,
 				CorsairHeaders : 0,
 				//PERLED
-				PerLEDOnboardLEDs : 6,
+				PerLEDOnboardLEDs : 0,
 				ForceZoneBased	  : false,
 				JARGB_V2		  : false
 			},
@@ -1030,6 +1034,18 @@ class MysticLight {
 				ForceZoneBased	  : false,
 				JARGB_V2		  : true,
 			},
+			0x7D73 : //B650I Edge Wifi
+			{
+				OnboardLEDs    : 0,
+				RGBHeaders     : 0,
+				ARGBHeaders    : 1,
+				JPipeLEDs	   : 0,
+				CorsairHeaders : 0,
+				//PERLED
+				PerLEDOnboardLEDs : 0,
+				ForceZoneBased	  : false,
+				JARGB_V2		  : true,
+			},
 			0x7D74 : //B650 Carbon Wifi
 			{
 				OnboardLEDs    : 6,
@@ -1053,6 +1069,18 @@ class MysticLight {
 				PerLEDOnboardLEDs : 0,
 				ForceZoneBased	  : false,
 				JARGB_V2		  : true
+			},
+			0x7D76 : //B650M Mortar Wifi
+			{
+				OnboardLEDs    : 0,
+				RGBHeaders     : 2,
+				ARGBHeaders    : 2,
+				JPipeLEDs	   : 0,
+				CorsairHeaders : 0,
+				//PERLED
+				PerLEDOnboardLEDs : 0,
+				ForceZoneBased	  : false,
+				JARGB_V2		  : true,
 			},
 			0x7D86 : //Z790 Ace
 			{
@@ -1135,6 +1163,18 @@ class MysticLight {
 				CorsairHeaders : 0,
 				//PERLED
 				PerLEDOnboardLEDs : 0,
+				ForceZoneBased	  : false,
+				JARGB_V2		  : true,
+			},
+			0x7E10 : //B650 Edge
+			{
+				OnboardLEDs    : 6,
+				RGBHeaders     : 2,
+				ARGBHeaders    : 2,
+				JPipeLEDs	   : 0,
+				CorsairHeaders : 0,
+				//PERLED
+				PerLEDOnboardLEDs : 6,
 				ForceZoneBased	  : false,
 				JARGB_V2		  : true,
 			},
@@ -1370,12 +1410,14 @@ class MysticLight {
 			this.createStandardLEDs(this.ConfigurationOverrides[device.getMotherboardName()]);
 			device.log("Using Configuration Override", {toFile:true});
 		} else {
-			this.createStandardLEDs(this.Library[device.productId()]);
+			this.createStandardLEDs(this.Library[device.productId()], advancedMode);
 		}
 
+		device.log(`Device has ${OnboardLEDs} Onboard LEDs, ${RGBHeaders} RGB Headers, ${ARGBHeaders} ARGB Headers, and ${JPipeLEDs} JPipe LEDs.`)
 	}
 
-	createStandardLEDs(configTable) {
+	createStandardLEDs(configTable, advancedMode = false) {
+
 		for(let RGBHeaders = 0; RGBHeaders < configTable["RGBHeaders"]; RGBHeaders++) {
 			this.createSubdevice(this.LEDArrays.RGBHeaderArray[RGBHeaders]);
 		}
@@ -1396,24 +1438,37 @@ class MysticLight {
 				this.createSubdevice(this.LEDArrays.CorsairHeaderArray[CorsairHeaders]);
 			}
 
-			for(let OnboardLEDs = 0; OnboardLEDs < configTable["OnboardLEDs"]; OnboardLEDs++) {
-				this.createSubdevice(this.LEDArrays.OnboardArray[OnboardLEDs]);
-			}
-
 			JPipeLEDs = configTable["JPipeLEDs"];
 			OnboardLEDs = configTable["OnboardLEDs"];
 		} else {
-			for(let OnboardLEDs = 0; OnboardLEDs < (configTable["PerLEDOnboardLEDs"]); OnboardLEDs++) {
-				this.createSubdevice(this.LEDArrays.OnboardArray[OnboardLEDs]);
-			}
 
 			OnboardLEDs = configTable["PerLEDOnboardLEDs"];
+
+			if(advancedMode === true) {
+				vLedNames = [];
+				vLedPositions = [];
+
+				for(let OnboardLEDs = 0; OnboardLEDs < (configTable["PerLEDOnboardLEDs"]); OnboardLEDs++) {
+					device.removeSubdevice(this.LEDArrays.OnboardArray[OnboardLEDs]);
+					this.createSubdevice(this.LEDArrays.OnboardArray[OnboardLEDs]);
+				}
+			} else {
+				vLedNames = [];
+				vLedPositions = [];
+
+				for(let deviceLEDs = 0; deviceLEDs < OnboardLEDs; deviceLEDs++) {
+					device.removeSubdevice(this.LEDArrays.OnboardArray[deviceLEDs]);
+					vLedNames.push(`LED ${deviceLEDs + 1}`);
+					vLedPositions.push([ deviceLEDs, 0 ]);
+					device.setSize([vLedPositions.length+1, 2]);
+				}
+			}
 
 			this.SetupChannels();
 			this.PerLEDInit();
 		}
 
-		RGBHeaders  = configTable["RGBHeaders"];
+		RGBHeaders = configTable["RGBHeaders"];
 	}
 
 	createConfigurationOverrideLEDs() {
@@ -1528,12 +1583,25 @@ class MysticLight {
 	GrabOnboardLEDs(iIdx, shutdown = false) {
 		let col;
 
-		if(shutdown) {
+		if(advancedMode === true) {
+
+			if(shutdown) {
+				col = hexToRgb(shutdownColor);
+			} else if (LightingMode === "Forced") {
+				col = hexToRgb(forcedColor);
+			} else {
+				col = device.subdeviceColor(this.LEDArrays.OnboardArray[iIdx], 1, 1);
+			}
+
+			return col;
+		}
+
+		if(shutdown){
 			col = hexToRgb(shutdownColor);
-		} else if (LightingMode === "Forced") {
+		}else if (LightingMode === "Forced") {
 			col = hexToRgb(forcedColor);
-		} else {
-			col = device.subdeviceColor(this.LEDArrays.OnboardArray[iIdx], 1, 1);
+		}else{
+			col = device.color(vLedPositions[iIdx][0], vLedPositions[iIdx][1]);
 		}
 
 		return col;
@@ -1709,12 +1777,12 @@ class MysticLight {
 
 		if(header1Data.length > 0) {
 			device.send_report([0x53, 0x25, 0x04, 0x00, 0x00].concat(header1Data), 725);
-			device.pause(13);
+			//device.pause(13);
 		}
 
 		if(header2Data.length > 0) {
 			device.send_report([0x53, 0x25, 0x04, 0x01, 0x00].concat(header2Data), 725);
-			device.pause(13);
+			//device.pause(13);
 		}
 
 		if(ARGBHeaders > 2) {
@@ -1722,13 +1790,13 @@ class MysticLight {
 
 			if(header3Data.length > 0) {
 				device.send_report([0x53, 0x25, 0x04, 0x02, 0x00].concat(header3Data), 725);
-				device.pause(13);
+				//device.pause(13);
 			}
 		}
 
 		if(OnboardLEDData.length > 0) {
 			device.send_report([0x53, 0x25, 0x06, 0x00, 0x00].concat(OnboardLEDData), 725);
-			device.pause(13);
+			//device.pause(13);
 		}
 	}
 }

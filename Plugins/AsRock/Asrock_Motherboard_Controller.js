@@ -492,14 +492,16 @@ function LEDConfig() {
 	if(device.getMotherboardName() in ConfigurationOverrides) {
 		device.log(`Using magic of Tables for this mobo. MSI would be proud.`);
 
-		deviceZones[0] = ConfigurationOverrides[device.getMotherboardName()]["RGBHeader1"];
-		deviceZones[1] = ConfigurationOverrides[device.getMotherboardName()]["RGBHeader2"];
-		deviceZones[2] = ConfigurationOverrides[device.getMotherboardName()]["ARGBHeader1"];
-		deviceZones[3] = ConfigurationOverrides[device.getMotherboardName()]["ARGBHeader2"];
-		deviceZones[4] = ConfigurationOverrides[device.getMotherboardName()]["PCH"];
-		deviceZones[5] = ConfigurationOverrides[device.getMotherboardName()]["IOShield"];
-		deviceZones[6] = ConfigurationOverrides[device.getMotherboardName()]["PCB"];
-		deviceZones[7] = ConfigurationOverrides[device.getMotherboardName()]["ARGBHeader3"];
+		const moboName = device.getMotherboardName();
+
+		deviceZones[0] = ConfigurationOverrides[moboName]["RGBHeader1"];
+		deviceZones[1] = ConfigurationOverrides[moboName]["RGBHeader2"];
+		deviceZones[2] = ConfigurationOverrides[moboName]["ARGBHeader1"];
+		deviceZones[3] = ConfigurationOverrides[moboName]["ARGBHeader2"];
+		deviceZones[4] = ConfigurationOverrides[moboName]["PCH"];
+		deviceZones[5] = ConfigurationOverrides[moboName]["IOShield"];
+		deviceZones[6] = ConfigurationOverrides[moboName]["PCB"];
+		deviceZones[7] = ConfigurationOverrides[moboName]["ARGBHeader3"];
 
 		return;
 	}
