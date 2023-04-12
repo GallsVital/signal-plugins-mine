@@ -1,7 +1,7 @@
 
 export function Name() { return "Razer Addressable RGB Controller"; }
-export function VendorId() { return   0x1532; }
-export function ProductId() { return  0x0F1F; }
+export function VendorId() { return 0x1532; }
+export function ProductId() { return 0x0F1F; }
 export function Publisher() { return "WhirlwindFX"; }
 export function Size() { return [1, 1]; }
 export function Type() { return "Hid"; }
@@ -124,21 +124,22 @@ function setChannelBrightness(channel) {
 	packetSend(packet, 91);
 }
 
-function SendChannel(Channel) {
+function SendChannel(Channel, shutdown = false) {
 	let ChannelLedCount = device.channel(ChannelArray[Channel][0]).ledCount;
 	const componentChannel = device.channel(ChannelArray[Channel][0]);
 
 	let RGBData = [];
+	if (shutdown) {
+		RGBData = device.createColorArray(shutdownColor, ChannelLedCount, "Inline");
 
-	if(LightingMode === "Forced") {
+	} else if(LightingMode === "Forced") {
 		RGBData = device.createColorArray(forcedColor, ChannelLedCount, "Inline");
-
+		
 	} else if(componentChannel.shouldPulseColors()) {
 		ChannelLedCount = 80;
 
 		const pulseColor = device.getChannelPulseColor(ChannelArray[Channel][0], ChannelLedCount);
 		RGBData = device.createColorArray(pulseColor, ChannelLedCount, "Inline");
-
 	} else {
 		RGBData = device.channel(ChannelArray[Channel][0]).getColors("Inline");
 	}
