@@ -29,7 +29,7 @@ export function ControllableParameters(){
 		{"property":"forcedColor", "group":"lighting", "label":"Forced Color", "min":"0", "max":"360", "type":"color", "default":"#009bde"},
 		{"property":"DpiControl", "group":"mouse", "label":"Enable Dpi Control", "type":"boolean", "default":"false"},
 		{"property":"dpiStages", "group":"mouse", "label":"Number of DPI Stages", "step":"1", "type":"number", "min":"1", "max":"5", "default":"5"},
-		{"property":"dpiRollover", "group":"mouse", "label":"DPI Stage Rollover", "type":"boolean", "default": "false"},
+		{"property":"dpiRollover", "group":"mouse", "label":"DPI Cycle Rollover", "type":"boolean", "default": "true"},
 		{"property":"dpi1", "group":"mouse", "label":"DPI Stage 1", "step":"50", "type":"number", "min":"100", "max": config.maxDPI, "default":"400"},
 		{"property":"dpi2", "group":"mouse", "label":"DPI Stage 2", "step":"50", "type":"number", "min":"100", "max": config.maxDPI, "default":"800"},
 		{"property":"dpi3", "group":"mouse", "label":"DPI Stage 3", "step":"50", "type":"number", "min":"100", "max": config.maxDPI, "default":"1600"},
@@ -275,6 +275,7 @@ class LegacyCorsairLibrary {
 	constructor() {
 		this.PIDLibrary = {
 			0x1B35 : "Dark Core",
+			0x1B64 : "Dark Core",
 			0x1B51 : "Dark Core SE",
 			0x1B4B : "Dark Core SE",
 			0x1B34 : "Glaive RGB",
@@ -293,7 +294,7 @@ class LegacyCorsairLibrary {
 			"Dark Core" : {
 				vLedNames : [ "Front Zone", "Logo Zone" ],
 				vLedPositions : [ [1, 0], [1, 2], [0, 1] ],
-				vKeys : [ 1, 0 ],
+				vKeys : [ 2, 0, 1 ],
 				size : [3, 3],
 				maxDPI : 16000,
 				wireless : true
