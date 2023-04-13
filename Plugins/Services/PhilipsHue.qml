@@ -170,10 +170,17 @@ Item {
                     valueRole: "id"
                     property bool ready: false
                     visible: bridge.connected && bridge.supportsStreaming && areaComboBox.model.length > 0
-                    onCurrentValueChanged: {
+                    onActivated: {
                         if(!ready) return;
                         console.log(areaComboBox.currentText, areaComboBox.currentValue)
                         bridge.setSelectedArea(areaComboBox.currentValue);
+                    }
+                    onModelChanged: {
+                        let idx = areaComboBox.find(bridge.selectedAreaName)
+                        console.log(idx)
+                        if(idx >= 0){
+                            areaComboBox.currentIndex = idx;
+                        } 
                     }
                     Component.onCompleted: {
                         console.log("Selecting Default", bridge.selectedAreaName)
