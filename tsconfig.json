@@ -29,24 +29,24 @@
 			//"performance": ["./types/performance.d.ts"]
 		},
 	},
-	"files": [
-		"./types/globals.d.ts",
-		"./types/device.d.ts",
-		"./types/console.d.ts",
-		"./types/bus.d.ts",
-		"./types/battery.d.ts",
-		"./types/Exports.d.ts",
-		"./types/ComponentChannel.d.ts",
-		"./types/ControllableParameters.d.ts",
-		"./types/performance.d.ts", // Can be removed in QT6
-		"./types/NanoLeaf.d.ts",
-		"./types/PhilipsHue.d.ts",
-		"./types/Udp.d.ts",
-		"./types/DiscoveryService.d.ts",
-		"./types/mouse.d.ts",
-		"./types/keyboard.d.ts"
-    ],
-	"include": ["CodeSnippets/**/*","Non-Release-Plugins/**/*", "Plugins/**/*"],
+	// "files": [
+	// 	// "./types/globals.d.ts",
+	// 	// "./types/device.d.ts",
+	// 	// "./types/console.d.ts",
+	// 	// "./types/bus.d.ts",
+	// 	// "./types/battery.d.ts",
+	// 	// "./types/Exports.d.ts",
+	// 	// "./types/ComponentChannel.d.ts",
+	// 	// "./types/ControllableParameters.d.ts",
+	// 	// "./types/performance.d.ts", // Can be removed in QT6
+	// 	// "./types/NanoLeaf.d.ts",
+	// 	// "./types/PhilipsHue.d.ts",
+	// 	// "./types/Udp.d.ts",
+	// 	// "./types/DiscoveryService.d.ts",
+	// 	// "./types/mouse.d.ts",
+	// 	// "./types/keyboard.d.ts"
+    // ],
+	"include": ["CodeSnippets/**/*","Non-Release-Plugins/**/*", "Plugins/**/*", "Types/**/*"],
 	"exclude": [
 		"node_modules",
 		"**/node_modules/*",

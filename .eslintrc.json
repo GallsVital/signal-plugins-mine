@@ -35,7 +35,8 @@
         "udp": "readonly",
         "service": "readonly",
         "dtls": "readonly",
-        "XMLHttpRequest": "readonly"
+        "XMLHttpRequest": "readonly",
+        "base64": "readonly"
     },
     "rules": {
         "semi":"warn",
