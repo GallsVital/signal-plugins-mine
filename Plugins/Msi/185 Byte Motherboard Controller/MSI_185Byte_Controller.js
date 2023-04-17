@@ -70,7 +70,7 @@ export function Initialize() {
 
 export function Render() {
 	if(perLED === true) {
-		if(ARGBHeaders > 1 && CorsairHeaders > 0) {
+		if(ARGBHeaders > 1 || CorsairHeaders > 0) {
 			MSIMotherboard.sendGen1SplitPacketARGB();//Gen 1 boards have JCorsair headers and therefore use a new zone register.
 		} else {
 			if(gen2Support) { ///MMM Nesting
@@ -904,13 +904,13 @@ class MysticLight {
 			},
 			0x7D43 : //B660M Bazooka
 			{
-				OnboardLEDs    : 6,
+				OnboardLEDs    : 0,
 				RGBHeaders     : 1,
 				ARGBHeaders    : 2,
 				JPipeLEDs	   : 0,
 				CorsairHeaders : 0,
 				//PERLED
-				PerLEDOnboardLEDs : 6,
+				PerLEDOnboardLEDs : 0,
 				ForceZoneBased	  : false,
 				JARGB_V2		  : false
 			},
@@ -988,13 +988,13 @@ class MysticLight {
 			},
 			0x7D59 : //Pro B660-A
 			{
-				OnboardLEDs    : 6,
+				OnboardLEDs    : 0,
 				RGBHeaders     : 1,
 				ARGBHeaders    : 2,
 				JPipeLEDs	   : 0,
 				CorsairHeaders : 0,
 				//PERLED
-				PerLEDOnboardLEDs : 6,
+				PerLEDOnboardLEDs : 0,
 				ForceZoneBased	  : false,
 				JARGB_V2		  : false
 			},
@@ -1451,6 +1451,7 @@ class MysticLight {
 				for(let OnboardLEDs = 0; OnboardLEDs < (configTable["PerLEDOnboardLEDs"]); OnboardLEDs++) {
 					device.removeSubdevice(this.LEDArrays.OnboardArray[OnboardLEDs]);
 					this.createSubdevice(this.LEDArrays.OnboardArray[OnboardLEDs]);
+					device.setControllableLeds(vLedNames, vLedPositions)
 				}
 			} else {
 				vLedNames = [];
@@ -1461,6 +1462,7 @@ class MysticLight {
 					vLedNames.push(`LED ${deviceLEDs + 1}`);
 					vLedPositions.push([ deviceLEDs, 0 ]);
 					device.setSize([vLedPositions.length+1, 2]);
+					device.setControllableLeds(vLedNames, vLedPositions)
 				}
 			}
 
@@ -1499,11 +1501,32 @@ class MysticLight {
 			JPipeLEDs = this.ConfigurationOverrides[device.getMotherboardName()]["JPipeLEDs"];
 			OnboardLEDs = this.ConfigurationOverrides[device.getMotherboardName()]["OnboardLEDs"];
 		} else {
-			for(let OnboardLEDs = 0; OnboardLEDs < (this.ConfigurationOverrides[device.getMotherboardName()]["PerLEDOnboardLEDs"]); OnboardLEDs++) {
-				this.createSubdevice(this.LEDArrays.OnboardArray[OnboardLEDs]);
-			}
 
-			OnboardLEDs = this.ConfigurationOverrides[device.getMotherboardName()]["PerLEDOnboardLEDs"];
+			const moboName = device.getMotherboardName();
+
+			OnboardLEDs = this.ConfigurationOverrides[moboName]["PerLEDOnboardLEDs"];
+
+			if(advancedMode === true) {
+				vLedNames = [];
+				vLedPositions = [];
+
+				for(let OnboardLEDs = 0; OnboardLEDs < (this.ConfigurationOverrides[moboName]["PerLEDOnboardLEDs"]); OnboardLEDs++) {
+					device.removeSubdevice(this.LEDArrays.OnboardArray[OnboardLEDs]);
+					this.createSubdevice(this.LEDArrays.OnboardArray[OnboardLEDs]);
+					device.setControllableLeds(vLedNames, vLedPositions)
+				}
+			} else {
+				vLedNames = [];
+				vLedPositions = [];
+
+				for(let deviceLEDs = 0; deviceLEDs < OnboardLEDs; deviceLEDs++) {
+					device.removeSubdevice(this.ConfigurationOverrides[moboName]["PerLEDOnboardLEDs"]);
+					vLedNames.push(`LED ${deviceLEDs + 1}`);
+					vLedPositions.push([ deviceLEDs, 0 ]);
+					device.setSize([vLedPositions.length+1, 2]);
+					device.setControllableLeds(vLedNames, vLedPositions)
+				}
+			}
 
 			this.SetupChannels();
 			this.PerLEDInit();
@@ -1572,7 +1595,7 @@ class MysticLight {
 
 	///////////////////////////////////////////////////////////////////////PERLED
 	PerLEDInit() {
-		if(gen2Support || ARGBHeaders > 1 && CorsairHeaders > 0) {
+		if(gen2Support || ARGBHeaders > 1 || CorsairHeaders > 0) {
 			device.send_report(this.splitPerLEDPacket, 185);
 		} else {
 			device.send_report(this.perledpacket, 185);
@@ -1746,7 +1769,12 @@ class MysticLight {
 
 		const header1Data = this.grabChannelRGBData(0);
 		const header2Data = this.grabChannelRGBData(1);
-		const header3Data = this.grabChannelRGBData(2);
+		let header3Data = [];
+		if(ARGBHeaders > 2 || CorsairHeaders > 0)
+		{
+			header3Data = this.grabChannelRGBData(2);
+		}
+		
 
 		if(header1Data.length > 0) {
 			device.send_report([0x53, 0x25, 0x04, 0x00, 0x00].concat(header1Data), 725);
