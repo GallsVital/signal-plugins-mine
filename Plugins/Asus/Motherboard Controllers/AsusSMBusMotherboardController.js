@@ -32,7 +32,7 @@ export function Scan(bus) {
 	  // Skip any non AMD / Nuvoton Busses
 
 	for(const addr of addys) {
-		if(!bus.IsAMDBus && !bus.IsNuvotonBus()){return;}
+		if(!bus.IsAMDBus() && !bus.IsNuvotonBus()){return;}
 
 		const result = bus.WriteQuick(addr);
 
