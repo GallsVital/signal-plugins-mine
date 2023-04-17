@@ -170,7 +170,7 @@ export function Shutdown() {
 	SendMainBoardLeds(true);
 
 	if(DeviceInfo.PolymoSupport) {
-		sendPolymoColors();
+		sendPolymoColors(true);
 
 		for(let channel = 0; channel < DeviceInfo.ARGBChannelCount; channel++){
 			SendARGBChannel(channel, true, true);
