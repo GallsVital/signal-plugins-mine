@@ -10,7 +10,7 @@ export function DefaultScale(){return 1.0;}
 shutdownColor:readonly
 LightingMode:readonly
 forcedColor:readonly
-MotherboardPass:readonly
+motherboardPass:readonly
 RGBHeaderToggle:readonly
 RGBconfig:readonly
 */
@@ -19,23 +19,12 @@ export function ControllableParameters(){
 		{"property":"shutdownColor", "group":"lighting", "label":"Shutdown Color", "min":"0", "max":"360", "type":"color", "default":"#009bde"},
 		{"property":"LightingMode", "group":"lighting", "label":"Lighting Mode", "type":"combobox", "values":["Canvas", "Forced"], "default":"Canvas"},
 		{"property":"forcedColor", "group":"lighting", "label":"Forced Color", "min":"0", "max":"360", "type":"color", "default":"#009bde"},
-		{"property":"MotherboardPass", "group":"", "label":"Enable MotherBoard Passthrough", "type":"boolean", "default":"false"},
+		{"property":"motherboardPass", "group":"", "label":"Enable MotherBoard Passthrough", "type":"boolean", "default":"false"},
 		{"property":"RGBHeaderToggle", "group":"", "label":"Enable RGBHeader", "type":"boolean", "default":"True"},
 		{"property":"RGBconfig", "group":"lighting", "label":"RGB Header Config", "type":"combobox",   "values":["RGB", "RBG", "BGR", "BRG", "GBR", "GRB"], "default":"GRB"},
 
 
 	];
-}
-
-const vKeyNames = [];
-const vKeyPositions = [];
-
-export function LedNames() {
-	return vKeyNames;
-}
-
-export function LedPositions() {
-	return vKeyPositions;
 }
 
 const ParentDeviceName = "Cooler Master ARGB Controller";
@@ -60,10 +49,39 @@ function SetupChannels(){
 
 export function Initialize() {
 	SetupChannels();
+	setRGBHeader(RGBHeaderToggle);
+	setmotherboardPass(motherboardPass);
+}
+
+export function Render() {
+
+	if(!motherboardPass){
+		for(let channel = 0; channel < 4; channel++) {
+			SendChannel(channel);
+			device.pause(1);
+		}
+
+		sendRGBHeader(RGBHeaderToggle);
+	}
 }
 
 export function Shutdown() {
+	if(!motherboardPass){
+		for(let channel = 0; channel < 4; channel++) {
+			SendChannel(channel, true);
+			device.pause(1);
+		}
 
+		sendRGBHeader(RGBHeaderToggle, true);
+	}
+}
+
+export function onmotherboardPassChanged() {
+	setmotherboardPass(motherboardPass);
+}
+
+export function onRGBHeaderToggleChanged() {
+	setRGBHeader(RGBHeaderToggle);
 }
 
 const RGBConfigs =
@@ -76,12 +94,10 @@ const RGBConfigs =
 	"GRB" : [1, 0, 2]
 };
 
-let savedMotherboardPass;
 
-function setMotherboardPass() {
-	savedMotherboardPass = MotherboardPass;
+function setmotherboardPass(motherboardPass) {
 
-	if(savedMotherboardPass) {
+	if(motherboardPass) {
 		device.write([0x00, 0x80, 0x17, 0x02], 65);
 		device.write([0x00, 0x80, 0x01, 0x02], 65);
 		device.write([0x00, 0x80, 0x01, 0x02], 65);
@@ -116,120 +132,51 @@ function SendChannel(Channel, shutdown = false) {
 		RGBData = device.channel(ChannelArray[Channel][0]).getColors("Inline");
 	}
 
-	// while(RGBData.length < 61 * 3){
-	//     RGBData.push(0)
-	// }
+	device.write([0x00, 0x00, 0x10, 0x02, Channel, 0x30].concat(RGBData.splice(0, 59)), 65);
 
+	device.write([0x00, 0x01].concat(RGBData.splice(0, 63)), 65);
 
-	var packet = [];
-	packet[0] = 0x00;
-	packet[1] = 0x00;
-	packet[2] = 0x10;
-	packet[3] = 0x02;
-	packet[4] = Channel;
-	packet[5] = 0x30;
-	packet = packet.concat(RGBData.splice(0, 59));
-	device.write(packet, 65);
-
-	var packet = [];
-	packet[0] = 0x00;
-	packet[1] = 0x01;
-	packet = packet.concat(RGBData.splice(0, 63));
-	device.write(packet, 65);
-
-	var packet = [];
-	packet[0] = 0x00;
-	packet[1] = 0x82;
-	packet = packet.concat(RGBData.splice(0, 62));
-	device.write(packet, 65);
+	device.write([0x00, 0x82].concat(RGBData.splice(0, 62)), 65);
 }
 
-function sendRGBHeader(shutdown = false){
+function sendRGBHeader(RGBHeaderToggle = false, shutdown = false){
 	device.write([0x00, 0x080, 0x01, 0x03], 65);
 
-	const packet = [];
-	packet[0] = 0x00;
-	packet[1] = 0x80;
-	packet[2] = 0x04;
-	packet[3] = 0x05;//mode?
-	packet[4] = 0x10;
-	packet[5] = 0x02;
-	packet[6] = 0xFF; //Brightess
 
-	if(savedRGBHeader){
+	if(RGBHeaderToggle){
 		const iPxX = RGB_Header.positioning[0][0];
 		const iPxY = RGB_Header.positioning[0][1];
-		let mxPxColor;
+		let Color;
 
 		//find colors
 		if(shutdown){
-			mxPxColor = hexToRgb(shutdownColor);
+			Color = hexToRgb(shutdownColor);
 		}else if (LightingMode === "Forced") {
-			mxPxColor = hexToRgb(forcedColor);
+			Color = hexToRgb(forcedColor);
 		}else{
-			mxPxColor = device.subdeviceColor("RGBHeader", iPxX, iPxY);
+			Color = device.subdeviceColor("RGBHeader", iPxX, iPxY);
 		}
 
-		//set colors
-		packet[7] = mxPxColor[RGBConfigs[RGBconfig][0]];
-		packet[8] = mxPxColor[RGBConfigs[RGBconfig][1]];
-		packet[9] = mxPxColor[RGBConfigs[RGBconfig][2]];
-		device.write(packet, 65);
+		device.write([0x00, 0x80, 0x04, 0x05, 0x10, 0x02, 0xFF, Color[RGBConfigs[RGBconfig][0]], Color[RGBConfigs[RGBconfig][1]], Color[RGBConfigs[RGBconfig][2]]], 65);
 
 	}
 }
 
-let savedRGBHeader;
 
-function setRGBHeader(){
-	if(savedRGBHeader != RGBHeaderToggle){
-		savedRGBHeader = RGBHeaderToggle;
+function setRGBHeader(RGBHeaderToggle = false){
 
-		if(!savedRGBHeader){
-			device.removeSubdevice("RGBHeader");
-		}else{
-			//"Ch1 | Port 1"
-			device.createSubdevice("RGBHeader");
-			// Parent Device + Sub device Name + Ports
-			device.setSubdeviceName("RGBHeader", `${ParentDeviceName} - ${RGB_Header.displayName}`);
-			device.setSubdeviceImage("RGBHeader", RGB_Header.image);
-			device.setSubdeviceSize("RGBHeader", RGB_Header.width, RGB_Header.height);
-			device.setSubdeviceLeds("RGBHeader",
-				RGB_Header.LedNames,
-				RGB_Header.positioning);
-
-		}
-	}
-}
-
-
-export function Render() {
-
-	if(MotherboardPass){
-		if(savedMotherboardPass != MotherboardPass){
-			setMotherboardPass();
-		}else{
-			device.pause(30);
-			device.pause(30);
-		}
+	if(!RGBHeaderToggle){
+		device.removeSubdevice("RGBHeader");
 	}else{
-		//InitChannels();
-		if(savedMotherboardPass != MotherboardPass){
-			setMotherboardPass();
-		}
+		//"Ch1 | Port 1"
+		device.createSubdevice("RGBHeader");
+		// Parent Device + Sub device Name + Ports
+		device.setSubdeviceName("RGBHeader", `${ParentDeviceName} - ${RGB_Header.displayName}`);
+		device.setSubdeviceImage("RGBHeader", RGB_Header.image);
+		device.setSubdeviceSize("RGBHeader", RGB_Header.width, RGB_Header.height);
+		device.setSubdeviceLeds("RGBHeader", RGB_Header.LedNames, RGB_Header.positioning);
 
-		SendChannel(0);
-		device.pause(1);
-		SendChannel(1);
-		device.pause(1);
-		SendChannel(2);
-		device.pause(1);
-		SendChannel(3);
-		device.pause(1);
-		sendRGBHeader();
 	}
-
-	setRGBHeader();
 }
 
 function hexToRgb(hex) {
