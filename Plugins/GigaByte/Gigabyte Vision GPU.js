@@ -420,6 +420,7 @@ class GigabyteVisionGPuList {
 			new GigabyteVisionIdentifier(Nvidia.RTX3060TI_LHR,  GigabyteVisionIds.RTX3060TI_VISION_OC,           0x63, "GIGABYTE 3060 Vision OC LHR"), //Confirmed.
 			new GigabyteVisionIdentifier(Nvidia.RTX3070_LHR,    GigabyteVisionIds.RTX3070_EAGLE_OC,              0x63, "GIGABYTE 3070 Eagle OC LHR"),
 			new GigabyteVisionIdentifier(Nvidia.RTX3070,        GigabyteVisionIds.RTX3070_EAGLE_OC,              0x63, "GIGABYTE 3070 Eagle OC"),
+			new GigabyteVisionIdentifier(Nvidia.RTX3080,	    GigabyteVisionIds.RTX3080_EAGLE_OC,    		 	 0x63, "GIGABYTE 3080 Eagle OC"),
 			new GigabyteVisionIdentifier(Nvidia.RTX3080_LHR,    GigabyteVisionIds.RTX3080_EAGLE_OC,    		 	 0x63, "GIGABYTE 3080 Eagle OC LHR"),
 			new GigabyteVisionIdentifier(Nvidia.RTX3090,        GigabyteVisionIds.RTX3090_VISION_OC_24G,         0x63, "GIGABYTE 3090 Vision OC"),
 			new GigabyteVisionIdentifier(Nvidia.RTX3090,        GigabyteVisionIds.RTX3090_GAMING_OC_24GB,        0x62, "GIGABYTE 3090 Gaming OC 24G"), // Confirmed
