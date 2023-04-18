@@ -302,7 +302,6 @@ function detectInputs() {
 	}
 }
 
-/* eslint-disable complexity */
 function processInputs(Added, Removed) {
 
 	for (let values = 0; values < Added.length; values++) {
@@ -348,7 +347,6 @@ function processInputs(Added, Removed) {
 	}
 }
 
-/* eslint-enable complexity */
 function grabColors(shutdown = false) {
 
 
@@ -749,7 +747,6 @@ const razerDeviceLibrary = new deviceLibrary();
 
 export class RazerProtocol {
 	constructor() {
-		/** @typedef {[number[], string]} RazerResponse*/
 		/** Defines for the 3 device modes that a Razer device can be set to. FactoryMode should never be used, but is here as reference. */
 		this.DeviceModes =
 		{
@@ -2381,24 +2378,34 @@ class DPIManager {
 			device.log("No Set DPI Callback given. DPI Handler cannot function!");
 		}
 	}
-	getCurrentStage() {
-		return this.currentStage;
-	}
-	getMaxStage() {
-		return this.maxDPIStage;
-	}
+
+	/** Fetch Which DPI Stage We Are Currently Set To. Frequently used for DPI Lights. */
+	getCurrentStage() { return this.currentStage; }
+	/** Override Currently Set Stage Number. */
+	setCurrentStage(currentStage) { this.currentStage = currentStage; }
+
+	/** Get Current Max DPI Stage that the DPI Handler will increment through. */
+	getMaxStage() { return this.maxDPIStage; }
+	/** Set Max DPI Stage for the DPIHandler to increment through*/
+	setMaxStage(maxDPIStage) { this.maxDPIStage = maxDPIStage; }
+
 	/** Enables or Disables the DPIHandler*/
 	setEnableControl(EnableDpiControl) {
 		this.enableDpiControl = EnableDpiControl;
 	}
 	/** GetDpi Value for a given stage.*/
 	getDpiValue(stage) {
-		// TODO - Bounds check
 		// This is a dict of functions, make sure to call them
-		device.log("Current DPI Stage: " + stage);
-		device.log("Current DPI: " + this.dpiStageValues[stage]());
+		if(this.dpiStageValues[stage]() !== undefined && stage <= this.getMaxStage && stage > 0) {
+			device.log("Current DPI Stage: " + stage);
+			device.log("Current DPI: " + this.dpiStageValues[stage]());
 
-		return this.dpiStageValues[stage]();
+			return this.dpiStageValues[stage]();
+		}
+
+		console.log("Failed to get DPI Value for given stage.", {toFile : true});
+
+		return -1;
 	}
 	/** SetDpi Using Callback. Bypasses setStage.*/
 	setDpi() {
