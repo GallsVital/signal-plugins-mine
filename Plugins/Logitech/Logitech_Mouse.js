@@ -28,18 +28,8 @@ export function ControllableParameters() {
 		{"property":"shutdownColor", "group":"lighting", "label":"Shutdown Color", "min":"0", "max":"360", "type":"color", "default":"#009bde"},
 		{"property":"LightingMode", "group":"lighting", "label":"Lighting Mode", "type":"combobox", "values":["Canvas", "Forced"], "default":"Canvas"},
 		{"property":"forcedColor", "group":"lighting", "label":"Forced Color", "min":"0", "max":"360", "type":"color", "default":"#009bde"},
-		{"property":"settingControl", "group":"mouse", "label":"Enable Setting Control", "type":"boolean", "default":"true"},
-		{"property":"dpiStages", "group":"mouse", "label":"Number of DPI Stages", "step":"1", "type":"number", "min":"1", "max":"5", "default":"5"},
-		{"property":"dpi1", "group":"mouse", "label":"DPI 1", "step":"50", "type":"number", "min":"200", "max":"25600", "default":"400"},
-		{"property":"dpi2", "group":"mouse", "label":"DPI 2", "step":"50", "type":"number", "min":"200", "max":"25600", "default":"800"},
-		{"property":"dpi3", "group":"mouse", "label":"DPI 3", "step":"50", "type":"number", "min":"200", "max":"25600", "default":"1200"},
-		{"property":"dpi4", "group":"mouse", "label":"DPI 4", "step":"50", "type":"number", "min":"200", "max":"25600", "default":"1600"},
-		{"property":"dpi5", "group":"mouse", "label":"DPI 5", "step":"50", "type":"number", "min":"200", "max":"25600", "default":"2000"},
-		{"property":"dpi6", "group":"mouse", "label":"Sniper Button DPI", "step":"50", "type":"number", "min":"200", "max":"25600", "default":"400"},
-		{"property":"dpiLight", "group":"mouse", "label":"DPI Light Always On", "type":"boolean", "default": "true"},
 		{"property":"OnboardState", "group":"", "label":"Onboard Button Mode", "type":"boolean", "default": "false"},
-		{"property":"dpiRollover", "group":"mouse", "label":"DPI Stage Rollover", "type":"boolean", "default": "false"},
-		{"property":"pollingRate", "group":"mouse", "label":"Polling Rate", "type":"combobox", "values":[ "1000", "500", "250", "100" ], "default":"1000"},
+		{"property":"pollingRate", "group":"", "label":"Polling Rate", "type":"combobox", "values":[ "1000", "500", "250", "100" ], "default":"1000"},
 	];
 }
 
@@ -161,9 +151,7 @@ export function onOnboardStateChanged() {
 }
 
 export function onpollingrateChanged() {
-	if(settingControl) {
-		Logitech.SetPollingRate(pollingRate);
-	}
+	Logitech.SetPollingRate(pollingRate);
 }
 
 function PollBattery() {
@@ -1175,10 +1163,13 @@ export class LogitechProtocol {
 		   battery.setBatteryLevel(this.GetBatteryCharge());
 	   }
 
+	   this.SetPollingRate(pollingRate);
+
 	   if(this.GetDeviceType() === "Mouse"){
 		   device.addFeature("mouse");
 
 		   LogitechMouse.SetOnBoardState(OnboardState);
+		   LogitechMouse.addMouseProps();
 		   LogitechMouse.SetDpiLightAlwaysOn(dpiLight);
 
 		   if(settingControl && !OnboardState) {
@@ -1190,6 +1181,8 @@ export class LogitechProtocol {
 				LogitechMouse.SetDPILights(3); //Fallback to set DPILights to full
 				DPIHandler.setEnableControl(false);
 		   }
+	   } else if(this.GetDeviceType() === "Keyboard") {
+			device.setImageFromBase64(keyboardImage());
 	   }
 	}
 	/** Grab Feature ID's Off of the Device Using the Feature Pages. */
@@ -1633,6 +1626,22 @@ export class LogitechMouseDevice {
 
 	setHasDPILights(hasDPILights) { this.Config.hasDPILights = hasDPILights; }
 	getHasDPILights() { return this.Config.hasDPILights; }
+
+	addMouseProps() {
+		device.addProperty({"property":"settingControl", "group":"mouse", "label":"Enable Setting Control", "type":"boolean", "default":"true"});
+		device.addProperty({"property":"dpiStages", "group":"mouse", "label":"Number of DPI Stages", "step":"1", "type":"number", "min":"1", "max":"5", "default":"5"});
+		device.addProperty({"property":"dpi1", "group":"mouse", "label":"DPI 1", "step":"50", "type":"number", "min":"200", "max":"25600", "default":"400"});
+		device.addProperty({"property":"dpi2", "group":"mouse", "label":"DPI 2", "step":"50", "type":"number", "min":"200", "max":"25600", "default":"800"});
+		device.addProperty({"property":"dpi3", "group":"mouse", "label":"DPI 3", "step":"50", "type":"number", "min":"200", "max":"25600", "default":"1200"});
+		device.addProperty({"property":"dpi4", "group":"mouse", "label":"DPI 4", "step":"50", "type":"number", "min":"200", "max":"25600", "default":"1600"});
+		device.addProperty({"property":"dpi5", "group":"mouse", "label":"DPI 5", "step":"50", "type":"number", "min":"200", "max":"25600", "default":"2000"});
+		device.addProperty({"property":"dpi6", "group":"mouse", "label":"Sniper Button DPI", "step":"50", "type":"number", "min":"200", "max":"25600", "default":"400"});
+		device.addProperty({"property":"dpiRollover", "group":"mouse", "label":"DPI Stage Rollover", "type":"boolean", "default": "false"});
+
+		if(this.getHasDPILights()) {
+			device.addProperty({"property":"dpiLight", "group":"mouse", "label":"DPI Light Always On", "type":"boolean", "default": "true"});
+		}
+	}
 
 	/** Set the Current Software DPI based on a callback from the DPIHandler. */
 	setDpi(dpi, stage = 0) {
