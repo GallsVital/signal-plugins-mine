@@ -240,6 +240,7 @@ class NvidiaGPUDeviceIds {
 		this.RTX3080TI       = 0x2208;
 		this.RTX3090         = 0x2204;
 		this.RTX3090TI       = 0x2203;
+		this.RTX4070		 = 0x2786;
 		this.RTX4070TI 		 = 0x2782;
 		this.RTX4080		 = 0x2704;
 		this.RTX4090		 = 0x2684;
@@ -324,6 +325,7 @@ class GigabyteVisionDeviceIds {
 		this.RTX3070_EAGLE_OC           	= 0x404E;
 		this.RTX3080_EAGLE_OC				= 0x4040;
 		this.RTX3090_VISION_OC_24G			= 0x4044;
+		this.RTX4070_AERO					= 0x40E6;
 		this.RTX4070TI_MASTER_12G           = 0x40bb;
 		this.RTX4080_GAMING_OC	            = 0x40bc;
 		this.RTX4080_AERO_OC_16G			= 0x40C5;
@@ -401,8 +403,6 @@ class GigabyteVisionGPuList {
 			new GigabyteVisionIdentifier(Nvidia.RTX4070TI,      GigabyteVisionIds.RTX4070TI_EAGLE_12G,        	 0x71, "GIGABYTE 4070TI Eagle"),
 			new GigabyteVisionIdentifier(Nvidia.RTX4070TI,      GigabyteVisionIds.RTX4070TI_EAGLE_OC_12G,        0x71, "GIGABYTE 4070TI Eagle OC"),
 			new GigabyteVisionIdentifier(Nvidia.RTX4080,        GigabyteVisionIds.RTX4080_EAGLE_OC_16GD,         0x71, "GIGABYTE 4080 Eagle OC"),
-
-			//New GPUs for 2.2.29 -------------------------------------------------------------------
 			new GigabyteVisionIdentifier(Nvidia.GTX1070,        GigabyteVisionIds.GTX1070_GAMING,                0x47, "GIGABYTE 1070 Gaming"),
 			new GigabyteVisionIdentifier(Nvidia.GTX1080,      GigabyteVisionIds.GTX1080_G1_GAMING,               0x48, "GIGABYTE 1080 G1 Gaming"), //Confirmed!
 			new GigabyteVisionIdentifier(Nvidia.GTX1080TI,      GigabyteVisionIds.GTX1080TI_AORUS_11G,         	 0x47, "GIGABYTE 1080Ti AORUS"), //Confirmed
@@ -424,6 +424,7 @@ class GigabyteVisionGPuList {
 			new GigabyteVisionIdentifier(Nvidia.RTX3080_LHR,    GigabyteVisionIds.RTX3080_EAGLE_OC,    		 	 0x63, "GIGABYTE 3080 Eagle OC LHR"),
 			new GigabyteVisionIdentifier(Nvidia.RTX3090,        GigabyteVisionIds.RTX3090_VISION_OC_24G,         0x63, "GIGABYTE 3090 Vision OC"),
 			new GigabyteVisionIdentifier(Nvidia.RTX3090,        GigabyteVisionIds.RTX3090_GAMING_OC_24GB,        0x62, "GIGABYTE 3090 Gaming OC 24G"), // Confirmed
+			new GigabyteVisionIdentifier(Nvidia.RTX4070,		GigabyteVisionIds.RTX4070_AERO,					 0x71, "GIGABYTE 4070 Aero"),
 			new GigabyteVisionIdentifier(Nvidia.RTX4070TI,      GigabyteVisionIds.RTX4070TI_MASTER_12G,			 0x71, "GIGABYTE 4070Ti Master 12G"), //Confirmed
 			new GigabyteVisionIdentifier(Nvidia.RTX4080,        GigabyteVisionIds.RTX4080_AERO_OC_16G,           0x71, "GIGABYTE 4080 Aero OC"),
 		];
