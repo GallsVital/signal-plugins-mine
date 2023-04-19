@@ -6,6 +6,8 @@ export class MockDevice{
 	color = jest.fn().mockImplementation(() => {
 		return [10, 20, 30];
 	});
+	vendorId = jest.fn().mockImplementation(() => {} );
+	productId = jest.fn().mockImplementation(() => {} );
 	setName = jest.fn().mockImplementation((name) => {});
 	setSize = jest.fn().mockImplementation(([x, y]) => {});
 	setControllableLeds = jest.fn().mockImplementation((names, positions) => {});
@@ -20,4 +22,5 @@ export class MockDevice{
 	set_endpoint = jest.fn().mockImplementation((Interface, Usage, UsagePage, Collection) => {});
 	clearReadBuffer = jest.fn().mockImplementation(() => {});
 	pause = jest.fn().mockImplementation(() => {});
+	addFeature = jest.fn().mockImplementation((feature) => {}); //Each feature needs mocked tbh.
 }

@@ -66,11 +66,12 @@ export function Render() {
 	for (let channel = 0; channel < 5; channel++) {
 		Sendchannel(channel);
 	}
+
 	PollFans();
 }
 
 export function Shutdown() {
-
+	device.pause(2000);
 }
 let n = 0;
 

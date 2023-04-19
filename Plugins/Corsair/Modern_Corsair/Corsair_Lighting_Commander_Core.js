@@ -672,7 +672,7 @@ function SendCoolingdata() {
 
 		// Prevent pump from going below 60%
 		// Doing this on newer models will put the device into a failsafe mode until power cycled.
-		if(fan === 0){
+		if(fan === 0 && PumpConnected){ //PumpConnected is a check to handle users with a CoCo but no Capellix. Needs Thorough testing.
 			fanLevel = Math.max(60, fanLevel);
 		}
 

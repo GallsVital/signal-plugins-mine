@@ -2,7 +2,7 @@ export function Name() { return "MSI Mystic Light Controller"; }
 export function VendorId() { return 0x1462; }
 export function Documentation(){ return "troubleshooting/msi"; }
 // DO NOT PID SWAP THIS IF YOU DONT KNOW WHAT YOUR DOING
-export function ProductId() { return devicePIDs;}
+export function ProductId() { return Object.keys(MSIMotherboard.Library);}
 // YOU CAN BRICK THESE MOTHERBOARDS RGB CONTROLLER WITH ONE WRONG PACKET
 export function Publisher() { return "WhirlwindFX"; }
 export function Size() { return [0, 0]; }
@@ -26,11 +26,6 @@ export function ControllableParameters() {
 export function ConflictingProcesses() {
 	return ["LedKeeper.exe", "Dragon Center", "DCv2.exe", "LightKeeperService.exe", "LightKeeperService2.exe" ];
 }
-
-const devicePIDs =
-[
-	0x7B93, 0x7C34, 0x7C35, 0x7C36, 0x7C37, 0x7C56, 0x7C59, 0x7C70, 0x7C71, 0x7C73, 0x7C75, 0x7C76, 0x7C77, 0x7C79, 0x7C80, 0x7C81, 0x7C82, 0x7C83, 0x7C84, 0x7C85, 0x7C86, 0x7C88, 0x7C89, 0x7C90, 0x7C91, 0x7C92, 0x7C94, 0x7C95, 0x7C98, 0x7C99, 0x7D03, 0x7D04, 0x7D05, 0x7D06, 0x7D07, 0x7D08, 0x7D09, 0x7D10, 0x7D11, 0x7D12, 0x7D13, 0x7D14, 0x7D15, 0x7D16, 0x7D17, 0x7D18, 0x7D19, 0x7D20, 0x7D21, 0x7D22, 0x7D25, 0x7D27, 0x7D28, 0x7D29, 0x7D30, 0x7D31, 0x7D32, 0x7D36, 0x7D37, 0x7D38, 0x7D40, 0x7D41, 0x7D42, 0x7D43, 0x7D45, 0x7D46, 0x7D50, 0x7D52, 0x7D53, 0x7D54, 0x7D59, 0x7D74, 0x7D67, 0x7D69, 0x7D70, 0x7D73, 0x7D76, 0x7D86, 0x7D89, 0x7D91, 0x7D97, 0x7D99, 0x7E03, 0x7E07, 0x7E10
-];
 
 const ParentDeviceName = "Mystic Light Controller";
 
@@ -70,13 +65,13 @@ export function Initialize() {
 
 export function Render() {
 	if(perLED === true) {
-		if(ARGBHeaders > 1 && CorsairHeaders > 0) {
+		if(ARGBHeaders > 1 || CorsairHeaders > 0) {
 			MSIMotherboard.sendGen1SplitPacketARGB();//Gen 1 boards have JCorsair headers and therefore use a new zone register.
 		} else {
 			if(gen2Support) { ///MMM Nesting
 				MSIMotherboard.sendGen2SplitPacketARGB(); //Gen 2 boards use a 3rd register on the 0x04 zone as that's still a JRainbow.
 			} else {
-				MSIMotherboard.sendGen1ARGB(); //This is the older ARGB Send style. It uses a single packet for all zones. I may deprecate this.
+				MSIMotherboard.sendGen1ARGB(); //This is the older ARGB Send style. It uses a single packet for all zones. I did deprecate this, minus the single header boards.
 			}
 
 		}
@@ -426,7 +421,7 @@ class MysticLight {
 			0x7C90 : //B550 Gaming Carbon Wifi
 			{
 				OnboardLEDs    : 10,
-				RGBHeaders     : 0,
+				RGBHeaders     : 1,
 				ARGBHeaders    : 2,
 				JPipeLEDs	   : 0,
 				CorsairHeaders : 1,
@@ -904,13 +899,13 @@ class MysticLight {
 			},
 			0x7D43 : //B660M Bazooka
 			{
-				OnboardLEDs    : 6,
+				OnboardLEDs    : 0,
 				RGBHeaders     : 1,
 				ARGBHeaders    : 2,
 				JPipeLEDs	   : 0,
 				CorsairHeaders : 0,
 				//PERLED
-				PerLEDOnboardLEDs : 6,
+				PerLEDOnboardLEDs : 0,
 				ForceZoneBased	  : false,
 				JARGB_V2		  : false
 			},
@@ -988,13 +983,13 @@ class MysticLight {
 			},
 			0x7D59 : //Pro B660-A
 			{
-				OnboardLEDs    : 6,
+				OnboardLEDs    : 0,
 				RGBHeaders     : 1,
 				ARGBHeaders    : 2,
 				JPipeLEDs	   : 0,
 				CorsairHeaders : 0,
 				//PERLED
-				PerLEDOnboardLEDs : 6,
+				PerLEDOnboardLEDs : 0,
 				ForceZoneBased	  : false,
 				JARGB_V2		  : false
 			},
@@ -1451,6 +1446,7 @@ class MysticLight {
 				for(let OnboardLEDs = 0; OnboardLEDs < (configTable["PerLEDOnboardLEDs"]); OnboardLEDs++) {
 					device.removeSubdevice(this.LEDArrays.OnboardArray[OnboardLEDs]);
 					this.createSubdevice(this.LEDArrays.OnboardArray[OnboardLEDs]);
+					device.setControllableLeds(vLedNames, vLedPositions)
 				}
 			} else {
 				vLedNames = [];
@@ -1461,6 +1457,7 @@ class MysticLight {
 					vLedNames.push(`LED ${deviceLEDs + 1}`);
 					vLedPositions.push([ deviceLEDs, 0 ]);
 					device.setSize([vLedPositions.length+1, 2]);
+					device.setControllableLeds(vLedNames, vLedPositions)
 				}
 			}
 
@@ -1499,11 +1496,32 @@ class MysticLight {
 			JPipeLEDs = this.ConfigurationOverrides[device.getMotherboardName()]["JPipeLEDs"];
 			OnboardLEDs = this.ConfigurationOverrides[device.getMotherboardName()]["OnboardLEDs"];
 		} else {
-			for(let OnboardLEDs = 0; OnboardLEDs < (this.ConfigurationOverrides[device.getMotherboardName()]["PerLEDOnboardLEDs"]); OnboardLEDs++) {
-				this.createSubdevice(this.LEDArrays.OnboardArray[OnboardLEDs]);
-			}
 
-			OnboardLEDs = this.ConfigurationOverrides[device.getMotherboardName()]["PerLEDOnboardLEDs"];
+			const moboName = device.getMotherboardName();
+
+			OnboardLEDs = this.ConfigurationOverrides[moboName]["PerLEDOnboardLEDs"];
+
+			if(advancedMode === true) {
+				vLedNames = [];
+				vLedPositions = [];
+
+				for(let OnboardLEDs = 0; OnboardLEDs < (this.ConfigurationOverrides[moboName]["PerLEDOnboardLEDs"]); OnboardLEDs++) {
+					device.removeSubdevice(this.LEDArrays.OnboardArray[OnboardLEDs]);
+					this.createSubdevice(this.LEDArrays.OnboardArray[OnboardLEDs]);
+					device.setControllableLeds(vLedNames, vLedPositions)
+				}
+			} else {
+				vLedNames = [];
+				vLedPositions = [];
+
+				for(let deviceLEDs = 0; deviceLEDs < OnboardLEDs; deviceLEDs++) {
+					device.removeSubdevice(this.ConfigurationOverrides[moboName]["PerLEDOnboardLEDs"]);
+					vLedNames.push(`LED ${deviceLEDs + 1}`);
+					vLedPositions.push([ deviceLEDs, 0 ]);
+					device.setSize([vLedPositions.length+1, 2]);
+					device.setControllableLeds(vLedNames, vLedPositions)
+				}
+			}
 
 			this.SetupChannels();
 			this.PerLEDInit();
@@ -1572,7 +1590,7 @@ class MysticLight {
 
 	///////////////////////////////////////////////////////////////////////PERLED
 	PerLEDInit() {
-		if(gen2Support || ARGBHeaders > 1 && CorsairHeaders > 0) {
+		if(gen2Support || ARGBHeaders > 1 || CorsairHeaders > 0) {
 			device.send_report(this.splitPerLEDPacket, 185);
 		} else {
 			device.send_report(this.perledpacket, 185);
@@ -1746,7 +1764,12 @@ class MysticLight {
 
 		const header1Data = this.grabChannelRGBData(0);
 		const header2Data = this.grabChannelRGBData(1);
-		const header3Data = this.grabChannelRGBData(2);
+		let header3Data = [];
+		if(ARGBHeaders > 2 || CorsairHeaders > 0)
+		{
+			header3Data = this.grabChannelRGBData(2);
+		}
+		
 
 		if(header1Data.length > 0) {
 			device.send_report([0x53, 0x25, 0x04, 0x00, 0x00].concat(header1Data), 725);

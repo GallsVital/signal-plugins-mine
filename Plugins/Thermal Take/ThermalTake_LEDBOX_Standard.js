@@ -51,6 +51,7 @@ export function Render() {
 }
 
 export function Shutdown() {
+	device.pause(2000);
 	//Device Reverts to Hardware Mode.
 }
 
