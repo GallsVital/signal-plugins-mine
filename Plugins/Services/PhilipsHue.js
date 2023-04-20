@@ -119,7 +119,7 @@ function getColors(){
 		RGBData[index+1] = 0;
 		RGBData[index+2] = lightId;
 
-		const color = device.subdeviceColor(`Philip's Hue Light: ${lightId}`, 1, 1);
+		const color = device.subdeviceColor(`Philips Hue Light: ${lightId}`, 1, 1);
 
 		color[0] = mapu8Tou16(color[0]);
 		color[1] = mapu8Tou16(color[1]);
@@ -288,11 +288,11 @@ function createLightsForArea(AreaId){
 
 	for(const light of controller.areas[AreaId].lights){
 		device.log(`Adding Light: ${light}`);
-		device.createSubdevice(`Philip's Hue Light: ${light}`);
-		device.setSubdeviceName(`Philip's Hue Light: ${light}`, controller.lights[light].name);
-		device.setSubdeviceSize(`Philip's Hue Light: ${light}`, 3, 3);
-		device.setSubdeviceImage(`Philip's Hue Light: ${light}`, "");
-		device.setSubdeviceLeds(`Philip's Hue Light: ${light}`, ["Device"], [[1, 1]]);
+		device.createSubdevice(`Philips Hue Light: ${light}`);
+		device.setSubdeviceName(`Philips Hue Light: ${light}`, controller.lights[light].name);
+		device.setSubdeviceSize(`Philips Hue Light: ${light}`, 3, 3);
+		device.setSubdeviceImage(`Philips Hue Light: ${light}`, "");
+		device.setSubdeviceLeds(`Philips Hue Light: ${light}`, ["Device"], [[1, 1]]);
 	}
 
 	CurrentArea = AreaId;
@@ -335,6 +335,7 @@ export function DiscoveryService() {
 	this.Removal = function(value){
 		for(const controller of service.controllers){
 			if(controller.id === value.bridgeid){
+				service.suppressController(controller);
 				service.removeController(controller);
 
 				return;
@@ -343,7 +344,6 @@ export function DiscoveryService() {
 	};
 }
 
-// TODO: can we do something with the xy positions hue gives us?
 
 class HueBridge {
 	constructor(value){
@@ -361,7 +361,7 @@ class HueBridge {
 		this.selectedAreaName = service.getSetting(this.id, "selectedAreaName") ?? "";
 		this.instantiated = false;
 		this.lastPollingTimeStamp = 0;
-		this.pollingInterval = 20000;
+		this.pollingInterval = 60000;
 		this.supportsStreaming = false;
 		this.apiversion = "";
 
@@ -382,6 +382,14 @@ class HueBridge {
 		service.log("key: "+(this.key || "unknown"));
 		service.log("selectedArea: "+(this.selectedArea || "unknown"));
 		service.log("selectedAreaName: "+(this.selectedAreaName || "unknown"));
+	}
+
+	ForgetLink(){
+		service.saveSetting(this.id, "key", undefined);
+		service.saveSetting(this.id, "username", undefined);
+		this.key = "";
+		this.username = "";
+		this.connected = false;
 	}
 
 	ResolveIpAddress(){
@@ -408,7 +416,6 @@ class HueBridge {
 	CreateBridgeDevice(){
 		service.updateController(this);
 
-		// TODO: only annouce if we have entertainment zones.
 		// Instantiate device in SignalRGB, and pass 'this' object to device.
 		service.announceController(this);
 	}

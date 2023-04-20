@@ -27,10 +27,15 @@ export function Initialize() {
 
 	device.log("Obj host "+controller.hostname+":"+controller.port+"@"+controller.key);
 
-	Nanoleaf = new NanoleafDevice(controller);
+	if(!Nanoleaf){
 
-	Nanoleaf.ExtractPanelInformation(controller.panelinfo);
-	Nanoleaf.InitializeDevice();
+		Nanoleaf = new NanoleafDevice(controller);
+
+		Nanoleaf.ExtractPanelInformation(controller.panelinfo);
+		Nanoleaf.InitializeDevice();
+	}
+
+	Nanoleaf.openAttempts = 0;
 }
 
 
@@ -46,9 +51,11 @@ export function Render() {
 		}
 
 	}else if(Nanoleaf.openAttempts < Nanoleaf.MaxAttemptsToOpenStream){
-		Nanoleaf.openAttempts++;
-
-		Nanoleaf.StartStream();
+		if(Date.now() - Nanoleaf.lastOpenAttemptTime > 5000){
+			Nanoleaf.lastOpenAttemptTime = Date.now();
+			Nanoleaf.openAttempts++;
+			Nanoleaf.StartStream();
+		}
 	}else{
 		// Alert User....
 		device.log(`Failed To Open Stream after ${Nanoleaf.openAttempts} Attempts! Aborting Rendering...`);
@@ -80,11 +87,14 @@ class NanoleafDevice{
 		this.protocol = new NanoleafProtocol(controller);
 		this.openAttempts = 0;
 		this.MaxAttemptsToOpenStream = 5;
+		this.lastOpenAttemptTime = 0;
 		this.config = {
 			originalBrightness: 100,
 			originalEffect: ""
 		};
 		this.ScaleFactor = 12;
+		/** @type {LedPosition} */
+		this.size = [0, 0];
 		this.lightCount = 0;
 		/** @type {NanoLeafPanelInfo[]} */
 		this.panels = [];
@@ -115,9 +125,9 @@ class NanoleafDevice{
 		//device.log(`Nanoleaf Canvas TopLeft Point: {${minX},${minY}}.`);
 		//device.log(`Nanoleaf Canvas BottomRight Point: {${maxX},${maxY}}.`);
 
-		const size = [Math.ceil((maxX) / this.ScaleFactor) + 1, Math.ceil((maxY) / this.ScaleFactor) + 1];
-		device.log(`Scale Factor: ${this.ScaleFactor}, Ending Size ${size}`);
-		device.setSize(size);
+		this.size = [Math.ceil((maxX) / this.ScaleFactor) + 1, Math.ceil((maxY) / this.ScaleFactor) + 1];
+		device.log(`Scale Factor: ${this.ScaleFactor}, Ending Size ${this.size}`);
+		device.setSize(this.size);
 	}
 
 	ExtractPanelInformation(panelConfig){
@@ -233,7 +243,7 @@ class NanoleafDevice{
 			packet[startidx + 0] = lightinfo.panelId;
 			packet[startidx + 1] = 1; // reserved
 
-			const x = lightinfo.x / this.ScaleFactor;
+			const x = this.size[0] - (lightinfo.x / this.ScaleFactor) - 1;
 			const y = lightinfo.y / this.ScaleFactor;
 			const col = device.color(x, y);
 			packet[startidx + 2] = col[0]; //r
@@ -259,8 +269,8 @@ class NanoleafDevice{
 			packet[startidx] = (lightinfo.panelId >> 8) & 0xFF;
 			packet[startidx + 1] = lightinfo.panelId & 0xFF; // reserved
 
-			const x = lightinfo.x / this.ScaleFactor;
-			const y = lightinfo.y / this.ScaleFactor;
+			const x = this.size[0] - (lightinfo.x / this.ScaleFactor) - 1;
+			const y = (lightinfo.y / this.ScaleFactor);
 
 			const col = device.color(x, y);
 			packet[startidx + 2] = col[0]; //r
@@ -535,149 +545,6 @@ export function DiscoveryService() {
 		} else {
 			controller.updateWithValue(value);
 		}
-	};
-
-	this.Interface = function() {
-		return `
-Item {
-	anchors.fill: parent
-	Column{
-        width: parent.width
-        height: parent.height
-		
-		Rectangle{
-			id: scanningItem
-			height: 50
-			width: childrenRect.width + 15
-			visible: service.controllers.length == 0
-			color: theme.background3
-			radius: theme.radius
-
-			BusyIndicator {
-				id: scanningIndicator
-				height: 30
-				anchors.verticalCenter: parent.verticalCenter
-				width: parent.height
-				Material.accent: "#88FFFFFF"
-				running: scanningItem.visible
-			}  
-
-			Column{
-				width: childrenRect.width
-				anchors.left: scanningIndicator.right
-				anchors.verticalCenter: parent.verticalCenter
-
-				Text{
-					color: theme.secondarytextcolor
-					text: "Searching network for Nanoleaf Controllers" 
-					font.pixelSize: 14
-					font.family: "Montserrat"
-				}
-				Text{
-					color: theme.secondarytextcolor
-					text: "This may take several minutes..." 
-					font.pixelSize: 14
-					font.family: "Montserrat"
-				}
-			}
-		}
-		
-
-        Repeater {
-			model: service.controllers          
-			delegate: Item {
-				width: 300
-            	height: content.height + 100 //margins plus space
-
-				Rectangle {
-					width: parent.width
-					height: parent.height - 10
-					color: "#3baf29"
-					radius: 5
-				}
-				Image {
-					x: 10
-					y: 10
-					height: 50                
-					source: "https://marketplace.signalrgb.com/brands/products/nanoleaf/dark_logo.png"
-					fillMode: Image.PreserveAspectFit
-					antialiasing: true
-					mipmap:true
-				}
-				Column {
-					id: content
-					x: 10
-					y: 80
-					width: parent.width - 20
-					spacing: 10
-					
-					Text{
-						color: theme.primarytextcolor
-						text: model.modelData.obj.name
-						font.pixelSize: 16
-						font.family: "Poppins"
-						font.bold: true
-					}
-					Text{
-						color: theme.primarytextcolor
-						text: "Id: " + model.modelData.obj.id
-					}
-					Text{
-						color: theme.primarytextcolor
-						text: "Firmware v"+model.modelData.obj.firmwareVersion
-					}    
-					Item{
-						width: parent.width
-						height: 50
-
-						Rectangle {
-							width: parent.width
-							height: parent.height
-							color: "#22ffffff"
-							radius: 5
-						}
-						Text{
-							height: parent.height
-							x: 10
-							color: theme.primarytextcolor
-							verticalAlignment: Text.AlignVCenter
-							text: (model.modelData.obj.connected === true) ? "Linked" : (model.modelData.obj.waitingforlink === true) ? "Waiting For Link..."+model.modelData.obj.retriesleft : "Not Linked"
-						}
-						ToolButton {        
-							height: 50
-							width: 120
-							anchors.verticalCenter: parent.verticalCenter
-							font.family: "Poppins"
-							font.bold: true 
-							visible: !model.modelData.obj.connected && !model.modelData.obj.waitingforlink  
-							text: "Link"
-							anchors.right: parent.right
-							onClicked: {
-								model.modelData.obj.startLink();
-							}
-						}
-						BusyIndicator {
-							y: 10
-							height: 30
-							width: parent.height
-							Material.accent: "#88FFFFFF"
-							anchors.right: parent.right
-							visible: model.modelData.obj.waitingforlink === true
-						}
-					}    
-					Text{
-						width: parent.width
-						color: theme.primarytextcolor
-						verticalAlignment: Text.AlignVCenter
-						visible: !model.modelData.obj.connected
-						text: "To link this controller start the linking process above and then put the controller into pairing mode."
-						wrapMode: Text.WrapAtWordBoundaryOrAnywhere
-					}      
-				}
-			}  
-        }
-    }
-}`;
 	};
 }
 
