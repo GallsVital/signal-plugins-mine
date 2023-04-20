@@ -52,7 +52,7 @@ export function Render() {
 }
 
 export function Shutdown() {
-
+	device.pause(2000);
 }
 
 function SetupChannels() {

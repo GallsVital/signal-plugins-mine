@@ -10,7 +10,7 @@ export function Documentation(){ return "troubleshooting/corsair"; }
 shutdownColor:readonly
 LightingMode:readonly
 forcedColor:readonly
-DpiControl:readonly
+settingControl:readonly
 dpiStages:readonly
 dpiRollover:readonly
 dpi1:readonly
@@ -19,15 +19,19 @@ dpi3:readonly
 dpi4:readonly
 dpi5:readonly
 dpi6:readonly
+angleSnapping:readonly
+idleTimeout:readonly
+idleTimeoutLength:readonly
+liftOffDistance:readonly
 */
 export function ControllableParameters(){
 	const config = deviceLibrary.getDeviceByProductId(device.productId());
 
-	return [
+	const UserProps = [
 		{"property":"shutdownColor", "group":"lighting", "label":"Shutdown Color", "min":"0", "max":"360", "type":"color", "default":"#009bde"},
 		{"property":"LightingMode", "group":"lighting", "label":"Lighting Mode", "type":"combobox", "values":["Canvas", "Forced"], "default":"Canvas"},
 		{"property":"forcedColor", "group":"lighting", "label":"Forced Color", "min":"0", "max":"360", "type":"color", "default":"#009bde"},
-		{"property":"DpiControl", "group":"mouse", "label":"Enable Dpi Control", "type":"boolean", "default":"false"},
+		{"property":"settingControl", "group":"mouse", "label":"Enable Dpi Control", "type":"boolean", "default":"false"},
 		{"property":"dpiStages", "group":"mouse", "label":"Number of DPI Stages", "step":"1", "type":"number", "min":"1", "max":"5", "default":"5"},
 		{"property":"dpiRollover", "group":"mouse", "label":"DPI Cycle Rollover", "type":"boolean", "default": "true"},
 		{"property":"dpi1", "group":"mouse", "label":"DPI Stage 1", "step":"50", "type":"number", "min":"100", "max": config.maxDPI, "default":"400"},
@@ -36,7 +40,18 @@ export function ControllableParameters(){
 		{"property":"dpi4", "group":"mouse", "label":"DPI Stage 4", "step":"50", "type":"number", "min":"100", "max": config.maxDPI, "default":"2400"},
 		{"property":"dpi5", "group":"mouse", "label":"DPI Stage 5", "step":"50", "type":"number", "min":"100", "max": config.maxDPI, "default":"3200"},
 		{"property":"dpi6", "group":"mouse", "label":"DPI Sniper Stage", "step":"50", "type":"number", "min":"100", "max": config.maxDPI, "default":"400"},
+		{"property":"angleSnapping", "group":"mouse", "label":"Angle Snapping", "type":"boolean", "default":"false"},
+		{"property":"liftOffDistance", "group":"mouse", "label":"Lift Off Distance", "type":"combobox", "values":["Low", "Middle", "High"], "default":"Middle"},
 	];
+
+	if (config.wireless) {
+		UserProps.push(...[
+			{"property":"idleTimeout", "group":"mouse", "label":"Enable Device Sleep", "type":"boolean", "default":"false"},
+			{"property":"idleTimeoutLength", "group":"mouse", "label":"Device Sleep Timeout (Minutes)", "step":"1", "type":"number", "min":"1", "max":"30", "default":"15"},
+		]);
+	}
+
+	return UserProps;
 }
 
 let savedPollTimer = Date.now();
@@ -51,45 +66,12 @@ export function LedPositions() {
 }
 
 
-export function Initialize(configRequired = false) {
+export function Initialize() {
 	device.set_endpoint(1, 0x0004, 0xffc2);
+	LegacyCorsair.deviceInitialization();
 
-	if(!configRequired) {
-		const DeviceInformation = LegacyCorsair.getFirmwareInformation();
-		LegacyCorsair.setDeviceInfo();
-
-		LegacyCorsair.setDeviceType(DeviceInformation[5]);
-
-		if(LegacyCorsair.getWirelessDevice()) {
-			LegacyCorsair.checkWakeStatus();
-		} else {
-			LegacyCorsair.setWakeStatus(true); //Wired devices will never have a wake status
-		}
-
-		device.addFeature("mouse");
-	}
-
-	if(configRequired || !LegacyCorsair.getWirelessDevice()) {
-		device.log("Device Requires Config as it has woken from sleep or has been rebooted");
-		LegacyCorsair.setLightingControlMode(LegacyCorsair.modes.SoftwareMode);
-		LegacyCorsair.setSpecialFunctionControlMode(LegacyCorsair.modes.SoftwareMode);
-
-		if(LegacyCorsair.getWirelessDevice()) {
-			LegacyCorsair.wirelessDeviceSetup();
-		}
-
-		if(DpiControl) {
-			DpiHandler.setEnableControl(true);
-			DpiHandler.maxDPIStage = dpiStages;
-			DpiHandler.dpiRollover = dpiRollover;
-			DpiHandler.setDpi();
-		}
-
-		if(LegacyCorsair.getDeviceName() === "Nightsword") { //is mine just a special snowflake? Probably, but also edge cases.
-			device.write([0x00, 0x07, 0x05, 0x02, 0x00, 0x03], 65);
-		}
-
-		device.write([0x00, 0x07, 0x40, 0x16, 0x00, 0x01, 0x80, 0x02, 0x80, 0x03, 0x80, 0x04, 0x80, 0x05, 0x80, 0x06, 0x40, 0x07, 0x40, 0x08, 0x40, 0x09, 0x40, 0x0a, 0x40, 0x0b, 0x40, 0x0c, 0x40, 0x0d, 0x40, 0x0e, 0x40, 0x0f, 0x40, 0x10, 0x40, 0x11, 0x40, 0x12, 0x40, 0x13, 0x40, 0x14, 0x40, 0x15, 0x40, 0x16, 0x40, 0x17, 0x40, 0x18, 0x40, 0x19, 0x40, 0x1a, 0x40], 65);
+	if(!LegacyCorsair.getWirelessDevice()) {
+		LegacyCorsair.configureDevice();
 	}
 }
 
@@ -106,11 +88,11 @@ export function Render() {
 
 export function Shutdown() {
 	LegacyCorsair.setLightingControlMode(LegacyCorsair.modes.HardwareMode);
-	LegacyCorsair.setSpecialFunctionControlMode(LegacyCorsair.modes.HardwareMode);
+	LegacyCorsair.setSpecialFunctionControlMode(LegacyCorsair.modes.HardwareMode); //throw it back to hardware mode.  (╯°□°）╯
 }
 
-export function onDpiControlChanged() {
-	DpiHandler.setEnableControl(DpiControl);
+export function onsettingControlChanged() {
+	DpiHandler.setEnableControl(settingControl);
 }
 
 export function ondpiStagesChanged() {
@@ -143,6 +125,22 @@ export function ondpi5Changed() {
 
 export function ondpi6Changed() {
 	DpiHandler.DPIStageUpdated(6);
+}
+
+export function onangleSnappingChanged() {
+	LegacyCorsair.setDeviceAngleSnap(angleSnapping);
+}
+
+export function onidleTimeoutChanged() {
+	LegacyCorsair.setIdleTimeout(idleTimeout, idleTimeoutLength);
+}
+
+export function onidleTimeoutLength() {
+	LegacyCorsair.setIdleTimeout(idleTimeout, idleTimeoutLength);
+}
+
+export function onliftOffDistanceChanged() {
+	LegacyCorsair.setliftOffDistance(liftOffDistance);
 }
 
 function getDeviceBatteryStatus() {
@@ -271,7 +269,7 @@ function hexToRgb(hex) {
 	return colors;
 }
 
-class LegacyCorsairLibrary {
+export class LegacyCorsairLibrary {
 	constructor() {
 		this.PIDLibrary = {
 			0x1B35 : "Dark Core",
@@ -346,7 +344,7 @@ class LegacyCorsairLibrary {
 			"M65 Elite" : {
 				vLedNames : [ "Scroll Zone", "Dpi Zone", "Logo Zone" ],
 				vLedPositions : [ [1, 0], [1, 1], [1, 2] ],
-				vKeys : [ 1, 3, 2 ],
+				vKeys : [ 4, 3, 2 ],
 				size : [3, 3],
 				maxDPI : 18000
 			},
@@ -394,7 +392,7 @@ class LegacyCorsairLibrary {
 }
 const deviceLibrary = new LegacyCorsairLibrary();
 
-class LegacyCorsairProtocol {
+export class LegacyCorsairProtocol {
 	constructor() {
 		/** Write command to device, and recieves no response. */
 		this.write = 0x07;
@@ -434,13 +432,19 @@ class LegacyCorsairProtocol {
 			keyInputMode : 0x40,
 			/** Command for reading Battery.*/
 			batteryStaus : 0x50,
+			/** Command for setting idle timeout.*/
+			idleTimeout : 0xA6
 		};
-
+		/** Array of Config Values*/
 		this.Config =
 		{
+			/** Device Type Variable (Keyboard, Mouse, Mousepad).*/
 			deviceType : 0x00,
+			/** Flag for Wired Vs Wireless Device.*/ //May be able to infer from available endpoints? I'll have to see what the K57? does
 			wirelessDevice : false,
+			/** Flag for Knowing if a device is awake or not. Is always true on wired devices.*/
 			deviceAwake : false,
+			/** Device Name Variable used for setting name in signal and looking up through the device library dict.*/
 			deviceName : "",
 			vKeys : [],
 			vKeyPositions : [],
@@ -470,11 +474,17 @@ class LegacyCorsairProtocol {
 			0x01 : 0
 		};
 
+		this.LODDict = {
+			"Low" : 0x02,
+			"Middle" : 0x03,
+			"High" : 0x04
+		};
+
 		this.mouseSubcommands =
 		{
 			dpi : 0x02,
 			liftOffDistance : 0x03,
-			angleSnapping : 0x04 //0x00, snapping
+			angleSnapping : 0x04
 		};
 
 		this.keyboardColorDict =
@@ -505,7 +515,7 @@ class LegacyCorsairProtocol {
 			17 : "Keypad 10",
 			18 : "Keypad 11",
 			19 : "Keypad 12",
-			20 : "null 20",
+			20 : "null 20", //Wonder what mouse has this key?
 			24 : "Profile Up",
 			25 : "Profile Down"
 		};
@@ -516,6 +526,7 @@ class LegacyCorsairProtocol {
 	getDeviceName() { return this.Config.deviceName; }
 	setDeviceName(deviceName) { this.Config.deviceName = deviceName; }
 
+	getDeviceType() { return this.Config.deviceType; }
 	setDeviceType(deviceType) { this.Config.deviceType = this.DeviceTypes[deviceType]; }
 
 	getWirelessDevice() { return this.Config.wirelessDevice; }
@@ -541,7 +552,7 @@ class LegacyCorsairProtocol {
 		this.setvKeys(config.vKeys);
 		this.setvKeyNames(config.vLedNames);
 		this.setvLedPositions(config.vLedPositions);
-		this.setDeviceName(deviceLibrary.PIDLibrary[device.productId()]); //WJY DID THIS WORK WITHOUT THIS?!?!?!?
+		this.setDeviceName(deviceLibrary.PIDLibrary[device.productId()]); //WHY DID THIS WORK WITHOUT THIS?!?!?!?
 		device.setName("Corsair " + deviceLibrary.PIDLibrary[device.productId()]);
 		device.setSize(config.size);
 		device.setControllableLeds(this.Config.vKeyNames, this.Config.vKeyPositions);
@@ -549,70 +560,107 @@ class LegacyCorsairProtocol {
 
 	/** Legacy Corsair Write Command*/
 	setCommand(data) {
-		const packet = [0x00, this.write];
-		data  = data || [0x00, 0x00, 0x00];
-		packet.push(...data);
-		device.write(packet, 65);
+		device.write([0x00, this.write].concat(data), 65);
 	}
 	/** Legacy Corsair Read Command*/
 	getCommand(data) {
-		const packet = [0x00, this.read];
-		packet.push(...data);
-		device.send_report(packet, 65);
+		device.send_report([0x00, this.read].concat(data), 65);
 
-		const returnpacket = device.get_report(packet, 65);
+		const returnPacket = device.get_report([0x00, this.read], 65);
 
-		return returnpacket.slice(4, 64);
+		return returnPacket.slice(4, 64);
 	}
 	/** Legacy Corsair Streaming Command, used exclusively on keyboards iirc*/
 	streamCommand(data) {
-		const packet = [0x00, this.stream];
-		packet.push(...data);
-		device.write(packet, 65);
+		device.write([0x00, this.stream].concat(data), 65);
 	}
 	wirelessDeviceSetup() { //good way to make sure users pair the right device to the right receiver
 		const wirelessFirmwarePacket = this.getCommand([0xae]);
 
 		device.log("Full Wireless Info Packet: " + wirelessFirmwarePacket);
 
-		const VendorID = wirelessFirmwarePacket[2].toString(16) + wirelessFirmwarePacket[1].toString(16);
-		device.log("Wireless Device Vendor ID: " + VendorID);
+		if(wirelessFirmwarePacket[2] !== undefined && wirelessFirmwarePacket[2] > 0 && wirelessFirmwarePacket[1] !== undefined && wirelessFirmwarePacket[1] > 0) {
+			const VendorID = wirelessFirmwarePacket[2].toString(16) + wirelessFirmwarePacket[1].toString(16);
+			device.log("Wireless Device Vendor ID: " + VendorID);
+		} else {
+			device.log("Failed to Grab Wireless Device Vendor ID.", {toFile : true});
 
-		const ProductID = wirelessFirmwarePacket[4].toString(16) + wirelessFirmwarePacket[3].toString(16);
-		device.log("Wireless Device Product ID: " + ProductID);
+			return [-1, -1];
+		}
 
-		const unknownWirelessPacket = this.getCommand([0x4a]);
+		if(wirelessFirmwarePacket[4] !== undefined && wirelessFirmwarePacket[4] > 0 && wirelessFirmwarePacket[3] !== undefined && wirelessFirmwarePacket[3] > 0) {
+			const ProductID = wirelessFirmwarePacket[4].toString(16) + wirelessFirmwarePacket[3].toString(16);
+			device.log("Wireless Device Product ID: " + ProductID);
+		} else {
+			device.log("Failed to Grab Wireless Device Product ID.", {toFile : true});
+
+			return [-1, -1];
+		}
+
 		device.addFeature("battery");
 
 		this.setCommand([0xAD, 0x00, 0x00, 0x64]); //Crank the brightness
 
-		getDeviceBatteryStatus();
+		return this.getBatteryLevel();
 	}
+	/* eslint-disable complexity */
 	/** Grab Relevant Information off of the Device.*/
-	getFirmwareInformation() {
-		const returnpacket = this.getCommand([0x01, 0x00]);
-		//device.log("Full Return Packet: " + returnpacket);
+	getFirmwareInformation() { //Complexity of 21, but we don't really care. This is simply just a way to return all of our info and we parse like 2 bytes of it. If we do, then I may split it out into smaller functions.
+		const returnPacket = this.getCommand([0x01, 0x00]);
 
-		const firmwareVersion = returnpacket[6].toString(16) + returnpacket[5].toString(16);
-		device.log("Device Firmware Version:" + firmwareVersion, {toFile: true});
+		device.log(returnPacket);
 
-		const bootloaderVersion = returnpacket[8].toString(16) + returnpacket[7].toString(16);
-		device.log("Device Bootloader Version:" + bootloaderVersion, {toFile: true});
+		let firmwareVersion = "";
+		let bootloaderVersion = "";
+		let VendorID = "";
+		let ProductID = "";
+		let pollingRate = 0;
+		let layout = 0;
+		let deviceType = "";
 
-		const VendorID = returnpacket[10].toString(16) + returnpacket[9].toString(16);
-		device.log("Device Vendor ID: " + VendorID, {toFile: true});
 
-		const ProductID = returnpacket[12].toString(16) + returnpacket[11].toString(16);
-		device.log("Device Product ID: " + ProductID, {toFile: true});
+		if(returnPacket[5] !== undefined && returnPacket[6] !== undefined && returnPacket[5] > 0) {
+			firmwareVersion = returnPacket[6].toString(16) + returnPacket[5].toString(16);
+			device.log("Device Firmware Version:" + firmwareVersion, {toFile: true});
+		} else {
+			return [-1, -1, -1, -1, -1, -1];
+		}
 
-		const pollingRate = 1000 / returnpacket[13];
-		device.log("Device Polling Rate: " + pollingRate + "Hz", {toFile: true});
+		if(returnPacket[7] !== undefined && returnPacket[8] !== undefined && returnPacket[7] > 0) {
+			bootloaderVersion = returnPacket[8].toString(16) + returnPacket[7].toString(16);
+			device.log("Device Bootloader Version:" + bootloaderVersion, {toFile: true});
+		}else {
+			return [-1, -1, -1, -1, -1, -1];
+		}
 
-		const layout = returnpacket[20];
+		if(returnPacket[9] !== undefined && returnPacket[10] !== undefined && returnPacket[9] > 0) {
+			VendorID = returnPacket[10].toString(16) + returnPacket[9].toString(16);
+			device.log("Device Vendor ID: " + VendorID, {toFile: true});
+		}else {
+			return [-1, -1, -1, -1, -1, -1];
+		}
 
-		let deviceType = this.DeviceIdentifiers[returnpacket[17]];
+		if(returnPacket[11] !== undefined && returnPacket[12] !== undefined && returnPacket[11] > 0) {
+			ProductID = returnPacket[12].toString(16) + returnPacket[11].toString(16);
+			device.log("Device Product ID: " + ProductID, {toFile: true});
+		}else {
+			return [-1, -1, -1, -1, -1, -1];
+		}
 
-		if(layout !== undefined) {
+		if(returnPacket[13] !== undefined && returnPacket[13] > 0) {
+			pollingRate = 1000 / returnPacket[13];
+			device.log("Device Polling Rate: " + pollingRate + "Hz", {toFile: true});
+		}
+
+		if(returnPacket[17] !== undefined && returnPacket[17] > 0) {
+			deviceType = this.DeviceIdentifiers[returnPacket[17]];
+		}else {
+			return [-1, -1, -1, -1, -1, -1];
+		}
+
+		if(returnPacket[20] !== undefined && returnPacket[20] > 0) {
+			layout = returnPacket[20];
+
 			if(layout > 5 && deviceType === "Keyboard") {
 				device.log("Mouse misidentified as a keyboard.", {toFile: true});
 				deviceType = "Mouse"; //something something Dark Core identifies as a keyboard
@@ -622,18 +670,17 @@ class LegacyCorsairProtocol {
 			device.log("Device Type: " + deviceType, {toFile: true});
 		}
 
-		const ledMask = returnpacket[21];
-		device.log("LED Mask: " + ledMask, {toFile: true}); //this is about as reliable as autodection on MSI boards. Half the mice just straight up ignore it, or they give me values that make ZERO SENSE.
-
 		return [firmwareVersion, bootloaderVersion, VendorID, ProductID, pollingRate, deviceType];
 	}
+	/* eslint-enable complexity */
 	/** Grab Battery Level off of the Device.*/
 	getBatteryLevel() {
 		const batteryPacket = this.getCommand([0x50]);
+
 		const batteryLevel = this.batteryDict[batteryPacket[1]];
 		const batteryStatus = batteryPacket[2];
 
-		if(batteryLevel !== 0) {
+		if(batteryLevel !== undefined && batteryStatus !== undefined) {
 			device.log("Battery Level: " + batteryLevel + "%");
 
 			return [batteryLevel, batteryStatus];
@@ -643,17 +690,74 @@ class LegacyCorsairProtocol {
 
 		return [-1, -1];
 	}
-	/** Check if a device is awake using the battery level as a gauge.*/
+	/** Check if a device is awake using the battery level as a gauge. Does not forward battery percentage to Signal's UI.*/
 	checkWakeStatus() {
 		const wakeStatus = this.getBatteryLevel();
 
 		if(wakeStatus[0] !== undefined) {
 			this.setWakeStatus(true);
-			Initialize(true);
+			this.configureDevice();
 		} else {
 			this.setWakeStatus(false);
 			device.log("Device is taking a nap.");
 		}
+	}
+	/** Initialize the Device and Check That it is Connected and Awake. */
+	deviceInitialization() {
+
+		let attempts = 0;
+		let DeviceInformation = [];
+
+		do {
+			DeviceInformation = this.getFirmwareInformation();
+
+			if(DeviceInformation[0] === -1) {
+			   device.pause(50);
+			   attempts++;
+			}
+	   }
+
+	   while(DeviceInformation[0] === -1 && attempts < 5);
+
+	   this.setDeviceInfo();
+
+		this.setDeviceType(DeviceInformation[5]);
+
+		if(this.getWirelessDevice()) {
+			this.checkWakeStatus();
+		} else {
+			this.setWakeStatus(true); //Wired devices will never have a wake status
+		}
+
+		device.addFeature("mouse");
+	}
+	/** Configure the device based on the dictionary and data gathered in Device Initialization. */
+	configureDevice() {
+		device.log("Device Requires Config as it has woken from sleep or has been rebooted");
+		this.setLightingControlMode(this.modes.SoftwareMode);
+		this.setSpecialFunctionControlMode(this.modes.SoftwareMode);
+
+		if(this.getWirelessDevice()) {
+			this.wirelessDeviceSetup();
+		}
+
+		if(settingControl) {
+			DpiHandler.setEnableControl(true);
+			DpiHandler.maxDPIStage = dpiStages;
+			DpiHandler.dpiRollover = dpiRollover;
+			DpiHandler.setDpi();
+			this.setDeviceAngleSnap(angleSnapping);
+			this.setliftOffDistance(liftOffDistance);
+			this.setIdleTimeout(idleTimeout, idleTimeoutLength);
+		}
+
+		if(this.getDeviceName() === "Nightsword") { //is mine just a special snowflake? Probably, but also edge cases.
+			device.write([0x00, 0x07, 0x05, 0x02, 0x00, 0x03], 65); //Just realized this is setting software mode, but with an extra brightness flag.
+		}
+
+		this.setKeyOutputType([0x01, 0x80, 0x02, 0x80, 0x03, 0x80, 0x04, 0x80, 0x05, 0x80, 0x06, 0x40, 0x07, 0x40, 0x08, 0x40, 0x09, 0x40, 0x0a, 0x40, 0x0b, 0x40, 0x0c, 0x40, 0x0d, 0x40, 0x0e, 0x40, 0x0f, 0x40, 0x10, 0x40, 0x11, 0x40, 0x12, 0x40, 0x13, 0x40, 0x14, 0x40, 0x15, 0x40, 0x16, 0x40, 0x17, 0x40, 0x18, 0x40, 0x19, 0x40, 0x1a, 0x40]);
+
+		device.write([0x00, 0x07, 0x40, 0x16, 0x00, 0x01, 0x80, 0x02, 0x80, 0x03, 0x80, 0x04, 0x80, 0x05, 0x80, 0x06, 0x40, 0x07, 0x40, 0x08, 0x40, 0x09, 0x40, 0x0a, 0x40, 0x0b, 0x40, 0x0c, 0x40, 0x0d, 0x40, 0x0e, 0x40, 0x0f, 0x40, 0x10, 0x40, 0x11, 0x40, 0x12, 0x40, 0x13, 0x40, 0x14, 0x40, 0x15, 0x40, 0x16, 0x40, 0x17, 0x40, 0x18, 0x40, 0x19, 0x40, 0x1a, 0x40], 65);
 	}
 	/** Set Device to Function Control Mode.*/
 	setSpecialFunctionControlMode(mode) {
@@ -662,17 +766,16 @@ class LegacyCorsairProtocol {
 	}
 	/** Set Device Lighting Mode.*/
 	setLightingControlMode(mode) {
-		const packet = [this.Commands.lightingControl, mode, 0x00, this.Config.deviceType];
+		const packet = [this.Commands.lightingControl, mode, 0x00, this.getDeviceType()];
 		this.setCommand(packet);
 	}
 	/** Set Software Lighting on the Dark Core and Dark Core SE. Things use a wacky packet send.*/
 	setDarkCoreLighting(RGBData) {
-		//this.setCommand([0xAA, 0x00, 0x00, 0x07, 0x07, 0x00, 0x00, 0x64].concat(RGBData).concat(0x05));
-		device.write([0x00, 0x07, 0xaa, 0x00, 0x00, 0x01, 0x07, 0x00, 0x00, 0x64].concat(RGBData.splice(0, 3)).concat([0x00, 0x00, 0x00, 0x05]), 65); //no idea what second arg is
+		this.setCommand([0xaa, 0x00, 0x00, 0x01, 0x07, 0x00, 0x00, 0x64].concat(RGBData.splice(0, 3)).concat([0x00, 0x00, 0x00, 0x05])); //no idea what second arg is, AS IT DOES NOTHING
 		device.pause(5);
-		device.write([0x00, 0x07, 0xaa, 0x00, 0x00, 0x02, 0x07, 0x00, 0x00, 0x64].concat(RGBData.splice(0, 3)).concat([0x00, 0x00, 0x00, 0x04]), 65);
+		this.setCommand([0xaa, 0x00, 0x00, 0x02, 0x07, 0x00, 0x00, 0x64].concat(RGBData.splice(0, 3)).concat([0x00, 0x00, 0x00, 0x04]));
 		device.pause(5);
-		device.write([0x00, 0x07, 0xaa, 0x00, 0x00, 0x04, 0x07, 0x00, 0x00, 0x64].concat(RGBData.splice(0, 3)).concat([0x00, 0x00, 0x00, 0x03]), 65);
+		this.setCommand([0xaa, 0x00, 0x00, 0x04, 0x07, 0x00, 0x00, 0x64].concat(RGBData.slice(0, 3)).concat([0x00, 0x00, 0x00, 0x03]));
 		device.pause(5);
 	}
 
@@ -694,7 +797,7 @@ class LegacyCorsairProtocol {
 	}
 	/** Set Device's Angle Snapping on or off.*/
 	setDeviceAngleSnap(angleSnapping) {
-		this.setCommand([this.Commands.mouseFunctions, this.mouseSubcommands.angleSnapping, 0x00, angleSnapping]);
+		this.setCommand([this.Commands.mouseFunctions, this.mouseSubcommands.angleSnapping, 0x00, angleSnapping ? 1 : 0]);
 	}
 	/** Apply Device's Software Keyboard Lighting Zones.*/
 	ApplyLightingStream(colorChannel, packetCount, finishValue) {
@@ -702,24 +805,40 @@ class LegacyCorsairProtocol {
 	}
 	/** Set Which Output Method a Given Array of Keys Will Use.*/
 	setKeyOutputType(keys) { //In this method we feed in the keys and the type they'll use in case we want to split them (Which we will.)
-		while(keys > 0) {
-			const keysToSend = Math.min(keys.length, 30);
-			this.setCommand([this.Commands.keyInputMode, keysToSend].concat(keys.splice(0, keysToSend*2)));
+		while(keys.length > 0) {
+			const keysToSend = Math.min((keys.length/2), 30);
+			this.setCommand([this.Commands.keyInputMode, keysToSend, 0x00].concat(keys.splice(0, keysToSend*2)));
 		}
 	}
 	/** Set Device's Software DPI.*/
-	setDPI(deviceDPI) {//There is another more complicated handler to do this properly. For now we're manipulating a single stage. Bright side is that we can do infinite zones even if a mouse only supports 2 or 3.
+	setDPI(deviceDPI, RGBData = [0x00, 0x00, 0x00]) {//There is another more complicated handler to do this properly. For now we're manipulating a single stage. Bright side is that we can do infinite zones even if a mouse only supports 2 or 3.
 
 		const LowDpi = deviceDPI%256;
     	const HighDpi = deviceDPI/256;
-    	this.setCommand([LegacyCorsair.Commands.mouseFunctions, 0xD1, 0x00, 0x00, LowDpi, HighDpi, LowDpi, HighDpi, 0x00, 0x00, 0x00]); //this is jank, why am I doing it like this ?.
-		this.setCommand([LegacyCorsair.Commands.mouseFunctions, 0x02, 0x00, 0x01]);
+    	this.setCommand([LegacyCorsair.Commands.mouseFunctions, 0xD3, 0x00, 0x00, LowDpi, HighDpi, LowDpi, HighDpi].concat(RGBData)); //this is jank, why am I doing it like this ?.
+		this.setCommand([LegacyCorsair.Commands.mouseFunctions, 0x02, 0x00, 0x03]); //bonk. this is your stage selector. It's really not that complicated
 	}//Double edged sword because of indicators. We render DPI Indicators useless by these means if a device won't let you change them individually. Namely the Dark Core.
+	/** Set Device's Idle Timeout and it's length. */
+	setIdleTimeout(idleTimeout, idleTimeoutLength) {
+		if(idleTimeout <= 30 && idleTimeout >= 1) {
+			this.setCommand([this.Commands.idleTimeout, 0x00, idleTimeout ? 0x01 : 0x00, 0x03, idleTimeoutLength]);
+		} else {
+			console.log("Failed to set Idle Timeout as value was out of bounds.", {toFile : true});
+		}
+	}
+	/** Set Device's Lift Off Distance. */
+	setliftOffDistance(liftOffDistance) {
+		if(this.LODDict[liftOffDistance] !== undefined) {
+			this.setCommand([this.Commands.mouseFunctions, this.mouseSubcommands.liftOffDistance, 0x00, this.LODDict[liftOffDistance]]);
+		} else {
+			console.log("Failed to set Lift Off Distance as value was out of bounds.", {toFile : true});
+		}
+	}
 }
 
 const LegacyCorsair = new LegacyCorsairProtocol();
 
-class DPIManager {
+export class DPIManager {
 	constructor(DPIConfig) {
 		this.currentStage = 1;
 		this.sniperStage = 6;
@@ -906,11 +1025,6 @@ class BitArray {
 					break;
 
 				default: {
-					// Skip keys only windows should handle.
-					//if(pressedKey === 0){
-					//	continue;
-					//}
-					// Send Events for any keys we don't handle above
 					const buttonName = LegacyCorsair.getPressedKey(bitIdx);
 					const eventData = {
 						"buttonCode": 0,
@@ -918,7 +1032,6 @@ class BitArray {
 						"name":buttonName
 					};
 
-					device.log(eventData);
 					mouse.sendEvent(eventData, "Button Press");
 
 				}
@@ -935,7 +1048,7 @@ const macroInputArray = new BitArray(4);
 export function Validate(endpoint) {
 	return (endpoint.interface === 1 && endpoint.usage === 0x0004 && endpoint.usage_page === 0xffc2)  //Normal Endpoint
 	    || (endpoint.interface === 0 && endpoint.usage === 0x0002 && endpoint.usage_page === 0xffc1) //Macro Endpoint
-		|| (endpoint.interface === 0 && endpoint.usage === 0x0002 && endpoint.usage_page === 0xffc3);
+		|| (endpoint.interface === 0 && endpoint.usage === 0x0002 && endpoint.usage_page === 0xffc3);//Wake endpoint
 }
 
 export function Image() {

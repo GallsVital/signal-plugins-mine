@@ -1,6 +1,6 @@
 export function Name() { return "Corsair Elite Cappelix LCD"; }
 export function VendorId() { return 0x1b1c; }
-export function ProductId() { return 0x0C39; }
+export function ProductId() { return [0x0C39, 0x0C33]; }
 export function Publisher() { return "WhirlwindFX"; }
 export function Size() { return [6, 6]; }
 export function DefaultPosition(){return [240, 120];}
