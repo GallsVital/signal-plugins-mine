@@ -1,7 +1,7 @@
 declare const udp: Udp;
 
 declare class Udp{
-    public send(Host: String, Port: number, avData: number[], meEndianness?: boolean);
+    public send(Host: String, Port: number, avData: number[] | string | object, meEndianness?: boolean);
 }
 
 declare class dtls{
