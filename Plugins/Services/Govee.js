@@ -8,6 +8,7 @@ export function DefaultPosition() {return [75, 70]; }
 export function DefaultScale(){return 8.0;}
 /* global
 controller:readonly
+discovery: readonly
 TurnOffOnShutdown:readonly
 */
 export function ControllableParameters() {
@@ -109,7 +110,6 @@ export function DiscoveryService() {
 	this.UdpBroadcastPort = 4001;
 	this.UdpBroadcastAddress = "239.255.255.250";
 	this.UdpListenPort = 4002;
-
 
 	this.lastPollTime = 0;
 	this.PollInterval = 60000;
