@@ -162,7 +162,7 @@ export default class DpiController{
 
     private updateDpiRange(){
         for(const stage in this.dpiMap.keys()){
-            let prop = device.getProperty(`dpi${+stage}`) as NumberParameter;
+            let prop = device.getProperty(`dpi${+stage}`)// as NumberParameter;
             prop.min = this.minDpi;
             prop.max = this.maxDpi;
             device.addProperty(prop);
