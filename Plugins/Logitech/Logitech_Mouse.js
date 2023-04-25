@@ -1156,6 +1156,7 @@ export class LogitechProtocol {
 		   this.FetchDefaultFriendlyDeviceName();
 	   }
 
+
 	   this.SetDirectMode(OnboardState);
 
 	   if(this.HasBattery()) {
