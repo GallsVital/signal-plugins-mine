@@ -70,12 +70,10 @@ let offset = 0;
 
 let packetsSent = 0;
 
-function getInput()
-{
+function getInput() {
 	const packet = device.read([0x00], 512, 1);
 
-	if(packet[0] === 0x01 && packet[1] === 0x02 && packet[2] === 0x21)
-	{
+	if(packet[0] === 0x01 && packet[1] === 0x02 && packet[2] === 0x21) {
 		const position = (packet[7] << 8) + (packet[6] & 0xff);
 		device.log(`Position: ${position}`);
 	}
@@ -154,3 +152,6 @@ export function Validate(endpoint) {
 	return endpoint.interface === 0;
 }
 
+export function Image() {
+	return "";
+}

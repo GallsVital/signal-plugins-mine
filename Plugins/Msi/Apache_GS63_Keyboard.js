@@ -74,3 +74,6 @@ export function Render() {
 	device.send_report(packet, 8);
 }
 
+export function Image() {
+	return "";
+}
