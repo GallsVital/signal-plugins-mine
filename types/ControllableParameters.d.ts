@@ -17,6 +17,7 @@ declare interface NumberParameter extends ParameterBase{
 	min: string | number
 	max: string | number
 	step?: string | number
+	live?: string | number | boolean
 	type: "number"
 }
 declare interface ComboboxParameter extends ParameterBase{
