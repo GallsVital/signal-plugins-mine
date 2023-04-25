@@ -1,25 +1,16 @@
-/* eslint-disable brace-style */
 export function Name() { return "Elgato Streamdeck"; }
 export function VendorId() { return 0x0fd9; }
 export function ProductId() { return 0x0080; }
 export function Publisher() { return "WhirlwindFX"; }
-export function Size() { return [5, 3]; }
+export function Size() { return [ButtonSize * RowWidth + 1, ButtonSize * ColHeight + 1]; }
 export function DefaultPosition(){return [240, 120];}
 export function DefaultScale(){return 8.0;}
 /* global
-shutdownColor:readonly
-LightingMode:readonly
-forcedColor:readonly
-buttontimeout:readonly
-brightness:readonly
+hwbrightness:readonly
 */
 export function ControllableParameters(){
 	return [
-		{"property":"shutdownColor", "group":"lighting", "label":"Shutdown Color", "min":"0", "max":"360", "type":"color", "default":"#009bde"},
-		{"property":"LightingMode", "group":"lighting", "label":"Lighting Mode", "type":"combobox", "values":["Canvas", "Forced"], "default":"Canvas"},
-		{"property":"forcedColor", "group":"lighting", "label":"Forced Color", "min":"0", "max":"360", "type":"color", "default":"#009bde"},
-		{"property":"buttontimeout", "group":"", "label":"Button Press Timeout", "step":"1", "type":"number", "min":"1", "max":"50", "default":"5"},
-		{"property":"brightness", "group":"", "label":"Screen Brightness", "step":"1", "type":"number", "min":"1", "max":"100", "default":"50"},
+		{"property":"hwbrightness", "group":"", "label":"Hardware Brightness", "step":"1", "type":"number", "min":"1", "max":"100", "default":"25"},
 	];
 }
 
@@ -30,122 +21,79 @@ const vLedPositions =
 	[0, 1], [1, 1], [2, 1], [3, 1], [4, 1],
 	[0, 2], [1, 2], [2, 2], [3, 2], [4, 2]
 ];
+const ButtonSize = 36;
+const RowWidth = 5;
+const ColHeight = 3;
 
-export function LedNames()
-{
+export function LedNames() {
 	return vLedNames;
 }
 
-export function LedPositions()
-{
+export function LedPositions() {
 	return vLedPositions;
 }
 
-export function Initialize()
-{
-
+export function Initialize() {
+	setBrightness();
 }
 
-export function Render()
-{
+export function Render() {
 	colorgrabber();
 }
 
-function makeHexString(ColorArray)
-{
-	let hexstring = "#";
-	hexstring += decimalToHex(ColorArray[0], 2);
-	hexstring += decimalToHex(ColorArray[1], 2);
-	hexstring += decimalToHex(ColorArray[2], 2);
-
-	return hexstring;
+export function onhwresetdeviceChanged() {
+	resetDevice();
 }
 
-function decimalToHex(d, padding)
-{
-	let hex = Number(d).toString(16);
-	padding = typeof (padding) === "undefined" || padding === null ? padding = 2 : padding;
-
-	while (hex.length < padding) {
-		hex = "0" + hex;
-	}
-
-	return hex;
-	//return "0x" + hex;
+function resetDevice() {
+	device.write([0x02], 1024);
+	device.send_report([0x03, 0x02], 32);
+	setBrightness();
 }
 
-function colorgrabber(shutdown=false)
-{
-	for(let iIdx = 0; iIdx < 15; iIdx++)
-	{
+export function onhwbrightnessChanged() {
+	setBrightness();
+}
 
-		let rgbdata = [];
-		const iPxX = vLedPositions[iIdx][0];
-		const iPxY = vLedPositions[iIdx][1];
-		let color;
-		let finalpacket = 0;
+function setBrightness() {
+	device.send_report([0x03, 0x08, hwbrightness], 32);
+}
 
-		if(shutdown)
-		{
-			color = hexToRgb(shutdownColor);
-		}
-		else if (LightingMode == "Forced")
-		{
-			color = hexToRgb(forcedColor);
-		}
-		else
-		{
-			color = device.color(iPxX, iPxY);
-		}
+function colorgrabber() {
+	for(let iIdx = 0; iIdx < 15; iIdx++) {
+		let RGBData = [];
 
-		const buttoncolor = makeHexString(color);
+		const iXoffset = (iIdx % 5) * ButtonSize;
+		const iYoffset = Math.floor(iIdx / 5) * ButtonSize;
 
-		rgbdata = device.ConvertColorToImageBuffer(buttoncolor, 72, 72, "JPEG");
+		RGBData = device.getImageBuffer(iXoffset, iYoffset, ButtonSize, ButtonSize, {flipH: true});
 
-		for(let packetssent = 0; packetssent * 1016 < rgbdata.length; packetssent++)
-		{
-			const packetRGBDataLength = Math.min(1016, rgbdata.length);
 
-			finalpacket = (packetRGBDataLength < 1016);
+		let BytesLeft = RGBData.length;
+		let packetsSent = 0;
 
-			const data = rgbdata.splice(0, packetRGBDataLength );
+		while(BytesLeft > 0) {
+			const BytesToSend = Math.min(1016, BytesLeft);
 
-			sendZone(iIdx, packetRGBDataLength, data, finalpacket);
+			if(BytesToSend < 1016) {
+				sendZone(BytesLeft, iIdx, RGBData.splice(0, BytesLeft), packetsSent, 0x01);
+			} else {
+				sendZone(BytesToSend, iIdx, RGBData.splice(0, BytesToSend), packetsSent, 0x00);
+			}
+
+			BytesLeft -= BytesToSend;
+			packetsSent++;
 		}
 	}
 }
 
-
-function sendZone(iIdx, length, rgbdata, finalpacket)
-{
-	let packet = [];
-	packet[0] = 0x02;
-	packet[1] = 0x07;
-	packet[2] = iIdx;
-	packet[3] = finalpacket ? 1 : 0;
-	packet[4] = (length >> 8 & 0xFF);
-	packet[5] = (length & 0xFF);
-	packet[6] = 0x00;
-	packet[7] = 0x00;
-
-	packet = packet.concat(rgbdata.splice(0, 1016));
+function sendZone(packetLength, iIdx, rgbdata, packetsSent, finalPacket) {
+	const packet = [0x02, 0x07, iIdx, finalPacket, packetLength & 0xFF, (packetLength >> 8) & 0xFF, packetsSent, 0x00];
+	packet.push(...rgbdata);
 
 	device.write(packet, 1024);
 }
 
-
-export function Validate(endpoint)
-{
+export function Validate(endpoint) {
 	return endpoint.interface === -1;
-}
-
-function hexToRgb(hex)
-{
-	const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
-	const colors = [];
-	colors[0] = parseInt(result[1], 16);
-	colors[1] = parseInt(result[2], 16);
-	colors[2] = parseInt(result[3], 16);
-
-	return colors;
 }
