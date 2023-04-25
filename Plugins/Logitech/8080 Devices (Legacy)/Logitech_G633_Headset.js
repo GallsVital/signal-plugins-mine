@@ -373,3 +373,7 @@ function hexToRgb(hex) {
 
 	return colors;
 }
+
+export function Image() {
+	return "";
+}

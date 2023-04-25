@@ -110,3 +110,7 @@ function hexToRgb(hex) {
 export function Validate(endpoint) {
 	return endpoint.interface === 3;
 }
+
+export function Image() {
+	return "";
+}
