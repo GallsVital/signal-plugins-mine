@@ -2,103 +2,15 @@ import fs from 'fs';
 import path from 'path';
 import * as url from 'url';
 import DirectoryWalker from './DirectoryWalker.js';
-
-function CheckThatLEDNameAndPositionLengthsMatch(Plugin, ReportErrorCallback){
-	if(typeof Plugin.LedPositions === "undefined"){
-		return;
-	}
-	const LedNames = Plugin.LedNames();
-	const LedPositions = Plugin.LedPositions();
-
-	if(LedNames.length !== LedPositions.length){
-		ReportErrorCallback(`Led Name and Position differ in length! Led Painting and key press effects will not function. Led Names [${LedNames.length}], Led Positions: [${LedPositions.length}]`);
-	}
-}
-
-function CheckAllLedPositionsAreWithinBounds(Plugin, ReportErrorCallback){
-	if(typeof Plugin.LedPositions === "undefined"){
-		return;
-	}
-
-	const [width, height] = Plugin.Size();
-	const LedPositions = Plugin.LedPositions();
-
-	LedPositions.forEach((Position) => {
-		if(Position[0] < 0 || Position[0] >= width){
-			ReportErrorCallback(`Led X coordinate of [${Position}] is out of bounds. [${Position[0]}] is not inside the plugins width [0-${width})`);
-		}
-
-		if(Position[1] < 0 || Position[1] >= height){
-			ReportErrorCallback(`Led Y coordinate of [${Position}] is out of bounds. [${Position[1]}] is not inside the plugins height [0-${height})`);
-		}
-	});
-}
-
-function CheckForImageExport(Plugin, ReportErrorCallback){
-
-	if(typeof Plugin.Image === "undefined"){
-		ReportErrorCallback("Plugin Lacks an Image Export!");
-	}
-
-	const Base64ImageString = Plugin.Image();
-
-	if(Base64ImageString == ""){
-		ReportErrorCallback("Plugin Exports an empty Image!");
-	}
-}
+import { CheckThatLEDNameAndPositionLengthsMatch } from './Validators/CheckThatLEDNameAndPositionLengthsMatch.js';
+import { CheckAllLedPositionsAreWithinBounds } from './Validators/CheckAllLedPositionsAreWithinBounds.js';
+import { CheckForImageExport } from './Validators/CheckForImageExport.js';
+import { DuplicateUSBPluginValidator } from './Validators/DuplicateUSBPluginValidator.js';
 
 function CheckForGPUListDuplicates(Plugin, ReportErrorCallback){
 	if(typeof Plugin.BrandGPUList !== "undefined"){
 		if(Plugin.BrandGPUList().CheckForDuplicates()){
 			ReportErrorCallback("Plugin contains duplicate GPU list entries.");
-		}
-	}
-}
-
-class DuplicateUSBPluginValidator{
-	constructor(){
-		this.pluginMap = new Map();
-	}
-
-	CheckIDPair(Vendor, Product, ReportErrorCallback, PluginPath){
-		const pair = `${Vendor}:${Product}`;
-
-		if(!this.pluginMap.has(pair)){
-			this.pluginMap.set(pair, [PluginPath]);
-
-			return;
-		}
-
-
-		const PluginPaths = this.pluginMap.get(pair);
-		let message = `Plugin contains duplicate Vendor:Product id pair!`;
-
-		for(const path of PluginPaths){
-			message += "\n\t\tPrevious File: " + path;
-		}
-
-		ReportErrorCallback(message);
-
-		PluginPaths.push(PluginPath);
-		this.pluginMap.set(pair, PluginPaths);
-	}
-
-	CheckForUSBProductIdDuplicates(Plugin, ReportErrorCallback, PluginPath){
-		if(typeof Plugin.VendorId === "undefined" || typeof Plugin.ProductId === "undefined"){
-			return;
-		}
-
-		const VendorId = Plugin.VendorId();
-		const ProductIds = Plugin.ProductId();
-
-		if(typeof ProductIds === "number"){
-			this.CheckIDPair(VendorId, ProductIds, ReportErrorCallback, PluginPath);
-
-			return;
-		}
-
-		for(const ProductId of ProductIds){
-			this.CheckIDPair(VendorId, ProductId, ReportErrorCallback, PluginPath);
 		}
 	}
 }

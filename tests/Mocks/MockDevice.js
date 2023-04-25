@@ -23,4 +23,6 @@ export class MockDevice{
 	clearReadBuffer = jest.fn().mockImplementation(() => {});
 	pause = jest.fn().mockImplementation(() => {});
 	addFeature = jest.fn().mockImplementation((feature) => {}); //Each feature needs mocked tbh.
+
+	addProperty = jest.fn().mockImplementation((property) => {});
 }
