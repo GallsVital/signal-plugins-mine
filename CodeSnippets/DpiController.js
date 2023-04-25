@@ -24,6 +24,7 @@ export default class DpiController{
 
 		try{
 			// @ts-ignore
+			// eslint-disable-next-line no-undef
 			this.maxStageIdx = dpiStages;
 		}catch(e){
 			this.log("Skipping setting of user selected max stage count. Property is undefined");
@@ -161,6 +162,7 @@ export default class DpiController{
 
 			this.log(`Adding Stage: ${i}`);
 			device.addProperty({"property":`dpi${i}`, "group":"mouse", "label":`DPI ${i}`, "step":"50", "type":"number", "min": this.minDpi, "max": this.maxDpi, "default":"400"});
+			// eslint-disable-next-line no-eval
 			this.dpiMap.set(i, () => { return eval(`dpi${i}`);});
 		}
 	}
