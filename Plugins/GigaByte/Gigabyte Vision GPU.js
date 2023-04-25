@@ -264,6 +264,7 @@ class GigabyteVisionDeviceIds {
 		this.GTX1080TI_XTREME_WATERFORCE_2  = 0x376A;
 		this.GTX1650_GAMING_OC              = 0x3FE4;
 		this.GTX1660_GAMING_OC_6GB          = 0x3FC7;
+		this.GTX1660TI_GAMING_OC_6GB        = 0x3FC5;
 		this.GTX1660S_GAMING_OC             = 0x4014;
 		this.RTX2060_GAMING_OC              = 0x37CE;
 		this.RTX2060_GAMING_OC_PRO          = 0x3FC2;
@@ -361,6 +362,7 @@ class GigabyteVisionGPuList {
 			new GigabyteVisionIdentifier(Nvidia.GTX1080TI,      GigabyteVisionIds.GTX1080TI_XTREME,              0x47, "GIGABYTE 1080Ti XTREME Edition"),
 			new GigabyteVisionIdentifier(Nvidia.GTX1080TI,      GigabyteVisionIds.GTX1080TI_GAMING_OC_BLACK,     0x47, "GIGABYTE 1080Ti Gaming OC Black"),
 			new GigabyteVisionIdentifier(Nvidia.GTX1080TI,      GigabyteVisionIds.GTX1080TI_XTREME_WATERFORCE_2, 0x47, "GIGABYTE 1080Ti Waterforce Xtreme Edition"),
+			new GigabyteVisionIdentifier(Nvidia.GTX1660TI,      GigabyteVisionIds.GTX1660TI_GAMING_OC_6GB,       0x47, "GIGABYTE 1660Ti Gaming OC 6gb"),
 			new GigabyteVisionIdentifier(Nvidia.GTX1660,        GigabyteVisionIds.GTX1660_GAMING_OC_6GB,         0x47, "GIGABYTE 1660 Gaming OC 6gb"),
 			new GigabyteVisionIdentifier(Nvidia.GTX1660S,       GigabyteVisionIds.GTX1660S_GAMING_OC,            0x47, "GIGABYTE 1660 Super Gaming OC"),
 			new GigabyteVisionIdentifier(Nvidia.RTX2060S_OC,    GigabyteVisionIds.RTX2060S_GAMING_OC_3X_WHITE,   0x47, "GIGABYTE 2060 Super Gaming OC Windforce White"),

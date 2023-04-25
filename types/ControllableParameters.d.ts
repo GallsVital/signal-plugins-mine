@@ -3,7 +3,7 @@ declare interface ParameterBase{
 	property: string
 	group?: string
 	label: string
-	default: string
+	default: string | number
 	order?: number
 	type: "color" | "combobox" | "number" | "boolean" | "textfield" | "hue"
 }

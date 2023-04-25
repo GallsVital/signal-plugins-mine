@@ -1,6 +1,6 @@
 export function Name() { return "Corsair K70 Pro"; }
 export function VendorId() { return 0x1b1c; }
-export function ProductId() { return [0x1BC4, 0x1BB3]; }
+export function ProductId() { return [0x1BC4, 0x1BB3, 0x1BD4, 0x1BC6]; }
 export function Publisher() { return "WhirlwindFX"; }
 export function Size() { return [22, 7]; }
 export function DefaultPosition(){return [10, 100];}
