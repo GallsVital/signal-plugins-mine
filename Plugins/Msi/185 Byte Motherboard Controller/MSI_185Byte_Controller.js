@@ -29,7 +29,6 @@ export function ConflictingProcesses() {
 
 const ParentDeviceName = "Mystic Light Controller";
 
-
 const DeviceMaxLedLimit = 360;
 
 //Channel Name, Led Limit
@@ -1431,6 +1430,9 @@ class MysticLight {
 
 			for(let CorsairHeaders = 0; CorsairHeaders < configTable["CorsairHeaders"]; CorsairHeaders++) {
 				this.createSubdevice(this.LEDArrays.CorsairHeaderArray[CorsairHeaders]);
+			}
+			for(let OnboardLEDs = 0; OnboardLEDs < configTable["OnboardLEDs"]; OnboardLEDs++) {
+				this.createSubdevice(this.LEDArrays.OnboardArray[OnboardLEDs]);
 			}
 
 			JPipeLEDs = configTable["JPipeLEDs"];
