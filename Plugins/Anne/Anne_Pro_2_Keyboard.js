@@ -66,11 +66,17 @@ export function Render() {
 	sendColors();
 }
 
-export function Shutdown() {
-	sendColors(true);
+export function Shutdown(SystemSuspending) {
+
+	if(SystemSuspending){
+		sendColors("#000000"); // Go Dark on System Sleep/Shutdown
+	}else{
+		sendColors(shutdownColor);
+	}
+
 }
 
-function sendColors(shutdown = false) {
+function sendColors(overrideColor) {
 	const RGBData = new Array(228).fill(0);
 
 	for(let iIdx = 0; iIdx < vKeys.length; iIdx++) {
@@ -78,8 +84,8 @@ function sendColors(shutdown = false) {
 		const iPxY = vKeyPositions[iIdx][1];
 		var col;
 
-		if(shutdown) {
-			col = hexToRgb(shutdownColor);
+		if(overrideColor) {
+			col = hexToRgb(overrideColor);
 		}else if (LightingMode === "Forced") {
 			col = hexToRgb(forcedColor);
 		}else {
