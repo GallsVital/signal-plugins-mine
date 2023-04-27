@@ -258,6 +258,7 @@ class NvidiaGPUDeviceIds {
 		this.RTX3080TI       = 0x2208;
 		this.RTX3090         = 0x2204;
 		this.RTX3090TI       = 0x2203;
+		this.RTX4070		 = 0x2786;
 		this.RTX4070TI		 = 0x2782;
 		this.RTX4080		 = 0x2704;
 		this.RTX4090		 = 0x2684;
@@ -268,6 +269,8 @@ const Nvidia = new NvidiaGPUDeviceIds();
 
 class MSIGPUDeviceIDs {
 	constructor() {
+		this.RTX4070_GAMING_X_TRIO 					 = 0x5136;
+
 		this.RTX4070TI_GAMING_X_TRIO				 = 0x5132;
 		this.RTX4070TI_SUPRIM_X						 = 0x5133;
 		this.RTX4070TI_GAMING_X_TRIO_W				 = 0x5139;
@@ -291,6 +294,7 @@ class MSIGPUList {
 		const MSIGPUIDs  = new MSIGPUDeviceIDs();
 		this.devices =
         [
+        	new MSIGPUIdentifier(Nvidia.RTX4070, MSIGPUIDs.RTX4070_GAMING_X_TRIO, 0x68, "MSI RTX 4070 GAMING X TRIO",),
         	new MSIGPUIdentifier(Nvidia.RTX4070TI, MSIGPUIDs.RTX4070TI_GAMING_X_TRIO, 0x68, "MSI RTX 4070Ti GAMING X TRIO"),
         	new MSIGPUIdentifier(Nvidia.RTX4070TI, MSIGPUIDs.RTX4070TI_GAMING_X_TRIO_W, 0x68, "MSI RTX 4070Ti GAMING X TRIO White"),
         	new MSIGPUIdentifier(Nvidia.RTX4070TI, MSIGPUIDs.RTX4070TI_SUPRIM_X, 0x68, "MSI RTX 4070Ti SUPRIM X"),

@@ -28,26 +28,17 @@ export function ControllableParameters(){
 	const config = deviceLibrary.getDeviceByProductId(device.productId());
 
 	const UserProps = [
-		{"property":"shutdownColor", "group":"lighting", "label":"Shutdown Color", "min":"0", "max":"360", "type":"color", "default":"#009bde"},
-		{"property":"LightingMode", "group":"lighting", "label":"Lighting Mode", "type":"combobox", "values":["Canvas", "Forced"], "default":"Canvas"},
-		{"property":"forcedColor", "group":"lighting", "label":"Forced Color", "min":"0", "max":"360", "type":"color", "default":"#009bde"},
-		{"property":"settingControl", "group":"mouse", "label":"Enable Dpi Control", "type":"boolean", "default":"false"},
-		{"property":"dpiStages", "group":"mouse", "label":"Number of DPI Stages", "step":"1", "type":"number", "min":"1", "max":"5", "default":"5"},
-		{"property":"dpiRollover", "group":"mouse", "label":"DPI Cycle Rollover", "type":"boolean", "default": "true"},
-		{"property":"dpi1", "group":"mouse", "label":"DPI Stage 1", "step":"50", "type":"number", "min":"100", "max": config.maxDPI, "default":"400"},
-		{"property":"dpi2", "group":"mouse", "label":"DPI Stage 2", "step":"50", "type":"number", "min":"100", "max": config.maxDPI, "default":"800"},
-		{"property":"dpi3", "group":"mouse", "label":"DPI Stage 3", "step":"50", "type":"number", "min":"100", "max": config.maxDPI, "default":"1600"},
-		{"property":"dpi4", "group":"mouse", "label":"DPI Stage 4", "step":"50", "type":"number", "min":"100", "max": config.maxDPI, "default":"2400"},
-		{"property":"dpi5", "group":"mouse", "label":"DPI Stage 5", "step":"50", "type":"number", "min":"100", "max": config.maxDPI, "default":"3200"},
-		{"property":"dpi6", "group":"mouse", "label":"DPI Sniper Stage", "step":"50", "type":"number", "min":"100", "max": config.maxDPI, "default":"400"},
-		{"property":"angleSnapping", "group":"mouse", "label":"Angle Snapping", "type":"boolean", "default":"false"},
-		{"property":"liftOffDistance", "group":"mouse", "label":"Lift Off Distance", "type":"combobox", "values":["Low", "Middle", "High"], "default":"Middle"},
+		{"property":"shutdownColor", "group":"lighting", "label":"Shutdown Color", "min":"0", "max":"360", "type":"color", "default":"#009bde", "order" : 4},
+		{"property":"LightingMode", "group":"lighting", "label":"Lighting Mode", "type":"combobox", "values":["Canvas", "Forced"], "default":"Canvas", "order" : 4},
+		{"property":"forcedColor", "group":"lighting", "label":"Forced Color", "min":"0", "max":"360", "type":"color", "default":"#009bde", "order" : 4},
+		{"property":"angleSnapping", "group":"mouse", "label":"Angle Snapping", "type":"boolean", "default":"false", "order" : 4},
+		{"property":"liftOffDistance", "group":"mouse", "label":"Lift Off Distance", "type":"combobox", "values":["Low", "Middle", "High"], "default":"Middle", "order" : 4},
 	];
 
 	if (config.wireless) {
 		UserProps.push(...[
-			{"property":"idleTimeout", "group":"mouse", "label":"Enable Device Sleep", "type":"boolean", "default":"false"},
-			{"property":"idleTimeoutLength", "group":"mouse", "label":"Device Sleep Timeout (Minutes)", "step":"1", "type":"number", "min":"1", "max":"30", "default":"15"},
+			{"property":"idleTimeout", "group":"mouse", "label":"Enable Device Sleep", "type":"boolean", "default":"false", "order" : 4},
+			{"property":"idleTimeoutLength", "group":"mouse", "label":"Device Sleep Timeout (Minutes)", "step":"1", "type":"number", "min":"1", "max":"30", "default":"15", "order" : 4},
 		]);
 	}
 
@@ -92,39 +83,39 @@ export function Shutdown() {
 }
 
 export function onsettingControlChanged() {
-	DpiHandler.setEnableControl(settingControl);
+	DPIHandler.setActiveControl(settingControl);
 }
 
 export function ondpiStagesChanged() {
-	DpiHandler.maxDPIStage = dpiStages;
+	DPIHandler.setMaxStageCount(dpiStages);
 }
 
 export function ondpiRolloverChanged() {
-	DpiHandler.dpiRollover = dpiRollover;
+	DPIHandler.setRollover(dpiRollover);
 }
 
 export function ondpi1Changed() {
-	DpiHandler.DPIStageUpdated(1);
+	DPIHandler.DPIStageUpdated(1);
 }
 
 export function ondpi2Changed() {
-	DpiHandler.DPIStageUpdated(2);
+	DPIHandler.DPIStageUpdated(2);
 }
 
 export function ondpi3Changed() {
-	DpiHandler.DPIStageUpdated(3);
+	DPIHandler.DPIStageUpdated(3);
 }
 
 export function ondpi4Changed() {
-	DpiHandler.DPIStageUpdated(4);
+	DPIHandler.DPIStageUpdated(4);
 }
 
 export function ondpi5Changed() {
-	DpiHandler.DPIStageUpdated(5);
+	DPIHandler.DPIStageUpdated(5);
 }
 
 export function ondpi6Changed() {
-	DpiHandler.DPIStageUpdated(6);
+	DPIHandler.DPIStageUpdated(6);
 }
 
 export function onangleSnappingChanged() {
@@ -295,7 +286,8 @@ export class LegacyCorsairLibrary {
 				vKeys : [ 2, 0, 1 ],
 				size : [3, 3],
 				maxDPI : 16000,
-				wireless : true
+				wireless : true,
+				hasSniperButton : true
 			},
 
 			"Dark Core SE" : {
@@ -304,7 +296,8 @@ export class LegacyCorsairLibrary {
 				vKeys : [ 2, 0, 1 ],
 				size : [2, 3],
 				maxDPI : 16000,
-				wireless : true
+				wireless : true,
+				hasSniperButton : true
 			},
 			"Glaive RGB" : {
 				vLedNames : [ "Logo Zone", "Front Zone", "Light Zone" ],
@@ -346,21 +339,24 @@ export class LegacyCorsairLibrary {
 				vLedPositions : [ [1, 0], [1, 1], [1, 2] ],
 				vKeys : [ 4, 3, 2 ],
 				size : [3, 3],
-				maxDPI : 18000
+				maxDPI : 18000,
+				hasSniperButton : true
 			},
 			"M65 Pro" : {
 				vLedNames : [ "Scroll Zone", "Dpi Zone", "Logo Zone" ],
 				vLedPositions : [ [1, 0], [1, 1], [1, 2] ],
 				vKeys : [ 1, 3, 2 ],
 				size : [3, 3],
-				maxDPI : 12400
+				maxDPI : 12400,
+				hasSniperButton : true
 			},
 			"Nightsword" : {
 				vLedNames : ["Logo Zone", "Rear Zone", "Front Zone", "Scroll Zone"],
 				vLedPositions : [[2, 2], [2, 3], [1, 0], [0, 0]],
 				vKeys : [ 2, 6, 1, 4 ],
 				size : [3, 4],
-				maxDPI : 12400
+				maxDPI : 12400,
+				hasSniperButton : true
 			},
 			"Scimitar" : {
 				vLedNames : [ "Logo Zone", "Side Bar", "Side Keys", "Front Zone", "Scroll Zone" ],
@@ -448,7 +444,9 @@ export class LegacyCorsairProtocol {
 			deviceName : "",
 			vKeys : [],
 			vKeyPositions : [],
-			vKeyNames : []
+			vKeyNames : [],
+			maxDPI: 0,
+			hasSniperButton : false
 		};
 
 		this.DeviceTypes =
@@ -532,8 +530,14 @@ export class LegacyCorsairProtocol {
 	getWirelessDevice() { return this.Config.wirelessDevice; }
 	setWirelessDevice(wireless) { this.Config.wirelessDevice = wireless; }
 
+	getMaxDPI() { return this.Config.maxDPI; }
+	setMaxDPI(maxDPI) { this.Config.maxDPI = maxDPI; }
+
 	getWakeStatus() { return this.Config.deviceAwake; }
 	setWakeStatus(wakeStatus) { this.Config.deviceAwake = wakeStatus; }
+
+	getHasSniperButton() { return this.Config.hasSniperButton; }
+	setHasSniperButton(hasSniperButton) { this.Config.hasSniperButton = hasSniperButton; }
 
 	getvKeys() { return this.Config.vKeys; }
 	setvKeys(vKeys) { this.Config.vKeys = vKeys; }
@@ -546,7 +550,15 @@ export class LegacyCorsairProtocol {
 		const config = deviceLibrary.getDeviceByProductId(device.productId());
 
 		if(config.wireless) {
-			this.setWirelessDevice(true);
+			this.setWirelessDevice(config.wireless);
+		}
+
+		if(config.maxDPI) {
+			this.setMaxDPI(config.maxDPI);
+		}
+
+		if(config.hasSniperButton) {
+			this.setHasSniperButton(config.hasSniperButton);
 		}
 
 		this.setvKeys(config.vKeys);
@@ -741,11 +753,22 @@ export class LegacyCorsairProtocol {
 			this.wirelessDeviceSetup();
 		}
 
+
+		DPIHandler.setMinDpi(200);
+		DPIHandler.setMaxDpi(this.getMaxDPI());
+		DPIHandler.addProperties();
+
+		if(this.getHasSniperButton()) {
+			DPIHandler.addSniperProperty();
+		}
+
+		DPIHandler.setMaxStageCount(dpiStages);
+		DPIHandler.setRollover(dpiRollover);
+		DPIHandler.setUpdateCallback(function(dpi) { return LegacyCorsair.setDPI(dpi); });
+
 		if(settingControl) {
-			DpiHandler.setEnableControl(true);
-			DpiHandler.maxDPIStage = dpiStages;
-			DpiHandler.dpiRollover = dpiRollover;
-			DpiHandler.setDpi();
+			DPIHandler.setActiveControl(true);
+			DPIHandler.update();
 			this.setDeviceAngleSnap(angleSnapping);
 			this.setliftOffDistance(liftOffDistance);
 			this.setIdleTimeout(idleTimeout, idleTimeoutLength);
@@ -838,111 +861,178 @@ export class LegacyCorsairProtocol {
 
 const LegacyCorsair = new LegacyCorsairProtocol();
 
-export class DPIManager {
-	constructor(DPIConfig) {
-		this.currentStage = 1;
-		this.sniperStage = 6;
+export default class DpiController {
+	constructor() {
+		this.currentStageIdx = 1;
+		this.maxSelectedableStage = 5;
+		this.maxStageIdx = 5; //Default to 5 as it's most common if not defined
+		this.sniperStageIdx = 6;
 
-		this.DPISetCallback = function () { device.log("No Set DPI Callback given. DPI Handler cannot function!"); };
+		this.updateCallback = (dpi) => { this.log("No Set DPI Callback given. DPI Handler cannot function!"); dpi; };
 
-		if (DPIConfig.hasOwnProperty("callback")) {
-			this.DPISetCallback = DPIConfig.callback;
-		}
+		this.logCallback = (message) => { console.log(message); };
 
 		this.sniperMode = false;
-		this.enableDpiControl = false;
-		this.maxDPIStage = 5; //Default to 5 as it's most common if not defined
+		this.enabled = false;
 		this.dpiRollover = false;
-		this.dpiStageValues = {};
+		this.dpiMap = new Map();
+		this.maxDpi = 18000;
+		this.minDpi = 200;
+	}
+	addProperties() {
+		device.addProperty({ "property": "settingControl", "group": "mouse", "label": "Enable Setting Control", "type": "boolean", "default": "true", "order": 1 });
+		device.addProperty({ "property": "dpiStages", "group": "mouse", "label": "Number of DPI Stages", "step": "1", "type": "number", "min": "1", "max": this.maxSelectedableStage, "default": this.maxStageIdx, "order": 1, "live": "false" });
+		device.addProperty({ "property": "dpiRollover", "group": "mouse", "label": "DPI Stage Rollover", "type": "boolean", "default": "false", "order": 1 });
 
-		if (DPIConfig.hasOwnProperty("callback")) {
-			this.dpiStageValues = DPIConfig.stages;
-		} else {
-			device.log("No Set DPI Callback given. DPI Handler cannot function!");
+		try {
+			// @ts-ignore
+			this.maxStageIdx = dpiStages;
+		} catch (e) {
+			this.log("Skipping setting of user selected max stage count. Property is undefined");
 		}
+
+		this.rebuildUserProperties();
+	}
+	addSniperProperty() {
+		device.addProperty({ "property": `dpi${this.sniperStageIdx}`, "group": "mouse", "label": "Sniper Button DPI", "step": "50", "type": "number", "min": this.minDpi, "max": this.maxDpi, "default": "400", "order": 3 });
+		// eslint-disable-next-line no-eval
+		this.dpiMap.set(6, () => { return eval(`dpi${6}`); });
 	}
 	getCurrentStage() {
-		return this.currentStage;
+		return this.currentStageIdx;
 	}
 	getMaxStage() {
-		return this.maxDPIStage;
+		return this.maxStageIdx;
 	}
-	/** Enables or Disables the DPIHandler*/
-	setEnableControl(EnableDpiControl) {
-		this.enableDpiControl = EnableDpiControl;
+	getSniperIdx() { return this.sniperStageIdx; }
+	setRollover(enabled) {
+		this.dpiRollover = enabled;
+	}
+	setMaxStageCount(count) {
+		this.maxStageIdx = count;
+		this.rebuildUserProperties();
+	}
+	setMinDpi(minDpi) { this.minDpi = minDpi; this.updateDpiRange(); }
+	setMaxDpi(maxDpi) { this.maxDpi = maxDpi; this.updateDpiRange(); }
+	setUpdateCallback(callback) {
+		this.updateCallback = callback;
+	}
+	active() { return this.enabled; }
+	setActiveControl(EnableDpiControl) {
+		this.enabled = EnableDpiControl;
+
+		if (this.enabled) {
+			this.update();
+		}
 	}
 	/** GetDpi Value for a given stage.*/
-	getDpiValue(stage) {
-		// TODO - Bounds check
-		// This is a dict of functions, make sure to call them
-		device.log("Current DPI Stage: " + stage);
-		device.log("Current DPI: " + this.dpiStageValues[stage]());
+	getDpiForStage(stage) {
+		if (!this.dpiMap.has(stage)) {
+			device.log("bad stage: " + stage);
+			this.log("Invalid Stage...");
 
-		return this.dpiStageValues[stage]();
-	}
-	/** SetDpi Using Callback. Bypasses setStage.*/
-	setDpi() {
-		if (!this.enableDpiControl) {
 			return;
 		}
 
-		if (this.sniperMode) {
-			this.DPISetCallback(this.getDpiValue(6));
-		} else {
-			this.DPISetCallback(this.getDpiValue(this.currentStage));
-		}
+		// This is a dict of functions, make sure to call them
+		this.log("Current DPI Stage: " + stage);
+
+		const dpiWrapper = this.dpiMap.get(stage);
+		const dpi = dpiWrapper();
+		this.log("Current DPI: " + dpi);
+
+		return dpi;
 	}
 	/** Increment DPIStage */
 	increment() {
-		this.setStage(this.currentStage + 1);
+		this.setStage(this.currentStageIdx + 1);
 	}
 	/** Decrement DPIStage */
 	decrement() {
-		this.setStage(this.currentStage - 1);
+		this.setStage(this.currentStageIdx - 1);
 	}
 	/** Set DPIStage and then set DPI to that stage.*/
 	setStage(stage) {
-		if (stage > this.maxDPIStage) {
-			this.currentStage = this.dpiRollover ? 1 : this.maxDPIStage;
+		if (stage > this.maxStageIdx) {
+			this.currentStageIdx = this.dpiRollover ? 1 : this.maxStageIdx;
 		} else if (stage < 1) {
-			this.currentStage = this.dpiRollover ? this.maxDPIStage : 1;
+			this.currentStageIdx = this.dpiRollover ? this.maxStageIdx : 1;
 		} else {
-			this.currentStage = stage;
+			this.currentStageIdx = stage;
 		}
 
-		this.setDpi();
+		this.update();
+	}
+	/** SetDpi Using Callback. Bypasses setStage.*/
+	update() {
+		if (!this.enabled) {
+			return;
+		}
+		const stage = this.sniperMode ? this.sniperStageIdx : this.currentStageIdx;
+		const dpi = this.getDpiForStage(stage);
+
+		if (dpi) {
+			this.updateCallback(dpi);
+		}
 	}
 	/** Stage update check to update DPI if current stage values are changed.*/
 	DPIStageUpdated(stage) {
 		// if the current stage's value was changed by the user
 		// reapply the current stage with the new value
-		if (stage === this.currentStage) {
-			this.setDpi();
+		if (stage === this.currentStageIdx) {
+			this.update();
 		}
 	}
 	/** Set Sniper Mode on or off. */
-	SetSniperMode(sniperMode) {
+	setSniperMode(sniperMode) {
 		this.sniperMode = sniperMode;
-		this.setDpi();
+		this.log("Sniper Mode: " + this.sniperMode);
+		this.update();
 	}
+	rebuildUserProperties() {
+		// Remove Stages
 
+		for (const stage in Array.from(this.dpiMap.keys())) {
+			if(+stage+1 === this.sniperStageIdx) {
+				continue;
+			}
+
+			if (stage >= this.maxStageIdx) {
+				this.log(`Removing Stage: ${+stage+1}`);
+				device.removeProperty(`dpi${+stage+1}`);
+				this.dpiMap.delete(+stage+1);
+			}
+		}
+		// Add new Stages
+		const stages = Array.from(this.dpiMap.keys());
+
+		for (let i = 1; i <= this.maxStageIdx; i++) {
+			if (stages.includes(i)) {
+				continue;
+			}
+
+			this.log(`Adding Stage: ${i}`);
+			device.addProperty({ "property": `dpi${i}`, "group": "mouse", "label": `DPI ${i}`, "step": "50", "type": "number", "min": this.minDpi, "max": this.maxDpi, "default": "400", "order": 2 });
+			// eslint-disable-next-line no-eval
+			this.dpiMap.set(i, () => { return eval(`dpi${i}`); });
+		}
+	}
+	updateDpiRange() {
+		for (const stage in this.dpiMap.keys()) {
+			const prop = device.getProperty(`dpi${+stage}`);
+			prop.min = this.minDpi;
+			prop.max = this.maxDpi;
+			device.addProperty(prop);
+		}
+	}
+	log(message) {
+		if (this.logCallback) {
+			this.logCallback(message);
+		}
+	}
 }
 
-const DPIConfig =
-{
-	stages:
-	{
-		1: function () { return dpi1; },
-		2: function () { return dpi2; },
-		3: function () { return dpi3; },
-		4: function () { return dpi4; },
-		5: function () { return dpi5; },
-		6: function () { return dpi6; }
-	},
-	callback: function (dpi) { return LegacyCorsair.setDPI(dpi); }
-};
-
-const DpiHandler = new DPIManager(DPIConfig);
+const DPIHandler = new DpiController();
 
 class BitArray {
 	constructor(length) {
@@ -1008,7 +1098,7 @@ class BitArray {
 				case 5:
 					if(!isPressed) {break;}
 
-					DpiHandler.increment();
+					DPIHandler.increment();
 					device.log("DPI Up");
 					break;
 
@@ -1016,12 +1106,12 @@ class BitArray {
 					if(!isPressed) {break;}
 
 					device.log("DPI Down");
-					DpiHandler.decrement();
+					DPIHandler.decrement();
 					break;
 				case 7:
 					device.log("Sniper Pew Pew!");
 					device.log("pressed: " + isPressed);
-					DpiHandler.SetSniperMode(isPressed);
+					DPIHandler.setSniperMode(isPressed);
 					break;
 
 				default: {

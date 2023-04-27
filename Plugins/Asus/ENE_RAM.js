@@ -1,5 +1,5 @@
 // Modifing SMBUS Plugins is -DANGEROUS- and can -DESTROY- devices.
-export function Name() { return "ENE RAM"; }
+export function Name() { return "Aura Compatible RAM"; }
 export function Publisher() { return "WhirlwindFX"; }
 export function Documentation(){ return "troubleshooting"; }
 export function Type() { return "SMBUS"; }
@@ -15,9 +15,9 @@ forcedColor:readonly
 */
 export function ControllableParameters(){
 	return [
-		{"property":"shutdownColor", "group":"lighting", "label":"Shutdown Color", "min":"0", "max":"360", "type":"color", "default":"#009bde"},
+		{"property":"shutdownColor", "group":"lighting", "label":"Shutdown Color", "min":"0", "max":"360", "type":"color", "default":"#ff0000"},
 		{"property":"LightingMode", "group":"lighting", "label":"Lighting Mode", "type":"combobox", "values":["Canvas", "Forced"], "default":"Canvas"},
-		{"property":"forcedColor", "group":"lighting", "label":"Forced Color", "min":"0", "max":"360", "type":"color", "default":"#009bde"},
+		{"property":"forcedColor", "group":"lighting", "label":"Forced Color", "min":"0", "max":"360", "type":"color", "default":"#ff0000"},
 	];
 }
 
@@ -40,7 +40,7 @@ export function Scan(bus) {
 	ENE = new ENERam(ENEInterface);
 
 	const FoundAddresses = [];
-	const startingAddresses = [ 0x70, 0x77 ]; // 0x74 This is gone because it explodes on Gigglebyte boards.
+	const startingAddresses = [ 0x77 ]; // 0x74 This is gone because it explodes on Gigglebyte boards.
 
 	// Teamgroup Xtreem Ram like Aura/ENE ram needs to have its address remapped by the first program that touches it.
 	// If we have a device on 0x77 then we need to attempt to remap them.
@@ -62,6 +62,7 @@ export function Scan(bus) {
 
 	for(const address of ENE.potentialAuraAddresses) {
 		const iRet = bus.WriteQuick(address);
+		bus.pause(1);
 
 		if(iRet !== 0){
 			continue;
@@ -463,6 +464,7 @@ class ENERam{
 
 		for (let iChannelIdx = 0; iChannelIdx < 8; iChannelIdx++) {
 			const iRet = this.Bus().WriteQuick(primaryAddress);
+			bus.pause(1);
 
 			if (iRet < 0) {
 				this.Bus().log(`Address [${primaryAddress}] is unpopulated. Avoiding Ram address remap.`, {toFile:true});
@@ -497,13 +499,16 @@ class ENERam{
 				const busAddress = freeAddress << 1;
 
 				this.Interface.WriteRegister(primaryAddress, 0xE0f8, iChannelIdx);
+				bus.pause(1);
 				this.Interface.WriteRegister(primaryAddress, 0xE0f9, busAddress);
+				bus.pause(1);
 
 				this.Bus().log(`Remapping Address from [${busAddress}] to [${freeAddress}]`, {toFile: true});
 
 			} else {
 				for (const address of this.potentialAuraAddresses) {
 					const iRet = this.Bus().WriteQuick(address);
+					bus.pause(1);
 
 					if (iRet < 0) {
 						this.Bus().log(`Found Free Address on [${address}]`, {toFile: true});
@@ -521,7 +526,9 @@ class ENERam{
 				const busAddress = freeAddress << 1;
 
 				this.Interface.WriteRegister(primaryAddress, 0x80f8, iChannelIdx);
+				bus.pause(1);
 				this.Interface.WriteRegister(primaryAddress, 0x80f9, busAddress);
+				bus.pause(1);
 
 				this.Bus().log(`Remapping Address from [${primaryAddress}] to [${freeAddress}]`, {toFile: true});
 

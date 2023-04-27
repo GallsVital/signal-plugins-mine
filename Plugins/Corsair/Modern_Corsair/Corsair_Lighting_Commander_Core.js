@@ -293,7 +293,7 @@ function FetchPumpConnectionStatus(){
 		device.log("Pump is Disconnected!", {toFile: true});
 
 		return false;
-	}else if(FanData[0] === 7){
+	}else if(FanData[0] === 7 || FanData[0] === 1){ //Added State 1 in 2.2.30. Fixed a user that had it working properly in ICUE, but not Signal.
 		device.log("Pump is Connected! Creating Subdevice...", {toFile: true});
 
 		return true;
