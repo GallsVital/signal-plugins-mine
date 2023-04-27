@@ -360,6 +360,7 @@ class GigabyteVisionGPuList {
 
 		this.devices = [
 			new GigabyteVisionIdentifier(Nvidia.GTX1080TI,      GigabyteVisionIds.GTX1080TI_XTREME,              0x47, "GIGABYTE 1080Ti XTREME Edition"),
+			new GigabyteVisionIdentifier(Nvidia.GTX1080TI,      GigabyteVisionIds.GTX1080TI_GAMING_OC,     		 0x47, "GIGABYTE 1080Ti Gaming OC"),
 			new GigabyteVisionIdentifier(Nvidia.GTX1080TI,      GigabyteVisionIds.GTX1080TI_GAMING_OC_BLACK,     0x47, "GIGABYTE 1080Ti Gaming OC Black"),
 			new GigabyteVisionIdentifier(Nvidia.GTX1080TI,      GigabyteVisionIds.GTX1080TI_XTREME_WATERFORCE_2, 0x47, "GIGABYTE 1080Ti Waterforce Xtreme Edition"),
 			new GigabyteVisionIdentifier(Nvidia.GTX1660TI,      GigabyteVisionIds.GTX1660TI_GAMING_OC_6GB,       0x47, "GIGABYTE 1660Ti Gaming OC 6gb"),
