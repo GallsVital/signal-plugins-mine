@@ -56,11 +56,17 @@ export function Render() {
 	sendColors();
 }
 
-export function Shutdown() {
-	sendColors(true);
+export function Shutdown(SystemSuspending) {
+
+	if(SystemSuspending){
+		sendColors("#000000"); // Go Dark on System Sleep/Shutdown
+	}else{
+		sendColors(shutdownColor);
+	}
+
 }
 
-function sendColors(shutdown = false) {
+function sendColors(overrideColor) {
 	const packet = new Array(65).fill(0xFF);
 
 	packet[1] = 0x92;
@@ -78,8 +84,8 @@ function sendColors(shutdown = false) {
 		const iLed = vLedIDs[idx];
 		var color;
 
-		if(shutdown){
-			color = hexToRgb(shutdownColor);
+		if(overrideColor){
+			color = hexToRgb(overrideColor);
 		}else if (LightingMode === "Forced") {
 			color = hexToRgb(forcedColor);
 		}else{
