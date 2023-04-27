@@ -249,6 +249,7 @@ class NvidiaGPUDeviceIds {
 		this.RTX3060_GA104   = 0x2487;
 		this.RTX3060TI       = 0x2486;
 		this.RTX3060TI_LHR   = 0x2489;
+		this.RTX3060TI_GDDR6X = 0x24C9;
 		this.RTX3070         = 0x2484;
 		this.RTX3070_LHR     = 0x2488;
 		this.RTX3070TI       = 0x2482;
@@ -310,6 +311,8 @@ class MSIGPUDeviceIDs {
 		this.MSI_RTX3060_GAMING_X_TRIO_LHR           = 0x3903;
 		this.MSI_RTX3060TI_GAMING_X_LHR              = 0x3973;
 		this.MSI_RTX3060TI_GAMING_X_TRIO_LHR         = 0x3903;
+
+		this.MSI_RTX3060TI_GAMING_X_TRIO_LHR_GDDR6X = 0x5058;
 
 		this.MSI_RTX3070_SUPRIM_X                    = 0x3901;
 		this.MSI_RTX3070_SUPRIM                      = 0x390C;
@@ -385,6 +388,7 @@ class MSIGPUList {
         	new MSIGPUIdentifier(Nvidia.RTX3060TI, MSIGPUIDs.MSI_RTX3070_GAMING_X_TRIO,         0x68, "MSI RTX 3060Ti Gaming X Trio"), //Duplicate sub dev id on different dev id
         	new MSIGPUIdentifier(Nvidia.RTX3060TI_LHR, MSIGPUIDs.MSI_RTX3060TI_GAMING_X_LHR,        0x68, "MSI RTX 3060Ti Gaming X LHR"),
         	new MSIGPUIdentifier(Nvidia.RTX3060TI_LHR, MSIGPUIDs.MSI_RTX3060TI_GAMING_X_TRIO_LHR,   0x68, "MSI RTX 3060Ti Gaming X Trio LHR"),
+        	new MSIGPUIdentifier(Nvidia.RTX3060TI_GDDR6X, MSIGPUIDs.MSI_RTX3060TI_GAMING_X_TRIO_LHR_GDDR6X,   0x68, "MSI RTX 3060Ti Gaming X Trio LHR"),
 
         	new MSIGPUIdentifier(Nvidia.RTX3070, MSIGPUIDs.MSI_RTX3070_GAMING_X_TRIO,         0x68, "MSI RTX 3070 Gaming X Trio"),
         	new MSIGPUIdentifier(Nvidia.RTX3070, MSIGPUIDs.MSI_RTX3070_GAMING_Z_TRIO,         0x68, "MSI RTX 3070 Gaming X Trio"),
