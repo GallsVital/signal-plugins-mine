@@ -305,6 +305,8 @@ class MSIGPUDeviceIDs {
 		this.MSI_RTX2080TI_LIGHTNING_Z               = 0x3770;
 		this.MSI_RTX2080TI_DUKE_OC			   = 0x3710;
 
+		this.MSI_RTX3050_GAMING_X_8G				 = 0xC979;
+
 		this.MSI_RTX3060_GAMING_X_12G                = 0x3976;
 		this.MSI_RTX3060_GAMING_X_TRIO_12G           = 0x3903;
 		this.MSI_RTX3060_GAMING_X_TRIO_LHR           = 0x3903;
@@ -375,6 +377,8 @@ class MSIGPUList {
         	new MSIGPUIdentifier(Nvidia.RTX2080TI, MSIGPUIDs.MSI_RTX2080TI_SEA_HAWK_EK_X,       0x68, "MSI RTX 2080Ti Sea Hawk EK X"),
         	new MSIGPUIdentifier(Nvidia.RTX2080TI, MSIGPUIDs.MSI_RTX2080TI_LIGHTNING_Z,       0x68, "MSI RTX 2080Ti Lightning Z"),    //Untested
         	new MSIGPUIdentifier(Nvidia.RTX2080TI, MSIGPUIDs.MSI_RTX2080TI_DUKE_OC,			0x68, "MSI RTX 2080Ti DUKE OC"),
+
+        	new MSIGPUIdentifier(Nvidia.RTX3050, MSIGPUIDs.MSI_RTX3050_GAMING_X_8G,		0x68, "MSI RTX 3050 Gaming X 8G"),
 
         	new MSIGPUIdentifier(Nvidia.RTX3060, MSIGPUIDs.MSI_RTX3060_GAMING_X_TRIO_12G,     0x68, "MSI RTX 3060 Gaming X Trio 12G"),     //Duplicate sub dev id on different dev id
         	new MSIGPUIdentifier(Nvidia.RTX3060, MSIGPUIDs.MSI_RTX3060_GAMING_X_12G,          0x68, "MSI RTX 3060 Gaming X 12g"),
