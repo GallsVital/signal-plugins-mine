@@ -114,7 +114,7 @@ Item {
 
                                 Text{
                                     color: theme.secondarytextcolor
-                                    text: "API Version: "+ bridge.apiversion
+                                    text: "API Version: " + (bridge.apiversion != "" ? bridge.apiversion : "Unknown")
                                 }  
                             }
 
@@ -124,16 +124,58 @@ Item {
                                 visible: bridge.connected
                             }
 
+                            Item{
+                                height: visible ? 30 : 0
+                                width: parent.width
+                                visible: bridge.currentlyValidatingIP
+
+                                Row{
+                                    spacing: 5
+                                    BusyIndicator {
+                                        height: 30
+                                        width: parent.height
+                                        Material.accent: "#88FFFFFF"
+                                    }
+                                    Text{
+                                        color: theme.primarytextcolor
+                                        text: `Currently Validating IP Address...`
+                                        anchors.verticalCenter: parent.verticalCenter
+                                    }
+                                }
+                            }
+
+                            Item{
+                                height: visible ? 30 : 0
+                                width: parent.width
+                                visible: bridge.currentlyResolvingIP
+
+                                Row{
+                                    spacing: 5
+                                    BusyIndicator {
+                                        height: 30
+                                        width: parent.height
+                                        Material.accent: "#88FFFFFF"
+                                    }
+                                    Text{
+                                        color: theme.primarytextcolor
+                                        text: `Currently Resolving IP Address...`
+                                        anchors.verticalCenter: parent.verticalCenter
+                                    }
+                                }
+                            }
+
                         }
                         
                         Item{
                             width: root.width - leftCol.width - content.padding * 2
                             height: leftCol.height
+
                             Text{
                                 text: "Streaming Area"
                                 color: theme.secondarytextcolor
                                 font.pixelSize: 12
                                 anchors.bottom: areaComboBox.top
+                                visible: bridge.connected && bridge.supportsStreaming && areaComboBox.model.length > 0
                             }
 
                             SComboBox{
@@ -143,8 +185,8 @@ Item {
                                 textRole: "name"
                                 valueRole: "id"
                                 property bool ready: false
-                                visible: bridge.connected && bridge.supportsStreaming && areaComboBox.model.length > 0
                                 anchors.verticalCenter: parent.verticalCenter
+                                visible: bridge.connected && bridge.supportsStreaming && areaComboBox.model.length > 0
 
                                 onActivated: {
                                     if(!ready){
@@ -188,10 +230,9 @@ Item {
                             //     }
                             // }
 
-
                             Item{
                                 visible: !bridge.connected && bridge.supportsStreaming
-                                width: 140
+                                width: 160
                                 height: 40
                                 anchors.verticalCenter: parent.verticalCenter
                                 anchors.right: parent.right

@@ -6,6 +6,7 @@ export function Size() { return [48, 48]; }
 export function DefaultPosition() {return [75, 70]; }
 export function DefaultScale(){return 1.0;}
 /* global
+discovery:readonly
 controller:readonly
 turnOffOnShutdown:readonly
 */
@@ -487,54 +488,54 @@ export function DiscoveryService() {
 	this.MDns = [
 		"_nanoleafapi._tcp.local."
 	];
+	this.firstRun = true;
+	this.cache = new IPCache();
+	//this.currentlyValidatingIP = false;
+	//this.failedToValidateIP = false;
 
 	this.Initialize = function(){
 		service.log("Initializing Plugin!");
 		service.log("Searching for network devices...");
-
-		// const cache = service.getSetting("base", "cache");
-		// service.log(cache);
-
-		// for(let i = 0; i < cache.length; i++){
-		// 	service.log(cache[i]);
-		// 	this.Discovered(cache[i]);
-		// }
 	};
 
 	this.Update = function() {
 		for(const cont of service.controllers){
 			cont.obj.update();
 		}
+
+		if(this.firstRun){
+			this.firstRun = false;
+			this.LoadCachedDevices();
+		}
+
 	};
 
 	this.Discovered = function(value) {
-		//service.log(value);
-
-		// const cache = service.getSetting("base", "cache") || [];
-		// let hostExists = false;
-
-		// for(let i = 0; i < cache.length; i++){
-		// 	if(value.hostname === cache[i].hostname){
-		// 		hostExists = true;
-		// 	}
-		// }
-
-		// if(!hostExists){
-		// 	cache.push(value);
-		// 	service.saveSetting("base", "cache", cache);
-		// }
-
+		service.log(`New host discovered!`);
+		service.log(value);
 		this.CreateController(value);
 	};
 
 	this.Removal = function(value){
-		for(const controller of service.controllers){
-			if(controller.id === value.id){
-				service.removeController(controller);
+		service.log(`${value.hostname} was removed from the network!`);
 
-				return;
-			}
+		// for(const controller of service.controllers){
+		// 	if(controller.id === value.id){
+		// 		service.removeController(controller);
+
+		// 		return;
+		// 	}
+		// }
+	};
+
+	this.LoadCachedDevices = function(){
+		service.log("Loading Cached Devices...");
+
+		for(const [key, value] of this.cache.Entries()){
+			service.log(`Found Cached Device: [${key}: ${JSON.stringify(value)}]`);
+			this.CreateController(value);
 		}
+
 	};
 
 	this.CreateController = function(value){
@@ -544,8 +545,37 @@ export function DiscoveryService() {
 			service.addController(new NanoleafBridge(value));
 		} else {
 			controller.updateWithValue(value);
+			service.log(`Updated: ${controller.name}`);
 		}
 	};
+
+	// this.ValidateIPAddress = function(ip){
+	// 	const port = 16021;
+	// 	this.currentlyValidatingIP = true;
+	// 	this.failedToValidateIP = false;
+
+	// 	const instance = this;
+
+	// 	service.log(`Attempting to validate ip address: ${ip}`);
+	// 	XmlHttp.Post(`http://${ip}:${port}/api/v1/new`, (xhr) => {
+	// 		service.log(`ValidateIPAddress: State: ${xhr.readyState}, Status: ${xhr.status}`);
+
+	// 		if(xhr.readyState === 4){
+	// 			instance.currentlyValidatingIP = false;
+
+	// 			if(xhr.status === 403){
+	// 				service.log(`ip [${ip}] made a valid call!`);
+	// 			}
+
+	// 			if(xhr.status === 0){
+	// 				service.log(`Error: ip [${ip}] made an invalid call! It's likely not a valid ip address for a nanoleaf device...`);
+	// 				instance.failedToValidateIP = true;
+	// 			}
+	// 		}
+	// 	},
+	// 	{/* No Data*/},
+	// 	true);
+	// };
 }
 
 
@@ -553,32 +583,85 @@ class NanoleafBridge {
 	constructor(value){
 
 		this.updateWithValue(value);
-		this.key = service.getSetting(this.id, "key");
+		this.key = service.getSetting(this.id, "key") ?? "";
 		this.connected = this.key != "";
+		this.waitingforlink = false;
 		this.retriesleft = 60;
 		this.ip = "";
 		this.deviceCreated = false;
 		this.panelinfo = undefined;
 		this.lastPollTime = 0;
-		service.log("Constructed: "+this.name);
+		this.currentlyValidatingIP = false;
+		this.failedToValidateIP = false;
+		this.currentlyResolvingIP = false;
 
-		this.ResolveIpAddress();
+		service.log(`Constructed: ${this.name}`);
+
+		if(value?.ip){
+			this.ValidateIPAddress(value?.ip);
+		}else{
+			this.ResolveIpAddress();
+		}
+	}
+
+	ValidateIPAddress(ip){
+		this.currentlyValidatingIP = true;
+		service.updateController(this);
+
+		const instance = this;
+		service.log(`Attempting to validate ip address: ${ip}`);
+
+		// We could just check if the ip/port combo has something at it, but I'd like to know if we specifically have a nanoleaf device at that ip
+		XmlHttp.Post(`http://${ip}:${this.port}/api/v1/new`, (xhr) => {
+			service.log(`ValidateIPAddress: State: ${xhr.readyState}, Status: ${xhr.status}`);
+
+			if(xhr.readyState === 4){
+				if(xhr.status === 403){
+					service.log(`ip [${ip}] made a valid call!`);
+					instance.ip = ip;
+				}
+
+				if(xhr.status === 0){
+					service.log(`Error: ip [${ip}] made an invalid call! It's likely not a valid ip address for a nanoleaf device...`);
+					instance.failedToValidateIP = true;
+					instance.ResolveIpAddress();
+				}
+
+				instance.currentlyValidatingIP = false;
+				service.updateController(instance);
+			}
+		},
+		{/* No Data*/},
+		true);
+	}
+
+	cacheControllerInfo(){
+		discovery.cache.Add(this.id, {
+			hostname: this.hostname,
+			name: this.name,
+			port: this.port,
+			firmwareVersion: this.firmwareVersion,
+			model: this.model,
+			id: this.id,
+			ip: this.ip
+		});
 	}
 
 	updateWithValue(value) {
-		this.hostname = value.hostname;
-		this.name = value.name;
+		this.hostname = value?.hostname;
+		this.name = value?.name ?? "Unknown Name";
 		this.port = value.port;
-		this.firmwareVersion = value.srcvers;
-		this.model = value.md;
+		this.firmwareVersion = value.srcvers ?? value.firmwareVersion;
+		this.model = value.md ?? value?.model ?? "Unknown Model";
 		this.id = value.id;
 		//this.serviceValue = value;
-		service.log("Updated: "+this.name);
 		service.updateController(this);
 	}
 
 	ResolveIpAddress(){
 		service.log("Attempting to resolve IPV4 address...");
+		this.currentlyResolvingIP = true;
+		service.updateController(this);
 
 		const instance = this;
 		service.resolve(this.hostname, (host) => {
@@ -590,19 +673,11 @@ class NanoleafBridge {
 			if(host.protocol === "IPV4"){
 				instance.ip = host.ip;
 
-				// let ipcache = service.getSetting("base", "ipcache") || [];
-				// service.log(ipcache);
-				// ipcache.push(instance.ip);
-				// ipcache = ipcache.filter((c, index) => {
-				// 	return ipcache.indexOf(c) === index;
-				// });
-				// service.log(ipcache);
-				// service.saveSetting("base", "ipcache", ipcache);
-
 				service.log(`Found IPV4 address: ${host.ip}`);
 
-				//service.saveSetting(instance.id, "ip", instance.ip);
-				//instance.RequestBridgeConfig();
+				instance.cacheControllerInfo();
+				this.currentlyResolvingIP = false;
+				this.failedToValidateIP = false;
 				service.updateController(instance); //notify ui.
 			}else if(host.protocol === "IPV6"){
 				service.log(`Skipping IPV6 address: ${host.ip}`);
@@ -630,6 +705,10 @@ class NanoleafBridge {
 			return;
 		}
 
+		if(this.ip === ""){
+			return;
+		}
+
 		// Grab panel info if we don't have it.
 		// This creates the network device
 		if(this.connected && !this.panelinfo){
@@ -652,7 +731,7 @@ class NanoleafBridge {
 		service.saveSetting(this.id, "key", this.key);
 
 		this.retriesleft = 0;
-		this.waitingforlink = 0;
+		this.waitingforlink = false;
 		this.connected = true;
 		service.updateController(this);
 	}
@@ -662,7 +741,6 @@ class NanoleafBridge {
 		service.log(`Requesting Panel Info...`);
 		service.log(`http://${this.ip}:${this.port}/api/v1/${this.key}/`);
 		XmlHttp.Get(`http://${this.ip}:${this.port}/api/v1/${this.key}/`, (xhr) => {
-			service.log(`getClusterInfo(): State: ${xhr.readyState}, Status: ${xhr.status}`);
 
 			if (xhr.readyState === 4 && xhr.status === 200) {
 				service.log(`Panel Info Grabbed`);
@@ -683,12 +761,17 @@ class NanoleafBridge {
 		{/* No Data*/},
 		 true);
 	}
-
+	/** @param {NanoLeafResponsePacket} response */
 	setDetails(response) {
 
 		// Capture panel and light information.
 		this.panelinfo = response;
+		this.firmwareVersion = response.firmwareVersion;
+		this.hostname = response.name;
+		this.model = response.model;
+
 		service.log(this.panelinfo);
+		this.cacheControllerInfo();
 
 		service.updateController(this);
 		//service.log("DEETS: "+JSON.stringify(response));
@@ -725,6 +808,7 @@ class XmlHttp{
 
 	static Post(url, callback, data, async = false){
 		const xhr = new XMLHttpRequest();
+
 		xhr.open("POST", url, async);
 
 		xhr.setRequestHeader("Accept", "application/json");
@@ -755,6 +839,78 @@ class XmlHttp{
 		xhr.onreadystatechange = callback.bind(null, xhr);
 
 		xhr.send(JSON.stringify(data));
+	}
+}
+class IPCache{
+	constructor(){
+		this.cacheMap = new Map();
+		this.persistanceId = "ipCache";
+		this.persistanceKey = "cache";
+
+		this.PopulateCacheFromStorage();
+	}
+	Add(key, value){
+		service.log(`Adding ${key} to IP Cache...`);
+
+		this.cacheMap.set(key, value);
+		this.Persist();
+	}
+
+	Remove(key){
+		this.cacheMap.delete(key);
+		this.Persist();
+	}
+	Has(key){
+		return this.cacheMap.has(key);
+	}
+	Get(key){
+		return this.cacheMap.get(key);
+	}
+	Entries(){
+		return this.cacheMap.entries();
+	}
+
+	PopulateCacheFromStorage(){
+		service.log("Populating IP Cache from storage...");
+
+		const storage = service.getSetting(this.persistanceId, this.persistanceKey);
+
+		if(storage === undefined){
+			service.log(`IP Cache is empty...`);
+
+			return;
+		}
+
+		let mapValues;
+
+		try{
+			mapValues = JSON.parse(storage);
+		}catch(e){
+			service.log(e);
+		}
+
+		if(mapValues === undefined){
+			service.log("Failed to load cache from storage! Cache is invalid!");
+
+			return;
+		}
+
+		if(mapValues.length === 0){
+			service.log(`IP Cache is empty...`);
+		}
+
+		this.cacheMap = new Map(mapValues);
+	}
+
+	Persist(){
+		service.log("Saving IP Cache...");
+		service.saveSetting(this.persistanceId, this.persistanceKey, JSON.stringify(Array.from(this.cacheMap.entries())));
+	}
+
+	DumpCache(){
+		for(const [key, value] of this.cacheMap.entries()){
+			service.log([key, value]);
+		}
 	}
 }
 

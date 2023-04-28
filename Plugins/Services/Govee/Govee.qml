@@ -119,16 +119,26 @@ Item {
                                 }  
                             }
 
+                            Text{
+                                color: theme.secondarytextcolor
+                                text: `Supports DreamView Protocol: ${device.supportDreamView  ? "True" : "False"}`
+                            }
+
+                            Text{
+                                color: theme.secondarytextcolor
+                                text: `Supports Razer Protocol: ${device.supportRazer ? "True" : "False"}`
+                            }
+
+                            Text{
+                                color: theme.warn
+                                width: parent.width
+                                visible: !device.supportDreamView && !device.supportRazer
+                                wrapMode: Text.WrapAtWordBoundaryOrAnywhere
+                                text: `This device doesn't support Govee's Razer, or Dreamview protocols. SignalRGB is unable to control it...`
+                            }
+
                         }
 
-                        // Text{
-                        //     width: parent.width - content.padding * 2
-                        //     color: theme.warn
-                        //     text: "Bridge firmware doesn't allow streaming. API Version must be atleast 1.22.0"
-                        //     visible: !bridge.supportsStreaming && bridge.apiversion != ""
-                        //     wrapMode: Text.WrapAtWordBoundaryOrAnywhere
-                        //     font.pixelSize: 12
-                        // }
                     }
                 }
             }  

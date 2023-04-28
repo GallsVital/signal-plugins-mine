@@ -307,6 +307,9 @@ export function DiscoveryService() {
 		"_hue._tcp.local."
 	];
 
+	this.firstrun = true;
+	this.cache = new IPCache();
+
 	this.Initialize = function(){
 		service.log("Initializing Plugin!");
 		service.log("Searching for network devices...");
@@ -316,6 +319,12 @@ export function DiscoveryService() {
 		for(const cont of service.controllers){
 			cont.obj.update();
 		}
+
+		if(this.firstrun){
+			this.firstrun = false;
+			this.LoadCachedDevices();
+		}
+
 	};
 
 	this.Shutdown = function(){
@@ -323,24 +332,44 @@ export function DiscoveryService() {
 	};
 
 	this.Discovered = function(value) {
-		const controller = service.getController(value.bridgeid);
+		service.log(`New host discovered!`);
+		service.log(value);
+		this.CreateController(value);
+	};
+
+	this.Removal = function(value){
+		service.log(`${value.hostname} was removed from the network!`);
+
+		// for(const controller of service.controllers){
+		// 	if(controller.id === value.bridgeid){
+		// 		service.suppressController(controller);
+		// 		service.removeController(controller);
+
+		// 		return;
+		// 	}
+		// }
+	};
+
+	this.CreateController = function(value){
+		const bridgeid = value?.bridgeid ?? value?.id;
+		const controller = service.getController(bridgeid);
 
 		if (controller === undefined) {
 			service.addController(new HueBridge(value));
 		} else {
 			controller.updateWithValue(value);
+			service.log(`Updated: ${controller.bridgeid}`);
 		}
 	};
 
-	this.Removal = function(value){
-		for(const controller of service.controllers){
-			if(controller.id === value.bridgeid){
-				service.suppressController(controller);
-				service.removeController(controller);
+	this.LoadCachedDevices = function(){
+		service.log("Loading Cached Devices...");
 
-				return;
-			}
+		for(const [key, value] of this.cache.Entries()){
+			service.log(`Found Cached Device: [${key}: ${JSON.stringify(value)}]`);
+			this.CreateController(value);
 		}
+
 	};
 }
 
@@ -349,7 +378,7 @@ class HueBridge {
 	constructor(value){
 		this.updateWithValue(value);
 
-		this.ip = ""; //service.getSetting(this.id, "ip") ?? "";
+		this.ip = "";
 		this.key = service.getSetting(this.id, "key") ?? "";
 		this.username = service.getSetting(this.id, "username") ?? "";
 		this.areas = {};
@@ -364,11 +393,63 @@ class HueBridge {
 		this.pollingInterval = 60000;
 		this.supportsStreaming = false;
 		this.apiversion = "";
+		this.currentlyValidatingIP = false;
+		this.currentlyResolvingIP = false;
+		this.failedToValidateIP = false;
 
 		this.DumpBridgeInfo();
 
-		// We should probably resolve the ip address every time incase it moves...
-		this.ResolveIpAddress();
+		const ip = value?.ip;
+
+		if(ip){
+			this.ValidateIPAddress(ip);
+		}else{
+			this.ResolveIpAddress();
+		}
+	}
+
+	ValidateIPAddress(ip){
+		this.currentlyValidatingIP = true;
+		service.updateController(this);
+
+		const instance = this;
+		service.log(`Attempting to validate ip address: ${ip}`);
+
+		// We could just check if the ip has something at it, but I'd like to know if we specifically have a hue device at that ip
+		XmlHttp.Get(`http://${ip}/api/config`, (xhr) => {
+			service.log(`ValidateIPAddress: State: ${xhr.readyState}, Status: ${xhr.status}`);
+
+			if (xhr.readyState !== 4) {
+				return;
+			}
+
+			if(xhr.status === 200){
+				service.log(`ip [${ip}] made a valid call!`);
+				instance.ip = ip;
+				instance.SetConfig(JSON.parse(xhr.response));
+			}
+
+			if(xhr.status === 0){
+				service.log(`Error: ip [${ip}] made an invalid call! It's likely not a valid ip address for a Hue device...`);
+				instance.failedToValidateIP = true;
+				instance.ResolveIpAddress();
+			}
+
+			instance.currentlyValidatingIP = false;
+			service.updateController(instance);
+		},
+		true);
+	}
+
+	cacheControllerInfo(){
+		discovery.cache.Add(this.id, {
+			hostname: this.hostname,
+			name: this.name,
+			port: this.port,
+			modelid: this.model,
+			bridgeid: this.id,
+			ip: this.ip
+		});
 	}
 
 	DumpBridgeInfo(){
@@ -402,6 +483,10 @@ class HueBridge {
 				service.log(`Found IPV4 address: ${host.ip}`);
 				//service.saveSetting(instance.id, "ip", instance.ip);
 				instance.RequestBridgeConfig();
+
+				instance.cacheControllerInfo();
+				this.currentlyResolvingIP = false;
+				this.failedToValidateIP = false;
 				service.updateController(instance); //notify ui.
 			}else if(host.protocol === "IPV6"){
 				service.log(`Skipping IPV6 address: ${host.ip}`);
@@ -433,6 +518,7 @@ class HueBridge {
 	}
 
 	updateWithValue(value){
+		service.log(value);
 		this.hostname = value.hostname;
 		this.name = value.name;
 		this.port = value.port;
@@ -488,7 +574,16 @@ class HueBridge {
 		service.updateController(this); //notify ui.
 	}
 
+	// TODO: this should just be a FSM at this point...
 	update() {
+		if(this.currentlyValidatingIP){
+			return;
+		}
+
+		if(this.failedToValidateIP){
+			return;
+		}
+
 		if (this.waitingforlink){
 			this.retriesleft--;
 			this.requestLink();
@@ -502,6 +597,8 @@ class HueBridge {
 		}
 
 		if(!this.connected){
+			service.updateController(this);
+
 			return;
 		}
 
@@ -521,7 +618,7 @@ class HueBridge {
 			this.CreateBridgeDevice();
 			this.instantiated = true;
 
-			return;
+
 		}
 
 		if(Date.now() - this.lastPollingTimeStamp > this.pollingInterval){
@@ -579,7 +676,15 @@ class HueBridge {
 		service.log("Requesting Light Info...");
 
 		XmlHttp.Get(`http://${this.ip}/api/${this.username}/lights`, (xhr) => {
-			if (xhr.readyState === 4 && xhr.status === 200) {
+			if (xhr.readyState !== 4){
+				return;
+			}
+
+			if(xhr.status !== 200){
+				service.log(`RequestLightInfo(): Error - Status [${xhr.status}]`);
+			}
+
+			if(xhr.status === 200) {
 
 				/** @type {Object.<number, HueLight>} */
 				const response = JSON.parse(xhr.response);
@@ -675,6 +780,79 @@ class XmlHttp{
 		xhr.onreadystatechange = callback.bind(null, xhr);
 
 		xhr.send(JSON.stringify(data));
+	}
+}
+
+class IPCache{
+	constructor(){
+		this.cacheMap = new Map();
+		this.persistanceId = "ipCache";
+		this.persistanceKey = "cache";
+
+		this.PopulateCacheFromStorage();
+	}
+	Add(key, value){
+		service.log(`Adding ${key} to IP Cache...`);
+
+		this.cacheMap.set(key, value);
+		this.Persist();
+	}
+
+	Remove(key){
+		this.cacheMap.delete(key);
+		this.Persist();
+	}
+	Has(key){
+		return this.cacheMap.has(key);
+	}
+	Get(key){
+		return this.cacheMap.get(key);
+	}
+	Entries(){
+		return this.cacheMap.entries();
+	}
+
+	PopulateCacheFromStorage(){
+		service.log("Populating IP Cache from storage...");
+
+		const storage = service.getSetting(this.persistanceId, this.persistanceKey);
+
+		if(storage === undefined){
+			service.log(`IP Cache is empty...`);
+
+			return;
+		}
+
+		let mapValues;
+
+		try{
+			mapValues = JSON.parse(storage);
+		}catch(e){
+			service.log(e);
+		}
+
+		if(mapValues === undefined){
+			service.log("Failed to load cache from storage! Cache is invalid!");
+
+			return;
+		}
+
+		if(mapValues.length === 0){
+			service.log(`IP Cache is empty...`);
+		}
+
+		this.cacheMap = new Map(mapValues);
+	}
+
+	Persist(){
+		service.log("Saving IP Cache...");
+		service.saveSetting(this.persistanceId, this.persistanceKey, JSON.stringify(Array.from(this.cacheMap.entries())));
+	}
+
+	DumpCache(){
+		for(const [key, value] of this.cacheMap.entries()){
+			service.log([key, value]);
+		}
 	}
 }
 
