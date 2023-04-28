@@ -771,7 +771,10 @@ export class LegacyCorsairProtocol {
 			DPIHandler.update();
 			this.setDeviceAngleSnap(angleSnapping);
 			this.setliftOffDistance(liftOffDistance);
-			this.setIdleTimeout(idleTimeout, idleTimeoutLength);
+
+			if(this.getWirelessDevice()) {
+				this.setIdleTimeout(idleTimeout, idleTimeoutLength);
+			}
 		}
 
 		if(this.getDeviceName() === "Nightsword") { //is mine just a special snowflake? Probably, but also edge cases.
