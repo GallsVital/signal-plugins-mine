@@ -19,16 +19,6 @@ export function ControllableParameters(){
 	];
 }
 
-
-export function Initialize() {
-
-}
-
-export function Shutdown() {
-
-}
-
-
 const vLedNames = [
 	"Keyboard Zone 4", "Keyboard Zone 3", "Keyboard Zone 2", "Keyboard Zone 1", "Alien Logo", "Alienware Logo", "Trackpad", "Power Button", "Bottom Left Bar", "Bottom Right Bar", "Top Left Bar", "Top Right Bar", "Macro Keys"
 ];
@@ -36,7 +26,6 @@ const vLedNames = [
 const vLedPositions = [
 	[5, 2], [4, 2], [3, 2], [2, 2], [3, 0], [3, 1], [3, 1], [3, 3], [0, 3], [6, 3], [0, 0], [6, 0], [1, 2]
 ];
-
 
 export function LedNames() {
 	return vLedNames;
@@ -46,13 +35,26 @@ export function LedPositions() {
 	return vLedPositions;
 }
 
-export function Render() {
-	SendColors();
+export function Initialize() {
 
 }
 
-function SendColors(shutdown = false){
-	const RGBData = [];//new Array(700).fill(0);
+export function Render() {
+	sendColors();
+}
+
+export function Shutdown(SystemSuspending) {
+
+	if(SystemSuspending){
+		sendColors("#000000"); // Go Dark on System Sleep/Shutdown
+	}else{
+		sendColors(shutdownColor);
+	}
+
+}
+
+function sendColors(overrideColor){
+	const RGBData = [];
 	device.write([0x02, 0x07, 0x04], 12);
 	device.pause(1);
 
@@ -61,8 +63,8 @@ function SendColors(shutdown = false){
 		const iPxY = vLedPositions[iIdx][1];
 		var mxPxColor;
 
-		if(shutdown){
-			mxPxColor = hexToRgb(shutdownColor);
+		if(overrideColor){
+			mxPxColor = hexToRgb(overrideColor);
 		}else if (LightingMode === "Forced") {
 			mxPxColor = hexToRgb(forcedColor);
 		}else{
