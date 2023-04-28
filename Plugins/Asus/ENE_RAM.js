@@ -21,7 +21,6 @@ export function ControllableParameters(){
 	];
 }
 
-// TODO: up these to 15, and try to detect it via the config table if it still exists on these sticks
 let vLedNames = [ ];
 let vLedPositions = [ ];
 let ENE;
@@ -464,7 +463,7 @@ class ENERam{
 
 		for (let iChannelIdx = 0; iChannelIdx < 8; iChannelIdx++) {
 			const iRet = this.Bus().WriteQuick(primaryAddress);
-			bus.pause(1);
+			this.Bus().pause(1);
 
 			if (iRet < 0) {
 				this.Bus().log(`Address [${primaryAddress}] is unpopulated. Avoiding Ram address remap.`, {toFile:true});
@@ -499,16 +498,16 @@ class ENERam{
 				const busAddress = freeAddress << 1;
 
 				this.Interface.WriteRegister(primaryAddress, 0xE0f8, iChannelIdx);
-				bus.pause(1);
+				this.Bus().pause(1);
 				this.Interface.WriteRegister(primaryAddress, 0xE0f9, busAddress);
-				bus.pause(1);
+				this.Bus().pause(1);
 
 				this.Bus().log(`Remapping Address from [${busAddress}] to [${freeAddress}]`, {toFile: true});
 
 			} else {
 				for (const address of this.potentialAuraAddresses) {
 					const iRet = this.Bus().WriteQuick(address);
-					bus.pause(1);
+					this.Bus().pause(1);
 
 					if (iRet < 0) {
 						this.Bus().log(`Found Free Address on [${address}]`, {toFile: true});
@@ -526,9 +525,9 @@ class ENERam{
 				const busAddress = freeAddress << 1;
 
 				this.Interface.WriteRegister(primaryAddress, 0x80f8, iChannelIdx);
-				bus.pause(1);
+				this.Bus().pause(1);
 				this.Interface.WriteRegister(primaryAddress, 0x80f9, busAddress);
-				bus.pause(1);
+				this.Bus().pause(1);
 
 				this.Bus().log(`Remapping Address from [${primaryAddress}] to [${freeAddress}]`, {toFile: true});
 
