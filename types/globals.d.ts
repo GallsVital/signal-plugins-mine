@@ -8,6 +8,7 @@ declare type SubdeviceId = string;
 declare type LogOptions = {
 	toFile?: boolean
 	Hex?: boolean
+	pretty?: boolean
 }
 
 declare type ImageFormat = "JPEG" | "PNG" | "BMP"
