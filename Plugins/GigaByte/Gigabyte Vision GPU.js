@@ -155,10 +155,11 @@ class GigabyteVisionProtocol {
 		{
 			writeLength : 0
 		};
+		this.byteaddresses = [0x62, 0x32];
 	}
 
 	determineWriteLength() {
-		this.config.writeLength = bus.GetAddress() === 0x62 ? 8 : 4;
+		this.config.writeLength = this.byteaddresses.includes(bus.GetAddress()) ? 8 : 4;
 	}
 
 	setMode(mode) {
@@ -385,7 +386,7 @@ class GigabyteVisionGPuList {
 			new GigabyteVisionIdentifier(Nvidia.RTX3070_LHR,    GigabyteVisionIds.RTX3070_VISION_OC,             0x63, "GIGABYTE 3070 Vision OC LHR"),
 			new GigabyteVisionIdentifier(Nvidia.RTX3070TI,      GigabyteVisionIds.RTX3070TI_EAGLE_OC,            0x63, "GIGABYTE 3070Ti Eagle OC LHR"),
 			new GigabyteVisionIdentifier(Nvidia.RTX3070TI,      GigabyteVisionIds.RTX3070TI_VISION_OC,           0x63, "GIGABYTE 3070Ti Vision OC LHR"),
-			new GigabyteVisionIdentifier(Nvidia.RTX3060TI,      GigabyteVisionIds.RTX3060TI_EAGLE_OC,            0x63, "GIGABYTE 3060Ti Eagle OC"),
+			new GigabyteVisionIdentifier(Nvidia.RTX3060TI,      GigabyteVisionIds.RTX3060TI_EAGLE_OC,            0x32, "GIGABYTE 3060Ti Eagle OC"),
 			new GigabyteVisionIdentifier(Nvidia.RTX3060TI_LHR,  GigabyteVisionIds.RTX3060TI_EAGLE_OC,            0x63, "GIGABYTE 3060Ti Eagle OC LHR"),
 			new GigabyteVisionIdentifier(Nvidia.RTX3060TI_LHR,  GigabyteVisionIds.RTX3060TI_EAGLE_OC_REV2_LHR,   0x63, "GIGABYTE 3060Ti Eagle OC Rev 2.0 LHR"),
 			new GigabyteVisionIdentifier(Nvidia.RTX3060TI_LHR,  GigabyteVisionIds.RTX3060TI_GAMING_OC,           0x32, "GIGABYTE 3060Ti Gaming OC Rev 2.0"),
