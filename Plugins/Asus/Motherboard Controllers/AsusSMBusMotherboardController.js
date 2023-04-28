@@ -192,7 +192,6 @@ class AsusSMBus {
         {
         	"LED-0116"        : "V1",
         	"AUMA0-E8K4-0101" : "V1",
-        	"AUDA0-E6K5-0101" : "V2",
         	"AUMA0-E6K5-0104" : "V2",
         	"AUMA0-E6K5-0105" : "V2",
         	"AUMA0-E6K5-0106" : "V2",
