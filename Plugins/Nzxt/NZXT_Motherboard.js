@@ -149,8 +149,8 @@ export class NZXTProtocol {
 
 		for(let i = 0; i < totalchannels; i++) {
 			const RGBData = this.grabRGBData(i);
-			this.StreamLightingPacketChannel(0, RGBData, i);
-			this.StreamLightingPacketChannel(1, RGBData, i);
+			this.StreamLightingPacketChannel(0, RGBData.splice(0, 60), i);
+			this.StreamLightingPacketChannel(1, RGBData.splice(0, 60), i);
 			this.SubmitLightingColors(i);
 		}
 
