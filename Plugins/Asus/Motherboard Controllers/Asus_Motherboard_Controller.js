@@ -67,10 +67,10 @@ const RGBConfigs = {
 	"GRB" : [1, 0, 2]
 };
 
-var ChannelArray = [];
-var HeaderArray = [];
-var vLedNames = [];
-var vLedPositions = [];
+let ChannelArray = [];
+let HeaderArray = [];
+let vLedNames = [];
+let vLedPositions = [];
 
 // Device Constants
 const Device_ChannelLedLimit = 120;
@@ -103,9 +103,9 @@ const ASUS_MODE_DIRECT = 0xFF;
 
 const ConfigurationOverrides = {
 	"AULA3-AR32-0207":{MainboardCount: 3, ARGBChannelCount:3, RGBHeaderCount: 1}, // THIS HAS A SPACE AT THE END?!?!?!
-	"AULA3-AR32-0214":{MainboardCount: 2, ARGBChannelCount:3, RGBHeaderCount: 1},// Asus TUF GAMING Z790-PLUS WIFI D4
+	"AULA3-AR32-0214":{MainboardCount: 2, ARGBChannelCount:3, RGBHeaderCount: 1}, // Asus TUF GAMING Z790-PLUS WIFI D4
 	"AULA3-AR32-0213":{MainboardCount: 2, ARGBChannelCount:3, RGBHeaderCount: 1},
-	"AULA3-6K75-0210":{MainboardCount: 9, ARGBChannelCount:4, RGBHeaderCount: 1},
+	"Asus ROG MAXIMUS Z690 EXTREME GLACIAL":{MainboardCount: 7, ARGBChannelCount:4, RGBHeaderCount: 1, polymoOverride : true}, //The naming for this is a bit backwards. It forces polymo off.
 	//"AULA3-6K75-0206":{MainboardCount: 7, ARGBChannelCount:3, RGBHeaderCount: 1},
 	//"AULA3-AR42-0207":{MainboardCount: 3, ARGBChannelCount:1, RGBHeaderCount: 2},
 	"TUF GAMING X570-PRO (WI-FI)": {MainboardCount: 3, ARGBChannelCount:1, RGBHeaderCount: 2},
@@ -308,7 +308,7 @@ function FetchMainBoardColors(shutdown = false){
 	for(let iIdx = 0; iIdx < vLedPositions.length; iIdx++) {
 		const iPxX = vLedPositions[iIdx][0];
 		const iPxY = vLedPositions[iIdx][1];
-		var col;
+		let col;
 
 		if(shutdown){
 			col = hexToRgb(shutdownColor);
@@ -334,7 +334,7 @@ function Fetch12VHeaderColors(shutdown = false){
 	let TotalLedCount = 0;
 
 	for(let iIdx = 0; iIdx < DeviceInfo.RGBHeaderCount; iIdx++) {
-		var col;
+		let col;
 
 		if(shutdown){
 			col = hexToRgb(shutdownColor);
@@ -451,16 +451,18 @@ function FetchConfigTable(){
 
 function ParseConfigTable(){
 
+	let polymoOverride = false;
+
 	for(const config in ConfigurationOverrides){
 		// If modelId matches, or if mobo name does
 		if(DeviceInfo.Model.localeCompare(config) == 0 || device.getMotherboardName() == config){
-			LoadOverrideConfiguration(config);
+			polymoOverride = LoadOverrideConfiguration(config);
 
 			return;
 		}
 	}
 
-	if(DeviceInfo.ConfigTable[ASUS_CONFIG_ARGB_CHANNELS] === 4) {
+	if(DeviceInfo.ConfigTable[ASUS_CONFIG_ARGB_CHANNELS] === 4 && polymoOverride === false) {
 		DeviceInfo.ARGBChannelCount = DeviceInfo.ConfigTable[ASUS_CONFIG_ARGB_CHANNELS] - 1;
 		device.log(`ARGB channel Count ${DeviceInfo.ARGBChannelCount} `, {toFile: true});
 		DeviceInfo.PolymoSupport = 1;
@@ -508,6 +510,9 @@ function LoadOverrideConfiguration(DeviceName){
 	DeviceInfo.RGBHeaderCount = configuration.RGBHeaderCount;
 	device.log(`12V Header Count ${DeviceInfo.RGBHeaderCount} `, {toFile: true});
 
+	if(configuration.polymoOverride) { return configuration.polymoOverride; }
+
+	return false;
 }
 
 
