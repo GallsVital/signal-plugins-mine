@@ -507,6 +507,7 @@ export class deviceLibrary {
 			0x00aa: "Basilisk V3 Pro",
 			0x00ab: "Basilisk V3 Pro",
 			0x0083: "Basilisk X Hyperspeed",
+			0x00b9: "Basilisk X Hyperspeed", //technically V3, but we do not care.
 			//0x0271 : "Blackwidow V3 Mini",
 			//0x0258 : "Blackwidow V3 Mini",
 			0x005C: "Deathadder Elite",
@@ -523,7 +524,7 @@ export class deviceLibrary {
 			0x0073: "Mamba",
 			0x0072: "Mamba",
 			//0x0068: "Mamba Hyperflux", //99% sure this is busted.
-			0x0046: "Mamba Tournament Edition",
+			//0x0046: "Mamba Tournament Edition", I'll come back for you soon.
 			0x0053: "Naga Chroma",
 			0x008D: "Naga Lefthand",
 			0x008F: "Naga Pro",
@@ -923,6 +924,8 @@ export class RazerProtocol {
 			DeviceLEDPositions : [],
 			/** Variable that holds current device's LED vKeys. */
 			DeviceLedIndexes : [],
+			/** Variable that holds the current device's Product ID. */
+			DeviceProductId : 0x00,
 			/** Dict for button inputs to map them with names and things. */
 			inputDict : {},
 
@@ -944,6 +947,9 @@ export class RazerProtocol {
 			}
 		};
 	}
+
+	getDeviceProductId() { return this.Config.DeviceProductId; }
+	setDeviceProductId(productId) { this.Config.DeviceProductId = productId; }
 
 	getDeviceLEDNames(){ return this.Config.DeviceLEDNames; }
 	setDeviceLEDNames(DeviceLEDNames) { this.Config.DeviceLEDNames = DeviceLEDNames; }
@@ -979,6 +985,7 @@ export class RazerProtocol {
 
 			this.setDeviceLEDNames(layout.vLedNames);
 			this.setDeviceLEDPositions(layout.vLedPositions);
+			this.setDeviceProductId(device.productId()); //yay edge cases!
 
 
 			if(layout.vKeys) {
@@ -2437,7 +2444,11 @@ class RazerMouseFunctions {
 	}
 	/** Function to set Mouse Lighting.*/
 	setMouseLighting(RGBData, NumberOfLEDs = Razer.getNumberOfLEDs(), hyperflux = false) { //no returns on this or the led color sets. I do not care.
-		Razer.StandardPacketSend([(NumberOfLEDs * 3 + 5), 0x0F, 0x03, hyperflux ? 1 : 0, 0x00, 0x00, 0x00, NumberOfLEDs - 1].concat(RGBData));
+		if(Razer.getDeviceProductId() === 0x0046) { //I'll leave this behind for now.
+			Razer.StandardPacketSend([(NumberOfLEDs * 3 + 5), 0x03, 0x0C, 0x00, 0x00, 0x00, 0x00, NumberOfLEDs - 1].concat(RGBData));
+		} else {
+			Razer.StandardPacketSend([(NumberOfLEDs * 3 + 5), 0x0F, 0x03, hyperflux ? 1 : 0, 0x00, 0x00, 0x00, NumberOfLEDs - 1].concat(RGBData));
+		}
 	}
 	/** Function to set a legacy mouse's led brightness. You cannot use zero for this one as it wants a specific zone. That being said we could scan for specific zones on a device.*/
 	getModernMouseLEDBrightness(led = 0, detection = false, retryAttempts = 5) {

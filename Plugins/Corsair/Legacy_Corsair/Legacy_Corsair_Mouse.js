@@ -323,7 +323,7 @@ export class LegacyCorsairLibrary {
 			"Harpoon Pro" : {
 				vLedNames : [ "Mouse" ],
 				vLedPositions : [ [1, 1] ],
-				vKeys : [ 1 ],
+				vKeys : [ 3 ],
 				size : [3, 3],
 				maxDPI : 12400
 			},
