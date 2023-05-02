@@ -521,7 +521,12 @@ class HueBridge {
 	updateWithValue(value){
 		service.log(value);
 		this.hostname = value.hostname;
-		this.name = value.name;
+
+		// Keep bridge name if we have it
+		if(!this.config?.name){
+			this.name = value.name;
+		}
+
 		this.port = value.port;
 		this.id = value.hasOwnProperty("bridgeid") ? value.bridgeid : value.id;
 		this.model = value.hasOwnProperty("bridgeid") ? value.modelid : value.md;
