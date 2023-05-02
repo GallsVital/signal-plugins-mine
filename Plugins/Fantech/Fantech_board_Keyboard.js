@@ -52,23 +52,23 @@ const boards = {
 	MK870TKL:{
 		name: "MK870TKL",
 		vKeyNames: [
-			"Esc",     "F1", "F2", "F3", "F4",   "F5", "F6", "F7", "F8",    "F9", "F10", "F11", "F12",  "Print Screen", "Scroll Lock", "Pause Break",
-			"`", "1", "2", "3", "4", "5", "6", "7", "8", "9", "0", "-_", "=+", "Backspace", "Insert", "Home", "PgUp",
-			"Tab", "Q", "W", "E", "R", "T", "Y", "U", "I", "O", "P", "[", "]", "\\", "Delete", " End", "PgDown",
+			"Esc",     "F1", "F2", "F3", "F4",   "F5", "F6", "F7", "F8",    "F9", "F10", "F11", "F12",  		  "Print Screen", "Scroll Lock", "Pause Break",
+			"`", "1", "2", "3", "4", "5", "6", "7", "8", "9", "0", "-_", "=+", "Backspace", 					  "Insert", "Home", "PgUp",
+			"Tab", "Q", "W", "E", "R", "T", "Y", "U", "I", "O", "P", "[", "]", "\\", 							  "Delete", " End", "PgDown",
 			"CapsLock", "A", "S", "D", "F", "G", "H", "J", "K", "L", ";", "'",       "Enter",
-			"Left Shift",      "Z", "X", "C", "V", "B", "N", "M", ",", ".", "/",     "Right Shift",    "Up Arrow",
+			"Left Shift",      "Z", "X", "C", "V", "B", "N", "M", ",", ".", "/",     "Right Shift",    			  "Up Arrow",
 			"Left Ctrl", "Left Win", "Left Alt",        "Space",      "Right Alt", "Menu", "Right Ctrl", "Fn",    "Left Arrow",  "Down Arrow", "Right Arrow"
 		],
 		vKeys: [
-			0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13,	15, 16, 17,
+			0, 		1, 2, 3, 4, 	5, 6, 7, 8, 	  9, 10, 11, 12,	15, 16, 17,
 			22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34,  36,    37, 38, 30,
 			44,  45, 46, 47, 48, 49, 50, 51, 52, 53, 54, 55, 56, 58,    59, 60, 61,
 			66,   68, 69, 70, 71, 72, 73, 74, 75, 76, 77, 78,    80,
-			88,    90, 91, 92, 93, 94, 95, 96, 97, 98, 99,      102, 104,
+			88,    90, 91, 92, 93, 94, 95, 96, 97, 98, 99,      102, 	104,
 			110, 111, 112,         116,          120, 121, 122, 123,    125, 126, 127
 		],
 		vKeyPositions: [
-			[0, 0], [1, 0], [2, 0], [3, 0], [4, 0], [5, 0], [6, 0], [7, 0], [8, 0], [9, 0], [10, 0], [11, 0], [12, 0],   [13, 0],	[14, 0], [15, 0], [16, 0],
+			[0, 0], [1, 0], [2, 0], [3, 0], [4, 0], [5, 0], [6, 0], [7, 0], [8, 0], [9, 0], [10, 0], [11, 0], [12, 0],   			[14, 0], [15, 0], [16, 0],
 			[0, 1], [1, 1], [2, 1], [3, 1], [4, 1], [5, 1], [6, 1], [7, 1], [8, 1], [9, 1], [10, 1], [11, 1], [12, 1],   [13, 1],	[14, 1], [15, 1], [16, 1],
 			[0, 2],  [1, 2], [2, 2], [3, 2], [4, 2], [5, 2], [6, 2], [7, 2], [8, 2], [9, 2], [10, 2], [11, 2], [12, 2],  [13, 2],	[14, 2], [15, 2], [16, 2],
 			[0, 3],   [1, 3], [2, 3], [3, 3], [4, 3], [5, 3], [6, 3], [7, 3], [8, 3], [9, 3], [10, 3], [11, 3],          [13, 3],
@@ -101,14 +101,14 @@ export function onboardModelChanged () {
 	vKeys = boards[boardModel].vKeys;
 
 	device.setName(boards[boardModel].name);
-	device.log(`Model set to: ` + device.name);
+	device.log(`Model set to: ` + boards[boardModel].name);
 	device.setControllableLeds(vKeyNames, vKeyPositions);
 }
 
 export function Initialize() {
 
 	device.setName(boards[boardModel].name);
-	device.log(`Model set to: ` + device.name);
+	device.log(`Model set to: ` + boards[boardModel].name);
 
 	device.write([0x01, 0x0D], 64);
 	device.write([0x01, 0x15], 64);
