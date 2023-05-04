@@ -527,12 +527,12 @@ export function DiscoveryService() {
 	};
 
 	this.Discovered = function(value) {
-		service.log(`New host discovered!`);
 
 		const packetType = JSON.parse(value.response).msg.cmd;
 		//service.log(`Type: ${packetType}`);
 
 		if(packetType === "scan"){
+			service.log(`New host discovered!`);
 			service.log(value);
 			this.CreateControllerDevice(value);
 		}
