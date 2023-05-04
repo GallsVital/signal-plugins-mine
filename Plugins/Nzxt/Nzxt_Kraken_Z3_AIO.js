@@ -185,17 +185,20 @@ function sendchannel1Colors(Channel, shutdown = false) {
 	let ChannelLedCount = device.channel(ChannelArray[Channel][0]).LedCount();
 	const componentChannel = device.channel(ChannelArray[Channel][0]);
 
+	if(!ChannelLedCount) {
+	  return;
+	}
 	let RGBData = [];
 
 	if(LightingMode == "Forced") {
-		RGBData = device.createColorArray(forcedColor, ChannelLedCount, "Inline", "GRB");
+	  RGBData = device.createColorArray(forcedColor, ChannelLedCount, "Inline", "GRB");
 	} else if(componentChannel.shouldPulseColors()) {
-		ChannelLedCount = 40;
+	  ChannelLedCount = 40;
 
-		const pulseColor = device.getChannelPulseColor(ChannelArray[Channel][0], ChannelLedCount);
-		RGBData = device.createColorArray(pulseColor, ChannelLedCount, "Inline", "GRB");
+	  const pulseColor = device.getChannelPulseColor(ChannelArray[Channel][0], ChannelLedCount);
+	  RGBData = device.createColorArray(pulseColor, ChannelLedCount, "Inline", "GRB");
 	} else {
-		RGBData = device.channel(ChannelArray[Channel][0]).getColors("Inline", "GRB");
+	  RGBData = device.channel(ChannelArray[Channel][0]).getColors("Inline", "GRB");
 	}
 
 	StreamLightingPacketChanneled(ChannelLedCount*3, RGBData, Channel);

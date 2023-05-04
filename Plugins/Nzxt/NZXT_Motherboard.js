@@ -148,26 +148,31 @@ export class NZXTProtocol {
 		const totalchannels = this.NZXTCHL + this.ARGBCHL;
 
 		for(let i = 0; i < totalchannels; i++) {
-			const RGBData = this.grabRGBData(i);
-			this.StreamLightingPacketChannel(0, RGBData.splice(0, 60), i);
-			this.StreamLightingPacketChannel(1, RGBData.splice(0, 60), i);
-			this.SubmitLightingColors(i);
+		  const RGBData = this.grabRGBData(i);
+
+		  // no led on this channel, skip
+		  if(RGBData.length === 0) {continue;}
+
+		  this.StreamLightingPacketChannel(0, RGBData.splice(0, 60), i);
+		  this.StreamLightingPacketChannel(1, RGBData.splice(0, 60), i);
+
+		  this.SubmitLightingColors(i);
 		}
 
 		for(let i = 0; i < this.RGBCHL; i++){
-			this.SendRGBHeader(i);
+		  this.SendRGBHeader(i);
 		}
-	}
+	  }
 
-	grabRGBData(Channel) {
+	  grabRGBData(Channel) {
 		let ChannelID = Channel + 1;
 		let ChannelName = "ARGB Header";
 
 		if(Channel < this.NZXTCHL){
-			ChannelName = `NZXT Header ${ChannelID}`;
+		  ChannelName = `NZXT Header ${ChannelID}`;
 		}else{
-			ChannelID = Channel - this.NZXTCHL + 1;
-			ChannelName = `ARGB Header ${ChannelID}`;
+		  ChannelID = Channel - this.NZXTCHL + 1;
+		  ChannelName = `ARGB Header ${ChannelID}`;
 		}
 
 		let ChannelLedCount = device.channel(ChannelName).LedCount();
@@ -175,24 +180,27 @@ export class NZXTProtocol {
 		let RGBData = [];
 
 		if(LightingMode === "Forced") {
-			RGBData = device.createColorArray(forcedColor, ChannelLedCount, "Inline", "GRB");
+		  RGBData = device.createColorArray(forcedColor, ChannelLedCount, "Inline", "GRB");
 		} else if(componentChannel.shouldPulseColors()) {
-			ChannelLedCount = 40;
+		  ChannelLedCount = 40;
 
-			const pulseColor = device.getChannelPulseColor(ChannelName);
-			RGBData = device.createColorArray(pulseColor, ChannelLedCount, "Inline", "GRB");
+		  const pulseColor = device.getChannelPulseColor(ChannelName);
+		  RGBData = device.createColorArray(pulseColor, ChannelLedCount, "Inline", "GRB");
 		} else {
-			RGBData = device.channel(ChannelName).getColors("Inline", "GRB");
+		  RGBData = device.channel(ChannelName).getColors("Inline", "GRB");
 		}
 
-		return RGBData.concat(new Array(120 - RGBData.length).fill(0));
-	}
+		return RGBData;
+	  }
 
-	StreamLightingPacketChannel(packetNumber, RGBData, channel) {
+	  StreamLightingPacketChannel(packetNumber, RGBData, channel) {
+		if (RGBData.length === 0) {
+		  return;
+		}
 		const packet = [0x22, 0x10 | packetNumber, 0x01 << channel, 0x00];
 		packet.push(...RGBData);
 		device.write(packet, 64);
-	}
+	  }
 
 	SubmitLightingColors(channel) {
 		const packet = [0x22, 0xA0, 1 << channel, 0x00, 0x01, 0x00, 0x00, 0x28, 0x00, 0x00, 0x80, 0x00, 0x32, 0x00, 0x00, 0x01];
