@@ -8,6 +8,13 @@ export function DefaultPosition(){return [0, 0]; }
 export function DefaultScale(){return 1.0; }
 export function SupportsSubdevices(){ return true; }
 export function DefaultComponentBrand() { return "CompGen"; }
+/* global
+controller:readonly
+discovery: readonly
+turnOffOnShutdown:readonly
+LightingMode:readonly
+forcedColor:readonly
+*/
 export function ControllableParameters() {
 	return [
 		{"property":"LightingMode", "group":"settings", "label":"Lighting Mode", "type":"combobox", "values":["Canvas", "Forced"], "default":"Canvas"},
@@ -35,7 +42,7 @@ class WLEDDevice {
 		this.defaultOn = controller.defaultOn;
 		this.defaultBri = controller.defaultBri;
 	}
-	
+
 	changeDeviceState(forceOff = false, forceOn = false, fullBright = false) {
 		DeviceState.Change(this.ip, this.defaultOn, this.defaultBri, forceOff, forceOn, fullBright, false);
 	}
@@ -50,10 +57,10 @@ class WLEDDevice {
 		let ChannelLedCount = componentChannel.ledCount > this.deviceledcount ? this.deviceledcount : componentChannel.ledCount;
 
 		let RGBData = [];
+
 		if(shutdown) {
 			RGBData = device.createColorArray(colorBlack, ChannelLedCount, "Inline");
-		}
-		else if(LightingMode === "Forced") {
+		} else if(LightingMode === "Forced") {
 			RGBData = device.createColorArray(forcedColor, ChannelLedCount, "Inline");
 		} else if(componentChannel.shouldPulseColors()) {
 			ChannelLedCount = this.deviceledcount;
@@ -102,37 +109,35 @@ export function DiscoveryService() {
 	this.IconUrl = "https://raw.githubusercontent.com/SRGBmods/public/main/images/wled/998_led_nodemcu.png";
 
 	this.MDns = [ "_wled._tcp.local." ];
-	
+
 	this.forceDiscover = function(ipaddress) {
 		if(!ipaddress || ipaddress === undefined) {
-			return;
-		}
-		else if (this.isValidIP(ipaddress)) {
+
+		} else if (this.isValidIP(ipaddress)) {
 			service.log("Forcing Discovery for WLED device at IP: " + ipaddress);
 			this.ip = ipaddress;
 			this.port = 80;
 			this.forced = true;
 			this.offline = false;
 			this.prepareDiscovery(false);
-			return;
-		}
-		else {
-			return;
+
+		} else {
+
 		}
 	};
 
 	this.forceDelete = function(ipaddress) {
 		if(!ipaddress || ipaddress === undefined) {
-			return;
-		}
-		else if (this.isValidIP(ipaddress)) {
+
+		} else if (this.isValidIP(ipaddress)) {
 			let devicelist_string = service.getSetting("forcedDiscovery", "devicelist");
+
 			if(devicelist_string === undefined || devicelist_string.length === 0) {
-				return;
-			}
-			else if(devicelist_string !== undefined && devicelist_string.length > 0 && devicelist_string.includes(ipaddress)) {
+
+			} else if(devicelist_string !== undefined && devicelist_string.length > 0 && devicelist_string.includes(ipaddress)) {
 				service.log("Force Deleting WLED device at IP: " + ipaddress);
-				let devicelist = JSON.parse(devicelist_string);
+
+				const devicelist = JSON.parse(devicelist_string);
 				const macAddress = devicelist[ipaddress];
 				delete devicelist[ipaddress];
 				devicelist_string = JSON.stringify(devicelist);
@@ -142,23 +147,24 @@ export function DiscoveryService() {
 				this.port = 80;
 				this.forced = true;
 				this.prepareDiscovery(true);
-				return;
+
 			}
-		}
-		else {
-			return;
+		} else {
+
 		}
 	};
-	
+
 	this.isValidIP = function(ipaddress) {
 		if (/^(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$/.test(ipaddress)) {
 			return true;
 		}
+
 		return false;
 	};
-	
+
 	this.prepareDiscovery = function(deletion = false) {
 		const instance = this;
+
 		if(!deletion) {
 			service.log(`Requesting basic Device Information for forced discovery...`);
 			service.log(`http://${instance.ip}:${instance.port}/json/info/`);
@@ -166,23 +172,22 @@ export function DiscoveryService() {
 
 				if (xhr.readyState === 4) {
 					if(xhr.status === 200) {
-						let devicedata = JSON.parse(xhr.response);
-						let wledname = devicedata.name === "WLED" ? "wled-" + devicedata.mac.substr(devicedata.mac.length - 6) : devicedata.name;
-						let forcedvalue = {"hostname":devicedata.ip,"mac":devicedata.mac,"name":wledname,"port":80,"forced":true};
+						const devicedata = JSON.parse(xhr.response);
+						const wledname = devicedata.name === "WLED" ? "wled-" + devicedata.mac.substr(devicedata.mac.length - 6) : devicedata.name;
+						const forcedvalue = {"hostname":devicedata.ip, "mac":devicedata.mac, "name":wledname, "port":80, "forced":true};
 						instance.Discovered(forcedvalue);
-					}
-					else {
+					} else {
 						service.log("ERROR for IP " + instance.ip + ", device is OFFLINE or does not respond!");
 					}
 				}
 			});
-		}
-		else {
+		} else {
 			for(const controller of service.controllers) {
 				if(controller.id === instance.mac) {
 					service.removeSetting(controller.id, "name");
 					service.removeSetting(controller.id, "ip");
 					service.removeController(controller);
+
 					return;
 				}
 			}
@@ -193,23 +198,27 @@ export function DiscoveryService() {
 		service.log("Initializing Plugin!");
 		service.log("Searching for network devices...");
 	};
-	
+
 	this.loadForcedDevices = function() {
-		let devicelist_string = service.getSetting("forcedDiscovery", "devicelist");
+		const devicelist_string = service.getSetting("forcedDiscovery", "devicelist");
+
 		if(devicelist_string !== undefined && devicelist_string.length > 0) {
 			service.log("Refreshing force discovered devices...");
-			let devicelist = JSON.parse(devicelist_string);
+
+			const devicelist = JSON.parse(devicelist_string);
 			Object.keys(devicelist).forEach(key => {
 				let controllerExists = false;
+
 				for(const cont of service.controllers) {
 					if(cont.obj.ip === key) {
 						controllerExists = true;
 					}
 				}
+
 				if(!controllerExists) {
 					this.forceDiscover(key);
 				}
-			})
+			});
 		}
 	};
 
@@ -218,6 +227,7 @@ export function DiscoveryService() {
 			cont.obj.update();
 		}
 		const currentTime = Date.now();
+
 		if(currentTime - lastForcedUpdate >= 60000) {
 			lastForcedUpdate = currentTime;
 			this.loadForcedDevices();
@@ -232,8 +242,7 @@ export function DiscoveryService() {
 
 		if (controller === undefined) {
 			service.addController(new WLEDBridge(value));
-		}
-		else {
+		} else {
 			if(this.forced === value.forced) {
 				controller.updateWithValue(value);
 			}
@@ -265,11 +274,10 @@ class WLEDBridge {
 		this.offline = false;
 
 		service.log("Constructed: "+this.name);
-		
+
 		if(!this.forced) {
 			this.getDeviceIP();
-		}
-		else {
+		} else {
 			this.ip = this.hostname;
 			this.getDeviceInfo();
 		}
@@ -283,9 +291,11 @@ class WLEDBridge {
 		this.port = value.port;
 		this.id = value.mac;
 		this.ip = this.forced ? value.hostname : value.ip;
+
 		if(this.forced) {
 			this.saveForceDiscovery();
 		}
+
 		service.log("Updated: "+this.mac);
 		service.updateController(this);
 		this.getDeviceInfo();
@@ -298,17 +308,18 @@ class WLEDBridge {
 			this.readyToAnnounce = true;
 			service.updateController(this);
 		}
+
 		this.createDevice();
-		
+
 		const currentTime = Date.now();
+
 		if(currentTime - this.lastUpdate >= (Math.floor(Math.random() * 10000) + 50000)) {
 			this.lastUpdate = currentTime;
 			this.getDeviceInfo();
 		}
 	}
-	
-	createDevice()
-	{
+
+	createDevice() {
 		if(this.readyToAnnounce && !this.announced) {
 			if(!this.connected) {
 				this.saveController();
@@ -320,10 +331,11 @@ class WLEDBridge {
 			}
 
 			this.announced = true;
-			if(this.connected)
-			{
+
+			if(this.connected) {
 				DeviceState.Change(this.ip, this.defaultOn, this.defaultBri, false, true, true);
 			}
+
 			service.updateController(this);
 		}
 	}
@@ -347,8 +359,7 @@ class WLEDBridge {
 					instance.offline = false;
 					service.updateController(instance);
 					instance.setDeviceInfo(JSON.parse(xhr.response));
-				}
-				else {
+				} else {
 					instance.offline = true;
 					service.updateController(instance);
 					service.log("ERROR for IP " + instance.ip + ", device is OFFLINE or does not respond!");
@@ -356,24 +367,24 @@ class WLEDBridge {
 			}
 		});
 	}
-	
+
 	getDeviceIP() {
 		const instance = this;
 		service.log(`Reading IPV4 from JSON API...`);
-		let mdnsHostname = instance.hostname.substring(0, instance.hostname.length - 1);
+
+		const mdnsHostname = instance.hostname.substring(0, instance.hostname.length - 1);
 		service.log(`http://${mdnsHostname}:${this.port}/json/`);
 		XmlHttp.Get(`http://${mdnsHostname}:${this.port}/json/`, (xhr) => {
 
 			if (xhr.readyState === 4) {
 				if(xhr.status === 200) {
-					let devicedata = JSON.parse(xhr.response);
+					const devicedata = JSON.parse(xhr.response);
 					instance.ip = devicedata.info.ip;
 					service.log("IP for " + instance.hostname + " received: " + instance.ip);
 					instance.offline = false;
 					service.updateController(instance);
 					instance.setDeviceInfo(devicedata);
-				}
-				else {
+				} else {
 					instance.offline = true;
 					service.updateController(instance);
 					service.log("ERROR for mdnsHostname: " + instance.hostname + ", device is OFFLINE or does not respond!");
@@ -388,6 +399,7 @@ class WLEDBridge {
 			this.defaultBri = response.state.bri;
 			this.firstUpdate = false;
 		}
+
 		this.streamingPort = response.info.udpport;
 		this.arch = response.info.arch;
 		this.firmwareversion = response.info.ver;
@@ -395,41 +407,43 @@ class WLEDBridge {
 		this.signalstrength = response.info.wifi.signal;
 		service.log("Device info for " + this.name + " with IP " + this.ip + " received:");
 		service.log("UDP Port: " + this.streamingPort + " - Arch: " + this.arch + " - Firmware: " + this.firmwareversion + " - LED count: " + this.deviceledcount + " - default State: " + (this.defaultOn ? "ON" : "OFF") + " - default Brightness: " + this.defaultBri + " - Signal strength: " + this.signalstrength);
-		
+
 		this.linked = service.getSetting(this.mac, "ip");
-		if(this.linked === this.ip)
-		{
+
+		if(this.linked === this.ip) {
 			this.connected = true;
 			this.readyToAnnounce = true;
 		}
+
 		if(this.forced) {
 			this.saveForceDiscovery();
 		}
+
 		service.updateController(this);
 	}
-	
+
 	saveForceDiscovery() {
 		let devicelist_string = service.getSetting("forcedDiscovery", "devicelist");
 		let devicelist = {};
+
 		if(devicelist_string === undefined || devicelist_string.length === 0) {
 			devicelist[this.ip] = this.mac;
 			devicelist_string = JSON.stringify(devicelist);
 			service.saveSetting("forcedDiscovery", "devicelist", devicelist_string);
-		}
-		else if(devicelist_string !== undefined && devicelist_string.length > 0 && !devicelist_string.includes(this.ip)) {
+		} else if(devicelist_string !== undefined && devicelist_string.length > 0 && !devicelist_string.includes(this.ip)) {
 			devicelist = JSON.parse(devicelist_string);
 			devicelist[this.ip] = this.mac;
 			devicelist_string = JSON.stringify(devicelist);
 			service.saveSetting("forcedDiscovery", "devicelist", devicelist_string);
 		}
 	}
-	
+
 	startLink() {
 		DeviceState.Change(this.ip, this.defaultOn, this.defaultBri, false, true, true);
 		this.waitingforlink = true;
 		service.updateController(this);
 	}
-	
+
 	startRemove() {
 		DeviceState.Change(this.ip, this.defaultOn, this.defaultBri);
 		service.removeSetting(this.mac, "name");
@@ -440,19 +454,19 @@ class WLEDBridge {
 		service.suppressController(this);
 		service.updateController(this);
 	}
-	
+
 	startDelete() {
 		discovery.forceDelete(this.ip);
 	}
-	
+
 	startForceDiscover() {
 		discovery.forceDiscover(this.ip);
 	}
-	
+
 	turnOn() {
 		DeviceState.Change(this.ip, this.defaultOn, this.defaultBri, false, true, true);
 	}
-	
+
 	turnOff() {
 		DeviceState.Change(this.ip, this.defaultOn, this.defaultBri, true);
 	}
@@ -471,7 +485,7 @@ class XmlHttp {
 
 		xhr.send();
 	}
-	
+
 	static Post(url, callback, data, async = true) {
 		const xhr = new XMLHttpRequest();
 		xhr.open("POST", url, async);
