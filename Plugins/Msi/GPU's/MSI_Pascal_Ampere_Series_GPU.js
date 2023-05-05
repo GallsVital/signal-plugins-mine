@@ -384,6 +384,7 @@ class MSIGPUList {
         	new MSIGPUIdentifier(Nvidia.RTX3050, MSIGPUIDs.MSI_RTX3050_GAMING_X_8G,		0x68, "MSI RTX 3050 Gaming X 8G"),
 
         	new MSIGPUIdentifier(Nvidia.RTX3060, MSIGPUIDs.MSI_RTX3060_GAMING_X_TRIO_12G,     0x68, "MSI RTX 3060 Gaming X Trio 12G"),     //Duplicate sub dev id on different dev id
+        	new MSIGPUIdentifier(Nvidia.RTX3060_GA104, MSIGPUIDs.MSI_RTX3060_GAMING_X_TRIO_12G,     0x68, "MSI RTX 3060 Gaming X Trio 12G"),     //Duplicate sub dev id on different dev id
         	new MSIGPUIdentifier(Nvidia.RTX3060, MSIGPUIDs.MSI_RTX3060_GAMING_X_12G,          0x68, "MSI RTX 3060 Gaming X 12g"),
         	new MSIGPUIdentifier(Nvidia.RTX3060_LHR, MSIGPUIDs.MSI_RTX3060_GAMING_X_12G,          0x68, "MSI RTX 3060 Gaming X 12G LHR"),
         	new MSIGPUIdentifier(Nvidia.RTX3060_GA104, MSIGPUIDs.MSI_RTX3060_GAMING_X_12G,          0x68, "MSI RTX 3060 Gaming X 12G (GA104)"),
