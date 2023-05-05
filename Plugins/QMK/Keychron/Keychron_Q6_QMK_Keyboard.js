@@ -3,7 +3,7 @@ export function Version() { return "1.1.3"; }
 export function VendorId() { return 0x3434; }
 export function ProductId() { return [0x0160, 0x0161, 0x0162, 0x0163]; }
 export function Publisher() { return "WhirlwindFX"; }
-export function Documentation(){ return ""; }
+export function Documentation(){ return "qmk/srgbmods-qmk-firmware"; }
 export function Size() { return [21, 6]; }
 export function DefaultPosition(){return [10, 100]; }
 export function DefaultScale(){return 8.0;}
@@ -26,6 +26,7 @@ let vKeyPositions = [];
 let vKeys = [];
 
 //Plugin Version: Built for Protocol V1.0.4
+
 const vKeysANSI =
 [
 	0,  1,  2,  3,  4,  5,  6,  7,  8,  9,  10, 11, 12, 		13, 14, 15,    16, 17, 18, 19,
