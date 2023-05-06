@@ -193,9 +193,6 @@ export class NZXTProtocol {
 	}
 
 	StreamLightingPacketChannel(packetNumber, RGBData, channel) {
-		if (!RGBData.length) {
-			return;
-		}
 		const packet = [0x22, 0x10 | packetNumber, 0x01 << channel, 0x00];
 		packet.push(...RGBData);
 		device.write(packet, 64);
