@@ -185,6 +185,9 @@ function sendchannel1Colors(Channel, shutdown = false) {
 	let ChannelLedCount = device.channel(ChannelArray[Channel][0]).LedCount();
 	const componentChannel = device.channel(ChannelArray[Channel][0]);
 
+	if(!ChannelLedCount) {
+		return;
+	}
 	let RGBData = [];
 
 	if(LightingMode == "Forced") {
@@ -198,8 +201,6 @@ function sendchannel1Colors(Channel, shutdown = false) {
 	} else {
 		RGBData = device.channel(ChannelArray[Channel][0]).getColors("Inline", "GRB");
 	}
-
-	if(RGBData.length === 0) {return;}
 
 	StreamLightingPacketChanneled(ChannelLedCount*3, RGBData, Channel);
 	SubmitLightingColors(Channel);

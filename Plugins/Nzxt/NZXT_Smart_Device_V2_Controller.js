@@ -119,6 +119,10 @@ function SendChannel(Channel, shutdown = false) {
 		return;
 	}
 
+	if(!ChannelLedCount) {
+		return;
+	}
+
 	let RGBData = [];
 
 	if(LightingMode === "Forced"){
@@ -133,8 +137,6 @@ function SendChannel(Channel, shutdown = false) {
 	}else{
 		RGBData = componentChannel.getColors("Inline", "GRB");
 	}
-
-	if(RGBData.length === 0) {return;}
 
 	let packetNumber = 0;
 	ChannelLedCount = ChannelLedCount >= 120 ? 120 : ChannelLedCount;
