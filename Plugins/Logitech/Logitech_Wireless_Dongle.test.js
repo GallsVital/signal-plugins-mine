@@ -76,7 +76,7 @@ describe("Logitech Dongle", () => {
 		const Logitech = new LogitechProtocol();
 		const LogitechMouse = new LogitechMouseDevice();
 
-		const DPI = Math.round(Math.random() * 10000);
+		const DPI = Math.round(Math.random() * 10000 / 50)*50;
 		const Stage = Math.round(Math.random() * 5);
 		const MockFeatureID = 0;//Math.round(Math.random() * 255);
 		Logitech.FeatureIDs.DPIID = MockFeatureID;
