@@ -456,6 +456,7 @@ class GigabyteMasterDeviceIds {
 		this.RTX2080S_AORUS                 = 0x3FF3;
 		this.RTX2080S_AORUS_P               = 0x3FF4;
 		this.RTX3060_MASTER_O08G            = 0x4051;
+		this.RTX3060_GAMING_OC_12GB         = 0x4074;
 		this.RTX3070_MASTER                 = 0x4069;
 		this.RTX3070TI_MASTER               = 0x408E;
 		this.RTX3080_XTREME_WATERFORCE      = 0x4038;
@@ -513,6 +514,7 @@ class GigabyteMasterGPuList {
 			new GigabyteMasterIdentifier(Nvidia.RTX2080S,       GigabyteMasterIds.RTX2080S_AORUS,         			0x50, "GIGABYTE AORUS 2080 Super OC"),
 			new GigabyteMasterIdentifier(Nvidia.RTX2080S,       GigabyteMasterIds.RTX2080S_AORUS_P,         		0x50, "GIGABYTE AORUS 2080 Super"),
 			new GigabyteMasterIdentifier(Nvidia.RTX3060TI,		GigabyteMasterIds.RTX3060_MASTER_O08G,       		0x66, "GIGABYTE AORUS 3060Ti Master 8GB"),
+			new GigabyteMasterIdentifier(Nvidia.RTX3060_GA104,  GigabyteMasterIds.RTX3060_GAMING_OC_12GB,        	0x32, "GIGABYTE 3060 Gaming OC"),
 			new GigabyteMasterIdentifier(Nvidia.RTX3070,        GigabyteMasterIds.RTX3070_MASTER,         			0x66, "GIGABYTE AORUS 3070 Master 8GB"),
 			new GigabyteMasterIdentifier(Nvidia.RTX3070_LHR,	GigabyteMasterIds.RTX3070_MASTER,					0x66, "GIGABYTE AORUS 3070 Master 8GB LHR"),
 			new GigabyteMasterIdentifier(Nvidia.RTX3070TI,		GigabyteMasterIds.RTX3070TI_MASTER,         		0x70, "GIGABYTE AORUS 3070Ti Master 8GB"),
