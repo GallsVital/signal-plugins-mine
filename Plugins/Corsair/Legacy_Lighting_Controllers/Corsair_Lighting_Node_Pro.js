@@ -21,7 +21,6 @@ export function ControllableParameters(){
 }
 
 export function SupportsSubdevices(){ return true; }
-export function LacksOnBoardLeds(){ return true;}
 export function DefaultComponentBrand() { return "Corsair";}
 export function Documentation(){ return "troubleshooting/corsair"; }
 
