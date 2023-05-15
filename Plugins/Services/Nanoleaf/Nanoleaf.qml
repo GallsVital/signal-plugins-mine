@@ -143,7 +143,7 @@ Item {
 			}
 
 			delegate: Item {
-				width: 250
+				width: content.childrenRect.width + content.padding
             	height: content.childrenRect.height + content.padding
 				property var controller: model.modelData.obj
 
