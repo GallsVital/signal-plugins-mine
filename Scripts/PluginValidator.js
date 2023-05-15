@@ -2,37 +2,10 @@ import fs from 'fs';
 import path from 'path';
 import * as url from 'url';
 import DirectoryWalker from './DirectoryWalker.js';
-
-function CheckThatLEDNameAndPositionLengthsMatch(Plugin, ReportErrorCallback){
-	if(typeof Plugin.LedPositions === "undefined"){
-		return;
-	}
-	const LedNames = Plugin.LedNames();
-	const LedPositions = Plugin.LedPositions();
-
-	if(LedNames.length !== LedPositions.length){
-		ReportErrorCallback(`Led Name and Position differ in length! Led Painting and key press effects will not function. Led Names [${LedNames.length}], Led Positions: [${LedPositions.length}]`);
-	}
-}
-
-function CheckAllLedPositionsAreWithinBounds(Plugin, ReportErrorCallback){
-	if(typeof Plugin.LedPositions === "undefined"){
-		return;
-	}
-
-	const [width, height] = Plugin.Size();
-	const LedPositions = Plugin.LedPositions();
-
-	LedPositions.forEach((Position) => {
-		if(Position[0] < 0 || Position[0] >= width){
-			ReportErrorCallback(`Led X coordinate of [${Position}] is out of bounds. [${Position[0]}] is not inside the plugins width [0-${width})`);
-		}
-
-		if(Position[1] < 0 || Position[1] >= height){
-			ReportErrorCallback(`Led Y coordinate of [${Position}] is out of bounds. [${Position[1]}] is not inside the plugins height [0-${height})`);
-		}
-	});
-}
+import { CheckThatLEDNameAndPositionLengthsMatch } from './Validators/CheckThatLEDNameAndPositionLengthsMatch.js';
+import { CheckAllLedPositionsAreWithinBounds } from './Validators/CheckAllLedPositionsAreWithinBounds.js';
+import { CheckForImageExport } from './Validators/CheckForImageExport.js';
+import { DuplicateUSBPluginValidator } from './Validators/DuplicateUSBPluginValidator.js';
 
 function CheckForGPUListDuplicates(Plugin, ReportErrorCallback){
 	if(typeof Plugin.BrandGPUList !== "undefined"){
@@ -41,6 +14,8 @@ function CheckForGPUListDuplicates(Plugin, ReportErrorCallback){
 		}
 	}
 }
+
+const DuplicateUSBValidator = new DuplicateUSBPluginValidator();
 
 class PluginValidator {
 	constructor() {
@@ -52,6 +27,8 @@ class PluginValidator {
 			CheckThatLEDNameAndPositionLengthsMatch,
 			CheckAllLedPositionsAreWithinBounds,
 			//CheckForGPUListDuplicates,
+			DuplicateUSBValidator.CheckForUSBProductIdDuplicates.bind(DuplicateUSBValidator),
+			CheckForImageExport
 		];
 		this.excludedFiles = [".test.js"];
 	}
@@ -120,7 +97,7 @@ class PluginValidator {
 
 	async AttemptValidator(validatorCallback, pluginModule, PluginPath) {
 		try {
-			validatorCallback(pluginModule, this.#GetReportErrorCallback(PluginPath, validatorCallback.name));
+			validatorCallback(pluginModule, this.#GetReportErrorCallback(PluginPath, validatorCallback.name), PluginPath);
 		} catch (e) {
 			this.#ReportError(PluginPath, validatorCallback.name, e);
 		}

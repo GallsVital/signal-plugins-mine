@@ -5,7 +5,7 @@ import * as url from 'url';
 export default class DirectoryWalker{
 	constructor(){
 		this.paths = [];
-		this.excludedfileTypes = [".test.js"];
+		this.excludedfileTypes = [".test.js", ".ts", ".qml"];
 	};
 
 	AddPath(pathToAdd) {

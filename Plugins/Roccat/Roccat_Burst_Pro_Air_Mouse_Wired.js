@@ -23,9 +23,9 @@ timeoutlength:readonly
 */
 export function ControllableParameters(){
 	return [
-		{"property":"shutdownColor", "group":"lighting", "label":"Shutdown Color", "min":"0", "max":"360", "type":"color", "default":"009bde"},
+		{"property":"shutdownColor", "group":"lighting", "label":"Shutdown Color", "min":"0", "max":"360", "type":"color", "default":"#009bde"},
 		{"property":"LightingMode", "group":"lighting", "label":"Lighting Mode", "type":"combobox", "values":["Canvas", "Forced"], "default":"Canvas"},
-		{"property":"forcedColor", "group":"lighting", "label":"Forced Color", "min":"0", "max":"360", "type":"color", "default":"009bde"},
+		{"property":"forcedColor", "group":"lighting", "label":"Forced Color", "min":"0", "max":"360", "type":"color", "default":"#009bde"},
 		{"property":"DpiControl", "group":"mouse", "label":"Enable Dpi Control", "type":"boolean", "default":"false"},
 		{"property":"dpi1", "group":"mouse", "label":"DPI 1", "step":"50", "type":"number", "min":"50", "max":"19000", "default":"800"},
 		{"property":"dpi2", "group":"mouse", "label":"DPI 2", "step":"50", "type":"number", "min":"50", "max":"19000", "default":"1200"},
@@ -41,7 +41,7 @@ export function ControllableParameters(){
 }
 
 const vLedNames = [ "Scroll Wheel", "Left Click", "Right Click", "Back" ];
-const vLedPositions = [ [1,0], [0,1], [2,1], [1,3] ];
+const vLedPositions = [ [1, 0], [0, 1], [2, 1], [1, 3] ];
 
 const PollingDict =
 {
@@ -52,8 +52,8 @@ const PollingDict =
 };
 
 function hexToRgb(hex) {
-	let result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
-	let colors = [];
+	const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+	const colors = [];
 	colors[0] = parseInt(result[1], 16);
 	colors[1] = parseInt(result[2], 16);
 	colors[2] = parseInt(result[3], 16);
@@ -69,12 +69,13 @@ export function LedPositions() {
 }
 
 
-export function Initialize() 
-{
-    initpackets();
+export function Initialize() {
+	initpackets();
+
 	if(DpiControl) {
 		dpiset();
 	}
+
 	initpackets();
 }
 
@@ -119,99 +120,95 @@ export function ondebounceChanged() {
 	dpiset;
 }
 
-function initpackets()
-{
-    var packet = [0x06, 0x00, 0x35, 0x07];
-    device.send_report(packet,30);
-    device.pause(70);
+function initpackets() {
+	let packet = [0x06, 0x00, 0x35, 0x07];
+	device.send_report(packet, 30);
+	device.pause(70);
 
 
 	packet = [0x06, 0x00, 0x43, 0x07, 0x0c, 0x11, 0x0d, 0x00, 0x0a, 0x0a, 0x0a, 0x0a, 0x0a, 0x0a, 0x0a];
-    device.send_report(packet,30);
-    device.pause(70);
+	device.send_report(packet, 30);
+	device.pause(70);
 
-    packet = [0x06, 0x00, 0x4e, 0x06, 0x04, 0x01, 0x01, 0x01, 0xff];
-    device.send_report(packet,30);
-    device.pause(70);
+	packet = [0x06, 0x00, 0x4e, 0x06, 0x04, 0x01, 0x01, 0x01, 0xff];
+	device.send_report(packet, 30);
+	device.pause(70);
 
 	packet = [0x06, 0x00, 0x00, 0x04];
-    device.send_report(packet,30);
+	device.send_report(packet, 30);
 	device.pause(70);
 
 	packet = [0x06, 0x00, 0x00, 0x05];
-    device.send_report(packet,30);
+	device.send_report(packet, 30);
 	device.pause(70);
 }
 
 
-
-function dpiset()
-{
-	var packet = [0x06, 0x00, 0x00, 0x04];
-    device.send_report(packet,30);
+function dpiset() {
+	let packet = [0x06, 0x00, 0x00, 0x04];
+	device.send_report(packet, 30);
 	device.pause(70);
 	packet = [0x06, 0x00, 0x00, 0x05];
-    device.send_report(packet,30);
+	device.send_report(packet, 30);
 	device.pause(70);
 	packet = [0x06, 0x00, 0x25, 0x07, 0x02];
-    device.send_report(packet,30);
+	device.send_report(packet, 30);
 	device.pause(70);
 	packet = [0x06, 0x00, 0x46, 0x06, 0x02];
-    device.send_report(packet,30);
+	device.send_report(packet, 30);
 	device.pause(70);
 	packet = [0x06, 0x00, 0x44, 0x07];
-    device.send_report(packet,30);
+	device.send_report(packet, 30);
 	device.pause(70);
 	packet = [];
-    packet[0] = 0x06
-    packet[1] = 0x00;
-    packet[2] = 0x46;
-    packet[3] = 0x06;
-    packet[4] = 0x19;
-    packet[5] = 0x80;
-    packet[6] = 0x0c;
-    packet[7] = 0x00;
-    packet[8] = 0x00;
-    packet[9] = 0x03; 
-    packet[10] = 0x1f;//0x01
-    packet[11] = 0x04;//0x04 or 0x01
-    packet[12] = dpi1%256;//50 for 50 dpi
-    packet[13] = Math.floor(dpi1/256);//0 for 50
-    packet[14] = dpi2%256;//100 for 100
-    packet[15] = Math.floor(dpi2/256);//0 for 100
-    packet[16] = dpi3%256;//200
-    packet[17] = Math.floor(dpi3/256);//0
-    packet[18] = dpi4%256;//144 for 400
-    packet[19] = Math.floor(dpi4/256);//1 to add 256 to dpi
-    packet[20] = dpi5%256;// 64 for 1600
-    packet[21] = Math.floor(dpi5/256); //6 to add 256 6 times to dpi
-    packet[22] = 0xff;
-    packet[23] = 0x00;
-    packet[24] = 0x48;
-    packet[25] = 0xff;
-    packet[26] = 0x14;
-    packet[27] = 0xff;
-    packet[28] = 0x00;
-    packet[29] = 0x48;
+	packet[0] = 0x06;
+	packet[1] = 0x00;
+	packet[2] = 0x46;
+	packet[3] = 0x06;
+	packet[4] = 0x19;
+	packet[5] = 0x80;
+	packet[6] = 0x0c;
+	packet[7] = 0x00;
+	packet[8] = 0x00;
+	packet[9] = 0x03;
+	packet[10] = 0x1f;//0x01
+	packet[11] = 0x04;//0x04 or 0x01
+	packet[12] = dpi1%256;//50 for 50 dpi
+	packet[13] = Math.floor(dpi1/256);//0 for 50
+	packet[14] = dpi2%256;//100 for 100
+	packet[15] = Math.floor(dpi2/256);//0 for 100
+	packet[16] = dpi3%256;//200
+	packet[17] = Math.floor(dpi3/256);//0
+	packet[18] = dpi4%256;//144 for 400
+	packet[19] = Math.floor(dpi4/256);//1 to add 256 to dpi
+	packet[20] = dpi5%256;// 64 for 1600
+	packet[21] = Math.floor(dpi5/256); //6 to add 256 6 times to dpi
+	packet[22] = 0xff;
+	packet[23] = 0x00;
+	packet[24] = 0x48;
+	packet[25] = 0xff;
+	packet[26] = 0x14;
+	packet[27] = 0xff;
+	packet[28] = 0x00;
+	packet[29] = 0x48;
 
-    device.send_report(packet,30);
-	device.pause(70);
-    packet = [0x06, 0x00, 0x44, 0x07];
-    device.send_report(packet,30);
-	device.pause(70);
-	packet = [0x06, 0x00, 0x46, 0x06, 0x02, 0x01];
-	device.send_report(packet,30);
+	device.send_report(packet, 30);
 	device.pause(70);
 	packet = [0x06, 0x00, 0x44, 0x07];
-    device.send_report(packet,30);
+	device.send_report(packet, 30);
+	device.pause(70);
+	packet = [0x06, 0x00, 0x46, 0x06, 0x02, 0x01];
+	device.send_report(packet, 30);
+	device.pause(70);
+	packet = [0x06, 0x00, 0x44, 0x07];
+	device.send_report(packet, 30);
 	device.pause(70);
 
 	varioussettings();
 }
 
-function varioussettings()
-{
-	var packet = [];
+function varioussettings() {
+	let packet = [];
 	packet[0] = 0x06;
 	packet[1] = 0x00;
 	packet[2] = 0x46;
@@ -224,7 +221,7 @@ function varioussettings()
 	packet[9] = PollingDict[pollingrate];
 	packet[10] = 0x01;
 	packet[11] = 0x06;
-	packet[12] = 0xff; 
+	packet[12] = 0xff;
 	packet[13] = 0x00; //15 in decimal, probably time identifier
 	packet[14] = 0x00;//ff for no effect
 	packet[15] = 0x00;
@@ -242,16 +239,16 @@ function varioussettings()
 	packet[27] = 0xff;
 	packet[28] = 0xff;
 	packet[29] = 0xff;
-	device.send_report(packet,30);
+	device.send_report(packet, 30);
 	device.pause(70);
 	packet = [0x06, 0x00, 0x44, 0x07];
-    device.send_report(packet,30);
+	device.send_report(packet, 30);
 	device.pause(70);
 	packet = [0x06, 0x00, 0x46, 0x06, 0x02, 0x02];
-	device.send_report(packet,30);
+	device.send_report(packet, 30);
 	device.pause(70);
 	packet = [0x06, 0x00, 0x44, 0x07];
-    device.send_report(packet,30);
+	device.send_report(packet, 30);
 	device.pause(70);
 
 	fillerpacket();
@@ -260,7 +257,7 @@ function varioussettings()
 
 function fillerpacket()//I don't know what this does yet
 {
-	var packet = [];
+	let packet = [];
 	packet[0] = 0x06;
 	packet[1] = 0x00;
 	packet[2] = 0x46;
@@ -280,19 +277,18 @@ function fillerpacket()//I don't know what this does yet
 	packet[16] = 0x7d;
 	packet[17] = 0x1d;
 
-	device.send_report(packet,30);
+	device.send_report(packet, 30);
 	device.pause(70);
 
 	packet = [0x06, 0x00, 0x44, 0x07];
-    device.send_report(packet,30);
+	device.send_report(packet, 30);
 	device.pause(70);
 
 	debounceadjust();
 }
 
-function debounceadjust()
-{
-	let packet = [];
+function debounceadjust() {
+	const packet = [];
 	packet[0] = 0x06;
 	packet[1] = 0x00;
 	packet[2] = 0x43;
@@ -311,25 +307,24 @@ function debounceadjust()
 	packet[15] = 0x61;//CRC that we'll ignore for now
 	packet[22] = 0x7e;
 
-	device.send_report(packet,30);
+	device.send_report(packet, 30);
 	device.pause(70);
 
 }
 
 
-
 function sendZone(shutdown = false) {
-	let packet = [];
+	const packet = [];
 	packet[0] = 0x06;
 	packet[1] = 0x00;//Possible wireless flag
 	packet[2] = 0x4d;
 	packet[3] = 0x06;
-    packet[4] = 0x0c;
+	packet[4] = 0x0c;
 
 
 	for(let iIdx = 0; iIdx < 4; iIdx++) {
-		let iPxX = vLedPositions[iIdx][0];
-		let iPxY = vLedPositions[iIdx][1];
+		const iPxX = vLedPositions[iIdx][0];
+		const iPxY = vLedPositions[iIdx][1];
 		var col;
 
 		if(shutdown){
@@ -339,6 +334,7 @@ function sendZone(shutdown = false) {
 		}else{
 			col = device.color(iPxX, iPxY);
 		}
+
 		packet[iIdx*3 + 5] = col[0];
 		packet[iIdx*3 + 6] = col[1];
 		packet[iIdx*3 + 7] = col[2];
@@ -349,7 +345,6 @@ function sendZone(shutdown = false) {
 	device.pause(1);
 
 }
-
 
 
 export function Render() {
@@ -363,13 +358,13 @@ export function Shutdown() {
 
 
 export function Validate(endpoint) {
-	return endpoint.interface === 2 && endpoint.usage === 0xff00; 
-     
+	return endpoint.interface === 2 && endpoint.usage === 0xff00;
+
 }
 
 function sendPacketString(string, size){
-	let packet= [];
-	let data = string.split(' ');
+	const packet= [];
+	const data = string.split(' ');
 
 	for(let i = 0; i < data.length; i++){
 		packet[i] = parseInt(data[i], 16);

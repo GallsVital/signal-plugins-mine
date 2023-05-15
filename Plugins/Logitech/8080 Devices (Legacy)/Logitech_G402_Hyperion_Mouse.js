@@ -18,15 +18,15 @@ export function ControllableParameters(){
 }
 let Brightness;
 let savedDpi1;
-export function DeviceMessages() { 
+export function DeviceMessages() {
 	return [
-	{property: "Brightness Control Only", message:"Brightness Control Only", tooltip: "This device lacks ARGB leds, but brightness control is retained"},
+		{property: "Brightness Control Only", message:"Brightness Control Only", tooltip: "This device lacks ARGB leds, but brightness control is retained"},
 	];
 }
 export function Initialize() {
 	device.set_endpoint(1, 0x0001, 0xff00); // System IF
 
-	 let packet = [];
+	 const packet = [];
 	packet[0x00] = 0x10;
 	packet[0x01] = 0xFF;
 	packet[0x02] = 0x05;
@@ -62,7 +62,7 @@ export function onBrightnessChanged() {
 function sendZone() {
 	device.set_endpoint(1, 0x0002, 0xff00); // Lighting IF
 
-	let packet = [];
+	const packet = [];
 	packet[0x00] = 0x11;
 	packet[0x01] = 0xFF;
 	packet[0x02] = 0x05;
@@ -82,7 +82,7 @@ function setDpi(dpi) {
 
 	savedDpi1 = dpi1;
 
-	let packet = [];
+	const packet = [];
 	packet[0] = 0x10;
 	packet[1] = 0xFF;
 	packet[2] = 0x0C;
@@ -101,8 +101,8 @@ export function Validate(endpoint) {
 }
 
 function hexToRgb(hex) {
-	let result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
-	let colors = [];
+	const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+	const colors = [];
 	colors[0] = parseInt(result[1], 16);
 	colors[1] = parseInt(result[2], 16);
 	colors[2] = parseInt(result[3], 16);

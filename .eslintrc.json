@@ -30,7 +30,13 @@
         "device": "readonly", 
         "bus": "readonly",
         "battery": "readonly",
-        "mouse": "readonly"
+        "mouse": "readonly",
+        "keyboard": "readonly",
+        "udp": "readonly",
+        "service": "readonly",
+        "dtls": "readonly",
+        "XMLHttpRequest": "readonly",
+        "base64": "readonly"
     },
     "rules": {
         "semi":"warn",
@@ -93,7 +99,7 @@
             {
                 "selector": "MemberExpression[object.name = 'device'][property.name='repollSize']", 
                 "message": "device.repollSize() is deprecated and should not be used. Instead use device.setSize()"
-            }
+            }//,
             // {
             //     "selector": "MemberExpression[object.name = 'device'][property.name='log']", 
             //     "message": "device.log() is deprecated and should not be used. Instead use console.log()"

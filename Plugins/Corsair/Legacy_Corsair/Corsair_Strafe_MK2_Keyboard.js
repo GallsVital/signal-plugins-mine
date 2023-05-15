@@ -14,9 +14,9 @@ layout:readonly
 */
 export function ControllableParameters(){
 	return [
-		{"property":"shutdownColor", "group":"lighting", "label":"Shutdown Color", "min":"0", "max":"360", "type":"color", "default":"009bde"},
+		{"property":"shutdownColor", "group":"lighting", "label":"Shutdown Color", "min":"0", "max":"360", "type":"color", "default":"#009bde"},
 		{"property":"LightingMode", "group":"lighting", "label":"Lighting Mode", "type":"combobox", "values":["Canvas", "Forced"], "default":"Canvas"},
-		{"property":"forcedColor", "group":"lighting", "label":"Forced Color", "min":"0", "max":"360", "type":"color", "default":"009bde"},
+		{"property":"forcedColor", "group":"lighting", "label":"Forced Color", "min":"0", "max":"360", "type":"color", "default":"#009bde"},
 		{"property":"layout", "group":"", "label":"Keyboard Layout", "type":"combobox", "values":["ANSI", "ISO"], "default":"ANSI"},
 	];
 }
@@ -24,23 +24,23 @@ export function ControllableParameters(){
 export function Documentation(){ return "troubleshooting/corsair"; }
 
 function hexToRgb(hex) {
-	let result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
-	let colors = [];
+	const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+	const colors = [];
 	colors[0] = parseInt(result[1], 16);
 	colors[1] = parseInt(result[2], 16);
 	colors[2] = parseInt(result[3], 16);
 
 	return colors;
 }
-let CORSAIR_COMMAND_WRITE       = 0x07;
-let CORSAIR_COMMAND_READ        = 0x0E;
-let CORSAIR_COMMAND_STREAM      = 0x7F;
-let CORSAIR_PROPERTY_LIGHTING_CONTROL           = 0x05;
-let CORSAIR_LIGHTING_CONTROL_HARDWARE           = 0x01;
-let CORSAIR_LIGHTING_CONTROL_SOFTWARE           = 0x02;
-let CORSAIR_PROPERTY_SUBMIT_KEYBOARD_COLOR_24   = 0x28;
-let CORSAIR_PROPERTY_SPECIAL_FUNCTION = 0x04;
-let CORSAIR_PROPERTY_SUBMIT_MOUSE_COLOR         = 0x22;
+const CORSAIR_COMMAND_WRITE       = 0x07;
+const CORSAIR_COMMAND_READ        = 0x0E;
+const CORSAIR_COMMAND_STREAM      = 0x7F;
+const CORSAIR_PROPERTY_LIGHTING_CONTROL           = 0x05;
+const CORSAIR_LIGHTING_CONTROL_HARDWARE           = 0x01;
+const CORSAIR_LIGHTING_CONTROL_SOFTWARE           = 0x02;
+const CORSAIR_PROPERTY_SUBMIT_KEYBOARD_COLOR_24   = 0x28;
+const CORSAIR_PROPERTY_SPECIAL_FUNCTION = 0x04;
+const CORSAIR_PROPERTY_SUBMIT_MOUSE_COLOR         = 0x22;
 
 
 export function Initialize() {
@@ -64,11 +64,11 @@ export function Initialize() {
 	InitScanCodes();
 }
 let savedLayout;
-let SkippedKeys_ANSI = [
+const SkippedKeys_ANSI = [
 	63, 65, 66, 81, 83, 85, 111, 120, 121, 122, 123, 124, 125, 126, 127, 128, 129,
 ];
 
-let SkippedKeys_ISO = [
+const SkippedKeys_ISO = [
 	63, 65, 66, 80, 83, 85, 111, 120, 121, 122, 123, 124, 125, 126, 127, 128, 129,
 ];
 const LayoutDict = {
@@ -81,7 +81,7 @@ function InitScanCodes(){
 	savedLayout = layout;
 	device.log(`Setting layout to ${savedLayout}`);
 
-	let ScanCodes = [];
+	const ScanCodes = [];
 
 	for(let ScanCode = 0; ScanCode < 120 + LayoutDict[layout].length && ScanCode < 0x84; ScanCode++){
 		if(LayoutDict[layout].includes(ScanCode)){
@@ -107,8 +107,8 @@ function InitScanCodes(){
 
 function sendPacketString(string, size){
 
-	let packet= [];
-	let data = string.split(' ');
+	const packet= [];
+	const data = string.split(' ');
 
 	for(let i = 0; i < data.length; i++){
 		packet[i] =parseInt(data[i], 16);//.toString(16)
@@ -118,15 +118,15 @@ function sendPacketString(string, size){
 }
 
 export function Shutdown() {
-	let red = [144];
-	let green = [144];
-	let blue = [144];
+	const red = [144];
+	const green = [144];
+	const blue = [144];
 
 
 	for(let iIdx = 0; iIdx < vKeys.length; iIdx++) {
-		let iPxX = vKeyPositions[iIdx][0];
-		let iPxY = vKeyPositions[iIdx][1];
-		let mxPxColor = device.color(iPxX, iPxY);
+		const iPxX = vKeyPositions[iIdx][0];
+		const iPxY = vKeyPositions[iIdx][1];
+		const mxPxColor = device.color(iPxX, iPxY);
 		red[vKeys[iIdx]] = 255;
 		green[vKeys[iIdx]] = 0;
 		blue[vKeys[iIdx]] = 0;
@@ -164,7 +164,7 @@ function StreamPacket(packet_id, data_sz, data) {
 
 
 function SubmitKbColors(color_channel, packet_count, finish_val) {
-	let packet = [];
+	const packet = [];
 
 	packet[0x00]   = 0x00;
 	packet[0x01]   = CORSAIR_COMMAND_WRITE;
@@ -178,7 +178,7 @@ function SubmitKbColors(color_channel, packet_count, finish_val) {
 
 
 var vKeys = [
-	125, 137, 8,                       47,59,                               20,    // Special key row.
+	125, 137, 8,                       47, 59,                               20,    // Special key row.
 	0,     12, 24, 36, 48,     60, 72, 84, 96,     108, 120, 132, 6,     18, 30, 42,    32, 44, 56,  68,  //20
 	1,   13, 25, 37, 49, 61, 73, 85, 97, 109, 121, 133, 7,       31,     54, 66, 78,    80, 92, 104, 116, //21
 	2,   14, 26, 38, 50, 62, 74, 86, 98, 110, 122, 134,   90,   102,     43, 55, 67,    9,  21, 33,  128, //21
@@ -189,8 +189,8 @@ var vKeys = [
 	16, 114
 ];
 
-let vKeyNames = [
-	"Profile", "Brightness", "Lock",                  "Logo","Logo2",                   "Mute",
+const vKeyNames = [
+	"Profile", "Brightness", "Lock",                  "Logo", "Logo2",                   "Mute",
 	"Esc", "F1", "F2", "F3", "F4", "F5", "F6", "F7", "F8", "F9", "F10", "F11", "F12",         "Print Screen", "Scroll Lock", "Pause Break",   "MediaStop", "MediaRewind", "MediaPlayPause", "MediaFastForward",
 	"`", "1", "2", "3", "4", "5", "6", "7", "8", "9", "0", "-_", "=+", "Backspace",                        "Insert", "Home", "Page Up",       "NumLock", "Num /", "Num *", "Num -",  //21
 	"Tab", "Q", "W", "E", "R", "T", "Y", "U", "I", "O", "P", "[", "]", "\\",                               "Del", "End", "Page Down",         "Num 7", "Num 8", "Num 9", "Num +",    //21
@@ -204,7 +204,7 @@ let vKeyNames = [
 // This array must be the same length as vKeys[], and represents the pixel color position in our pixel matrix that we reference.  For example,
 // item at index 3 [9,0] represents the corsair logo, and the render routine will grab its color from [9,0].
 var vKeyPositions = [
-	[1, 0], [2, 0], [3, 0],                                    [8,0],[9,0],                                                             [17, 0],   // Logo & specialkey row.
+	[1, 0], [2, 0], [3, 0],                                    [8, 0], [9, 0],                                                             [17, 0],   // Logo & specialkey row.
 	[0, 1], [1, 1], [2, 1], [3, 1], [4, 1], [5, 1], [6, 1], [7, 1], [8, 1], [9, 1], [10, 1], [11, 1],         [13, 1],   [14, 1], [15, 1], [16, 1],   [17, 1], [18, 1], [19, 1], [20, 1], //20
 	[0, 2], [1, 2], [2, 2], [3, 2], [4, 2], [5, 2], [6, 2], [7, 2], [8, 2], [9, 2], [10, 2], [11, 2], [12, 2], [13, 2],   [14, 2], [15, 2], [16, 2],   [17, 2], [18, 2], [19, 2], [20, 2], //21
 	[0, 3], [1, 3], [2, 3], [3, 3], [4, 3], [5, 3], [6, 3], [7, 3], [8, 3], [9, 3], [10, 3], [11, 3], [12, 3], [13, 3],   [14, 3], [15, 3], [16, 3],   [17, 3], [18, 3], [19, 3], [20, 3], //21
@@ -230,14 +230,14 @@ export function Render() {
 
 function sendColors(shutdown = false){
 
-	let red = [144];
-	let green = [144];
-	let blue = [144];
+	const red = [144];
+	const green = [144];
+	const blue = [144];
 
 
 	for(let iIdx = 0; iIdx < vKeys.length; iIdx++) {
-		let iPxX = vKeyPositions[iIdx][0];
-		let iPxY = vKeyPositions[iIdx][1];
+		const iPxX = vKeyPositions[iIdx][0];
+		const iPxY = vKeyPositions[iIdx][1];
 		var mxPxColor;
 
 		if(shutdown){

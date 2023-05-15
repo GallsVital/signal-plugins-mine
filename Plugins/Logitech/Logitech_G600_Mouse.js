@@ -1,11 +1,11 @@
 
 
-let G600_RGB_WRITE = 0xF1;
-let G600_DPI_WRITE = 0xF2;
+const G600_RGB_WRITE = 0xF1;
+const G600_DPI_WRITE = 0xF2;
 
-let G600_FIXED_MODE = 0x00;
-let G600_BRETHING_MODE = 0x01;
-let G600_CYCLE_MODE = 0x02;
+const G600_FIXED_MODE = 0x00;
+const G600_BRETHING_MODE = 0x01;
+const G600_CYCLE_MODE = 0x02;
 
 export function Name() { return "Logitech G600 Mouse"; }
 export function VendorId() { return  0x046D; } //
@@ -24,18 +24,18 @@ dpi1:readonly
 */
 export function ControllableParameters(){
 	return [
-		{"property":"shutdownColor", "group":"lighting", "label":"Shutdown Color", "min":"0", "max":"360", "type":"color", "default":"009bde"},
+		{"property":"shutdownColor", "group":"lighting", "label":"Shutdown Color", "min":"0", "max":"360", "type":"color", "default":"#009bde"},
 		{"property":"LightingMode", "group":"lighting", "label":"Lighting Mode", "type":"combobox", "values":["Grid", "Forced"], "default":"Grid"},
-		{"property":"forcedColor", "group":"lighting", "label":"Forced Color", "min":"0", "max":"360", "type":"color", "default":"009bde"},
+		{"property":"forcedColor", "group":"lighting", "label":"Forced Color", "min":"0", "max":"360", "type":"color", "default":"#009bde"},
 		{"property":"DpiControl", "group":"mouse", "label":"Enable Dpi Control", "type":"boolean", "default":"false"},
 		{"property":"dpi1", "group":"mouse", "label":"DPI", "step":"50", "type":"number", "min":"200", "max":"12400", "default":"800"},
 	];
 }
 
 let savedDpi1;
-let vLedNames = ["MouseWide"];
+const vLedNames = ["MouseWide"];
 
-let vLedPositions = [[1, 1]];
+const vLedPositions = [[1, 1]];
 
 export function LedNames() {
 	return vLedNames;
@@ -54,13 +54,13 @@ export function Initialize() {
 
 function sendColors(shutdown = false){
 
-	let packet = [];
+	const packet = [];
 	//packet[0x00] = 0x00;
 	packet[0x00]   = G600_RGB_WRITE;
 
 	// Fetch color at 1,1
-	let iX = vLedPositions[0][0];
-	let iY = vLedPositions[0][1];
+	const iX = vLedPositions[0][0];
+	const iY = vLedPositions[0][1];
 
 	let col;
 
@@ -100,7 +100,7 @@ function setDpi(dpi){
 
 	savedDpi1 = dpi;
 
-	let packet = [];
+	const packet = [];
 	packet[0] = 0xF2;
 	packet[1] = 0x02;
 	packet[2] = 0x00;
@@ -112,8 +112,8 @@ function setDpi(dpi){
 }
 
 function hexToRgb(hex) {
-	let result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
-	let colors = [];
+	const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+	const colors = [];
 	colors[0] = parseInt(result[1], 16);
 	colors[1] = parseInt(result[2], 16);
 	colors[2] = parseInt(result[3], 16);

@@ -1,6 +1,6 @@
 export function Name() { return "Razer Ornata V3"; }
 export function VendorId() { return 0x1532; }
-export function ProductId() { return 0x028f; }
+export function ProductId() { return [0x028f, 0x02a1]; }
 export function Publisher() { return "WhirlwindFX"; }
 export function Documentation(){ return "troubleshooting/razer"; }
 export function Size() { return [21, 6]; }
@@ -13,9 +13,9 @@ forcedColor:readonly
 */
 export function ControllableParameters(){
 	return [
-		{"property":"shutdownColor", "label":"Shutdown Color", "min":"0", "max":"360", "type":"color", "default":"009bde"},
+		{"property":"shutdownColor", "label":"Shutdown Color", "min":"0", "max":"360", "type":"color", "default":"#009bde"},
 		{"property":"LightingMode", "label":"Lighting Mode", "type":"combobox", "values":["Canvas", "Forced"], "default":"Canvas"},
-		{"property":"forcedColor", "label":"Forced Color", "min":"0", "max":"360", "type":"color", "default":"009bde"},
+		{"property":"forcedColor", "label":"Forced Color", "min":"0", "max":"360", "type":"color", "default":"#009bde"},
 	];
 }
 

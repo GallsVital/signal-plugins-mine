@@ -3,7 +3,8 @@ declare interface ParameterBase{
 	property: string
 	group?: string
 	label: string
-	default: string
+	default: string | number
+	order?: number
 	type: "color" | "combobox" | "number" | "boolean" | "textfield" | "hue"
 }
 
@@ -13,8 +14,10 @@ declare interface ColorParameter extends ParameterBase{
 	type: "color"
 }
 declare interface NumberParameter extends ParameterBase{
-	min: string
-	max: string
+	min: string | number
+	max: string | number
+	step?: string | number
+	live?: string | number | boolean
 	type: "number"
 }
 declare interface ComboboxParameter extends ParameterBase{

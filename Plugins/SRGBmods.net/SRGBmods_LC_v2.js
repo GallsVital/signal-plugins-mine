@@ -1,15 +1,14 @@
-// SRGBmods LED Controller v2
 export function Name() { return "SRGBmods LED Controller v2"; }
 export function VendorId() { return 0x16D0; }
 export function ProductId() { return 0x1201; }
 export function Publisher() { return "FeuerSturm"; }
 export function Documentation() { return "gettingstarted/srgbmods-net-info"; }
 export function Size() { return [1, 1]; }
-export function DefaultPosition(){return [0, 0];}
-export function DefaultScale(){return 1.0;}
+export function DefaultPosition(){ return [0, 0]; }
+export function DefaultScale(){ return 1.0; }
 export function Type() { return "Hid"; }
 export function SupportsSubdevices(){ return true; }
-export function DefaultComponentBrand() { return "CompGen";}
+export function DefaultComponentBrand() { return "CompGen"; }
 /* global
 shutdownColor:readonly
 LightingMode:readonly
@@ -48,7 +47,7 @@ export function DeviceMessages() {
 const DeviceMaxLedLimit = 4056;
 const ChannelArray =
 [
-	["Channel 1", 4056],
+	["Channel 1", DeviceMaxLedLimit],
 ];
 
 function SetupChannels() {
@@ -59,7 +58,7 @@ function SetupChannels() {
 	}
 }
 
-const PluginVersion = "1.0.0";
+const PluginVersion = "1.2.0";
 
 const vKeyNames = [];
 const vKeyPositions = [];
@@ -120,7 +119,8 @@ export function Shutdown() {
 }
 
 function SendChannel(Channel, shutdown = false) {
-	const ChannelLedCount = device.channel(ChannelArray[Channel][0]).ledCount > ChannelArray[Channel][1] ? ChannelArray[Channel][1] : device.channel(ChannelArray[Channel][0]).ledCount;
+	const componentChannel = device.channel(ChannelArray[Channel][0]);
+	let ChannelLedCount = componentChannel.ledCount > ChannelArray[Channel][1] ? ChannelArray[Channel][1] : componentChannel.ledCount;
 
 	let RGBData = [];
 
@@ -128,25 +128,21 @@ function SendChannel(Channel, shutdown = false) {
 		RGBData = device.createColorArray(shutdownColor, ChannelLedCount, "Inline");
 	} else if(LightingMode === "Forced") {
 		RGBData = device.createColorArray(forcedColor, ChannelLedCount, "Inline");
+	} else if(componentChannel.shouldPulseColors()) {
+		ChannelLedCount = 1014;
+
+		const pulseColor = device.getChannelPulseColor(ChannelArray[Channel][0]);
+		RGBData = device.createColorArray(pulseColor, ChannelLedCount, "Inline");
 	} else {
-		const deviceCh = device.channel(ChannelArray[Channel][0]);
-		RGBData = deviceCh.getColors("Inline");
+		RGBData = componentChannel.getColors("Inline");
+	}
 
-		const components = deviceCh.getComponentNames();
-		const componentCount = components.length;
+	const NumPackets = Math.ceil(ChannelLedCount / MaxLedsInPacket);
 
-		for(let currComp = 0; currComp < componentCount; currComp++) {
-			const DeviceLedCount = deviceCh.getComponentData(components[currComp]).LedCount;
-			const DeviceRGBData = RGBData.splice(0, ((DeviceLedCount)*3));
-
-			const NumPackets = Math.ceil(DeviceLedCount / MaxLedsInPacket);
-
-			for(let CurrPacket = 1; CurrPacket <= NumPackets; CurrPacket++) {
-				let packet = [0x00, CurrPacket, 0x00, NumPackets, currComp + 1, 0xAA];
-				packet = packet.concat(DeviceRGBData.splice(0, 507));
-				device.write(packet, 513);
-			}
-		}
+	for(let CurrPacket = 1; CurrPacket <= NumPackets; CurrPacket++) {
+		let packet = [0x00, CurrPacket, 0x00, NumPackets, 0x00, 0xAA];
+		packet = packet.concat(RGBData.splice(0, 507));
+		device.write(packet, 513);
 	}
 }
 

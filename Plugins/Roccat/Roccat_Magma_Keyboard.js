@@ -13,9 +13,9 @@ forcedColor:readonly
 */
 export function ControllableParameters(){
 	return [
-		{"property":"shutdownColor", "group":"lighting", "label":"Shutdown Color", "min":"0", "max":"360", "type":"color", "default":"009bde"},
+		{"property":"shutdownColor", "group":"lighting", "label":"Shutdown Color", "min":"0", "max":"360", "type":"color", "default":"#009bde"},
 		{"property":"LightingMode", "group":"lighting", "label":"Lighting Mode", "type":"combobox", "values":["Canvas", "Forced"], "default":"Canvas"},
-		{"property":"forcedColor", "group":"lighting", "label":"Forced Color", "min":"0", "max":"360", "type":"color", "default":"009bde"},
+		{"property":"forcedColor", "group":"lighting", "label":"Forced Color", "min":"0", "max":"360", "type":"color", "default":"#009bde"},
 	];
 }
 
@@ -36,11 +36,11 @@ export function Shutdown() {
 	sendReportString("0e 05 00 00 00", 5);
 }
 
-let vKeyNames = [
+const vKeyNames = [
 	"Zone1", "Zone2", "Zone3", "Zone4", "Zone5"
 ];
 
-let vKeyPositions = [
+const vKeyPositions = [
 	[0, 0], [2, 0], [4, 0], [6, 0], [9, 0]
 ];
 
@@ -56,22 +56,22 @@ function ColorZones() {
 	device.set_endpoint(3, 1, 0xFF00, 0);
 
 	let color;
-	let packet = [];
+	const packet = [];
 	packet[0x00] = 0x00;
 	packet[0x01] = 0xa1;
 	packet[0x02] = 0x01;
 	packet[0x03] = 0x40;
 
 	for(let iIdx = 0; iIdx < vKeyPositions.length; iIdx++) {
-		let iPxX = vKeyPositions[iIdx][0];
-		let iPxY = vKeyPositions[iIdx][1];
+		const iPxX = vKeyPositions[iIdx][0];
+		const iPxY = vKeyPositions[iIdx][1];
 
 		if (LightingMode === "Forced") {
 			color = hexToRgb(forcedColor);
 		} else {
 			color = device.color(iPxX, iPxY);
 		}
-		let mxPxColor = color;
+		const mxPxColor = color;
 		packet[0x04+iIdx] = mxPxColor[0];
 		packet[0x04+iIdx+5] = mxPxColor[1];
 		packet[0x04+iIdx+10] = mxPxColor[2];
@@ -86,8 +86,8 @@ export function Render() {
 }
 
 function sendPacketString(string, size) {
-	let packet = [];
-	let data = string.split(' ');
+	const packet = [];
+	const data = string.split(' ');
 
 	for(let i = 0; i < data.length; i++) {
 		packet[i] = parseInt(data[i], 16);
@@ -97,8 +97,8 @@ function sendPacketString(string, size) {
 }
 
 function sendReportString(string, size) {
-	let packet = [];
-	let data = string.split(' ');
+	const packet = [];
+	const data = string.split(' ');
 
 	for(let i = 0; i < data.length; i++) {
 		packet[i] = parseInt(data[i], 16);
@@ -108,8 +108,8 @@ function sendReportString(string, size) {
 }
 
 function hexToRgb(hex) {
-	let result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
-	let colors = [];
+	const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+	const colors = [];
 	colors[0] = parseInt(result[1], 16);
 	colors[1] = parseInt(result[2], 16);
 	colors[2] = parseInt(result[3], 16);

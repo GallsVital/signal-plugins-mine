@@ -14,23 +14,23 @@ forcedColor:readonly
 */
 export function ControllableParameters(){
 	return [
-		{"property":"shutdownColor", "group":"lighting", "label":"Shutdown Color", "min":"0", "max":"360", "type":"color", "default":"009bde"},
+		{"property":"shutdownColor", "group":"lighting", "label":"Shutdown Color", "min":"0", "max":"360", "type":"color", "default":"#009bde"},
 		{"property":"LightingMode", "group":"lighting", "label":"Lighting Mode", "type":"combobox", "values":["Canvas", "Forced"], "default":"Canvas"},
-		{"property":"forcedColor", "group":"lighting", "label":"Forced Color", "min":"0", "max":"360", "type":"color", "default":"009bde"},
+		{"property":"forcedColor", "group":"lighting", "label":"Forced Color", "min":"0", "max":"360", "type":"color", "default":"#009bde"},
 	];
 }
 
 const vKeys = [
 	0, 8,  16, 24, 32, 40, 48, 56, 64, 72, 80, 88, 96, 104,			112,
-	1, 9,  17, 25, 33, 41, 49, 57, 65, 73, 81, 89, 97,				113,
+	1, 9,  17, 25, 33, 41, 49, 57, 65, 73, 81, 89, 97, 105,			113,
 	2, 10, 18, 26, 34, 42, 50, 58, 66, 74, 82, 90, 98,    106,		114,
 	3, 11, 19, 27, 35, 43, 51, 59, 67, 75, 83, 91, 99,		107,	115,
-	4, 12, 20,         52,         76, 84, 92,			100,108, 116,
+	4, 12, 20,         52,         76, 84, 92,			100, 108, 116,
 ];
 
 const vKeyNames = [
 	"Esc", "1", "2", "3", "4", "5", "6", "7", "8", "9", "0", "-_", "=+", "Backspace",								"Insert",
-	"Tab", "Q", "W", "E", "R", "T", "Y", "U", "I", "O", "P", "[", "]",					 /*EntTop*/					"Del",
+	"Tab", "Q", "W", "E", "R", "T", "Y", "U", "I", "O", "P", "[", "]", "\\",				 /*EntTop*/					"Del",
 	"CapsLock", "A", "S", "D", "F", "G", "H", "J", "K", "L", ";", "'", "#",					"Enter",				"Page Up",
 	"Left Shift", "ISO\\",  "Z", "X", "C", "V", "B", "N", "M", ",", ".", "/", "Right Shift",		  "Up Arrow",	"Page Down",
 	"Left Ctrl", "Left Win", "Left Alt", "Space", "Right Alt", "Fn", "Right Ctrl",  "Left Arrow", "Down Arrow", "Right Arrow",
@@ -38,7 +38,7 @@ const vKeyNames = [
 
 const vKeyPositions = [
 	[0, 0], [1, 0], [2, 0], [3, 0], [4, 0], [5, 0], [6, 0], [7, 0], [8, 0], [9, 0], [10, 0], [11, 0], [12, 0], [13, 0],	   [14, 0],   //15
-	[0, 1], [1, 1], [2, 1], [3, 1], [4, 1], [5, 1], [6, 1], [7, 1], [8, 1], [9, 1], [10, 1], [11, 1], [12, 1],			   [14, 1],   //14
+	[0, 1], [1, 1], [2, 1], [3, 1], [4, 1], [5, 1], [6, 1], [7, 1], [8, 1], [9, 1], [10, 1], [11, 1], [12, 1], [13, 1],	   [14, 1],   //14
 	[0, 2], [1, 2], [2, 2], [3, 2], [4, 2], [5, 2], [6, 2], [7, 2], [8, 2], [9, 2], [10, 2], [11, 2], [12, 2],  [13, 2],   [14, 2],   //15
 	[0, 3], [1, 3], [2, 3], [3, 3], [4, 3], [5, 3], [6, 3], [7, 3], [8, 3], [9, 3], [10, 3], [11, 3], [12, 3],   [13, 3],  [14, 3],   //15
 	[0, 5], [1, 5], [2, 5],                         [6, 5],					[9, 4], [10, 5], [11, 5],   [12, 5], [13, 5], [14, 5],    //10

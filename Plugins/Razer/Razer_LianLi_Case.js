@@ -14,9 +14,9 @@ forcedColor:readonly
 */
 export function ControllableParameters(){
 	return [
-		{"property":"shutdownColor", "group":"lighting", "label":"Shutdown Color", "min":"0", "max":"360", "type":"color", "default":"009bde"},
+		{"property":"shutdownColor", "group":"lighting", "label":"Shutdown Color", "min":"0", "max":"360", "type":"color", "default":"#009bde"},
 		{"property":"LightingMode", "group":"lighting", "label":"Lighting Mode", "type":"combobox", "values":["Canvas", "Forced"], "default":"Canvas"},
-		{"property":"forcedColor", "group":"lighting", "label":"Forced Color", "min":"0", "max":"360", "type":"color", "default":"009bde"},
+		{"property":"forcedColor", "group":"lighting", "label":"Forced Color", "min":"0", "max":"360", "type":"color", "default":"#009bde"},
 	];
 }
 
@@ -216,7 +216,7 @@ function grabLighting(shutdown = false) {
 		const ledsToSend = TotalLedCount >= 16 ? 16 : TotalLedCount;
 		TotalLedCount -= ledsToSend;
 		Razer.setLianLiCaseColor(RGBData.splice(0, (ledsToSend+1)*3), packetCount);
-		device.pause(1);
+		device.pause(2);
 		packetCount++;
 	}
 

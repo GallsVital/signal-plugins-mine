@@ -39,18 +39,20 @@ export function Scan(bus) {
 
 	for(const GPU of new GigabyteVisionGPuList().devices) {
 		if(CheckForIdMatch(bus, GPU)) {
-			// No Quick Write test on Nvidia
-			//if(bus.ReadByteWithoutRegister(GPU.Address) < 0) {
-			//	bus.log(bus.ReadByteWithoutRegister(GPU.Address) + "on" + GPU.Address, {toFile : true});
-			//	bus.log("failed read test!", {toFile : true});
-			//
-			//	return [];
-			//}
 
-			//if(GigabyteVisionGpuCheck(bus, GPU)) {
-			bus.log(`Found Gigabyte Vision GPU! [${GPU.Name}]`, {toFile : true});
-			FoundAddresses.push(GPU.Address);
-			//}
+			const returnValue = 0;//bus.WriteBlockWithoutRegister(GPU.Address, 4, [0xAB]);
+
+			if(returnValue !== -1)
+			{
+				bus.log(`Address ${GPU.Address} returned ${returnValue}`, {toFile : true});
+				bus.log(`Found Gigabyte Vision GPU! [${GPU.Name}]`, {toFile : true});
+				FoundAddresses.push(GPU.Address);
+			}
+			else
+			{
+				bus.log(`Address ${GPU.Address} returned -1, skipping.`, {toFile : true});
+			}
+
 		}
 	}
 
@@ -315,12 +317,15 @@ class GigabyteVisionDeviceIds {
 		this.RTX2060_GAMING_OC_PRO          = 0x3FC9;
 		this.RTX2060S_GAMING_OC_3X_8GB		= 0x4009;
 		this.RTX2070S_GAMING_OC_3X_2		= 0x4010;
+		this.RTX2070S_GAMING_OC_WHITE 		= 0x3fff;
 		this.RTX2080_WINDFORCE				= 0x379f;
 		this.RTX2080TI_GAMING_OC            = 0x37A9;
 		this.RTX3060TI_VISION_OC			= 0x4077;
 		this.RTX3070_EAGLE_OC           	= 0x404E;
 		this.RTX3080_EAGLE_OC				= 0x4040;
 		this.RTX3090_VISION_OC_24G			= 0x4044;
+		this.RTX4080_AERO_OC_16G			= 0x40C5;
+		this.RTX4080_EAGLE_OC               = 0x40be; //confirmed.
 	}
 }
 
@@ -364,7 +369,7 @@ class GigabyteVisionGPuList {
 			new GigabyteVisionIdentifier(Nvidia.RTX3060,        GigabyteVisionIds.RTX3060_EAGLE_OC_REV2,         0x63, "GIGABYTE 3060 Eagle OC Rev 2.0"),
 			new GigabyteVisionIdentifier(Nvidia.RTX3060_LHR,    GigabyteVisionIds.RTX3060_EAGLE_OC_REV2,         0x62, "GIGABYTE 3060 Eagle OC Rev 2.0 LHR"),
 			new GigabyteVisionIdentifier(Nvidia.RTX3060,        GigabyteVisionIds.RTX3060_GAMING_OC_12GB,        0x62, "GIGABYTE 3060 Gaming OC"),
-			new GigabyteVisionIdentifier(Nvidia.RTX3060_LHR,    GigabyteVisionIds.RTX3060_GAMING_OC_12GB,        0x62, "GIGABYTE 3060 Gaming OC LHR"),
+			new GigabyteVisionIdentifier(Nvidia.RTX3060_LHR,    GigabyteVisionIds.RTX3060_GAMING_OC_12GB,        0x62, "GIGABYTE 3060 Gaming OC LHR"), //0x32?!?!?
 			new GigabyteVisionIdentifier(Nvidia.RTX3060,        GigabyteVisionIds.RTX3060_VISION_OC_12GB,        0x63, "GIGABYTE 3060 Vision OC"),
 			new GigabyteVisionIdentifier(Nvidia.RTX3060_LHR,    GigabyteVisionIds.RTX3060_VISION_OC_12GB,        0x63, "GIGABYTE 3060 Vision OC LHR"),
 			new GigabyteVisionIdentifier(Nvidia.RTX3060_GA104,  GigabyteVisionIds.RTX3060_VISION_OC_12GB,        0x63, "GIGABYTE 3060 Vision OC LHR (GA104)"),
@@ -374,7 +379,7 @@ class GigabyteVisionGPuList {
 			new GigabyteVisionIdentifier(Nvidia.RTX3070TI,      GigabyteVisionIds.RTX3070TI_VISION_OC,           0x63, "GIGABYTE 3070Ti Vision OC LHR"),
 			new GigabyteVisionIdentifier(Nvidia.RTX3060TI,      GigabyteVisionIds.RTX3060TI_EAGLE_OC,            0x63, "GIGABYTE 3060Ti Eagle OC"),
 			new GigabyteVisionIdentifier(Nvidia.RTX3060TI_LHR,  GigabyteVisionIds.RTX3060TI_EAGLE_OC,            0x63, "GIGABYTE 3060Ti Eagle OC LHR"),
-			new GigabyteVisionIdentifier(Nvidia.RTX3060TI_LHR,  GigabyteVisionIds.RTX3060TI_GAMING_OC,           0x62, "GIGABYTE 3060Ti Gaming OC Rev 2.0"),
+			new GigabyteVisionIdentifier(Nvidia.RTX3060TI_LHR,  GigabyteVisionIds.RTX3060TI_GAMING_OC,           0x32, "GIGABYTE 3060Ti Gaming OC Rev 2.0"),
 			new GigabyteVisionIdentifier(Nvidia.RTX3060TI_LHR,  GigabyteVisionIds.RTX3060TI_GAMING_OC_PRO,       0x62, "GIGABYTE 3060Ti Gaming OC Pro Rev 3.0"),
 			new GigabyteVisionIdentifier(Nvidia.RTX3070,        GigabyteVisionIds.RTX3070_GAMING_OC,             0x62, "GIGABYTE 3070 Gaming OC"),
 			new GigabyteVisionIdentifier(Nvidia.RTX3070_LHR,    GigabyteVisionIds.RTX3070_GAMING_OC,             0x62, "GIGABYTE 3070 Gaming OC LHR"),
@@ -394,21 +399,26 @@ class GigabyteVisionGPuList {
 
 			//New GPUs for 2.2.29 -------------------------------------------------------------------
 			new GigabyteVisionIdentifier(Nvidia.GTX1070,        GigabyteVisionIds.GTX1070_GAMING,                0x47, "GIGABYTE 1070 Gaming"),
-			new GigabyteVisionIdentifier(Nvidia.GTX1080,      GigabyteVisionIds.GTX1080_G1_GAMING,               0x48, "GIGABYTE 1080 G1 Gaming"),
-			new GigabyteVisionIdentifier(Nvidia.GTX1080TI,      GigabyteVisionIds.GTX1080TI_11G,              	 0x47, "GIGABYTE 1080Ti Gaming OC"), //I need the actual name for this card.
+			new GigabyteVisionIdentifier(Nvidia.GTX1080,      GigabyteVisionIds.GTX1080_G1_GAMING,               0x48, "GIGABYTE 1080 G1 Gaming"), //Confirmed!
+			new GigabyteVisionIdentifier(Nvidia.GTX1080TI,      GigabyteVisionIds.GTX1080TI_11G,              	 0x47, "GIGABYTE 1080Ti Gaming OC"), //Confirmed
 			new GigabyteVisionIdentifier(Nvidia.RTX2060_TU104,  GigabyteVisionIds.RTX2060_GAMING_OC_PRO,         0x47, "GIGABYTE 2060 Gaming OC Pro"), //Very iffy.
 			new GigabyteVisionIdentifier(Nvidia.RTX2060S_OC,    GigabyteVisionIds.RTX2060S_GAMING_OC,     		 0x47, "GIGABYTE 2060 Super Gaming OC"), //Confirmed.
 			new GigabyteVisionIdentifier(Nvidia.RTX2060S_OC,    GigabyteVisionIds.RTX2060S_GAMING_OC_3X_8GB,     0x47, "GIGABYTE 2060 Super Gaming OC Windforce"), //Confirmed.
-			new GigabyteVisionIdentifier(Nvidia.RTX2080_A,      GigabyteVisionIds.RTX2070S_GAMING_OC_3X_2,       0x47, "GIGABYTE 2070 Super Gaming OC"),
+			new GigabyteVisionIdentifier(Nvidia.RTX2060S_OC,    GigabyteVisionIds.RTX2060S_GAMING_OC_WHITE,      0x47, "GIGABYTE 2060 Super Gaming OC White"), //Confirmed.
+			new GigabyteVisionIdentifier(Nvidia.RTX2070S,      GigabyteVisionIds.RTX2070S_GAMING_OC_3X_2,       0x47, "GIGABYTE 2070 Super Gaming OC"),
+			new GigabyteVisionIdentifier(Nvidia.RTX2070S,      GigabyteVisionIds.RTX2070S_GAMING_OC_WHITE,       0x47, "GIGABYTE 2070 Super Gaming OC"),
 			new GigabyteVisionIdentifier(Nvidia.RTX2080_A,      GigabyteVisionIds.RTX2080_WINDFORCE,    		 0x47, "GIGABYTE 2080 Windforce OC"),
 			new GigabyteVisionIdentifier(Nvidia.RTX2080TI,      GigabyteVisionIds.RTX2080TI_GAMING_OC,    		 0x47, "GIGABYTE 2080TI Gaming OC"),
 			new GigabyteVisionIdentifier(Nvidia.RTX3060_GA104,  GigabyteVisionIds.RTX3060_GAMING_OC_12GB,        0x62, "GIGABYTE 3060 Gaming OC"),
-			new GigabyteVisionIdentifier(Nvidia.RTX3060_GA104,  GigabyteVisionIds.RTX3060_EAGLE_OC_REV2,         0x63, "GIGABYTE 3060 Eagle OC LHR (GA104)"), //Try this again on next build.
+			new GigabyteVisionIdentifier(Nvidia.RTX3060_GA104,  GigabyteVisionIds.RTX3060_EAGLE_OC_REV2,         0x32, "GIGABYTE 3060 Eagle OC LHR (GA104)"), //Try this again on next build.
 			new GigabyteVisionIdentifier(Nvidia.RTX3060TI,      GigabyteVisionIds.RTX3060TI_GAMING_OC_PRO,       0x62, "GIGABYTE 3060Ti Gaming OC Pro Rev 1.0"), //Confirmed.
 			new GigabyteVisionIdentifier(Nvidia.RTX3060TI_LHR,  GigabyteVisionIds.RTX3060TI_VISION_OC,           0x63, "GIGABYTE 3060 Vision OC LHR"), //Confirmed.
 			new GigabyteVisionIdentifier(Nvidia.RTX3070_LHR,    GigabyteVisionIds.RTX3070_EAGLE_OC,              0x63, "GIGABYTE 3070 Eagle OC LHR"),
+			new GigabyteVisionIdentifier(Nvidia.RTX3070,        GigabyteVisionIds.RTX3070_EAGLE_OC,              0x63, "GIGABYTE 3070 Eagle OC"),
 			new GigabyteVisionIdentifier(Nvidia.RTX3080_LHR,    GigabyteVisionIds.RTX3080_EAGLE_OC,    		 	 0x63, "GIGABYTE 3080 Eagle OC LHR"),
 			new GigabyteVisionIdentifier(Nvidia.RTX3090,        GigabyteVisionIds.RTX3090_VISION_OC_24G,         0x63, "GIGABYTE 3090 Vision OC"),
+			new GigabyteVisionIdentifier(Nvidia.RTX4080,        GigabyteVisionIds.RTX4080_AERO_OC_16G,           0x71, "GIGABYTE 4080 Aero OC"),
+			new GigabyteVisionIdentifier(Nvidia.RTX4080,        GigabyteVisionIds.RTX4080_EAGLE_OC,          	 0x71, "GIGABYTE 4080 Eagle OC"), //Confirmed
 		];
 	}
 }

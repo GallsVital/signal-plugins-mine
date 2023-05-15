@@ -27,14 +27,14 @@ export function Shutdown() {
 export function Render() {
 	// https://github.com/bparker06/msi-keyboard/blob/master/keyboard.cpp
 
-	let packet = [];
+	const packet = [];
 
 	packet[0] = 1;
 	packet[1] = 2;
 	packet[2] = 64;
 	packet[3] = 1;
 
-	let z1 = device.color(1, 0);
+	const z1 = device.color(1, 0);
 	packet[4] = z1[0];
 	packet[5] = z1[1];
 	packet[6] = z1[2];
@@ -43,7 +43,7 @@ export function Render() {
 
 	packet[3] = 2;
 
-	let z2 = device.color(4, 0);
+	const z2 = device.color(4, 0);
 	packet[4] = z2[0];
 	packet[5] = z2[1];
 	packet[6] = z2[2];
@@ -51,7 +51,7 @@ export function Render() {
 
 	packet[3] = 3;
 
-	let z3 = device.color(7, 0);
+	const z3 = device.color(7, 0);
 	packet[4] = z3[0];
 	packet[5] = z3[1];
 	packet[6] = z3[2];
@@ -74,3 +74,6 @@ export function Render() {
 	device.send_report(packet, 8);
 }
 
+export function Image() {
+	return "";
+}

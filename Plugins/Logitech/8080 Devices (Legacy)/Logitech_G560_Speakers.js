@@ -13,9 +13,9 @@ forcedColor:readonly
 */
 export function ControllableParameters() {
 	return [
-		{"property":"shutdownColor", "group":"lighting", "label":"Shutdown Color", "min":"0", "max":"360", "type":"color", "default":"009bde"},
+		{"property":"shutdownColor", "group":"lighting", "label":"Shutdown Color", "min":"0", "max":"360", "type":"color", "default":"#009bde"},
 		{"property":"LightingMode", "group":"lighting", "label":"Lighting Mode", "type":"combobox", "values":["Canvas", "Forced"], "default":"Canvas"},
-		{"property":"forcedColor", "group":"lighting", "label":"Forced Color", "min":"0", "max":"360", "type":"color", "default":"009bde"},
+		{"property":"forcedColor", "group":"lighting", "label":"Forced Color", "min":"0", "max":"360", "type":"color", "default":"#009bde"},
 	];
 }
 
@@ -109,7 +109,7 @@ function sendZone(zone, shutdown = false) //TODO Come back and fix this. It woul
 	packet[0x09] = 0x02;
 
 	device.write(packet, 20);
-	device.pause(5);
+	device.pause(15);
 }
 
 export function Render() {

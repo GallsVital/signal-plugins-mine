@@ -283,12 +283,14 @@ class EVGATuringDeviceIds{
 		this.RTX2070_SUPER_XC_HYBRID                    = 0x3178;
 		this.RTX2070_SUPER_FTW3                         = 0x3273;
 		this.RTX2070_SUPER_FTW3_ULTRA                   = 0x3277;
+		this.RTX2080_FTW3_HYBRID_GAMING					= 0x2284;
 		this.RTX2080_BLACK                              = 0x2081;
 		this.RTX2080_XC_BLACK                           = 0x2082;
 		this.RTX2080_XC_GAMING                          = 0x2182;
 		this.RTX2080_XC2_GAMING                         = 0x2187;
 		this.RTX2080_XC_ULTRA_GAMING                    = 0x2183;
 		this.RTX2080TI_BLACK_EDITION                    = 0x2281;
+		this.RTX2080TI_XC_ULTRA		                    = 0x2382;
 		this.RTX2080TI_XC_ULTRA_GAMING                  = 0x2383;
 		this.RTX2080TI_FTW3_ULTRA_HYBRID                = 0x2484;
 		this.RTX2080TI_FTW3_ULTRA                       = 0x2487;
@@ -341,7 +343,7 @@ class EVGATuringIdentifier extends GPUIdentifier{
 	}
 }
 
-export function BrandGPUList(){ return new EVGATuringGPUList(); }
+export function BrandGPUList(){ return new EVGATuringGPUList().devices; }
 
 class EVGATuringGPUList extends GPUList{
 	constructor(){
@@ -362,11 +364,13 @@ class EVGATuringGPUList extends GPUList{
 			new EVGATuringIdentifier(Nvidia.RTX2070S,           EVGATuringIds.RTX2070_SUPER_FTW3,               "EVGA RTX 2070 Super FTW3"),
 			new EVGATuringIdentifier(Nvidia.RTX2070S,           EVGATuringIds.RTX2070_SUPER_FTW3_ULTRA,         "EVGA RTX 2070 Super FTW3 Ultra"),
 			new EVGATuringIdentifier(Nvidia.RTX2080,            EVGATuringIds.RTX2080_BLACK,                    "EVGA RTX 2080 Black"),
+			new EVGATuringIdentifier(Nvidia.RTX2080_A,          EVGATuringIds.RTX2080_FTW3_HYBRID_GAMING,		"EVGA RTX 2080 FTW3 Hybrid Gaming"),
 			new EVGATuringIdentifier(Nvidia.RTX2080_A,          EVGATuringIds.RTX2080_XC_BLACK,                 "EVGA RTX 2080 XC Black"),
 			new EVGATuringIdentifier(Nvidia.RTX2080_A,          EVGATuringIds.RTX2080_XC_GAMING,                "EVGA RTX 2080 XC Gaming"),
 			new EVGATuringIdentifier(Nvidia.RTX2080_A,          EVGATuringIds.RTX2080_XC2_GAMING,               "EVGA RTX 2080 XC2 Gaming"),
 			new EVGATuringIdentifier(Nvidia.RTX2080_A,          EVGATuringIds.RTX2080_XC_ULTRA_GAMING,          "EVGA RTX 2080 XC Ultra Gaming"),
 			new EVGATuringIdentifier(Nvidia.RTX2080TI_TU102,    EVGATuringIds.RTX2080TI_BLACK_EDITION,          "EVGA RTX 2080Ti Black Edition"),
+			new EVGATuringIdentifier(Nvidia.RTX2080TI,          EVGATuringIds.RTX2080TI_XC_ULTRA,		        "EVGA RTX 2080Ti XC Ultra"),
 			new EVGATuringIdentifier(Nvidia.RTX2080TI,          EVGATuringIds.RTX2080TI_XC_ULTRA_GAMING,        "EVGA RTX 2080Ti XC Ultra Gaming"),
 			new EVGATuringIdentifier(Nvidia.RTX2080TI,          EVGATuringIds.RTX2080TI_FTW3_ULTRA_HYBRID,      "EVGA RTX 2080Ti FTW3 Ultra Hybrid"),
 			new EVGATuringIdentifier(Nvidia.RTX2080TI,          EVGATuringIds.RTX2080TI_FTW3_ULTRA,             "EVGA RTX 2080Ti FTW3 Ultra"),
@@ -376,7 +380,6 @@ class EVGATuringGPUList extends GPUList{
 			new EVGATuringIdentifier(Nvidia.RTX2080_SUPER,      EVGATuringIds.RTX2080_SUPER_FTW3_ULTRA,         "EVGA RTX 2080 Super FTW3 Ultra"),
 			new EVGATuringIdentifier(Nvidia.RTX2080_SUPER,      EVGATuringIds.RTX2080_SUPER_XC_HYBRID,          "EVGA RTX 2080 Super XC Hybrid"),
 			new EVGATuringIdentifier(Nvidia.RTX2080_SUPER,      EVGATuringIds.RTX2080_SUPER_XC_HYDRO_COPPER,    "EVGA RTX 2080 Super XC Hydro Copper"),
-			new EVGATuringIdentifier(Nvidia.RTX2080_SUPER,      EVGATuringIds.RTX2080_SUPER_FTW3_HYBRID_GAMING, "EVGA RTX 2080 Super FTW3 Hybrid Gaming"),
 			new EVGATuringIdentifier(Nvidia.RTX2080_SUPER,      EVGATuringIds.RTX2080_SUPER_FTW3_HYBRID_GAMING, "EVGA RTX 2080 Super FTW3 Hybrid Gaming"),
 
 			//new EVGATuringIdentifier(Nvidia.RTX2080_SUPER,      EVGATuringIds.RTX2080_SUPER_FTW3_HYDRO_COPPER,  "EVGA RTX 2080 Super FTW3 Hydro Copper"), // UNTESTED

@@ -13,9 +13,9 @@ forcedColor:readonly
 */
 export function ControllableParameters(){
 	return [
-		{"property":"shutdownColor", "group":"lighting", "label":"Shutdown Color", "min":"0", "max":"360", "type":"color", "default":"009bde"},
+		{"property":"shutdownColor", "group":"lighting", "label":"Shutdown Color", "min":"0", "max":"360", "type":"color", "default":"#009bde"},
 		{"property":"LightingMode", "group":"lighting", "label":"Lighting Mode", "type":"combobox", "values":["Canvas", "Forced"], "default":"Canvas"},
-		{"property":"forcedColor", "group":"lighting", "label":"Forced Color", "min":"0", "max":"360", "type":"color", "default":"009bde"},
+		{"property":"forcedColor", "group":"lighting", "label":"Forced Color", "min":"0", "max":"360", "type":"color", "default":"#009bde"},
 	];
 }
 const vKeys = [ 0 ];
@@ -74,13 +74,13 @@ function PollConnectionStatus()//Overcomplicated logic to know when we reconnect
 }
 
 function CheckConnectionStatus() {
-	let status = PollConnectionStatus();
+	const status = PollConnectionStatus();
 
 	if(status) {
 		device.log("Headset Reconnected");
 		device.pause(20000);
 
-		let packet = device.read([0x00], 65);
+		const packet = device.read([0x00], 65);
 
 		Initialize();
 	}
@@ -95,7 +95,7 @@ export function Initialize() {
 	device.write([0x00, 0xFF, 0x01], 64);
 	device.pause(10);
 
-	let packet = device.read([0x00], 65);
+	const packet = device.read([0x00], 65);
 }
 export function Render() {
 	sendZone();
@@ -129,8 +129,8 @@ function PollBattery()//This refuses to work properly for like the first 5-7 rea
 	device.pause(10);
 	packet = device.read(packet, 65);
 
-	let Battery = packet[5];
-	let Batterylevel = BatteryDict[Battery];
+	const Battery = packet[5];
+	const Batterylevel = BatteryDict[Battery];
 
 	if(Batterylevel == -1) {
 		device.log("Battery Status Invalid. Repolling in 10 seconds.");
@@ -142,14 +142,14 @@ function PollBattery()//This refuses to work properly for like the first 5-7 rea
 }
 
 function sendZone(shutdown = false) {
-	let packet = [];
+	const packet = [];
 	packet[0] = 0x00;
 	packet[1] = 0xFF;
 	packet[2] = 0x04;
 
 	for(let iIdx = 0; iIdx < vKeys.length; iIdx++) {
-		let iPxX = vLedPositions[iIdx][0];
-		let iPxY = vLedPositions[iIdx][1];
+		const iPxX = vLedPositions[iIdx][0];
+		const iPxY = vLedPositions[iIdx][1];
 		var col;
 
 		if(shutdown){
@@ -169,8 +169,8 @@ function sendZone(shutdown = false) {
 }
 
 function hexToRgb(hex) {
-	let result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
-	let colors = [];
+	const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+	const colors = [];
 	colors[0] = parseInt(result[1], 16);
 	colors[1] = parseInt(result[2], 16);
 	colors[2] = parseInt(result[3], 16);

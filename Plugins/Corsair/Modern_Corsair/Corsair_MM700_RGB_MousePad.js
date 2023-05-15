@@ -1,6 +1,6 @@
 export function Name() { return "Corsair MM700 RGB"; }
 export function VendorId() { return 0x1b1c; }
-export function ProductId() { return 0x1B9B; }
+export function ProductId() { return [0x1B9B, 0X1BC9]; }
 export function Documentation(){ return "troubleshooting/corsair"; }
 export function Publisher() { return "WhirlwindFX"; }
 export function Size() { return [10, 3]; }
@@ -13,9 +13,9 @@ forcedColor:readonly
 */
 export function ControllableParameters(){
 	return [
-		{"property":"shutdownColor", "group":"lighting", "label":"Shutdown Color", "min":"0", "max":"360", "type":"color", "default":"009bde"},
+		{"property":"shutdownColor", "group":"lighting", "label":"Shutdown Color", "min":"0", "max":"360", "type":"color", "default":"#009bde"},
 		{"property":"LightingMode", "group":"lighting", "label":"Lighting Mode", "type":"combobox", "values":["Canvas", "Forced"], "default":"Canvas"},
-		{"property":"forcedColor", "group":"lighting", "label":"Forced Color", "min":"0", "max":"360", "type":"color", "default":"009bde"},
+		{"property":"forcedColor", "group":"lighting", "label":"Forced Color", "min":"0", "max":"360", "type":"color", "default":"#009bde"},
 	];
 }
 

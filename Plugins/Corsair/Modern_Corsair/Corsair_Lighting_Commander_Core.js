@@ -29,7 +29,7 @@ export function UsesCorsairMutex(){ return true; }
 
 export function DefaultComponentBrand() { return "Corsair"; }
 export function Documentation(){ return "troubleshooting/corsair"; }
-export function SystemResumeDelay() { return 9000; }
+
 /** @type {ValidateExport} */
 export function Validate(endpoint) {
 	return endpoint.interface === 0x0000 && endpoint.usage === 0x0001 && endpoint.usage_page === 0xFF42;
@@ -293,7 +293,7 @@ function FetchPumpConnectionStatus(){
 		device.log("Pump is Disconnected!", {toFile: true});
 
 		return false;
-	}else if(FanData[0] === 7){
+	}else if(FanData[0] === 7 || FanData[0] === 1){ //Added State 1 in 2.2.30. Fixed a user that had it working properly in ICUE, but not Signal.
 		device.log("Pump is Connected! Creating Subdevice...", {toFile: true});
 
 		return true;
@@ -672,7 +672,7 @@ function SendCoolingdata() {
 
 		// Prevent pump from going below 60%
 		// Doing this on newer models will put the device into a failsafe mode until power cycled.
-		if(fan === 0){
+		if(fan === 0 && PumpConnected){ //PumpConnected is a check to handle users with a CoCo but no Capellix. Needs Thorough testing.
 			fanLevel = Math.max(60, fanLevel);
 		}
 

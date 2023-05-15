@@ -14,14 +14,14 @@ forcedColor:readonly
 */
 export function ControllableParameters(){
 	return [
-		{"property":"shutdownColor", "group":"lighting", "label":"Shutdown Color", "min":"0", "max":"360", "type":"color", "default":"009bde"},
+		{"property":"shutdownColor", "group":"lighting", "label":"Shutdown Color", "min":"0", "max":"360", "type":"color", "default":"#009bde"},
 		{"property":"LightingMode", "group":"lighting", "label":"Lighting Mode", "type":"combobox", "values":["Canvas", "Forced"], "default":"Canvas"},
-		{"property":"forcedColor", "group":"lighting", "label":"Forced Color", "min":"0", "max":"360", "type":"color", "default":"009bde"},
+		{"property":"forcedColor", "group":"lighting", "label":"Forced Color", "min":"0", "max":"360", "type":"color", "default":"#009bde"},
 	];
 }
 
 function GetReport(cmd_class, cmd_id, size) {
-	let report = new Array(91).fill(0);
+	const report = new Array(91).fill(0);
 	report[0] = 0;
 	report[1] = 0x00;
 	report[2] = 0xFF;
@@ -46,8 +46,8 @@ function CalculateCrc(report) {
 }
 
 function hexToRgb(hex) {
-	let result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
-	let colors = [];
+	const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+	const colors = [];
 	colors[0] = parseInt(result[1], 16);
 	colors[1] = parseInt(result[2], 16);
 	colors[2] = parseInt(result[3], 16);
@@ -55,7 +55,7 @@ function hexToRgb(hex) {
 	return colors;
 }
 
-let vLedNames = [
+const vLedNames = [
 	"Key 01", "Key 02", "Key 03", "Key 04", "Key 05",
 	"Key 06", "Key 07", "Key 08", "Key 09", "Key 10",
 	"Key 11", "Key 12", "Key 13", "Key 14", "Key 15",
@@ -63,7 +63,7 @@ let vLedNames = [
 	"Key 20",
 ];
 
-let vKeymap = [
+const vKeymap = [
 	0, 1, 2, 3, 4,
 	5, 6, 7, 8, 9,
 	10, 11, 12, 13, 14,
@@ -71,7 +71,7 @@ let vKeymap = [
 	20
 ];
 
-let vLedPositions = [
+const vLedPositions = [
 	[0, 0], [1, 0], [2, 0], [3, 0], [4, 0],
 	[0, 1], [1, 1], [2, 1], [3, 1], [4, 1],
 	[0, 2], [1, 2], [2, 2], [3, 2], [4, 2],
@@ -79,7 +79,7 @@ let vLedPositions = [
 	[5, 6],
 ];
 
-let vRowKeys = [
+const vRowKeys = [
 	[0, 1, 2, 3, 4],
 	[5, 6, 7, 8, 9],
 	[10, 11, 12, 13, 14],
@@ -95,7 +95,7 @@ export function LedPositions() {
 }
 
 function EnableSoftwareControl() {
-	let report = GetReport(0x0F, 0x03, 0x47);
+	const report = GetReport(0x0F, 0x03, 0x47);
 	report[2] = 0x3F;
 	report[11] = 0;
 	report[13] = 15;
@@ -112,7 +112,7 @@ export function Initialize() {
 }
 
 function SendPacket(shutdown = false) {
-	let packet = [];
+	const packet = [];
 	packet[0] = 0x00;
 	packet[1] = 0x00;
 	packet[2] = 0x1F;
@@ -128,8 +128,8 @@ function SendPacket(shutdown = false) {
 		packet[11] = iRow;
 
 		for(let iRowKey = 0; iRowKey < vRowKeys[iRow].length; iRowKey++) {
-			let iPxX = vLedPositions[vRowKeys[iRow][iRowKey]][0];
-			let iPxY = vLedPositions[vRowKeys[iRow][iRowKey]][1];
+			const iPxX = vLedPositions[vRowKeys[iRow][iRowKey]][0];
+			const iPxY = vLedPositions[vRowKeys[iRow][iRowKey]][1];
 			var color;
 
 			if(shutdown){
@@ -139,7 +139,7 @@ function SendPacket(shutdown = false) {
 			}else{
 				color = device.color(iPxX, iPxY);
 			}
-			let iLedIdx = (iRowKey*3) + 14;
+			const iLedIdx = (iRowKey*3) + 14;
 			packet[iLedIdx] = color[0];
 			packet[iLedIdx+1] = color[1];
 			packet[iLedIdx+2] = color[2];

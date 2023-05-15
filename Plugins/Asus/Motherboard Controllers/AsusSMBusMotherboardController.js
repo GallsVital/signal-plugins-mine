@@ -24,7 +24,7 @@ export function ControllableParameters() {
 export function Scan(bus) {
 
 	const FoundAddresses = [];
-	const addys = [0x40, 0x4E, 0x4F];
+	const addys = [0x39, 0x40, 0x4E, 0x4F, 0x66];
 
 	const AsusSMBusInterface = new AsusSMBusInterfaceFree(bus);
 	const AsusMobo = new AsusSMBus(AsusSMBusInterface);
@@ -32,7 +32,7 @@ export function Scan(bus) {
 	  // Skip any non AMD / Nuvoton Busses
 
 	for(const addr of addys) {
-		if(!bus.IsAMDBus && !bus.IsNuvotonBus()){return;}
+		if(!bus.IsAMDBus() && !bus.IsNuvotonBus()){return;}
 
 		const result = bus.WriteQuick(addr);
 
@@ -192,13 +192,10 @@ class AsusSMBus {
         {
         	"LED-0116"        : "V1",
         	"AUMA0-E8K4-0101" : "V1",
-        	"AUDA0-E6K5-0101" : "V2",
         	"AUMA0-E6K5-0104" : "V2",
         	"AUMA0-E6K5-0105" : "V2",
         	"AUMA0-E6K5-0106" : "V2",
         	"AUMA0-E6K5-0107" : "GPU V2",
-        	"DIMM_LED-0102"   : "V1",
-        	"DIMM_LED-0103"   : "V1"
         };
 	}
 
@@ -326,9 +323,6 @@ class AsusAuraSMBusController {
         	"AUMA0-E6K5-0104" : "V2",
         	"AUMA0-E6K5-0105" : "V2",
         	"AUMA0-E6K5-0106" : "V2",
-        	"AUMA0-E6K5-0107" : "GPU V2",
-        	"DIMM_LED-0102"   : "V1",
-        	"DIMM_LED-0103"   : "V1"
         };
 		//Map of zones to their respective names
 		this.motherboardZones =
@@ -425,11 +419,27 @@ class AsusAuraSMBusController {
 		deviceProtocolVersion = this.deviceNameDict[deviceName];
 		configTable = this.getDeviceConfigTable();
 		deviceLEDCount = configTable[2];
+
+		for(let attempts = 0; attempts < 20; attempts++) {
+			if(deviceName in this.deviceNameDict && deviceLEDCount < 15) {
+				device.log(`Init hit on attempt: ${attempts}.`);
+				break;
+			} else {
+				deviceName = this.getDeviceName();
+				deviceProtocolVersion = this.deviceNameDict[deviceName];
+
+				configTable = this.getDeviceConfigTable();
+				device.log(configTable);
+
+				deviceLEDCount = configTable[2];
+			}
+		}
+
+		if(deviceName in this.deviceNameDict) { this.ValidDeviceID = true; } else { device.log("Invalid Model Returned, Aborting Render Loop"); }
+
 		device.log("Device Type: " + deviceName, {toFile: true});
 		device.log("Device Protocol Version: " + deviceProtocolVersion, {toFile: true});
 		device.log("Device Onboard LED Count: " + deviceLEDCount, {toFile: true});
-
-		if(deviceName in this.deviceNameDict) { this.ValidDeviceID = true; } else { device.log("Invalid Model Returned, Aborting Render Loop"); }
 	}
 
 	getDeviceName() {

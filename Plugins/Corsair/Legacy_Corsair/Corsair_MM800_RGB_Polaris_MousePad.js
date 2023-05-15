@@ -12,36 +12,36 @@ forcedColor:readonly
 */
 export function ControllableParameters(){
 	return [
-		{"property":"shutdownColor", "group":"lighting", "label":"Shutdown Color", "min":"0", "max":"360", "type":"color", "default":"009bde"},
+		{"property":"shutdownColor", "group":"lighting", "label":"Shutdown Color", "min":"0", "max":"360", "type":"color", "default":"#009bde"},
 		{"property":"LightingMode", "group":"lighting", "label":"Lighting Mode", "type":"combobox", "values":["Canvas", "Forced"], "default":"Canvas"},
-		{"property":"forcedColor", "group":"lighting", "label":"Forced Color", "min":"0", "max":"360", "type":"color", "default":"009bde"},
+		{"property":"forcedColor", "group":"lighting", "label":"Forced Color", "min":"0", "max":"360", "type":"color", "default":"#009bde"},
 	];
 }
 
 export function Documentation(){ return "troubleshooting/corsair"; }
 
 function hexToRgb(hex) {
-	let result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
-	let colors = [];
+	const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+	const colors = [];
 	colors[0] = parseInt(result[1], 16);
 	colors[1] = parseInt(result[2], 16);
 	colors[2] = parseInt(result[3], 16);
 
 	return colors;
 }
-let CORSAIR_COMMAND_WRITE       = 0x07;
-let CORSAIR_COMMAND_READ        = 0x0E;
-let CORSAIR_COMMAND_STREAM      = 0x7F;
-let CORSAIR_PROPERTY_LIGHTING_CONTROL           = 0x05;
-let CORSAIR_LIGHTING_CONTROL_HARDWARE           = 0x01;
-let CORSAIR_LIGHTING_CONTROL_SOFTWARE           = 0x02;
-let CORSAIR_PROPERTY_SUBMIT_KEYBOARD_COLOR_24   = 0x28;
-let CORSAIR_PROPERTY_SPECIAL_FUNCTION = 0x04;
-let CORSAIR_PROPERTY_SUBMIT_MOUSE_COLOR         = 0x22;
+const CORSAIR_COMMAND_WRITE       = 0x07;
+const CORSAIR_COMMAND_READ        = 0x0E;
+const CORSAIR_COMMAND_STREAM      = 0x7F;
+const CORSAIR_PROPERTY_LIGHTING_CONTROL           = 0x05;
+const CORSAIR_LIGHTING_CONTROL_HARDWARE           = 0x01;
+const CORSAIR_LIGHTING_CONTROL_SOFTWARE           = 0x02;
+const CORSAIR_PROPERTY_SUBMIT_KEYBOARD_COLOR_24   = 0x28;
+const CORSAIR_PROPERTY_SPECIAL_FUNCTION = 0x04;
+const CORSAIR_PROPERTY_SUBMIT_MOUSE_COLOR         = 0x22;
 
 
 export function Initialize() {
-	let packet2 = [];
+	const packet2 = [];
 	packet2[0x00]           = 0x00;
 	packet2[0x01]           = CORSAIR_COMMAND_WRITE;
 	packet2[0x02]           = CORSAIR_PROPERTY_LIGHTING_CONTROL;
@@ -51,7 +51,7 @@ export function Initialize() {
 
 	device.write(packet2, 65);
 
-	let packet = [];
+	const packet = [];
 	packet[0x00]           = 0x00;
 	packet[0x01]           = CORSAIR_COMMAND_WRITE;
 	packet[0x02]           = CORSAIR_PROPERTY_SPECIAL_FUNCTION;
@@ -59,7 +59,7 @@ export function Initialize() {
 	packet[0x05]   = 0x00;
 	device.write(packet, 65);
 
-	let packet1 = [];
+	const packet1 = [];
 	packet1[0x00]   = 0x00;
 	packet1[0x01]   = 0x07;
 	packet1[0x02]   = 0x22;
@@ -71,7 +71,7 @@ export function Initialize() {
 
 
 export function Shutdown() {
-	let packet = [];
+	const packet = [];
 	packet[0x00]   = 0x00;
 	packet[0x01]   = 0x07;
 	packet[0x02]   = 0x22;
@@ -81,8 +81,8 @@ export function Shutdown() {
 
 	//vKeys.length
 	for(let iIdx = 0; iIdx < vKeyPositions.length; iIdx++) {
-		let iPxX = vKeyPositions[iIdx][0];
-		let iPxY = vKeyPositions[iIdx][1];
+		const iPxX = vKeyPositions[iIdx][0];
+		const iPxY = vKeyPositions[iIdx][1];
 		packet[0x05+iIdx*3] = 255;
 		packet[0x06+iIdx*3 ] = 0;
 		packet[0x07+iIdx*3 ] = 0;
@@ -93,7 +93,7 @@ export function Shutdown() {
 }
 
 
-let vKeyNames = [
+const vKeyNames = [
 	"Led 1", "Led 2", "Led 3", "Led 4", "Led 5", "Led 6", "Led 7", "Led 8", "Led 9", "Led 10", "Led 11", "Led 12", "Led 13", "Led 14", "Led 15"
 ];
 
@@ -120,7 +120,7 @@ export function Render() {
 function sendColors(shutdown = false){
 
 
-	let packet = [];
+	const packet = [];
 	packet[0x00]   = 0x00;
 	packet[0x01]   = 0x07;
 	packet[0x02]   = 0x22;
@@ -130,8 +130,8 @@ function sendColors(shutdown = false){
 
 	//vKeys.length
 	for(let iIdx = 0; iIdx < vKeyPositions.length; iIdx++) {
-		let iPxX = vKeyPositions[iIdx][0];
-		let iPxY = vKeyPositions[iIdx][1];
+		const iPxX = vKeyPositions[iIdx][0];
+		const iPxY = vKeyPositions[iIdx][1];
 		var mxPxColor;
 
 		if(shutdown){

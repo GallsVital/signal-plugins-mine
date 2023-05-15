@@ -18,9 +18,9 @@ mousePolling:readonly
 */
 export function ControllableParameters(){
 	return [
-		{"property":"shutdownColor", "group":"lighting", "label":"Shutdown Color", "min":"0", "max":"360", "type":"color", "default":"009bde"},
+		{"property":"shutdownColor", "group":"lighting", "label":"Shutdown Color", "min":"0", "max":"360", "type":"color", "default":"#009bde"},
 		{"property":"LightingMode", "group":"lighting", "label":"Lighting Mode", "type":"combobox", "values":["Grid", "Forced"], "default":"Grid"},
-		{"property":"forcedColor", "group":"lighting", "label":"Forced Color", "min":"0", "max":"360", "type":"color", "default":"009bde"},
+		{"property":"forcedColor", "group":"lighting", "label":"Forced Color", "min":"0", "max":"360", "type":"color", "default":"#009bde"},
 		{"property":"SettingControl", "group":"mouse", "label":"Enable Setting Control", "type":"boolean", "default":"false"},
 		{"property":"dpi1", "group":"mouse", "label":"DPI 1", "step":"50", "type":"number", "min":"400", "max":"12000", "default":"800"},
 		{"property":"dpi2", "group":"mouse", "label":"DPI 2", "step":"50", "type":"number", "min":"400", "max":"12000", "default":"1200"},
@@ -30,21 +30,21 @@ export function ControllableParameters(){
 
 	];
 }
-let pollingDict = {
+const pollingDict = {
 	"125Hz" : 8,
 	"250Hz" : 4,
 	"500Hz" : 2,
 	"1000Hz": 1
 };
-let config = [
+const config = [
 	0x04, 0x11
 ];
 
-let vLedNames = [
+const vLedNames = [
 	"Sides", "Logo"
 ];
 
-let vLedPositions = [
+const vLedPositions = [
 	[1, 1], [1, 1]
 ];
 
@@ -70,8 +70,8 @@ export function Shutdown() {
 
 
 function sendReportString(string, size){
-	let packet= [];
-	let data = string.split(' ');
+	const packet= [];
+	const data = string.split(' ');
 
 	for(let i = 0; i < data.length; i++){
 		packet[parseInt(i, 16)] = parseInt(data[i], 16);//.toString(16)
@@ -110,7 +110,7 @@ function setDpi(){
 	savedDpi4 = dpi4;
 	savedPollingRate = pollingDict[mousePolling];
 
-	let packet = [];
+	const packet = [];
 	packet[0] = 0x00;
 	packet[1] = 0x00;
 	packet[2] = 0x00;
@@ -149,7 +149,7 @@ function setDpi(){
 
 function sendColors(shutdown = false){
 
-	let packet = [];
+	const packet = [];
 	packet[0] = 0x00;
 	packet[1] = 0x00;
 	packet[2] = 0x00;
@@ -165,8 +165,8 @@ function sendColors(shutdown = false){
 
 
 	for(let iIdx = 0; iIdx < 1; iIdx++) {
-		let iPxX = vLedPositions[iIdx][0];
-		let iPxY = vLedPositions[iIdx][1];
+		const iPxX = vLedPositions[iIdx][0];
+		const iPxY = vLedPositions[iIdx][1];
 		var mxPxColor;
 
 		if(shutdown){
@@ -191,8 +191,8 @@ function sendColors(shutdown = false){
 }
 
 function hexToRgb(hex) {
-	let result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
-	let colors = [];
+	const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+	const colors = [];
 	colors[0] = parseInt(result[1], 16);
 	colors[1] = parseInt(result[2], 16);
 	colors[2] = parseInt(result[3], 16);

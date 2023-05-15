@@ -14,9 +14,9 @@ forcedColor:readonly
 */
 export function ControllableParameters(){
 	return [
-		{"property":"shutdownColor", "group":"lighting", "label":"Shutdown Color", "min":"0", "max":"360", "type":"color", "default":"009bde"},
+		{"property":"shutdownColor", "group":"lighting", "label":"Shutdown Color", "min":"0", "max":"360", "type":"color", "default":"#009bde"},
 		{"property":"LightingMode", "group":"lighting", "label":"Lighting Mode", "type":"combobox", "values":["Canvas", "Forced"], "default":"Canvas"},
-		{"property":"forcedColor", "group":"lighting", "label":"Forced Color", "min":"0", "max":"360", "type":"color", "default":"009bde"},
+		{"property":"forcedColor", "group":"lighting", "label":"Forced Color", "min":"0", "max":"360", "type":"color", "default":"#009bde"},
 	];
 }
 
@@ -26,7 +26,7 @@ export function SupportsSubdevices(){ return true; }
 
 const DeviceMaxLedLimit = 240;
 
-let ChannelArray = [
+const ChannelArray = [
 	["Channel 1", 120],
 	["Channel 2", 120],
 	["Channel 3", 120],
@@ -51,7 +51,7 @@ export function LedPositions() {
 export function Initialize() {
 	device.set_endpoint(0, 1, 0x000C, 0);
 
-	let packet = new Array(91).fill(0);
+	const packet = new Array(91).fill(0);
 
 	packet[2] = 0x1F;
 	packet[6] = 0x01;
@@ -86,7 +86,7 @@ export function Initialize() {
 export function Shutdown() {
 	device.set_endpoint(0, 1, 0x000C, 0);
 
-	let packet = new Array(91).fill(0);
+	const packet = new Array(91).fill(0);
 
 	packet[2] = 0x1F;
 	packet[6] = 0x01;
@@ -98,7 +98,7 @@ export function Shutdown() {
 
 function SendChannel(Channel, shutdown = false) {
 	let ChannelLedCount = device.channel(ChannelArray[Channel][0]).ledCount;
-	let componentChannel = device.channel(ChannelArray[Channel][0]);
+	const componentChannel = device.channel(ChannelArray[Channel][0]);
 
 	let RGBData = [];
 
@@ -109,7 +109,7 @@ function SendChannel(Channel, shutdown = false) {
 	} else if(componentChannel.shouldPulseColors()) {
 		ChannelLedCount = 80;
 
-		let pulseColor = device.getChannelPulseColor(ChannelArray[Channel][0], ChannelLedCount);
+		const pulseColor = device.getChannelPulseColor(ChannelArray[Channel][0], ChannelLedCount);
 		RGBData = device.createColorArray(pulseColor, ChannelLedCount, "Inline");
 	} else {
 		RGBData = device.channel(ChannelArray[Channel][0]).getColors("Inline");

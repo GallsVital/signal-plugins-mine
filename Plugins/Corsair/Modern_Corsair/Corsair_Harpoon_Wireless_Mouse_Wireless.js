@@ -1,13 +1,13 @@
 
-let CORSAIR_COMMAND_WRITE       = 0x07;
-let CORSAIR_COMMAND_READ        = 0x0E;
-let CORSAIR_COMMAND_STREAM      = 0x7F;
+const CORSAIR_COMMAND_WRITE       = 0x07;
+const CORSAIR_COMMAND_READ        = 0x0E;
+const CORSAIR_COMMAND_STREAM      = 0x7F;
 
-let CORSAIR_LIGHTING_CONTROL_HARDWARE           = 0x01;
-let CORSAIR_LIGHTING_CONTROL_SOFTWARE           = 0x02;
+const CORSAIR_LIGHTING_CONTROL_HARDWARE           = 0x01;
+const CORSAIR_LIGHTING_CONTROL_SOFTWARE           = 0x02;
 
-let CORSAIR_PROPERTY_SPECIAL_FUNCTION = 0x04;
-let CORSAIR_PROPERTY_SUBMIT_MOUSE_COLOR         = 0x22;
+const CORSAIR_PROPERTY_SPECIAL_FUNCTION = 0x04;
+const CORSAIR_PROPERTY_SUBMIT_MOUSE_COLOR         = 0x22;
 
 
 export function Name() { return "Corsair Harpoon Wireless - Wireless"; }
@@ -26,9 +26,9 @@ dpi1:readonly
 */
 export function ControllableParameters(){
 	return [
-		{"property":"shutdownColor", "group":"lighting", "label":"Shutdown Color", "min":"0", "max":"360", "type":"color", "default":"009bde"},
+		{"property":"shutdownColor", "group":"lighting", "label":"Shutdown Color", "min":"0", "max":"360", "type":"color", "default":"#009bde"},
 		{"property":"LightingMode", "group":"lighting", "label":"Lighting Mode", "type":"combobox", "values":["Canvas", "Forced"], "default":"Canvas"},
-		{"property":"forcedColor", "group":"lighting", "label":"Forced Color", "min":"0", "max":"360", "type":"color", "default":"009bde"},
+		{"property":"forcedColor", "group":"lighting", "label":"Forced Color", "min":"0", "max":"360", "type":"color", "default":"#009bde"},
 		{"property":"DpiControl", "group":"mouse", "label":"Enable Dpi Control", "type":"boolean", "default":"false"},
 		{"property":"dpi1", "group":"mouse", "label":"DPI", "step":"50", "type":"number", "min":"200", "max":"12400", "default":"800"},
 	];
@@ -37,8 +37,8 @@ export function ControllableParameters(){
 export function Documentation(){ return "troubleshooting/corsair"; }
 
 function hexToRgb(hex) {
-	let result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
-	let colors = [];
+	const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+	const colors = [];
 	colors[0] = parseInt(result[1], 16);
 	colors[1] = parseInt(result[2], 16);
 	colors[2] = parseInt(result[3], 16);
@@ -47,9 +47,9 @@ function hexToRgb(hex) {
 }
 
 let savedDpi1 = 0;
-let vLedNames = ["Dpi Zone", "Logo Zone", ];
+const vLedNames = ["Dpi Zone", "Logo Zone", ];
 
-let vLedPositions = [[1, 0], [1, 2]
+const vLedPositions = [[1, 0], [1, 2]
 ];
 
 export function LedNames() {
@@ -61,8 +61,8 @@ export function LedPositions() {
 }
 
 function sendPacketString(string, size){
-	let packet= [];
-	let data = string.split(' ');
+	const packet= [];
+	const data = string.split(' ');
 
 	for(let i = 0; i < data.length; i++){
 		packet[parseInt(i, 16)] = parseInt(data[i], 16);//.toString(16)
@@ -86,7 +86,7 @@ export function Initialize() {
 
 function sendColors(shutdown = false){
 
-	let packet = [];
+	const packet = [];
 	packet[0x00]   = 0x00;
 	packet[0x01]   = 0x09;
 	packet[0x02]   = 0x06;
@@ -95,8 +95,8 @@ function sendColors(shutdown = false){
 
 
 	for(let zone_idx = 0; zone_idx < vLedPositions.length; zone_idx++) {
-		let iX = vLedPositions[zone_idx][0];
-		let iY = vLedPositions[zone_idx][1];
+		const iX = vLedPositions[zone_idx][0];
+		const iY = vLedPositions[zone_idx][1];
 		var col;
 
 		if(shutdown){
@@ -128,7 +128,7 @@ function setDpi(dpi){
 
 	savedDpi1 = dpi;
 
-	let RoundedDpi = Math.round(dpi/100)*100;
+	const RoundedDpi = Math.round(dpi/100)*100;
 	var packet = [];
 	packet[0] = 0x00;
 	packet[1] = 0x98;

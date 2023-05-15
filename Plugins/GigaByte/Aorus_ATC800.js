@@ -17,9 +17,9 @@ tempRpmIndicator:readonly
 */
 export function ControllableParameters() {
 	return [
-		{ "property": "shutdownColor", "group": "lighting", "label": "Shutdown Color", "min": "0", "max": "360", "type": "color", "default": "009bde" },
+		{ "property": "shutdownColor", "group": "lighting", "label": "Shutdown Color", "min": "0", "max": "360", "type": "color", "default":"#009bde" },
 		{ "property": "LightingMode", "group": "lighting", "label": "Lighting Mode", "type": "combobox", "values": ["Forced Static", "Static", "Pulse", "Flash", "Double flash", "Color cycle", "Color shift", "Rainbow loop", "Gradient", "Tricolor", "Wave", "Radiate"], "default": "Static" },
-		{ "property": "forcedColor", "group": "lighting", "label": "Forced Color", "min": "0", "max": "360", "type": "color", "default": "009bde" },
+		{ "property": "forcedColor", "group": "lighting", "label": "Forced Color", "min": "0", "max": "360", "type": "color", "default":"#009bde" },
 		{ "property": "speed", "group": "lighting", "label": "Speed", "step": "1", "type": "number", "min": "0", "max": "7", "default": "2" },
 		{ "property": "tempRpmIndicator", "group": "lighting", "label": "Enable CPU Temp/RPM Indicator", "type": "boolean", "default": "0" }
 	];

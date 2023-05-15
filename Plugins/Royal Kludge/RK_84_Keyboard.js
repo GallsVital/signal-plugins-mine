@@ -1,7 +1,7 @@
 export function Name() { return "Royal Kludge RK84"; }
 export function Publisher() { return "Mizzen"; }
 export function VendorId() { return  0x258a;}  //Device's USB Vendor Id in Hex
-export function ProductId() { return [0x005d, 0x0059, 0x00c8];} //Device's USB Product Id in Hex
+export function ProductId() { return [0x005d, 0x0059, 0x00c8, 0x010D];} //Device's USB Product Id in Hex
 export function Size() { return [31, 11]; }
 export function DefaultPosition(){return [0, 5];}
 export function DefaultScale(){return 1.5;}
@@ -12,9 +12,9 @@ forcedColor:readonly
 */
 export function ControllableParameters(){
 	return [
-		{"property":"shutdownColor", "label":"Shutdown Color", "min":"0", "max":"360", "type":"color", "default":"009bde"},
+		{"property":"shutdownColor", "label":"Shutdown Color", "min":"0", "max":"360", "type":"color", "default":"#009bde"},
 		{"property":"LightingMode", "label":"Lighting Mode", "type":"combobox", "values":["Canvas", "Forced"], "default":"Canvas"},
-		{"property":"forcedColor", "label":"Forced Color", "min":"0", "max":"360", "type":"color", "default":"009bde"},
+		{"property":"forcedColor", "label":"Forced Color", "min":"0", "max":"360", "type":"color", "default":"#009bde"},
 	];
 }
 
@@ -99,8 +99,8 @@ function StreamPacket(zone, data) {
 	packet[0x02] = zone;
 	packet = packet.concat(data);
 
-	device.send_report(packet, 65);
 	device.pause(1);
+	device.send_report(packet, 65);
 }
 
 function SendPacket(shutdown = false) {

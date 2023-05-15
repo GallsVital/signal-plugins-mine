@@ -15,14 +15,14 @@ forcedColor:readonly
 */
 export function ControllableParameters(){
 	return [
-		{"property":"shutdownColor", "group":"lighting", "label":"Shutdown Color", "min":"0", "max":"360", "type":"color", "default":"009bde"},
+		{"property":"shutdownColor", "group":"lighting", "label":"Shutdown Color", "min":"0", "max":"360", "type":"color", "default":"#009bde"},
 		{"property":"LightingMode", "group":"lighting", "label":"Lighting Mode", "type":"combobox", "values":["Canvas", "Forced"], "default":"Canvas"},
-		{"property":"forcedColor", "group":"lighting", "label":"Forced Color", "min":"0", "max":"360", "type":"color", "default":"009bde"},
+		{"property":"forcedColor", "group":"lighting", "label":"Forced Color", "min":"0", "max":"360", "type":"color", "default":"#009bde"},
 
 	];
 }
 
-let vLedNames =
+const vLedNames =
 [
 	"MediaPreviousTrack", "MediaPlayPause", "MediaNextTrack", "VOLUME_MUTE",
 	"LightBar Led 1", "LightBar Led 2", "LightBar Led 3", "LightBar Led 4", "LightBar Led 5", "LightBar Led 6", "LightBar Led 7", "LightBar Led 8", "LightBar Led 9", "LightBar Led 10",
@@ -37,7 +37,7 @@ let vLedNames =
 	"Left Ctrl", "Left Win", "Left Alt", "Space", "Right Alt", "Fn", "Menu", "Right Ctrl",  "Left Arrow", "Down Arrow", "Right Arrow", "Num 0", "Num ."                       //13
 ];
 
-let vLedPositions =
+const vLedPositions =
 [                                                                                                                                     [15, 0], [16, 0], [17, 0], [18, 0],
 	[0, 1], [1, 1], [2, 1],        [4, 1], [5, 1], [6, 1],        [8, 1], [9, 1], [10, 1], [11, 1], [12, 1], [13, 1],   [14, 1], [15, 1], [16, 1],   [17, 1], [18, 1], [19, 1],
 
@@ -49,7 +49,7 @@ let vLedPositions =
 	[0, 7], [1, 7], [2, 7],                      [6, 7],                      [10, 7], [11, 7], [12, 7], [13, 7],    [14, 7], [15, 7], [16, 7],   [17, 7],         [19, 7],               // 13
 ];
 
-let vKeymap = 
+const vKeymap =
 [
 	//Media Keys 115
 	168, 169, 170, 171,
@@ -65,64 +65,51 @@ let vKeymap =
 	9, 25,  41,         73,                 121,     137,  17,  123,  19, 35, 51,  129,      145,
 ];
 
-export function LedNames() 
-{
+export function LedNames() {
 	return vLedNames;
 }
 
-export function LedPositions() 
-{
+export function LedPositions() {
 	return vLedPositions;
 }
 
-export function Initialize() 
-{
+export function Initialize() {
 
 }
 
-export function Render() 
-{
+export function Render() {
 	sendColors();
 	SendBar();
 }
 
-export function Shutdown() 
-{
+export function Shutdown() {
 	sendColors(true);
 }
 
-function sendColorchannel(channel, data)
-{
-	let packet = [0x07, 0x16, channel, 0xA0];
+function sendColorchannel(channel, data) {
+	const packet = [0x07, 0x16, channel, 0xA0];
 	packet.push(...data);
 
 	device.send_report(packet, 264);
 	device.pause(1);
 }
 
-function sendColors(shutdown = false) 
-{
+function sendColors(shutdown = false) {
 	//get color data
-	let red = new Array(106).fill(0);
-	let green = new Array(106).fill(0);
-	let blue = new Array(106).fill(0);
+	const red = new Array(106).fill(0);
+	const green = new Array(106).fill(0);
+	const blue = new Array(106).fill(0);
 
-	for(let iIdx = 0; iIdx < vKeymap.length; iIdx++) 
-	{
-		let iPxX = vLedPositions[iIdx][0];
-		let iPxY = vLedPositions[iIdx][1];
+	for(let iIdx = 0; iIdx < vKeymap.length; iIdx++) {
+		const iPxX = vLedPositions[iIdx][0];
+		const iPxY = vLedPositions[iIdx][1];
 		var color;
 
-		if(shutdown)
-		{
+		if(shutdown) {
 			color = hexToRgb(shutdownColor);
-		}
-		else if (LightingMode === "Forced") 
-		{
+		} else if (LightingMode === "Forced") {
 			color = hexToRgb(forcedColor);
-		}
-		else
-		{
+		} else {
 			color = device.color(iPxX, iPxY);
 		}
 
@@ -142,30 +129,24 @@ function sendColors(shutdown = false)
 
 }
 
-let Bar_Red =  [ 0x92, 0x13, 0x93, 0x12, 0x08, 0x48, 0x88, 0x09, 0x89, 0x0A, 0x8A, 0x0B, 0x8B, 0x0C, 0x8C, 0x0D, 0x8D, 0x0E, 0x8F, 0x8E, 0x0F, 0x4F ];
-let Bar_Green =  [ 0x82, 0x23, 0x83, 0x22, 0x29, 0x28, 0x78, 0x19, 0x79, 0x1A, 0x7A, 0x1B, 0x7B, 0x1C, 0x7C, 0x1D, 0x7D, 0x1E, 0x6E, 0x7E, 0x1F, 0x6F ];
-let Bar_Blue = [ 0x72, 0x33, 0x73, 0x32, 0x39, 0x38, 0x68, 0x3A, 0x69, 0x2A, 0x6A, 0x2B, 0x6B, 0x2C, 0x6C, 0x2D, 0x6D, 0x2E, 0x5E, 0x5D, 0x2F, 0x5F ];
+const Bar_Red =  [ 0x92, 0x13, 0x93, 0x12, 0x08, 0x48, 0x88, 0x09, 0x89, 0x0A, 0x8A, 0x0B, 0x8B, 0x0C, 0x8C, 0x0D, 0x8D, 0x0E, 0x8F, 0x8E, 0x0F, 0x4F ];
+const Bar_Green =  [ 0x82, 0x23, 0x83, 0x22, 0x29, 0x28, 0x78, 0x19, 0x79, 0x1A, 0x7A, 0x1B, 0x7B, 0x1C, 0x7C, 0x1D, 0x7D, 0x1E, 0x6E, 0x7E, 0x1F, 0x6F ];
+const Bar_Blue = [ 0x72, 0x33, 0x73, 0x32, 0x39, 0x38, 0x68, 0x3A, 0x69, 0x2A, 0x6A, 0x2B, 0x6B, 0x2C, 0x6C, 0x2D, 0x6D, 0x2E, 0x5E, 0x5D, 0x2F, 0x5F ];
 
 function SendBar(shutdown = false) //Sends Lightbar and Media Keys
 {
-	let packet = [0x07, 0x16, 0x04, 0x0A];
+	const packet = [0x07, 0x16, 0x04, 0x0A];
 
-	for(let iIdx = 0; iIdx < 22; iIdx++) 
-	{
-		let iPxX = vLedPositions[iIdx][0];
-		let iPxY = vLedPositions[iIdx][1];
+	for(let iIdx = 0; iIdx < 22; iIdx++) {
+		const iPxX = vLedPositions[iIdx][0];
+		const iPxY = vLedPositions[iIdx][1];
 		var color;
 
-		if(shutdown) 
-		{
+		if(shutdown) {
 			color = hexToRgb(shutdownColor);
-		} 
-		else if (LightingMode === "Forced") 
-		{
+		} else if (LightingMode === "Forced") {
 			color = hexToRgb(forcedColor);
-		} 
-		else 
-		{
+		} else {
 			color = device.color(iPxX, iPxY);
 		}
 
@@ -178,10 +159,9 @@ function SendBar(shutdown = false) //Sends Lightbar and Media Keys
 	device.pause(1);
 }
 
-function hexToRgb(hex) 
-{
-	let result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
-	let colors = [];
+function hexToRgb(hex) {
+	const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+	const colors = [];
 	colors[0] = parseInt(result[1], 16);
 	colors[1] = parseInt(result[2], 16);
 	colors[2] = parseInt(result[3], 16);
@@ -189,8 +169,7 @@ function hexToRgb(hex)
 	return colors;
 }
 
-export function Validate(endpoint) 
-{
+export function Validate(endpoint) {
 	return endpoint.interface === 2 && endpoint.usage === 1 && endpoint.usage_page === 0xff01;
 }
 

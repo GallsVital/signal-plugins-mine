@@ -1,6 +1,6 @@
 export function Name() { return "Corsair K70 TKL"; }
 export function VendorId() { return 0x1b1c; }
-export function ProductId() { return 0x1B73; }
+export function ProductId() { return [0x1B73, 0x1bb9]; }
 export function Publisher() { return "WhirlwindFX"; }
 export function Size() { return [22, 8]; }
 export function DefaultPosition(){return [10, 100];}
@@ -13,9 +13,9 @@ forcedColor:readonly
 */
 export function ControllableParameters(){
 	return [
-		{"property":"shutdownColor", "group":"lighting", "label":"Shutdown Color", "min":"0", "max":"360", "type":"color", "default":"009bde"},
+		{"property":"shutdownColor", "group":"lighting", "label":"Shutdown Color", "min":"0", "max":"360", "type":"color", "default":"#009bde"},
 		{"property":"LightingMode", "group":"lighting", "label":"Lighting Mode", "type":"combobox", "values":["Canvas", "Forced"], "default":"Canvas"},
-		{"property":"forcedColor", "group":"lighting", "label":"Forced Color", "min":"0", "max":"360", "type":"color", "default":"009bde"},
+		{"property":"forcedColor", "group":"lighting", "label":"Forced Color", "min":"0", "max":"360", "type":"color", "default":"#009bde"},
 	];
 }
 export function Documentation(){ return "troubleshooting/corsair"; }
@@ -25,15 +25,15 @@ let savedStartUpValue = true;
 let errors = 0;
 
 function hexToRgb(hex) {
-	let result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
-	let colors = [];
+	const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+	const colors = [];
 	colors[0] = parseInt(result[1], 16);
 	colors[1] = parseInt(result[2], 16);
 	colors[2] = parseInt(result[3], 16);
 
 	return colors;
 }
-let readpacket = [];
+const readpacket = [];
 export function Initialize() {
 
 	sendPacketString("00 08 01 03 00 02", 1025);  //Critical Software control packet
@@ -85,8 +85,8 @@ export function Initialize() {
 
 function sendPacketString(string, size){
 
-	let packet= [];
-	let data = string.split(' ');
+	const packet= [];
+	const data = string.split(' ');
 
 	for(let i = 0; i < data.length; i++){
 		packet[parseInt(i, 16)] =parseInt(data[i], 16);//.toString(16)
@@ -101,7 +101,7 @@ export function Shutdown() {
 
 }
 
-let vKeys = [
+const vKeys = [
 
 	119, 122, 120, 121,            -1, -3,                  124, 109, 110, 98,
 	37,   54, 55, 56, 57,     58, 59, 60, 61,     62, 63, 64, 65,     66, 67, 68,
@@ -113,7 +113,7 @@ let vKeys = [
 	96, 46 //ISO
 ];
 
-let vKeyNames = [
+const vKeyNames = [
 	"MediaStop", "MediaPreviousTrack", "MediaPlayPause", "MediaNextTrack",  "Logo 1", "Logo 2", "Profile", "Brightness", "Lock", "VOLUME_MUTE",
 	"Esc", "F1", "F2", "F3", "F4", "F5", "F6", "F7", "F8", "F9", "F10", "F11", "F12",         "Print Screen", "Scroll Lock", "Pause Break",
 	"`", "1", "2", "3", "4", "5", "6", "7", "8", "9", "0", "-_", "=+", "Backspace",                        "Insert", "Home", "Page Up",
@@ -124,7 +124,7 @@ let vKeyNames = [
 	"ISO #", "ISO <"
 ];
 
-let vKeyPositions = [
+const vKeyPositions = [
 	[0, 0], [1, 0], [2, 0],  [3, 0],         [7, 0], [8, 0],                               [11, 0], [12, 0], [13, 0],   [14, 0],
 	[0, 1],        [2, 1], [3, 1], [4, 1], [5, 1], [6, 1], [7, 1], [8, 1], [9, 1],  [10, 1], [11, 1], [12, 1], [13, 1],   [14, 1], [15, 1], [16, 1],
 	[0, 2], [1, 2], [2, 2], [3, 2], [4, 2], [5, 2], [6, 2], [7, 2], [8, 2], [9, 2],  [10, 2], [11, 2], [12, 2], [13, 2],   [14, 2], [15, 2], [16, 2],
@@ -167,8 +167,8 @@ function sendColors(shutdown = false){
 
 
 	for(let iIdx = 0; iIdx < vKeys.length; iIdx++) {
-		let iPxX = vKeyPositions[iIdx][0];
-		let iPxY = vKeyPositions[iIdx][1];
+		const iPxX = vKeyPositions[iIdx][0];
+		const iPxY = vKeyPositions[iIdx][1];
 		var mxPxColor;
 
 		if(shutdown){

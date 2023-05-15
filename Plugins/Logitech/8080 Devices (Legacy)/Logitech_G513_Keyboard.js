@@ -14,32 +14,32 @@ forcedColor:readonly
 */
 export function ControllableParameters(){
 	return [
-		{"property":"shutdownColor", "group":"lighting", "label":"Shutdown Color", "min":"0", "max":"360", "type":"color", "default":"009bde"},
+		{"property":"shutdownColor", "group":"lighting", "label":"Shutdown Color", "min":"0", "max":"360", "type":"color", "default":"#009bde"},
 		{"property":"LightingMode", "group":"lighting", "label":"Lighting Mode", "type":"combobox", "values":["Canvas", "Forced"], "default":"Canvas"},
-		{"property":"forcedColor", "group":"lighting", "label":"Forced Color", "min":"0", "max":"360", "type":"color", "default":"009bde"},
+		{"property":"forcedColor", "group":"lighting", "label":"Forced Color", "min":"0", "max":"360", "type":"color", "default":"#009bde"},
 
 	];
 }
 
 function hexToRgb(hex) {
-	let result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
-	let colors = [];
+	const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+	const colors = [];
 	colors[0] = parseInt(result[1], 16);
 	colors[1] = parseInt(result[2], 16);
 	colors[2] = parseInt(result[3], 16);
 
 	return colors;
 }
-let vLedNames = [
+const vLedNames = [
 	"Esc", "F1", "F2", "F3", "F4", "F5", "F6", "F7", "F8", "F9", "F10", "F11", "F12",         "Print Screen", "Scroll Lock", "Pause Break",
 	"`", "1", "2", "3", "4", "5", "6", "7", "8", "9", "0", "-_", "=+", "Backspace",                 "Insert", "Home", "Page Up",       "NumLock", "Num /", "Num *", "Num -",  //21
 	"Tab", "Q", "W", "E", "R", "T", "Y", "U", "I", "O", "P", "[", "]", "\\",                        "Del", "End", "Page Down",         "Num 7", "Num 8", "Num 9", "Num +",    //21
 	"CapsLock", "A", "S", "D", "F", "G", "H", "J", "K", "L", ";", "'", "ISO_/", "Enter",                                               "Num 4", "Num 5", "Num 6",             //16
-	"Left Shift", "ISO_Y", "Z", "X", "C", "V", "B", "N", "M", ",", ".", "/","?","Right Shift",               "Up Arrow",               "Num 1", "Num 2", "Num 3", "Num Enter", //17
+	"Left Shift", "ISO_Y", "Z", "X", "C", "V", "B", "N", "M", ",", ".", "/", "?", "Right Shift",               "Up Arrow",               "Num 1", "Num 2", "Num 3", "Num Enter", //17
 	"Left Ctrl", "Left Win", "Left Alt", "Space", "Right Alt", "Fn", "Menu", "Right Ctrl",  "Left Arrow", "Down Arrow", "Right Arrow", "Num 0", "Num ."                       //13
 ];
 
-let vKeymap = [ //0x64, 0x32
+const vKeymap = [ //0x64, 0x32
 	// 0x29,   0x3A, 0x3B, 0x3C, 0x3D,   0x3E, 0x3F, 0x40, 0x41,   0x42, 0x43, 0x44, 0x45,      0x46, 0x47, 0x48,
 	// 0x35, 0x1E, 0x1F, 0x20, 0x21, 0x22, 0x23, 0x24, 0x25, 0x26, 0x27, 0x2D, 0x2E, 0x2A,      0x49, 0x4A, 0x4B,    0x53, 0x54, 0x55, 0x56,
 	// 0x2B, 0x14, 0x1A, 0x08, 0x15, 0x17, 0x1C, 0x18, 0x0C, 0x12, 0x13, 0x2F, 0x30, 0x31,      0x4C, 0x4D, 0x4E,    0x5F, 0x60, 0x61, 0x57,
@@ -48,15 +48,15 @@ let vKeymap = [ //0x64, 0x32
 	// 0xE0, 0xE3, 0xE2,                 0x2C,                  0xE6, 0xE7, 0x65,    0xE4,      0x50, 0x51, 0x4F,    0x62, 0x63
 
 	//Modded for ISO layout
-	41,		58, 59, 60, 61,		62, 63, 64, 65,   66, 67,68,69,		70, 71, 72,
+	41,		58, 59, 60, 61,		62, 63, 64, 65,   66, 67, 68, 69,		70, 71, 72,
 	53,	30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 45, 46, 	42,		73, 74, 75,		83, 84, 85, 86,
 	43,	20, 26, 8, 21, 23, 28, 24, 12, 18, 19, 47, 48, 		49,		76, 77, 78,		95, 96, 97, 87,
 	57,	4,	22, 7, 9, 10, 11, 13, 14, 15, 51, 52, 50, 		40,						92, 93, 94,
-	225,	100,29, 27, 6, 25, 5, 17, 16, 54, 55, 56, 135, 229,			82,			89, 90, 91, 88,
-	224,227,226,           44,				230, 231, 101, 228,		80, 81, 79,		98, 99
+	225,	100, 29, 27, 6, 25, 5, 17, 16, 54, 55, 56, 135, 229,			82,			89, 90, 91, 88,
+	224, 227, 226,           44,				230, 231, 101, 228,		80, 81, 79,		98, 99
 ];
 
-let vLedPositions = [
+const vLedPositions = [
 
 
 	//Modded for ISO layout
@@ -84,7 +84,7 @@ export function Initialize() {
 
 
 function Apply() {
-	let packet = [];
+	const packet = [];
 
 	packet[0] = 0x11;
 	packet[1] = 0xFF;
@@ -99,7 +99,7 @@ function Apply() {
 
 
 function SendPacket(startIdx, count, shutdown = false) {
-	let packet = [];
+	const packet = [];
 	packet[0] = 0x12;
 	packet[1] = 0xFF;
 	packet[2] = 0x0C;
@@ -110,10 +110,10 @@ function SendPacket(startIdx, count, shutdown = false) {
 	packet[7] = 0x0E; // led count
 
 	for(let iIdx = 0; iIdx < count; iIdx++){
-		let iLedIdx = (iIdx * 4) + 8;
-		let iKeyIdx = startIdx + iIdx;
-		let iKeyPosX = vLedPositions[iKeyIdx][0];
-		let iKeyPosY = vLedPositions[iKeyIdx][1];
+		const iLedIdx = (iIdx * 4) + 8;
+		const iKeyIdx = startIdx + iIdx;
+		const iKeyPosX = vLedPositions[iKeyIdx][0];
+		const iKeyPosY = vLedPositions[iKeyIdx][1];
 
 		var color;
 

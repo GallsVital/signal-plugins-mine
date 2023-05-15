@@ -20,9 +20,9 @@ dpi4:readonly
 */
 export function ControllableParameters(){
 	return [
-		{"property":"shutdownColor", "group":"lighting", "label":"Shutdown Color", "min":"0", "max":"360", "type":"color", "default":"009bde"},
+		{"property":"shutdownColor", "group":"lighting", "label":"Shutdown Color", "min":"0", "max":"360", "type":"color", "default":"#009bde"},
 		{"property":"LightingMode", "group":"lighting", "label":"Lighting Mode", "type":"combobox", "values":["Canvas", "Forced"], "default":"Canvas"},
-		{"property":"forcedColor", "group":"lighting", "label":"Forced Color", "min":"0", "max":"360", "type":"color", "default":"009bde"},
+		{"property":"forcedColor", "group":"lighting", "label":"Forced Color", "min":"0", "max":"360", "type":"color", "default":"#009bde"},
 		{"property":"SettingControl", "group":"mouse", "label":"Enable Setting Control", "type":"boolean", "default":"false"},
 		{"property":"angleSnapping", "group":"mouse", "label":"angle snapping", "type":"boolean", "default":"false"},
 		{"property":"mousePolling", "group":"mouse", "label":"Polling Rate", "type":"combobox", "values":["125Hz", "250Hz", "500Hz", "1000Hz"], "default":"500Hz"},
@@ -41,13 +41,13 @@ let savedDpi4;
 let savedAngleSnapping;
 let savedPollingRate;
 let savedMouseResponse;
-let pollingDict = {
+const pollingDict = {
 	"125Hz"  : 0,
 	"250Hz"  : 1,
 	"500Hz"  : 2,
 	"1000Hz" : 3,
 };
-let responseDict = {
+const responseDict = {
 	"12ms" :2,
 	"16ms" :3,
 	"20ms" :4,
@@ -56,11 +56,11 @@ let responseDict = {
 	"32ms" :7,
 };
 
-let vKeyNames = [
+const vKeyNames = [
 	"Scroll Wheel", "Logo", "Underglow"
 ];
 
-let vKeyPositions = [
+const vKeyPositions = [
 	[1, 1], [1, 2], [1, 0]
 ];
 
@@ -100,7 +100,7 @@ export function Shutdown() {
 
 function sendColors(zone, shutdown = false){
 
-	let packet = [];
+	const packet = [];
 	packet[0] = 0x00;
 	packet[1] = 0x51;
 	packet[2] = 0x28;
@@ -109,8 +109,8 @@ function sendColors(zone, shutdown = false){
 	packet[5] = 0x00;
 	packet[6] = 0x04;
 
-	let iPxX = vKeyPositions[zone][0];
-	let iPxY = vKeyPositions[zone][1];
+	const iPxX = vKeyPositions[zone][0];
+	const iPxY = vKeyPositions[zone][1];
 	let col;
 
 	if(shutdown){
@@ -150,8 +150,8 @@ function sendMouseSettings(){
 
 function sendPacketString(string, size){
 
-	let packet= [];
-	let data = string.split(' ');
+	const packet= [];
+	const data = string.split(' ');
 
 	for(let i = 0; i < data.length; i++){
 		packet[i] =parseInt(data[i], 16);//.toString(16)
@@ -161,8 +161,8 @@ function sendPacketString(string, size){
 }
 
 function hexToRgb(hex) {
-	let result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
-	let colors = [];
+	const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+	const colors = [];
 	colors[0] = parseInt(result[1], 16);
 	colors[1] = parseInt(result[2], 16);
 	colors[2] = parseInt(result[3], 16);

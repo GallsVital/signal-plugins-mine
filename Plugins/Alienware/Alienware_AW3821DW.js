@@ -12,9 +12,9 @@ forcedColor:readonly
 */
 export function ControllableParameters() {
 	return [
-		{"property":"shutdownColor", "group":"lighting", "label":"Shutdown Color", "min":"0", "max":"360", "type":"color", "default":"009bde"},
+		{"property":"shutdownColor", "group":"lighting", "label":"Shutdown Color", "min":"0", "max":"360", "type":"color", "default":"#009bde"},
 		{"property":"LightingMode", "group":"lighting", "label":"Lighting Mode", "type":"combobox", "values":["Canvas", "Forced"], "default":"Canvas"},
-		{"property":"forcedColor", "group":"lighting", "label":"Forced Color", "min":"0", "max":"360", "type":"color", "default":"009bde"},
+		{"property":"forcedColor", "group":"lighting", "label":"Forced Color", "min":"0", "max":"360", "type":"color", "default":"#009bde"},
 	];
 }
 
@@ -56,11 +56,17 @@ export function Render() {
 	sendColors();
 }
 
-export function Shutdown() {
-	sendColors(true);
+export function Shutdown(SystemSuspending) {
+
+	if(SystemSuspending){
+		sendColors("#000000"); // Go Dark on System Sleep/Shutdown
+	}else{
+		sendColors(shutdownColor);
+	}
+
 }
 
-function sendColors(shutdown = false) {
+function sendColors(overrideColor) {
 	const packet = new Array(65).fill(0xFF);
 
 	packet[1] = 0x92;
@@ -78,8 +84,8 @@ function sendColors(shutdown = false) {
 		const iLed = vLedIDs[idx];
 		var color;
 
-		if(shutdown){
-			color = hexToRgb(shutdownColor);
+		if(overrideColor){
+			color = hexToRgb(overrideColor);
 		}else if (LightingMode === "Forced") {
 			color = hexToRgb(forcedColor);
 		}else{

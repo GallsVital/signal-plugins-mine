@@ -14,9 +14,9 @@ forcedColor:readonly
 */
 export function ControllableParameters() {
 	return [
-		{"property":"shutdownColor", "group":"lighting", "label":"Shutdown Color", "min":"0", "max":"360", "type":"color", "default":"009bde"},
+		{"property":"shutdownColor", "group":"lighting", "label":"Shutdown Color", "min":"0", "max":"360", "type":"color", "default":"#009bde"},
 		{"property":"LightingMode", "group":"lighting", "label":"Lighting Mode", "type":"combobox", "values":["Canvas", "Forced"], "default":"Canvas"},
-		{"property":"forcedColor", "group":"lighting", "label":"Forced Color", "min":"0", "max":"360", "type":"color", "default":"009bde"},
+		{"property":"forcedColor", "group":"lighting", "label":"Forced Color", "min":"0", "max":"360", "type":"color", "default":"#009bde"},
 	];
 }
 
@@ -83,10 +83,10 @@ export function Shutdown() {
 
 function StreamLightingPacketChanneled(count, data, channel) {
 
-	var packetNumber = 0;
+	const packetNumber = 0;
 	let totalLedCount = count;
 
-	for(var packetNumber = 0; packetNumber < 2; packetNumber++ ) {
+	for(let packetNumber = 0; packetNumber < 2; packetNumber++ ) {
 		const ledsToSend = totalLedCount >= 60 ? 60 : totalLedCount;
 		totalLedCount -= ledsToSend;
 
@@ -104,7 +104,7 @@ function sendchannelPumpColors(channel, shutdown = false) {
 	for(let iIdx = 0; iIdx < vLedMap.length; iIdx++) {
 		const iPxX = vLedPositions[iIdx][0];
 		const iPxY = vLedPositions[iIdx][1];
-		var col;
+		let col;
 
 		if(shutdown) {
 			col = hexToRgb(shutdownColor);

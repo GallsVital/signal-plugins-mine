@@ -1,5 +1,6 @@
+// export default class performance{ //QT6 export
 
-export default class performance{
+declare class performance{
     /** Starts a performance timer with the given name. If no name is given 'default' will be used.
      * @param Name Name of the performance timer
      * 

@@ -1,6 +1,6 @@
 export function Name() { return "Razer Ornata V3 X"; }
 export function VendorId() { return 0x1532; }
-export function ProductId() { return 0x0294; }
+export function ProductId() { return [0x0294, 0x02a2]; }
 export function Documentation(){ return "troubleshooting/razer"; }
 export function Publisher() { return "Orcus, Rafee"; }
 export function Size() { return [3, 3]; }
@@ -13,17 +13,17 @@ forcedColor:readonly
 */
 export function ControllableParameters(){
 	return [
-		{"property":"shutdownColor", "label":"Shutdown Color", "min":"0", "max":"360", "type":"color", "default":"009bde"},
+		{"property":"shutdownColor", "label":"Shutdown Color", "min":"0", "max":"360", "type":"color", "default":"#009bde"},
 		{"property":"LightingMode", "label":"Lighting Mode", "type":"combobox", "values":["Canvas", "Forced"], "default":"Canvas"},
-		{"property":"forcedColor", "label":"Forced Color", "min":"0", "max":"360", "type":"color", "default":"009bde"},
+		{"property":"forcedColor", "label":"Forced Color", "min":"0", "max":"360", "type":"color", "default":"#009bde"},
 	];
 }
 
-let vLedNames = [
+const vLedNames = [
 	"Keyboard"
 ];
 
-let vLedPositions = [
+const vLedPositions = [
 	[1, 1]
 ];
 
@@ -52,13 +52,14 @@ function CalculateCrc(report) {
 	for (let iIdx = 3; iIdx < 89; iIdx++) {
 		iCrc ^= report[iIdx];
 	}
+
 	return iCrc;
 }
 
 function SendColorPacket(shutdown = false) {
 
-	let packet = [];
-	packet[0] = 0x00 //Zero Padding
+	const packet = [];
+	packet[0] = 0x00; //Zero Padding
 	packet[1] = 0x00;
 	packet[2] = 0x1f;
 	packet[3] = 0x00;
@@ -73,8 +74,8 @@ function SendColorPacket(shutdown = false) {
 	packet[12] = 0x00;
 	packet[13] = 0x00;
 
-	let iX = vLedPositions[0][0];
-	let iY = vLedPositions[0][1];
+	const iX = vLedPositions[0][0];
+	const iY = vLedPositions[0][1];
 
 	let color;
 
@@ -103,8 +104,8 @@ export function Render() {
 }
 
 function hexToRgb(hex) {
-	let result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
-	let colors = [];
+	const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+	const colors = [];
 	colors[0] = parseInt(result[1], 16);
 	colors[1] = parseInt(result[2], 16);
 	colors[2] = parseInt(result[3], 16);

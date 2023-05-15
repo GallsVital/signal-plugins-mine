@@ -9,19 +9,17 @@ export function DefaultScale(){return 10.0;}
 LightingMode:readonly
 forcedColor:readonly
 */
-export function ControllableParameters()
-{
+export function ControllableParameters() {
 	return [
 		{"property":"LightingMode", "group":"lighting", "label":"Lighting Mode", "type":"combobox", "values":["Canvas", "Forced"], "default":"Canvas"},
-		{"property":"forcedColor", "group":"lighting", "label":"Forced Color", "min":"0", "max":"360", "type":"color", "default":"009bde"},
+		{"property":"forcedColor", "group":"lighting", "label":"Forced Color", "min":"0", "max":"360", "type":"color", "default":"#009bde"},
 	];
 }
-export function ConflictingProcesses() 
-{
+export function ConflictingProcesses() {
 	return ["ORIOS.exe"];
 }
 
-let vKeyPositions = 
+const vKeyPositions =
 [
 	[0, 0], [2, 0], [3, 0], [4, 0], [5, 0], [6, 0], [7, 0], [8, 0], [9, 0], [10, 0], [11, 0], [12, 0], [13, 0], [14, 0], [15, 0], [16, 0],
 	[0, 1], [1, 1], [2, 1], [3, 1], [4, 1], [5, 1], [6, 1], [7, 1], [8, 1], [9, 1], [10, 1], [12, 1], [13, 1], [14, 1], [15, 1], [16, 1], [17, 1], [18, 1], [19, 1], [20, 1], [21, 1],
@@ -31,7 +29,7 @@ let vKeyPositions =
 	[0, 5], [1, 5], [2, 5], [6, 5], [10, 5], [11, 5], [12, 5], [14, 5], [15, 5], [16, 5], [17, 5], [18, 5], [20, 5]
 ];
 
-let vKeyNames = 
+const vKeyNames =
 [
 	"Esc", "F1", "F2", "F3", "F4", "F5", "F6", "F7", "F8", "F9", "F10", "F11", "F12", "Print Screen", "Scroll Lock", "Pause Break",
 	"^", "1", "2", "3", "4", "5", "6", "7", "8", "9", "0", "ß", "´", "Backspace", "Insert", "Home", "Page Up", "NumLock", "Num /", "Num *", "Num -",
@@ -41,7 +39,7 @@ let vKeyNames =
 	"Left Ctrl", "Left Win", "Left Alt", "Space", "AltGr", "Fn", "Menu", "Right Ctrl", "Left Arrow", "Down Arrow", "Right Arrow", "Num 0", "Num ,"
 ];
 
-let vKeyIndexes = 
+const vKeyIndexes =
 [
 	0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 14, 15, 16,
 	21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41,
@@ -51,51 +49,41 @@ let vKeyIndexes =
 	106, 107, 108, 109, 110, 111, 113, 119, 120, 121, 123, 124, 126
 ];
 
-export function LedNames() 
-{
+export function LedNames() {
 	return vKeyNames;
 }
 
-export function LedPositions() 
-{
+export function LedPositions() {
 	return vKeyPositions;
 }
 
-export function Initialize()
-{
+export function Initialize() {
 
 }
 
-export function Render() 
-{
+export function Render() {
 	SendPacket();
 }
 
-export function Shutdown()
-{
+export function Shutdown() {
 
 }
 
-let row_packet_four = [ 0x38, 0x38, 0x38, 0x38, 0x38, 0x38, 0x2a ];
-let row_packet_five = [ 0x00, 0x38, 0x70, 0xa8, 0xe0, 0x18, 0x50 ];
-let row_packet_six  = [ 0x00, 0x00, 0x00, 0x00, 0x00, 0x01, 0x01 ];
+const row_packet_four = [ 0x38, 0x38, 0x38, 0x38, 0x38, 0x38, 0x2a ];
+const row_packet_five = [ 0x00, 0x38, 0x70, 0xa8, 0xe0, 0x18, 0x50 ];
+const row_packet_six  = [ 0x00, 0x00, 0x00, 0x00, 0x00, 0x01, 0x01 ];
 
-function SendPacket() 
-{
+function SendPacket() {
 	let mxPxColor;
-	let RGBData = new Array(392).fill(0x00);
+	const RGBData = new Array(392).fill(0x00);
 
-	for(let iIdx = 0; iIdx < vKeyPositions.length; iIdx++) 
-	{
-		let iPxX = vKeyPositions[iIdx][0];
-		let iPxY = vKeyPositions[iIdx][1];
+	for(let iIdx = 0; iIdx < vKeyPositions.length; iIdx++) {
+		const iPxX = vKeyPositions[iIdx][0];
+		const iPxY = vKeyPositions[iIdx][1];
 
-		if (LightingMode === "Forced") 
-		{
+		if (LightingMode === "Forced") {
 			mxPxColor = hexToRgb(forcedColor);
-		} 
-		else 
-		{
+		} else {
 			mxPxColor = device.color(iPxX, iPxY);
 		}
 
@@ -104,20 +92,17 @@ function SendPacket()
 		RGBData[(vKeyIndexes[iIdx]*3)+2] = mxPxColor[2];
 	}
 
-	for(let row = 0; row <= 6; row++) 
-	{
-		let packet = [0x04, 0x00, 0x00, 0x12, row_packet_four[row], row_packet_five[row], row_packet_six[row], 0x00];
+	for(let row = 0; row <= 6; row++) {
+		const packet = [0x04, 0x00, 0x00, 0x12, row_packet_four[row], row_packet_five[row], row_packet_six[row], 0x00];
 		packet.push(...RGBData.splice(0, 56));
 		device.write(packet, 64);
 	}
 }
 
 
-
-function hexToRgb(hex) 
-{
-	let result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
-	let colors = [];
+function hexToRgb(hex) {
+	const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+	const colors = [];
 	colors[0] = parseInt(result[1], 16);
 	colors[1] = parseInt(result[2], 16);
 	colors[2] = parseInt(result[3], 16);
@@ -125,8 +110,7 @@ function hexToRgb(hex)
 	return colors;
 }
 
-export function Validate(endpoint) 
-{
+export function Validate(endpoint) {
 	return endpoint.interface === 1 && endpoint.usage === 0x0092 && endpoint.usage_page == 0xFF1C && endpoint.collection == 4;
 }
 

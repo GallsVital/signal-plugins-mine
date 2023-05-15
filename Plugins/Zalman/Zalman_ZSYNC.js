@@ -9,11 +9,10 @@ export function DefaultScale(){return 1.0;}
 LightingMode:readonly
 forcedColor:readonly
 */
-export function ControllableParameters()
-{
+export function ControllableParameters() {
 	return [
 		{"property":"LightingMode", "group":"lighting", "label":"Lighting Mode", "type":"combobox", "values":["Canvas", "Forced"], "default":"Canvas"},
-		{"property":"forcedColor", "group":"lighting", "label":"Forced Color", "min":"0", "max":"360", "type":"color", "default":"009bde"},
+		{"property":"forcedColor", "group":"lighting", "label":"Forced Color", "min":"0", "max":"360", "type":"color", "default":"#009bde"},
 	];
 }
 
@@ -30,7 +29,7 @@ export function SupportsSubdevices(){ return true; }
 const DeviceMaxLedLimit = 192;
 
 //Channel Name, Led Limit
-let ChannelArray = 
+const ChannelArray =
 [
 	["Channel 1", 40],
 	["Channel 2", 40],
@@ -42,76 +41,62 @@ let ChannelArray =
 	["Channel 8", 40]
 ];
 
-function SetupChannels()
-{
+function SetupChannels() {
 	device.SetLedLimit(DeviceMaxLedLimit);
 
-	for(let i = 0; i < ChannelArray.length; i++)
-	{
+	for(let i = 0; i < ChannelArray.length; i++) {
 		device.addChannel(ChannelArray[i][0], ChannelArray[i][1]);
 	}
 }
 
-export function LedNames() 
-{
+export function LedNames() {
 	return vKeyNames;
 }
 
-export function LedPositions() 
-{
+export function LedPositions() {
 	return vKeyPositions;
 }
 
-export function Initialize() 
-{
+export function Initialize() {
 	SetupChannels();
 }
 
-export function Render() 
-{
-	for(let Channel = 0; Channel < 8; Channel++)
-	{
-	SendChannel(Channel);
+export function Render() {
+	for(let Channel = 0; Channel < 8; Channel++) {
+		SendChannel(Channel);
 	}
+
 	SubmitLightingColors();
 }
 
-export function Shutdown() 
-{
-	for(let Channel = 0; Channel < 8; Channel++)
-	{
+export function Shutdown() {
+	for(let Channel = 0; Channel < 8; Channel++) {
 		device.write([0x00, CORSAIR_LIGHTING_CONTROLLER_MODE, Channel, CORSAIR_HARDWARE_MODE], 65);
 	}
 }
 
-function SendChannel(Channel) 
-{
+function SendChannel(Channel) {
 	let ChannelLedCount = device.channel(ChannelArray[Channel][0]).LedCount();
-	let componentChannel = device.channel(ChannelArray[Channel][0]);
+	const componentChannel = device.channel(ChannelArray[Channel][0]);
 
 	let ColorData = [];
 
-	if(LightingMode === "Forced")
-	{
+	if(LightingMode === "Forced") {
 		ColorData = device.createColorArray(forcedColor, ChannelLedCount, "Seperate");
 
-	}
-	else if(componentChannel.shouldPulseColors())
-	{
+	} else if(componentChannel.shouldPulseColors()) {
 		ChannelLedCount = 40;
 
-		let pulseColor = device.getChannelPulseColor(ChannelArray[Channel][0], ChannelLedCount);
+		const pulseColor = device.getChannelPulseColor(ChannelArray[Channel][0], ChannelLedCount);
 		ColorData = device.createColorArray(pulseColor, ChannelLedCount, "Seperate");
 
-	}
-	else
-	{
+	} else {
 		ColorData = device.channel(ChannelArray[Channel][0]).getColors("Seperate");
 	}
 
-	let RedChannelData = ColorData[0];
-	let GreenChannelData = ColorData[1];
-	let BlueChannelData = ColorData[2];
+	const RedChannelData = ColorData[0];
+	const GreenChannelData = ColorData[1];
+	const BlueChannelData = ColorData[2];
 
 
 	//Set up for update
@@ -121,9 +106,8 @@ function SendChannel(Channel)
 	let ledsSent = 0;
 	ChannelLedCount = ChannelLedCount >= 40 ? 40 : ChannelLedCount;
 
-	while(ChannelLedCount > 0)
-	{
-		let ledsToSend = ChannelLedCount >= 50 ? 50 : ChannelLedCount;
+	while(ChannelLedCount > 0) {
+		const ledsToSend = ChannelLedCount >= 50 ? 50 : ChannelLedCount;
 
 		StreamLightingPacketChanneled(ledsSent, ledsToSend, 0, RedChannelData.splice(0, ledsToSend), Channel);
 
@@ -137,17 +121,15 @@ function SendChannel(Channel)
 }
 
 
-function InitChannel(channel)
-{
-	let packet = [0x00, CORSAIR_LIGHTING_CONTROLLER_MODE, channel, CORSAIR_SOFTWARE_MODE];
+function InitChannel(channel) {
+	const packet = [0x00, CORSAIR_LIGHTING_CONTROLLER_MODE, channel, CORSAIR_SOFTWARE_MODE];
 
 	device.write(packet, 65);
 	device.read(packet, 17);
 
 }
 
-function StreamLightingPacketChanneled(start, count, colorChannel, data, channel) 
-{
+function StreamLightingPacketChanneled(start, count, colorChannel, data, channel) {
 	//channel selection == 32 0/1 Start Count Channel LEDS
 	//(Start, Count, Color, Data)
 	let packet = [0x00, CORSAIR_LIGHTING_CONTROLLER_STREAM, channel, start, count, colorChannel];
@@ -157,17 +139,15 @@ function StreamLightingPacketChanneled(start, count, colorChannel, data, channel
 	device.read(packet, 17);
 }
 
-function SubmitLightingColors() 
-{
-	let packet = [0x00, CORSAIR_LIGHTING_CONTROLLER_COMMIT, 0xFF];
+function SubmitLightingColors() {
+	const packet = [0x00, CORSAIR_LIGHTING_CONTROLLER_COMMIT, 0xFF];
 
 	device.write(packet, 65);
 	device.read(packet, 17);
 }
 
 
-export function Validate(endpoint) 
-{
+export function Validate(endpoint) {
 	return endpoint.interface === -1 ||  endpoint.interface === 2;
 }
 

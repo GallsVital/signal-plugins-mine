@@ -8,11 +8,12 @@ declare type SubdeviceId = string;
 declare type LogOptions = {
 	toFile?: boolean
 	Hex?: boolean
+	pretty?: boolean
 }
 
 declare type ImageFormat = "JPEG" | "PNG" | "BMP"
 
-declare type DeviceFeature = "battery" | "mouse" | "corsairmutex" | "usbmutex";
+declare type DeviceFeature = "battery" | "mouse" | "keyboard" | "udp" | "dtls" | "base64";
 declare type hexToRgb = (HexString: string) => ColorArray;
 
 declare type ChannelConfig = [ChannelId, number];

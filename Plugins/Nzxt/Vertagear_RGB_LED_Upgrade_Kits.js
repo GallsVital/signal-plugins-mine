@@ -11,26 +11,23 @@ shutdownColor:readonly
 LightingMode:readonly
 forcedColor:readonly
 */
-export function ControllableParameters()
-{
+export function ControllableParameters() {
 	return [
-		{"property":"shutdownColor", "group":"lighting", "label":"Shutdown Color", "min":"0", "max":"360", "type":"color", "default":"009bde"},
+		{"property":"shutdownColor", "group":"lighting", "label":"Shutdown Color", "min":"0", "max":"360", "type":"color", "default":"#009bde"},
 		{"property":"LightingMode", "group":"lighting", "label":"Lighting Mode", "type":"combobox", "values":["Canvas", "Forced"], "default":"Canvas"},
-		{"property":"forcedColor", "group":"lighting", "label":"Forced Color", "min":"0", "max":"360", "type":"color", "default":"009bde"},
+		{"property":"forcedColor", "group":"lighting", "label":"Forced Color", "min":"0", "max":"360", "type":"color", "default":"#009bde"},
 	];
 }
-let ParentDeviceName = "Vertagear RGB Chair Upgrade";
+const ParentDeviceName = "Vertagear RGB Chair Upgrade";
 
 const vKeyNames = [];
 const vKeyPositions = [];
 
-export function LedNames() 
-{
+export function LedNames() {
 	return vKeyNames;
 }
 
-export function LedPositions() 
-{
+export function LedPositions() {
 	return vKeyPositions;
 }
 
@@ -40,85 +37,71 @@ export function DefaultComponentBrand() { return "Vertagear";}
 const DeviceMaxLedLimit = 80;
 
 //Channel Name, Led Limit
-let ChannelArray = 
+const ChannelArray =
 [
 	["Top Kit", 40],
 	["Bottom Kit", 40]
 ];
 
-function SetupChannels()
-{
+function SetupChannels() {
 	device.SetLedLimit(DeviceMaxLedLimit);
 
-	for(let i = 0; i < ChannelArray.length; i++)
-	{
+	for(let i = 0; i < ChannelArray.length; i++) {
 		device.addChannel(ChannelArray[i][0], ChannelArray[i][1]);
 	}
 }
-export function Initialize() 
-{
+export function Initialize() {
 	SetupChannels();
 }
 
-export function Render() 
-{
+export function Render() {
 	SendChannel(0);
 	SendChannel(1);
 }
 
-export function Shutdown() 
-{
+export function Shutdown() {
 	SendChannel(0, true);
 	SendChannel(1, true);
 
 }
 
-function StreamLightingPacketChanneled(packetNumber, count, data, channel) 
-{
-	let packet = [0x22, 0x10 | packetNumber, 0x01 << channel, 0x00];
+function StreamLightingPacketChanneled(packetNumber, count, data, channel) {
+	const packet = [0x22, 0x10 | packetNumber, 0x01 << channel, 0x00];
 	packet.push(...data);
 	device.write(packet, 64);
 	device.read(packet, 64);
 }
 
-function SubmitLightingColors(channel) 
-{
-	let packet = [0x22, 0xA0, 1 << channel, 0x00, 0x01, 0x00, 0x00, 0x0A, 0x00, 0x00, 0x80, 0x00, 0x32, 0x00, 0x00, 0x01];
+function SubmitLightingColors(channel) {
+	const packet = [0x22, 0xA0, 1 << channel, 0x00, 0x01, 0x00, 0x00, 0x0A, 0x00, 0x00, 0x80, 0x00, 0x32, 0x00, 0x00, 0x01];
 	device.write(packet, 64);
 	device.read(packet, 64);
 }
 
-function SendChannel(Channel, shutdown = false) 
-{
+function SendChannel(Channel, shutdown = false) {
 	let ChannelLedCount = device.channel(ChannelArray[Channel][0]).LedCount();
-	let componentChannel = device.channel(ChannelArray[Channel][0]);
+	const componentChannel = device.channel(ChannelArray[Channel][0]);
 
 	let RGBData = [];
 
-	if(LightingMode === "Forced")
-	{
+	if(LightingMode === "Forced") {
 		RGBData = device.createColorArray(forcedColor, ChannelLedCount, "Inline", "GRB");
 
-	}
-	else if(componentChannel.shouldPulseColors())
-	{
+	} else if(componentChannel.shouldPulseColors()) {
 		ChannelLedCount = 40;
 
-		let pulseColor = device.getChannelPulseColor(ChannelArray[Channel][0], ChannelLedCount);
+		const pulseColor = device.getChannelPulseColor(ChannelArray[Channel][0], ChannelLedCount);
 		RGBData = device.createColorArray(pulseColor, ChannelLedCount, "Inline", "GRB");
 
-	}
-	else
-	{
+	} else {
 		RGBData = device.channel(ChannelArray[Channel][0]).getColors("Inline", "GRB");
 	}
 
 	let packetNumber = 0;
 	ChannelLedCount = ChannelLedCount >= 120 ? 120 : ChannelLedCount;
 
-	while(ChannelLedCount > 0)
-	{
-		let ledsToSend = ChannelLedCount >= 20 ? 20 : ChannelLedCount;
+	while(ChannelLedCount > 0) {
+		const ledsToSend = ChannelLedCount >= 20 ? 20 : ChannelLedCount;
 		StreamLightingPacketChanneled(packetNumber, ledsToSend, RGBData.splice(0, ledsToSend * 3), Channel);
 
 		packetNumber += 1;
@@ -129,8 +112,7 @@ function SendChannel(Channel, shutdown = false)
 
 }
 
-export function Validate(endpoint) 
-{
+export function Validate(endpoint) {
 	return endpoint.interface === -1;
 }
 

@@ -13,16 +13,16 @@ forcedColor:readonly
 */
 export function ControllableParameters(){
 	return [
-		{"property":"shutdownColor", "group":"lighting", "label":"Shutdown Color", "min":"0", "max":"360", "type":"color", "default":"009bde"},
+		{"property":"shutdownColor", "group":"lighting", "label":"Shutdown Color", "min":"0", "max":"360", "type":"color", "default":"#009bde"},
 		{"property":"LightingMode", "group":"lighting", "label":"Lighting Mode", "type":"combobox", "values":["Canvas", "Forced"], "default":"Canvas"},
-		{"property":"forcedColor", "group":"lighting", "label":"Forced Color", "min":"0", "max":"360", "type":"color", "default":"009bde"},
+		{"property":"forcedColor", "group":"lighting", "label":"Forced Color", "min":"0", "max":"360", "type":"color", "default":"#009bde"},
 
 	];
 }
 
 function hexToRgb(hex) {
-	let result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
-	let colors = [];
+	const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+	const colors = [];
 	colors[0] = parseInt(result[1], 16);
 	colors[1] = parseInt(result[2], 16);
 	colors[2] = parseInt(result[3], 16);
@@ -44,14 +44,14 @@ export function Shutdown() {
 }
 
 
-let vKeyNames = [
+const vKeyNames = [
 	"Scroll Wheel", "Logo"
 
 ];
 
 // This array must be the same length as vKeys[], and represents the pixel color position in our pixel matrix that we reference.  For example,
 // item at index 3 [9,0] represents the corsair logo, and the render routine will grab its color from [9,0].
-let vKeyPositions = [
+const vKeyPositions = [
 	[1, 2], [1, 0],
 ];
 
@@ -71,7 +71,7 @@ export function Render() {
 
 function sendColors(zone, shutdown = false){
 
-	let packet = [];
+	const packet = [];
 	packet[0] = 0x00;
 	packet[1] = 0x51;
 	packet[2] = 0x28;
@@ -80,8 +80,8 @@ function sendColors(zone, shutdown = false){
 	packet[5] = 0x00;
 	packet[6] = 0x04;
 
-	let iPxX = vKeyPositions[zone][0];
-	let iPxY = vKeyPositions[zone][1];
+	const iPxX = vKeyPositions[zone][0];
+	const iPxY = vKeyPositions[zone][1];
 	let col;
 
 	if(shutdown){
@@ -125,8 +125,8 @@ export function Validate(endpoint) {
 
 function sendPacketString(string, size){
 
-	let packet= [];
-	let data = string.split(' ');
+	const packet= [];
+	const data = string.split(' ');
 
 	for(let i = 0; i < data.length; i++){
 		packet[i] =parseInt(data[i], 16);//.toString(16)

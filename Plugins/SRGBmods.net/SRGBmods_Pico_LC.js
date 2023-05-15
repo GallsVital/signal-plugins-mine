@@ -18,7 +18,7 @@ export function ControllableParameters()
 	return [
 		{"property":"shutdownColor", "label":"Shutdown Color", "min":"0", "max":"360", "type":"color", "default":"000000"},
 		{"property":"LightingMode", "label":"Lighting Mode", "type":"combobox", "values":["Canvas", "Forced"], "default":"Canvas"},
-		{"property":"forcedColor", "label":"Forced Color", "min":"0", "max":"360", "type":"color", "default":"009bde"},
+		{"property":"forcedColor", "label":"Forced Color", "min":"0", "max":"360", "type":"color", "default":"#009bde"},
 	];
 }
 
@@ -59,6 +59,8 @@ export function Initialize()
 	packet[2] = 0x01;
 	device.write(packet, 65);
 	SetupChannels();
+	device.log("Pico LC is EOL (end of life)! Please consider upgrading to LC v1 - srgbmods.net");
+	device.notify(`Pico LC is EOL (end of life)!`, `Please consider upgrading to LC v1 - srgbmods.net`, 1);
 }
 
 export function Render()
@@ -113,7 +115,7 @@ function SendChannel(Channel, shutdown = false)
 	for(let CurrPacket = 1; CurrPacket <= NumPackets; CurrPacket++)
 	{
 		let packet = [0x00, CurrPacket, 0x00, NumPackets, Channel + 1];
-		packet.push(...RGBData.splice(0, 60));
+		packet = packet.concat(RGBData.splice(0, 60));
 		device.write(packet, 65);
 	}
 }

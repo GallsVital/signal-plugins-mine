@@ -11,17 +11,17 @@ shutdownColor:readonly
 */
 export function ControllableParameters(){
 	return [
-		{"property":"shutdownColor", "group":"lighting", "label":"Shutdown Color", "min":"0", "max":"360", "type":"color", "default":"009bde"},
+		{"property":"shutdownColor", "group":"lighting", "label":"Shutdown Color", "min":"0", "max":"360", "type":"color", "default":"#009bde"},
 		// {"property":"DpiControl", "group":"mouse", "label":"Enable Dpi Control","type":"boolean","default":"false"},
 		//{"property":"dpi1", "group":"mouse", "label":"DPI 1", "step":"50","type":"number","min":"200", "max":"8000","default":"800"},
 	];
 }
 
-let vLedNames = [
+const vLedNames = [
 	"Front Zone", "Mid Zone", "Rear Zone"
 ];
 
-let vLedPositions = [
+const vLedPositions = [
 	[1, 0], [1, 1], [1, 2],
 ];
 
@@ -52,14 +52,14 @@ export function Validate(endpoint) {
 
 function SendColorPacket(shutdown = false) {
 	for(let iIdx = 0; iIdx < 3; iIdx++){
-		let packet = [];
+		const packet = [];
 		packet[0x00]  = 0x00;
 		packet[0x01]  = 0x61;
 		packet[0x02]  = 0x01;
 		packet[0x03] =  iIdx;
 
-		let iPxX = vLedPositions[iIdx][0];
-		let iPxY = vLedPositions[iIdx][1];
+		const iPxX = vLedPositions[iIdx][0];
+		const iPxY = vLedPositions[iIdx][1];
 
 		var color;
 
@@ -106,8 +106,8 @@ export function Render() {
 // }
 
 function hexToRgb(hex) {
-	let result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
-	let colors = [];
+	const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+	const colors = [];
 	colors[0] = parseInt(result[1], 16);
 	colors[1] = parseInt(result[2], 16);
 	colors[2] = parseInt(result[3], 16);

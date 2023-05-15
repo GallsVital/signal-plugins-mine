@@ -1,16 +1,16 @@
 {
 	"compilerOptions": {
-		"module": "ES6",
+		"module": "ES2020",
 		"moduleResolution": "NodeNext",
-		"target": "ES6",
-		"lib": ["ES6", "es2017"],
+		"target": "ES2020",
+		"lib": ["ES7", "es2020"],
 		"allowJs": true,
 		"checkJs": true,
 		"composite": true,
 		"incremental": true,
 		"assumeChangesOnlyAffectDirectDependencies": true,
-		//"declaration": true,
-		//"declarationMap": true,
+		"declaration": true,
+		"declarationMap": true,
 		"outDir": "dist",
 		//"noEmit": true,
 		"esModuleInterop": true,
@@ -26,20 +26,27 @@
 		"paths": {
 			"@Mock/*": ["tests/*"],
 			"@Types/*":["types/*"],
-			"performance": ["./types/performance.d.ts"]
+			//"performance": ["./types/performance.d.ts"]
 		},
 	},
-	"files": [
-		"./types/globals.d.ts",
-		"./types/device.d.ts",
-		"./types/console.d.ts",
-		"./types/bus.d.ts",
-		"./types/battery.d.ts",
-		"./types/Exports.d.ts",
-		"./types/ComponentChannel.d.ts",
-		"./types/ControllableParameters.d.ts"
-    ],
-	"include": ["Plugins/**/*"],
+	// "files": [
+	// 	// "./types/globals.d.ts",
+	// 	// "./types/device.d.ts",
+	// 	// "./types/console.d.ts",
+	// 	// "./types/bus.d.ts",
+	// 	// "./types/battery.d.ts",
+	// 	// "./types/Exports.d.ts",
+	// 	// "./types/ComponentChannel.d.ts",
+	// 	// "./types/ControllableParameters.d.ts",
+	// 	// "./types/performance.d.ts", // Can be removed in QT6
+	// 	// "./types/NanoLeaf.d.ts",
+	// 	// "./types/PhilipsHue.d.ts",
+	// 	// "./types/Udp.d.ts",
+	// 	// "./types/DiscoveryService.d.ts",
+	// 	// "./types/mouse.d.ts",
+	// 	// "./types/keyboard.d.ts"
+    // ],
+	"include": ["CodeSnippets/**/*","Non-Release-Plugins/**/*", "Plugins/**/*", "Types/**/*"],
 	"exclude": [
 		"node_modules",
 		"**/node_modules/*",

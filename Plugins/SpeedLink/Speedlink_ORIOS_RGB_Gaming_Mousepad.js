@@ -9,64 +9,53 @@ export function DefaultScale(){return 28.0;}
 LightingMode:readonly
 forcedColor:readonly
 */
-export function ControllableParameters()
-{
+export function ControllableParameters() {
 	return [
 		{"property":"LightingMode", "group":"lighting", "label":"Lighting Mode", "type":"combobox", "values":["Canvas", "Forced"], "default":"Canvas"},
-		{"property":"forcedColor", "group":"lighting", "label":"Forced Color", "min":"0", "max":"360", "type":"color", "default":"009bde"},
+		{"property":"forcedColor", "group":"lighting", "label":"Forced Color", "min":"0", "max":"360", "type":"color", "default":"#009bde"},
 	];
 }
 export function ConflictingProcesses() { return ["ORIOS.exe"]; }
 
-let vLedNames = [ "Led 1", "Led 2", "Led 3", "Led 4", "Led 5", "Led 6", "Led 7", "Led 8", "Led 9", "Led 10" ];
+const vLedNames = [ "Led 1", "Led 2", "Led 3", "Led 4", "Led 5", "Led 6", "Led 7", "Led 8", "Led 9", "Led 10" ];
 
-let vLedPositions = [ [1, 0], [0, 0], [0, 1], [0, 2], [1, 2], [2, 2], [3, 2], [3, 1], [3, 0], [2, 0] ];
+const vLedPositions = [ [1, 0], [0, 0], [0, 1], [0, 2], [1, 2], [2, 2], [3, 2], [3, 1], [3, 0], [2, 0] ];
 
-export function LedNames() 
-{
+export function LedNames() {
 	return vLedNames;
 }
 
-export function LedPositions() 
-{
+export function LedPositions() {
 	return vLedPositions;
 }
 
-export function Initialize()
-{
+export function Initialize() {
 
 }
 
-export function Render() 
-{
+export function Render() {
 	SendPacket();
 	device.pause(1);
 }
 
-export function Shutdown()
-{
-	
+export function Shutdown() {
+
 }
 
-function SendPacket() 
-{
+function SendPacket() {
 	let color;
-	let packet = [0x04, 0x00, 0x00, 0x12, 0x21];
+	const packet = [0x04, 0x00, 0x00, 0x12, 0x21];
 
-	for(let iIdx = 0; iIdx < vLedPositions.length; iIdx++) 
-	{
-		let iPxX = vLedPositions[iIdx][0];
-		let iPxY = vLedPositions[iIdx][1];
+	for(let iIdx = 0; iIdx < vLedPositions.length; iIdx++) {
+		const iPxX = vLedPositions[iIdx][0];
+		const iPxY = vLedPositions[iIdx][1];
 
-		if (LightingMode === "Forced") 
-		{
+		if (LightingMode === "Forced") {
 			color = hexToRgb(forcedColor);
-		} 
-		else 
-		{
+		} else {
 			color = device.color(iPxX, iPxY);
 		}
-		let mxPxColor = color;
+		const mxPxColor = color;
 		packet[8+(iIdx*3)] = mxPxColor[0];
 		packet[8+(iIdx*3)+2] = mxPxColor[2];
 		packet[8+(iIdx*3)+4] = mxPxColor[1];
@@ -77,10 +66,9 @@ function SendPacket()
 	device.write([0x04, 0x02, 0x00, 0x02], 64);
 }
 
-function hexToRgb(hex) 
-{
-	let result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
-	let colors = [];
+function hexToRgb(hex) {
+	const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+	const colors = [];
 	colors[0] = parseInt(result[1], 16);
 	colors[1] = parseInt(result[2], 16);
 	colors[2] = parseInt(result[3], 16);
@@ -88,8 +76,7 @@ function hexToRgb(hex)
 	return colors;
 }
 
-export function Validate(endpoint) 
-{
+export function Validate(endpoint) {
 	return endpoint.interface === 1 && endpoint.usage === 0x0092 && endpoint.usage_page === 0xFF1C && endpoint.collection === 4;
 }
 

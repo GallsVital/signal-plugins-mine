@@ -21,7 +21,7 @@ export function LedNames() { return []; }
 export function LedPositions() { return []; }
 export function SupportsSubdevices() { return true; }
 export function DefaultComponentBrand() { return "Corsair"; }
-export function SystemResumeDelay() { return 9000; }
+
 export function SupportsFanControl(){ return true; }
 // Use the CorsairLink mutex any time this device is rendering.
 // if we don't our reads may be ruined by other programs

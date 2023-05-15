@@ -15,14 +15,14 @@ LCDToggle:readonly
 */
 export function ControllableParameters(){
 	return [
-		{"property":"shutdownColor", "group":"lighting", "label":"Shutdown Color", "min":"0", "max":"360", "type":"color", "default":"009bde"},
+		{"property":"shutdownColor", "group":"lighting", "label":"Shutdown Color", "min":"0", "max":"360", "type":"color", "default":"#009bde"},
 		{"property":"LightingMode", "group":"lighting", "label":"Lighting Mode", "type":"combobox", "values":["Canvas", "Forced"], "default":"Canvas"},
-		{"property":"forcedColor", "group":"lighting", "label":"Forced Color", "min":"0", "max":"360", "type":"color", "default":"009bde"},
+		{"property":"forcedColor", "group":"lighting", "label":"Forced Color", "min":"0", "max":"360", "type":"color", "default":"#009bde"},
 		{"property":"LCDToggle", "group":"", "label":"LCD Logo", "type":"boolean", "default":"false"},
 
 	];
 }
-let SignalRGB_OLED = [
+const SignalRGB_OLED = [
 	0x00, 0x65, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
 	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
 	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
@@ -39,7 +39,7 @@ let SignalRGB_OLED = [
 ];
 
 
-let vLedNames = [
+const vLedNames = [
 	"< ISO", "# ISO", //ISO
 	"Esc", "F1", "F2", "F3", "F4", "F5", "F6", "F7", "F8", "F9", "F10", "F11", "F12",         "Print Screen", "Scroll Lock", "Pause Break",
 	"`", "1", "2", "3", "4", "5", "6", "7", "8", "9", "0", "-_", "=+", "Backspace",                        "Insert", "Home", "Page Up",       "NumLock", "Num /", "Num *", "Num -",  //21
@@ -49,7 +49,7 @@ let vLedNames = [
 	"Left Ctrl", "Left Win", "Left Alt", "Space", "Right Alt", "Fn", "Menu", "Right Ctrl",  "Left Arrow", "Down Arrow", "Right Arrow", "Num 0", "Num .", "Extra"                //13
 ];
 
-let vLedPositions = [
+const vLedPositions = [
 	[1, 4], [12, 3], //ISO
 	[0, 0], [1, 0], [2, 0], [3, 0], [4, 0], [5, 0], [6, 0], [7, 0], [8, 0], [9, 0], [10, 0], [11, 0], [12, 0],           [14, 0], [15, 0], [16, 0],            //20
 	[0, 1], [1, 1], [2, 1], [3, 1], [4, 1], [5, 1], [6, 1], [7, 1], [8, 1], [9, 1], [10, 1], [11, 1], [12, 1], [13, 1],   [14, 1], [15, 1], [16, 1],   [17, 1], [18, 1], [19, 1], [20, 1], //21
@@ -60,7 +60,7 @@ let vLedPositions = [
 	, [18, 5]
 ];
 
-let vKeymap = [
+const vKeymap = [
 	100, 50, //ISO
 	41, 58, 59, 60, 61, 62, 63, 64, 65, 66, 67, 68, 69,         70, 71, 72,
 	53, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 45, 46, 42,     73, 74, 75,         83, 84, 85, 86,  //21
@@ -86,8 +86,8 @@ export function LedPositions() {
 }
 
 function sendPacketString(string, size){
-	let packet= [];
-	let data = string.split(' ');
+	const packet= [];
+	const data = string.split(' ');
 
 	for(let i = 0; i < data.length; i++){
 		packet[parseInt(i, 16)] = parseInt(data[i], 16);//.toString(16)
@@ -97,8 +97,8 @@ function sendPacketString(string, size){
 }
 
 function sendReportString(string, size){
-	let packet= [];
-	let data = string.split(' ');
+	const packet= [];
+	const data = string.split(' ');
 
 	for(let i = 0; i < data.length; i++){
 		packet[parseInt(i, 16)] =parseInt(data[i], 16);//.toString(16)
@@ -119,17 +119,17 @@ export function Validate(endpoint) {
 }
 
 function sendColors(shutdown = false){
-	let packet = [];
-	let red = [];
-	let green = [];
-	let blue = [];
+	const packet = [];
+	const red = [];
+	const green = [];
+	const blue = [];
 	packet[0x00]   = 0;
 	packet[0x01]   = 0x3A;
 	packet[0x02]   = vKeymap.length;
 
 	for (var idx = 0; idx <= vKeymap.length; idx++) {
-		let iPxX = vLedPositions[idx][0];
-		let iPxY = vLedPositions[idx][1];
+		const iPxX = vLedPositions[idx][0];
+		const iPxY = vLedPositions[idx][1];
 		var color;
 
 		if(shutdown){
@@ -162,8 +162,8 @@ export function Render() {
 }
 
 function hexToRgb(hex) {
-	let result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
-	let colors = [];
+	const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+	const colors = [];
 	colors[0] = parseInt(result[1], 16);
 	colors[1] = parseInt(result[2], 16);
 	colors[2] = parseInt(result[3], 16);

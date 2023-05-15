@@ -1,4 +1,3 @@
-
 export function Name() { return "GIGABYTE Motherboard LED Controller"; }
 export function VendorId() { return  0x048D; }
 export function ProductId() { return [0x5702, 0x8297];}
@@ -19,9 +18,9 @@ ForceAllZonesActive:readonly
 */
 export function ControllableParameters(){
 	return [
-		{"property":"shutdownColor", "group":"lighting", "label":"Shutdown Color", "min":"0", "max":"360", "type":"color", "default":"009bde"},
+		{"property":"shutdownColor", "group":"lighting", "label":"Shutdown Color", "min":"0", "max":"360", "type":"color", "default":"#009bde"},
 		{"property":"LightingMode", "group":"lighting", "label":"Lighting Mode", "type":"combobox", "values":["Canvas", "Forced"], "default":"Canvas", "tooltip":"This toggles the device between displaying its canvas position, or being locked to its Forced Color"},
-		{"property":"forcedColor", "group":"lighting", "label":"Forced Color", "min":"0", "max":"360", "type":"color", "default":"009bde"},
+		{"property":"forcedColor", "group":"lighting", "label":"Forced Color", "min":"0", "max":"360", "type":"color", "default":"#009bde"},
 		{"property":"Mainboardconfig", "group":"lighting", "label":"MainBoard Configuration", "type":"combobox",   "values":["RGB", "RBG", "BGR", "BRG", "GBR", "GRB"], "default":"BGR"},
 		{"property":"Headerconfig", "group":"lighting",  "label":"12v Header Configuration", "type":"combobox",   "values":["RGB", "RBG", "BGR", "BRG", "GBR", "GRB"], "default":"RGB"},
 		{"property":"RGBconfig", "group":"lighting", "label":"ARGB Channel Configuration", "type":"combobox",   "values":["RGB", "RBG", "BGR", "BRG", "GBR", "GRB"], "default":"GRB"},
@@ -139,6 +138,17 @@ const MotherboardConfigs = {
 			0x21: ["12v Header Bottom", HeaderConfiguration],
 			0x23: ["PCIe", MainboardConfiguration],
 			0x24: ["12V Header Top", HeaderConfiguration]
+		}
+	},
+	"B760M AORUS ELITE AX": {
+		ARGB:{
+			"5v ARGB Header 1": 0x58,
+			"5v ARGB Header 2": 0x59,
+		},
+		Mainboard:{
+			0x20: ["12V Header 1", MainboardConfiguration],
+			0x21: ["12V Header 2", HeaderConfiguration],
+			0x22: ["Chipset", MainboardConfiguration],
 		}
 	},
 	"X570 AORUS ELITE": {

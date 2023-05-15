@@ -16,14 +16,14 @@ forcedColor:readonly
 */
 export function ControllableParameters(){
 	return [
-		{"property":"shutdownColor", "group":"lighting", "label":"Shutdown Color", "min":"0", "max":"360", "type":"color", "default":"009bde"},
+		{"property":"shutdownColor", "group":"lighting", "label":"Shutdown Color", "min":"0", "max":"360", "type":"color", "default":"#009bde"},
 		{"property":"LightingMode", "group":"lighting", "label":"Lighting Mode", "type":"combobox", "values":["Canvas", "Forced"], "default":"Canvas"},
-		{"property":"forcedColor", "group":"lighting", "label":"Forced Color", "min":"0", "max":"360", "type":"color", "default":"009bde"},
+		{"property":"forcedColor", "group":"lighting", "label":"Forced Color", "min":"0", "max":"360", "type":"color", "default":"#009bde"},
 
 	];
 }
 
-let vLedNames = 
+const vLedNames =
 [
 	"Esc", "F1", "F2", "F3", "F4", "F5", "F6", "F7", "F8", "F9", "F10", "F11", "F12",         "Print Screen", "Scroll Lock", "Pause Break",
 	"`", "1", "2", "3", "4", "5", "6", "7", "8", "9", "0", "-_", "=+", "Backspace",                        "Insert", "Home", "Page Up",       "NumLock", "Num /", "Num *", "Num -",  //21
@@ -33,7 +33,7 @@ let vLedNames =
 	"Left Ctrl", "Left Win", "Left Alt", "Space", "Right Alt", "Fn", "Menu", "Right Ctrl",  "Left Arrow", "Down Arrow", "Right Arrow", "Num 0", "Num ."                       //13
 ];
 
-let vLedPositions = 
+const vLedPositions =
 [
 	[0, 0],    [1, 0], [2, 0], [3, 0], [4, 0],    [6, 0], [7, 0], [8, 0], [9, 0],  [10, 0], [11, 0], [12, 0], [13, 0],   [14, 0], [15, 0], [16, 0],            //20
 	[0, 1],  [1, 1], [2, 1], [3, 1], [4, 1], [5, 1], [6, 1], [7, 1], [8, 1], [9, 1], [10, 1], [11, 1], [12, 1], [13, 1],   [14, 1], [15, 1], [16, 1],   [17, 1], [18, 1], [19, 1], [20, 1], //21
@@ -45,7 +45,7 @@ let vLedPositions =
 
 ];
 
-let vKeymap = 
+const vKeymap =
 [
 	0,     12, 18, 24, 30,   36, 42, 48, 54,    60, 66, 72, 78,  84, 90, 96,
 	1,  7, 13, 19, 25, 31,  37, 43, 49, 55,  61, 67, 73,    79,  85, 91, 97,   103, 109, 115, 121,
@@ -55,61 +55,48 @@ let vKeymap =
 	5,  11,  17,         35,                 53,     65,    83,  89, 95, 101,  107,      119,
 ];
 
-export function LedNames() 
-{
+export function LedNames() {
 	return vLedNames;
 }
 
-export function LedPositions() 
-{
+export function LedPositions() {
 	return vLedPositions;
 }
 
-export function Initialize() 
-{
+export function Initialize() {
 
 }
 
-export function Render() 
-{
+export function Render() {
 	sendColor();
 }
 
-export function Shutdown() 
-{
+export function Shutdown() {
 	sendColor(true);
 }
 
-function StartPacket()
-{
+function StartPacket() {
 	device.send_report([0x00, 0x04, 0xF2], 65);
 }
 
-function sendColor(shutdown = false)
-{
+function sendColor(shutdown = false) {
 	StartPacket();
 
 	//get color data
-	let red = [168];
-	let green = [168];
-	let blue = [168];
+	const red = [168];
+	const green = [168];
+	const blue = [168];
 
-	for(let iIdx = 0; iIdx < vKeymap.length; iIdx++) 
-	{
-		let iPxX = vLedPositions[iIdx][0];
-		let iPxY = vLedPositions[iIdx][1];
+	for(let iIdx = 0; iIdx < vKeymap.length; iIdx++) {
+		const iPxX = vLedPositions[iIdx][0];
+		const iPxY = vLedPositions[iIdx][1];
 		var color;
 
-		if(shutdown)
-		{
+		if(shutdown) {
 			color = hexToRgb(shutdownColor);
-		}
-		else if (LightingMode === "Forced") 
-		{
+		} else if (LightingMode === "Forced") {
 			color = hexToRgb(forcedColor);
-		}
-		else
-		{
+		} else {
 			color = device.color(iPxX, iPxY);
 		}
 
@@ -118,18 +105,16 @@ function sendColor(shutdown = false)
 		blue[vKeymap[iIdx]] = color[2];
 	}
 
-	let packet = [];
+	const packet = [];
 	packet[0x00]   = 0x00;
 
 	let TotalkeyCount = 128;
 	let sentKeys = 0;
 
-	while(TotalkeyCount > 0)
-	{
-		let keys = TotalkeyCount >= 16 ? 16 : TotalkeyCount;
+	while(TotalkeyCount > 0) {
+		const keys = TotalkeyCount >= 16 ? 16 : TotalkeyCount;
 
-		for(let idx = 0; idx < keys; idx++) 
-		{
+		for(let idx = 0; idx < keys; idx++) {
 			packet[(idx * 4) + 1] = 0x81;
 			packet[(idx * 4) + 2] = red[sentKeys];
 			packet[(idx * 4) + 3] = green[sentKeys];
@@ -142,10 +127,9 @@ function sendColor(shutdown = false)
 	}
 }
 
-function hexToRgb(hex) 
-{
-	let result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
-	let colors = [];
+function hexToRgb(hex) {
+	const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+	const colors = [];
 	colors[0] = parseInt(result[1], 16);
 	colors[1] = parseInt(result[2], 16);
 	colors[2] = parseInt(result[3], 16);
@@ -153,8 +137,7 @@ function hexToRgb(hex)
 	return colors;
 }
 
-export function Validate(endpoint) 
-{
+export function Validate(endpoint) {
 	return endpoint.interface === 3;
 }
 

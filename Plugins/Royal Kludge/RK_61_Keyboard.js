@@ -12,13 +12,13 @@ forcedColor:readonly
 */
 export function ControllableParameters(){
 	return [
-		{"property":"shutdownColor", "group":"lighting", "label":"Shutdown Color", "min":"0", "max":"360", "type":"color", "default":"009bde"},
+		{"property":"shutdownColor", "group":"lighting", "label":"Shutdown Color", "min":"0", "max":"360", "type":"color", "default":"#009bde"},
 		{"property":"LightingMode", "group":"lighting", "label":"Lighting Mode", "type":"combobox", "values":["Canvas", "Forced"], "default":"Canvas"},
-		{"property":"forcedColor", "group":"lighting", "label":"Forced Color", "min":"0", "max":"360", "type":"color", "default":"009bde"},
+		{"property":"forcedColor", "group":"lighting", "label":"Forced Color", "min":"0", "max":"360", "type":"color", "default":"#009bde"},
 	];
 }
 
-let vKeyNames = [
+const vKeyNames = [
 	"Esc", "1", "2", "3", "4", "5", "6", "7", "8", "9", "0", "-_", "=+", "Backspace", //14
 	"Tab", "Q", "W", "E", "R", "T", "Y", "U", "I", "O", "P", "[", "]", "\\", //14
 	"CapsLock", "A", "S", "D", "F", "G", "H", "J", "K", "L", ";", "'",       "Enter", //14
@@ -26,7 +26,7 @@ let vKeyNames = [
 	"Left Ctrl", "Left Win", "Left Alt", "Space", "Right Alt", "Menu", "Right Ctrl", "Fn", //8
 ];
 
-let vKeys = [
+const vKeys = [
 	4,  22, 40, 58, 76, 94,  112, 130, 148, 166, 184, 202, 220, 238,
 	7,  25, 43, 61, 79, 97,  115, 133, 151, 169, 187, 205, 223, 241,
 	10, 28, 46, 64, 82, 100, 118, 136, 154, 172, 190, 208,      244,
@@ -35,7 +35,7 @@ let vKeys = [
 ];
 
 
-let vKeyPositions = [
+const vKeyPositions = [
 	[0, 0], [1, 0], [2, 0], [3, 0], [4, 0], [5, 0], [6, 0], [7, 0], [8, 0], [9, 0], [10, 0], [11, 0], [12, 0], [13, 0],
 	[0, 1], [1, 1], [2, 1], [3, 1], [4, 1], [5, 1], [6, 1], [7, 1], [8, 1], [9, 1], [10, 1], [11, 1], [12, 1], [13, 1],
 	[0, 2], [1, 2], [2, 2], [3, 2], [4, 2], [5, 2], [6, 2], [7, 2], [8, 2], [9, 2], [10, 2], [11, 2],         [13, 2],
@@ -66,7 +66,7 @@ export function Shutdown() {
 }
 
 function sendZonefake(zone) {
-	let packet = [];
+	const packet = [];
 	packet[0x00] = 0x0a;
 	packet[0x01] = 0x07;
 	packet[0x02] = zone;
@@ -100,24 +100,18 @@ function StreamPacket(zone, data) {
 }
 
 function SendPacket(shutdown = false) {
-	let RGBData = new Array(425).fill(0);
+	const RGBData = new Array(425).fill(0);
 
-	for(let iIdx = 0; iIdx < vKeys.length; iIdx++) 
-	{
-		let iPxX = vKeyPositions[iIdx][0];
-		let iPxY = vKeyPositions[iIdx][1];
+	for(let iIdx = 0; iIdx < vKeys.length; iIdx++) {
+		const iPxX = vKeyPositions[iIdx][0];
+		const iPxY = vKeyPositions[iIdx][1];
 		var col;
 
-		if(shutdown) 
-		{
+		if(shutdown) {
 			col = hexToRgb(shutdownColor);
-		} 
-		else if (LightingMode === "Forced") 
-		{
+		} else if (LightingMode === "Forced") {
 			col = hexToRgb(forcedColor);
-		} 
-		else 
-		{
+		} else {
 			col = device.color(iPxX, iPxY);
 		}
 
@@ -135,8 +129,8 @@ function SendPacket(shutdown = false) {
 }
 
 function hexToRgb(hex) {
-	let result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
-	let colors = [];
+	const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+	const colors = [];
 	colors[0] = parseInt(result[1], 16);
 	colors[1] = parseInt(result[2], 16);
 	colors[2] = parseInt(result[3], 16);

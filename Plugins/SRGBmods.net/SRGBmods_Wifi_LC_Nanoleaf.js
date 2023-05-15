@@ -4,11 +4,11 @@ export function ProductId() { return 0x1176; }
 export function Publisher() { return "FeuerSturm"; }
 export function Documentation() { return "gettingstarted/srgbmods-net-info"; }
 export function Size() { return [1,1]; }
-export function DefaultPosition(){return [0,0]}
-export function DefaultScale(){return 1.0}
+export function DefaultPosition(){return [0,0]; }
+export function DefaultScale(){return 1.0; }
 export function Type() { return "Hid"; }
 export function SupportsSubdevices(){ return true; }
-export function DefaultComponentBrand() { return "Nanoleaf"}
+export function DefaultComponentBrand() { return "Nanoleaf"; }
 /* global
 UpdateRate:readonly
 shutdownColor:readonly
@@ -19,20 +19,22 @@ export function ControllableParameters()
 {
 	return [
 		{"property":"UpdateRate", "label":"Update rate", "type":"combobox", "values":["10fps","30fps"], "default":"10fps", "tooltip":"Not all Nanoleaf panels support more than 10fps!"},
-		{"property":"shutdownColor", "label":"Shutdown Color","min":"0","max":"360","type":"color","default":"000000"},
+		{"property":"shutdownColor", "label":"Shutdown Color","min":"0","max":"360","type":"color","default":"#000000"},
 		{"property":"LightingMode", "label":"Lighting Mode", "type":"combobox", "values":["Canvas","Forced"], "default":"Canvas"},
-		{"property":"forcedColor", "label":"Forced Color","min":"0","max":"360","type":"color","default":"009bde"},
+		{"property":"forcedColor", "label":"Forced Color","min":"0","max":"360","type":"color","default":"#009bde"},
 	];
 }
 
 const DeviceMaxLedLimit = 100;
-var ChannelArray = [ ["Nanoleaf Panels", 100] ];
+var ChannelArray = [ ["Nanoleaf Panels", DeviceMaxLedLimit] ];
 
 function SetupChannels()
 {
 	device.SetLedLimit(DeviceMaxLedLimit);
-	device.addChannel(ChannelArray[0][0],ChannelArray[0][1]);
+	device.addChannel(ChannelArray[0][0], ChannelArray[0][1]);
 }
+
+const PluginVersion = "1.1.0";
 
 const vKeyNames = [];
 const vKeyPositions = [];
@@ -50,13 +52,34 @@ export function LedPositions()
 
 export function Initialize()
 {
-	SetupChannels()
+	SetupChannels();
+	requestFirmwareVersion();
+}
+
+function compareFirmwareVersion()
+{
+	let firmwarePacket = device.read([0x00], 4, 10);
+	let FirmwareVersion = firmwarePacket[1] + "." + firmwarePacket[2] + "." + firmwarePacket[3]
+	device.log("SRGBmods Wifi LC Firmware version: " + FirmwareVersion);
+	device.log("SRGBmods Wifi LC Plugin version:   " + PluginVersion);
+	if(FirmwareVersion !== PluginVersion)
+	{
+		device.log("Firmware <-> Plugin version mismatch! Make sure to use matching versions!");
+		device.notify(`Firmware ${FirmwareVersion} <-> Plugin ${PluginVersion} version mismatch!`, `Make sure to use matching versions!`, 0);
+	}
+}
+
+function requestFirmwareVersion()
+{
+	let packet = [ 0x00, 0x00, 0x00, 0x00, 0xCC ];
+	device.write(packet, 65);
+	compareFirmwareVersion();
 }
 
 export function Render()
 {
 	SendChannel(0);
-	device.pause(UpdateRate == "10fps" ? 75 : 3);
+	device.pause(UpdateRate == "10fps" ? 75 : 1);
 }
 
 export function Shutdown()
@@ -66,9 +89,10 @@ export function Shutdown()
 
 function SendChannel(Channel,shutdown = false)
 {
-	var ChannelLedCount = device.channel(ChannelArray[Channel][0]).ledCount > ChannelArray[Channel][1] ? ChannelArray[Channel][1] : device.channel(ChannelArray[Channel][0]).ledCount;
+	let componentChannel = device.channel(ChannelArray[Channel][0]);
+	let ChannelLedCount = componentChannel.ledCount > ChannelArray[Channel][1] ? ChannelArray[Channel][1] : componentChannel.ledCount;
 
-	var RGBData = [];
+	let RGBData = [];
 	if(shutdown)
 	{
 		RGBData = device.createColorArray(shutdownColor, ChannelLedCount, "Inline");
@@ -77,23 +101,23 @@ function SendChannel(Channel,shutdown = false)
 	{
 		RGBData = device.createColorArray(forcedColor, ChannelLedCount, "Inline");
 	}
-	else if(device.getLedCount() == 0)
+	else if(componentChannel.shouldPulseColors())
 	{
-		ChannelLedCount = 20;
-		var pulseColor = device.getChannelPulseColor(ChannelArray[Channel][0], ChannelLedCount);
+		ChannelLedCount = 40;
+		const pulseColor = device.getChannelPulseColor(ChannelArray[Channel][0]);
 		RGBData = device.createColorArray(pulseColor, ChannelLedCount, "Inline");
 	}
 	else
 	{
-		RGBData = device.channel(ChannelArray[Channel][0]).getColors("Inline");
+		RGBData = componentChannel.getColors("Inline");
 	}
 	
-	var NumPackets = Math.ceil(ChannelLedCount / MaxLedsInPacket);
+	let NumPackets = Math.ceil(ChannelLedCount / MaxLedsInPacket);
 	
-	for(var CurrPacket = 1; CurrPacket <= NumPackets; CurrPacket++)
+	for(let CurrPacket = 1; CurrPacket <= NumPackets; CurrPacket++)
 	{
 		let packet = [0x00, CurrPacket, 0xEE, NumPackets, 0x01];
-		packet.push(...RGBData.splice(0,60));
+		packet = packet.concat(RGBData.splice(0, 60));
 		device.write(packet, 65);
 	}
 }

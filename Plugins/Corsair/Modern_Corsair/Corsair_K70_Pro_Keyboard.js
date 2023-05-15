@@ -1,6 +1,6 @@
 export function Name() { return "Corsair K70 Pro"; }
 export function VendorId() { return 0x1b1c; }
-export function ProductId() { return [0x1BC4, 0x1BB3]; }
+export function ProductId() { return [0x1BC4, 0x1BB3, 0x1BD4, 0x1BC6]; }
 export function Publisher() { return "WhirlwindFX"; }
 export function Size() { return [22, 7]; }
 export function DefaultPosition(){return [10, 100];}
@@ -13,9 +13,9 @@ forcedColor:readonly
 */
 export function ControllableParameters(){
 	return [
-		{"property":"shutdownColor", "label":"Shutdown Color", "min":"0", "max":"360", "type":"color", "default":"009bde"},
+		{"property":"shutdownColor", "label":"Shutdown Color", "min":"0", "max":"360", "type":"color", "default":"#009bde"},
 		{"property":"LightingMode", "label":"Lighting Mode", "type":"combobox", "values":["Canvas", "Forced"], "default":"Canvas"},
-		{"property":"forcedColor", "label":"Forced Color", "min":"0", "max":"360", "type":"color", "default":"009bde"},
+		{"property":"forcedColor", "label":"Forced Color", "min":"0", "max":"360", "type":"color", "default":"#009bde"},
 
 	];
 }

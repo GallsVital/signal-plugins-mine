@@ -72,11 +72,10 @@ function SetGPUNameFromBusIds() {
 
 function sendColors(shutdown = false) {
 
-	for(let zone = 0; zone < 3; zone++)
-	{
-        const iPxX = vLedPositions[zone][0];
-        const iPxY = vLedPositions[zone][1];
-        let color;
+	for(let zone = 0; zone < 3; zone++) {
+		const iPxX = vLedPositions[zone][0];
+		const iPxY = vLedPositions[zone][1];
+		let color;
 
 		if(shutdown) {
 			color = hexToRgb(shutdownColor);
@@ -85,8 +84,9 @@ function sendColors(shutdown = false) {
 		} else {
 			color = device.color(iPxX, iPxY);
 		}
+
 		PNYGPU.setRGB(zone, color);
-        device.pause(10);
+		device.pause(10);
 	}
 
 }
@@ -96,12 +96,11 @@ class PNYGPUController {
 		this.registers =
         {
         	Fetch    : 0x82,
-			Lighting : 0x02
+        	Lighting : 0x02
         };
 	}
 
-	setRGB(zone, RGBData)
-	{
+	setRGB(zone, RGBData) {
 		const packet = [0x06, 0xff, zone, 0x00];
 		packet.push(...RGBData);
 		bus.WriteBlock(this.registers.Lighting, 0x07, packet);
@@ -128,9 +127,16 @@ class PNYGPUIdentifier extends GPUIdentifier {
 	}
 }
 
+export function BrandGPUList(){ return PNYGPUIDs; }
+
 const PNYGPUIDs =
 [
+	new PNYGPUIdentifier(0x2782, 0x13b1, "PNY RTX 4070TI XLR8"),
+	new PNYGPUIdentifier(0x2782, 0x13b2, "PNY RTX 4070 Ti 12GB XLR8 Gaming VERTO™ EPIC-X RGB Triple Fan"),
+	new PNYGPUIdentifier(0x2704, 0x13b0, "PNY RTX 4080 XLR8 Gaming VERTO™ OC"),
 	new PNYGPUIdentifier(0x2684, 0x13ad, "PNY RTX 4090 XLR8"),
+	new PNYGPUIdentifier(0x2684, 0x13ae, "PNY RTX 4090 XLR8"),
+	new PNYGPUIdentifier(0x2704, 0x13BC, "PNY RTX 4080 16GB XLR8 Gaming OC"),
 ];
 
 function hexToRgb(hex) {
