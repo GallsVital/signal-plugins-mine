@@ -158,7 +158,7 @@ class GigabyteVisionProtocol {
 	}
 
 	determineWriteLength() {
-		this.config.writeLength = [0x62, 0x32].includes(bus.GetAddress()) ? 8 : 4;
+		this.config.writeLength = [0x62].includes(bus.GetAddress()) ? 8 : 4;
 	}
 
 	setMode(mode) {
