@@ -129,13 +129,13 @@ Item {
                                 text: `Supports Razer Protocol: ${device.supportRazer ? "True" : "False"}`
                             }
 
-                            Text{
-                                color: theme.warn
-                                width: parent.width
-                                visible: !device.supportDreamView && !device.supportRazer
-                                wrapMode: Text.WrapAtWordBoundaryOrAnywhere
-                                text: `This device doesn't support Govee's Razer, or Dreamview protocols. SignalRGB is unable to control it...`
-                            }
+                            // Text{
+                            //     color: theme.warn
+                            //     width: parent.width
+                            //     visible: !device.supportDreamView && !device.supportRazer
+                            //     wrapMode: Text.WrapAtWordBoundaryOrAnywhere
+                            //     text: `This device doesn't support Govee's Razer, or Dreamview protocols. SignalRGB is unable to control it...`
+                            // }
 
                         }
 
