@@ -113,12 +113,12 @@ export function LedPositions() {
 
 function SendChannel(Channel, shutdown = false) {
 	const componentChannel = device.channel(ChannelArray[Channel][0]);
-	let ChannelLedCount = componentChannel.LedCount();
 
 	if(componentChannel == null){
 		return;
 	}
 
+	let ChannelLedCount = componentChannel.LedCount();
 	let RGBData = [];
 
 	if(LightingMode === "Forced"){
