@@ -151,7 +151,7 @@ export class NZXTProtocol {
 			const RGBData = this.grabRGBData(i);
 
 			// no led on this channel, skip
-			if(RGBData.length === 0) {continue;}
+			if(!RGBData.length) {continue;}
 
 			this.StreamLightingPacketChannel(0, RGBData.splice(0, 60), i);
 			this.StreamLightingPacketChannel(1, RGBData.splice(0, 60), i);
@@ -194,9 +194,7 @@ export class NZXTProtocol {
 	}
 
 	StreamLightingPacketChannel(packetNumber, RGBData, channel) {
-		if (RGBData.length === 0) {
-			return;
-		}
+		if(!RGBData.length) {return;}
 		const packet = [0x22, 0x10 | packetNumber, 0x01 << channel, 0x00];
 		packet.push(...RGBData);
 		device.write(packet, 64);

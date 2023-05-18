@@ -134,7 +134,7 @@ function SendChannel(Channel, shutdown = false) {
 		RGBData = componentChannel.getColors("Inline", "GRB");
 	}
 
-	if(RGBData.length === 0) {return;}
+	if(!RGBData.length) {return;}
 
 	let packetNumber = 0;
 	ChannelLedCount = ChannelLedCount >= 120 ? 120 : ChannelLedCount;
