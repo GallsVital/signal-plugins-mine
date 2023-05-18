@@ -281,6 +281,7 @@ class GigabyteXtremeGPUList {
 			new GigabyteXtremeIdentifier(Nvidia.RTX3080, 		GigabyteXtremeIds.RTX3080AORUS_X_10GD, 0x60, "GIGABYTE RTX 3080 Aorus Master"),
 			new GigabyteXtremeIdentifier(Nvidia.RTX3080_LHR, 	GigabyteXtremeIds.RTX3080AORUS_X_10GD, 0x60, "GIGABYTE RTX 3080 Aorus Master LHR"), //I think 0x61 is lcd. Users will complain if I'm wrong.
 			new GigabyteXtremeIdentifier(Nvidia.RTX3080, 		GigabyteXtremeIds.RTX3080AORUS_X_10GD_2, 0x60, "GIGABYTE RTX 3080 Aorus Master"),
+			new GigabyteXtremeIdentifier(Nvidia.RTX3080_LHR, 	GigabyteXtremeIds.RTX3080AORUS_X_10GD_2, 0x60, "GIGABYTE RTX 3080 Aorus Master LHR"),
 			new GigabyteXtremeIdentifier(Nvidia.RTX3090, 		GigabyteXtremeIds.RTX3090AOURUS_X_24GD, 0x60, "GIGABYTE RTX 3090 XTREME"),
 			new GigabyteXtremeIdentifier(Nvidia.RTX3080TI, 		GigabyteXtremeIds.RTX3080TI_XTREME_12G, 0x60, "GIGABYTE RTX 3080TI XTREME"),
 			new GigabyteXtremeIdentifier(Nvidia.RTX3080TI, 		GigabyteXtremeIds.RTX3080TI_MASTER, 0x60, "GIGABYTE RTX 3080TI Aorus Master"),
