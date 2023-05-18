@@ -4,7 +4,7 @@ export function Publisher() { return "WhirlwindFX"; }
 export function Documentation(){ return "troubleshooting/asus"; }
 export function Type() { return "SMBUS"; }
 export function Size() { return [30, 1]; }
-export function DefaultPosition(){return [0, 0];}
+export function DefaultPosition(){return [200, 125];}
 export function DefaultScale(){return 2.5;}
 export function LedNames() { return vLedNames; }
 export function LedPositions() { return vLedPositions; }
@@ -17,7 +17,10 @@ export function ControllableParameters() {
 	return [
 		{"property":"shutdownColor", "group":"lighting", "label":"Shutdown Color", "min":"0", "max":"360", "type":"color", "default":"#009bde"},
 		{"property":"LightingMode", "group":"lighting", "label":"Lighting Mode", "type":"combobox", "values":["Canvas", "Forced"], "default":"Canvas"},
-		{"property":"forcedColor", "group":"lighting", "label":"Forced Color", "min":"0", "max":"360", "type":"color", "default":"#009bde"},
+		{"property":"forcedColor", "group":"lighting", "label":"Forced Color", "min":"0", "max":"360", "type":"color", "default":"#009bde", tooltip: "Something something forced color"},
+		{"property":"forcedColor123", "group":"lighting", "label":"Forced Color", "min":"0", "max":"360", "type":"boolean", "default":"false", tooltip: "Something something toggle switch"},
+		{"property":"OnboardState", "group":"", "label":"Onboard Button Mode", "type":"boolean", "default": "false", "tooltip" : "Enables button bindings from onboard saved profiles. Disables SignalRGB DPI and Macro Control."},
+
 	];
 }
 
@@ -54,9 +57,20 @@ const OldRGBData = [];
 export function Initialize() {
 	AsusGPU.getDeviceInformation();
 	SetGPUNameFromBusIds();
+
 	AsusGPU.setDirectMode(0x01);
+
+	// ENEInterface.WriteRegister(0x80A2, 0x16);
+	// ENEInterface.WriteRegister(0x80D0, 0x0F);
+	// ENEInterface.WriteRegister(0x80D1, 0x4F);
+	// ENEInterface.WriteRegister(0x80D0, 0x0F);
+	// ENEInterface.WriteRegister(0x80D1, 0x4F);
+	// ENEInterface.WriteBlock(0x8020, [0x01, 0x01]);
+	// ENEInterface.WriteRegister(0x8024, 0);
+	// ENEInterface.WriteRegister(0x802F, 1);
+
 	//AsusGPU.auraWriteRegister(0x8024, 0x00); //This is an unknown register. it comes right after direction.
-	AsusGPU.auraWriteRegister(0x802f, 0x01);
+	//AsusGPU.auraWriteRegister(0x802f, 0x01);
 }
 
 export function Render() {
@@ -64,6 +78,7 @@ export function Render() {
 }
 
 export function Shutdown() {
+	AsusGPU.setDirectMode(0x00);
 	AsusGPU.setMode(AsusGPU.modes.rainbow);
 }
 
@@ -112,13 +127,14 @@ function sendColors(shutdown = false) {
 	}
 
 	if(refreshColors) {
-
 		bus.WriteBlock(0x00, 2, [0x81, 0x00]);
 
 		while(RGBData.length > 0) {
-			let packet = [0x0B];
-			packet = packet.concat(RGBData.splice(0, 11));
-			bus.WriteBlock(AsusGPU.registers.color, 0x0C, packet);
+			const packetSize = Math.min(RGBData.length, 31);
+			let packet = [packetSize];
+			packet = packet.concat(RGBData.splice(0, packetSize));
+
+			bus.WriteBlock(AsusGPU.registers.color, packetSize + 1, packet);
 		}
 
 		refreshColors = false;
@@ -241,6 +257,7 @@ class AsusGPUController {
 
 	setDirectMode(directMode) {
 		this.auraWriteRegister(this.auraCommands.directAccess, directMode);
+		this.auraWriteRegister(0x80A0, 1);
 	}
 
 	setMode(deviceMode) {
@@ -254,6 +271,96 @@ class AsusGPUController {
 		bus.WriteByte(this.registers.direction, direction);
 		bus.WriteBlock(this.registers.command, 2, [this.commands.action, this.commands.apply]);
 		bus.WriteByte(this.registers.direction, 0x01); //apply direction
+	}
+}
+export class BinaryUtils{
+	static WriteInt16LittleEndian(value){
+		return [value & 0xFF, (value >> 8) & 0xFF];
+	}
+	static WriteInt16BigEndian(value){
+		return this.WriteInt16LittleEndian(value).reverse();
+	}
+	static ReadInt16LittleEndian(array){
+		return (array[0] & 0xFF) | (array[1] & 0xFF) << 8;
+	}
+	static ReadInt16BigEndian(array){
+		return this.ReadInt16LittleEndian(array.slice(0, 2).reverse());
+	}
+	static ReadInt32LittleEndian(array){
+		return (array[0] & 0xFF) | ((array[1] << 8) & 0xFF00) | ((array[2] << 16) & 0xFF0000) | ((array[3] << 24) & 0xFF000000);
+	}
+	static ReadInt32BigEndian(array){
+		if(array.length < 4){
+			array.push(...new Array(4 - array.length).fill(0));
+		}
+
+		return this.ReadInt32LittleEndian(array.slice(0, 4).reverse());
+	}
+	static WriteInt32LittleEndian(value){
+		return [value & 0xFF, ((value >> 8) & 0xFF), ((value >> 16) & 0xFF), ((value >> 24) & 0xFF)];
+	}
+	static WriteInt32BigEndian(value){
+		return this.WriteInt32LittleEndian(value).reverse();
+	}
+
+}
+
+class ENEInterface{
+
+	static WriteBlock(register, data){
+
+		bus.WriteBlock(0x00, 2, BinaryUtils.WriteInt16BigEndian(register));
+
+		//bus.WriteWord(0x00, ((register << 8) & 0xFF00) | ((register >> 8) & 0x00FF));
+		bus.WriteBlock(0x03, data.length, data);
+	}
+
+	static WriteWord(register){
+		bus.WriteWord(0x00, ((register << 8) & 0xFF00) | ((register >> 8) & 0x00FF));
+		bus.WriteByte(0x01, 0x00);
+		bus.WriteByte(0x01, 0x01);
+	}
+
+	static WriteRegisterWithoutArgument(register) {
+		bus.WriteWord(0x00, ((register << 8) & 0xFF00) | ((register >> 8) & 0x00FF));
+	}
+
+	static WriteRegister(register, value){
+		bus.WriteWord(0x00, ((register << 8) & 0xFF00) | ((register >> 8) & 0x00FF));
+		bus.WriteByte(0x01, value);
+	}
+
+	static ReadRegister(register){
+		bus.WriteWord(0x00, ((register << 8) & 0xFF00) | ((register >> 8) & 0x00FF));
+
+		return bus.ReadByte(0x81);
+	}
+
+	static ReadWord(register){
+		bus.WriteWord(0x00, ((register << 8) & 0xFF00) | ((register >> 8) & 0x00FF));
+
+		let returnValue = (bus.ReadByte(0x81) << 8) & 0xFF00;
+		returnValue |= bus.ReadByte(0x81) & 0xFF;
+
+		return returnValue;
+	}
+
+	static ReadBytes(length) {
+		for(let bytesToRead = 0; bytesToRead < length; bytesToRead++) {
+			bus.ReadByte(0x81);
+		}
+	}
+
+	static ReadBlockByBytes(register, length){
+		bus.WriteWord(0x00, ((register << 8) & 0xFF00) | ((register >> 8) & 0x00FF));
+
+		const returnedBytes = [];
+
+		for(let bytesToRead = 0; bytesToRead < length; bytesToRead++) {
+			returnedBytes[bytesToRead] = bus.ReadByte(0x81);
+		}
+
+		return returnedBytes;
 	}
 }
 
