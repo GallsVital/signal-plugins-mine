@@ -64,12 +64,51 @@ export function Initialize() {
 }
 
 export function Render() {
-	MSIMotherboard.setPerledMode();
 	MSIMotherboard.choosePacketSendType();
 }
 
 export function Shutdown() {
 	MSIMotherboard.choosePacketSendType(true);
+}
+
+function holder() {
+	if(perLED === true) {
+		if(gen2Support && ARGBHeaders > 1) { ///MMM Nesting
+			MSIMotherboard.sendGen2SplitPacketARGB(); //Gen 2 boards use a 3rd register on the 0x04 zone as that's still a JRainbow.
+		} else if(ARGBHeaders > 1 || CorsairHeaders > 0) {
+			MSIMotherboard.sendGen1SplitPacketARGB();//Gen 1 boards have JCorsair headers and therefore use a new zone register.
+		} else {
+			MSIMotherboard.sendGen1ARGB(); //This is the older ARGB Send style. It uses a single packet for all zones. I did deprecate this, minus the single header boards.
+		}
+	} else {
+		if(MSIMotherboard.CheckPacketLength() !== 185) {
+			device.log("PACKET LENGTH ERROR. ABORTING RENDERING");
+
+			return;
+		}
+
+		MSIMotherboard.setDeviceZones();
+		MSIMotherboard.applyZones();
+	}
+
+	if(perLED === true) {
+		if(gen2Support && ARGBHeaders > 1) { ///MMM Nesting
+			MSIMotherboard.sendGen2SplitPacketARGB(true); //Gen 2 boards use a 3rd register on the 0x04 zone as that's still a JRainbow.
+		} else if(ARGBHeaders > 1 || CorsairHeaders > 0) {
+			MSIMotherboard.sendGen1SplitPacketARGB(true);//Gen 1 boards have JCorsair headers and therefore use a new zone register.
+		} else {
+			MSIMotherboard.sendGen1ARGB(true); //This is the older ARGB Send style. It uses a single packet for all zones. I did deprecate this, minus the single header boards.
+		}
+	} else {
+		if(MSIMotherboard.CheckPacketLength() !== 185) {
+			device.log("PACKET LENGTH ERROR. ABORTING RENDERING");
+
+			return;
+		}
+
+		MSIMotherboard.setDeviceZones(true);
+		MSIMotherboard.applyZones();
+	}
 }
 
 export function onadvancedModeChanged() {
@@ -1142,6 +1181,18 @@ class MysticLight {
 				ForceZoneBased	  : false,
 				JARGB_V2		  : true,
 			},
+			0x7E06 : //Z790-P Wifi
+			{
+				OnboardLEDs    : 0,
+				RGBHeaders     : 1,
+				ARGBHeaders    : 2,
+				JPipeLEDs	   : 0,
+				CorsairHeaders : 0,
+				//PERLED
+				PerLEDOnboardLEDs : 0,
+				ForceZoneBased	  : false,
+				JARGB_V2		  : true,
+			},
 			0x7E07 : //Z790-A Pro DDR4
 			{
 				OnboardLEDs    : 0,
@@ -1747,6 +1798,8 @@ class MysticLight {
 
 	choosePacketSendType(shutdown = false) {
 		if(perLED) {
+			MSIMotherboard.setPerledMode();
+
 			if(this.getTotalLEDCount()) {
 				this.sendGen1ARGB(shutdown);
 			} else {
@@ -1815,8 +1868,8 @@ class MysticLight {
 					0x01, 0x00, 0x00, 0x00, 0x08, 0x00, 0x00, 0x00, 0x80, 0x00, //JRGB1
 					0x01, 0x00, 0x00, 0x00, 0x2a, 0x00, 0x00, 0x00, 0x80, 0x00, //JPipe1
 					0x01, 0x00, 0x00, 0x00, 0x2a, 0x00, 0x00, 0x00, 0x80, 0x00, //JPipe2
-					0x01, 0x00, 0x00, 0x00, 0x08, 0x00, 0x00, 0x00, 0x80, 0x00, this.header1LEDCount > 1 ? this.header1LEDCount : 1, //JRainbow1 //Extra Byte determines number of leds
-					0x01, 0x00, 0x00, 0x00, 0x08, 0x00, 0x00, 0x00, 0x80, 0x00, this.header2LEDCount > 1 ? this.header2LEDCount : 1, //JRainbow2
+					0x00, 0x00, 0x00, 0x00, 0x28, 0x00, 0x00, 0x00, 0x80, 0x00, this.header1LEDCount > 1 ? this.header1LEDCount : 1, //JRainbow1 //Extra Byte determines number of leds
+					0x00, 0x00, 0x00, 0x00, 0x28, 0x00, 0x00, 0x00, 0x80, 0x00, this.header2LEDCount > 1 ? this.header2LEDCount : 1, //JRainbow2
 					0x01, 0x00, 0x00, 0x00, 0x28, 0x00, 0x00, 0x00, 0x82, 0x00, this.header3LEDCount > 1 ? this.header3LEDCount : 1, //JRainbow3 or Corsair? //61
 					0x01, 0x00, 0x00, 0x00, 0x28, 0x00, 0x00, 0x00, 0x80, 0x00, //JCorsair other?
 					0x25, 0x00, 0x00, 0x00, 0xa9, 0x00, 0x00, 0x00, 0x9f, 0x00, //JOnboard1
