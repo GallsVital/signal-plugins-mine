@@ -2,7 +2,6 @@ export function Name() { return "Fantech board"; }
 export function VendorId() { return 0x0416; }
 export function ProductId() { return 0xc345; }
 export function Publisher() { return "WhirlwindFX"; }
-export function Size() { return [14, 5]; }
 export function DefaultPosition(){return [10, 100]; }
 export function DefaultScale(){return 8.0;}
 export function ControllableParameters() {
@@ -47,7 +46,8 @@ const boards = {
 			[0, 2],   [1, 2], [2, 2], [3, 2], [4, 2], [5, 2], [6, 2], [7, 2], [8, 2], [9, 2], [10, 2], [11, 2],          [13, 2],
 			[0, 3],        [2, 3], [3, 3], [4, 3], [5, 3], [6, 3], [7, 3], [8, 3], [9, 3], [10, 3], [11, 3],             [13, 3],
 			[0, 4], [1, 4], [2, 4],                         [6, 4],                            [10, 4], [11, 4], [12, 4], [13, 4]
-		]
+		],
+		size: [14, 5]
 	},
 	MK870TKL:{
 		name: "MK870TKL",
@@ -57,11 +57,11 @@ const boards = {
 			"Tab", "Q", "W", "E", "R", "T", "Y", "U", "I", "O", "P", "[", "]", "\\", 							  "Delete", " End", "PgDown",
 			"CapsLock", "A", "S", "D", "F", "G", "H", "J", "K", "L", ";", "'",       "Enter",
 			"Left Shift",      "Z", "X", "C", "V", "B", "N", "M", ",", ".", "/",     "Right Shift",    			  "Up Arrow",
-			"Left Ctrl", "Left Win", "Left Alt",        "Space",      "Right Alt", "Menu", "Right Ctrl", "Fn",    "Left Arrow",  "Down Arrow", "Right Arrow"
+			"Left Ctrl", "Left Win", "Left Alt",        "Space",      "Right Alt", "Fn", "Menu", "Right Ctrl",    "Left Arrow",  "Down Arrow", "Right Arrow"
 		],
 		vKeys: [
-			0, 		1, 2, 3, 4, 	5, 6, 7, 8, 	  9, 10, 11, 12,	15, 16, 17,
-			22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34,  36,    37, 38, 30,
+			0, 		2, 3, 4, 5, 	7, 8, 9, 10, 	 11, 12, 13, 14,	15, 16, 17,
+			22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34,  36,    37, 38, 39,
 			44,  45, 46, 47, 48, 49, 50, 51, 52, 53, 54, 55, 56, 58,    59, 60, 61,
 			66,   68, 69, 70, 71, 72, 73, 74, 75, 76, 77, 78,    80,
 			88,    90, 91, 92, 93, 94, 95, 96, 97, 98, 99,      102, 	104,
@@ -74,13 +74,18 @@ const boards = {
 			[0, 3],   [1, 3], [2, 3], [3, 3], [4, 3], [5, 3], [6, 3], [7, 3], [8, 3], [9, 3], [10, 3], [11, 3],          [13, 3],
 			[0, 4],        [2, 4], [3, 4], [4, 4], [5, 4], [6, 4], [7, 4], [8, 4], [9, 4], [10, 4], [11, 4],             [13, 4],	[15, 4],
 			[0, 5], [1, 5], [2, 5],                         [6, 5],                            [10, 5], [11, 5], [12, 5], [13, 5],	[14, 5], [15, 5], [16, 5]
-		]
+		],
+		size: [17, 6]
 	}
 };
 
 let vKeyNames = [];
 let vKeys = [];
 let vKeyPositions = [];
+
+export function Size() {
+	return boards[boardModel].size;
+}
 
 export function LedNames() {
 	vKeyNames = boards[boardModel].vKeyNames;
@@ -107,6 +112,11 @@ export function onboardModelChanged () {
 
 export function Initialize() {
 
+	vKeyNames = boards[boardModel].vKeyNames;
+	vKeyPositions = boards[boardModel].vKeyPositions;
+	vKeys = boards[boardModel].vKeys;
+
+	device.setControllableLeds(vKeyNames, vKeyPositions);
 	device.setName(boards[boardModel].name);
 	device.log(`Model set to: ` + boards[boardModel].name);
 
