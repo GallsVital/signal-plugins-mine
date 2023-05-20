@@ -1,21 +1,35 @@
-export function Name() { return "Steelseries QcK Prism 5XL"; }
+export function Name() { return "Steelseries QcK Prism XL"; }
 export function VendorId() { return 0x1038; }
-export function Documentation(){ return "troubleshooting/steelseries"; }
-export function ProductId() { return 0x151A; }
+export function ProductId() { return [0x1516, 0x151A, 0x1520, 0x3769, 0x151e]; }
 export function Publisher() { return "WhirlwindFX"; }
+export function Documentation(){ return "troubleshooting/steelseries"; }
 export function Size() { return [2, 2]; }
 export function DefaultPosition(){return [240, 120];}
 export function DefaultScale(){return 8.0;}
+/* global
+shutdownColor:readonly
+LightingMode:readonly
+forcedColor:readonly
+*/
+export function ControllableParameters(){
+	return [
+		{"property":"shutdownColor", "label":"Shutdown Color", "min":"0", "max":"360", "type":"color", "default":"#009bde"},
+		{"property":"LightingMode", "label":"Lighting Mode", "type":"combobox", "values":["Canvas", "Forced"], "default":"Canvas"},
+		{"property":"forcedColor", "label":"Forced Color", "min":"0", "max":"360", "type":"color", "default":"#009bde"},
+	];
+}
+
 const vLedNames = [
 	"Mousemat Top", "Mousemap Bottom"
 ];
 
-const vLedPositions = [[0, 0], [0, 1]];
+const vLedPositions = [
+	[0, 0], [0, 1]
+];
 
-export function Initialize() {
-	// Qck doesn't require a setup packet.
-	return "Hello, there!";
-}
+const vLeds = [
+	5, 17
+];
 
 export function LedNames() {
 	return vLedNames;
@@ -25,139 +39,85 @@ export function LedPositions() {
 	return vLedPositions;
 }
 
-export function Shutdown() {
+export function Initialize() {
+
+}
+
+export function Render() {
+	sendColors();
+}
+
+export function Shutdown(SystemSuspending) {
+
+	if(SystemSuspending){
+		sendColors("#000000"); // Go Dark on System Sleep/Shutdown
+	}else{
+		sendColors(shutdownColor);
+	}
+
+}
+
+export function sendColors(overrideColor) {
+
 	// Most of this is grabbed using usblyzer.  Usblyzer sent 524 byte packets followed
 	// by 64 byte commit packets.  Here, we sent the bytes we'll use and the engine will
 	// pad the rest with zeroes.  Important to note that we add 1 to the send and write functions
 	// because hid firstbyte is (almost) always zero.  Use usblyzer to verify the packets sent.
 	const packet = [];
 
-	// first byte is zero.
-	packet[0] = 0;
-
-	// packet start.
 	packet[1] = 14;
-	packet[2] = 0;
 	packet[3] = 2;
-	packet[4] = 0;
-
-	// Color, bottom.
-	packet[5] = 100; //r
-	packet[6] = 100; //g
-	packet[7] = 100; //b
-
-	packet[8] = 255; //?
+	packet[8] = 255;
 	packet[9] = 50;
 	packet[10] = 200;
-
-	packet[11] = 0; //?
-	packet[12] = 0;
-	packet[13] = 0;
-
-	packet[14] = 1; //?
-	packet[15] = 0;
-	packet[16] = 0;
-
-	// Color, top.
-	packet[17] = 100;
-	packet[18] = 100;
-	packet[19] = 100;
-
-	packet[20] = 255; //?
+	packet[14] = 1;
+	packet[20] = 255;
 	packet[21] = 50;
 	packet[22] = 200;
-
-	packet[23] = 0; //?
-	packet[24] = 0;
 	packet[25] = 1;
-
-	packet[26] = 1; //?
-	packet[27] = 0;
+	packet[26] = 1;
 	packet[28] = 1;
 
+	for (let idx = 0; idx < vLeds.length; idx++) {
+		const iPxX = vLedPositions[idx][0];
+		const iPxY = vLedPositions[idx][1];
+		let color;
+
+		if(overrideColor){
+			color = hexToRgb(overrideColor);
+		}else if (LightingMode === "Forced") {
+			color = hexToRgb(forcedColor);
+		}else{
+			color = device.color(iPxX, iPxY);
+		}
+
+		const iLedIdx 		= vLeds[idx];
+		packet[iLedIdx] 	= color[0];
+		packet[iLedIdx+1] 	= color[1];
+		packet[iLedIdx+2] 	= color[2];
+	}
 
 	device.send_report(packet, 525);
 
 	// We have to send 'write' vs 'send_report' here with only 0x0D as byte 1. (first byte
 	// is always zero)
-	const apply = [];
-	apply[0] = 0;
-	apply[1] = 0x0D;
-	device.write(apply, 65);
+	device.write([0x00, 0x0D], 65);
+}
+
+function hexToRgb(hex) {
+	const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+	const colors = [];
+	colors[0] = parseInt(result[1], 16);
+	colors[1] = parseInt(result[2], 16);
+	colors[2] = parseInt(result[3], 16);
+
+	return colors;
 }
 
 export function Validate(endpoint) {
 	// Qck has two interfaces - return 'true' if the endpoint is at interface
 	// zero.
 	return endpoint.interface === 0;
-}
-
-export function Render() {
-
-	// Most of this is grabbed using usblyzer.  Usblyzer sent 524 byte packets followed
-	// by 64 byte commit packets.  Here, we sent the bytes we'll use and the engine will
-	// pad the rest with zeroes.  Important to note that we add 1 to the send and write functions
-	// because hid firstbyte is (almost) always zero.  Use usblyzer to verify the packets sent.
-	const packet = [];
-
-	// first byte is zero.
-	packet[0] = 0;
-
-	// packet start.
-	packet[1] = 14;
-	packet[2] = 0;
-	packet[3] = 2;
-	packet[4] = 0;
-
-	// Color, bottom.
-	const iBX = vLedPositions[1][0];
-	const iBY = vLedPositions[1][1];
-	const bottom = device.color(iBX, iBY);
-	packet[5] = bottom[0]; //r
-	packet[6] = bottom[1]; //g
-	packet[7] = bottom[2]; //b
-
-	packet[8] = 255; //?
-	packet[9] = 50;
-	packet[10] = 200;
-
-	packet[11] = 0; //?
-	packet[12] = 0;
-	packet[13] = 0;
-
-	packet[14] = 1; //?
-	packet[15] = 0;
-	packet[16] = 0;
-
-	// Color, top.
-	const iTX = vLedPositions[0][0];
-	const iTY = vLedPositions[0][1];
-	const top = device.color(iTX, iTY);
-	packet[17] = top[0];
-	packet[18] = top[1];
-	packet[19] = top[2];
-
-	packet[20] = 255; //?
-	packet[21] = 50;
-	packet[22] = 200;
-
-	packet[23] = 0; //?
-	packet[24] = 0;
-	packet[25] = 1;
-
-	packet[26] = 1; //?
-	packet[27] = 0;
-	packet[28] = 1;
-
-
-	device.send_report(packet, 525);
-
-	// We have to send 'write' vs 'send_report' here with only 0x0D as byte 1. (first byte
-	// is always zero)
-	const apply = [];
-	apply[0] = 0;
-	apply[1] = 0x0D;
-	device.write(apply, 65);
 }
 
 export function Image() {
