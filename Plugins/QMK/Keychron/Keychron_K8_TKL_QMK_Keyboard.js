@@ -1,5 +1,5 @@
 export function Name() { return "Keychron K8 TKL QMK Keyboard"; }
-export function Version() { return "1.1.3"; }
+export function Version() { return "1.1.4"; }
 export function VendorId() { return 0x3434; }
 export function ProductId() { return 0xfe0f; }
 export function Publisher() { return "realSnosh & WhirlwindFX"; }
@@ -8,12 +8,14 @@ export function Size() { return [17, 6]; }
 export function DefaultPosition(){return [150, 95]; }
 export function DefaultScale(){return 8.6;}
 /* global
+shutdownMode:readonly
 shutdownColor:readonly
 LightingMode:readonly
 forcedColor:readonly
 */
 export function ControllableParameters() {
 	return [
+		{"property":"shutdownMode", "group":"lighting", "label":"Shutdown Mode", "type":"combobox", "values":["SignalRGB", "Hardware"], "default":"SignalRGB"},
 		{"property":"shutdownColor", "group":"lighting", "label":"Shutdown Color", "min":"0", "max":"360", "type":"color", "default":"#009bde"},
 		{"property":"LightingMode", "group":"lighting", "label":"Lighting Mode", "type":"combobox", "values":["Canvas", "Forced"], "default":"Canvas"},
 		{"property":"forcedColor", "group":"lighting", "label":"Forced Color", "min":"0", "max":"360", "type":"color", "default":"#009bde"},
@@ -82,7 +84,11 @@ export function Shutdown(SystemSuspending) {
 	if(SystemSuspending) {
 		sendColors("#000000"); // Go Dark on System Sleep/Shutdown
 	} else {
-		effectDisable();
+		if (shutdownMode === "SignalRGB") {
+			sendColors(shutdownColor);
+		} else {
+			effectDisable();
+		}
 	}
 
 }
@@ -162,7 +168,7 @@ function returnSignalRGBProtocolVersion(data) {
 
 
 	if(PluginProtocolVersion !== SignalRGBProtocolVersion) {
-		device.notify("Unsupported Protocol Version: ", `This plugin is intended for SignalRGB Protocol version ${PluginProtocolVersion}. This device is version: ${SignalRGBProtocolVersion}`, 0);
+		device.notify("Unsupported Protocol Version: ", `This plugin is intended for SignalRGB Protocol version ${PluginProtocolVersion}. This device is version: ${SignalRGBProtocolVersion}`, 1, "Documentation");
 	}
 
 	device.pause(30);
@@ -171,7 +177,7 @@ function returnSignalRGBProtocolVersion(data) {
 function requestUniqueIdentifier() //Grab the unique identifier for this keyboard model
 {
 	if(device.write([0x00, 0x23], 32) === -1) {
-		device.notify("Unsupported Firmware: ", `This device is not running SignalRGB-compatible firmware. Click the Open Troubleshooting Docs button to learn more.`, 0);
+		device.notify("Unsupported Firmware: ", `This device is not running SignalRGB-compatible firmware. Click the Open Troubleshooting Docs button to learn more.`, 1, "Documentation");
 	}
 
 	device.pause(30);
@@ -214,7 +220,7 @@ function returnFirmwareType(data) {
 	const FirmwareTypeByte = data[2];
 
 	if(!(FirmwareTypeByte === MainlineQMKFirmware || FirmwareTypeByte === VIAFirmware)) {
-		device.notify("Unsupported Firmware: ", "Click Show Console, and then click on troubleshooting for your keyboard to find out more.", 0);
+		device.notify("Unsupported Firmware: ", "Click Show Console, and then click on troubleshooting for your keyboard to find out more.", 1, "Documentation");
 	}
 
 	if(FirmwareTypeByte === MainlineQMKFirmware) {
