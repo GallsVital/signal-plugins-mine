@@ -52,7 +52,6 @@ export function Initialize() {
 
 export function Render() {
 	sendColors();
-	device.pause(1000);
 }
 
 export function Shutdown() {
@@ -86,7 +85,6 @@ function sendColors(shutdown = false) {
 		}
 
 		PNYGPU.setRGB(zone, color);
-		device.pause(10);
 	}
 
 }

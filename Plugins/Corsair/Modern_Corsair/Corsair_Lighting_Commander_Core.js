@@ -330,6 +330,15 @@ function GetFanSettings() {
 		case 1:
 			device.log(`${FanControllerArray[i]} is Disconnected!`);
 			break;
+
+		case 2: //Chance broke this with the D-30's and we have no idea what state 2 does. Let's see.
+			if(!ConnectedFans.includes(i)){
+				device.createFanControl(FanControllerArray[i]);
+				ConnectedFans.push(i);
+				device.log(`Found ${FanControllerArray[i]}`);
+			}
+
+			break;
 		case 4:
 			device.log("Device is still booting up. We'll refetch fan states later...", {toFile: true});
 			ConnectedFans = [];

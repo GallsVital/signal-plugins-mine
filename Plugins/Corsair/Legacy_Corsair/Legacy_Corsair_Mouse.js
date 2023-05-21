@@ -164,7 +164,7 @@ function readInputs() {
 	device.set_endpoint(0, 0x0002, 0xffc1); // Macro input endpoint
 
 	do {
-    	const packet = device.read([0x00], 64, 0);
+    	const packet = device.read([0x00], 64, 1);
     	processInputs(packet);
 	}
 	while(device.getLastReadSize() > 0);
@@ -309,7 +309,7 @@ export class LegacyCorsairLibrary {
 			"Glaive Pro" : {
 				vLedNames : [ "Mouse" ],
 				vLedPositions : [ [1, 1] ],
-				vKeys : [ 1 ],
+				vKeys : [ 3 ], //was 1 but that no worky
 				size : [3, 3],
 				maxDPI : 12400
 			},
@@ -1015,7 +1015,7 @@ export default class DpiController {
 			}
 
 			this.log(`Adding Stage: ${i}`);
-			device.addProperty({ "property": `dpi${i}`, "group": "mouse", "label": `DPI ${i}`, "step": "50", "type": "number", "min": this.minDpi, "max": this.maxDpi, "default": "400", "order": 2 });
+			device.addProperty({ "property": `dpi${i}`, "group": "mouse", "label": `DPI ${i}`, "step": "50", "type": "number", "min": this.minDpi, "max": this.maxDpi, "default": 800 + (400*i), "order": 2 });
 			// eslint-disable-next-line no-eval
 			this.dpiMap.set(i, () => { return eval(`dpi${i}`); });
 		}
