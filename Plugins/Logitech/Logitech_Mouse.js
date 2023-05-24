@@ -2208,7 +2208,7 @@ export class BitArray {
 /* eslint-enable complexity */
 const macroInputArray = new BitArray(3);
 
-class LogitechExtras { //class to store all of the extra unused stuff
+export class LogitechExtras { //class to store all of the extra unused stuff
 	constructor() {
 
 	}
