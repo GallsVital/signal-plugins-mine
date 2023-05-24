@@ -103,13 +103,14 @@ const ASUS_MODE_DIRECT = 0xFF;
 
 const ConfigurationOverrides = {
 	"AULA3-AR32-0207":{MainboardCount: 3, ARGBChannelCount:3, RGBHeaderCount: 1}, // THIS HAS A SPACE AT THE END?!?!?!
-	"AULA3-AR32-0214":{MainboardCount: 2, ARGBChannelCount:3, RGBHeaderCount: 1}, // Asus TUF GAMING Z790-PLUS WIFI D4
+	//"AULA3-AR32-0214":{MainboardCount: 2, ARGBChannelCount:3, RGBHeaderCount: 1}, // Asus TUF GAMING Z790-PLUS WIFI D4
 	"AULA3-AR32-0213":{MainboardCount: 2, ARGBChannelCount:3, RGBHeaderCount: 1},
 	"AULA3-AR32-0218":{MainboardCount: 5, ARGBChannelCount:3, RGBHeaderCount: 1}, //Z790 Apex
 	"Asus ROG MAXIMUS Z690 EXTREME GLACIAL":{MainboardCount: 7, ARGBChannelCount:4, RGBHeaderCount: 1, polymoOverride : true}, //The naming for this is a bit backwards. It forces polymo off.
 	//"AULA3-6K75-0206":{MainboardCount: 7, ARGBChannelCount:3, RGBHeaderCount: 1},
 	//"AULA3-AR42-0207":{MainboardCount: 3, ARGBChannelCount:1, RGBHeaderCount: 2},
 	"TUF GAMING X570-PRO (WI-FI)": {MainboardCount: 3, ARGBChannelCount:1, RGBHeaderCount: 2},
+	"PRIME Z790-A Wifi" : {MainboardCount: 3, ARGBChannelCount:3, RGBHeaderCount: 1}
 };
 
 const DeviceInfo = {
