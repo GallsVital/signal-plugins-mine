@@ -28,18 +28,8 @@ export function ControllableParameters() {
 		{"property":"shutdownColor", "group":"lighting", "label":"Shutdown Color", "min":"0", "max":"360", "type":"color", "default":"#009bde"},
 		{"property":"LightingMode", "group":"lighting", "label":"Lighting Mode", "type":"combobox", "values":["Canvas", "Forced"], "default":"Canvas"},
 		{"property":"forcedColor", "group":"lighting", "label":"Forced Color", "min":"0", "max":"360", "type":"color", "default":"#009bde"},
-		{"property":"OnboardState", "group":"", "label":"Onboard Button Mode", "type":"boolean", "default": "false"},
+		{"property":"OnboardState", "group":"", "label":"Onboard Button Mode", "type":"boolean", "default": "false", "tooltip" : "Enables button bindings from onboard saved profiles. Disables SignalRGB DPI and Macro Control."},
 		{"property":"pollingRate", "group":"", "label":"Polling Rate", "type":"combobox", "values":[ "1000", "500", "250", "100" ], "default":"1000"},
-
-		{"property":"settingControl", "group":"mouse", "label":"Enable Setting Control", "type":"boolean", "default":"true"},
-		{"property":"dpiStages", "group":"mouse", "label":"Number of DPI Stages", "step":"1", "type":"number", "min":"1", "max":"5", "default":"5"},
-		{"property":"dpi1", "group":"mouse", "label":"DPI 1", "step":"50", "type":"number", "min":"200", "max":"25600", "default":"400"},
-		{"property":"dpi2", "group":"mouse", "label":"DPI 2", "step":"50", "type":"number", "min":"200", "max":"25600", "default":"800"},
-		{"property":"dpi3", "group":"mouse", "label":"DPI 3", "step":"50", "type":"number", "min":"200", "max":"25600", "default":"1200"},
-		{"property":"dpi4", "group":"mouse", "label":"DPI 4", "step":"50", "type":"number", "min":"200", "max":"25600", "default":"1600"},
-		{"property":"dpi5", "group":"mouse", "label":"DPI 5", "step":"50", "type":"number", "min":"200", "max":"25600", "default":"2000"},
-		{"property":"dpi6", "group":"mouse", "label":"Sniper Button DPI", "step":"50", "type":"number", "min":"200", "max":"25600", "default":"400"},
-		{"property":"dpiRollover", "group":"mouse", "label":"DPI Stage Rollover", "type":"boolean", "default": "false"}
 	];
 }
 
@@ -58,7 +48,6 @@ export function LedPositions() {
 
 export function Initialize() {
 	Logitech.detectDeviceEndpoint();
-	LogitechMouse.removeMouseProps();
 	LogitechPowerplay.Powerplayinit();
 	DeviceConnected = false;
 
@@ -83,6 +72,8 @@ export function Render() {
 		}
 
 		device.pause(1000);
+
+		return;
 	}
 
 	if(LogitechMouse.getEnabledDPILights()) {
@@ -92,6 +83,7 @@ export function Render() {
 	PollBattery();
 	DetectInputs();
 	grabColors();
+	device.pause(5);
 }
 
 export function Shutdown() {
@@ -192,7 +184,10 @@ function dpiLightAlwaysOnTimeHandler() {
 		return;
 	}
 
-	Logitech.setShortFeature([Logitech.FeatureIDs.RGB8071ID, 0x20, 0x00, 0x00], false, false, "Hero DPI Light", true); //bypassing the logging I added for DPI Lights.
+	if(Logitech.UsesHeroProtocol()) { Logitech.setShortFeature([Logitech.FeatureIDs.RGB8071ID, 0x20, 0x00, 0x00], false, false, "Hero DPI Light", true); } else {
+		Logitech.setLongFeature([Logitech.FeatureIDs.LEDControlID, 0x50, 0x01, 0x00, 0x01, 0x00, 0x00 ], false, "DPI Lights", true);
+	}
+
 	LogitechMouse.setEnabledDPILights(false);
 }
 
@@ -200,15 +195,20 @@ function DetectInputs() {
 	do {
 		device.set_endpoint(Logitech.GetDeviceEndpoint([`interface`]), Logitech.MessageTypeEndpoints.LongMessageEndpoint, 0xff00);
 
-    	const packet = device.read([0x00], 9, 1);
+    	const packet = device.read([0x00], 9, 0);
 
 		macroInputArray.update(ProcessInputs(packet));
 	}
 	while(device.getLastReadSize() > 0);
 }
 
+// eslint-disable-next-line complexity
 function ProcessInputs(packet) {
 	if(packet[0] === Logitech.MessageTypes.LongMessage && packet[1] === Logitech.GetConnectionType() && packet[2] === Logitech.FeatureIDs.ButtonSpyID) {
+
+		if(packet[4] === 0 && packet[5] === 0 && packet[6] === 0 && packet[7] === 0 && DPIHandler.getSniperMode()) {
+			DPIHandler.setSniperMode(false); //The BitIDX system is so far over my head this is my temporary band-aid
+		}
 
 		return packet.slice(4, 7);
 	}
@@ -222,6 +222,56 @@ function ProcessInputs(packet) {
 	}
 
 	return[];
+}
+
+function macroInputHandler(bitIdx, isPressed) {
+
+	const PhysicalbuttonID = LogitechMouse.MapPhysicalButtonIDToName(bitIdx);
+	const PhysicalbuttonName = LogitechMouse.GetMouseButtons(PhysicalbuttonID);
+	const pressedKey = LogitechMouse.MapButtonNameToSignalRGBValue(PhysicalbuttonName);
+
+	switch(pressedKey){
+	case 7:
+		if(!isPressed) {break;}
+
+		DPIHandler.increment();
+		device.log("DPI Up");
+		break;
+
+	case 6:
+		if(!isPressed) {break;}
+
+		device.log("DPI Down");
+		DPIHandler.decrement();
+		break;
+	case 13:
+		DPIHandler.setSniperMode(isPressed);
+
+		if(isPressed && settingControl){
+			LogitechMouse.SetDPILights(1);
+		}
+
+		break;
+
+	default: {
+		// Skip keys only windows should handle.
+		if(pressedKey === 0){
+			break;
+		}
+		// Send Events for any keys we don't handle above
+		const eventData = {
+			"buttonCode": 0,
+			"released": !isPressed,
+			"name":PhysicalbuttonName
+		};
+
+		//device.log(eventData);
+
+		if(Logitech.GetDeviceType() === "Mouse") {
+			mouse.sendEvent(eventData, "Button Press");
+		}
+	}
+	}
 }
 
 const PreviousFrameColors = [];
@@ -263,8 +313,6 @@ function grabColors(shutdown = false) {
 			RGBData[packetidx + 3] = color[2];
 
 			packetidx += 4;
-			// const LedInfo = [ledIndexes[iIdx]].concat(color);
-			// RGBData = RGBData.concat(LedInfo);
 		} else {
 			const iLedIdx = ((ledIndexes[iIdx]-1) * 3);
 			RGBData[iLedIdx] =   color[0];
@@ -295,9 +343,7 @@ function sendMousePad(shutdown = false) {
 		color = device.subdeviceColor("PowerPlayMat", iX, iY);
 	}
 
-	const packet = [Logitech.MessageTypes.LongMessage, 0x07, 0x0B, 0x30, 0x00, 0x01, color[0], color[1], color[2], 0x02];
-
-	device.write(packet, 20);
+	device.write([Logitech.MessageTypes.LongMessage, 0x07, 0x0B, 0x30, 0x00, 0x01, color[0], color[1], color[2], 0x02], 20);
 }
 
 function hexToRgb(hex) {
@@ -514,8 +560,8 @@ export class LogitechDeviceLibrary {
 				"button7" : "Top",
 				"button8" : "Scroll Right",
 				"button9" : "Scroll Left",
-				"button10" : "DPI UP",
-				"button11" : "DPI Down"
+				"button10" : "DPI Down",
+				"button11" : "DPI UP"
 			},
 			G900Body :
 			{
@@ -918,7 +964,9 @@ export class LogitechProtocol {
 			/** Variable that holds current device's LED Positions. */
 			DeviceLEDPositions : [],
 			/** Variable that holds current device's LED vKeys. */
-			DeviceLedIndexes : []
+			DeviceLedIndexes : [],
+			/** Variable that holds current device's Max DPI. */
+			DeviceMaxDPI : 25600,
 		};
 		/** Dictionary of Device Feature Pages. */
 		this.FeaturePages =
@@ -1011,13 +1059,13 @@ export class LogitechProtocol {
 		};
 	}
 
+	//Getters and Setters
+
 	GetDeviceType(){ return this.Config.DeviceType; }
 	SetDeviceType(DeviceType) { this.Config.DeviceType = DeviceType; }
 
-	//Getters and Setters
-	SetConnectionMode(ConnectionMode) {
-		this.Config.ConnectionMode = this.ConnectionType[ConnectionMode];
-	}
+	GetConnectionMode() { return this.Config.ConnectionMode; }
+	SetConnectionMode(ConnectionMode) { this.Config.ConnectionMode = this.ConnectionType[ConnectionMode]; }
 
 	SetDeviceID(DeviceID) {
 		this.DeviceID = DeviceID;
@@ -1038,6 +1086,10 @@ export class LogitechProtocol {
 			device.log("Device has sniper button.");
 		}
 
+		if(deviceLibrary.maxDPI) {
+			this.SetDeviceMaxDPI(deviceLibrary.maxDPI);
+		}
+
 		this.SetMouseBodyType(deviceLibrary.bodyStyle);
 		this.SetDeviceLedNames(LogitechDevice.vLedNameDict[deviceLibrary.ledStyle]);
 		this.SetDeviceLedIndexes(LogitechDevice.vLedsDict[deviceLibrary.ledStyle]);
@@ -1045,6 +1097,9 @@ export class LogitechProtocol {
 		this.SetDeviceType(deviceLibrary.DeviceType);
 		device.setControllableLeds(this.Config.DeviceLEDNames, this.Config.DeviceLEDPositions);
 	}
+
+	GetDeviceMaxDPI() { return this.Config.DeviceMaxDPI; }
+	SetDeviceMaxDPI(MaxDPI) { this.Config.DeviceMaxDPI = MaxDPI; }
 
 	GetDeviceLedNames(){ return this.Config.DeviceLEDNames; }
 	SetDeviceLedNames(LedNames) { this.Config.DeviceLEDNames = LedNames; }
@@ -1090,7 +1145,7 @@ export class LogitechProtocol {
 	getShortFeature(){
 		device.set_endpoint(this.Config.deviceEndpoint[`interface`], this.MessageTypeEndpoints.ShortMessageEndpoint, 0xff00);
 
-		const returnPacket = device.read([0x00], 7);
+		const returnPacket = device.read([0x00], 7, 20);
 		const response = new LogitechResponse(returnPacket);
 
 		if(response.error !== 0x00 && response.error < 11) {
@@ -1103,7 +1158,7 @@ export class LogitechProtocol {
 	getLongFeature(){
 		device.set_endpoint(this.Config.deviceEndpoint[`interface`], this.MessageTypeEndpoints.LongMessageEndpoint, 0xff00);
 
-		const returnPacket = device.read([0x00], 20);
+		const returnPacket = device.read([0x00], 20, 20);
 		const response = new LogitechResponse(returnPacket);
 
 		if(response.error !== 0x00 && response.error < 11) {
@@ -1112,7 +1167,6 @@ export class LogitechProtocol {
 
 		return response;
 	}
-
 	/** Send Short Data. */
 	setShortFeature(data, NoResponse, forceWired, callingFunction, noDelay = false){
 		device.set_endpoint(this.Config.deviceEndpoint[`interface`], this.MessageTypeEndpoints.ShortMessageEndpoint, 0xff00);
@@ -1125,7 +1179,7 @@ export class LogitechProtocol {
 			return new LogitechResponse([]);
 		}
 
-	   const returnPacket = device.read([0x00], 7);
+	   const returnPacket = device.read([0x00], 7, 20);
 
 		const response = new LogitechResponse(returnPacket);
 
@@ -1141,14 +1195,14 @@ export class LogitechProtocol {
 
 		if(!noDelay) { device.pause(30); this.clearLongReadBuffer(); }
 
-	   const packet = [this.MessageTypes.LongMessage, this.Config.ConnectionMode, ...data];
-	   device.write(packet, 20);
+	    const packet = [this.MessageTypes.LongMessage, this.Config.ConnectionMode, ...data];
+	    device.write(packet, 20);
 
-	   if(NoResponse){
+	    if(NoResponse){
 		   return new LogitechResponse([]);
-	   }
+	    }
 
-	    const returnPacket = device.read([0x00], 20);
+	    const returnPacket = device.read([0x00], 20, 20);
 		const response = new LogitechResponse(returnPacket);
 
 		if(response.error !== 0x00  && response.error < 11) {
@@ -1208,86 +1262,59 @@ export class LogitechProtocol {
 	//Actual Device Functions
 	/** Initialize the Device and Prepare For Rendering. */
 	InitializeDevice() {
-	   this.FetchFeatureIDsFromDevice();
-	   this.ConfigureSettingsBasedOnFeatureIds();
+	    this.FetchFeatureIDsFromDevice();
+	    this.ConfigureSettingsBasedOnFeatureIds();
 
-	   // Dump All Supported Feature Pages;
-	  // this.FetchSupportedFeatures();
+	    const CommunicationID = this.FetchDeviceInfo();
 
-	   const CommunicationID = this.FetchDeviceInfo();
+	    if(LogitechDevice.DeviceIDs.hasOwnProperty(CommunicationID)) {
+			device.log("Matching Device ID Found");
+			this.SetDeviceID(CommunicationID);
+	    } else {
+			DeviceConnected = false;
 
-	   if(LogitechDevice.DeviceIDs.hasOwnProperty(CommunicationID)) {
-		   device.log("Matching Device ID Found");
-		   this.SetDeviceID(CommunicationID);
-	   } else {
-		   DeviceConnected = false;
+			return; //Kick back to pairing check if our DeviceIDCheck fails. I should probably add a timeout here, but we'll see. At the very least this doesn't lock up the render loop.
+	    }
 
-		   return; //Kick back to pairing check if our DeviceIDCheck fails. I should probably add a timeout here, but we'll see. At the very least this doesn't lock up the render loop.
-	   }
+	    this.FetchDeviceName();
 
-	   this.SetDeviceResetMode(); //Kick it to reset. Fixes lots of weird issues.
-
-	   this.FetchDeviceName();
-	   this.FetchDeviceType(); //No longer used for detection. Lowers chance of missing.
-
-	   if(this.SupportsFeaturePage(this.FeaturePages.FriendlyName)){
+	    if(this.SupportsFeaturePage(this.FeaturePages.FriendlyName)){
 			device.log("Device Supports Friendly Name.", {toFile : true});
-		   this.FetchFriendlyDeviceName();
-		   this.FetchDefaultFriendlyDeviceName();
-	   }
+			this.FetchFriendlyDeviceName();
+			this.FetchDefaultFriendlyDeviceName();
+	    }
 
-	   this.SetDirectMode(OnboardState);
+	    this.SetDirectMode(OnboardState);
 
-	   if(this.HasBattery()) {
-		   device.addFeature("battery");
-		   battery.setBatteryLevel(this.GetBatteryCharge());
-	   }
+	    this.SetPollingRate(pollingRate);
+		macroInputArray.setCallback((bitIdx, isPressed) => { return macroInputHandler(bitIdx, isPressed); });
 
-	   this.SetPollingRate(pollingRate);
+	    if(this.GetDeviceType() === "Mouse"){
+			LogitechMouse.configureMouseSettings();
+	    } else if(this.GetDeviceType() === "Keyboard") {
+			LogitechKeyboard.configureKeyboardSettings();
+	    }
 
-	   if(this.GetDeviceType() === "Mouse"){
-		   device.addFeature("mouse");
-		   device.setImageFromBase64(mouseImage());
-
-		   LogitechMouse.SetOnBoardState(OnboardState);
-		   LogitechMouse.addMouseProps();
-
-		   if(LogitechMouse.getHasDPILights()) {
-				LogitechMouse.SetDpiLightAlwaysOn(dpiLight);
-		   }
-
-
-			DPIHandler.setMinDpi(200);
-			DPIHandler.setMaxDpi(25600); //TODO UNHARDCODE IT
-			DPIHandler.setUpdateCallback(function(dpi) { return LogitechMouse.setDpi(dpi); });
-			DPIHandler.addProperties();
-
-		   if(settingControl && !OnboardState) {
-				DPIHandler.setActiveControl(settingControl);
-				DPIHandler.update();
-		   } else {
-				LogitechMouse.SetDPILights(3); //Fallback to set DPILights to full
-		   }
-	   } else if(this.GetDeviceType() === "Keyboard") {
-			device.setImageFromBase64(keyboardImage());
-	   }
+	    if(this.HasBattery()) {
+			device.addFeature("battery");
+			battery.setBatteryLevel(this.GetBatteryCharge());
+		}
 	}
 	/** Grab Feature ID's Off of the Device Using the Feature Pages. */
 	FetchFeatureIDsFromDevice() {
-	   device.log(`----Scanning Feature Pages----`);
+	    device.log(`----Scanning Feature Pages----`);
 
-	   for (const [Feature, Page] of Object.entries(this.FeaturePages)) {
-		   const FeatureID = this.FetchFeatureIdFromPage(Page);
+	    for (const [Feature, Page] of Object.entries(this.FeaturePages)) {
+		    const FeatureID = this.FetchFeatureIdFromPage(Page);
 
 
-		   if(FeatureID !== undefined) {
+		    if(FeatureID !== undefined) {
 				if(FeatureID > 0){
 					this.FeatureIDs[Feature+'ID'] = FeatureID;
 					device.log(Feature + " FeatureID: " + this.FeatureIDs[Feature+'ID'], {toFile: true});
 				}
 			}
-
-	   }
+	    }
 
 	   device.log(`----End Of Feature Pages----`);
 	}
@@ -1307,46 +1334,7 @@ export class LogitechProtocol {
 
 		return -1;
 	}
-	/** Fetch the Number of Feature ID's a Device Has. */
-	FetchFeatureCount(){
-	   const count = this.setLongFeature([0x01, 0x00]).data[1];
-	   device.log(`Supported Feature Count: ${count}`);
 
-	   return count;
-	}
-
-	/** Fetch and Dump All Supported Feature Pages. */
-	FetchSupportedFeatures(){
-	   device.log(`Dumping All Supported Feature Pages`);
-	   device.log(`------------------------`);
-
-	   const FeatureCount = this.FetchFeatureCount();
-
-	   for(let i = 0; i < FeatureCount; i++){
-		   const packet = [0x01, 0x10, i];
-		   const ReturnData = this.setLongFeature(packet).data;
-		   const FeaturePage = (ReturnData[0] << 8) | ReturnData[1];
-		   const FeatureType = ReturnData[2];
-		   const FeatureVersion = ReturnData[3];
-
-		   const Obsolete = FeatureType & (1 << 7);
-		   const Hidden = FeatureType & (1 << 6);
-		   const Engineering = FeatureType & (1 << 5);
-		   const Manufacturing = FeatureType & (1 << 4);
-
-		   let message = `Supported Feature Page: 0x${FeaturePage.toString(16)}, Version: ${FeatureVersion}`;
-
-		   if(Obsolete){
-			   message += ", Obsolete";
-		   }
-
-		   if(Hidden){
-			   message += ", Hidden";
-		   }
-
-		   device.log(message);
-	   }
-	}
 	/** Helper to Reference Back A Feature ID to a Feature Page. */
 	GetFeatureIdOfFeaturePage(FeaturePage){
 	   // Doing a reverse lookup here and then checking for the feature Id.
@@ -1394,10 +1382,6 @@ export class LogitechProtocol {
 	   device.log("Transport 2 Model ID: " + Transport2, {toFile: true});
 	   device.log("Transport 3 Model ID: " + Transport3, {toFile: true});
 	   device.log("Serial Number Support:" + SerialNumberSupport, {toFile: true});
-
-	   // if(SerialNumberSupport){}
-	   // 	this.FetchDeviceSerialNumber();
-	   // }
 
 	   for(let entityIDX = 0; entityIDX < Math.max(TotalEntities, 3); entityIDX++) {
 
@@ -1461,16 +1445,6 @@ export class LogitechProtocol {
 	FetchDeviceNameLength() {
 		return this.setSpecificFeature([this.FeatureIDs.DeviceNameID, 0x00], "Short", "Long", this.FeatureIDs.DeviceNameID).data[1];
 	}
-	/** Fetch What Kind of HIDPP Device We're Talking To. */
-	FetchDeviceType() {
-
-		const deviceTypeId = this.setSpecificFeature([this.FeatureIDs.DeviceNameID, 0x20], "Short", "Long", this.FeatureIDs.DeviceNameID).data[1];
-
-		device.log("Detected Device Type: " + deviceTypeId, {toFile : true});
-		device.log("Device Type: " + this.Config.DeviceType, {toFile: true});
-
-		return this.GetDeviceType();
-	}
 	/** Fetch Friendly Device Name. */
 	FetchFriendlyDeviceName() {
 
@@ -1507,16 +1481,15 @@ export class LogitechProtocol {
 	/** Fetch Default Friendly Device Name. */
 	FetchDefaultFriendlyDeviceName() {
 
-	   const DeviceNameBytes = [];
-	   let ReadOffset = 0;
-	  const BytesReadPerPacket = 0x10;
-	  // Default Friendly Name Length is index 3
-	  const NameLengthInBytes = this.FetchFriendlyDeviceNameLength()[3];
+	   	const DeviceNameBytes = [];
+	   	let ReadOffset = 0;
+	  	const BytesReadPerPacket = 0x10;
+	  	// Default Friendly Name Length is index 3
+		const NameLengthInBytes = this.FetchFriendlyDeviceNameLength()[3];
 
-	  if(NameLengthInBytes !== undefined) {
+	    if(NameLengthInBytes !== undefined) {
 			while(ReadOffset < NameLengthInBytes) {
-				const namePacket = [this.FeatureIDs.FriendlyNameID, 0x20, ReadOffset];
-				this.setShortFeature(namePacket);
+				this.setShortFeature([this.FeatureIDs.FriendlyNameID, 0x20, ReadOffset]);
 
 				const nameReturnPacket = this.getLongFeature().data;
 				nameReturnPacket.shift();
@@ -1524,7 +1497,7 @@ export class LogitechProtocol {
 				ReadOffset += BytesReadPerPacket;
 				DeviceNameBytes.push(...nameReturnPacket);
 			}
-	  }
+	    }
 
 	   this.Config.DefaultFriendlyName = String.fromCharCode(...DeviceNameBytes);
 	   device.log("Default Friendly Device Name: " + this.Config.DefaultFriendlyName, {toFile: true});
@@ -1575,7 +1548,7 @@ export class LogitechProtocol {
 	}
 	/** Fetch Unified Battery Percentage. Returns Status and Battery Percentage. */
 	GetUnifiedBatteryPercentage() {
-		DetectInputs(); //Clear Buffer I hope.
+		DetectInputs(); //run this directly before the Battery Check. The chances of this are now extremely low. We can fallback onto the handler of always checking instead of using device.clearReadBuffer.
 
 		const BatteryArray = this.setSpecificFeature([this.FeatureIDs.UnifiedBatteryID, 0x10], "Short", "Long", this.FeatureIDs.UnifiedBatteryID, 5, "Unified Battree").data;
 
@@ -1589,7 +1562,7 @@ export class LogitechProtocol {
 	}
 	/** Fetch Battery Voltage That Needs Parsed With the Voltage Table. */
 	GetBatteryVoltage() {
-		DetectInputs(); //Clear the buffer I hope.
+		DetectInputs();
 
 	   const BatteryArray = this.setSpecificFeature([this.FeatureIDs.BatteryVoltageID, 0x00, 0x10], "Long", "Long", this.FeatureIDs.BatteryVoltageID, 5, "Battree Voltage").data;
 
@@ -1614,16 +1587,9 @@ export class LogitechProtocol {
 
 		 return LogitechDevice.PercentageLookupTable[nearestVoltageBand];
 	}
-	SetDeviceResetMode() {
-		this.setShortFeature([this.FeatureIDs.ResetID, 0x10], false, false, "Reset");
-		this.clearLongReadBuffer();
-		this.clearShortReadBuffer();
-		device.pause(1500);
-		device.log("Device Reset.", {toFile : true});
-	}
 	/** Set Device Polling Rate. */
 	SetPollingRate(pollingrate) {
-		this.setShortFeature([this.FeatureIDs.PollingRateID, 0x20, 1000/pollingrate]);
+		this.setShortFeature([this.FeatureIDs.PollingRateID, 0x20, 1000/pollingrate], false, false, "Polling Rate Set");
 	}
 	/** Stop Burning Flash Memory. */
 	SetDirectMode(OnboardState) {
@@ -1674,24 +1640,19 @@ export class LogitechProtocol {
 	/** Write Pretty Lights to Devices That Send Multiple LEDs Per Packet. */
 	SendPerKeyLightingPacket(RGBData) {
 		while(RGBData.length > 0) {
-			let packet = [this.FeatureIDs.PerKeyLightingV2ID, 0x10];
-
 			const DataLength = Math.min(16, RGBData.length);
-			packet = packet.concat(RGBData.splice(0, DataLength));
-			this.setLongFeature(packet, true, "PerKey Send", true);
+			this.setLongFeature([this.FeatureIDs.PerKeyLightingV2ID, 0x10].concat(RGBData.splice(0, DataLength)), true, "PerKey Send", true);
 		}
 
 		this.PerKeyLightingApply();
 	}
 	/** Apply PerLED Lighting. */
 	PerKeyLightingApply() {
-		const packet = [this.FeatureIDs.PerKeyLightingV2ID, 0x70];
-		this.setLongFeature(packet, true, "Perkey RGB Apply", true);
+		this.setLongFeature([this.FeatureIDs.PerKeyLightingV2ID, 0x70], true, "Perkey RGB Apply", true);
 	}
 	/** Packet Apply For Devices That Require It. */
 	Apply() {
-		const packet = [0x00, 0x20, 0x01];
-		this.setLongFeature(packet, true, "RGB Apply", true);
+		this.setLongFeature([0x00, 0x20, 0x01], true, "RGB Apply", true);
 	}
 }
 
@@ -1703,7 +1664,7 @@ export class LogitechMouseDevice {
 			/** Variable for defining if a mouse has DPI Lights. */
 			hasDPILights : false,
 			enabledDPILights : false,
-			heroDPILightAlwaysOn : false,
+			DPILightAlwaysOn : false,
 			/** Variable for defining if a mouse has a sniper button. */
 			hasSniperButton : false
 		};
@@ -1712,8 +1673,8 @@ export class LogitechMouseDevice {
 	getEnabledDPILights() { return this.Config.enabledDPILights; }
 	setEnabledDPILights(enabledDPILights) { this.Config.enabledDPILights = enabledDPILights; }
 
-	getheroDPILightAlwaysOn() { return this.Config.heroDPILightAlwaysOn; }
-	setheroDPILightAlwaysOn(heroDPILightAlwaysOn) { this.Config.heroDPILightAlwaysOn = heroDPILightAlwaysOn; }
+	getDPILightAlwaysOn() { return this.Config.DPILightAlwaysOn; }
+	setDPILightAlwaysOn(DPILightAlwaysOn) { this.Config.DPILightAlwaysOn = DPILightAlwaysOn; }
 
 	getHasDPILights() { return this.Config.hasDPILights; }
 	setHasDPILights(hasDPILights) { this.Config.hasDPILights = hasDPILights; }
@@ -1721,40 +1682,43 @@ export class LogitechMouseDevice {
 	getHasSniperButton() { return this.Config.hasSniperButton; }
 	setHasSniperButton(hasSniperButton) { this.Config.hasSniperButton = hasSniperButton; }
 
-	addMouseProps() {
+	/** Configure Initial Mouse settings. */
+	configureMouseSettings() {
+		device.addFeature("mouse");
+		device.setImageFromBase64(mouseImage());
+
+		this.SetOnBoardState(OnboardState);
+
 		if(this.getHasDPILights()) {
 			device.addProperty({"property":"dpiLight", "group":"mouse", "label":"DPI Light Always On", "type":"boolean", "default": "true"});
+		}
+
+		if(this.getHasDPILights()) {
+			this.SetDpiLightAlwaysOn(dpiLight);
 		}
 
 		if(this.getHasSniperButton()) {
 			DPIHandler.addSniperProperty();
 		}
-	}
 
-	removeMouseProps() {
-		device.removeProperty("settingControl");
-		device.removeProperty("dpiStages");
-		device.removeProperty("dpi1");
-		device.removeProperty("dpi2");
-		device.removeProperty("dpi3");
-		device.removeProperty("dpi4");
-		device.removeProperty("dpi5");
-		device.removeProperty("dpi6");
-		device.removeProperty("dpiRollover");
+		DPIHandler.setMinDpi(200);
+		DPIHandler.setMaxDpi(Logitech.GetDeviceMaxDPI());
+		DPIHandler.setUpdateCallback((dpi, stage) => { return this.setDpi(dpi, stage); });
+		DPIHandler.addProperties();
+
+		if(settingControl && !OnboardState) {
+			DPIHandler.setActiveControl(settingControl);
+			DPIHandler.update();
+		} else {
+			this.SetDPILights(3); //Fallback to set DPILights to full
+		}
 	}
 
 	/** Set the Current Software DPI based on a callback from the DPIHandler. */
 	setDpi(dpi, stage = 0) {
-		if(stage === 0) {
-			const dpiStage = DPIHandler.getCurrentStage();
-			Logitech.setLongFeature([ Logitech.FeatureIDs.DPIID, 0x30, 0x00, Math.floor(dpi/256), dpi%256, dpiStage ], true, "DPI", true);
-			device.log("DPI Set to : " + dpiStage, {toFile : true});
-			this.SetDPILights(dpiStage);
-		} else {
-			Logitech.setLongFeature([ Logitech.FeatureIDs.DPIID, 0x30, 0x00, Math.floor(dpi/256), dpi%256, stage ], true, "DPI", true);
-			device.log("DPI Set to : " + stage, {toFile : true});
-			this.SetDPILights(stage);
-		}
+		Logitech.setLongFeature([ Logitech.FeatureIDs.DPIID, 0x30, 0x00, Math.floor(dpi/256), dpi%256, stage ], true, "DPI", true);
+		device.log("DPI Set to : " + stage, {toFile : true});
+		this.SetDPILights(stage);
 	}
 	/** Set the Number of DPI Lights That are On For a Mouse. */
 	SetDPILights(stage) {
@@ -1768,7 +1732,7 @@ export class LogitechMouseDevice {
 			Logitech.setLongFeature([Logitech.FeatureIDs.LEDControlID, 0x50, 0x01, 0x00, 0x02, 0x00, stage ], false, "DPI Lights", true); //Setting State!
 		}
 
-		if(this.getheroDPILightAlwaysOn() === false && Logitech.UsesHeroProtocol()) {
+		if(this.getDPILightAlwaysOn() === false) {
 			this.setEnabledDPILights(true);
 			savedDPITimer = Date.now();
 		}
@@ -1783,14 +1747,7 @@ export class LogitechMouseDevice {
 			return;
 		}
 
-		if(Logitech.UsesHeroProtocol()) { //These mice don't play nice.
-			this.setheroDPILightAlwaysOn(DPILight);
-
-			return;
-		}
-
-		const DPILightTogglepacket = [Logitech.FeatureIDs.LEDControlID, 0x70, 0x01, (DPILight ? 0x02 : 0x04)];
-		Logitech.setShortFeature(DPILightTogglepacket, false, false, "DPI Light Toggle"); //Fun fact: this is the only function that mattered anyway
+		this.setDPILightAlwaysOn(DPILight);
 	}
 	/** Enable or Disable Software Button Listener. */
 	SetButtonSpy(OnboardState) {
@@ -1811,9 +1768,9 @@ export class LogitechMouseDevice {
 		this.SetButtonSpy(OnboardState);
 	}
 
-	 MapPhysicalButtonIDToName(buttonId){ return LogitechDevice.PhysicalButtonIds[buttonId];}
-	 GetMouseButtons(physicalButton){ return LogitechDevice.ButtonMaps[Logitech.GetMouseBodyType()][physicalButton];}
-	 MapButtonNameToSignalRGBValue(ButtonName){ return LogitechDevice.buttonMapDict[ButtonName];}
+	MapPhysicalButtonIDToName(buttonId){ return LogitechDevice.PhysicalButtonIds[buttonId];}
+	GetMouseButtons(physicalButton){ return LogitechDevice.ButtonMaps[Logitech.GetMouseBodyType()][physicalButton];}
+	MapButtonNameToSignalRGBValue(ButtonName){ return LogitechDevice.buttonMapDict[ButtonName];}
 }
 
 const LogitechMouse = new LogitechMouseDevice();
@@ -1821,6 +1778,10 @@ const LogitechMouse = new LogitechMouseDevice();
 class LogitechKeyboardDevice {
 	constructor() {
 
+	}
+
+	configureKeyboardSettings() {
+		device.setImageFromBase64(keyboardImage()); //This will have more settings for G and M Key configs in the future
 	}
 
 	GKeySetup(enable = true) {
@@ -1868,8 +1829,7 @@ class LogitechPowerplayDevice {
 
 		device.set_endpoint(2, 0x0001, 0xff00);
 
-		const packet = [0x10, 0x07, 0x0b, 0x10];//RGB Info iirc
-		device.write(packet, 7);
+		device.write([0x10, 0x07, 0x0b, 0x10], 7); //RGB Info iirc?
 
 		device.set_endpoint(2, 0x0002, 0xff00);
 
@@ -1925,8 +1885,7 @@ export class LogitechDongleDevice {
 	}
 
 	SetHidppNotifications(enabled){
-		const data = [0x80, 0x00, 0x00, enabled];//Enable Hid++ Notifications
-		const returnPacket = Logitech.setShortFeature(data, false, true).data;
+		const returnPacket = Logitech.setShortFeature([0x80, 0x00, 0x00, enabled], false, true).data;
 
 		const errorCode = returnPacket[2];
 
@@ -1952,9 +1911,7 @@ export class LogitechDongleDevice {
 			return true;
 		}
 
-		const data = [0x80, 0x02, 0x02, 0x00]; //Fake Reconnect
-
-		const returndata = Logitech.setShortFeature(data, false, true).data;
+		const returndata = Logitech.setShortFeature([0x80, 0x02, 0x02, 0x00], false, true).data; //Fake reconnect
 		device.log("Return Data" + returndata);
 
 		if(returndata[0] === 0 && returndata[1] === 0 && returndata[2] === 0x00 && returndata[3] === 0x00) { //Do you like edge cases? I don't. They are the reason for this statement's existence.
@@ -1979,46 +1936,7 @@ export class LogitechDongleDevice {
 		}
 
 		return false;
-	 }
-
-	SetPairingMode() {
-		const packet = [0x80, 0xb2, 0x03, 0x01]; //Additional arguments are supported, device number, and timeout for pairing. This could be useful if I wanted to add unifying support as a weekend project lol.
-		//Sidenote for the lock and unlock functions. Lightspeed dongles don't have the ability to lock or unlock. We can only force a clear of paired devices as they have 1 register. Lock/Unlock keeps current pairing and allows for more devices.
-		Logitech.setShortFeature(packet, false,  true).data; //Drop the lock and d/c any connected device.
-		device.log("Device D/C'd"); //This should set a flag for pairing mode, so that we can flip into device connect check mode. When we grab a new device, pop our init process. Should be seamless.
-		this.GetPostPairingSetup();
-	 }
-
-	 GetPostPairingSetup() {//This function could walk us into a deadlock. We're adding a timeout, otherwise the plugin could get stuck if we don't catch the init function.
-		let devicePaired = false; //Dongle doesn't have a way to recover from a failed pair it seems like. Ghub is the same way. Just need to keep it in mind.
-		let pairingTime = 0;
-		device.set_endpoint(2, 0x0001, 0xff00);
-
-		do {
-			const response = device.read([0x00], 7, 10);
-			const reconnectMessage = [17, 1, 4, 0, 1, 1, 1]; //Full reconnect Message
-			pairingTime++;
-
-			if(response[0] !== 0x00) {
-				device.log(response); //Leave this here in case a device does something weird.
-			}
-
-
-			if(Logitech.CompareArrays(response, reconnectMessage)) {
-
-				devicePaired = true;
-				device.log("New Device Paired. Running initialization process.");
-			}
-
-			if(pairingTime > 5000) {//If we're locked up for a full minute, we can presume failure.
-				device.log("Device Pairing Failed, or Connect Message Failed.");
-				devicePaired = true; //force to true. The init function will catch us anyway if we don't have a paired device.
-			}
-		}
-		while(devicePaired === false);
-
-		//This function holds up init until we get a good result or timeout. No further action needed. I could add a return for logging good values tho.
-	 }
+	}
 }
 
 const LogitechDongle = new LogitechDongleDevice();
@@ -2030,7 +1948,7 @@ export default class DpiController {
 		this.maxStageIdx = 5; //Default to 5 as it's most common if not defined
 		this.sniperStageIdx = 6;
 
-		this.updateCallback = (dpi) => { this.log("No Set DPI Callback given. DPI Handler cannot function!"); dpi; };
+		this.updateCallback = (dpi, stage) => { this.log("No Set DPI Callback given. DPI Handler cannot function!"); dpi; stage; };
 
 		this.logCallback = (message) => { console.log(message); };
 
@@ -2038,11 +1956,11 @@ export default class DpiController {
 		this.enabled = false;
 		this.dpiRollover = false;
 		this.dpiMap = new Map();
-		this.maxDpi = 18000;
+		this.maxDpi = 25600;
 		this.minDpi = 200;
 	}
 	addProperties() {
-		device.addProperty({ "property": "settingControl", "group": "mouse", "label": "Enable Setting Control", "type": "boolean", "default": "true", "order": 1 });
+		device.addProperty({ "property": "settingControl", "group": "mouse", "label": "Enable Setting Control", "type": "boolean", "default": "false", "order": 1 });
 		device.addProperty({ "property": "dpiStages", "group": "mouse", "label": "Number of DPI Stages", "step": "1", "type": "number", "min": "1", "max": this.maxSelectedableStage, "default": this.maxStageIdx, "order": 1, "live" : "false" });
 		device.addProperty({ "property": "dpiRollover", "group": "mouse", "label": "DPI Stage Rollover", "type": "boolean", "default": "false", "order": 1 });
 
@@ -2056,30 +1974,28 @@ export default class DpiController {
 		this.rebuildUserProperties();
 	}
 	addSniperProperty() {
-		device.addProperty({ "property": `dpi${this.sniperStageIdx}`, "group": "mouse", "label": "Sniper Button DPI", "step": "50", "type": "number", "min": this.minDpi, "max": this.maxDpi, "default": "400", "order": 3 });
+		device.addProperty({ "property": `dpi${this.sniperStageIdx}`, "group": "mouse", "label": "Sniper Button DPI", "step": "50", "type": "number", "min": this.minDpi, "max": this.maxDpi, "default": "400", "order": 3, "live": "false" });
 		// eslint-disable-next-line no-eval
 		this.dpiMap.set(6, () => { return eval(`dpi${6}`); });
 	}
-	getCurrentStage() {
-		return this.currentStageIdx;
-	}
-	getMaxStage() {
-		return this.maxStageIdx;
-	}
+
+	getCurrentStage() { return this.currentStageIdx; }
+	getMaxStage() { return this.maxStageIdx; }
 	getSniperIdx() { return this.sniperStageIdx; }
-	setRollover(enabled) {
-		this.dpiRollover = enabled;
-	}
+
+	getSniperMode() { return this.sniperMode; }
+	setRollover(enabled) { this.dpiRollover = enabled; }
+
 	setMaxStageCount(count) {
 		this.maxStageIdx = count;
 		this.rebuildUserProperties();
 	}
+
 	setMinDpi(minDpi) { this.minDpi = minDpi; this.updateDpiRange(); }
 	setMaxDpi(maxDpi) { this.maxDpi = maxDpi; this.updateDpiRange(); }
-	setUpdateCallback(callback) {
-		this.updateCallback = callback;
-	}
+	setUpdateCallback(callback) { this.updateCallback = callback; }
 	active() { return this.enabled; }
+
 	setActiveControl(EnableDpiControl) {
 		this.enabled = EnableDpiControl;
 
@@ -2134,7 +2050,7 @@ export default class DpiController {
 		const dpi = this.getDpiForStage(stage);
 
 		if (dpi) {
-			this.updateCallback(dpi);
+			this.updateCallback(dpi, stage);
 		}
 	}
 	/** Stage update check to update DPI if current stage values are changed.*/
@@ -2174,7 +2090,7 @@ export default class DpiController {
 			}
 
 			this.log(`Adding Stage: ${i}`);
-			device.addProperty({ "property": `dpi${i}`, "group": "mouse", "label": `DPI ${i}`, "step": "50", "type": "number", "min": this.minDpi, "max": this.maxDpi, "default": "400", "order": 2 });
+			device.addProperty({ "property": `dpi${i}`, "group": "mouse", "label": `DPI ${i}`, "step": "50", "type": "number", "min": this.minDpi, "max": this.maxDpi, "default": 800 + (400*i), "order": 2, "live": "false" });
 			// eslint-disable-next-line no-eval
 			this.dpiMap.set(i, () => { return eval(`dpi${i}`); });
 		}
@@ -2196,7 +2112,13 @@ export default class DpiController {
 
 const DPIHandler = new DpiController();
 
-class BitArray {
+/**
+ * @callback bitArrayCallback
+ * @param {number} bitIdx
+ * @param {boolean} state
+ */
+
+export class BitArray {
 	constructor(length) {
 		// Create Backing Array
 		this.buffer = new ArrayBuffer(length);
@@ -2204,32 +2126,41 @@ class BitArray {
 		this.bitArray = new Uint8Array(this.buffer);
 		// Constant for width of each index
 		this.byteWidth = 8;
+
+		/** @type {bitArrayCallback} */
+		this.callback = (bitIdx, state) => {throw new Error("BitArray(): No Callback Available?");};
 	}
 
 	toArray() {
 		return [...this.bitArray];
 	}
 
+	/** @param {number} bitIdx */
 	get(bitIdx) {
-		return this.bitArray[bitIdx / this.byteWidth | 0] === 1 << (bitIdx % this.byteWidth);
+		const byte = this.bitArray[bitIdx / this.byteWidth | 0] ?? 0;
+
+		return Boolean(byte & 1 << (bitIdx % this.byteWidth));
 	}
 
+	/** @param {number} bitIdx */
 	set(bitIdx) {
 		this.bitArray[bitIdx / this.byteWidth | 0] |= 1 << (bitIdx % this.byteWidth);
 	}
 
+	/** @param {number} bitIdx */
 	clear(bitIdx) {
 		this.bitArray[bitIdx / this.byteWidth | 0] &= ~(1 << (bitIdx % this.byteWidth));
 	}
 
+	/** @param {number} bitIdx */
 	toggle(bitIdx) {
 		this.bitArray[bitIdx / this.byteWidth | 0] ^= 1 << (bitIdx % this.byteWidth);
 	}
 
-	compareByte(index, value) {
-		return this.bitArray[index] === value;
-	}
-
+	/**
+	 * @param {number} bitIdx
+	 * @param {boolean} state
+	 *  */
 	setState(bitIdx, state) {
 		if(state) {
 			this.set(bitIdx);
@@ -2237,68 +2168,38 @@ class BitArray {
 			this.clear(bitIdx);
 		}
 	}
-	/* eslint-disable complexity */
+
+	/** @param {bitArrayCallback} callback */
+	setCallback(callback){
+		this.callback = callback;
+	}
+
+	/** @param {number[]} newArray */
 	update(newArray) {
+		// Check Every Byte
 		for(let byteIdx = 0; byteIdx < newArray.length; byteIdx++) {
-			if(this.compareByte(byteIdx, newArray[byteIdx])) {
+			const value = newArray[byteIdx] ?? 0;
+
+			if(this.bitArray[byteIdx] === value) {
 				continue;
 			}
 
+			// Check Every bit of every changed Byte
 			for (let bit = 0; bit < this.byteWidth; bit++) {
-				const isPressed = (1 << (bit % this.byteWidth) === (newArray[byteIdx] & (1 << (bit % this.byteWidth))));
+				const isPressed = Boolean((value) & (1 << (bit)));
 
 				const bitIdx = byteIdx * 8 + bit;
 
-				if(isPressed === this.get(byteIdx * 8 + bit)) {
+				// Skip if the new bit state matches the old bit state
+				if(isPressed === this.get(bitIdx)) {
 					continue;
 				}
 
+				// Save new State
 				this.setState(bitIdx, isPressed);
 
-				const PhysicalbuttonID = LogitechMouse.MapPhysicalButtonIDToName(bitIdx);
-				const PhysicalbuttonName = LogitechMouse.GetMouseButtons(PhysicalbuttonID);
-				const pressedKey = LogitechMouse.MapButtonNameToSignalRGBValue(PhysicalbuttonName);
-
-				switch(pressedKey){
-				case 7:
-					if(!isPressed) {break;}
-
-					DPIHandler.increment();
-					device.log("DPI Up");
-					break;
-
-				case 6:
-					if(!isPressed) {break;}
-
-					device.log("DPI Down");
-					DPIHandler.decrement();
-					break;
-				case 13:
-					DPIHandler.setSniperMode(isPressed);
-
-					if(isPressed && settingControl){
-						LogitechMouse.SetDPILights(1);
-					}
-
-					break;
-
-				default: {
-					// Skip keys only windows should handle.
-					if(pressedKey === 0){
-						continue;
-					}
-					// Send Events for any keys we don't handle above
-					const eventData = {
-						"buttonCode": 0,
-						"released": !isPressed,
-						"name":PhysicalbuttonName
-					};
-
-					device.log(eventData);
-					mouse.sendEvent(eventData, "Button Press");
-
-				}
-				}
+				// Fire callback
+				this.callback(bitIdx, isPressed);
 			}
 
 		}
@@ -2306,6 +2207,112 @@ class BitArray {
 }
 /* eslint-enable complexity */
 const macroInputArray = new BitArray(3);
+
+class LogitechExtras { //class to store all of the extra unused stuff
+	constructor() {
+
+	}
+
+	/** Fetch the Number of Feature ID's a Device Has. */
+	FetchFeatureCount(){
+		const count = Logitech.setLongFeature([0x01, 0x00]).data[1];
+		device.log(`Supported Feature Count: ${count}`);
+
+		return count;
+		 }
+
+		 /** Fetch and Dump All Supported Feature Pages. */
+		 FetchSupportedFeatures(){
+		device.log(`Dumping All Supported Feature Pages`);
+		device.log(`------------------------`);
+
+		const FeatureCount = this.FetchFeatureCount();
+
+		for(let i = 0; i < FeatureCount; i++){
+			const packet = [0x01, 0x10, i];
+			const ReturnData = Logitech.setLongFeature(packet).data;
+			const FeaturePage = (ReturnData[0] << 8) | ReturnData[1];
+			const FeatureType = ReturnData[2];
+			const FeatureVersion = ReturnData[3];
+
+			const Obsolete = FeatureType & (1 << 7);
+			const Hidden = FeatureType & (1 << 6);
+			const Engineering = FeatureType & (1 << 5);
+			const Manufacturing = FeatureType & (1 << 4);
+
+			let message = `Supported Feature Page: 0x${FeaturePage.toString(16)}, Version: ${FeatureVersion}`;
+
+			if(Obsolete){
+				message += ", Obsolete";
+			}
+
+			if(Hidden){
+				message += ", Hidden";
+			}
+
+			device.log(message);
+		}
+	}
+
+	/** Fetch What Kind of HIDPP Device We're Talking To. */
+	FetchDeviceType() {
+
+		const deviceTypeId = Logitech.setSpecificFeature([Logitech.FeatureIDs.DeviceNameID, 0x20], "Short", "Long", Logitech.FeatureIDs.DeviceNameID).data[1];
+
+		device.log("Detected Device Type: " + deviceTypeId, {toFile : true});
+		device.log("Device Type: " + Logitech.GetDeviceType(), {toFile: true}); //
+
+		return deviceTypeId;
+	}
+
+	SetDeviceResetMode() {
+		Logitech.setShortFeature([Logitech.FeatureIDs.ResetID, 0x10], false, false, "Reset");
+		device.pause(1500);
+		Logitech.clearLongReadBuffer();
+		Logitech.clearShortReadBuffer();
+		device.log("Device Reset.", {toFile : true});
+	}
+
+	//Dongle Functions ------------------------------------------------------------------------------------------------------------------------------------------------
+	SetPairingMode() {
+		const packet = [0x80, 0xb2, 0x03, 0x01]; //Additional arguments are supported, device number, and timeout for pairing. This could be useful if I wanted to add unifying support as a weekend project lol.
+		//Sidenote for the lock and unlock functions. Lightspeed dongles don't have the ability to lock or unlock. We can only force a clear of paired devices as they have 1 register. Lock/Unlock keeps current pairing and allows for more devices.
+		Logitech.setShortFeature(packet, false,  true).data; //Drop the lock and d/c any connected device.
+		device.log("Device D/C'd"); //This should set a flag for pairing mode, so that we can flip into device connect check mode. When we grab a new device, pop our init process. Should be seamless.
+		this.GetPostPairingSetup();
+	 }
+
+	 GetPostPairingSetup() {//This function could walk us into a deadlock. We're adding a timeout, otherwise the plugin could get stuck if we don't catch the init function.
+		let devicePaired = false; //Dongle doesn't have a way to recover from a failed pair it seems like. Ghub is the same way. Just need to keep it in mind.
+		let pairingTime = 0;
+		device.set_endpoint(2, 0x0001, 0xff00);
+
+		do {
+			const response = device.read([0x00], 7, 10);
+			const reconnectMessage = [17, 1, 4, 0, 1, 1, 1]; //Full reconnect Message
+			pairingTime++;
+
+			if(response[0] !== 0x00) {
+				device.log(response); //Leave this here in case a device does something weird.
+			}
+
+
+			if(Logitech.CompareArrays(response, reconnectMessage)) {
+
+				devicePaired = true;
+				device.log("New Device Paired. Running initialization process.");
+			}
+
+			if(pairingTime > 5000) {//If we're locked up for a full minute, we can presume failure.
+				device.log("Device Pairing Failed, or Connect Message Failed.");
+				devicePaired = true; //force to true. The init function will catch us anyway if we don't have a paired device.
+			}
+		}
+		while(devicePaired === false);
+
+		//This function holds up init until we get a good result or timeout. No further action needed. I could add a return for logging good values tho.
+	 }
+}
 
 export class LogitechResponse {
 	constructor(packet) {
