@@ -255,6 +255,7 @@ class GigabyteVisionDeviceIds {
 		this.GTX1060_G1_GAMING_OC           = 0x3739;
 		this.GTX1060_XTREME                 = 0x3776;
 		this.GTX1070_XTREME                 = 0x3778;
+		this.GTX1070_G1_GAMING              = 0x3701;
 		this.GTX1070TI_GAMING               = 0x3794;
 		this.GTX1080_G1_GAMING              = 0x3702;
 		this.GTX1080TI_GAMING_OC            = 0x374C;
@@ -311,10 +312,7 @@ class GigabyteVisionDeviceIds {
 		this.RTX4070TI_EAGLE_OC_12G			= 0x40CA;
 		this.RTX4080_EAGLE_OC_16GD			= 0x40BE;
 		this.RTX4090_GAMING_OC_24GB			= 0x40BF;
-
-		//NEW GPUS
 		this.GTX1070_GAMING                 = 0x3772;
-		this.GTX1080_G1_GAMING				= 0x3702;
 		this.GTX1080TI_AORUS_11G       		= 0x3752;
 		this.RTX2060_GAMING_OC_PRO          = 0x3FC9;
 		this.RTX2060S_GAMING_OC_3X_8GB		= 0x4009;
@@ -406,6 +404,7 @@ class GigabyteVisionGPuList {
 			new GigabyteVisionIdentifier(Nvidia.RTX4070TI,      GigabyteVisionIds.RTX4070TI_EAGLE_OC_12G,        0x71, "GIGABYTE 4070TI Eagle OC"),
 			new GigabyteVisionIdentifier(Nvidia.RTX4080,        GigabyteVisionIds.RTX4080_EAGLE_OC_16GD,         0x71, "GIGABYTE 4080 Eagle OC"),
 			new GigabyteVisionIdentifier(Nvidia.GTX1070,        GigabyteVisionIds.GTX1070_GAMING,                0x47, "GIGABYTE 1070 Gaming"),
+			new GigabyteVisionIdentifier(Nvidia.GTX1070,		GigabyteVisionIds.GTX1070_G1_GAMING,			 0x47, "GIGABYTE 1070 G1 Gaming"),
 			new GigabyteVisionIdentifier(Nvidia.GTX1080,      GigabyteVisionIds.GTX1080_G1_GAMING,               0x48, "GIGABYTE 1080 G1 Gaming"), //Confirmed!
 			new GigabyteVisionIdentifier(Nvidia.GTX1080TI,      GigabyteVisionIds.GTX1080TI_AORUS_11G,         	 0x47, "GIGABYTE 1080Ti AORUS"), //Confirmed
 			new GigabyteVisionIdentifier(Nvidia.RTX2060_TU104,  GigabyteVisionIds.RTX2060_GAMING_OC_PRO,         0x47, "GIGABYTE 2060 Gaming OC Pro"), //Very iffy.
