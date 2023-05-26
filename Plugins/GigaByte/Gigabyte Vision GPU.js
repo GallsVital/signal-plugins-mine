@@ -404,7 +404,7 @@ class GigabyteVisionGPuList {
 			new GigabyteVisionIdentifier(Nvidia.RTX4070TI,      GigabyteVisionIds.RTX4070TI_EAGLE_OC_12G,        0x71, "GIGABYTE 4070TI Eagle OC"),
 			new GigabyteVisionIdentifier(Nvidia.RTX4080,        GigabyteVisionIds.RTX4080_EAGLE_OC_16GD,         0x71, "GIGABYTE 4080 Eagle OC"),
 			new GigabyteVisionIdentifier(Nvidia.GTX1070,        GigabyteVisionIds.GTX1070_GAMING,                0x47, "GIGABYTE 1070 Gaming"),
-			new GigabyteVisionIdentifier(Nvidia.GTX1070,		GigabyteVisionIds.GTX1070_G1_GAMING,			 0x47, "GIGABYTE 1070 G1 Gaming"),
+			new GigabyteVisionIdentifier(Nvidia.GTX1070,		GigabyteVisionIds.GTX1070_G1_GAMING,			 0x48, "GIGABYTE 1070 G1 Gaming"),
 			new GigabyteVisionIdentifier(Nvidia.GTX1080,      GigabyteVisionIds.GTX1080_G1_GAMING,               0x48, "GIGABYTE 1080 G1 Gaming"), //Confirmed!
 			new GigabyteVisionIdentifier(Nvidia.GTX1080TI,      GigabyteVisionIds.GTX1080TI_AORUS_11G,         	 0x47, "GIGABYTE 1080Ti AORUS"), //Confirmed
 			new GigabyteVisionIdentifier(Nvidia.RTX2060_TU104,  GigabyteVisionIds.RTX2060_GAMING_OC_PRO,         0x47, "GIGABYTE 2060 Gaming OC Pro"), //Very iffy.
