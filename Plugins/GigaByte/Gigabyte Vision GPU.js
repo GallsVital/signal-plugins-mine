@@ -294,6 +294,7 @@ class GigabyteVisionDeviceIds {
 		this.RTX3080_VISION_OC              = 0x404B;
 		this.RTX3070_GAMING_OC              = 0x404C;
 		this.RTX3070_VISION_OC              = 0x404D;
+		this.RTX3070TI_GAMING	            = 0x40B6;
 		this.RTX3070TI_GAMING_OC            = 0x408F;
 		this.RTX3070TI_EAGLE                = 0x408C;
 		this.RTX3070TI_EAGLE_OC             = 0x408D;
@@ -392,6 +393,7 @@ class GigabyteVisionGPuList {
 			new GigabyteVisionIdentifier(Nvidia.RTX3070,        GigabyteVisionIds.RTX3070_GAMING_OC,             0x62, "GIGABYTE 3070 Gaming OC"),
 			new GigabyteVisionIdentifier(Nvidia.RTX3070_LHR,    GigabyteVisionIds.RTX3070_GAMING_OC,             0x62, "GIGABYTE 3070 Gaming OC LHR"),
 			new GigabyteVisionIdentifier(Nvidia.RTX3080_GA102,  GigabyteVisionIds.RTX3080_12G_GAMING_OC,     	 0x62, "GIGABYTE 3080 Gaming OC 12g LHR"),
+			new GigabyteVisionIdentifier(Nvidia.RTX3070TI,      GigabyteVisionIds.RTX3070TI_GAMING,				 0x62, "GIGABYTE 3070Ti Gaming"),
 			new GigabyteVisionIdentifier(Nvidia.RTX3070TI,      GigabyteVisionIds.RTX3070TI_GAMING_OC,           0x62, "GIGABYTE 3070Ti Gaming OC LHR"),
 			new GigabyteVisionIdentifier(Nvidia.RTX3080,        GigabyteVisionIds.RTX3080_GAMING_OC,             0x62, "GIGABYTE 3080 Gaming OC"),
 			new GigabyteVisionIdentifier(Nvidia.RTX3080_LHR,    GigabyteVisionIds.RTX3080_GAMING_OC,             0x62, "GIGABYTE 3080 Gaming OC LHR"),
