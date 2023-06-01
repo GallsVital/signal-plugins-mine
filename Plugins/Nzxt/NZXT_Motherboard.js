@@ -67,22 +67,22 @@ export class NZXTProtocol {
 		};
 
 		this.ChannelLibrary	=	{
-			0x2005:  {
+			0x2005: {
 				nzxtchannels: 3,
 				argbchannels: 0,
 				rgbchannels : 0,
 			},
-			0x200A:  {
+			0x200A: {
 				nzxtchannels: 2,
 				argbchannels: 1,
 				rgbchannels : 1,
 			},
-			0x200B:  {
+			0x200B: {
 				nzxtchannels: 2,
 				argbchannels: 1,
 				rgbchannels : 1,
 			},
-			0x200C:  {
+			0x200C: {
 				nzxtchannels: 2,
 				argbchannels: 1,
 				rgbchannels : 1,
@@ -92,7 +92,7 @@ export class NZXTProtocol {
 				argbchannels: 1,
 				rgbchannels : 1,
 			},
-			0x2016:  {
+			0x2016: {
 				nzxtchannels: 2,
 				argbchannels: 1,
 				rgbchannels : 1,
@@ -149,8 +149,13 @@ export class NZXTProtocol {
 
 		for(let i = 0; i < totalchannels; i++) {
 			const RGBData = this.grabRGBData(i);
+
+			// no led on this channel, skip
+			if(!RGBData.length) {continue;}
+
 			this.StreamLightingPacketChannel(0, RGBData.splice(0, 60), i);
 			this.StreamLightingPacketChannel(1, RGBData.splice(0, 60), i);
+
 			this.SubmitLightingColors(i);
 		}
 
@@ -185,10 +190,11 @@ export class NZXTProtocol {
 			RGBData = device.channel(ChannelName).getColors("Inline", "GRB");
 		}
 
-		return RGBData.concat(new Array(120 - RGBData.length).fill(0));
+		return RGBData;
 	}
 
 	StreamLightingPacketChannel(packetNumber, RGBData, channel) {
+		if(!RGBData.length) {return;}
 		const packet = [0x22, 0x10 | packetNumber, 0x01 << channel, 0x00];
 		packet.push(...RGBData);
 		device.write(packet, 64);
