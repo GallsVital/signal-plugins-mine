@@ -2,6 +2,7 @@ export function Name() { return "GMMK 2 65% ISO QMK Keyboard"; }
 export function VendorId() { return 0x320F; }
 export function ProductId() { return 0x504A; }
 export function Publisher() { return "WhirlwindFX"; }
+export function Documentation(){ return "qmk/supported-keyboards"; }
 export function Size() { return [17, 5]; }
 export function DefaultPosition(){return [10, 100]; }
 export function DefaultScale(){return 8.0;}
@@ -22,15 +23,16 @@ export function ControllableParameters() {
 
 const vKeys =
 [
-	0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14,
-	15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29,
-	30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41,   42, 43,
-	44,   45, 46, 47, 48, 49, 50, 51, 52, 53, 54, 55, 56, 57,
-	58, 59, 60,         61,         62, 63, 64, 65, 66,
+	0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, //15
+	15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, //15
+	30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41,   42, 43, //14
+	44,   45, 46, 47, 48, 49, 50, 51, 52, 53, 54, 55, 56, 57, //14
+	58, 59, 60,         61,         62, 63, 64, 65, 66, //9
 
-	67, 68, 69, 70, 71, 72, 73, 74, 75, 76,
-	77, 78, 79, 80, 81, 82, 83, 84, 85, 86, 87
+	67, 68, 69, 70, 71, 72, 73, 74, 75, 76, //10
+	77, 78, 79, 80, 81, 82, 83, 84, 85, 86 //10
 ];
+
 const vKeyNames =
 [
 	"Esc", "1", "2", "3", "4", "5", "6", "7", "8", "9", "0", "-_", "=+", "Backspace", "Delete", //15
@@ -39,8 +41,8 @@ const vKeyNames =
 	"Left Shift",  "Z", "X", "C", "V", "B", "N", "M", ",", ".", "/",     "Right Shift", "Up Arrow", "End", //14
 	"Left Ctrl", "Left Win", "Left Alt", "Space", "Right Alt", "Fn",  "Left Arrow", "Down Arrow", "Right Arrow", //9
 
-	"Right LED 1", "Right LED 2", "Right LED 3", "Right LED 4", "Right LED 5", "Right LED 6", "Right LED 7 ", "Right LED 8", "Right LED 9", "Right LED 10",
-	"Left LED 1", "Left LED 2", "Left LED 3", "Left LED 4", "Left LED 5", "Left LED 6", "Left LED 7", "Left LED 8", "Left LED 9", "Left LED 10",
+	"Right LED 1", "Right LED 2", "Right LED 3", "Right LED 4", "Right LED 5", "Right LED 6", "Right LED 7 ", "Right LED 8", "Right LED 9", "Right LED 10", //10
+	"Left LED 1", "Left LED 2", "Left LED 3", "Left LED 4", "Left LED 5", "Left LED 6", "Left LED 7", "Left LED 8", "Left LED 9", "Left LED 10", //10
 ];
 
 const vKeyPositions =
@@ -49,10 +51,10 @@ const vKeyPositions =
 	[1, 1], [2, 1], [3, 1], [4, 1], [5, 1], [6, 1], [7, 1], [8, 1], [9, 1], [10, 1], [11, 1], [12, 1], [13, 1], [14, 1], [15, 1], //15
 	[1, 2], [2, 2], [3, 2], [4, 2], [5, 2], [6, 2], [7, 2], [8, 2], [9, 2], [10, 2], [11, 2], [12, 2],          [14, 2], [15, 2], //14
 	[1, 3], [2, 3], [3, 3], [4, 3], [5, 3], [6, 3], [7, 3], [8, 3], [9, 3], [10, 3], [11, 3], 		   [13, 3], [14, 3], [15, 3], //14
-	[1, 4], [2, 4], [3, 4],                      [7, 4],                       [11, 4], [12, 4], [13, 4], [14, 4], [15, 4], //8
+	[1, 4], [2, 4], [3, 4],                      [7, 4],                       [11, 4], [12, 4], [13, 4], [14, 4], [15, 4], //9
 
-	[16, 1], [16, 1], [16, 1], [16, 2], [16, 2], [16, 2], [16, 3], [16, 3], [16, 3], [16, 4],
-	[0, 1], [0, 1], [0, 1], [0, 2], [0, 2], [0, 2], [0, 2], [0, 3], [0, 3], [0, 3],
+	[16, 1], [16, 1], [16, 1], [16, 2], [16, 2], [16, 2], [16, 3], [16, 3], [16, 3], [16, 4], //10
+	[0, 1], [0, 1], [0, 1], [0, 2], [0, 2], [0, 2], [0, 2], [0, 3], [0, 3], [0, 3], //10
 ];
 
 let LEDCount = 0;
@@ -161,7 +163,7 @@ function returnSignalRGBProtocolVersion(data) {
 
 
 	if(PluginProtocolVersion !== SignalRGBProtocolVersion) {
-		device.notify("Unsupported Protocol Version: ", `This plugin is intended for SignalRGB Protocol version ${PluginProtocolVersion}. This device is version: ${SignalRGBProtocolVersion}`, 0);
+		device.notify("Unsupported Protocol Version: ", `This plugin is intended for SignalRGB Protocol version ${PluginProtocolVersion}. This device is version: ${SignalRGBProtocolVersion}`, 1, "Documentation");
 	}
 
 	device.pause(30);
@@ -205,7 +207,7 @@ function returnFirmwareType(data) {
 	const FirmwareTypeByte = data[2];
 
 	if(FirmwareTypeByte !== MainlineQMKFirmware || FirmwareTypeByte !== VIAFirmware) {
-		device.notify("Unsupported Firmware: ", "Click Show Console, and then click on troubleshooting for your keyboard to find out more.", 0);
+		device.notify("Unsupported Firmware: ", "Click Show Console, and then click on troubleshooting for your keyboard to find out more.", 1, "Documentation");
 	}
 
 	if(FirmwareTypeByte == VIAFirmware){

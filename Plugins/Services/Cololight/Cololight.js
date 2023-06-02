@@ -125,7 +125,7 @@ export function DiscoveryService() {
 		if (this.timeSinceLastReq <= 0) { //} && this.RetryCount < this.Retries){
 			service.log("Requesting...");
 			service.broadcast("Z-SEARCH * \r\n");
-			this.timeSinceLastReq = 15;
+			this.timeSinceLastReq = 60;
 			this.RetryCount++;
 		}
 

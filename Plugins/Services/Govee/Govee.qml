@@ -10,7 +10,7 @@ Item {
 			id: scanningItem
 			height: 50
 			width: childrenRect.width + 15
-			visible: service.controllers.length == 0
+			visible: service.controllers.length === 0
 			color: theme.background3
 			radius: theme.radius
 

@@ -18,11 +18,14 @@ export function ControllableParameters() {
 	];
 }
 
+export function SupportsSubdevices() { return false; }
+
 /** @type {GoveeProtocol} */
 let govee;
 let ledCount = 4;
 let ledNames = [];
 let ledPositions = [];
+let subdevices = [];
 
 export function onvariableLedCountChanged(){
 	SetLedCount(variableLedCount);
@@ -38,27 +41,36 @@ export function Initialize(){
 	device.log(controller.sku);
 	device.setName(controller.sku);
 
-	let ledCount;
+	ClearSubdevices();
 
 	if(GoveeDeviceLibrary.hasOwnProperty(controller.sku)){
 		const GoveeDeviceInfo = GoveeDeviceLibrary[controller.sku];
 		device.setName(`Govee ${GoveeDeviceInfo.productName}`);
-		ledCount = GoveeDeviceInfo.ledCount;
 
 		if(GoveeDeviceInfo.hasVariableLedCount){
 			device.addProperty({"property": "variableLedCount", label: "Segment Count", "type": "number", "min": 1, "max": 60, default: GoveeDeviceInfo.ledCount, step: 1});
-			ledCount = variableLedCount;
+			SetLedCount(variableLedCount);
 		}else{
+			SetLedCount(GoveeDeviceInfo.ledCount);
 			device.removeProperty("variableLedCount");
+		}
+
+		if(GoveeDeviceInfo.usesSubDevices){
+			device.setIsSubdeviceController(true);
+
+			for(const subdevice of GoveeDeviceInfo.subdevices){
+				CreateSubDevice(subdevice);
+			}
+		}else{
+			device.setIsSubdeviceController(false);
 		}
 
 	}else{
 		device.log("Using Default Layout...");
 		device.setName(`Govee: ${controller.sku}`);
-		ledCount = 20;
+		SetLedCount(20);
 	}
 
-	SetLedCount(ledCount);
 
 	govee = new GoveeProtocol(controller.ip, controller.supportDreamView, controller.supportRazer);
 	// This is what happens in my wireshark
@@ -68,17 +80,9 @@ export function Initialize(){
 	govee.setDeviceState(true);
 }
 
+
 export function Render(){
-	const RGBData = new Array(ledCount * 3);
-
-	for(let i = 0 ; i < ledPositions.length; i++){
-		const ledPosition = ledPositions[i];
-
-		const color = device.color(ledPosition[0], ledPosition[1]);
-		RGBData[i * 3] = color[0];
-		RGBData[i * 3 + 1] = color[1];
-		RGBData[i * 3 + 2] = color[2];
-	}
+	const RGBData = subdevices.length > 0 ? GetRGBFromSubdevices() : GetDeviceRGB();
 
 	govee.SendRGB(RGBData);
 	device.pause(10);
@@ -90,6 +94,40 @@ export function Shutdown(suspend){
 	if(TurnOffOnShutdown){
 		govee.setDeviceState(false);
 	}
+}
+
+function GetRGBFromSubdevices(){
+	const RGBData = [];
+
+	for(const subdevice of subdevices){
+		const ledPositions = subdevice.ledPositions;
+
+		for(let i = 0 ; i < ledPositions.length; i++){
+			const ledPosition = ledPositions[i];
+
+			const color = device.subdeviceColor(subdevice.id, ledPosition[0], ledPosition[1]);
+			RGBData.push(color[0]);
+			RGBData.push(color[1]);
+			RGBData.push(color[2]);
+		}
+	}
+
+	return RGBData;
+}
+
+function GetDeviceRGB(){
+	const RGBData = new Array(ledCount * 3);
+
+	for(let i = 0 ; i < ledPositions.length; i++){
+		const ledPosition = ledPositions[i];
+
+		const color = device.color(ledPosition[0], ledPosition[1]);
+		RGBData[i * 3] = color[0];
+		RGBData[i * 3 + 1] = color[1];
+		RGBData[i * 3 + 2] = color[2];
+	}
+
+	return RGBData;
 }
 
 function SetLedCount(count){
@@ -110,6 +148,27 @@ function CreateLedMap(){
 	}
 }
 
+function ClearSubdevices(){
+	for(const subdevice of device.getCurrentSubdevices()){
+		device.removeSubdevice(subdevice);
+	}
+
+	subdevices = [];
+}
+
+function CreateSubDevice(subdevice){
+	const count = device.getCurrentSubdevices().length;
+	device.log(subdevice);
+	subdevice.id = `${subdevice.name} ${count + 1}`;
+	device.createSubdevice(subdevice.id);
+
+	device.setSubdeviceName(subdevice.id, subdevice.name);
+	device.setSubdeviceImage(subdevice.id, "");
+	device.setSubdeviceSize(subdevice.id, subdevice.size[0], subdevice.size[1]);
+	device.setSubdeviceLeds(subdevice.id, subdevice.ledNames, subdevice.ledPositions);
+
+	subdevices.push(subdevice);
+}
 
 /** @typedef { {productName: string, imageUrl: string, sku: string, state: number, supportRazer: boolean, supportFeast: boolean, ledCount: number, hasVariableLedCount?: boolean} } GoveeDevice */
 /** @type {Object.<string, GoveeDevice>} */
@@ -131,7 +190,7 @@ const GoveeDeviceLibrary = {
 		supportRazer: true,
 		supportFeast: true,
 		ledCount: 29, // This can support more? 5 * Segment Count - 1?
-		hasVariableLedCount: true
+		hasVariableLedCount: true,
 	},
 	H6065: {
 		productName: "Glide Y Lights",
@@ -194,7 +253,24 @@ const GoveeDeviceLibrary = {
 		state: 1,
 		supportRazer: true,
 		supportFeast: true,
-		ledCount: 15
+		ledCount: 0,
+		usesSubDevices: true,
+		subdevices: [
+			{
+				name: "Flow Plus Light Bar",
+				ledCount: 8,
+				size: [1, 8],
+				ledNames: ["Led 1", "Led 2", "Led 3", "Led 4", "Led 5", "Led 6", "Led 7", "Led 8"],
+				ledPositions: [[0, 0], [0, 1], [0, 2], [0, 3], [0, 4], [0, 5], [0, 6], [0, 7]],
+			},
+			{
+				name: "Flow Plus Light Bar",
+				ledCount: 8,
+				size: [1, 8],
+				ledNames: ["Led 1", "Led 2", "Led 3", "Led 4", "Led 5", "Led 6", "Led 7", "Led 8"],
+				ledPositions: [[0, 0], [0, 1], [0, 2], [0, 3], [0, 4], [0, 5], [0, 6], [0, 7]],
+			},
+		]
 	},
 	H6046: {
 		productName: "RGBIC TV Light Bars",

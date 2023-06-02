@@ -94,7 +94,7 @@ function checkFirmwareType() {
 	const FirmwareTypeByte = returnpacket[2];
 
 	if(FirmwareTypeByte !== 1 || FirmwareTypeByte !== 2) {
-		device.notify("Unsupported Firmware: ", "Click Show Console, and then click on troubleshooting for your keyboard to find out more.", 0);
+		device.notify("Unsupported Firmware: ", "Click Show Console, and then click on troubleshooting for your keyboard to find out more.", 1, "Documentation");
 	}
 
 	device.log("Firmware Type: " + FirmwareTypeByte);
