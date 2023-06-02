@@ -250,7 +250,7 @@ export function onGPUCableTypeChanged() {
 }
 
 function initController() {
-	for(let zones = 0x10; zones < 0x1b; zones++) {
+	for(let zones = 0x10; zones < 0x1c; zones++) {
 		device.send_report([0xE0, zones, 0x01, 0x02], 255);
 	}
 }
@@ -402,6 +402,6 @@ export function Validate(endpoint) {
 	return endpoint.interface === 1;
 }
 
-export function Image() {
-	return "";
-}
+//export function Image() {
+//	return "";
+//}
