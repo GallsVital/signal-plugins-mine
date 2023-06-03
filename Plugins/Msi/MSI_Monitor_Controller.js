@@ -21,7 +21,7 @@ export function ControllableParameters() {
 	];
 }
 
-export function SupportsSubdevices(){ return true; }
+export function SubdeviceController(){ return true; }
 export function LacksOnBoardLeds(){ return true; }
 export function DefaultComponentBrand() { return "MSI"; }
 export function DeviceMessage() { return ["Must configure monitor in device settings.", "In device settings, select your monitor model the dropdown."]; }

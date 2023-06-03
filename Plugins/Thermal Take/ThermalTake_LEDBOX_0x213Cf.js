@@ -19,7 +19,7 @@ export function ControllableParameters() {
 
 const ConnectedFans = [];
 
-export function SupportsSubdevices(){ return true; }
+export function SubdeviceController(){ return true; }
 const DeviceMaxLedLimit = 270;
 
 //Channel Name, Led Limit

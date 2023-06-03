@@ -19,7 +19,7 @@ export function ControllableParameters(){
 	];
 }
 
-export function SupportsSubdevices(){ return true; }
+export function SubdeviceController(){ return true; }
 
 const Arena = {
 	Speaker_Left : {

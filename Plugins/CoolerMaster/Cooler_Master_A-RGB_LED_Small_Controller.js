@@ -18,7 +18,7 @@ export function ControllableParameters(){
 		{"property":"forcedColor", "group":"lighting", "label":"Forced Color", "min":"0", "max":"360", "type":"color", "default":"#009bde"},
 	];
 }
-export function SupportsSubdevices(){ return true; }
+export function SubdeviceController(){ return true; }
 
 const DeviceMaxLedLimit = 48;
 const ChannelArray = [

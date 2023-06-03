@@ -23,7 +23,7 @@ const ParentDeviceName = "NZXT Smart Device 2";
 const vKeyNames = [];
 const vKeyPositions = [];
 
-export function SupportsSubdevices(){ return true; }
+export function SubdeviceController(){ return true; }
 export function DefaultComponentBrand() { return "NZXT";}
 
 const DeviceMaxLedLimit = 80;

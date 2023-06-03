@@ -21,7 +21,7 @@ const ParentDeviceName = "Corsair Lighting Commander Core";
 export function LedNames() { return []; }
 export function LedPositions() { return []; }
 
-export function SupportsSubdevices() { return true; }
+export function SubdeviceController() { return true; }
 export function SupportsFanControl(){ return true; }
 // Use the CorsairLink mutex any time this device is rendering.
 // if we don't our reads may be ruined by other programs
