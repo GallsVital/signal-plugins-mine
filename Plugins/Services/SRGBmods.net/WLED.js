@@ -6,7 +6,7 @@ export function Documentation() { return "gettingstarted/srgbmods-net-info"; }
 export function Size() { return [1, 1]; }
 export function DefaultPosition(){return [0, 0]; }
 export function DefaultScale(){return 1.0; }
-export function SupportsSubdevices(){ return true; }
+export function SubdeviceController(){ return true; }
 export function DefaultComponentBrand() { return "CompGen"; }
 /* global
 controller:readonly

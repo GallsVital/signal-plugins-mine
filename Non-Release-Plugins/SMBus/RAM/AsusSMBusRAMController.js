@@ -60,7 +60,7 @@ let deviceLEDCount = 0;
 let deviceName = "";
 let deviceProtocolVersion = "";
 
-export function SupportsSubdevices(){ return true; }
+export function SubdeviceController(){ return true; }
 
 export function Initialize() {
 	AsusSMBusController.getDeviceInformation();

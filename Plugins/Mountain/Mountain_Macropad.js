@@ -1,8 +1,8 @@
-export function Name() { return "Mountain Everest Max Keyboard"; }
+export function Name() { return "Mountain Macropad"; }
 export function VendorId() { return 0x3282; }//
-export function ProductId() { return 0x0001; }//0x0001
+export function ProductId() { return 0x0008; }//0x0001
 export function Publisher() { return "WhirlwindFX"; }
-export function Size() { return [22, 6]; }
+export function Size() { return [6, 2]; }
 export function DefaultPosition(){return [10, 100];}
 const DESIRED_HEIGHT = 85;
 export function DefaultScale(){return Math.floor(DESIRED_HEIGHT/Size()[1]);}
@@ -20,37 +20,20 @@ export function ControllableParameters() {
 	];
 }
 
-const vKeys =
-[
-	0, 9,  18, 27, 36, 45, 54, 63, 72, 81, 90,  99, 108,	      117, 114, 123,
-	1, 10, 19, 28, 37, 46, 55, 64, 73, 82, 91, 100, 109, 87,      96, 105, 115,   6,  24, 16, 15,
-	2, 11, 20, 29, 38, 47, 56, 65, 74, 83, 92, 101, 110, 119,     88, 97, 106,   61, 69, 70, 7,
-	3, 12, 21, 30, 39, 48, 57, 66, 75, 84, 93, 102, 111, 120,                        51, 52, 60,
-	4, 13, 22, 31, 40, 49, 58, 67, 76, 85, 94, 103, 121,              124,       34, 42, 43, 33,
-	5, 14, 23, 32, 41, 50, 59, 68, 77, 86, 95,                   104, 113, 122,    78, 79,
+const vKeys = [
+	0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11
 ];
 
-//8,13,17,25,26,35,42,45,54,63,72,81,90,99 is null
-const vKeyNames =
-[
-	"Esc", "F1", "F2", "F3", "F4", "F5", "F6", "F7", "F8", "F9", "F10", "F11", "F12",         "Print Screen", "Scroll Lock", "Pause Break",
-	"`", "1", "2", "3", "4", "5", "6", "7", "8", "9", "0", "-_", "=+", "Backspace",                        "Insert", "Home", "Page Up",       "NumLock", "Num /", "Num *", "Num -",  //21 //ISO are 111 and 13
-	"Tab", "Q", "W", "E", "R", "T", "Y", "U", "I", "O", "P", "[", "]", "\\",                               "Del", "End", "Page Down",         "Num 7", "Num 8", "Num 9", "Num +",    //21
-	"CapsLock", "A", "S", "D", "F", "G", "H", "J", "K", "L", ";", "'", "ISO_#", "Enter",                                                              "Num 4", "Num 5", "Num 6",             //16
-	"Left Shift", "ISO_<", "Z", "X", "C", "V", "B", "N", "M", ",", ".", "/", "Right Shift",                                  "Up Arrow",               "Num 1", "Num 2", "Num 3", "Num Enter", //17
-	"Left Ctrl", "Left Win", "Left Alt", "L-Space", "Space", "R-Space", "R-Underglow", "Right Alt", "Right Win", "Fn", "Right Ctrl",  "Left Arrow", "Down Arrow", "Right Arrow", "Num 0", "Num ."                       //13
+const vKeyNames = [
+	"M1", "M2", "M3", "M4", "M5", "M6",
+	"M7", "M8", "M9", "M10", "M11", "M12"
 ];
 
-
-const vKeyPositions =
-[
-	[0, 0], [1, 0], [2, 0], [3, 0], [4, 0],         [6, 0], [7, 0], [8, 0], [9, 0], [10, 0], [11, 0], [12, 0], [13, 0],   [14, 0], [15, 0], [16, 0],            //20
-	[0, 1], [1, 1], [2, 1], [3, 1], [4, 1], [5, 1], [6, 1], [7, 1], [8, 1], [9, 1], [10, 1], [11, 1], [12, 1], [13, 1],   [14, 1], [15, 1], [16, 1],   [17, 1], [18, 1], [19, 1], [20, 1], //21
-	[0, 2], [1, 2], [2, 2], [3, 2], [4, 2], [5, 2], [6, 2], [7, 2], [8, 2], [9, 2], [10, 2], [11, 2], [12, 2], [13, 2],   [14, 2], [15, 2], [16, 2],   [17, 2], [18, 2], [19, 2], [20, 3], //20
-	[0, 3], [1, 3], [2, 3], [3, 3], [4, 3], [5, 3], [6, 3], [7, 3], [8, 3], [9, 3], [10, 3], [11, 3], [12, 3], [13, 3],                                [17, 3], [18, 3], [19, 3], // 17
-	[0, 4], [1, 4], [2, 4], [3, 4], [4, 4], [5, 4], [6, 4], [7, 4], [8, 4], [9, 4], [10, 4], [11, 4],          [13, 4],            [15, 4],            [17, 4], [18, 4], [19, 4], [20, 4], // 17
-	[0, 5], [1, 5], [2, 5], [3, 5],                 [6, 5],         [8, 5], [9, 5], [10, 5], [11, 5], [12, 5], [13, 5],   [14, 5], [15, 5], [16, 5],   [17, 5],          [19, 5],               // 13
+const vKeyPositions = [
+	[0, 0], [1, 0], [2, 0], [3, 0], [4, 0], [5, 0],
+	[0, 1], [1, 1], [2, 1], [3, 1], [4, 1], [5, 1]
 ];
+
 
 export function LedNames() {
 	return vKeyNames;
@@ -61,23 +44,65 @@ export function LedPositions() {
 }
 
 export function Initialize() {
+	device.write([0x00, 0x11], 65); //Mode go brrr
 	device.write([0x00, 0x14, 0x00, 0x00, 0x00, 0x01, 0x06], 65); //Mode go brrr
-	device.read([0x00], 65);
-	device.write([0x00, 0x14, 0x2c, 0x0a, 0x00, 0xff, 0x64, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff], 65);
-	device.read([0x00], 65);
+	device.write([0x14, 0x2c, 0x0a, 0x00, 0xff, 0x64, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff], 64); //WHY DOES THIS WORK?
+	device.addFeature("keyboard");
+	macroInputArray.setCallback(macroHandler);
 }
 
 export function Render() {
 	sendColors();
+	macroEater();
 }
 
 export function Shutdown() {
 	sendColors(true);
 }
 
+function macroEater() { //tastes like chicken!
+	do {
+		const packet = device.read([0x00], 50, 0);
+
+		if(packet[1] === 0x01) {
+			macroInputArray.update([packet[43], packet[48]]);
+		}
+
+	}
+	while(device.getLastReadSize() > 0);
+}
+
+const buttonDict = {
+	0 : "M1",
+	2 : "M2",
+	3 : "M3",
+	4 : "M4",
+	5 : "M5",
+	6 : "M6",
+	7 : "M7",
+	8 : "M8",
+	9 : "M9",
+	10 : "M10",
+	11 : "M11",
+	12 : "M12",
+};
+
+function macroHandler(buttonCode, isPressed) {
+
+	const buttonName = buttonDict[buttonCode];
+	// Send Events for any keys we don't handle above
+	const eventData = {
+		"keyCode": 0,
+		"released": !isPressed,
+		"key":buttonName
+	};
+
+	device.log(eventData);
+	keyboard.sendEvent(eventData, "Key Press");
+}
+
 function grabColors(shutdown) {
-	const rgbdata = new Array(300);
-	rgbdata.fill(0xff);
+	const rgbdata = [];
 
 	for(let iIdx = 0; iIdx < vKeys.length; iIdx++) {
 		const iPxX = vKeyPositions[iIdx][0];
@@ -93,6 +118,7 @@ function grabColors(shutdown) {
 		}
 
 		const iLedIdx = vKeys[iIdx] * 3;
+
 		rgbdata[iLedIdx] = color[0];
 		rgbdata[iLedIdx+1] = color[1];
 		rgbdata[iLedIdx+2] = color[2];
@@ -105,27 +131,12 @@ function sendColors(shutdown = false) {
 
 	const rgbdata = grabColors(shutdown);
 
-	const LedsPerPacket = 19;
-	let PacketsSent = 0;
-	let BytesLeft = rgbdata.length;
-
-	while(PacketsSent < 7) {
-		const BytesToSend = Math.min(LedsPerPacket * 3, BytesLeft);
-		StreamLightingData(PacketsSent, rgbdata.splice(0, BytesToSend));
-
-		BytesLeft -= BytesToSend;
-		PacketsSent ++;
-	}
-
-	device.pause(5);
-	device.clearReadBuffer();
+	StreamLightingData(rgbdata);
 }
 
-function StreamLightingData(packetIdx, RGBData) {
+function StreamLightingData(RGBData) {
 
-	device.write([0x00, 0x14, 0x2c, 0x00, 0x01, packetIdx, 0x4b, 0x00].concat(RGBData), 65);
-	device.read([0x00], 65);
-	device.pause(1);
+	device.write([0x00, 0x14, 0x2c, 0x00, 0x01, 0x00, 0x4b, 0x00].concat(RGBData), 65);
 }
 
 function hexToRgb(hex) {
@@ -138,8 +149,104 @@ function hexToRgb(hex) {
 	return colors;
 }
 
+/**
+ * @callback bitArrayCallback
+ * @param {number} bitIdx
+ * @param {boolean} state
+ */
+
+export class BitArray {
+	constructor(length) {
+		// Create Backing Array
+		this.buffer = new ArrayBuffer(length);
+		// Byte View
+		this.bitArray = new Uint8Array(this.buffer);
+		// Constant for width of each index
+		this.byteWidth = 8;
+
+		/** @type {bitArrayCallback} */
+		this.callback = (bitIdx, state) => {throw new Error("BitArray(): No Callback Available?");};
+	}
+
+	toArray() {
+		return [...this.bitArray];
+	}
+
+	/** @param {number} bitIdx */
+	get(bitIdx) {
+		const byte = this.bitArray[bitIdx / this.byteWidth | 0] ?? 0;
+
+		return Boolean(byte & 1 << (bitIdx % this.byteWidth));
+	}
+
+	/** @param {number} bitIdx */
+	set(bitIdx) {
+		this.bitArray[bitIdx / this.byteWidth | 0] |= 1 << (bitIdx % this.byteWidth);
+	}
+
+	/** @param {number} bitIdx */
+	clear(bitIdx) {
+		this.bitArray[bitIdx / this.byteWidth | 0] &= ~(1 << (bitIdx % this.byteWidth));
+	}
+
+	/** @param {number} bitIdx */
+	toggle(bitIdx) {
+		this.bitArray[bitIdx / this.byteWidth | 0] ^= 1 << (bitIdx % this.byteWidth);
+	}
+
+	/**
+	 * @param {number} bitIdx
+	 * @param {boolean} state
+	 *  */
+	setState(bitIdx, state) {
+		if(state) {
+			this.set(bitIdx);
+		} else {
+			this.clear(bitIdx);
+		}
+	}
+
+	/** @param {bitArrayCallback} callback */
+	setCallback(callback){
+		this.callback = callback;
+	}
+
+	/** @param {number[]} newArray */
+	update(newArray) {
+		// Check Every Byte
+		for(let byteIdx = 0; byteIdx < newArray.length; byteIdx++) {
+			const value = newArray[byteIdx] ?? 0;
+
+			if(this.bitArray[byteIdx] === value) {
+				continue;
+			}
+
+			// Check Every bit of every changed Byte
+			for (let bit = 0; bit < this.byteWidth; bit++) {
+				const isPressed = Boolean((value) & (1 << (bit)));
+
+				const bitIdx = byteIdx * 8 + bit;
+
+				// Skip if the new bit state matches the old bit state
+				if(isPressed === this.get(bitIdx)) {
+					continue;
+				}
+
+				// Save new State
+				this.setState(bitIdx, isPressed);
+
+				// Fire callback
+				this.callback(bitIdx, isPressed);
+			}
+
+		}
+	}
+}
+/* eslint-enable complexity */
+const macroInputArray = new BitArray(2);
+
 export function Validate(endpoint) {
-	return endpoint.interface === 3;
+	return endpoint.interface === 2;
 }
 
 export function Image() {

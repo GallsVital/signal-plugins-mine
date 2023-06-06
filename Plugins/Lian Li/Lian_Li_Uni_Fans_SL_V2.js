@@ -27,7 +27,7 @@ export function DeviceMessages() {
 }
 
 
-export function SupportsSubdevices(){ return true; }
+export function SubdeviceController(){ return true; }
 export function DefaultComponentBrand() { return "LianLi";}
 
 const DeviceMaxLedLimit = 384;
@@ -67,11 +67,9 @@ export function LedPositions() {
 }
 
 export function Initialize() {
-	device.send_report([0xE0, 0x10, 0x63, 0x00, 0x01, 0x02, 0x03, 0x08], 32);
-	device.send_report([0xE0, 0x10, 0x60, 0x01, 0x06], 32);
-	device.send_report([0xE0, 0x10, 0x60, 0x02, 0x06], 32);
-	device.send_report([0xE0, 0x10, 0x60, 0x03, 0x06], 32);
-	device.send_report([0xE0, 0x10, 0x60, 0x04, 0x06], 32);
+	for(let channel = 1; channel < 7; channel++) {
+		device.send_report([0xE0, 0x10, 0x60, channel, 0x06], 32);
+	}
 
 	setFanMode();
 	burstFans();

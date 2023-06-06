@@ -18,7 +18,7 @@ export function ControllableParameters() {
 	];
 }
 
-export function SupportsSubdevices() { return false; }
+export function SubdeviceController() { return false; }
 
 /** @type {GoveeProtocol} */
 let govee;

@@ -24,7 +24,7 @@ const ParentDeviceName = "Corsair Lighting Commander Core";
 export function LedNames() { return vKeyNames; }
 export function LedPositions() { return vKeyPositions; }
 
-export function SupportsSubdevices() { return true; }
+export function SubdeviceController() { return true; }
 export function DefaultComponentBrand() { return "Corsair"; }
 export function Validate(endpoint) {
 	return endpoint.interface === 0;

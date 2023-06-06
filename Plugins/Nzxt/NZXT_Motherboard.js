@@ -20,7 +20,7 @@ export function ControllableParameters() {
 		{"property":"RGBconfig", "group":"lighting", "label":"12V RGB Channel Configuration", "type":"combobox", "values":["RGB", "RBG", "BGR", "BRG", "GBR", "GRB"], "default":"GRB"},
 	];
 }
-export function SupportsSubdevices(){ return true; }
+export function SubdeviceController(){ return true; }
 
 const RGBConfigs = {
 	"RGB" : [0, 1, 2],

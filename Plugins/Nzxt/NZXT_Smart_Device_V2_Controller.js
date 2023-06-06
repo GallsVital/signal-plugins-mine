@@ -21,7 +21,7 @@ export function ControllableParameters(){
 const vKeyNames = [];
 const vKeyPositions = [];
 
-export function SupportsSubdevices(){ return true; }
+export function SubdeviceController(){ return true; }
 export function DefaultComponentBrand() { return "NZXT";}
 
 const NZXTSmartDevice2ProductNames = {

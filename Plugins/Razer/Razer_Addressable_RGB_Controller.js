@@ -22,7 +22,7 @@ export function ControllableParameters() {
 
 const vLedNames = [];
 const vLedPositions = [];
-export function SupportsSubdevices(){ return true; }
+export function SubdeviceController(){ return true; }
 export function LacksOnBoardLeds() {return true;}
 const DeviceMaxLedLimit = 240;
 
@@ -129,12 +129,13 @@ function SendChannel(Channel, shutdown = false) {
 	const componentChannel = device.channel(ChannelArray[Channel][0]);
 
 	let RGBData = [];
+
 	if (shutdown) {
 		RGBData = device.createColorArray(shutdownColor, ChannelLedCount, "Inline");
 
 	} else if(LightingMode === "Forced") {
 		RGBData = device.createColorArray(forcedColor, ChannelLedCount, "Inline");
-		
+
 	} else if(componentChannel.shouldPulseColors()) {
 		ChannelLedCount = 80;
 

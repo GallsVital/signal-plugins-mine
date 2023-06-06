@@ -28,7 +28,7 @@ export function ControllableParameters() {
 		{"property":"shutdownColor", "group":"lighting", "label":"Shutdown Color", "min":"0", "max":"360", "type":"color", "default":"#009bde"},
 		{"property":"LightingMode", "group":"lighting", "label":"Lighting Mode", "type":"combobox", "values":["Canvas", "Forced"], "default":"Canvas"},
 		{"property":"forcedColor", "group":"lighting", "label":"Forced Color", "min":"0", "max":"360", "type":"color", "default":"#009bde"},
-		{"property":"OnboardState", "group":"", "label":"Onboard Button Mode", "type":"boolean", "default": "false", "tooltip" : "Enables button bindings from onboard saved profiles. Disables SignalRGB DPI and Macro Control."},
+		{"property":"OnboardState", "group":"", "label":"Onboard Memory Mode", "type":"boolean", "default": "false", "tooltip" : "Enables button bindings from onboard saved profiles. Disables SignalRGB DPI and Macro Control."},
 		{"property":"pollingRate", "group":"", "label":"Polling Rate", "type":"combobox", "values":[ "1000", "500", "250", "100" ], "default":"1000"},
 	];
 }
