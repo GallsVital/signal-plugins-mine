@@ -29,7 +29,7 @@ export function DeviceMessages() {
 }
 
 
-export function SupportsSubdevices(){ return true; }
+export function SubdeviceController(){ return true; }
 export function DefaultComponentBrand() { return "LianLi";}
 
 const DeviceMaxLedLimit = 80 * 4;

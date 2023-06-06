@@ -19,7 +19,7 @@ export function ControllableParameters() {
 }
 export function LedNames() { return []; }
 export function LedPositions() { return []; }
-export function SupportsSubdevices() { return true; }
+export function SubdeviceController() { return true; }
 export function DefaultComponentBrand() { return "Corsair"; }
 
 export function SupportsFanControl(){ return true; }

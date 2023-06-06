@@ -21,7 +21,7 @@ const BrightnessLimiter = .5;
 const vKeyNames = [];
 const vKeyPositions = [];
 
-export function SupportsSubdevices(){ return true; }
+export function SubdeviceController(){ return true; }
 export function DefaultComponentBrand() { return "Corsair";}
 export function Documentation(){ return "troubleshooting/corsair"; }
 

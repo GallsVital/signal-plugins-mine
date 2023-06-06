@@ -22,7 +22,7 @@ export function ControllableParameters(){
 
 const vLedNames = [];
 const vLedPositions = [];
-export function SupportsSubdevices(){ return true; }
+export function SubdeviceController(){ return true; }
 
 const DeviceMaxLedLimit = 240;
 

@@ -17,7 +17,7 @@ export function ControllableParameters() {
 	];
 }
 
-export function SupportsSubdevices(){ return true; }
+export function SubdeviceController(){ return true; }
 const DeviceMaxLedLimit = 54 * 5 ;
 
 //Channel Name, Led Limit
