@@ -43,7 +43,6 @@ export function Initialize() {
 
 export function Render() {
 	sendColors();
-	sendPerledLaptopColors();
 }
 
 export function Shutdown() {
