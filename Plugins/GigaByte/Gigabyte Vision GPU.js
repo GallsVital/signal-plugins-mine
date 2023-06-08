@@ -339,6 +339,7 @@ class GigabyteVisionDeviceIds {
 		this.RTX4070TI_GAMING_OC            = 0x40c6;
 		this.RTX4070TI_EAGLE_12G			= 0x40D2;
 		this.RTX4070TI_EAGLE_OC_12G			= 0x40CA;
+		this.RTX4070TI_AERO					= 0x40CB;
 		this.RTX4080_EAGLE_OC_16GD			= 0x40BE;
 		this.RTX4090_GAMING_OC_24GB			= 0x40BF;
 		this.GTX1070_GAMING                 = 0x3772;
@@ -462,6 +463,7 @@ class GigabyteVisionGPuList {
 			new GigabyteVisionIdentifier(Nvidia.RTX4070,		GigabyteVisionIds.RTX4070_AERO,					 0x71, "GIGABYTE 4070 Aero"),
 			new GigabyteVisionIdentifier(Nvidia.RTX4070TI,      GigabyteVisionIds.RTX4070TI_MASTER_12G,			 0x71, "GIGABYTE 4070Ti Master 12G"), //Confirmed
 			new GigabyteVisionIdentifier(Nvidia.RTX4080,        GigabyteVisionIds.RTX4080_AERO_OC_16G,           0x71, "GIGABYTE 4080 Aero OC"),
+			new GigabyteVisionIdentifier(Nvidia.RTX4070TI,		GigabyteVisionIds.RTX4070TI_AERO,				 0x71, "GIGABYTE 4070Ti Aero"),
 		];
 	}
 }
