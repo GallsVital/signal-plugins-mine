@@ -44,7 +44,7 @@ export function Scan(bus) {
 		if(CheckForIdMatch(bus, GPU)) {
 			bus.log(`Found Potential Gigabyte Master GPU! [${GPU.Name}]`, {toFile : true});
 
-			if(GigabyteVisionGpuCheck(bus, GPU.Address, true)){
+			if(GPU.Address === 0x50 || GigabyteVisionGpuCheck(bus, GPU.Address, true)){
 				FoundAddresses.push(GPU.Address);
 				bus.log(`Gigabyte Master GPU passed read test! [${GPU.Name}]`, {toFile : true});
 			}else{
@@ -93,9 +93,8 @@ function CheckAllPotentialAddresses(bus){
 
 function GigabyteVisionGpuCheck(bus, address, log = false){
 	const ValidReturnCodes = [0x10, 0x11, 0x12, 0x14];
-	// 0x62 (Gaming OC) cards use a 8 byte write length.
-	// GPU will softlock if this is wrong.
-	const WriteLength = [0x62, 0x71].includes(address) ? 8 : 4;
+	// All Master Protocol GPU's use 8 byte writes
+	const WriteLength = 8;
 
 	let data;
 
