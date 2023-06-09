@@ -188,7 +188,7 @@ const v24PinLedPositions =
 	[10, 5], [11, 5], [12, 5], [13, 5], [14, 5], [15, 5], [16, 5], [17, 5], [18, 5], [19, 5],
 ];
 
-export function SupportsSubdevices(){ return true; }
+export function SubdeviceController(){ return true; }
 
 export function Initialize() {
 	initController();

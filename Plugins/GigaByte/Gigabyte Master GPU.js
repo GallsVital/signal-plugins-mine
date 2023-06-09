@@ -44,7 +44,7 @@ export function Scan(bus) {
 		if(CheckForIdMatch(bus, GPU)) {
 			bus.log(`Found Potential Gigabyte Master GPU! [${GPU.Name}]`, {toFile : true});
 
-			if(GigabyteVisionGpuCheck(bus, GPU.Address, true)){
+			if(GPU.Address === 0x50 || GigabyteVisionGpuCheck(bus, GPU.Address, true)){
 				FoundAddresses.push(GPU.Address);
 				bus.log(`Gigabyte Master GPU passed read test! [${GPU.Name}]`, {toFile : true});
 			}else{
@@ -93,9 +93,8 @@ function CheckAllPotentialAddresses(bus){
 
 function GigabyteVisionGpuCheck(bus, address, log = false){
 	const ValidReturnCodes = [0x10, 0x11, 0x12, 0x14];
-	// 0x62 (Gaming OC) cards use a 8 byte write length.
-	// GPU will softlock if this is wrong.
-	const WriteLength = [0x62, 0x71].includes(address) ? 8 : 4;
+	// All Master Protocol GPU's use 8 byte writes
+	const WriteLength = 8;
 
 	let data;
 
@@ -286,7 +285,7 @@ class GigabyteMasterProtocol {
 					3: {Names : [ "Logo" ], Positions : [ [3, 1] ], Mapping : [ 0 ]}
 				}
 			},
-			0x40c6 ://RTX4070TI_GAMING_OC_12G
+			0x40c6 ://RTX4070_GAMING_OC_12G
 			{
 				Size: [5, 3],
 				modeZones : [0],
@@ -540,15 +539,13 @@ class GigabyteMasterDeviceIds {
 		this.RTX3090_XTREME_WATERFORCE       = 0x403A;
 		this.RTX3090_XTREME_WATERFORCE_2	 = 0x4039;
 		this.RTX4070_MASTER					 = 0x40E9;
+		this.RTX4070_GAMING_OC_12G			 = 0x40C6;
 		this.RTX4070TI_ELITE				 = 0x40C9;
-		this.RTX4070TI_GAMING_OC_12G	     = 0x40C6;
 		this.RTX4080_GAMING_OC_16G	    	 = 0x40bc;
 		this.RTX4080_GAMING_OC_16G_2	     = 0x40bd;
 		this.RTX4080_XTREME_WATERFORCE		 = 0x40c8;
 		this.RTX4090_AORUS_MASTER 			 = 0x40C0;
 		this.RTX4090_GAMING_OC_24GB			 = 0x40BF;
-
-
 	}
 }
 
@@ -563,8 +560,6 @@ class GPUIdentifier {
 		this.Model = Model;
 	}
 }
-
-//0x1458
 class GigabyteMasterIdentifier extends GPUIdentifier {
 	constructor(device, SubDevice, Address, Name) {
 		super(0x10DE, 0x1458, device, SubDevice, Address, Name, "");
@@ -606,12 +601,12 @@ class GigabyteMasterGPuList {
 			new GigabyteMasterIdentifier(Nvidia.RTX3060TI_LHR,  GigabyteMasterIds.RTX3060TI_ELITE_REV2,				0x70, "GIGABYTE Aorus 3060TI Elite REV2 LHR"),
 			new GigabyteMasterIdentifier(Nvidia.RTX3080,        GigabyteMasterIds.RTX3080_XTREME_WATERFORCE_10G,	0x65, "GIGABYTE AORUS 3080 XTREME Waterforce 10GB"),
 			new GigabyteMasterIdentifier(Nvidia.RTX3080_LHR,    GigabyteMasterIds.RTX3080_XTREME_WATERFORCE_10G,	0x65, "GIGABYTE AORUS 3080 XTREME Waterforce 10GB"),
-			new GigabyteMasterIdentifier(Nvidia.RTX3080TI,      GigabyteMasterIds.RTX3080TI_XTREME_WATERFORCE_12G,	0x64, "GIGABYTE AORUS 3080TI XTREME Waterforce 12GB"), //Confirmed
+			new GigabyteMasterIdentifier(Nvidia.RTX3080TI,      GigabyteMasterIds.RTX3080TI_XTREME_WATERFORCE_12G,	0x64, "GIGABYTE AORUS 3080TI XTREME Waterforce 12GB"),
 			new GigabyteMasterIdentifier(Nvidia.RTX3090,        GigabyteMasterIds.RTX3090_XTREME_WATERFORCE_2,		0x65, "GIGABYTE AORUS 3090 XTREME Waterforce 24GB"),
-			new GigabyteMasterIdentifier(Nvidia.RTX4070TI, 		GigabyteMasterIds.RTX4070TI_GAMING_OC_12G,			0x71, "GIGABYTE 4070TI Gaming OC"), //Confirmed
-			new GigabyteMasterIdentifier(Nvidia.RTX4070TI, 		GigabyteMasterIds.RTX4070TI_ELITE,					0x71, "GIGABYTE 4070TI Elite 12G"), //Confirmed single color
+			new GigabyteMasterIdentifier(Nvidia.RTX4070, 		GigabyteMasterIds.RTX4070_GAMING_OC_12G,			0x71, "GIGABYTE 4070 Gaming OC"),
+			new GigabyteMasterIdentifier(Nvidia.RTX4070TI, 		GigabyteMasterIds.RTX4070TI_ELITE,					0x71, "GIGABYTE 4070TI Elite 12G"),
 			new GigabyteMasterIdentifier(Nvidia.RTX4080, 		GigabyteMasterIds.RTX4080_GAMING_OC_16G,			0x71, "GIGABYTE 4080 Gaming OC"),
-			new GigabyteMasterIdentifier(Nvidia.RTX4080, 		GigabyteMasterIds.RTX4080_GAMING_OC_16G_2,			0x71, "GIGABYTE 4080 Gaming OC"), //Confirmed
+			new GigabyteMasterIdentifier(Nvidia.RTX4080, 		GigabyteMasterIds.RTX4080_GAMING_OC_16G_2,			0x71, "GIGABYTE 4080 Gaming OC"),
 			new GigabyteMasterIdentifier(Nvidia.RTX4080, 		GigabyteMasterIds.RTX4080_XTREME_WATERFORCE,		0x64, "GIGABYTE 4080 XTREME Waterforce 16GB"), //This card is single zone. Older ones were multizone. We'll see if it plays ball or not with sending multiple zones.
 
 			new GigabyteMasterIdentifier(Nvidia.RTX4070, 		GigabyteMasterIds.RTX4070_MASTER,		0x71, "GIGABYTE 4070 Aorus Master"),

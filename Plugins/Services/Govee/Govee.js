@@ -18,7 +18,7 @@ export function ControllableParameters() {
 	];
 }
 
-export function SupportsSubdevices() { return false; }
+export function SubdeviceController() { return false; }
 
 /** @type {GoveeProtocol} */
 let govee;
@@ -56,13 +56,13 @@ export function Initialize(){
 		}
 
 		if(GoveeDeviceInfo.usesSubDevices){
-			device.setIsSubdeviceController(true);
+			device.SetIsSubdeviceController(true);
 
 			for(const subdevice of GoveeDeviceInfo.subdevices){
 				CreateSubDevice(subdevice);
 			}
 		}else{
-			device.setIsSubdeviceController(false);
+			device.SetIsSubdeviceController(false);
 		}
 
 	}else{

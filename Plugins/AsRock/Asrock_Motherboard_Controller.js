@@ -106,7 +106,7 @@ const RGBConfigs = {
 	"GRB" : [1, 0, 2]
 };
 
-export function SupportsSubdevices(){ return true; }
+export function SubdeviceController(){ return true; }
 
 export function LedNames() {
 	return vLedNames;

@@ -31,7 +31,7 @@ export function LedPositions() {
 	return vKeyPositions;
 }
 
-export function SupportsSubdevices(){ return true; }
+export function SubdeviceController(){ return true; }
 export function DefaultComponentBrand() { return "Vertagear";}
 
 const DeviceMaxLedLimit = 80;

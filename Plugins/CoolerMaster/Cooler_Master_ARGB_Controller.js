@@ -28,7 +28,7 @@ export function ControllableParameters(){
 }
 
 const ParentDeviceName = "Cooler Master ARGB Controller";
-export function SupportsSubdevices(){ return true; }
+export function SubdeviceController(){ return true; }
 const DeviceMaxLedLimit = 196;
 //Channel Name, Led Limit
 const ChannelArray =

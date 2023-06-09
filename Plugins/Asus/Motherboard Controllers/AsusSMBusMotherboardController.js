@@ -64,7 +64,7 @@ let deviceName = "";
 let deviceProtocolVersion = "";
 let ParentDeviceName = "";
 
-export function SupportsSubdevices(){ return true; }
+export function SubdeviceController(){ return true; }
 
 export function Initialize() {
 	device.setName(device.getMotherboardName() + " Motherboard Controller");

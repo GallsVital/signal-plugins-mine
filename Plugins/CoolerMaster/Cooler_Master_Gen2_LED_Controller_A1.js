@@ -25,7 +25,7 @@ export function ControllableParameters(){
 	];
 }
 export function ConflictingProcesses() { return ["MasterPlusApp.exe"]; }
-export function SupportsSubdevices(){ return true; }
+export function SubdeviceController(){ return true; }
 
 const Gen1ChLedLimit = 60;
 const Gen2ChLedLimit = 80;

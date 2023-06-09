@@ -30,7 +30,7 @@ export function ControllableParameters(){
 
 export function LedNames() { return vLedNames; }
 export function LedPositions() { return vLedPositions; }
-export function SupportsSubdevices(){ return true; }
+export function SubdeviceController(){ return true; }
 export function Validate(endpoint) {
 	return endpoint.interface === -1 && endpoint.usage === 0x00CC;
 }
