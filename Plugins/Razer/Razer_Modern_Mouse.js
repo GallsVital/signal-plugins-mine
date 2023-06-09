@@ -45,7 +45,7 @@ export function ControllableParameters() {
 
 	if (DeviceInfo.wireless) {
 		UserProps.push(...[
-			{ "property": "idleTimeout", "group": "", "label": "Device Idle Timeout Length (S)", "step": "15", "type": "number", "min": "60", "max": "900", "default": "300", "live" : false }, //This may need to be switched over to a combobox.
+			{ "property": "idleTimeout", "group": "", "label": "Device Idle Timeout Length (S)", "step": "15", "type": "number", "min": "1", "max": "15", "default": "5", "live" : false }, //This may need to be switched over to a combobox.
 			{ "property": "lowPowerPercentage", "group": "", "label": "Device Low Power Mode Percentage", "step": "1", "type": "number", "min": "1", "max": "100", "default": "15", "live" : false },
 		]);
 	}
@@ -76,6 +76,10 @@ export function LedPositions() {
 
 export function Initialize() {
 	Razer.detectDeviceEndpoint();
+
+	if(Razer.getDeviceInitializationStatus()) {
+		deviceConfiguration(); //yay for edge cases without reloading a plugin
+	}
 }
 
 export function Render() {
@@ -201,29 +205,27 @@ function deviceInitialization(wake = false) {
 		}
 	}
 
-	if(wake) {
-		device.set_endpoint(Razer.Config.deviceEndpoint[`interface`], Razer.Config.deviceEndpoint[`usage`], Razer.Config.deviceEndpoint[`usage_page`]);
+	device.set_endpoint(Razer.Config.deviceEndpoint[`interface`], Razer.Config.deviceEndpoint[`usage`], Razer.Config.deviceEndpoint[`usage_page`]);
 
-		if (settingControl) {
-			if (razerDeviceLibrary.LEDLibrary[razerDeviceLibrary.PIDLibrary[device.productId()]]["hyperscrollWheel"]) {
-				RazerMouse.setDeviceScrollMode(ScrollMode);
-				RazerMouse.setDeviceScrollAccel(ScrollAccel);
-				RazerMouse.setDeviceSmartReel(SmartReel);
-			}
+	if (settingControl) {
+		if (razerDeviceLibrary.LEDLibrary[razerDeviceLibrary.PIDLibrary[device.productId()]]["hyperscrollWheel"]) {
+			RazerMouse.setDeviceScrollMode(ScrollMode);
+			RazerMouse.setDeviceScrollAccel(ScrollAccel);
+			RazerMouse.setDeviceSmartReel(SmartReel);
+		}
 
-			if (razerDeviceLibrary.LEDLibrary[razerDeviceLibrary.PIDLibrary[device.productId()]]["wireless"]) {
-				Razer.setDeviceIdleTimeout(idleTimeout);
-				Razer.setDeviceLowPowerPercentage(lowPowerPercentage);
-			}
+		if (razerDeviceLibrary.LEDLibrary[razerDeviceLibrary.PIDLibrary[device.productId()]]["wireless"]) {
+			Razer.setDeviceIdleTimeout(idleTimeout);
+			Razer.setDeviceLowPowerPercentage(lowPowerPercentage);
+		}
 
-			RazerMouse.setDeviceLOD(asymmetricLOD, liftOffDistance);
-			Razer.setDevicePollingRate(pollingRate);
+		RazerMouse.setDeviceLOD(asymmetricLOD, liftOffDistance);
+		Razer.setDevicePollingRate(pollingRate);
 
-			if (!OnboardDPI) {
-				Razer.setDeviceMode("Software Mode");
-				DPIHandler.setActiveControl(true);
-				DPIHandler.update();
-			}
+		if (!OnboardDPI) {
+			Razer.setDeviceMode("Software Mode");
+			DPIHandler.setActiveControl(true);
+			DPIHandler.update();
 		}
 	}
 }
@@ -254,6 +256,7 @@ function deviceConfiguration() {
 			Razer.setDeviceMode("Hardware Mode");
 		} else {
 			Razer.setDeviceMode("Software Mode");
+			DPIHandler.update(); //Yet again I hate edge cases.
 		}
 	}
 }
@@ -805,7 +808,7 @@ export class deviceLibrary {
 				size: [2, 2],
 				vLedNames: ["Mouse"],
 				vLedPositions: [[1, 1]],
-				maxDPI: 12400,
+				maxDPI: 20000,
 				wireless: true
 			},
 
@@ -1703,7 +1706,7 @@ export class RazerProtocol {
 
 		if (returnPacket[8] !== undefined && returnPacket[9] !== undefined) {
 			const idleTimeout = BinaryUtils.ReadInt16BigEndian([returnPacket[8], returnPacket[9]]);
-			device.log(`Current Device Idle Timeout: ${idleTimeout} Seconds.`);
+			device.log(`Current Device Idle Timeout: ${idleTimeout/60} Minutes.`);
 
 			return idleTimeout;
 		}
@@ -1712,7 +1715,7 @@ export class RazerProtocol {
 	}
 	/** Function to set the device idle timeout on supported devices. */
 	setDeviceIdleTimeout(timeout) {
-		const returnValues = this.ConfigPacketSend([0x02, 0x07, 0x03, (timeout >> 8 & 0xff), (timeout & 0xff)]);
+		const returnValues = this.ConfigPacketSend([0x02, 0x07, 0x03, (timeout*60 >> 8 & 0xff), (timeout*60 & 0xff)]);
 		device.pause(10);
 
 		const errorCode = returnValues[1];
@@ -2047,6 +2050,7 @@ class RazerMouseFunctions {
 		return 0;
 	}
 	/** Function to fix the edge case we create by fixing the dpi button/light on shutdown.*/
+	// eslint-disable-next-line complexity
 	setDeviceDPIToHardware(retryAttempts = 5) {
 		let errorCode = 0;
 		let returnPacket = [];
@@ -2075,46 +2079,12 @@ class RazerMouseFunctions {
 		}
 
 		if (returnPacket !== undefined) {
-			const currentStage = returnPacket[9];
-			const numberOfStages = returnPacket[10];
 
-			const dpi1X = BinaryUtils.ReadInt16BigEndian([returnPacket[12], returnPacket[13]]); //This is technically unnecessary as we get the returns, but this is more organized.
-			const dpi1Y = BinaryUtils.ReadInt16BigEndian([returnPacket[14], returnPacket[15]]);
-			const dpi2X = BinaryUtils.ReadInt16BigEndian([returnPacket[19], returnPacket[20]]);
-			const dpi2Y = BinaryUtils.ReadInt16BigEndian([returnPacket[21], returnPacket[22]]);
-			const dpi3X = BinaryUtils.ReadInt16BigEndian([returnPacket[26], returnPacket[27]]);
-			const dpi3Y = BinaryUtils.ReadInt16BigEndian([returnPacket[28], returnPacket[29]]);
-			const dpi4X = BinaryUtils.ReadInt16BigEndian([returnPacket[33], returnPacket[34]]);
-			const dpi4Y = BinaryUtils.ReadInt16BigEndian([returnPacket[35], returnPacket[36]]);
-			const dpi5X = BinaryUtils.ReadInt16BigEndian([returnPacket[40], returnPacket[41]]);
-			const dpi5Y = BinaryUtils.ReadInt16BigEndian([returnPacket[42], returnPacket[43]]);
+			const packet = [0x26, 0x04, 0x06, 0x00];
 
-			const packet = [0x26, 0x04, 0x06, 0x00, currentStage, numberOfStages, 0x00];
-
-			packet[7] = dpi1X >> 8;
-			packet[8] = dpi1X & 0xff;
-			packet[9] = dpi1Y >> 8;
-			packet[10] = dpi1Y & 0xff;
-			packet[13] = 0x01;
-			packet[14] = dpi2X >> 8;
-			packet[15] = dpi2X & 0xff;
-			packet[16] = dpi2Y >> 8;
-			packet[17] = dpi2Y & 0xff;
-			packet[20] = 0x02;
-			packet[21] = dpi3X >> 8;
-			packet[22] = dpi3X & 0xff;
-			packet[23] = dpi3Y >> 8;
-			packet[24] = dpi3Y & 0xff;
-			packet[27] = 0x03;
-			packet[28] = dpi4X >> 8;
-			packet[29] = dpi4X & 0xff;
-			packet[30] = dpi4Y >> 8;
-			packet[31] = dpi4Y & 0xff;
-			packet[34] = 0x04;
-			packet[35] = dpi5X >> 8;
-			packet[36] = dpi5X & 0xff;
-			packet[37] = dpi5Y >> 8;
-			packet[38] = dpi5Y & 0xff;
+			for(let bytes = 0; bytes < 40; bytes ++) {
+				packet[bytes + 4] = returnPacket[bytes + 9];
+			}
 
 			let errorCode = 0;
 			let attempts = 0;
@@ -2217,32 +2187,24 @@ class RazerMouseFunctions {
 	}
 	/** Function to set multiple dpi stages. We can set how many stages a device has, and this is saved onboard. This works with hardware buttons.*/
 	setDeviceDPI(stage, dpiStages, saveToFlash = false, retryAttempts = 5) {
-		const packet = [0x26, 0x04, 0x06, saveToFlash, stage, dpiStages, 0x00];
+		const packet = [0x26, 0x04, 0x06, saveToFlash, stage, dpiStages];
 
-		packet[7] = dpi1 >> 8;
-		packet[8] = dpi1 & 0xff;
-		packet[9] = dpi1 >> 8;
-		packet[10] = dpi1 & 0xff;
-		packet[13] = 0x01;
-		packet[14] = dpi2 >> 8;
-		packet[15] = dpi2 & 0xff;
-		packet[16] = dpi2 >> 8;
-		packet[17] = dpi2 & 0xff;
-		packet[20] = 0x02;
-		packet[21] = dpi3 >> 8;
-		packet[22] = dpi3 & 0xff;
-		packet[23] = dpi3 >> 8;
-		packet[24] = dpi3 & 0xff;
-		packet[27] = 0x03;
-		packet[28] = dpi4 >> 8;
-		packet[29] = dpi4 & 0xff;
-		packet[30] = dpi4 >> 8;
-		packet[31] = dpi4 & 0xff;
-		packet[34] = 0x04;
-		packet[35] = dpi5 >> 8;
-		packet[36] = dpi5 & 0xff;
-		packet[37] = dpi5 >> 8;
-		packet[38] = dpi5 & 0xff;
+		for(let stages = 0; stages < dpiStages; stages++) {
+			try {
+				// eslint-disable-next-line no-eval
+				const dpi = eval(`dpi${stages+1}`); //Cope ESLint.
+				const offset = 7 * stages + 6;
+
+				packet[offset] = stages;
+				packet[offset + 1] = dpi >> 8;
+				packet[offset + 2] = dpi & 0xff;
+				packet[offset + 3] = dpi >> 8;
+				packet[offset + 4] = dpi & 0xff;
+			} catch (error) {
+				device.log("Tried to Call a nonexistent DPI Stage.", {toFile : true});
+			}
+
+		}
 
 		let errorCode = 0;
 		let attempts = 0;
