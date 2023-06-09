@@ -7,12 +7,14 @@ export function Size() { return [19, 8]; }
 export function DefaultPosition(){return [10, 100]; }
 export function DefaultScale(){return 8.0;}
 /* global
+shutdownMode:readonly
 shutdownColor:readonly
 LightingMode:readonly
 forcedColor:readonly
 */
 export function ControllableParameters() {
 	return [
+		{"property":"shutdownMode", "group":"lighting", "label":"Shutdown Mode", "type":"combobox", "values":["SignalRGB", "Hardware"], "default":"SignalRGB"},
 		{"property":"shutdownColor", "group":"lighting", "label":"Shutdown Color", "min":"0", "max":"360", "type":"color", "default":"#009bde"},
 		{"property":"LightingMode", "group":"lighting", "label":"Lighting Mode", "type":"combobox", "values":["Canvas", "Forced"], "default":"Canvas"},
 		{"property":"forcedColor", "group":"lighting", "label":"Forced Color", "min":"0", "max":"360", "type":"color", "default":"#009bde"},
@@ -79,8 +81,18 @@ export function Render() {
 	sendColors();
 }
 
-export function Shutdown() {
-	effectDisable();
+export function Shutdown(SystemSuspending) {
+
+	if(SystemSuspending) {
+		sendColors("#000000"); // Go Dark on System Sleep/Shutdown
+	} else {
+		if (shutdownMode === "SignalRGB") {
+			sendColors(shutdownColor);
+		} else {
+			effectDisable();
+		}
+	}
+
 }
 
 function checkFirmwareType() {
@@ -193,7 +205,7 @@ function effectDisable() //Revert to Hardware Mode
 	device.write(packet, 32);
 }
 
-function grabColors(shutdown = false) {
+function grabColors(overrideColor) {
 	const rgbdata = [];
 
 	for(let iIdx = 0; iIdx < vKeys.length; iIdx++) {
@@ -201,8 +213,8 @@ function grabColors(shutdown = false) {
 		const iPxY = vKeyPositions[iIdx][1];
 		let color;
 
-		if(shutdown) {
-			color = hexToRgb(shutdownColor);
+		if(overrideColor) {
+			color = hexToRgb(overrideColor);
 		} else if (LightingMode === "Forced") {
 			color = hexToRgb(forcedColor);
 		} else {
@@ -218,8 +230,8 @@ function grabColors(shutdown = false) {
 	return rgbdata;
 }
 
-function sendColors() {
-	const rgbdata = grabColors();
+function sendColors(overrideColor) {
+	const rgbdata = grabColors(overrideColor);
 	const totalpackets = Math.floor(LEDCount/9);
 	const finalpacketoffset = (totalpackets*9);
 	const finalpacketledstosend = (LEDCount - finalpacketoffset);
