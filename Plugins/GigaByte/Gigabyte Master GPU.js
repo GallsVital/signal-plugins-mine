@@ -540,6 +540,7 @@ class GigabyteMasterDeviceIds {
 		this.RTX3090_XTREME_WATERFORCE_2	 = 0x4039;
 		this.RTX4070_MASTER					 = 0x40E9;
 		this.RTX4070_GAMING_OC_12G			 = 0x40C6;
+		this.RTX4070TI_GAMING_OC_12G		 = 0x40C6; // Yes, same PID for different SKUs
 		this.RTX4070TI_ELITE				 = 0x40C9;
 		this.RTX4080_GAMING_OC_16G	    	 = 0x40bc;
 		this.RTX4080_GAMING_OC_16G_2	     = 0x40bd;
@@ -604,6 +605,7 @@ class GigabyteMasterGPuList {
 			new GigabyteMasterIdentifier(Nvidia.RTX3080TI,      GigabyteMasterIds.RTX3080TI_XTREME_WATERFORCE_12G,	0x64, "GIGABYTE AORUS 3080TI XTREME Waterforce 12GB"),
 			new GigabyteMasterIdentifier(Nvidia.RTX3090,        GigabyteMasterIds.RTX3090_XTREME_WATERFORCE_2,		0x65, "GIGABYTE AORUS 3090 XTREME Waterforce 24GB"),
 			new GigabyteMasterIdentifier(Nvidia.RTX4070, 		GigabyteMasterIds.RTX4070_GAMING_OC_12G,			0x71, "GIGABYTE 4070 Gaming OC"),
+			new GigabyteMasterIdentifier(Nvidia.RTX4070TI, 		GigabyteMasterIds.RTX4070TI_GAMING_OC_12G,			0x71, "GIGABYTE 4070TI Gaming OC"), // Yes, same PID for different SKUs
 			new GigabyteMasterIdentifier(Nvidia.RTX4070TI, 		GigabyteMasterIds.RTX4070TI_ELITE,					0x71, "GIGABYTE 4070TI Elite 12G"),
 			new GigabyteMasterIdentifier(Nvidia.RTX4080, 		GigabyteMasterIds.RTX4080_GAMING_OC_16G,			0x71, "GIGABYTE 4080 Gaming OC"),
 			new GigabyteMasterIdentifier(Nvidia.RTX4080, 		GigabyteMasterIds.RTX4080_GAMING_OC_16G_2,			0x71, "GIGABYTE 4080 Gaming OC"),
