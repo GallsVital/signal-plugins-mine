@@ -129,6 +129,6 @@ export function Validate(endpoint) {
 
 }
 
-export function ImageResource() {
-	return "default/keyboard60";
+export function ImageUrl() {
+	return "https://marketplace.signalrgb.com/devices/default/keyboard-60.png";
 }

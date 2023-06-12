@@ -115,12 +115,10 @@ function hexToRgb(hex) {
 export function Validate(endpoint) {
 	return endpoint.interface === 0;
 }
-
-export function ImageResource() {
+export function ImageUrl() {
 	if(device.productId() === 0x1507 || device.productId() === 0x1514){
-		return "default/mousepad";
+		return "https://marketplace.signalrgb.com/devices/default/mousepad.png";
 	}
 
-	return "default/mousepadXL";
-
+	return "https://marketplace.signalrgb.com/devices/default/mousepad-xl.png";
 }

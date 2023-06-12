@@ -569,6 +569,6 @@ function ClearReadBuffer(timeout = 10){
 	//device.log(`Read Count ${count}: ${readCounts} Bytes`)
 }
 
-export function ImageResource() {
-	return "default/motherboard";
+export function ImageUrl() {
+	return "https://marketplace.signalrgb.com/devices/default/motherboard.png";
 }

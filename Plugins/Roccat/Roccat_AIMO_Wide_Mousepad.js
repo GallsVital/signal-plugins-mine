@@ -128,6 +128,6 @@ export function Validate(endpoint) {
 	return endpoint.interface ===  0 && endpoint.usage_page === 0xff01;
 }
 
-export function ImageResource() {
-	return "default/mousepadXL";
+export function ImageUrl() {
+	return "https://marketplace.signalrgb.com/devices/default/mousepad-xl.png";
 }

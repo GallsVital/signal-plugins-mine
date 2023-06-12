@@ -283,6 +283,6 @@ export function Validate(endpoint) {
 	return endpoint.interface === 2 | -1;
 }
 
-export function ImageResource() {
-	return "default/motherboard";
+export function ImageUrl() {
+	return "https://marketplace.signalrgb.com/devices/default/motherboard.png";
 }

@@ -87,6 +87,6 @@ function hexToRgb(hex) {
 	return colors;
 }
 
-export function ImageResource() {
-	return "default/mousepad";
+export function ImageUrl() {
+	return "https://marketplace.signalrgb.com/devices/default/mousepad.png";
 }

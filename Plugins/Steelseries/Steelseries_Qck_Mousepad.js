@@ -130,11 +130,10 @@ export function Validate(endpoint) {
 	return endpoint.interface === 0;
 }
 
-export function ImageResource() {
+export function ImageUrl() {
 	if(device.productId() === 0x150A || device.productId() === 0x150D){
-		return "default/mousepad";
+		return "https://marketplace.signalrgb.com/devices/default/mousepad.png";
 	}
 
-	return "default/mousepadXL";
-
+	return "https://marketplace.signalrgb.com/devices/default/mousepad-xl.png";
 }

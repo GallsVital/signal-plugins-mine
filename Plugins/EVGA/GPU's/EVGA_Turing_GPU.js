@@ -387,6 +387,6 @@ class EVGATuringGPUList extends GPUList{
 	}
 }
 
-export function ImageResource() {
-	return "default/gpu";
+export function ImageUrl() {
+	return "https://marketplace.signalrgb.com/devices/default/gpu.png";
 }

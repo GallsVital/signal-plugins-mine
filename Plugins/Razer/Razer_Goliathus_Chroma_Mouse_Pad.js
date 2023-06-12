@@ -195,6 +195,6 @@ export function Validate(endpoint) {
 
 }
 
-export function ImageResource() {
-	return "default/mousepad";
+export function ImageUrl() {
+	return "https://marketplace.signalrgb.com/devices/default/mousepad.png";
 }

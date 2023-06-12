@@ -195,6 +195,6 @@ function hexToRgb(hex) {
 	return colors;
 }
 
-export function ImageResource(){
-	return "default/ram";
+export function ImageUrl() {
+	return "https://marketplace.signalrgb.com/devices/default/ram.png";
 }

@@ -218,6 +218,6 @@ export function Validate(endpoint) {
 	return endpoint.interface === 2 && endpoint.usage === 0x0002;
 }
 
-export function ImageResource() {
-	return "default/keyboard";
+export function ImageUrl() {
+	return "https://marketplace.signalrgb.com/devices/default/keyboard-100.png";
 }

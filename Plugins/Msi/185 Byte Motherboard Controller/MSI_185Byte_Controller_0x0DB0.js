@@ -940,6 +940,6 @@ class MysticLight {
 
 const MSIMotherboard = new MysticLight();
 
-export function ImageResource() {
-	return "default/motherboard";
+export function ImageUrl() {
+	return "https://marketplace.signalrgb.com/devices/default/motherboard.png";
 }
