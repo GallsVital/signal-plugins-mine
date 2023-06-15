@@ -1,4 +1,4 @@
-export function Name() { return "Cooler Master MP711 Gaming Mouse"; }
+export function Name() { return "Cooler Master MM711 Gaming Mouse"; }
 export function VendorId() { return 0x2516; }
 export function ProductId() { return 0x0101; }
 export function Publisher() { return "WhirlwindFX"; }
