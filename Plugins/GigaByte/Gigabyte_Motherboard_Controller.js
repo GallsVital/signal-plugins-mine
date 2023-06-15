@@ -149,8 +149,11 @@ const MotherboardConfigs = {
 			0x20: ["Back IO", MainboardConfiguration],
 			0x21: ["Mainboard", MainboardConfiguration],
 			0x22: ["PCIe", MainboardConfiguration],
-			0x23: ["South Bridge", HeaderConfiguration],
+			0x23: ["South Bridge", MainboardConfiguration],
 			0x24: ["12v Header", HeaderConfiguration],
+			0x25: ["Led 4", MainboardConfiguration],
+			0x26: ["Led 5", MainboardConfiguration],
+			0x27: ["Led 6", MainboardConfiguration],
 		}
 	},
 	"B760M AORUS ELITE AX": {
