@@ -359,6 +359,7 @@ class GigabyteVisionDeviceIds {
 		this.RTX4070TI_MASTER_12G           = 0x40bb;
 		this.RTX4080_GAMING_OC	            = 0x40bc;
 		this.RTX4080_AERO_OC_16G			= 0x40C5;
+		this.RTX4090_AERO					= 0x40E4;
 	}
 }
 
@@ -467,6 +468,7 @@ class GigabyteVisionGPuList {
 			new GigabyteVisionIdentifier(Nvidia.RTX4070TI,      GigabyteVisionIds.RTX4070TI_MASTER_12G,			 0x71, "GIGABYTE 4070Ti Master 12G"), //Confirmed
 			new GigabyteVisionIdentifier(Nvidia.RTX4080,        GigabyteVisionIds.RTX4080_AERO_OC_16G,           0x71, "GIGABYTE 4080 Aero OC"),
 			new GigabyteVisionIdentifier(Nvidia.RTX4070TI,		GigabyteVisionIds.RTX4070TI_AERO,				 0x71, "GIGABYTE 4070Ti Aero"),
+			new GigabyteVisionIdentifier(Nvidia.RTX4090,		GigabyteVisionIds.RTX4090_AERO,					 0x71, "GIGABYTE 4090 Aero"),
 		];
 	}
 }
