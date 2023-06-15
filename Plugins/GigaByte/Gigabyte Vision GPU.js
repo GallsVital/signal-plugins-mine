@@ -406,7 +406,7 @@ class GigabyteVisionGPuList {
 			new GigabyteVisionIdentifier(Nvidia.RTX3060,        GigabyteVisionIds.RTX3060_EAGLE_OC_REV2,         0x32, "GIGABYTE 3060 Eagle OC Rev 2.0"),
 			new GigabyteVisionIdentifier(Nvidia.RTX3060,        GigabyteVisionIds.RTX3060_EAGLE_OC_REV2,         0x63, "GIGABYTE 3060 Eagle OC Rev 2.0"),
 			new GigabyteVisionIdentifier(Nvidia.RTX3060_LHR,    GigabyteVisionIds.RTX3060_EAGLE_OC_REV2,         0x32, "GIGABYTE 3060 Eagle OC Rev 2.0 LHR"),
-			new GigabyteVisionIdentifier(Nvidia.RTX3060_LHR,    GigabyteVisionIds.RTX3060_EAGLE_OC_REV2,         0x62, "GIGABYTE 3060 Eagle OC Rev 2.0 LHR"),
+			new GigabyteVisionIdentifier(Nvidia.RTX3060_LHR,    GigabyteVisionIds.RTX3060_EAGLE_OC_REV2,         0x63, "GIGABYTE 3060 Eagle OC Rev 2.0 LHR"),
 			new GigabyteVisionIdentifier(Nvidia.RTX3060_GA104,  GigabyteVisionIds.RTX3060_EAGLE_OC_REV2,         0x32, "GIGABYTE 3060 Eagle OC LHR (GA104)"),
 			new GigabyteVisionIdentifier(Nvidia.RTX3060_GA104,  GigabyteVisionIds.RTX3060_EAGLE_OC_REV2,         0x63, "GIGABYTE 3060 Eagle OC LHR (GA104)"),
 			new GigabyteVisionIdentifier(Nvidia.RTX3060,        GigabyteVisionIds.RTX3060_GAMING_OC_12GB,        0x62, "GIGABYTE 3060 Gaming OC"),
