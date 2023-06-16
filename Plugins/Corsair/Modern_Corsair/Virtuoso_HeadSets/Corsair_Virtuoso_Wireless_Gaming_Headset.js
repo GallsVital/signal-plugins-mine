@@ -1,6 +1,6 @@
 export function Name() { return "Corsair Virtuoso Wireless Gaming Headset"; }
 export function VendorId() { return 0x1b1c; }
-export function ProductId() { return 0x0A4C; }
+export function ProductId() { return [0x0A4C, 0x0A5C]; }
 export function Publisher() { return "WhirlwindFX"; }
 export function Size() { return [3, 3]; }
 export function DefaultPosition(){return [145, 85];}
