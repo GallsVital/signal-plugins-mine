@@ -32,7 +32,7 @@ export function LedNames() { return vLedNames; }
 export function LedPositions() { return vLedPositions; }
 export function SubdeviceController(){ return true; }
 export function Validate(endpoint) {
-	return endpoint.interface === -1 && endpoint.usage === 0x00CC;
+	return (endpoint.interface === -1 || endpoint.interface === 0) && endpoint.usage === 0x00CC;
 }
 
 const ParentDeviceName = "Gigabyte Motherboard";
@@ -138,6 +138,19 @@ const MotherboardConfigs = {
 			0x21: ["12v Header Bottom", HeaderConfiguration],
 			0x23: ["PCIe", MainboardConfiguration],
 			0x24: ["12V Header Top", HeaderConfiguration]
+		}
+	},
+	"B760I AORUS PRO DDR4": {
+		ARGB:{
+			"5v ARGB Header 1": 0x58,
+			"5v ARGB Header 2": 0x59,
+		},
+		Mainboard:{
+			0x20: ["Side LED 1", MainboardConfiguration],
+			0x21: ["Side LED 2", MainboardConfiguration],
+			0x22: ["Side LED 3", MainboardConfiguration],
+			0x23: ["Side LED 4", MainboardConfiguration],
+			0x24: ["12v Header", HeaderConfiguration],
 		}
 	},
 	"B760M AORUS ELITE AX": {

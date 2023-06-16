@@ -61,6 +61,7 @@ export class NZXTProtocol {
 			0x200A: "N7 Z490",
 			0x200B: "N7 B550",
 			0x200C: "N7 Z590",
+			0x201B: "N7 B650E",
 			0x2017: "N5 Z690",
 			0x2016: "N7 Z690",
 			0x201D: "N7 Z790",
@@ -86,6 +87,11 @@ export class NZXTProtocol {
 				nzxtchannels: 2,
 				argbchannels: 1,
 				rgbchannels : 1,
+			},
+			0x201B: {
+				nzxtchannels: 4,
+				argbchannels: 2,
+				rgbchannels : 0,
 			},
 			0x2017: {
 				nzxtchannels: 2,

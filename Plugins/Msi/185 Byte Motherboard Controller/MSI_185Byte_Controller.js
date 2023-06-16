@@ -1097,6 +1097,18 @@ class MysticLight {
 				ForceZoneBased	  : false,
 				JARGB_V2		  : true,
 			},
+			0x7D77 : //B650M-A WIFI
+			{
+				OnboardLEDs    : 0,
+				RGBHeaders     : 2,
+				ARGBHeaders    : 2,
+				JPipeLEDs	   : 0,
+				CorsairHeaders : 0,
+				//PERLED
+				PerLEDOnboardLEDs : 0,
+				ForceZoneBased	  : false,
+				JARGB_V2		  : true,
+			},
 			0x7D78 : //B650-P
 			{
 				OnboardLEDs    : 0,
@@ -1158,6 +1170,18 @@ class MysticLight {
 				JARGB_V2		  : true,
 			},
 			0x7D97 : //B660M Mortar Max
+			{
+				OnboardLEDs    : 0,
+				RGBHeaders     : 1,
+				ARGBHeaders    : 2,
+				JPipeLEDs	   : 0,
+				CorsairHeaders : 0,
+				//PERLED
+				PerLEDOnboardLEDs : 0,
+				ForceZoneBased	  : false,
+				JARGB_V2		  : true,
+			},
+			0x7D98 : //B760-P
 			{
 				OnboardLEDs    : 0,
 				RGBHeaders     : 1,

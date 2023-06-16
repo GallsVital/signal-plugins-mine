@@ -17,10 +17,7 @@ export function ControllableParameters() {
 	return [
 		{"property":"shutdownColor", "group":"lighting", "label":"Shutdown Color", "min":"0", "max":"360", "type":"color", "default":"#009bde"},
 		{"property":"LightingMode", "group":"lighting", "label":"Lighting Mode", "type":"combobox", "values":["Canvas", "Forced"], "default":"Canvas"},
-		{"property":"forcedColor", "group":"lighting", "label":"Forced Color", "min":"0", "max":"360", "type":"color", "default":"#009bde", tooltip: "Something something forced color"},
-		{"property":"forcedColor123", "group":"lighting", "label":"Forced Color", "min":"0", "max":"360", "type":"boolean", "default":"false", tooltip: "Something something toggle switch"},
-		{"property":"OnboardState", "group":"", "label":"Onboard Button Mode", "type":"boolean", "default": "false", "tooltip" : "Enables button bindings from onboard saved profiles. Disables SignalRGB DPI and Macro Control."},
-
+		{"property":"forcedColor", "group":"lighting", "label":"Forced Color", "min":"0", "max":"360", "type":"color", "default":"#009bde"},
 	];
 }
 
@@ -514,6 +511,7 @@ class Asus_Ampere_Lovelace_IDs {
 		this.RTX3090_TUF_GAMING_OC                 = 0x87B3;
 		this.RTX3090_TUF_GAMING                    = 0x87B5;
 		this.RTX3090_STRIX_GAMING                  = 0x87AF;
+		this.RTX3090_STRIX_GAMING_2				   = 0x87AD;
 		this.RTX3090_STRIX_GAMING_WHITE            = 0x87D9;
 		this.RTX3090_STRIX_GAMING_WHITE_V2         = 0x87DA;
 		this.RTX3090_STRIX_GAMING_EVA			   = 0x8886;
@@ -524,6 +522,7 @@ class Asus_Ampere_Lovelace_IDs {
 		this.RTX4070_TUF_GAMING					   = 0x88DF;
 		this.RTX4070TI_TUF_GAMING_OC			   = 0x88A3;
 		this.RTX4070TI_12GB_STRIX_GAMING_OC		   = 0X88A7;
+		this.RTX4070TI_12GB_STRIX_GAMING_OC_2      = 0x88DC;
 		this.RTX4070TI_TUF_GAMING				   = 0x88A6;
 
 		this.RTX4070TI_TUF_GAMING_OC_2			   = 0x88A4;
@@ -635,6 +634,7 @@ const Asus3000GPUIDs =
 	new AsusGPUIdentifier(Nvidia.RTX3090, AsusID.RTX3090_TUF_GAMING_OC, "Asus TUF 3090 Gaming OC"),
 	new AsusGPUIdentifier(Nvidia.RTX3090, AsusID.RTX3090_TUF_GAMING, "Asus TUF 3090 Gaming"),
 	new AsusGPUIdentifier(Nvidia.RTX3090, AsusID.RTX3090_STRIX_GAMING, "Asus ROG Strix 3090 O24G Gaming"),
+	new AsusGPUIdentifier(Nvidia.RTX3090, AsusID.RTX3090_STRIX_GAMING_2, "Asus ROG Strix 3090 O24G Gaming"),
 	new AsusGPUIdentifier(Nvidia.RTX3090, AsusID.RTX3090_STRIX_GAMING_WHITE, "Asus ROG Strix 3090 O24G Gaming White"),
 	new AsusGPUIdentifier(Nvidia.RTX3090, AsusID.RTX3090_STRIX_GAMING_WHITE_V2, "Asus ROG Strix 3090 O24G Gaming White V2"),
 	new AsusGPUIdentifier(Nvidia.RTX3090, AsusID.RTX3090_STRIX_GAMING_EVA, "Asus ROG Strix 3090 EVA Edition"),
@@ -644,6 +644,7 @@ const Asus3000GPUIDs =
 
 	new AsusGPUIdentifier(Nvidia.RTX4070, AsusID.RTX4070_TUF_GAMING, "Asus TUF RTX 4070 Gaming"),
 	new AsusGPUIdentifier(Nvidia.RTX4070TI, AsusID.RTX4070TI_12GB_STRIX_GAMING_OC, "Asus ROG Strix RTX 4070Ti 12GB Gaming OC"),
+	new AsusGPUIdentifier(Nvidia.RTX4070TI, AsusID.RTX4070TI_12GB_STRIX_GAMING_OC_2, "Asus ROG Strix RTX 4070Ti 12GB Gaming OC"),
 	new AsusGPUIdentifier(Nvidia.RTX4070TI, AsusID.RTX4070TI_TUF_GAMING_OC, "Asus TUF RTX 4070Ti Gaming OC"),
 	new AsusGPUIdentifier(Nvidia.RTX4070TI, AsusID.RTX4070TI_TUF_GAMING_OC_2, "Asus TUF RTX 4070Ti Gaming OC"),
 	new AsusGPUIdentifier(Nvidia.RTX4070TI, AsusID.RTX4070TI_TUF_GAMING, "Asus TUF RTX 4070Ti 12GB Gaming"),

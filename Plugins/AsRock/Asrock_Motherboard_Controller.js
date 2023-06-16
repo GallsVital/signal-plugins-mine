@@ -466,6 +466,17 @@ const ConfigurationOverrides = //Leave this here for now. Just in case
     	PCB         : 12,
     	ARGBHeader3 : 0
     },
+	"Z790 Pro RS/D4":
+    {
+    	RGBHeader1  : 1,
+    	RGBHeader2  : 0,
+    	ARGBHeader1 : 80,
+    	ARGBHeader2 : 80,
+    	ARGBHeader3 : 80,
+    	PCH         : 5,
+    	IOShield    : 5,
+    	PCB         : 5,
+    },
 };
 
 const deviceZones =
