@@ -42,7 +42,7 @@ const CoolingCommand = 0x14;
 let CurrentFanSpeed;
 export function Name() { return "Corsair H100i Pro XT "; }
 export function VendorId() { return  0x1b1c; }
-export function ProductId() { return [0x0C20, 0x0C2D]; }
+export function ProductId() { return 0x0000; } //[0x0C20, 0x0C2D]
 export function Publisher() { return "WhirlwindFX"; }
 export function Size() { return [5, 5]; }
 export function DefaultPosition(){return [165, 60];}
