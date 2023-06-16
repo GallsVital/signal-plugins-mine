@@ -1,8 +1,8 @@
 export function Name() { return "Logitech G910"; }
 export function VendorId() { return 0x046d; }
-export function Documentation(){ return "troubleshooting/logitech"; }
-export function ProductId() { return 0xc335; }
+export function ProductId() { return [0xc335, 0xc32B]; }
 export function Publisher() { return "WhirlwindFX"; }
+export function Documentation(){ return "troubleshooting/logitech"; }
 export function Size() { return [24, 9]; }
 export function DefaultPosition(){return [10, 100];}
 const DESIRED_HEIGHT = 85;
@@ -67,7 +67,6 @@ export function LedNames() {
 export function LedPositions() {
 	return vLedPositions;
 }
-
 
 export function Initialize() {
 	GKeySetup();
@@ -205,7 +204,7 @@ function Apply() {
 	device.pause(1);
 }
 
-function SendGkeys(shutdown = false) {
+function SendGkeys(overrideColor) {
 	const packet = [];
 	packet[0] = 0x12;
 	packet[1] = 0xFF;
@@ -222,8 +221,8 @@ function SendGkeys(shutdown = false) {
 		const iKeyPosY = vGkeyPositions[iIdx][1];
 		var color;
 
-		if(shutdown){
-			color = hexToRgb(shutdownColor);
+		if(overrideColor){
+			color = hexToRgb(overrideColor);
 		}else if (LightingMode === "Forced") {
 			color = hexToRgb(forcedColor);
 		}else{
@@ -242,7 +241,7 @@ function SendGkeys(shutdown = false) {
 	device.pause(1);
 }
 
-function SendLogoZones(shutdown = false){
+function SendLogoZones(overrideColor){
 	const packet = [];
 	packet[0] = 0x11;
 	packet[1] = 0xFF;
@@ -259,8 +258,8 @@ function SendLogoZones(shutdown = false){
 		const iKeyPosY = vLogoPositions[iIdx][1];
 		var color;
 
-		if(shutdown){
-			color = hexToRgb(shutdownColor);
+		if(overrideColor){
+			color = hexToRgb(overrideColor);
 		}else if (LightingMode === "Forced") {
 			color = hexToRgb(forcedColor);
 		}else{
@@ -280,7 +279,7 @@ function SendLogoZones(shutdown = false){
 	device.pause(1);
 }
 
-function SendPacket(startIdx, count, shutdown = false) {
+function SendPacket(startIdx, count, overrideColor) {
 	const packet = [];
 	packet[0] = 0x12;
 	packet[1] = 0xFF;
@@ -298,8 +297,8 @@ function SendPacket(startIdx, count, shutdown = false) {
 		const iKeyPosY = vLedPositions[iKeyIdx][1];
 		var color;
 
-		if(shutdown){
-			color = hexToRgb(shutdownColor);
+		if(overrideColor){
+			color = hexToRgb(overrideColor);
 		}else if (LightingMode === "Forced") {
 			color = hexToRgb(forcedColor);
 		}else{
@@ -334,18 +333,34 @@ export function Render() {
 }
 
 
-export function Shutdown() {
-	SendPacket(0, 14, true);
-	SendPacket(14, 14, true);
-	SendPacket(28, 14, true);
-	SendPacket(42, 14, true);
-	SendPacket(56, 14, true);
-	SendPacket(70, 14, true);
-	SendPacket(84, 14, true);
-	SendPacket(98, 9, true);
-	SendGkeys(true);
-	SendLogoZones(true);
-	Apply();
+export function Shutdown(SystemSuspending) {
+
+	if(SystemSuspending){
+		SendPacket(0, 14, "#000000");
+		SendPacket(14, 14, "#000000");
+		SendPacket(28, 14, "#000000");
+		SendPacket(42, 14, "#000000");
+		SendPacket(56, 14, "#000000");
+		SendPacket(70, 14, "#000000");
+		SendPacket(84, 14, "#000000");
+		SendPacket(98, 9, "#000000");
+		SendGkeys("#000000");
+		SendLogoZones("#000000");
+		Apply(); // Go Dark on System Sleep/Shutdown
+	}else{
+		SendPacket(0, 14, shutdownColor);
+		SendPacket(14, 14, shutdownColor);
+		SendPacket(28, 14, shutdownColor);
+		SendPacket(42, 14, shutdownColor);
+		SendPacket(56, 14, shutdownColor);
+		SendPacket(70, 14, shutdownColor);
+		SendPacket(84, 14, shutdownColor);
+		SendPacket(98, 9, shutdownColor);
+		SendGkeys(shutdownColor);
+		SendLogoZones(shutdownColor);
+		Apply();
+	}
+
 }
 
 function hexToRgb(hex) {
