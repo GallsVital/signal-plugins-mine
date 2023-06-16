@@ -283,6 +283,7 @@ class MSIGPUDeviceIDs {
 		this.MSI_GTX1660TI_GAMING_X_6G_2             = 0x375C;
 		this.MSI_GTX1660_SUPER_GAMING_6G             = 0xC759;
 		this.MSI_GTX1660_SUPER_GAMING_X_6G           = 0xC758;
+		this.MSI_GTX1660S_VENTUS_XS_OC               = 0xC75A;
 		this.MSI_RTX2060_GAMING_Z_6G                 = 0x3752;
 		this.MSI_RTX2060_GAMING_Z_6G_2               = 0x3754;
 		this.MSI_RTX2060_SUPER_GAMING_X              = 0xC752;
@@ -356,6 +357,7 @@ class MSIGPUList {
         	new MSIGPUIdentifier(Nvidia.GTX1660TI, MSIGPUIDs.MSI_GTX1660TI_GAMING_X_6G_2,         0x68, "MSI GTX 1060Ti Gaming X"), //Untested
         	new MSIGPUIdentifier(Nvidia.GTX1660S, MSIGPUIDs.MSI_GTX1660_SUPER_GAMING_6G,       0x68, "MSI GTX 1660 Super Gaming 6G"),
         	new MSIGPUIdentifier(Nvidia.GTX1660S, MSIGPUIDs.MSI_GTX1660_SUPER_GAMING_X_6G,     0x68, "MSI GTX 1660 Super Gaming X 6G"),
+        	new MSIGPUIdentifier(Nvidia.GTX1660S, MSIGPUIDs.MSI_GTX1660S_VENTUS_XS_OC,			0x68, "MSI GTX 1660 Super Ventos XS OC"),
 
         	new MSIGPUIdentifier(Nvidia.RTX2060_TU104, MSIGPUIDs. MSI_RTX2060_GAMING_Z_6G,           0x68, "MSI RTX 2060 Gaming Z"),
         	new MSIGPUIdentifier(Nvidia.RTX2060_TU106, MSIGPUIDs. MSI_RTX2060_GAMING_Z_6G,           0x68, "MSI RTX 2060 Gaming Z"),
