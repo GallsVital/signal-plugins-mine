@@ -45,7 +45,7 @@ let ChannelArray = [];
 const ConnectedFans = [];
 
 export function Validate(endpoint) {
-	return endpoint.interface === -1;
+	return (endpoint.interface === -1 || endpoint.interface === 0);
 }
 
 function SetupFans(){

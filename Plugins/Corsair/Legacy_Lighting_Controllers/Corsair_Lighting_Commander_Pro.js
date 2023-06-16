@@ -52,10 +52,9 @@ function SetupChannels(){
 let ConnectedFans = [];
 let ConnectedProbes = [];
 
-
 /** @type {ValidateExport} */
 export function Validate(endpoint) {
-	return endpoint.interface === -1 || endpoint.interface === 2;
+	return endpoint.interface === -1 || endpoint.interface === 0 || endpoint.interface === 2;
 }
 
 export function Initialize() {
