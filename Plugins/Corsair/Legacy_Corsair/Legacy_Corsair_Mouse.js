@@ -38,7 +38,7 @@ export function ControllableParameters(){
 	if (config.wireless) {
 		UserProps.push(...[
 			{"property":"idleTimeout", "group":"mouse", "label":"Enable Device Sleep", "type":"boolean", "default":"false", "order" : 4},
-			{"property":"idleTimeoutLength", "group":"mouse", "label":"Device Sleep Timeout (Minutes)", "step":"1", "type":"number", "min":"1", "max":"30", "default":"15", "order" : 4},
+			{"property":"idleTimeoutLength", "group":"mouse", "label":"Device Sleep Timeout (Minutes)", "step":"1", "type":"number", "min":"1", "max":"30", "default":"15", "order" : 4, "live": "false"},
 		]);
 	}
 
@@ -164,7 +164,7 @@ function readInputs() {
 	device.set_endpoint(0, 0x0002, 0xffc1); // Macro input endpoint
 
 	do {
-    	const packet = device.read([0x00], 64, 0);
+    	const packet = device.read([0x00], 64, 1);
     	processInputs(packet);
 	}
 	while(device.getLastReadSize() > 0);
@@ -309,7 +309,7 @@ export class LegacyCorsairLibrary {
 			"Glaive Pro" : {
 				vLedNames : [ "Mouse" ],
 				vLedPositions : [ [1, 1] ],
-				vKeys : [ 1 ],
+				vKeys : [ 3 ], //was 1 but that no worky
 				size : [3, 3],
 				maxDPI : 12400
 			},
@@ -883,7 +883,7 @@ export default class DpiController {
 		this.minDpi = 200;
 	}
 	addProperties() {
-		device.addProperty({ "property": "settingControl", "group": "mouse", "label": "Enable Setting Control", "type": "boolean", "default": "true", "order": 1 });
+		device.addProperty({ "property": "settingControl", "group": "mouse", "label": "Enable Setting Control", "type": "boolean", "default": "false", "order": 1 });
 		device.addProperty({ "property": "dpiStages", "group": "mouse", "label": "Number of DPI Stages", "step": "1", "type": "number", "min": "1", "max": this.maxSelectedableStage, "default": this.maxStageIdx, "order": 1, "live": "false" });
 		device.addProperty({ "property": "dpiRollover", "group": "mouse", "label": "DPI Stage Rollover", "type": "boolean", "default": "false", "order": 1 });
 
@@ -897,7 +897,7 @@ export default class DpiController {
 		this.rebuildUserProperties();
 	}
 	addSniperProperty() {
-		device.addProperty({ "property": `dpi${this.sniperStageIdx}`, "group": "mouse", "label": "Sniper Button DPI", "step": "50", "type": "number", "min": this.minDpi, "max": this.maxDpi, "default": "400", "order": 3 });
+		device.addProperty({ "property": `dpi${this.sniperStageIdx}`, "group": "mouse", "label": "Sniper Button DPI", "step": "50", "type": "number", "min": this.minDpi, "max": this.maxDpi, "default": "400", "order": 3, "live": "false" });
 		// eslint-disable-next-line no-eval
 		this.dpiMap.set(6, () => { return eval(`dpi${6}`); });
 	}
@@ -1015,7 +1015,7 @@ export default class DpiController {
 			}
 
 			this.log(`Adding Stage: ${i}`);
-			device.addProperty({ "property": `dpi${i}`, "group": "mouse", "label": `DPI ${i}`, "step": "50", "type": "number", "min": this.minDpi, "max": this.maxDpi, "default": "400", "order": 2 });
+			device.addProperty({ "property": `dpi${i}`, "group": "mouse", "label": `DPI ${i}`, "step": "50", "type": "number", "min": this.minDpi, "max": this.maxDpi, "default": 800 + (400*i), "order": 2, "live": "false" });
 			// eslint-disable-next-line no-eval
 			this.dpiMap.set(i, () => { return eval(`dpi${i}`); });
 		}

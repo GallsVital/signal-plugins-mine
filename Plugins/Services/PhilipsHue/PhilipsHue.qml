@@ -10,7 +10,7 @@ Item {
 			id: scanningItem
 			height: 50
 			width: childrenRect.width + 15
-			visible: service.controllers.length == 0
+			visible: service.controllers.length === 0
 			color: theme.background3
 			radius: theme.radius
 
@@ -135,6 +135,7 @@ Item {
                                         height: 30
                                         width: parent.height
                                         Material.accent: "#88FFFFFF"
+                                        running: bridge.currentlyValidatingIP
                                     }
                                     Text{
                                         color: theme.primarytextcolor
@@ -155,6 +156,7 @@ Item {
                                         height: 30
                                         width: parent.height
                                         Material.accent: "#88FFFFFF"
+                                        running: bridge.currentlyResolvingIP
                                     }
                                     Text{
                                         color: theme.primarytextcolor
@@ -272,6 +274,7 @@ Item {
                                     Material.accent: "#88FFFFFF"
                                     anchors.right: parent.right
                                     visible: bridge.waitingforlink === true
+                                    running: bridge.waitingforlink === true
                                 } 
                             }
                         }

@@ -1,6 +1,6 @@
 export function Name() { return "Glorious Model O Wireless - Wired "; }
 export function VendorId() { return 0x258A; }
-export function ProductId() { return 0x2011; }
+export function ProductId() { return [0x2011, 0x2013]; }
 export function Publisher() { return "WhirlwindFX"; }
 export function Size() { return [3, 3]; }
 export function DefaultPosition() {return [225, 120]; }

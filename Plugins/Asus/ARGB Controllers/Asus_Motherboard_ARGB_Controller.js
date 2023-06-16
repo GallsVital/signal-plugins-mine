@@ -36,7 +36,7 @@ const vLedPositions = [];
 export function LedNames() {
 	return vLedNames;
 }
-export function SupportsSubdevices(){ return true; }
+export function SubdeviceController(){ return true; }
 
 export function LedPositions() {
 	return vLedPositions;

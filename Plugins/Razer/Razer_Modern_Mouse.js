@@ -45,8 +45,8 @@ export function ControllableParameters() {
 
 	if (DeviceInfo.wireless) {
 		UserProps.push(...[
-			{ "property": "idleTimeout", "group": "", "label": "Device Idle Timeout Length (S)", "step": "15", "type": "number", "min": "60", "max": "900", "default": "60" }, //This may need to be switched over to a combobox.
-			{ "property": "lowPowerPercentage", "group": "", "label": "Device Low Power Mode Percentage", "step": "1", "type": "number", "min": "1", "max": "100", "default": "15" },
+			{ "property": "idleTimeout", "group": "", "label": "Device Idle Timeout Length (S)", "step": "15", "type": "number", "min": "1", "max": "15", "default": "5", "live" : false }, //This may need to be switched over to a combobox.
+			{ "property": "lowPowerPercentage", "group": "", "label": "Device Low Power Mode Percentage", "step": "1", "type": "number", "min": "1", "max": "100", "default": "15", "live" : false },
 		]);
 	}
 
@@ -75,10 +75,20 @@ export function LedPositions() {
 }
 
 export function Initialize() {
-	deviceInitialization();
+	Razer.detectDeviceEndpoint();
+
+	if(Razer.getDeviceInitializationStatus()) {
+		deviceConfiguration(); //yay for edge cases without reloading a plugin
+	}
 }
 
 export function Render() {
+
+	if(!Razer.getDeviceInitializationStatus()) {
+		deviceInitialization();
+
+		return;
+	}
 
 	detectInputs();
 
@@ -187,35 +197,11 @@ export function onSmartReelChanged() {
 
 function deviceInitialization(wake = false) {
 	if (!wake) {
-		Razer.detectDeviceEndpoint();
 		device.set_endpoint(Razer.Config.deviceEndpoint[`interface`], Razer.Config.deviceEndpoint[`usage`], Razer.Config.deviceEndpoint[`usage_page`]);
 		Razer.getDeviceTransactionID();
-		Razer.detectSupportedFeatures();
-		Razer.setDeviceProperties();
-		Razer.setDeviceMacroProperties();
-		Razer.setNumberOfLEDs(Razer.getDeviceLEDPositions().length);
-		Razer.setSoftwareLightingMode();
 
-		DPIHandler.setMinDpi(200);
-		DPIHandler.setMaxDpi(RazerMouse.getMaxDPI());
-		DPIHandler.setUpdateCallback(function(dpi) { return RazerMouse.setDeviceSoftwareDPI(dpi); });
-		DPIHandler.addProperties();
-
-		if(RazerMouse.getHasSniperButton()) {
-			DPIHandler.addSniperProperty();
-		}
-
-		DPIHandler.setRollover(dpiRollover);
-
-		if (settingControl) {
-			if (OnboardDPI) {
-				Razer.setDeviceMode("Hardware Mode");
-				DPIHandler.setActiveControl(false);
-				RazerMouse.setDeviceDPI(1, dpiStages, true);
-				Razer.setDeviceMode("Hardware Mode");
-			} else {
-				Razer.setDeviceMode("Software Mode");
-			}
+		if(Razer.getDeviceInitializationStatus()) {
+			deviceConfiguration();
 		}
 	}
 
@@ -240,6 +226,37 @@ function deviceInitialization(wake = false) {
 			Razer.setDeviceMode("Software Mode");
 			DPIHandler.setActiveControl(true);
 			DPIHandler.update();
+		}
+	}
+}
+
+function deviceConfiguration() {
+	Razer.detectSupportedFeatures();
+	Razer.setDeviceProperties();
+	Razer.setDeviceMacroProperties();
+	Razer.setNumberOfLEDs(Razer.getDeviceLEDPositions().length);
+	Razer.setSoftwareLightingMode();
+
+	DPIHandler.setMinDpi(200);
+	DPIHandler.setMaxDpi(RazerMouse.getMaxDPI());
+	DPIHandler.setUpdateCallback(function(dpi) { return RazerMouse.setDeviceSoftwareDPI(dpi); });
+	DPIHandler.addProperties();
+
+	if(RazerMouse.getHasSniperButton()) {
+		DPIHandler.addSniperProperty();
+	}
+
+	DPIHandler.setRollover(dpiRollover);
+
+	if (settingControl) {
+		if (OnboardDPI) {
+			Razer.setDeviceMode("Hardware Mode");
+			DPIHandler.setActiveControl(false);
+			RazerMouse.setDeviceDPI(1, dpiStages, true);
+			Razer.setDeviceMode("Hardware Mode");
+		} else {
+			Razer.setDeviceMode("Software Mode");
+			DPIHandler.update(); //Yet again I hate edge cases.
 		}
 	}
 }
@@ -432,7 +449,7 @@ function grabColors(shutdown = false) {
 		}
 
 		RGBData = PadRGBData.concat(RGBData);
-		RazerMouse.setMouseLighting(RGBData, 16); //MMM Hardcoding.
+		RazerMouse.setMouseLighting(RGBData, 17); //MMM Hardcoding.
 
 	} else {
 		const RGBData = [];
@@ -651,7 +668,7 @@ export class deviceLibrary {
 			},
 			"Hyperflux Pad":
 			{
-				/** @type {number[]} */
+				/** @type {number[]} */ //This may have more leds than we realize
 				size: [5, 5],
 				vLedNames: ["Led 1", "Led 2", "Led 3", "Led 4", "Led 5", "Led 6", "Led 7", "Led 8", "Led 9", "Led 10", "Led 11", "Led 12"],
 				/** @type {LedPosition[]} */
@@ -677,7 +694,8 @@ export class deviceLibrary {
 				size: [10, 11],
 				vLedNames: ["ScrollWheel", "Logo", "SideBarLeft1", "SideBarLeft2", "SideBarLeft3", "SideBarLeft4", "SideBarLeft5", "SideBarLeft6", "SideBarLeft7", "SideBarLeft8", "SideBarLeft9", "SideBarRight1", "SideBarRight2", "SideBarRight3", "SideBarRight4", "SideBarRight5", "SideBarRight6", "SideBarRight7", "SideBarRight8", "SideBarRight9"],
 				vLedPositions: [[5, 0], [5, 8], [0, 1], [0, 2], [0, 3], [0, 4], [0, 5], [0, 7], [0, 8], [0, 9], [0, 10], [9, 1], [9, 2], [9, 3], [9, 4], [9, 5], [9, 7], [9, 8], [9, 9], [9, 10]],
-				maxDPI: 16000
+				maxDPI: 16000,
+				requiresApplyPacket : true
 			},
 			"Mamba":
 			{
@@ -701,7 +719,8 @@ export class deviceLibrary {
 				size: [5, 7],
 				vLedNames: ["Left Side Bar 1", "Left Side Bar 2", "Left Side Bar 3", "Left Side Bar 4", "Left Side Bar 5", "Left Side Bar 6", "Left Side Bar 7", "Right Side Bar 1", "Right Side Bar 2", "Right Side Bar 3", "Right Side Bar 4", "Right Side Bar 5", "Right Side Bar 6", "Right Side Bar 7", "Logo", "ScrollWheel"],
 				vLedPositions: [[0, 0], [0, 1], [0, 2], [0, 3], [0, 4], [0, 5], [0, 6], [4, 0], [4, 1], [4, 2], [4, 3], [4, 4], [4, 5], [4, 6], [2, 5], [2, 0]],
-				maxDPI: 16000
+				maxDPI: 16000,
+				requiresApplyPacket : true
 			},
 			"Naga Chroma":
 			{
@@ -738,14 +757,16 @@ export class deviceLibrary {
 				size: [3, 3],
 				vLedNames: ["ScrollWheel", "Logo", "Side Panel"],
 				vLedPositions: [[0, 0], [0, 2], [1, 1]],
-				maxDPI: 12400
+				maxDPI: 12400,
+				requiresApplyPacket : true
 			},
 			"Naga X":
 			{
 				size: [3, 3],
 				vLedNames: ["ScrollWheel", "Side Panel"],
 				vLedPositions: [[1, 0], [0, 1]],
-				maxDPI: 18000
+				maxDPI: 18000,
+				endpoint : { "interface": 3, "usage": 0x0001, "usage_page": 0x000C },
 			},
 			"Orochi V2":
 			{
@@ -787,7 +808,7 @@ export class deviceLibrary {
 				size: [2, 2],
 				vLedNames: ["Mouse"],
 				vLedPositions: [[1, 1]],
-				maxDPI: 12400,
+				maxDPI: 20000,
 				wireless: true
 			},
 
@@ -928,6 +949,10 @@ export class RazerProtocol {
 			DeviceProductId : 0x00,
 			/** Dict for button inputs to map them with names and things. */
 			inputDict : {},
+			/** Is the device connected and able to receive commands? */
+			DeviceInitialized : false,
+			/** Variable Used to Indicate if a Device Requires an Apply Packet for Lighting Data. */
+			requiresApplyPacket : false,
 
 			SupportedFeatures:
 			{
@@ -948,6 +973,9 @@ export class RazerProtocol {
 		};
 	}
 
+	getDeviceInitializationStatus() { return this.Config.DeviceInitialized; }
+	setDeviceInitializationStatus(initStatus) { this.Config.DeviceInitialized = initStatus; }
+
 	getDeviceProductId() { return this.Config.DeviceProductId; }
 	setDeviceProductId(productId) { this.Config.DeviceProductId = productId; }
 
@@ -959,6 +987,9 @@ export class RazerProtocol {
 
 	getDeviceLEDIndexes(){ return this.Config.DeviceLedIndexes; }
 	setDeviceLEDIndexes(DeviceLedIndexes){ this.Config.DeviceLedIndexes = DeviceLedIndexes; }
+
+	getRequiresApplyPacket() { return this.Config.requiresApplyPacket; }
+	setRequiresApplyPacket(requiresApplyPacket) { this.Config.requiresApplyPacket = requiresApplyPacket; }
 
 	getHyperFlux() { return this.Config.SupportedFeatures.Hyperflux; }
 	setHyperFlux(HyperFlux) { this.Config.SupportedFeatures.Hyperflux = HyperFlux; }
@@ -1004,6 +1035,11 @@ export class RazerProtocol {
 			if(layout.hasSniperButton) {
 				device.log("Device has Sniper Button.");
 				RazerMouse.setHasSniperButton(layout.hasSniperButton);
+			}
+
+			if(layout.requiresApplyPacket) {
+				device.log("Device Requires Apply Packet");
+				this.setRequiresApplyPacket(layout.requiresApplyPacket);
 			}
 
 		} else {
@@ -1184,6 +1220,7 @@ export class RazerProtocol {
 	getDeviceTransactionID() {//Most devices return at minimum 2 Transaction ID's. We throw away any besides the first one.
 		const possibleTransactionIDs = [0x1f, 0x2f, 0x3f, 0x4f, 0x5f, 0x6f, 0x7f, 0x8f, 0x9f];
 		let devicesFound = 0;
+		let loops = 0;
 
 		do {
 			for (let testTransactionID = 0x00; testTransactionID < possibleTransactionIDs.length; testTransactionID++) {
@@ -1201,10 +1238,16 @@ export class RazerProtocol {
 					this.ConfigPacketRead(TransactionID);
 				}
 
+				if(devicesFound !== 0) {
+					this.setDeviceInitializationStatus(true);
+				}
+
 				device.pause(400);
 			}
+
+			loops++;
 		}
-		while (devicesFound === 0);
+		while (devicesFound === 0 && loops < 5);
 	}
 	/**Function to ensure that a grabbed transaction ID is not for a device we've already found a transaction ID for.*/
 	checkDeviceTransactionID(TransactionID, SerialString, devicesFound) {
@@ -1663,7 +1706,7 @@ export class RazerProtocol {
 
 		if (returnPacket[8] !== undefined && returnPacket[9] !== undefined) {
 			const idleTimeout = BinaryUtils.ReadInt16BigEndian([returnPacket[8], returnPacket[9]]);
-			device.log(`Current Device Idle Timeout: ${idleTimeout} Seconds.`);
+			device.log(`Current Device Idle Timeout: ${idleTimeout/60} Minutes.`);
 
 			return idleTimeout;
 		}
@@ -1672,7 +1715,7 @@ export class RazerProtocol {
 	}
 	/** Function to set the device idle timeout on supported devices. */
 	setDeviceIdleTimeout(timeout) {
-		const returnValues = this.ConfigPacketSend([0x02, 0x07, 0x03, (timeout >> 8 & 0xff), (timeout & 0xff)]);
+		const returnValues = this.ConfigPacketSend([0x02, 0x07, 0x03, (timeout*60 >> 8 & 0xff), (timeout*60 & 0xff)]);
 		device.pause(10);
 
 		const errorCode = returnValues[1];
@@ -1759,7 +1802,7 @@ export class RazerProtocol {
 	}
 	/** Function to set a modern device's effect to custom. */
 	setModernSoftwareLightingMode() {//Not all devices require this, but it seems to be sent to all of them?
-		return this.setModernMatrixEffect([0x00, 0x00, 0x08, 0x01, 0x01]);
+		return this.setModernMatrixEffect([0x00, 0x00, 0x08, 0x00, 0x01]);
 	}
 	/** Function to set the Chroma Charging Dock brightness.*/
 	getChargingDockBrightness() {
@@ -2007,6 +2050,7 @@ class RazerMouseFunctions {
 		return 0;
 	}
 	/** Function to fix the edge case we create by fixing the dpi button/light on shutdown.*/
+	// eslint-disable-next-line complexity
 	setDeviceDPIToHardware(retryAttempts = 5) {
 		let errorCode = 0;
 		let returnPacket = [];
@@ -2035,46 +2079,12 @@ class RazerMouseFunctions {
 		}
 
 		if (returnPacket !== undefined) {
-			const currentStage = returnPacket[9];
-			const numberOfStages = returnPacket[10];
 
-			const dpi1X = BinaryUtils.ReadInt16BigEndian([returnPacket[12], returnPacket[13]]); //This is technically unnecessary as we get the returns, but this is more organized.
-			const dpi1Y = BinaryUtils.ReadInt16BigEndian([returnPacket[14], returnPacket[15]]);
-			const dpi2X = BinaryUtils.ReadInt16BigEndian([returnPacket[19], returnPacket[20]]);
-			const dpi2Y = BinaryUtils.ReadInt16BigEndian([returnPacket[21], returnPacket[22]]);
-			const dpi3X = BinaryUtils.ReadInt16BigEndian([returnPacket[26], returnPacket[27]]);
-			const dpi3Y = BinaryUtils.ReadInt16BigEndian([returnPacket[28], returnPacket[29]]);
-			const dpi4X = BinaryUtils.ReadInt16BigEndian([returnPacket[33], returnPacket[34]]);
-			const dpi4Y = BinaryUtils.ReadInt16BigEndian([returnPacket[35], returnPacket[36]]);
-			const dpi5X = BinaryUtils.ReadInt16BigEndian([returnPacket[40], returnPacket[41]]);
-			const dpi5Y = BinaryUtils.ReadInt16BigEndian([returnPacket[42], returnPacket[43]]);
+			const packet = [0x26, 0x04, 0x06, 0x00];
 
-			const packet = [0x26, 0x04, 0x06, 0x00, currentStage, numberOfStages, 0x00];
-
-			packet[7] = dpi1X >> 8;
-			packet[8] = dpi1X & 0xff;
-			packet[9] = dpi1Y >> 8;
-			packet[10] = dpi1Y & 0xff;
-			packet[13] = 0x01;
-			packet[14] = dpi2X >> 8;
-			packet[15] = dpi2X & 0xff;
-			packet[16] = dpi2Y >> 8;
-			packet[17] = dpi2Y & 0xff;
-			packet[20] = 0x02;
-			packet[21] = dpi3X >> 8;
-			packet[22] = dpi3X & 0xff;
-			packet[23] = dpi3Y >> 8;
-			packet[24] = dpi3Y & 0xff;
-			packet[27] = 0x03;
-			packet[28] = dpi4X >> 8;
-			packet[29] = dpi4X & 0xff;
-			packet[30] = dpi4Y >> 8;
-			packet[31] = dpi4Y & 0xff;
-			packet[34] = 0x04;
-			packet[35] = dpi5X >> 8;
-			packet[36] = dpi5X & 0xff;
-			packet[37] = dpi5Y >> 8;
-			packet[38] = dpi5Y & 0xff;
+			for(let bytes = 0; bytes < 40; bytes ++) {
+				packet[bytes + 4] = returnPacket[bytes + 9];
+			}
 
 			let errorCode = 0;
 			let attempts = 0;
@@ -2177,32 +2187,24 @@ class RazerMouseFunctions {
 	}
 	/** Function to set multiple dpi stages. We can set how many stages a device has, and this is saved onboard. This works with hardware buttons.*/
 	setDeviceDPI(stage, dpiStages, saveToFlash = false, retryAttempts = 5) {
-		const packet = [0x26, 0x04, 0x06, saveToFlash, stage, dpiStages, 0x00];
+		const packet = [0x26, 0x04, 0x06, saveToFlash, stage, dpiStages];
 
-		packet[7] = dpi1 >> 8;
-		packet[8] = dpi1 & 0xff;
-		packet[9] = dpi1 >> 8;
-		packet[10] = dpi1 & 0xff;
-		packet[13] = 0x01;
-		packet[14] = dpi2 >> 8;
-		packet[15] = dpi2 & 0xff;
-		packet[16] = dpi2 >> 8;
-		packet[17] = dpi2 & 0xff;
-		packet[20] = 0x02;
-		packet[21] = dpi3 >> 8;
-		packet[22] = dpi3 & 0xff;
-		packet[23] = dpi3 >> 8;
-		packet[24] = dpi3 & 0xff;
-		packet[27] = 0x03;
-		packet[28] = dpi4 >> 8;
-		packet[29] = dpi4 & 0xff;
-		packet[30] = dpi4 >> 8;
-		packet[31] = dpi4 & 0xff;
-		packet[34] = 0x04;
-		packet[35] = dpi5 >> 8;
-		packet[36] = dpi5 & 0xff;
-		packet[37] = dpi5 >> 8;
-		packet[38] = dpi5 & 0xff;
+		for(let stages = 0; stages < dpiStages; stages++) {
+			try {
+				// eslint-disable-next-line no-eval
+				const dpi = eval(`dpi${stages+1}`); //Cope ESLint.
+				const offset = 7 * stages + 6;
+
+				packet[offset] = stages;
+				packet[offset + 1] = dpi >> 8;
+				packet[offset + 2] = dpi & 0xff;
+				packet[offset + 3] = dpi >> 8;
+				packet[offset + 4] = dpi & 0xff;
+			} catch (error) {
+				device.log("Tried to Call a nonexistent DPI Stage.", {toFile : true});
+			}
+
+		}
 
 		let errorCode = 0;
 		let attempts = 0;
@@ -2443,11 +2445,15 @@ class RazerMouseFunctions {
 		return 0;
 	}
 	/** Function to set Mouse Lighting.*/
-	setMouseLighting(RGBData, NumberOfLEDs = Razer.getNumberOfLEDs(), hyperflux = false) { //no returns on this or the led color sets. I do not care.
+	setMouseLighting(RGBData, NumberOfLEDs = Razer.getNumberOfLEDs()) { //no returns on this or the led color sets. I do not care.
 		if(Razer.getDeviceProductId() === 0x0046) { //I'll leave this behind for now.
 			Razer.StandardPacketSend([(NumberOfLEDs * 3 + 5), 0x03, 0x0C, 0x00, 0x00, 0x00, 0x00, NumberOfLEDs - 1].concat(RGBData));
 		} else {
-			Razer.StandardPacketSend([(NumberOfLEDs * 3 + 5), 0x0F, 0x03, hyperflux ? 1 : 0, 0x00, 0x00, 0x00, NumberOfLEDs - 1].concat(RGBData));
+			Razer.StandardPacketSend([(NumberOfLEDs * 3 + 5), 0x0F, 0x03, 0x00, 0x00, 0x00, 0x00, NumberOfLEDs - 1].concat(RGBData));
+
+			if(Razer.getRequiresApplyPacket()) {
+				Razer.setModernMatrixEffect([0x00, 0x00, 0x08, 0x00, 0x01]);
+			}
 		}
 	}
 	/** Function to set a legacy mouse's led brightness. You cannot use zero for this one as it wants a specific zone. That being said we could scan for specific zones on a device.*/
@@ -2544,7 +2550,7 @@ export default class DpiController {
 		this.minDpi = 200;
 	}
 	addProperties() {
-		device.addProperty({ "property": "settingControl", "group": "mouse", "label": "Enable Setting Control", "type": "boolean", "default": "true", "order": 1 });
+		device.addProperty({ "property": "settingControl", "group": "mouse", "label": "Enable Setting Control", "type": "boolean", "default": "false", "order": 1 });
 		device.addProperty({ "property": "dpiStages", "group": "mouse", "label": "Number of DPI Stages", "step": "1", "type": "number", "min": "1", "max": this.maxSelectedableStage, "default": this.maxStageIdx, "order": 1, "live" : false });
 		device.addProperty({ "property": "dpiRollover", "group": "mouse", "label": "DPI Stage Rollover", "type": "boolean", "default": "false", "order": 1 });
 
@@ -2558,7 +2564,7 @@ export default class DpiController {
 		this.rebuildUserProperties();
 	}
 	addSniperProperty() {
-		device.addProperty({ "property": `dpi${this.sniperStageIdx}`, "group": "mouse", "label": "Sniper Button DPI", "step": "50", "type": "number", "min": this.minDpi, "max": this.maxDpi, "default": "400", "order": 3 });
+		device.addProperty({ "property": `dpi${this.sniperStageIdx}`, "group": "mouse", "label": "Sniper Button DPI", "step": "50", "type": "number", "min": this.minDpi, "max": this.maxDpi, "default": "400", "order": 3, "live" : false });
 		// eslint-disable-next-line no-eval
 		this.dpiMap.set(6, () => { return eval(`dpi${6}`); });
 	}
@@ -2676,7 +2682,7 @@ export default class DpiController {
 			}
 
 			this.log(`Adding Stage: ${i}`);
-			device.addProperty({ "property": `dpi${i}`, "group": "mouse", "label": `DPI ${i}`, "step": "50", "type": "number", "min": this.minDpi, "max": this.maxDpi, "default": "400", "order": 2 });
+			device.addProperty({ "property": `dpi${i}`, "group": "mouse", "label": `DPI ${i}`, "step": "50", "type": "number", "min": this.minDpi, "max": this.maxDpi, "default": 800 + (400*i), "order": 2, "live" : false });
 			// eslint-disable-next-line no-eval
 			this.dpiMap.set(i, () => { return eval(`dpi${i}`); });
 		}

@@ -20,8 +20,7 @@ export function ControllableParameters(){
 	];
 }
 
-export function SupportsSubdevices(){ return true; }
-export function LacksOnBoardLeds(){ return true;}
+export function SubdeviceController(){ return true; }
 export function DefaultComponentBrand() { return "Corsair";}
 export function Documentation(){ return "troubleshooting/corsair"; }
 
@@ -43,7 +42,7 @@ function SetupChannels(){
 }
 
 export function Validate(endpoint) {
-	return endpoint.interface === -1 || endpoint.interface === 2;
+	return endpoint.interface === -1 || endpoint.interface === 0 || endpoint.interface === 2;
 }
 
 export function Initialize() {

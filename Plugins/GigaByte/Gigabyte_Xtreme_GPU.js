@@ -242,11 +242,11 @@ const Nvidia = new NvidiaGPUDeviceIds();
 
 class GigabyteXtremeDeviceIds {
 	constructor() {
-		this.RTX3080AORUS_X_10GD_LHR      =  0x403D;
-		this.RTX3080AORUS_X_10GD          =  0x403E;
-		this.RTX3090AOURUS_X_24GD         =  0x4041;
-		this.RTX3080TI_XTREME_12G       =  0x4080;
-		this.RTX3080TI_MASTER           =  0x4081;
+		this.RTX3080AORUS_X_10GD	=  0x403D;
+		this.RTX3080AORUS_X_10GD_2	=  0x403E;
+		this.RTX3090AOURUS_X_24GD	=  0x4041;
+		this.RTX3080TI_XTREME_12G	=  0x4080;
+		this.RTX3080TI_MASTER		=  0x4081;
 
 		//New for Patch
 		this.RTX3080AORUS_MASTER_12G	  =  0x40A5;
@@ -278,11 +278,13 @@ class GigabyteXtremeGPUList {
 		const GigabyteXtremeIds  = new GigabyteXtremeDeviceIds();
 
 		this.devices = [
-			new GigabyteXtremeIdentifier(Nvidia.RTX3080_LHR, GigabyteXtremeIds.RTX3080AORUS_X_10GD_LHR, 0x60, "GIGABYTE RTX 3080 Aorus Master LHR"), //I think 0x61 is lcd. Users will complain if I'm wrong.
-			new GigabyteXtremeIdentifier(Nvidia.RTX3080, GigabyteXtremeIds.RTX3080AORUS_X_10GD, 0x60, "GIGABYTE RTX 3080 Aorus Master"),
-			new GigabyteXtremeIdentifier(Nvidia.RTX3090, GigabyteXtremeIds.RTX3090AOURUS_X_24GD, 0x60, "GIGABYTE RTX 3090 XTREME"),
-			new GigabyteXtremeIdentifier(Nvidia.RTX3080TI, GigabyteXtremeIds.RTX3080TI_XTREME_12G, 0x60, "GIGABYTE RTX 3080TI XTREME"),
-			new GigabyteXtremeIdentifier(Nvidia.RTX3080TI, GigabyteXtremeIds.RTX3080TI_MASTER, 0x60, "GIGABYTE RTX 3080TI Aorus Master"),
+			new GigabyteXtremeIdentifier(Nvidia.RTX3080, 		GigabyteXtremeIds.RTX3080AORUS_X_10GD, 0x60, "GIGABYTE RTX 3080 Aorus Master"),
+			new GigabyteXtremeIdentifier(Nvidia.RTX3080_LHR, 	GigabyteXtremeIds.RTX3080AORUS_X_10GD, 0x60, "GIGABYTE RTX 3080 Aorus Master LHR"), //I think 0x61 is lcd. Users will complain if I'm wrong.
+			new GigabyteXtremeIdentifier(Nvidia.RTX3080, 		GigabyteXtremeIds.RTX3080AORUS_X_10GD_2, 0x60, "GIGABYTE RTX 3080 Aorus Master"),
+			new GigabyteXtremeIdentifier(Nvidia.RTX3080_LHR, 	GigabyteXtremeIds.RTX3080AORUS_X_10GD_2, 0x60, "GIGABYTE RTX 3080 Aorus Master LHR"),
+			new GigabyteXtremeIdentifier(Nvidia.RTX3090, 		GigabyteXtremeIds.RTX3090AOURUS_X_24GD, 0x60, "GIGABYTE RTX 3090 XTREME"),
+			new GigabyteXtremeIdentifier(Nvidia.RTX3080TI, 		GigabyteXtremeIds.RTX3080TI_XTREME_12G, 0x60, "GIGABYTE RTX 3080TI XTREME"),
+			new GigabyteXtremeIdentifier(Nvidia.RTX3080TI, 		GigabyteXtremeIds.RTX3080TI_MASTER, 0x60, "GIGABYTE RTX 3080TI Aorus Master"),
 
 			//New for Patch
 			new GigabyteXtremeIdentifier(Nvidia.RTX3080_GA102, GigabyteXtremeIds.RTX3080AORUS_MASTER_12G, 0x60, "GIGABYTE RTX 3080 Aorus Master (GA102)"), //Confirmed :)

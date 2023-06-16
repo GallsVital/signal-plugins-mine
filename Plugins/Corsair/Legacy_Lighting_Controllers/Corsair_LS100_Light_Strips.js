@@ -8,29 +8,20 @@ export function DefaultScale(){return 1.0;}
 /* global
 LightingMode:readonly
 forcedColor:readonly
-EndpointMode:readonly
+ArduinoCompatibilityMode:readonly
 */
 export function ControllableParameters(){
 	return [
 		{"property":"LightingMode", "group":"lighting", "label":"Lighting Mode", "type":"combobox", "values":["Canvas", "Forced"], "default":"Canvas"},
 		{"property":"forcedColor", "group":"lighting", "label":"Forced Color", "min":"0", "max":"360", "type":"color", "default":"#009bde"},
-		{"property":"EndpointMode",  "group":"", "label":"Endpoint Mode", "type":"combobox", "values":["Corsair", "Arduino"], "default":"Corsair"},
+		{"property":"ArduinoCompatibilityMode", "group":"", "label":"Arduino Compatibility Mode", "type":"boolean", "default":"true", "tooltip":"This is required for Arduino Based Models. Enabling will lower frame rate on Official Corsair Models."},
 	];
 }
 const BrightnessLimiter = .5;
 const vKeyNames = [];
 const vKeyPositions = [];
 
-const CORSAIR_LIGHTING_CONTROLLER_STREAM    = 0x32;
-const CORSAIR_LIGHTING_CONTROLLER_COMMIT    = 0x33;
-const CORSAIR_LIGHTING_CONTROLLER_START     = 0x34;
-const CORSAIR_LIGHTING_CONTROLLER_RESET     = 0x37;
-const CORSAIR_LIGHTING_CONTROLLER_MODE      = 0x38;
-
-const CORSAIR_HARDWARE_MODE = 0x01;
-const CORSAIR_SOFTWARE_MODE = 0x02;
-
-export function SupportsSubdevices(){ return true; }
+export function SubdeviceController(){ return true; }
 export function DefaultComponentBrand() { return "Corsair";}
 export function Documentation(){ return "troubleshooting/corsair"; }
 
@@ -55,13 +46,8 @@ export function Initialize() {
 }
 
 export function Shutdown() {
-
-	//channel 0
-	let packet = [0x00, CORSAIR_LIGHTING_CONTROLLER_MODE, 0x00, CORSAIR_HARDWARE_MODE];
-	device.write(packet, 65);
-	//channel 1
-	packet = [0x00, CORSAIR_LIGHTING_CONTROLLER_MODE, 0x01, CORSAIR_HARDWARE_MODE];
-	device.write(packet, 65);
+	CorsairLightingController.SetChannelToHardwareMode(0);
+	CorsairLightingController.SetChannelToHardwareMode(1);
 }
 
 export function LedNames() {
@@ -92,34 +78,19 @@ function SendChannel(Channel) {
 		ColorData = device.channel(ChannelArray[Channel][0]).getColors("Seperate");
 	}
 
-	const RedChannelData = ColorData[0].map( x => Math.floor(x * BrightnessLimiter));
-	const GreenChannelData = ColorData[1].map( x => Math.floor(x * BrightnessLimiter));
-	const BlueChannelData = ColorData[2].map( x => Math.floor(x * BrightnessLimiter));
+	ColorData[0] = ColorData[0].map( x => Math.floor(x * BrightnessLimiter));
+	ColorData[1] = ColorData[1].map( x => Math.floor(x * BrightnessLimiter));
+	ColorData[2] = ColorData[2].map( x => Math.floor(x * BrightnessLimiter));
 
-	InitChannel(Channel);
-	channelStart(Channel);
+	CorsairLightingController.SetDirectColors(Channel, ColorData);
 
-	//Stream RGB Data
-	let ledsSent = 0;
-	ChannelLedCount = ChannelLedCount >= 138 ? 138 : ChannelLedCount;
-
-	while(ChannelLedCount > 0){
-		const ledsToSend = ChannelLedCount >= 50 ? 50 : ChannelLedCount;
-
-		StreamLightingPacketChanneled(ledsSent, ledsToSend, 0, RedChannelData.splice(0, ledsToSend), Channel);
-
-		StreamLightingPacketChanneled(ledsSent, ledsToSend, 1, GreenChannelData.splice(0, ledsToSend), Channel);
-
-		StreamLightingPacketChanneled(ledsSent, ledsToSend, 2, BlueChannelData.splice(0, ledsToSend), Channel);
-
-		ledsSent += ledsToSend;
-		ChannelLedCount -= ledsToSend;
-	}
 }
 
 
 export function Render() {
-	device.clearReadBuffer();
+	if(!ArduinoCompatibilityMode){
+		device.clearReadBuffer();
+	}
 
 	SendChannel(0);
 	device.pause(1);
@@ -127,48 +98,132 @@ export function Render() {
 	SendChannel(1);
 	device.pause(1);
 
-	SubmitLightingColors();
+	CorsairLightingController.CommitColors();
 }
 
-
-function InitChannel(channel){
-	const packet = [0x00, CORSAIR_LIGHTING_CONTROLLER_MODE, channel, CORSAIR_SOFTWARE_MODE];
-
-	device.write(packet, 65);
-
-}
-
-function StreamLightingPacketChanneled(start, count, colorChannel, data, channel) {
-	//channel selection == 32 0/1 Start Count Channel LEDS
-	//(Start, Count, Color, Data)
-	let packet = [0x00, CORSAIR_LIGHTING_CONTROLLER_STREAM, channel, start, count, colorChannel];
-	packet = packet.concat(data);
-
-	device.write(packet, 65);
-}
-
-function channelStart(channel){
-	//start packet == 34 00 channel (len 64)
-	const packet = [0x00, CORSAIR_LIGHTING_CONTROLLER_START, channel];
-
-	device.write(packet, 65);
-}
-
-function channelReset(channel){
-	const packet = [0x00, CORSAIR_LIGHTING_CONTROLLER_RESET, channel];
-
-	device.write(packet, 65);
-}
-
-
-function SubmitLightingColors() {
-	const packet = [0x00, CORSAIR_LIGHTING_CONTROLLER_COMMIT, 0xFF];
-
-	device.write(packet, 65);
-}
 export function Validate(endpoint) {
-	return endpoint.interface === -1;
+	return endpoint.interface === -1 || endpoint.interface === 2;
 }
+
+/**
+ * Protocol Library for Corsair's Legacy Lighting Controllers
+ * @class CorsairLightingControllerProtocol
+ */
+class CorsairLightingControllerProtocol{
+	/** @typedef {1 | 2} ModeId */
+	/** @typedef {0 | 1} ChannelId*/
+
+	constructor(){
+		this.writeLength = 65;
+		this.readLength = 17;
+
+		/** @type {Object.<string, ModeId>} */
+		this.modes = {
+			hardware: 1,
+			software: 2
+		};
+
+		/**
+		 * @alias CommandIdDict
+		 * @type {Object.<string, number>}
+		 * @readonly
+		 */
+		this.commandIds = {
+			firmware: 0x02,
+			directColors: 0x032,
+			commit: 0x33,
+			startDirect: 0x34,
+			reset: 0x37,
+			mode: 0x38
+		};
+	}
+
+	FetchFirmwareVersion(){
+		const packet = [0x00, this.commandIds.firmware];
+		device.clearReadBuffer();
+		device.write(packet, this.writeLength);
+
+		const data = device.read([0x00], this.readLength);
+		device.log(data);
+	}
+	/** @param {ChannelId} ChannelId */
+	SetChannelToHardwareMode(ChannelId){
+		this.SetChannelMode(ChannelId, this.modes.hardware);
+	}
+	/** @param {ChannelId} ChannelId */
+	SetChannelToSoftwareMode(ChannelId){
+		this.SetChannelMode(ChannelId, this.modes.software);
+	}
+	/**
+	 * @param {ChannelId} ChannelId
+	 * @param {ModeId} Mode
+	 */
+	SetChannelMode(ChannelId, Mode){
+		const packet = [0x00, this.commandIds.mode, ChannelId, Mode];
+
+		device.write(packet, this.writeLength);
+		this.SafeRead();
+	}
+	/**
+	 * @param {ChannelId} ChannelId
+	 * @param {number[][]} RGBData
+	 */
+	SetDirectColors(ChannelId, RGBData){
+		this.SetChannelToSoftwareMode(ChannelId);
+
+		if(ArduinoCompatibilityMode){
+			this.StartDirectColorSend(ChannelId);
+		}
+
+		//Stream RGB Data
+		let ledsSent = 0;
+		// Check Red Channel Length
+		let TotalLedCount = RGBData[0].length >= 138 ? 138 : RGBData[0].length;
+
+		while(TotalLedCount > 0){
+			const ledsToSend = TotalLedCount >= 50 ? 50 : TotalLedCount;
+
+			this.StreamDirectColors(ledsSent, ledsToSend, 0, RGBData[0].splice(0, ledsToSend), ChannelId);
+
+			this.StreamDirectColors(ledsSent, ledsToSend, 1, RGBData[1].splice(0, ledsToSend), ChannelId);
+
+			this.StreamDirectColors(ledsSent, ledsToSend, 2, RGBData[2].splice(0, ledsToSend), ChannelId);
+
+			ledsSent += ledsToSend;
+			TotalLedCount -= ledsToSend;
+		}
+	}
+	StartDirectColorSend(ChannelId){
+		const packet = [0x00, this.commandIds.startDirect, ChannelId];
+
+		device.write(packet, this.writeLength);
+		this.SafeRead();
+	}
+	StreamDirectColors(startIdx, count, colorChannelid, data, channelId) {
+		let packet = [0x00, this.commandIds.directColors, channelId, startIdx, count, colorChannelid];
+		packet = packet.concat(data);
+
+		device.write(packet, this.writeLength);
+		this.SafeRead();
+	}
+	CommitColors(){
+		const packet = [0x00, this.commandIds.commit, 0xFF];
+
+		device.write(packet, this.writeLength);
+		this.SafeRead();
+	}
+
+	// Arduino based Node Pro's cannot use a 0 timeout buffer clear.
+	// This results in a 6fps loss for arduino models we can avoid on official models.
+	SafeRead(){
+		if(ArduinoCompatibilityMode){
+			return device.read([0x00], 17);
+		}
+
+		return device.read([0x00], 17, 0);
+	}
+}
+const CorsairLightingController = new CorsairLightingControllerProtocol();
 
 
 export function Image() {

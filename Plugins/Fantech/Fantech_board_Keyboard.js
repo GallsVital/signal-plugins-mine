@@ -9,7 +9,7 @@ export function ControllableParameters() {
 		{"property":"shutdownColor", "group":"lighting", "label":"Shutdown Color", "min":"0", "max":"360", "type":"color", "default":"#009bde"},
 		{"property":"LightingMode", "group":"lighting", "label":"Lighting Mode", "type":"combobox", "values":["Canvas", "Forced"], "default":"Canvas"},
 		{"property":"forcedColor", "group":"lighting", "label":"Forced Color", "min":"0", "max":"360", "type":"color", "default":"#009bde"},
-		{"property":"boardModel", "group":"", "label":"Layout", "type":"combobox", "values":["MAXFIT61", "MK870TKL"], "default":"MAXFIT61"},
+		{"property":"boardModel", "group":"", "label":"Layout", "type":"combobox", "values":["MAXFIT61", "MK870TKL", "K24"], "default":"MAXFIT61"},
 	];
 }
 /* global
@@ -76,6 +76,34 @@ const boards = {
 			[0, 5], [1, 5], [2, 5],                         [6, 5],                            [10, 5], [11, 5], [12, 5], [13, 5],	[14, 5], [15, 5], [16, 5]
 		],
 		size: [17, 6]
+	},
+	K24:{
+		name: "Motospeed K24",
+		vKeyNames: [
+			"Esc", "Tab", "Backspace", "FN",
+			"Numlock", "/", "*", "-",
+			"Num 7", "Num 8", "Num 9", "Num +",
+			"Num 4", "Num 5", "Num 6",
+			"Num 1", "Num 2", "Num 3", "Num Enter",
+			"Num 0", "."
+		],
+		vKeys: [
+			18, 19, 20, 21,
+			40, 41, 42, 43,
+			62, 63, 64, 65,
+			84, 85, 86,
+			106, 107, 108, 109,
+			128, 130
+		],
+		vKeyPositions: [
+			[0, 0], [1, 0], [2, 0], [3, 0],
+			[0, 1], [1, 1], [2, 1], [3, 1],
+			[0, 2], [1, 2], [2, 2], [3, 2],
+			[0, 3], [1, 3], [2, 3],
+			[0, 4], [1, 4], [2, 4], [3, 4],
+			[0, 5],			[2, 5],
+		],
+		size: [4, 6]
 	}
 };
 

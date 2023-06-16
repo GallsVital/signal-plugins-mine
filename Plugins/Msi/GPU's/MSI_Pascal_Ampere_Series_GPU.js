@@ -295,6 +295,7 @@ class MSIGPUDeviceIDs {
 		this.MSI_RTX2070_SUPER_GAMING_Z_TRIO         = 0x37B6;
 		this.MSI_RTX2070_SUPER_GAMING_X              = 0x373e;
 		this.MSI_RTX2070_SUPER_GAMING_X_TRIO         = 0xC726;
+		this.MSI_RTX2080_SUPER_SEA_HAWK_EK_X		 = 0xC72E;
 		this.MSI_RTX2080_DUKE_OC                     = 0x3721;
 		this.MSI_RTX2080_GAMING_TRIO                 = 0x372E;
 		this.MSI_RTX2080_GAMING_X_TRIO               = 0x3726;
@@ -375,6 +376,7 @@ class MSIGPUList {
         	new MSIGPUIdentifier(Nvidia.RTX2080_A, MSIGPUIDs.MSI_RTX2080_DUKE_OC,               0x68, "MSI RTX 2080 Duke OC"),
         	new MSIGPUIdentifier(Nvidia.RTX2080_A, MSIGPUIDs.MSI_RTX2080_SEA_HAWK_EK_X,         0x68, "MSI RTX 2080 Sea Hawk EK x"),
         	new MSIGPUIdentifier(Nvidia.RTX2080S, MSIGPUIDs.MSI_RTX2080S_GAMING_X_TRIO,        0x68, "MSI RTX 2080 Super Gaming X Trio"),
+        	new MSIGPUIdentifier(Nvidia.RTX2080S,	MSIGPUIDs.MSI_RTX2080_SUPER_SEA_HAWK_EK_X,	0x68, "MSI RTX 2080 Super SEA HAWK EK"),
         	new MSIGPUIdentifier(Nvidia.RTX2080TI, MSIGPUIDs.MSI_RTX2080TI_GAMING_X_TRIO,       0x68, "MSI RTX 2080Ti Gaming X Trio"),
         	new MSIGPUIdentifier(Nvidia.RTX2080TI, MSIGPUIDs.MSI_RTX2080TI_GAMING_Z_TRIO,       0x68, "MSI RTX 2080Ti Gaming Z Trio"), //Untested
         	new MSIGPUIdentifier(Nvidia.RTX2080TI, MSIGPUIDs.MSI_RTX2080TI_SEA_HAWK_EK_X,       0x68, "MSI RTX 2080Ti Sea Hawk EK X"),

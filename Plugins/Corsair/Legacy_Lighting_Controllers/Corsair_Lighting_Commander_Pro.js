@@ -20,7 +20,7 @@ export function ControllableParameters(){
 	];
 }
 
-export function SupportsSubdevices(){ return true; }
+export function SubdeviceController(){ return true; }
 export function SupportsFanControl(){ return true; }
 // Use the CorsairLink mutex any time this device is rendering.
 // if we don't our reads may be ruined by other programs
@@ -52,10 +52,9 @@ function SetupChannels(){
 let ConnectedFans = [];
 let ConnectedProbes = [];
 
-
 /** @type {ValidateExport} */
 export function Validate(endpoint) {
-	return endpoint.interface === -1 || endpoint.interface === 2;
+	return endpoint.interface === -1 || endpoint.interface === 0 || endpoint.interface === 2;
 }
 
 export function Initialize() {

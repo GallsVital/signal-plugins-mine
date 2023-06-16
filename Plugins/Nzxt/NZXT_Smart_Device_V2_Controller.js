@@ -21,7 +21,7 @@ export function ControllableParameters(){
 const vKeyNames = [];
 const vKeyPositions = [];
 
-export function SupportsSubdevices(){ return true; }
+export function SubdeviceController(){ return true; }
 export function DefaultComponentBrand() { return "NZXT";}
 
 const NZXTSmartDevice2ProductNames = {
@@ -45,7 +45,7 @@ let ChannelArray = [];
 const ConnectedFans = [];
 
 export function Validate(endpoint) {
-	return endpoint.interface === -1;
+	return (endpoint.interface === -1 || endpoint.interface === 0);
 }
 
 function SetupFans(){
@@ -119,7 +119,6 @@ function SendChannel(Channel, shutdown = false) {
 	}
 
 	let ChannelLedCount = componentChannel.LedCount();
-
 	let RGBData = [];
 
 	if(LightingMode === "Forced"){
@@ -134,6 +133,8 @@ function SendChannel(Channel, shutdown = false) {
 	}else{
 		RGBData = componentChannel.getColors("Inline", "GRB");
 	}
+
+	if(!RGBData.length) {return;}
 
 	let packetNumber = 0;
 	ChannelLedCount = ChannelLedCount >= 120 ? 120 : ChannelLedCount;

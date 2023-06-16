@@ -9,7 +9,7 @@ Item {
 			id: scanningItem
 			height: 50
 			width: childrenRect.width + 15
-			visible: service.controllers.length == 0
+			visible: service.controllers.length === 0
 			color: theme.background3
 			radius: theme.radius
 
@@ -143,7 +143,7 @@ Item {
 			}
 
 			delegate: Item {
-				width: 250
+				width: content.childrenRect.width + content.padding
             	height: content.childrenRect.height + content.padding
 				property var controller: model.modelData.obj
 

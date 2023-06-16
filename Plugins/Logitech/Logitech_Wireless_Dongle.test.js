@@ -2,6 +2,7 @@ const { MockDevice } = require("../../tests/mocks.js");
 const { LogitechProtocol } = require("./Logitech_Mouse.js");
 const { LogitechMouseDevice } = require("./Logitech_Mouse.js");
 const { LogitechDongleDevice } = require("./Logitech_Mouse.js");
+const { LogitechExtras } = require("./Logitech_Mouse.js");
 const { LogitechResponse } = require("./Logitech_Mouse.js");
 
 const pluginPath = "./Logitech_Mouse.js";
@@ -33,50 +34,11 @@ describe("Logitech Dongle", () => {
 		expect(global.device.write.mock.calls.length).toBe(0);
 
 	});
-	it.each([true, false])(
-		'SetDpiLightAlwaysOnHero(%d)',
-		(state) => {
-			const Logitech = new LogitechProtocol();
-			const LogitechMouse = new LogitechMouseDevice();
-			Logitech.Config.IsHeroProtocol = true;
-			LogitechMouse.Config.hasDPILights = true;
-
-			// set featureId to a random value as it's not controlled by SetDpiLightAlwaysOn()
-			const MockRGB8071ID = Math.round(Math.random() * 255);
-			Logitech.FeatureIDs.RGB8071ID = MockRGB8071ID;
-			LogitechMouse.SetDpiLightAlwaysOn(state);
-
-			expect(global.device.write).toHaveBeenCalledTimes(1); //this just sets a flag, rather than a bunch of writes now since hero doesn't respect the standard methods.
-			// Expected device.write packets. Order may not matter to the device, but we should keep them in the order we know works.
-			expect(global.device.write.mock.calls[0][0]).toEqual([0x10, Logitech.Config.ConnectionMode, 0x00, 0x70, 0x01, state ? 0x02 : 0x04]);
-		}
-	);
-
-	it.each([true, false])(
-		'SetDpiLightAlwaysOnLegacy(%d)',
-		(state) => {
-			const Logitech = new LogitechProtocol();
-			const LogitechMouse = new LogitechMouseDevice();
-			Logitech.Config.IsHeroProtocol = false;
-			LogitechMouse.Config.hasDPILights = true;
-
-			// set featureId to a random value as it's not controlled by SetDpiLightAlwaysOn()
-			const MockLEDControlID = 0;//Math.round(Math.random() * 255);
-			Logitech.FeatureIDs.LEDControlID = MockLEDControlID;
-			LogitechMouse.SetDpiLightAlwaysOn(state);
-
-			expect(global.device.write).toHaveBeenCalledTimes(1);
-
-			// Expected device.write packets. Order may not matter to the device, but we should keep them in the order we know works.
-			expect(global.device.write.mock.calls[0][0]).toEqual([0x10, Logitech.Config.ConnectionMode, Logitech.FeatureIDs.LEDControlID, 0x70, 0x01, state ? 0x02 : 0x04]);
-		}
-	);
-
 	it("SetDpi", () => {
 		const Logitech = new LogitechProtocol();
 		const LogitechMouse = new LogitechMouseDevice();
 
-		const DPI = Math.round(Math.random() * 10000);
+		const DPI = Math.round(Math.random() * 10000 / 50)*50;
 		const Stage = Math.round(Math.random() * 5);
 		const MockFeatureID = 0;//Math.round(Math.random() * 255);
 		Logitech.FeatureIDs.DPIID = MockFeatureID;
@@ -192,14 +154,13 @@ describe("Logitech Dongle", () => {
 	});
 
 	test.each([0, 5, 10])("Feature ID Count Mock Test", (FeatureIDCount) => {
-		const Logitech = new LogitechProtocol();
-		Logitech.Config.ConnectionMode = Logitech.ConnectionType["Wireless"];
-		global.device.read.mockImplementationOnce(() => { return [0x11, 0x01, 0x00, 0x00, FeatureIDCount, 0x00, 0x00]; });
+		const LogitechDevelopmentTools = new LogitechExtras();
+		global.device.read.mockImplementationOnce(() => { return [0x11, 0xff, 0x00, 0x00, FeatureIDCount, 0x00, 0x00]; });
 
-		expect(Logitech.FetchFeatureCount()).toBe(FeatureIDCount);
+		expect(LogitechDevelopmentTools.FetchFeatureCount()).toBe(FeatureIDCount);
 		expect(global.device.write.mock.calls.length).toBe(1);
 		expect(global.device.read.mock.calls.length).toBe(1);
-		expect(global.device.write.mock.calls[0]).toEqual([[0x11, 0x01, 0x01, 0x00], 20]);
+		expect(global.device.write.mock.calls[0]).toEqual([[0x11, 0xff, 0x01, 0x00], 20]);
 	});
 
 });

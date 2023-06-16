@@ -19,7 +19,7 @@ class GPUIdCollector{
 		return typeof pluginModule.BrandGPUList !== "undefined";
 	}
 	GetUIDFromGPU(GPU){
-		return `${GPU.Vendor}:${GPU.SubVendor}:${GPU.Device}:${GPU.SubDevice}`;
+		return `${GPU.Vendor}:${GPU.SubVendor}:${GPU.Device}:${GPU.SubDevice}:${GPU.Address}`;
 	}
 	// AddGPUToMap(GPU){
 	// 	const UID = this.GetUIDFromGPU(GPU);

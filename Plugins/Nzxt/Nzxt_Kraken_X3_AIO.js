@@ -126,12 +126,16 @@ function sendchannelPumpColors(channel, shutdown = false) {
 
 function sendchannel1Colors(Channel, shutdown = false) {
 	let ChannelLedCount = device.channel(ChannelArray[Channel][0]).LedCount();
+	const componentChannel = device.channel(ChannelArray[Channel][0]);
 
+	if(!ChannelLedCount) {
+		return;
+	}
 	let RGBData = [];
 
 	if(LightingMode == "Forced") {
 		RGBData = device.createColorArray(forcedColor, ChannelLedCount, "Inline", "GRB");
-	} else if(device.getLedCount() == 0) {
+	} else if(componentChannel.shouldPulseColors()) {
 		ChannelLedCount = 40;
 
 		const pulseColor = device.getChannelPulseColor(ChannelArray[Channel][0], ChannelLedCount);

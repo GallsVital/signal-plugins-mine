@@ -20,7 +20,7 @@ export function ControllableParameters() {
 		{"property":"RGBconfig", "group":"lighting", "label":"12V RGB Channel Configuration", "type":"combobox", "values":["RGB", "RBG", "BGR", "BRG", "GBR", "GRB"], "default":"GRB"},
 	];
 }
-export function SupportsSubdevices(){ return true; }
+export function SubdeviceController(){ return true; }
 
 const RGBConfigs = {
 	"RGB" : [0, 1, 2],
@@ -61,38 +61,44 @@ export class NZXTProtocol {
 			0x200A: "N7 Z490",
 			0x200B: "N7 B550",
 			0x200C: "N7 Z590",
+			0x201B: "N7 B650E",
 			0x2017: "N5 Z690",
 			0x2016: "N7 Z690",
 			0x201D: "N7 Z790",
 		};
 
 		this.ChannelLibrary	=	{
-			0x2005:  {
+			0x2005: {
 				nzxtchannels: 3,
 				argbchannels: 0,
 				rgbchannels : 0,
 			},
-			0x200A:  {
+			0x200A: {
 				nzxtchannels: 2,
 				argbchannels: 1,
 				rgbchannels : 1,
 			},
-			0x200B:  {
+			0x200B: {
 				nzxtchannels: 2,
 				argbchannels: 1,
 				rgbchannels : 1,
 			},
-			0x200C:  {
+			0x200C: {
 				nzxtchannels: 2,
 				argbchannels: 1,
 				rgbchannels : 1,
+			},
+			0x201B: {
+				nzxtchannels: 4,
+				argbchannels: 2,
+				rgbchannels : 0,
 			},
 			0x2017: {
 				nzxtchannels: 2,
 				argbchannels: 1,
 				rgbchannels : 1,
 			},
-			0x2016:  {
+			0x2016: {
 				nzxtchannels: 2,
 				argbchannels: 1,
 				rgbchannels : 1,
@@ -149,8 +155,13 @@ export class NZXTProtocol {
 
 		for(let i = 0; i < totalchannels; i++) {
 			const RGBData = this.grabRGBData(i);
+
+			// no led on this channel, skip
+			if(!RGBData.length) {continue;}
+
 			this.StreamLightingPacketChannel(0, RGBData.splice(0, 60), i);
 			this.StreamLightingPacketChannel(1, RGBData.splice(0, 60), i);
+
 			this.SubmitLightingColors(i);
 		}
 
@@ -185,10 +196,11 @@ export class NZXTProtocol {
 			RGBData = device.channel(ChannelName).getColors("Inline", "GRB");
 		}
 
-		return RGBData.concat(new Array(120 - RGBData.length).fill(0));
+		return RGBData;
 	}
 
 	StreamLightingPacketChannel(packetNumber, RGBData, channel) {
+		if(!RGBData.length) {return;}
 		const packet = [0x22, 0x10 | packetNumber, 0x01 << channel, 0x00];
 		packet.push(...RGBData);
 		device.write(packet, 64);

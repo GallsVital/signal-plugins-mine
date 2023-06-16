@@ -86,7 +86,7 @@ export function LedPositions() {
 }
 
 
-export function SupportsSubdevices() { return true; }
+export function SubdeviceController() { return true; }
 export function Initialize() {
 	Razer.getDeviceTransactionID();
 	Razer.getDeviceInfo();

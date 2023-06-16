@@ -32,7 +32,7 @@ const devicePIDs =
 //Temporarily Axed.
 const ParentDeviceName = "Mystic Light Controller";
 
-export function SupportsSubdevices(){ return true; }
+export function SubdeviceController(){ return true; }
 
 const DeviceMaxLedLimit = 360;
 

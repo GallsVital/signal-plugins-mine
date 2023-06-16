@@ -28,6 +28,19 @@ declare interface HidInfo{
 	writeLength: number,
 }
 
+declare type ImageResource = "default/aio" |		 
+"default/case" |
+"default/gpu" |
+"default/keyboard" |
+"default/keyboard60" |
+"default/keyboard80" |
+"default/motherboard" |
+"default/mouse"	|
+"default/mousepad" |
+"default/mousepadXL" |
+"default/ram"
+
+
 declare class device{
 	/**
 	 * returns the devices USB Vendor ID
@@ -182,7 +195,7 @@ declare class device{
 
 	public static GetComponentData(ComponentId: string): void
 	public static AvailableComponents(): void
-	public static getCurrentSubdevices(): String[]
+	public static getCurrentSubdevices(): string[]
 
 	/**
 	 * Sets the upper Led Count shown to the user in the Component UI. Has no effect if there are no configured Component Channels.
@@ -272,7 +285,9 @@ declare class device{
 	public static setControllableLeds(LedNames: string[], LedPositions: LedPosition[]): void
 	public static setSize(Size: number[]): void
 	public static setImageFromBase64(base64Image: string): void
-	
+	public static setImageFromResource(resourceUrl: ImageResource): void
+
+
 	/**
 	 * Creates a device message for the user.
 	 * @see {@link https://docs.signalrgb.com/plugins/utilities#deviceaddmessage SignalRGB Documentation}

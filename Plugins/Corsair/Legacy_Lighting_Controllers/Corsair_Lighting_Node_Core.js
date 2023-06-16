@@ -31,7 +31,7 @@ const CORSAIR_LIGHTING_CONTROLLER_MODE      = 0x38;
 const CORSAIR_HARDWARE_MODE = 0x01;
 const CORSAIR_SOFTWARE_MODE = 0x02;
 
-export function SupportsSubdevices(){ return true; }
+export function SubdeviceController(){ return true; }
 export function DefaultComponentBrand() { return "Corsair";}
 export function Documentation(){ return "troubleshooting/corsair"; }
 
@@ -167,8 +167,9 @@ function SubmitLightingColors() {
 	device.write(packet, 65);
 	device.read(packet, 17);
 }
+
 export function Validate(endpoint) {
-	return endpoint.interface === -1 | 2;
+	return endpoint.interface === -1 || endpoint.interface === 0 || endpoint.interface === 2;
 }
 
 

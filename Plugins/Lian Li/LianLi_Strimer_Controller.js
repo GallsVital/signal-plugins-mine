@@ -188,7 +188,7 @@ const v24PinLedPositions =
 	[10, 5], [11, 5], [12, 5], [13, 5], [14, 5], [15, 5], [16, 5], [17, 5], [18, 5], [19, 5],
 ];
 
-export function SupportsSubdevices(){ return true; }
+export function SubdeviceController(){ return true; }
 
 export function Initialize() {
 	initController();
@@ -250,7 +250,7 @@ export function onGPUCableTypeChanged() {
 }
 
 function initController() {
-	for(let zones = 0x10; zones < 0x1b; zones++) {
+	for(let zones = 0x10; zones < 0x1c; zones++) {
 		device.send_report([0xE0, zones, 0x01, 0x02], 255);
 	}
 }
@@ -402,6 +402,6 @@ export function Validate(endpoint) {
 	return endpoint.interface === 1;
 }
 
-export function Image() {
-	return "";
-}
+//export function Image() {
+//	return "";
+//}

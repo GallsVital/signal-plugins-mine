@@ -10,7 +10,7 @@ Item {
 			id: scanningItem
 			height: 50
 			width: childrenRect.width + 15
-			visible: service.controllers.length == 0
+			visible: service.controllers.length === 0
 			color: theme.background3
 			radius: theme.radius
 
@@ -129,13 +129,13 @@ Item {
                                 text: `Supports Razer Protocol: ${device.supportRazer ? "True" : "False"}`
                             }
 
-                            Text{
-                                color: theme.warn
-                                width: parent.width
-                                visible: !device.supportDreamView && !device.supportRazer
-                                wrapMode: Text.WrapAtWordBoundaryOrAnywhere
-                                text: `This device doesn't support Govee's Razer, or Dreamview protocols. SignalRGB is unable to control it...`
-                            }
+                            // Text{
+                            //     color: theme.warn
+                            //     width: parent.width
+                            //     visible: !device.supportDreamView && !device.supportRazer
+                            //     wrapMode: Text.WrapAtWordBoundaryOrAnywhere
+                            //     text: `This device doesn't support Govee's Razer, or Dreamview protocols. SignalRGB is unable to control it...`
+                            // }
 
                         }
 

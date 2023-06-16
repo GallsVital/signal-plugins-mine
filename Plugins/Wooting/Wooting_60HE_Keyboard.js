@@ -1,6 +1,6 @@
 export function Name() { return "Wooting 60 HE"; }
 export function VendorId() { return 0x31e3; }
-export function ProductId() { return 0x1310; }
+export function ProductId() { return [0x1310, 0x1312]; }
 export function Publisher() { return "WhirlwindFX"; }
 export function Size() { return [17, 6]; }
 export function DefaultPosition() { return [75, 70]; }

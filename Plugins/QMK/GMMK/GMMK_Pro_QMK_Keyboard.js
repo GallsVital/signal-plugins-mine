@@ -2,6 +2,7 @@ export function Name() { return "Glorious GMMK Pro QMK Keyboard"; }
 export function VendorId() { return 0x320F; }
 export function ProductId() { return 0x5044; }
 export function Publisher() { return "WhirlwindFX"; }
+export function Documentation(){ return "qmk/gmmk-pro"; }
 export function Size() { return [19, 7]; }
 export function DefaultPosition(){return [10, 100]; }
 export function DefaultScale(){return 8.0;}
@@ -195,7 +196,7 @@ function returnSignalRGBProtocolVersion(data) {
 
 
 	if(PluginProtocolVersion !== SignalRGBProtocolVersion) {
-		device.notify("Unsupported Protocol Version: ", `This plugin is intended for SignalRGB Protocol version ${PluginProtocolVersion}. This device is version: ${SignalRGBProtocolVersion}`, 0);
+		device.notify("Unsupported Protocol Version: ", `This plugin is intended for SignalRGB Protocol version ${PluginProtocolVersion}. This device is version: ${SignalRGBProtocolVersion}`, 1, "Documentation");
 	}
 
 	device.pause(30);
@@ -204,7 +205,7 @@ function returnSignalRGBProtocolVersion(data) {
 function requestUniqueIdentifier() //Grab the unique identifier for this keyboard model
 {
 	if(device.write([0x00, 0x23], 32) === -1) {
-		device.notify("GMMK Pro Unsupported Firmware: ", `This device is not running SignalRGB-compatible firmware. Click the Open Troubleshooting Docs button to learn more.`, 0);
+		device.notify("GMMK Pro Unsupported Firmware: ", `This device is not running SignalRGB-compatible firmware. Click the Open Troubleshooting Docs button to learn more.`, 1, "Documentation");
 	}
 
 	device.pause(30);
@@ -255,7 +256,7 @@ function returnFirmwareType(data) {
 	const FirmwareTypeByte = data[2];
 
 	if(FirmwareTypeByte !== MainlineQMKFirmware || FirmwareTypeByte !== VIAFirmware) {
-		device.notify("Unsupported Firmware: ", "Click Show Console, and then click on troubleshooting for your keyboard to find out more.", 0);
+		device.notify("Unsupported Firmware: ", "Click Show Console, and then click on troubleshooting for your keyboard to find out more.", 1, "Documentation");
 	}
 
 	if(FirmwareTypeByte === VIAFirmware){
