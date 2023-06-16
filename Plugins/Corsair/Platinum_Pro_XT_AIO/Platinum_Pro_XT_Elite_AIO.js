@@ -1,67 +1,29 @@
-
-
-const magic1 = [
-	//0x00, 0x3F,0xD9,
-	0x01, 0x01, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0x7F, 0x7F, 0x7F, 0x7F, 0xFF, 0x00, 0xFF, 0xFF, 0xFF, 0xFF, 0x00, 0xFF,
-	0xFF, 0xFF, 0xFF, 0x00, 0xFF, 0xFF, 0xFF, 0xFF, 0x00, 0xFF, 0xFF, 0xFF, 0xFF, 0x00, 0xFF, 0xFF, 0xFF, 0xFF, 0x00, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF,
-	0xFF, 0xFF, 0xFF, 0xFF, 0xFF,
-	//0x0B
-];
-const magic2 = [
-	//0x00, 0x3F,0xE2,
-	0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08, 0x09, 0x0A, 0x0B, 0x0C, 0x0D, 0x0E, 0x0F, 0x10, 0x11, 0x12, 0x13, 0x14, 0x15, 0x16, 0x17, 0x18, 0x19, 0x1A,
-	0x1B, 0x1C, 0x1D, 0x1E, 0x1F, 0x20, 0x21, 0x22, 0x23, 0x24, 0x25, 0x26, 0x27, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF,
-	0xFF, 0xFF, 0xFF, 0xFF, 0xFF
-	, //0xF9
-];
-const magic3 = [
-	//0x00, 0x3F,0xEB,
-	0x28, 0x29, 0x2A, 0x2B, 0x2C, 0x2D, 0x2E, 0x2F, 0x30, 0x31, 0x32, 0x33, 0x34, 0x35, 0x36, 0x37, 0x38, 0x39, 0x3A, 0x3B, 0x3C, 0x3D, 0x3E, 0x3F, 0x40, 0x41, 0x42,
-	0x43, 0x44, 0x45, 0x46, 0x47, 0x48, 0x49, 0x4A, 0x4B, 0x4C, 0x4D, 0x4E, 0x4F, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF,
-	0xFF, 0xFF, 0xFF, 0xFF, 0xFF,
-	//0x55
-];
-
-const CoolingBalanced = [0x14, 0x00, 0xFF, 0x05, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x01, 0xFF, 0xFF, 0x00, 0x00, 0xFF, 0x07, 0x1D, 0x33, 0x1E, 0x40, 0x1F, 0x4D, 0x20, 0x73, 0x21, 0xAD, 0x22, 0xD9, 0x23, 0xFF, 0x1D, 0x33, 0x1E, 0x40, 0x1F, 0x4D, 0x20, 0x73, 0x21, 0xAD, 0x22, 0xD9, 0x23, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0x5F];
-
-const CoolingExtreme = [0x14, 0x00, 0xFF, 0x05, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xFF, 0xFF, 0x00, 0x00, 0xFF, 0x07, 0x1C, 0x4D, 0x1D, 0x59, 0x1E, 0x80, 0x1F, 0xB3, 0x20, 0xCC, 0x21, 0xE6, 0x22, 0xFF, 0x1C, 0x4D, 0x1D, 0x59, 0x1E, 0x80, 0x1F, 0xB3, 0x20, 0xCC, 0x21, 0xE6, 0x22, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF];
-
-const CoolingQuiet = [0x14, 0x00, 0xFF, 0x05, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0xFF, 0xFF, 0x00, 0x00, 0xFF, 0x07, 0x1E, 0x33, 0x20, 0x40, 0x23, 0x73, 0x25, 0xA1, 0x27, 0xB8, 0x29, 0xCF, 0x2A, 0xFF, 0x1E, 0x33, 0x20, 0x40, 0x23, 0x73, 0x25, 0xA1, 0x27, 0xB8, 0x29, 0xCF, 0x2A, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0x3];
-
-const CoolingDict = {
-	"Quiet": CoolingQuiet,
-	"Balanced":CoolingBalanced,
-	"Extreme":CoolingExtreme
-};
-
-
-const ColorFlags = [0b100, 0b101, 0b110];
-const StartFlags = [0b001, 0b010, 0b011];
-const CoolingFlags = [0b000, 0b011];
-const CoolingCommand = 0x14;
-let CurrentFanSpeed;
-export function Name() { return "Corsair H150i Pro XT"; }
+export function Name() { return "Corsair Platinum/Pro XT/Elite Cooler"; }
 export function VendorId() { return  0x1b1c; }
-export function ProductId() { return 0x0000; } //[0x0C2f, 0x0C22]
+export function ProductId() { return Object.keys(PlatCooler.PIDLibrary); }
 export function Publisher() { return "WhirlwindFX"; }
 export function Size() { return [5, 5]; }
 export function DefaultPosition(){return [165, 60];}
 export function DefaultScale(){return 6.0;}
 /* global
 LightingMode:readonly
+shutdownColor:readonly
 forcedColor:readonly
-FanSpeed:readonly
+fanProfile:readonly
 */
 export function ControllableParameters(){
 	return [
 		{"property":"LightingMode", "group":"lighting", "label":"Lighting Mode", "type":"combobox", "values":["Canvas", "Forced"], "default":"Canvas"},
+		{"property":"shutdownColor", "group":"lighting", "label":"Shutdown Color", "min":"0", "max":"360", "type":"color", "default":"#009bde"},
 		{"property":"forcedColor", "group":"lighting", "label":"Forced Color", "min":"0", "max":"360", "type":"color", "default":"#009bde"},
-		{"property":"FanSpeed",  "group":"", "label":"Fan Speed", "type":"combobox", "values":["Quiet", "Balanced", "Extreme"], "default":"Balanced"},
+		{"property":"fanProfile",  "group":"", "label":"Pump Mode", "type":"combobox", "values":["Quiet", "Balanced", "Extreme"], "default":"Balanced"},
 	];
 }
 export function DefaultComponentBrand() { return "Corsair";}
 export function Documentation(){ return "troubleshooting/corsair"; }
 
+const ConnectedFans = [];
+const ConnectedProbes = [];
 const DeviceMaxLedLimit = 32;
 
 //Channel Name, Led Limit
@@ -76,156 +38,191 @@ function SetupChannels(){
 		device.addChannel(ChannelArray[i][0], ChannelArray[i][1]);
 	}
 }
-const vLedNames = [
-	"Logo 1", "Ring 1", "Ring 2", "Ring 3",
-	"Ring 4", "Logo 2", "Ring 5",
-	"Ring 6", "Logo 3", "Logo 4", "Ring 7",
-	"Ring 8",  "Ring 9",
-	"Ring 10", "Ring 11", "Ring 12",
-];
-const vLedPos = [
-	[1, 0], [2, 0], [3, 0],
-	[0, 1],      [2, 1],     [4, 1],
-	[0, 2],  [1, 2], [3, 2],  [4, 2],
-	[0, 3],      [2, 3],     [4, 3],
-	[1, 4], [2, 4], [3, 4]
-];
-const vLedMapping = [
-	11,  12,  13,
-	10,      1,     14,
-	9,    0,   2,   15,
-	8,      3,      4,
-	7,  6,  5,
-];
-
 
 export function LedNames() {
-	return vLedNames;
-}
-
-function sendPacketString(string, size){
-	const packet= [];
-	const data = string.split(' ');
-
-	for(let i = 0; i < data.length; i++){
-		packet[parseInt(i, 16)] = parseInt(data[i], 16);//.toString(16)
-	}
-
-	device.write(packet, size);
+	return PlatCooler.getvLedNames();
 }
 
 export function LedPositions() {
-	return vLedPos;
+	return PlatCooler.getvLedPositions();
 }
-
-function EnableSoftwareControl() {
-	sendColorPacket(StartFlags[0], magic1);
-	sendColorPacket(StartFlags[1], magic2);
-	sendColorPacket(StartFlags[2], magic3);
-}
-
-function ReturnToHardwareControl() {
-
-}
-
 
 export function Initialize() {
 	SetupChannels();
 
-	EnableSoftwareControl();
+	device.clearReadBuffer();
+	PlatCooler.findSequence();
+	PlatCooler.fetchLibrarySetup();
+	PlatCooler.EnableSoftwareControl();
+	burstFanTimer = Date.now(); //reset the Burst Fan Timer.
+	burstFans(true); //send burst packet.
 }
 
+export function Render() {
 
-// Sequence starts at 29, because of seq embedded in magic packets. (0xEB >> 3)
-let seq = 0;
+	if(!PlatCooler.getFansInitialized()) {
+		burstFans();
 
-function GetPacketSequence() {
-	seq++;
-
-	if (seq > 31) {seq = 1;}
-
-	const shift = seq << 3;
-
-	return shift;//+ 4;
-}
-
-
-const table = [];
-const PEC_MSB_MASK = 1 << (8 - 1);
-const PEC_MASK = (PEC_MSB_MASK << 1) - 1;
-const PEC_POLY = (0b100000111 & PEC_MASK);
-
-
-function GeneratePecTable() {
-	for (let iIdx = 0; iIdx < 256; iIdx++) {
-		let iReg = iIdx;
-
-		for(let iBit = 0; iBit < 8; iBit++){
-			if ((iReg & PEC_MSB_MASK) !== 0) {
-				iReg = (iReg << 1) ^ PEC_POLY;
-			} else {
-				iReg = (iReg << 1);
-			}
-		}
-
-		table[iIdx] = iReg & PEC_MASK;
-	}
-}
-
-
-function ComputePec(bytes) {
-	if (table.length === 0) { GeneratePecTable(); }
-	let iCrc = 0;
-	const sStr = "PEC:";
-
-	for (let iIdx = 0; iIdx < bytes.length; iIdx++) {
-		const iTableIdx = iCrc ^ bytes[iIdx];
-		iCrc = table[iTableIdx];
+		return;
 	}
 
-	return iCrc;
-}
+	sendColor();
+	PollFans();
 
-
-function sendColorPacket(command, data){
-	let packet = [];
-	packet[0] = 0x00;
-	packet[1] = 0x3F;
-	packet[2] = GetPacketSequence();
-	packet[2] |= command;
-	packet = packet.concat(data);
-	packet[63] = 0x00;
-	packet[64] = ComputePec(packet.slice(2, 64));
-	device.write(packet, 65);
-	device.read(packet, 65);
-	//10 works well for soft locks
 	device.pause(10);
 }
 
-function sendCoolingPacket(data){
-	let packet = [];
-	packet[0] = 0x00;
-	packet[1] = 0x3F;
-	packet[2] = GetPacketSequence();
-	// packet[3] = 0x14;
-	packet = packet.concat(data);
+export function Shutdown() {
+	sendColor(true);
+}
 
-	// packet[4] = 0x00;
-	// packet[5] = 0xFF;
-	// packet[6] = 0x05;
-	// packet[7] = 0xFF;
-	// packet[8] = 0xFF;
-	// packet[9] = 0xFF;
-	// packet[10] = 0xFF;
-	// packet[11] = 0xFF;
+export function onfanProfileChanged() {
+	if(device.fanControlDisabled()){
+		PlatCooler.sendCoolingProfile(PlatCooler.coolingProfiles[fanProfile]);
+	} // This catches the fanMode prop not being present.
+}
+
+let savedPollFanTimer = Date.now();
+let burstFanTimer = Date.now();
+const PollModeInternal = 3000;
+
+function burstFans(firstRun = false) {
+	if(device.fanControlDisabled()){
+		PlatCooler.setFansInitialized(true); //Makes it so that non-pro users can y'know use the aio with Signal.
+
+		return;
+	}
+
+	if(firstRun) { //Only send this command once. No need to abuse the device.
+		device.log("Bursting Fans!");
+		PlatCooler.sendCoolingPacket(PlatCooler.deviceFanModes.fixedPWMWithFallback, 0xff, PlatCooler.deviceFanModes.fixedPWMWithFallback, 0xff, PlatCooler.coolingModes.balanced);
+	}
+
+	if(Date.now() - burstFanTimer > 15000) {
+		PlatCooler.setFansInitialized(true);
+	}
+}
+
+function PollFans() {
+	//Break if were not ready to poll
+	if (Date.now() - savedPollFanTimer < PollModeInternal) {
+		return;
+	}
+
+	savedPollFanTimer = Date.now();
+
+	const fanData = PlatCooler.getCoolingInfo(); //Why are we doing this you may ask? Because if I don't send a packet every like 10 seconds the cooler just nopes out.
+	const liquidTemp = fanData[6];
+
+	if(device.fanControlDisabled()){
+		return;
+	} // This catches the fanMode prop not being present.
+
+	if(!ConnectedProbes.includes(0)){
+		ConnectedProbes.push(0);
+		device.createTemperatureSensor(`Liquid Temperature`);
+	}
+
+	if(liquidTemp !== 0) {
+		device.SetTemperature(`Liquid Temperature`, liquidTemp);
+	}
+
+	const fanOutputData = [];
 
 
-	// packet[63] = 0x00;
-	packet[64] = ComputePec(packet.slice(2, 64));
-	device.write(packet, 65);
-	device.read(packet, 65);
-	// //10 works well for soft locks
-	device.pause(3);
+	for(let fan = 0; fan < PlatCooler.getNumberOfFans(); fan++) {
+		const offset = 2* fan + 1;
+		const rpm = fanData[offset];
+		device.log(`Fan ${fan}: ${rpm}rpm`);
+
+		if(rpm > 0 && !ConnectedFans.includes(`Fan ${fan}`)) {
+			ConnectedFans.push(`Fan ${fan}`);
+			device.createFanControl(`Fan ${fan}`);
+		}
+
+		if(ConnectedFans.includes(`Fan ${fan}`)) {
+			device.setRPM(`Fan ${fan}`, rpm);
+
+			const newSpeed = device.getNormalizedFanlevel(`Fan ${fan}`) * 100;
+			fanOutputData.push(newSpeed);
+		}
+	}
+
+	PlatCooler.sendCoolingPacket(PlatCooler.deviceFanModes.fixedPWMWithFallback, Math.round(fanOutputData[0] /100 * 255), PlatCooler.deviceFanModes.fixedPWMWithFallback, Math.round(fanOutputData[1] * 255 / 100), PlatCooler.coolingModes[fanProfile]);
+}
+
+let lastLoopRGBData = [];
+
+function CompareArrays(array1, array2) {
+	return array1.length === array2.length &&
+    array1.every(function(value, index) { return value === array2[index];});
+}
+
+function sendColor(shutdown = false){
+
+	let RGBdata = [];
+	let TotalLedCount = 0;
+	const vLedPositions = PlatCooler.getvLedPositions();
+	const vLedIndexes = PlatCooler.getvLedIndexes();
+
+	//Pump
+
+	for(let iIdx = 0; iIdx < vLedIndexes.length; iIdx++) {
+		const iPxX = vLedPositions[iIdx][0];
+		const iPxY = vLedPositions[iIdx][1];
+		let col;
+
+		if (shutdown) {
+			col = hexToRgb(shutdownColor);
+		}else if (LightingMode === "Forced") {
+			col = hexToRgb(forcedColor);
+		} else{
+			col = device.color(iPxX, iPxY);
+		}
+
+		RGBdata[vLedIndexes[iIdx]*3] = col[2];
+		RGBdata[vLedIndexes[iIdx]*3+1] = col[1];
+		RGBdata[vLedIndexes[iIdx]*3+2] = col[0];
+		TotalLedCount += 1;
+	}
+
+	//Fans
+	let ChannelLedCount = device.channel(ChannelArray[0][0]).LedCount();
+	const componentChannel = device.channel(ChannelArray[0][0]);
+
+	let ColorData = [];
+
+	if(shutdown) {
+		ColorData = device.createColorArray(shutdownColor, ChannelLedCount, "Inline", "BGR");
+	} else if(LightingMode === "Forced"){
+		ColorData = device.createColorArray(forcedColor, ChannelLedCount, "Inline", "BGR");
+
+	}else if(componentChannel.shouldPulseColors()){
+		ChannelLedCount = 32;
+
+		const pulseColor = device.getChannelPulseColor(ChannelArray[0][0], ChannelLedCount);
+		ColorData = device.createColorArray(pulseColor, ChannelLedCount, "Inline", "BGR");
+
+	}else{
+		ColorData = device.channel(ChannelArray[0][0]).getColors("Inline", "BGR");
+	}
+
+	RGBdata = RGBdata.concat(ColorData);
+	TotalLedCount += ChannelLedCount;
+
+	if(!CompareArrays(lastLoopRGBData, RGBdata)) {
+		lastLoopRGBData = RGBdata;
+
+		PlatCooler.SendColorPacket(0b100, RGBdata.slice(0, 60));
+
+		if(TotalLedCount > 20) {
+			PlatCooler.SendColorPacket(0b101, RGBdata.slice(60, 120));
+		}
+
+		if(TotalLedCount > 40) {
+			PlatCooler.SendColorPacket(0b110, RGBdata.slice(120, 180));
+		}
+	}
 }
 
 function hexToRgb(hex) {
@@ -238,79 +235,432 @@ function hexToRgb(hex) {
 	return colors;
 }
 
-function sendColor(){
+class PlatinumProtocol {
+	constructor() {
 
-	let RGBdata = [];
-	let TotalLedCount = 0;
+		this.PIDLibrary = {
+			0x0C29 : "H60I",
+			0x0C15 : "H100/H115I",
+			0x0C18 : "H100/H115I",
+			0x0C19 : "H100/H115I",
+			0x0C20 : "H100/H115I",
+			0x0C21 : "H100/H115I",
+			0x0C2E : "H100/H115I",
+			0x0C2F : "H150I",
+			0x0C22 : "H150I",
+			0x0C37 : "H150I"
+		};
+		this.nameLibrary = {
+			0x0C29 : "H60I Pro XT",
+			0x0C15 : "H100I Platinum",
+			0x0C18 : "H100I Platinum",
+			0x0C19 : "H100I Platinum SE",
+			0x0C20 : "H100I Pro XT",
+			0x0C21 : "H115I Pro XT",
+			0x0C2E : "H115I Pro XT",
+			0x0C2F : "H150I Pro XT",
+			0x0C22 : "H150I Pro XT",
+			0x0C37 : "H150I Elite"
+		};
+		this.deviceLibrary = {
+			"H60I" : {
+				numberOfFans : 1,
+				vLedNames : [
+					"Logo 1", "Ring 1", "Ring 2", "Ring 3",
+					"Ring 4", "Logo 2", "Ring 5",
+					"Ring 6", "Logo 3", "Logo 4", "Ring 7",
+					"Ring 8",  "Ring 9",
+					"Ring 10", "Ring 11", "Ring 12",
+				],
+				vLedPositions : [
+					[1, 0], [2, 0], [3, 0],
+					[0, 1],      [2, 1],     [4, 1],
+					[0, 2],  [1, 2], [3, 2],  [4, 2],
+					[0, 3],      [2, 3],     [4, 3],
+					[1, 4], [2, 4], [3, 4]
+				],
+				vLedIndexes : [
+					11,  12,  13,
+					10,      1,     14,
+					9,    0,   2,   15,
+					8,      3,      4,
+					7,  6,  5,
+				],
+				size: [5, 5]
+			},
+			"H100/H115I" : {
+				numberOfFans : 2,
+				vLedNames : [
+					"Logo 1", "Ring 1", "Ring 2", "Ring 3",
+					"Ring 4", "Logo 2", "Ring 5",
+					"Ring 6", "Logo 3", "Logo 4", "Ring 7",
+					"Ring 8",  "Ring 9",
+					"Ring 10", "Ring 11", "Ring 12",
+				],
+				vLedPositions : [
+					[1, 0], [2, 0], [3, 0],
+					[0, 1],      [2, 1],     [4, 1],
+					[0, 2],  [1, 2], [3, 2],  [4, 2],
+					[0, 3],      [2, 3],     [4, 3],
+					[1, 4], [2, 4], [3, 4]
+				],
+				vLedIndexes : [
+					11,  12,  13,
+					10,      1,     14,
+					9,    0,   2,   15,
+					8,      3,      4,
+					7,  6,  5,
+				],
+				size: [5, 5]
+			},
+			"H150I" : {
+				numberOfFans : 3,
+				vLedNames : [
+					"Logo 1", "Ring 1", "Ring 2", "Ring 3",
+					"Ring 4", "Logo 2", "Ring 5",
+					"Ring 6", "Logo 3", "Logo 4", "Ring 7",
+					"Ring 8",  "Ring 9",
+					"Ring 10", "Ring 11", "Ring 12",
+				],
+				vLedPositions : [
+					[1, 0], [2, 0], [3, 0],
+					[0, 1],      [2, 1],     [4, 1],
+					[0, 2],  [1, 2], [3, 2],  [4, 2],
+					[0, 3],      [2, 3],     [4, 3],
+					[1, 4], [2, 4], [3, 4]
+				],
+				vLedIndexes : [
+					11,  12,  13,
+					10,      1,     14,
+					9,    0,   2,   15,
+					8,      3,      4,
+					7,  6,  5,
+				],
+				size: [5, 5]
+			}
+		};
 
-	//Pump
-	for(let iIdx = 0; iIdx < vLedMapping.length; iIdx++) {
-		const iPxX = vLedPos[iIdx][0];
-		const iPxY = vLedPos[iIdx][1];
-		var col;
+		this.deviceFanModes = {
+			defaultLiquidTemp : 0x00,
+			defaultExternalProbe : 0x01,
+			fixedPWM : 0x02,
+			fixedPWMWithFallback : 0x03,
+			fixedRPM : 0x04,
+			fixedRPMWithFallback : 0x05,
+			defaultCPUTempLiquid : 0x06,
+			defaultCPUTempExternalProbe : 0x07,
+			null : 0xff,
+			0x00 : "Default Liquid Temp Probe",
+			0x01 : "Default External Probe",
+			0x02 : "Fixed PWM",
+			0x03 : "Fixed PWM With Safety Fallback",
+			0x04 : "Fixed RPM",
+			0x05 : "Fixed RPM With Safety Fallback",
+			0x06 : "Default CPU/GPU + Liquid Temp Probe",
+			0x07 : "Default CPU/GPU + External Temp Probe"
+		};
 
-		if (LightingMode === "Forced") {
-			col = hexToRgb(forcedColor);
-		}else{
-			col = device.color(iPxX, iPxY);
+		this.settingsType = {
+			undefined : 0x00,
+			watchdog : 0x01,
+			pump : 0x02,
+			fan : 0x03,
+			fanSafetyProfile : 0x08,
+			saveToFlash : 0x10
+		};
+
+		this.packetStatusCodes = {
+			success : 0x00,
+			tempFail : 0x01,
+			tumpFail : 0x02,
+			savingSettings : 0x08,
+			sequenceError : 0x10,
+			crcError : 0x20,
+			cipherError : 0x40,
+			0x00 : "Success",
+			0x01 : "Temperature Failure",
+			0x02 : "Pump Failure",
+			0x08 : "Saving Settings",
+			0x10 : "Sequence Error", //Ergo you screwed up the sequence system
+			0x20 : "CRC Error",
+			0x40 : "Cipher Error"
+		};
+
+		this.coolingModes = {
+			"Quiet" : 0x00,
+			"Balanced" : 0x01,
+			"Extreme" : 0x02,
+			0x00 : "Quiet",
+			0x01 : "Balanced",
+			0x02 : "Extreme/Performance"
+		};
+
+		this.responseTypes = {
+			deviceName : 0x00,
+			firmwareVersion : 0x01,
+			failsafeState : 0x02,
+			temp : 0x03,
+			pumpMode : 0x04,
+			pumpPower : 0x05,
+			pumpSpeed : 0x06,
+			fanMode : 0x07,
+			fanPower : 0x08,
+			fanSpeed : 0x09,
+			firmwarePercent : 0x0A,
+			firmwareError : 0x0B,
+			led : 0x0C,
+			cujoGPUStatus : 0x0D,
+			model : 0x0E,
+			notifyLongRunningTask : 0x0F,
+			switchToHardwareModeComplete : 0x10
+		};
+
+		this.coolingProfiles = {
+			"Balanced" : [0x01, 0xFF, 0xFF, 0x00, 0x00, 0xFF, 0x07, 0x1D, 0x33, 0x1E, 0x40, 0x1F, 0x4D, 0x20, 0x73, 0x21, 0xAD, 0x22, 0xD9, 0x23, 0xFF, 0x1D, 0x33, 0x1E, 0x40, 0x1F, 0x4D, 0x20, 0x73, 0x21, 0xAD, 0x22, 0xD9, 0x23, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0x5F],
+			"Extreme"  : [0x02, 0xFF, 0xFF, 0x00, 0x00, 0xFF, 0x07, 0x1C, 0x4D, 0x1D, 0x59, 0x1E, 0x80, 0x1F, 0xB3, 0x20, 0xCC, 0x21, 0xE6, 0x22, 0xFF, 0x1C, 0x4D, 0x1D, 0x59, 0x1E, 0x80, 0x1F, 0xB3, 0x20, 0xCC, 0x21, 0xE6, 0x22, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF],
+			"Quiet"    : [0x00, 0xFF, 0xFF, 0x00, 0x00, 0xFF, 0x07, 0x1E, 0x33, 0x20, 0x40, 0x23, 0x73, 0x25, 0xA1, 0x27, 0xB8, 0x29, 0xCF, 0x2A, 0xFF, 0x1E, 0x33, 0x20, 0x40, 0x23, 0x73, 0x25, 0xA1, 0x27, 0xB8, 0x29, 0xCF, 0x2A, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0x03] //These are all of the profile points for temp.
+		};
+
+		this.config = {
+			numberOfFans : 0,
+			vLedNames : [],
+			vLedPositions : [],
+			vLedIndexes : [],
+			deviceSize : [0, 0],
+			seq : 8,
+			fansInitialized : false,
+		};
+
+		this.crcTable = [ 0, 7, 14, 9, 28, 27, 18, 21, 56, 63, 54, 49, 36, 35, 42, 45, 112, 119, 126, 121, 108, 107, 98, 101, 72, 79, 70, 65, 84, 83, 90, 93, 224, 231, 238, 233, 252, 251, 242, 245, 216, 223, 214, 209, 196, 195, 202, 205, 144, 151, 158, 153, 140, 139, 130, 133, 168, 175, 166, 161, 180, 179, 186, 189, 199, 192, 201, 206, 219, 220, 213, 210, 255, 248, 241, 246, 227, 228, 237, 234, 183, 176, 185, 190, 171, 172, 165, 162, 143, 136, 129, 134, 147, 148, 157, 154, 39, 32, 41, 46, 59, 60, 53, 50, 31, 24, 17, 22, 3, 4, 13, 10, 87, 80, 89, 94, 75, 76, 69, 66, 111, 104, 97, 102, 115, 116, 125, 122, 137, 142, 135, 128, 149, 146, 155, 156, 177, 182, 191, 184, 173, 170, 163, 164, 249, 254, 247, 240, 229, 226, 235, 236, 193, 198, 207, 200, 221, 218, 211, 212, 105, 110, 103, 96, 117, 114, 123, 124, 81, 86, 95, 88, 77, 74, 67, 68, 25, 30, 23, 16, 5, 2, 11, 12, 33, 38, 47, 40, 61, 58, 51, 52, 78, 73, 64, 71, 82, 85, 92, 91, 118, 113, 120, 127, 106, 109, 100, 99, 62, 57, 48, 55, 34, 37, 44, 43, 6, 1, 8, 15, 26, 29, 20, 19, 174, 169, 160, 167, 178, 181, 188, 187, 150, 145, 152, 159, 138, 141, 132, 131, 222, 217, 208, 215, 194, 197, 204, 203, 230, 225, 232, 239, 250, 253, 244, 243 ];
+		//we love CRC's
+	}
+
+	getNumberOfFans() { return this.config.numberOfFans; }
+	setNumberOfFans(numberOfFans) { this.config.numberOfFans = numberOfFans; }
+
+	getvLedNames() { return this.config.vLedNames; }
+	setvLedNames(vLedNames) { this.config.vLedNames = vLedNames; }
+
+	getvLedPositions() { return this.config.vLedPositions; }
+	setvLedPositions(vLedPositions) { this.config.vLedPositions = vLedPositions; }
+
+	getvLedIndexes() { return this.config.vLedIndexes; }
+	setvLedIndexes(vLedIndexes) { this.config.vLedIndexes = vLedIndexes; }
+
+	getSize() { return this.config.deviceSize; }
+	setSize(deviceSize) { this.config.deviceSize = deviceSize; }
+
+	getFansInitialized() { return this.config.fansInitialized; }
+	setFansInitialized(fansInitialized) { this.config.fansInitialized = fansInitialized; }
+
+	fetchLibrarySetup() {
+		const library = this.deviceLibrary[this.PIDLibrary[device.productId()]];
+		this.setvLedNames(library.vLedNames);
+		this.setvLedPositions(library.vLedPositions);
+		this.setvLedIndexes(library.vLedIndexes);
+		this.setNumberOfFans(library.numberOfFans);
+		this.setSize(library.size);
+
+		device.setControllableLeds(this.config.vLedNames, this.config.vLedPositions);
+		device.setSize(this.getSize());
+		device.setName(this.nameLibrary[device.productId()]);
+	}
+
+	calculateCRC(data, start, end) {
+		let crcResult = 0;
+
+		for(let index = start; index <= end; index++) {
+			crcResult = this.crcTable[crcResult ^ data[index]];
 		}
 
-		RGBdata[vLedMapping[iIdx]*3] = col[2];
-		RGBdata[vLedMapping[iIdx]*3+1] = col[1];
-		RGBdata[vLedMapping[iIdx]*3+2] = col[0];
-		TotalLedCount += 1;
+		return crcResult;
 	}
 
-	//Fans
-	let ChannelLedCount = device.channel(ChannelArray[0][0]).LedCount();
-	const componentChannel = device.channel(ChannelArray[0][0]);
+	getPacketSequence() {
+		this.config.seq += 8;
 
-	let ColorData = [];
+		if(this.config.seq === 256) {
+			this.config.seq = 8;
+		}
 
-	if(LightingMode === "Forced"){
-		ColorData = device.createColorArray(forcedColor, ChannelLedCount, "Inline", "BGR");
-
-	}else if(componentChannel.shouldPulseColors()){
-		ChannelLedCount = 16;
-
-		const pulseColor = device.getChannelPulseColor(ChannelArray[0][0], ChannelLedCount);
-		ColorData = device.createColorArray(pulseColor, ChannelLedCount, "Inline", "BGR");
-
-	}else{
-		ColorData = device.channel(ChannelArray[0][0]).getColors("Inline", "BGR");
+		return this.config.seq;
 	}
 
-	RGBdata = RGBdata.concat(ColorData);
-	TotalLedCount += ChannelLedCount;
+	sendPacketWithResponse(packet, callingFunction) {
+		packet[64] = this.calculateCRC(packet, 2, 63);
+		device.write(packet, 65);
 
+		const returnPacket = device.read(packet, 65);
 
-	sendColorPacket(ColorFlags[0], RGBdata.splice(0, 60));
-
-	if(TotalLedCount > 20) {
-		sendColorPacket(ColorFlags[1], RGBdata.splice(0, 60));
+		if(returnPacket[5] !== 0){
+			device.log(`Device Status: ${this.packetStatusCodes[returnPacket[5]]} from ${callingFunction}`);
+			device.clearReadBuffer();
+			device.pause(50);
+		}
 	}
 
-	if(TotalLedCount > 40) {
-		sendColorPacket(ColorFlags[2], RGBdata.splice(0, 60));
+	findSequence() {
+		let attempts = 0;
+		let errorCode = this.fetchDeviceInfo();
+
+		while(errorCode !== 0 && attempts < 10) {
+			errorCode = this.fetchDeviceInfo();
+			attempts++;
+		}
+
+		if(attempts < 32) {
+			device.log("Successfully Found Device Sequence!", {toFile : true});
+		} else { device.log("Failed to find Device Sequence.", {toFile : true}); }
 	}
 
-	//40 is known to be good for soft locks
-	device.pause(30);
-	device.pause(20);
+	fetchDeviceInfo() {
+		const packet = [0x00, 0x3f, this.getPacketSequence(), 0xff, 0x00];
+		packet[64] = this.calculateCRC(packet, 2, 63);
+
+		device.write(packet, 65);
+
+		const returnPacket = device.read(packet, 65);
+		device.log(`Device Firmware Version: ${returnPacket[3] >> 4}.0${returnPacket[3] & 0xf}.${returnPacket[4] & 15}`);
+		device.log(`Device Status: ${this.packetStatusCodes[returnPacket[5]]}`);
+		device.log(`Packet Count: ${returnPacket[6]}`);
+		device.log(`Packet Countdown Timeout: ${returnPacket[7]}`);
+		device.log(`Liquid Temp: ${((BinaryUtils.ReadInt16LittleEndian([returnPacket[8], returnPacket[9]]) / 25.6 + 0.5) / 10).toFixed(2)} C`);
+		device.log(`Fan 1 Index: ${returnPacket[10]}`);
+		device.log(`Fan 1 Mode: ${this.deviceFanModes[returnPacket[11]]}`);
+		device.log(`Fan 1 Set Duty: ${(returnPacket[12] / 255 * 100).toFixed(2)}%`);
+		device.log(`Fan 1 Set RPM: ${returnPacket[13] + (returnPacket[14] << 8)}`);
+		device.log(`Fan 1 Duty: ${(returnPacket[15] / 255 * 100).toFixed(2)}%`);
+		device.log(`Fan 1 RPM: ${returnPacket[16] + (returnPacket[17] << 8)}`);
+		device.log(`Fan 2 Index: ${returnPacket[17]}`);
+		device.log(`Fan 2 Mode: ${this.deviceFanModes[returnPacket[18]]}`);
+		device.log(`Fan 2 Set Duty: ${(returnPacket[19] / 255 * 100).toFixed(2)}%`);
+		device.log(`Fan 2 Set RPM: ${returnPacket[20] + (returnPacket[21] << 8)}`);
+		device.log(`Fan 2 Duty: ${(returnPacket[22] / 255 * 100).toFixed(2)}%`);
+		device.log(`Fan 2 RPM: ${returnPacket[23] + (returnPacket[24] << 8)}`);
+		device.log(`Pump Mode: ${this.coolingModes[returnPacket[25]]}`);
+		device.log(`Pump Set Duty: ${(returnPacket[26] / 255 * 100).toFixed(2)}%`);
+		device.log(`Pump Set RPM: ${returnPacket[27] + (returnPacket[28] << 8)}`);
+		device.log(`Pump Duty: ${(returnPacket[29] / 255 * 100).toFixed(2)}%`);
+		device.log(`Pump RPM: ${returnPacket[30] + (returnPacket[31] << 8)}`);
+		device.log(`Fan 3 Index: ${returnPacket[38]}`);
+		device.log(`Fan 3 Mode: ${this.deviceFanModes[returnPacket[39]]}`);
+		device.log(`Fan 3 Set Duty: ${(returnPacket[40] / 255 * 100).toFixed(2)}%`);
+		device.log(`Fan 3 Set RPM: ${returnPacket[41] + (returnPacket[42] << 8)}`);
+		device.log(`Fan 3 Duty: ${(returnPacket[43] / 255 * 100).toFixed(2)}%`);
+		device.log(`Fan 3 RPM: ${returnPacket[44] + (returnPacket[45] << 8)}`);
+		device.log(`Device go Boom State: ${returnPacket[63]}`);
+
+		return returnPacket[5];
+	}
+
+	getCoolingInfo() {
+		const packet = [0x00, 0x3f, this.getPacketSequence(), 0xff, 0x00];
+		packet[64] = this.calculateCRC(packet, 2, 63);
+
+		device.write(packet, 65);
+
+		const returnPacket = device.read(packet, 65);
+		const fan1Duty = (returnPacket[15] / 255 * 100).toFixed(2);
+		const fan1RPM = returnPacket[16] + (returnPacket[17] << 8);
+		const fan2Duty = (returnPacket[22] / 255 * 100).toFixed(2);
+		const fan2RPM = returnPacket[23] + (returnPacket[24] << 8);
+		const fan3Duty = (returnPacket[43] / 255 * 100).toFixed(2);
+		const fan3RPM = returnPacket[44] + (returnPacket[45] << 8);
+		const pumpMode = this.coolingModes[returnPacket[25]];
+		const pumpRPM = returnPacket[30] + (returnPacket[31] << 8);
+		const liquidTemp = ((BinaryUtils.ReadInt16LittleEndian([returnPacket[8], returnPacket[9]]) / 25.6 + 0.5) / 10).toFixed(2);
+		device.log(`Device Status: ${this.packetStatusCodes[returnPacket[5]]}`);
+		device.log(`Liquid Temp: ${liquidTemp} C`);
+
+		device.log(`Fan 1 Duty: ${fan1Duty}%`);
+		device.log(`Fan 1 RPM: ${fan1RPM}`);
+
+		if(PlatCooler.getNumberOfFans() > 1) {
+
+			device.log(`Fan 2 Duty: ${fan2Duty}%`);
+			device.log(`Fan 2 RPM: ${fan2RPM}`);
+
+			if(PlatCooler.getNumberOfFans() > 2) {
+
+				device.log(`Fan 3 Duty: ${fan3Duty}%`);
+				device.log(`Fan 3 RPM: ${fan3RPM}`);
+
+			}
+		}
+
+		device.log(`Pump Mode: ${pumpMode}`);
+		device.log(`Pump RPM: ${pumpRPM}`);
+
+		return [fan1Duty, fan1RPM, fan2Duty, fan2RPM, pumpMode, pumpRPM, liquidTemp];
+	}
+
+	sendCoolingProfile(profileData){
+
+		const packet = [0x00, 0x3F, this.getPacketSequence(), 0x14, 0x00, 0xFF, 0x05, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00].concat(profileData);
+
+		this.sendPacketWithResponse(packet, "Cooling Profile Set");
+	}
+
+	SendColorPacket(command, data){
+		const packet = [0x00, 0x3F, this.getPacketSequence() | command].concat(data);
+		this.sendPacketWithResponse(packet, "Color Packet");
+	}
+
+	sendCoolingPacket(fan1Mode, fan1Duty, fan2Mode, fan2Duty, pumpMode) {
+		const packetFill = new Array(65).fill(0xff);
+
+		const packet = [0x00, 0x3F, this.getPacketSequence(), 0x14, 0x00, 0xFF, 0x05, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, fan1Mode, 0x00, 0x00, 0x00, 0x00, fan1Duty, fan2Mode, 0x00, 0x00, 0x00, 0x00, fan2Duty, pumpMode].concat(packetFill);
+		packet[30] = 0x07;
+		this.sendPacketWithResponse(packet, "Cooling Packet");
+	}
+
+	EnableSoftwareControl() {
+		this.SendColorPacket(0b001,
+			[ 0x01, 0x01, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0x7F, 0x7F, 0x7F, 0x7F, 0xFF, 0x00, 0xFF, 0xFF, 0xFF, 0xFF, 0x00, 0xFF,
+				0xFF, 0xFF, 0xFF, 0x00, 0xFF, 0xFF, 0xFF, 0xFF, 0x00, 0xFF, 0xFF, 0xFF, 0xFF, 0x00, 0xFF, 0xFF, 0xFF, 0xFF, 0x00, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF,
+				0xFF, 0xFF, 0xFF, 0xFF, 0xFF]);
+		this.SendColorPacket(0b010,
+			[ 0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08, 0x09, 0x0A, 0x0B, 0x0C, 0x0D, 0x0E, 0x0F, 0x10, 0x11, 0x12, 0x13, 0x14, 0x15, 0x16, 0x17, 0x18, 0x19, 0x1A,
+				0x1B, 0x1C, 0x1D, 0x1E, 0x1F, 0x20, 0x21, 0x22, 0x23, 0x24, 0x25, 0x26, 0x27, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF,
+				0xFF, 0xFF, 0xFF, 0xFF, 0xFF]);
+		this.SendColorPacket(0b011,
+			[ 0x28, 0x29, 0x2A, 0x2B, 0x2C, 0x2D, 0x2E, 0x2F, 0x30, 0x31, 0x32, 0x33, 0x34, 0x35, 0x36, 0x37, 0x38, 0x39, 0x3A, 0x3B, 0x3C, 0x3D, 0x3E, 0x3F, 0x40, 0x41, 0x42,
+				0x43, 0x44, 0x45, 0x46, 0x47, 0x48, 0x49, 0x4A, 0x4B, 0x4C, 0x4D, 0x4E, 0x4F, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF,
+				0xFF, 0xFF, 0xFF, 0xFF, 0xFF]);
+	}
 }
 
-export function Render() {
-	if(CurrentFanSpeed != FanSpeed) {
-		CurrentFanSpeed = FanSpeed;
-		sendCoolingPacket(CoolingDict[CurrentFanSpeed]);
+const PlatCooler = new PlatinumProtocol();
+
+class BinaryUtils {
+	static WriteInt16LittleEndian(value) {
+		return [value & 0xFF, (value >> 8) & 0xFF];
 	}
+	static WriteInt16BigEndian(value) {
+		return this.WriteInt16LittleEndian(value).reverse();
+	}
+	static ReadInt16LittleEndian(array) {
+		return (array[0] & 0xFF) | (array[1] & 0xFF) << 8;
+	}
+	static ReadInt16BigEndian(array) {
+		return this.ReadInt16LittleEndian(array.slice(0, 2).reverse());
+	}
+	static ReadInt32LittleEndian(array) {
+		return (array[0] & 0xFF) | ((array[1] << 8) & 0xFF00) | ((array[2] << 16) & 0xFF0000) | ((array[3] << 24) & 0xFF000000);
+	}
+	static ReadInt32BigEndian(array) {
+		if (array.length < 4) {
+			array.push(...new Array(4 - array.length).fill(0));
+		}
 
-	sendColor();
-}
-
-
-export function Shutdown() {
-
+		return this.ReadInt32LittleEndian(array.slice(0, 4).reverse());
+	}
+	static WriteInt32LittleEndian(value) {
+		return [value & 0xFF, ((value >> 8) & 0xFF), ((value >> 16) & 0xFF), ((value >> 24) & 0xFF)];
+	}
+	static WriteInt32BigEndian(value) {
+		return this.WriteInt32LittleEndian(value).reverse();
+	}
 }
 
 export function Image() {
