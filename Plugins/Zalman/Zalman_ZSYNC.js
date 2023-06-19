@@ -148,7 +148,7 @@ function SubmitLightingColors() {
 
 
 export function Validate(endpoint) {
-	return endpoint.interface === -1 ||  endpoint.interface === 2;
+	return endpoint.interface === -1 || endpoint.interface === 0 || endpoint.interface === 2;
 }
 
 export function Image(){

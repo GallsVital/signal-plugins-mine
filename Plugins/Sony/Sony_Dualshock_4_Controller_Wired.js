@@ -73,7 +73,7 @@ function hexToRgb(hex) {
 
 export function Validate(endpoint) {
 	// 0x05C4 first revision, 0x09CC second revision - different interface values intentional
-	return (endpoint.interface === -1 && device.productId() === 0x05C4) ||
+	return ((endpoint.interface === -1 || endpoint.interface === 0) && device.productId() === 0x05C4) ||
 		(endpoint.interface === 3 && device.productId() === 0x09CC);
 }
 

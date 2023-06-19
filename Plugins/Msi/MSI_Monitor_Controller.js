@@ -22,7 +22,6 @@ export function ControllableParameters() {
 }
 
 export function SubdeviceController(){ return true; }
-export function LacksOnBoardLeds(){ return true; }
 export function DefaultComponentBrand() { return "MSI"; }
 export function DeviceMessage() { return ["Must configure monitor in device settings.", "In device settings, select your monitor model the dropdown."]; }
 export function onmonitorSelectedChanged() {
@@ -228,6 +227,10 @@ function hexToRgb(hex) {
 	colors[2] = parseInt(result[3], 16);
 
 	return colors;
+}
+
+export function Validate(endpoint) {
+	return endpoint.interface === 0 || endpoint.interface === -1;
 }
 
 export function Image() {
