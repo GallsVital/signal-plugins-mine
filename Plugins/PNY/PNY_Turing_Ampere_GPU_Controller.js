@@ -143,6 +143,7 @@ const PNYGPUIDs =
 	new PNYGPUIdentifier(0x2484, 0x1569, 0x2484, "PALIT RTX 3070 Gaming Pro"),
 	new PNYGPUIdentifier(0x2488, 0x1569, 0x2488, "PALIT RTX 3070 Gaming Pro"),
 	new PNYGPUIdentifier(0x2484, 0x1569, 0xf280, "PALIT RTX 3070 JetStream"),
+	new PNYGPUIdentifier(0x2488, 0x1569, 0xf278, "PALIT RTX 3070 GameRock"),
 
 
 	new PNYGPUIdentifier(0x2484, 0x196E, 0x136E, "PNY RTX 3070 XLR8"),
