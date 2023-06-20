@@ -195,11 +195,13 @@ function sendColors(shutdown = false) {
 		do {
 			const bytesToSend = Math.min(colorArray.length, 60);
 			LegacyCorsair.setSoftwareLightingStream(packetsSent+1, bytesToSend, colorArray.splice(0, bytesToSend));
+			device.pause(1);
 			packetsSent++;
 		}
 		while(colorArray.length > 0);
 
 		LegacyCorsair.ApplyLightingStream(colors, 3, colors === 3 ? 2 : 1);
+		device.pause(1);
 	}
 }
 
@@ -603,14 +605,14 @@ class LegacyCorsairProtocol {
 			127 : "G8",
 			128 : "G9",
 			129 : "G10",
-			130 : "G11",
-			131 : "G12",
-			132 : "G13",
-			133 : "G14",
-			134 : "G15",
-			135 : "G16",
-			136 : "G17",
-			137 : "G18"
+			136 : "G11",
+			137 : "G12",
+			138 : "G13",
+			139 : "G14",
+			140 : "G15",
+			141 : "G16",
+			142 : "G17",
+			143 : "G18"
 		};
 	}
 
