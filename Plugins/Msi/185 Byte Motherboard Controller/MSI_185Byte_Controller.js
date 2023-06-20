@@ -60,7 +60,7 @@ export function Initialize() {
 
 
 	device.setName(device.getMotherboardName());
-	//device.write([0x01, 0xbb, 0x00, 0x00, 0x00, 0x00, 0x01], 64); //Let's make sure users have their leds on in bios.
+	device.write([0x01, 0xbb, 0x00, 0x00, 0x00, 0x00, 0x01], 64); //Let's make sure users have their leds on in bios.
 }
 
 export function Render() {
@@ -1097,18 +1097,6 @@ class MysticLight {
 				ForceZoneBased	  : false,
 				JARGB_V2		  : true,
 			},
-			0x7D77 : //B650M-A WIFI
-			{
-				OnboardLEDs    : 0,
-				RGBHeaders     : 2,
-				ARGBHeaders    : 2,
-				JPipeLEDs	   : 0,
-				CorsairHeaders : 0,
-				//PERLED
-				PerLEDOnboardLEDs : 0,
-				ForceZoneBased	  : false,
-				JARGB_V2		  : true,
-			},
 			0x7D78 : //B650-P
 			{
 				OnboardLEDs    : 0,
@@ -1170,18 +1158,6 @@ class MysticLight {
 				JARGB_V2		  : true,
 			},
 			0x7D97 : //B660M Mortar Max
-			{
-				OnboardLEDs    : 0,
-				RGBHeaders     : 1,
-				ARGBHeaders    : 2,
-				JPipeLEDs	   : 0,
-				CorsairHeaders : 0,
-				//PERLED
-				PerLEDOnboardLEDs : 0,
-				ForceZoneBased	  : false,
-				JARGB_V2		  : true,
-			},
-			0x7D98 : //B760-P
 			{
 				OnboardLEDs    : 0,
 				RGBHeaders     : 1,
@@ -1476,6 +1452,8 @@ class MysticLight {
 		this.header1LEDCount = 0;
 		this.header2LEDCount = 0;
 		this.header3LEDCount = 0;
+
+		this.firstRun = true;
 	}
 
 	checkPerLEDSupport() {
@@ -1869,9 +1847,9 @@ class MysticLight {
 	}
 
 	checkChangedLengths() {
-		let header1Count = 0;
-		let header2Count = 0;
-		let header3Count = 0;
+		let header1Count = 1;
+		let header2Count = 1;
+		let header3Count = 1;
 
 		if(ARGBHeaders > 0) {
 			header1Count = device.channel(ChannelArray[0][0]).LedCount();
@@ -1897,7 +1875,7 @@ class MysticLight {
 	}
 
 	setPerledMode() {
-		if(this.checkChangedLengths()) {
+		if(this.checkChangedLengths() || this.firstRun) {
 			if(this.getTotalLEDCount()) {
 				device.send_report([
 					0x52, //enable, r,g,b, options, r,g,b,sync,seperator
@@ -1922,6 +1900,7 @@ class MysticLight {
 					0x00 //Save Flag
 				], 185);
 				device.log("Sent Efficiency PerLED Config Setup Packet.");
+				this.firstRun = false;
 			} else {
 				device.send_report([
 					0x52, //enable, r,g,b, options, r,g,b,sync,seperator
@@ -1946,6 +1925,7 @@ class MysticLight {
 					0x00 //Save Flag
 				], 185);
 				device.log("Sent High Capacity PerLED Config Setup Packet.");
+				this.firstRun = false;
 			}
 
 		}

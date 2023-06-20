@@ -363,6 +363,8 @@ class MysticLight {
 		this.header1LEDCount = 0;
 		this.header2LEDCount = 0;
 		this.header3LEDCount = 0;
+
+		this.firstRun = true;
 	}
 
 	checkPerLEDSupport() {
@@ -784,7 +786,7 @@ class MysticLight {
 	}
 
 	setPerledMode() {
-		if(this.checkChangedLengths()) {
+		if(this.checkChangedLengths() || this.firstRun) {
 			if(this.getTotalLEDCount()) {
 				device.send_report([
 					0x52, //enable, r,g,b, options, r,g,b,sync,seperator
@@ -809,6 +811,7 @@ class MysticLight {
 					0x00 //Save Flag
 				], 185);
 				device.log("Sent Efficiency PerLED Config Setup Packet.");
+				this.firstRun = false;
 			} else {
 				device.send_report([
 					0x52, //enable, r,g,b, options, r,g,b,sync,seperator
@@ -833,6 +836,7 @@ class MysticLight {
 					0x00 //Save Flag
 				], 185);
 				device.log("Sent High Capacity PerLED Config Setup Packet.");
+				this.firstRun = false;
 			}
 
 		}
