@@ -60,7 +60,7 @@ export function Initialize() {
 
 
 	device.setName(device.getMotherboardName());
-	device.write([0x01, 0xbb, 0x00, 0x00, 0x00, 0x00, 0x01], 64); //Let's make sure users have their leds on in bios.
+	//device.write([0x01, 0xbb, 0x00, 0x00, 0x00, 0x00, 0x01], 64); //Let's make sure users have their leds on in bios.
 }
 
 export function Render() {
@@ -69,46 +69,6 @@ export function Render() {
 
 export function Shutdown() {
 	MSIMotherboard.choosePacketSendType(true);
-}
-
-function holder() {
-	if(perLED === true) {
-		if(gen2Support && ARGBHeaders > 1) { ///MMM Nesting
-			MSIMotherboard.sendGen2SplitPacketARGB(); //Gen 2 boards use a 3rd register on the 0x04 zone as that's still a JRainbow.
-		} else if(ARGBHeaders > 1 || CorsairHeaders > 0) {
-			MSIMotherboard.sendGen1SplitPacketARGB();//Gen 1 boards have JCorsair headers and therefore use a new zone register.
-		} else {
-			MSIMotherboard.sendGen1ARGB(); //This is the older ARGB Send style. It uses a single packet for all zones. I did deprecate this, minus the single header boards.
-		}
-	} else {
-		if(MSIMotherboard.CheckPacketLength() !== 185) {
-			device.log("PACKET LENGTH ERROR. ABORTING RENDERING");
-
-			return;
-		}
-
-		MSIMotherboard.setDeviceZones();
-		MSIMotherboard.applyZones();
-	}
-
-	if(perLED === true) {
-		if(gen2Support && ARGBHeaders > 1) { ///MMM Nesting
-			MSIMotherboard.sendGen2SplitPacketARGB(true); //Gen 2 boards use a 3rd register on the 0x04 zone as that's still a JRainbow.
-		} else if(ARGBHeaders > 1 || CorsairHeaders > 0) {
-			MSIMotherboard.sendGen1SplitPacketARGB(true);//Gen 1 boards have JCorsair headers and therefore use a new zone register.
-		} else {
-			MSIMotherboard.sendGen1ARGB(true); //This is the older ARGB Send style. It uses a single packet for all zones. I did deprecate this, minus the single header boards.
-		}
-	} else {
-		if(MSIMotherboard.CheckPacketLength() !== 185) {
-			device.log("PACKET LENGTH ERROR. ABORTING RENDERING");
-
-			return;
-		}
-
-		MSIMotherboard.setDeviceZones(true);
-		MSIMotherboard.applyZones();
-	}
 }
 
 export function onadvancedModeChanged() {
@@ -1097,6 +1057,18 @@ class MysticLight {
 				ForceZoneBased	  : false,
 				JARGB_V2		  : true,
 			},
+			0x7D77 : //B650M-A WIFI
+			{
+				OnboardLEDs    : 0,
+				RGBHeaders     : 2,
+				ARGBHeaders    : 2,
+				JPipeLEDs	   : 0,
+				CorsairHeaders : 0,
+				//PERLED
+				PerLEDOnboardLEDs : 0,
+				ForceZoneBased	  : false,
+				JARGB_V2		  : true,
+			},
 			0x7D78 : //B650-P
 			{
 				OnboardLEDs    : 0,
@@ -1169,6 +1141,19 @@ class MysticLight {
 				ForceZoneBased	  : false,
 				JARGB_V2		  : true,
 			},
+			0x7D98 : //B760-P
+			{
+				OnboardLEDs    : 0,
+				RGBHeaders     : 1,
+				ARGBHeaders    : 2,
+				JPipeLEDs	   : 0,
+				CorsairHeaders : 0,
+				//PERLED
+				PerLEDOnboardLEDs : 0,
+				ForceZoneBased	  : false,
+				JARGB_V2		  : true,
+			},
+
 			0x7D99 : //B760M-A Wifi
 			{
 				OnboardLEDs    : 0,

@@ -71,46 +71,6 @@ export function Shutdown() {
 	MSIMotherboard.choosePacketSendType(true);
 }
 
-function holder() {
-	if(perLED === true) {
-		if(gen2Support && ARGBHeaders > 1) { ///MMM Nesting
-			MSIMotherboard.sendGen2SplitPacketARGB(); //Gen 2 boards use a 3rd register on the 0x04 zone as that's still a JRainbow.
-		} else if(ARGBHeaders > 1 || CorsairHeaders > 0) {
-			MSIMotherboard.sendGen1SplitPacketARGB();//Gen 1 boards have JCorsair headers and therefore use a new zone register.
-		} else {
-			MSIMotherboard.sendGen1ARGB(); //This is the older ARGB Send style. It uses a single packet for all zones. I did deprecate this, minus the single header boards.
-		}
-	} else {
-		if(MSIMotherboard.CheckPacketLength() !== 185) {
-			device.log("PACKET LENGTH ERROR. ABORTING RENDERING");
-
-			return;
-		}
-
-		MSIMotherboard.setDeviceZones();
-		MSIMotherboard.applyZones();
-	}
-
-	if(perLED === true) {
-		if(gen2Support && ARGBHeaders > 1) { ///MMM Nesting
-			MSIMotherboard.sendGen2SplitPacketARGB(true); //Gen 2 boards use a 3rd register on the 0x04 zone as that's still a JRainbow.
-		} else if(ARGBHeaders > 1 || CorsairHeaders > 0) {
-			MSIMotherboard.sendGen1SplitPacketARGB(true);//Gen 1 boards have JCorsair headers and therefore use a new zone register.
-		} else {
-			MSIMotherboard.sendGen1ARGB(true); //This is the older ARGB Send style. It uses a single packet for all zones. I did deprecate this, minus the single header boards.
-		}
-	} else {
-		if(MSIMotherboard.CheckPacketLength() !== 185) {
-			device.log("PACKET LENGTH ERROR. ABORTING RENDERING");
-
-			return;
-		}
-
-		MSIMotherboard.setDeviceZones(true);
-		MSIMotherboard.applyZones();
-	}
-}
-
 export function onadvancedModeChanged() {
 	MSIMotherboard.createLEDs();
 }
