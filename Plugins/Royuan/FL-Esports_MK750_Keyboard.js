@@ -1,4 +1,4 @@
-export function Name() { return "Royuan board"; }
+export function Name() { return "FL-Esports MK750"; }
 export function VendorId() { return 0x3151; }
 export function ProductId() { return 0x4015; }
 export function Publisher() { return "WhirlwindFX"; }
