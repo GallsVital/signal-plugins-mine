@@ -226,7 +226,7 @@ class LegacyCorsairLibrary {
 			0x1B33 : "K70 MKII", //Lux
 			0x1B13 : "K70 MKII", //OG K70
 			0x1B11 : "K95 RGB",
-			0x1B2D : "K95 Plat"
+			//0x1B2D : "K95 Plat"
 		};
 		this.deviceNameLibrary = {
 			0x1b49 : "K70 MKII",
@@ -237,7 +237,7 @@ class LegacyCorsairLibrary {
 			0x1B33 : "K70 Lux", //Lux
 			0x1B13 : "K70", //OG K70
 			0x1B11 : "K95 RGB",
-			0x1B2D : "K95 Platinum"
+			//0x1B2D : "K95 Platinum"
 		};
 		this.DeviceLibrary = {
 			"K70 MKII" : {
@@ -649,7 +649,7 @@ class LegacyCorsairProtocol {
 		this.setvKeys(config.vKeys);
 		this.setvKeyNames(config.vLedNames);
 		this.setvLedPositions(config.vLedPositions);
-		this.setDeviceName(deviceLibrary.PIDLibrary[device.productId()]); //WJY DID THIS WORK WITHOUT THIS?!?!?!?
+		this.setDeviceName(deviceLibrary.PIDLibrary[device.productId()]);
 		device.setName("Corsair " + deviceLibrary.deviceNameLibrary[device.productId()]);
 		device.setSize(config.size);
 		device.setControllableLeds(this.Config.vKeyNames, this.Config.vKeyPositions);
