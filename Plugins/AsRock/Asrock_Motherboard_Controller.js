@@ -39,6 +39,7 @@ Zone8Color:readonly
 Zone8Mode:readonly
 Zone8Speed:readonly
 ARGBMode:readonly
+overrideColor:readonly
 */
 export function ControllableParameters() {
 	return [
@@ -203,7 +204,38 @@ export function Render() {
 	}
 }
 
-export function Shutdown() {
+export function Shutdown(SystemSuspending) {
+
+	if(SystemSuspending){
+		if(modeSwitch === false) {
+			if(ARGBMode === true) {
+				SendRGB("#000000");
+			} else {
+				for(let zone = 0; zone < 8;zone++){
+					SetZone(zone, overrideColor);
+				}
+
+				device.pause(3000);
+			}
+		} else {
+			modeSwitch = false;
+		}
+
+	}else{
+		if(modeSwitch === false) {
+			if(ARGBMode === true) {
+				SendRGB(shutdownColor);
+			} else {
+				for(let zone = 0; zone < 8;zone++){
+					SetZone(zone, overrideColor);
+				}
+
+				device.pause(3000);
+			}
+		} else {
+			modeSwitch = false;
+		}
+	}
 
 }
 
@@ -273,9 +305,17 @@ function ReadZone(ZoneId) {
 	return packet.slice(5, 10);
 }
 
-function SetZone(zone) {
-	const colors = hexToRgb(zone.Color);
-	const packet = [0x00, 0x10, 0x00, zone.index, zone.Mode, colors[0], colors[1], colors[2], 0xFF - zone.Speed, 0xFF, 0x00];
+function SetZone(zone, overrideColor) {
+	let packet = [];
+
+	if (overrideColor){
+		const colors = hexToRgb(overrideColor);
+		packet = [0x00, 0x10, 0x00, zone.index, zone.Mode, colors[0], colors[1], colors[2], 0xFF - zone.Speed, 0xFF, 0x00];
+	}else{
+		const colors = hexToRgb(zone.Color);
+		packet = [0x00, 0x10, 0x00, zone.index, zone.Mode, colors[0], colors[1], colors[2], 0xFF - zone.Speed, 0xFF, 0x00];
+	}
+
 	device.write(packet, 65);
 	device.read(packet, 64);
 }
@@ -466,17 +506,6 @@ const ConfigurationOverrides = //Leave this here for now. Just in case
     	PCB         : 12,
     	ARGBHeader3 : 0
     },
-	"Z790 Pro RS/D4":
-    {
-    	RGBHeader1  : 1,
-    	RGBHeader2  : 0,
-    	ARGBHeader1 : 80,
-    	ARGBHeader2 : 80,
-    	ARGBHeader3 : 80,
-    	PCH         : 5,
-    	IOShield    : 5,
-    	PCB         : 5,
-    },
 };
 
 const deviceZones =
@@ -642,14 +671,14 @@ function CreatePCBZone() {
 	}
 }
 
-function grabRGBHeaderData(shutdown = false) {
+function grabRGBHeaderData(overrideColor) {
 	const RGBHeaderData = [];
 
 	for(let iIdx = 0; iIdx < RGBHeaders; iIdx++) {
 		let col;
 
-		if(shutdown) {
-			col = hexToRgb(shutdownColor);
+		if(overrideColor) {
+			col = hexToRgb(overrideColor);
 		} else if (LightingMode === "Forced") {
 			col = hexToRgb(forcedColor);
 		} else {
@@ -664,7 +693,7 @@ function grabRGBHeaderData(shutdown = false) {
 	return RGBHeaderData;
 }
 
-function grabMoboData(shutdown = false) {
+function grabMoboData(overrideColor) {
 	const MoboRGBData = [];
 
 	const PCHData = [];
@@ -676,8 +705,8 @@ function grabMoboData(shutdown = false) {
 		const iPxY = vPCHPositions[iIdx][1];
 		let col;
 
-		if(shutdown) {
-			col = hexToRgb(shutdownColor);
+		if(overrideColor) {
+			col = hexToRgb(overrideColor);
 		} else if (LightingMode === "Forced") {
 			col = hexToRgb(forcedColor);
 		} else {
@@ -694,8 +723,8 @@ function grabMoboData(shutdown = false) {
 		const iPxY = vIOShieldPositions[iIdx][1];
 		let col;
 
-		if(shutdown) {
-			col = hexToRgb(shutdownColor);
+		if(overrideColor) {
+			col = hexToRgb(overrideColor);
 		} else if (LightingMode === "Forced") {
 			col = hexToRgb(forcedColor);
 		} else {
@@ -712,8 +741,8 @@ function grabMoboData(shutdown = false) {
 		const iPxY = vPCBPositions[iIdx][1];
 		let col;
 
-		if(shutdown) {
-			col = hexToRgb(shutdownColor);
+		if(overrideColor) {
+			col = hexToRgb(overrideColor);
 		} else if (LightingMode === "Forced") {
 			col = hexToRgb(forcedColor);
 		} else {
@@ -732,12 +761,15 @@ function grabMoboData(shutdown = false) {
 	return MoboRGBData;
 }
 
-function grabRGBData(Channel) {
+function grabRGBData(Channel, overrideColor) {
 	let ChannelLedCount = device.channel(ChannelArray[Channel][0]).LedCount();
 	const componentChannel = device.channel(ChannelArray[Channel][0]);
 	let RGBData = [];
 
-	if(LightingMode === "Forced") {
+	if (overrideColor) {
+		RGBData = device.createColorArray(overrideColor, ChannelLedCount, "Inline", RGBconfig);
+
+	} else if(LightingMode === "Forced") {
 		RGBData = device.createColorArray(forcedColor, ChannelLedCount, "Inline", RGBconfig);
 
 	} else if(componentChannel.shouldPulseColors()) {
@@ -753,11 +785,11 @@ function grabRGBData(Channel) {
 	return RGBData.concat(new Array(240 - RGBData.length).fill(0));
 }
 
-function concatRGBData() {
+function concatRGBData(overrideColor) {
 	const RGBData = [];
-	const MoboRGBData = grabMoboData();
-	const RGBHeaderData = grabRGBHeaderData();
-	const Header1RGBData = grabRGBData(0);
+	const MoboRGBData = grabMoboData(overrideColor);
+	const RGBHeaderData = grabRGBHeaderData(overrideColor);
+	const Header1RGBData = grabRGBData(0, overrideColor);
 
 
 	//Properly Order Everything. RGBHeaders, Headers 1 and 2, Mobo, Header 3.
@@ -766,7 +798,7 @@ function concatRGBData() {
 	RGBData.push(...Header1RGBData);
 
 	if(ARGBHeaders > 1) {
-		const Header2RGBData = grabRGBData(1);
+		const Header2RGBData = grabRGBData(1, overrideColor);
 		RGBData.push(...Header2RGBData);
 	} else {
 		const Header2RGBData = new Array(240);
@@ -776,16 +808,16 @@ function concatRGBData() {
 	RGBData.push(...MoboRGBData);
 
 	if(ARGBHeaders > 2) {
-		const header3RGBData = grabRGBData(2);
+		const header3RGBData = grabRGBData(2, overrideColor);
 		RGBData.push(...header3RGBData);
 	}
 
 	return RGBData;
 }
 
-function SendRGB() {
+function SendRGB(overrideColor) {
 	// packet[64] = 0xf0; //this is seemingly arbitrary. No idea what it does, did not change depending on the data in the packet. Every packet had it. B550 had 0x64 or 0x65, and the Z690 was 0xf0.
-	const RGBData = concatRGBData();
+	const RGBData = concatRGBData(overrideColor);
 
 	//const initpacket = [0x00, 0x10, 0x00, 0xff, 0xE3, 0x00, 0x00, (TotalDeviceLEDs & 0xff), (TotalDeviceLEDs >> 8 & 0xff)];
 	const initpacket = [0x00, 0x10, 0x00, 0xff, 0xE3, 0x00, 0x00, 0x2f, 0x01];
