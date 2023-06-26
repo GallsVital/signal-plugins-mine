@@ -8,7 +8,7 @@ Item {
 
 		Rectangle{
 			id: scanningItem
-			height: 50
+			height: 100
 			width: childrenRect.width + 15
 			visible: service.controllers.length === 0
 			color: theme.background3
@@ -48,7 +48,7 @@ Item {
 
             delegate: Item {
                 id: root
-                width: 310
+                width: 250
                 height: content.height
                 property var device: model.modelData.obj
 
@@ -71,13 +71,13 @@ Item {
 
                         Column{
                             id: leftCol
-                            width: 300
+                            width: 250
                             height: childrenRect.height
                             spacing: 5
 
                             Text{
                                 color: theme.primarytextcolor
-                                text: "Placeholder Device Name For Now"//device.name
+                                text: device.name
                                 font.pixelSize: 16
                                 font.family: "Poppins"
                                 font.weight: Font.Bold
@@ -99,12 +99,57 @@ Item {
                                 }
 
                             }
-
                         }
-
                     }
                 }
             }  
+        }
+
+
+        Column{
+            Label{
+                text: "Force Discovery Using IP Address: "
+                color: theme.primarytextcolor
+		    	font.family: "Poppins"
+		    	font.bold: true
+		    	font.pixelSize: 15
+            }
+
+            Rectangle {
+			width: 200
+			height: 30
+			radius: 5
+			border.color: "#1c1c1c"
+			border.width: 1
+			color: Qt.lighter(theme.background1, 1.3)
+			    TextField {
+			    	width: 180
+			    	leftPadding: 10
+			    	rightPadding: 10
+			    	id: discoverIP
+			    	color: theme.secondarytextcolor
+			    	font.family: "Poppins"
+			    	font.pixelSize: 15
+			    	verticalAlignment: TextInput.AlignVCenter
+			    	placeholderText: "192.168.0.1"
+			    	onEditingFinished: {
+			    		discovery.forceDiscover(discoverIP.text);
+			    	}
+			    	validator: RegularExpressionValidator {
+			    		regularExpression:  /^((?:[0-1]?[0-9]?[0-9]|2[0-4][0-9]|25[0-5])\.){0,3}(?:[0-1]?[0-9]?[0-9]|2[0-4][0-9]|25[0-5])$/
+			    	}
+			    	background: Item {
+			    		width: parent.width
+			    		height: parent.height
+			    		Rectangle {
+			    			color: "transparent"
+			    			height: 1
+			    			width: parent.width
+			    			anchors.bottom: parent.bottom
+			    		}
+			    	}
+			    }
+			}
         }
     }
 }
