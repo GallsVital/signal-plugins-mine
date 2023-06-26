@@ -19,7 +19,7 @@ Item {
 					Text {
 						color: theme.primarytextcolor
 						textFormat: Text.RichText
-						text: "<table><tr><td width=\"24\" style=\"text-align:center;vertical-align:middle\"><img src=\"https://raw.githubusercontent.com/SRGBmods/public/main/images/wled/info-circle-fill.png\"></style></td><td><u><strong>Important:<strong></u><br>this service <strong>ONLY</strong> works for devices<br><strong>based on ESP8266 / ESP8285 / ESP32 micro controllers</strong><br><strong>flashed with <style>a:link { color: \"#FFFFFF\"; }</style><a href=\"https://kno.wled.ge/\">WLED firmware</a></strong>!</td></tr></table>"
+						text: "<table><tr><td width=\"24\" style=\"text-align:center;vertical-align:middle\"><img src=\"https://raw.githubusercontent.com/SRGBmods/public/main/images/wlc/info-circle-fill.png\"></style></td><td><u><strong>Important:<strong></u><br>this service <strong>ONLY</strong> works for the DIY (do-it-yourself) micro controllers<br><strong>Raspberry Pi Pico W</strong> and <strong>Arduino Nano RP2040 Connect</strong><br><strong>flashed with <style>a:link { color: \"#FFFFFF\"; }</style><a href=\"https://srgbmods.net/wifilc\">SRGBmods Wifi LC firmware</a></strong>!</td></tr></table>"
 						onLinkActivated: Qt.openUrlExternally(link)
 						font.pixelSize: 12
 						font.family: "Poppins"
@@ -43,7 +43,7 @@ Item {
 					spacing: 0
 					Text {
 						color: theme.primarytextcolor
-						text: "Discover WLED device by IP"
+						text: "Discover WLC device by IP"
 						font.pixelSize: 16
 						font.family: "Poppins"
 						font.bold: true
@@ -52,12 +52,12 @@ Item {
 						spacing: 6
 						Image {
 							x: 10
-							y: 6
-							height: 50				
-							source: "https://raw.githubusercontent.com/SRGBmods/public/main/images/wled/998_led_nodemcu.png"
+							y: 10
+							height: 40				
+							source: "https://raw.githubusercontent.com/SRGBmods/public/main/images/wlc/wlc-service.png"
 							fillMode: Image.PreserveAspectFit
-							antialiasing: false
-							mipmap: false
+							antialiasing: true
+							mipmap: true
 						}
 						Rectangle {
 							x: 10
@@ -106,13 +106,13 @@ Item {
 					width: parent.width - 20
 					spacing: 10
 					Image {
-						x: 10
+						x: 20
 						y: 10
-						height: 50				
-						source: "https://raw.githubusercontent.com/SRGBmods/public/main/images/wled/wled_logo_akemi.png"
+						height: 40				
+						source: "https://raw.githubusercontent.com/SRGBmods/public/main/images/wlc/wlc-logo_mono.png"
 						fillMode: Image.PreserveAspectFit
-						antialiasing: false
-						mipmap: false
+						antialiasing: true
+						mipmap: true
 					}
 				}
 				Column {
@@ -135,7 +135,7 @@ Item {
 							anchors.verticalCenter: parent.verticalCenter
 							font.family: "Poppins"
 							font.bold: true
-							icon.source: "https://raw.githubusercontent.com/SRGBmods/public/main/images/wled/icon-discover.png"
+							icon.source: "https://raw.githubusercontent.com/SRGBmods/public/main/images/wlc/icon-discover.png"
 							text: "Discover"
 							anchors.right: parent.right
 							onClicked: {
@@ -178,8 +178,13 @@ Item {
 				Rectangle {
 					width: parent.width
 					height: parent.height - 10
-					color: device.offline ? "#101010" : device.connected ? "#003EFF" : "#292929"
+					color: device.offline ? "#101010" : device.connected ? "#8f155f" : "#292929"
 					radius: 5
+					
+					Image {
+					   anchors.fill: parent
+					   source: device.offline ? "" : device.connected ? "https://raw.githubusercontent.com/SRGBmods/public/main/images/wlc/bg-linked.png" : ""
+					}
 				}
 				Column {
 					x: 260
@@ -187,13 +192,13 @@ Item {
 					width: parent.width - 20
 					spacing: 10
 					Image {
-						x: 10
+						x: 20
 						y: 10
-						height: 50				
-						source: device.offline ? "https://raw.githubusercontent.com/SRGBmods/public/main/images/wled/wled_logo_akemi_mono.png" : device.connected ? "https://raw.githubusercontent.com/SRGBmods/public/main/images/wled/wled_logo_akemi.png" : "https://raw.githubusercontent.com/SRGBmods/public/main/images/wled/wled_logo_akemi_mono.png"
+						height: 40				
+						source: "https://raw.githubusercontent.com/SRGBmods/public/main/images/wlc/wlc-logo_mono.png"
 						fillMode: Image.PreserveAspectFit
-						antialiasing: false
-						mipmap: false
+						antialiasing: true
+						mipmap: true
 					}
 				}
 				Column {
@@ -205,8 +210,13 @@ Item {
 						Rectangle {
 							width: 120
 							height: 26
-							color: device.offline ? "#C0A21B" : device.connected ? "#292929" : "#003EFF"
+							color: device.offline ? "#C0A21B" : device.connected ? "#292929" : "#8f155f"
 							radius: 5
+							
+							Image {
+							   anchors.fill: parent
+							   source: device.offline ? "" : !device.connected ? "https://raw.githubusercontent.com/SRGBmods/public/main/images/wlc/device-link.png" : ""
+							}
 							MouseArea {
 								anchors.fill: parent
 								acceptedButtons: Qt.NoButton
@@ -271,7 +281,7 @@ Item {
 						Image {
 							y: 3
 							id: iconSignalStrength
-							source: device.offline ? "https://raw.githubusercontent.com/SRGBmods/public/main/images/wled/device-offline.png" : device.signalstrength >= 90 ? "https://raw.githubusercontent.com/SRGBmods/public/main/images/wled/device-signal4.png" : device.signalstrength >= 75 ? "https://raw.githubusercontent.com/SRGBmods/public/main/images/wled/device-signal3.png" : device.signalstrength >= 60 ? "https://raw.githubusercontent.com/SRGBmods/public/main/images/wled/device-signal2.png" : device.signalstrength >= 50 ? "https://raw.githubusercontent.com/SRGBmods/public/main/images/wled/device-signal1.png" : "https://raw.githubusercontent.com/SRGBmods/public/main/images/wled/device-signal0.png"
+							source: device.offline ? "https://raw.githubusercontent.com/SRGBmods/public/main/images/wlc/device-offline.png" : device.signalstrength >= 90 ? "https://raw.githubusercontent.com/SRGBmods/public/main/images/wlc/device-signal4.png" : device.signalstrength >= 75 ? "https://raw.githubusercontent.com/SRGBmods/public/main/images/wlc/device-signal3.png" : device.signalstrength >= 60 ? "https://raw.githubusercontent.com/SRGBmods/public/main/images/wlc/device-signal2.png" : device.signalstrength >= 50 ? "https://raw.githubusercontent.com/SRGBmods/public/main/images/wlc/device-signal1.png" : "https://raw.githubusercontent.com/SRGBmods/public/main/images/wlc/device-signal0.png"
 						}
 					}
 					Row {
@@ -279,7 +289,7 @@ Item {
 						Image {
 							visible: device.offline ? false : true
 							id: iconTurnOn
-							source: "https://raw.githubusercontent.com/SRGBmods/public/main/images/wled/device-turnon.png"
+							source: "https://raw.githubusercontent.com/SRGBmods/public/main/images/wlc/device-turnon.png"
 							width: 16; height: 16
 							opacity: 1.0
 							MouseArea {
@@ -300,7 +310,7 @@ Item {
 						Image {
 							visible: device.offline ? false : true
 							id: iconTurnOff
-							source: "https://raw.githubusercontent.com/SRGBmods/public/main/images/wled/device-turnoff.png"
+							source: "https://raw.githubusercontent.com/SRGBmods/public/main/images/wlc/device-turnoff.png"
 							width: 16; height: 16
 							opacity: 1.0
 							MouseArea {
@@ -320,7 +330,7 @@ Item {
 						}
 						Image {
 							id: iconDelete
-							source: "https://raw.githubusercontent.com/SRGBmods/public/main/images/wled/device-delete.png"
+							source: "https://raw.githubusercontent.com/SRGBmods/public/main/images/wlc/device-delete.png"
 							width: 16; height: 16
 							visible: device.forced ? true : false
 							opacity: 1.0
@@ -341,7 +351,7 @@ Item {
 						}
 						Image {
 							id: iconForceAdd
-							source: "https://raw.githubusercontent.com/SRGBmods/public/main/images/wled/device-forceadd.png"
+							source: "https://raw.githubusercontent.com/SRGBmods/public/main/images/wlc/device-forceadd.png"
 							width: 16; height: 16
 							visible: device.forced ? false : true
 							opacity: 1.0
@@ -367,7 +377,7 @@ Item {
 					}
 					Text {
 						color: theme.primarytextcolor
-						text: "Arch: " + device.arch + " @ " + device.firmwareversion + "  |  LED count: " + device.deviceledcount
+						text: "MCU: " + device.arch + " @ " + device.firmwareversion + "  |  LED count: " + device.deviceledcount
 					}		  
 				}
 			}
