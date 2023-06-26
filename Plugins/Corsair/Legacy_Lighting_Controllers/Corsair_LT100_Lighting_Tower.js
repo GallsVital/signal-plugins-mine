@@ -158,8 +158,9 @@ function SubmitLightingColors() {
 	device.write(packet, 65);
 	device.read(packet, 17);
 }
+
 export function Validate(endpoint) {
-	return endpoint.interface === -1 | 2;
+	return endpoint.interface === -1 || endpoint.interface === 0;
 }
 
 
