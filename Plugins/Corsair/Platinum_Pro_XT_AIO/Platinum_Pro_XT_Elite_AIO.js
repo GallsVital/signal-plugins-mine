@@ -112,7 +112,7 @@ function PollFans() {
 	savedPollFanTimer = Date.now();
 
 	const fanData = PlatCooler.getCoolingInfo(); //Why are we doing this you may ask? Because if I don't send a packet every like 10 seconds the cooler just nopes out.
-	const liquidTemp = fanData[6];
+	const liquidTemp = fanData[8];
 
 	if(device.fanControlDisabled()){
 		return;
@@ -148,7 +148,7 @@ function PollFans() {
 		}
 	}
 
-	PlatCooler.sendCoolingPacket(PlatCooler.deviceFanModes.fixedPWMWithFallback, Math.round(fanOutputData[0] /100 * 255), PlatCooler.deviceFanModes.fixedPWMWithFallback, Math.round(fanOutputData[1] * 255 / 100), PlatCooler.coolingModes[fanProfile]);
+	PlatCooler.sendCoolingPacket(PlatCooler.deviceFanModes.fixedPWMWithFallback, Math.round(fanOutputData[0] /100 * 255), PlatCooler.deviceFanModes.fixedPWMWithFallback, Math.round(fanOutputData[1] * 255 / 100), PlatCooler.coolingModes[fanProfile], PlatCooler.deviceFanModes.fixedPWMWithFallback, Math.round(fanOutputData[2] * 255 / 100));
 }
 
 let lastLoopRGBData = [];
@@ -233,6 +233,10 @@ function hexToRgb(hex) {
 	colors[2] = parseInt(result[3], 16);
 
 	return colors;
+}
+
+export function Validate(endpoint) {
+	return endpoint.interface === -1 || endpoint.interface === 0;
 }
 
 class PlatinumProtocol {
@@ -591,7 +595,7 @@ class PlatinumProtocol {
 		device.log(`Pump Mode: ${pumpMode}`);
 		device.log(`Pump RPM: ${pumpRPM}`);
 
-		return [fan1Duty, fan1RPM, fan2Duty, fan2RPM, pumpMode, pumpRPM, liquidTemp];
+		return [fan1Duty, fan1RPM, fan2Duty, fan2RPM, fan3Duty, fan3RPM, pumpMode, pumpRPM, liquidTemp];
 	}
 
 	sendCoolingProfile(profileData){
@@ -606,10 +610,10 @@ class PlatinumProtocol {
 		this.sendPacketWithResponse(packet, "Color Packet");
 	}
 
-	sendCoolingPacket(fan1Mode, fan1Duty, fan2Mode, fan2Duty, pumpMode) {
+	sendCoolingPacket(fan1Mode, fan1Duty, fan2Mode, fan2Duty, pumpMode, fan3Mode, fan3Duty) {
 		const packetFill = new Array(65).fill(0xff);
 
-		const packet = [0x00, 0x3F, this.getPacketSequence(), 0x14, 0x00, 0xFF, 0x05, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, fan1Mode, 0x00, 0x00, 0x00, 0x00, fan1Duty, fan2Mode, 0x00, 0x00, 0x00, 0x00, fan2Duty, pumpMode].concat(packetFill);
+		const packet = [0x00, 0x3F, this.getPacketSequence(), 0x14, 0x00, 0xFF, 0x05, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, fan1Mode, 0x00, 0x00, 0x00, 0x00, fan1Duty, fan2Mode, 0x00, 0x00, 0x00, 0x00, fan2Duty, pumpMode, 0x00, 0x00, fan3Mode, fan3Duty,].concat(packetFill);
 		packet[30] = 0x07;
 		this.sendPacketWithResponse(packet, "Cooling Packet");
 	}

@@ -17,6 +17,6 @@ declare class service{
     public static announceController(instance: serviceObject);
     public static suppressController(instance: serviceObject)
     public static resolve(HostName: string, callback: Function): void
-    //public broadcast(QJSValue xMessage);
+    public static broadcast(message: number[]);
     public static controllers: serviceObject[];
 }

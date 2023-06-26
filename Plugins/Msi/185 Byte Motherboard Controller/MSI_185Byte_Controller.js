@@ -71,46 +71,6 @@ export function Shutdown() {
 	MSIMotherboard.choosePacketSendType(true);
 }
 
-function holder() {
-	if(perLED === true) {
-		if(gen2Support && ARGBHeaders > 1) { ///MMM Nesting
-			MSIMotherboard.sendGen2SplitPacketARGB(); //Gen 2 boards use a 3rd register on the 0x04 zone as that's still a JRainbow.
-		} else if(ARGBHeaders > 1 || CorsairHeaders > 0) {
-			MSIMotherboard.sendGen1SplitPacketARGB();//Gen 1 boards have JCorsair headers and therefore use a new zone register.
-		} else {
-			MSIMotherboard.sendGen1ARGB(); //This is the older ARGB Send style. It uses a single packet for all zones. I did deprecate this, minus the single header boards.
-		}
-	} else {
-		if(MSIMotherboard.CheckPacketLength() !== 185) {
-			device.log("PACKET LENGTH ERROR. ABORTING RENDERING");
-
-			return;
-		}
-
-		MSIMotherboard.setDeviceZones();
-		MSIMotherboard.applyZones();
-	}
-
-	if(perLED === true) {
-		if(gen2Support && ARGBHeaders > 1) { ///MMM Nesting
-			MSIMotherboard.sendGen2SplitPacketARGB(true); //Gen 2 boards use a 3rd register on the 0x04 zone as that's still a JRainbow.
-		} else if(ARGBHeaders > 1 || CorsairHeaders > 0) {
-			MSIMotherboard.sendGen1SplitPacketARGB(true);//Gen 1 boards have JCorsair headers and therefore use a new zone register.
-		} else {
-			MSIMotherboard.sendGen1ARGB(true); //This is the older ARGB Send style. It uses a single packet for all zones. I did deprecate this, minus the single header boards.
-		}
-	} else {
-		if(MSIMotherboard.CheckPacketLength() !== 185) {
-			device.log("PACKET LENGTH ERROR. ABORTING RENDERING");
-
-			return;
-		}
-
-		MSIMotherboard.setDeviceZones(true);
-		MSIMotherboard.applyZones();
-	}
-}
-
 export function onadvancedModeChanged() {
 	MSIMotherboard.createLEDs();
 }
@@ -1205,6 +1165,7 @@ class MysticLight {
 				ForceZoneBased	  : false,
 				JARGB_V2		  : true,
 			},
+
 			0x7D99 : //B760M-A Wifi
 			{
 				OnboardLEDs    : 0,
@@ -1488,6 +1449,8 @@ class MysticLight {
 		this.header1LEDCount = 0;
 		this.header2LEDCount = 0;
 		this.header3LEDCount = 0;
+
+		this.firstRun = true;
 	}
 
 	checkPerLEDSupport() {
@@ -1881,9 +1844,9 @@ class MysticLight {
 	}
 
 	checkChangedLengths() {
-		let header1Count = 0;
-		let header2Count = 0;
-		let header3Count = 0;
+		let header1Count = 1;
+		let header2Count = 1;
+		let header3Count = 1;
 
 		if(ARGBHeaders > 0) {
 			header1Count = device.channel(ChannelArray[0][0]).LedCount();
@@ -1909,7 +1872,7 @@ class MysticLight {
 	}
 
 	setPerledMode() {
-		if(this.checkChangedLengths()) {
+		if(this.checkChangedLengths() || this.firstRun) {
 			if(this.getTotalLEDCount()) {
 				device.send_report([
 					0x52, //enable, r,g,b, options, r,g,b,sync,seperator
@@ -1934,6 +1897,7 @@ class MysticLight {
 					0x00 //Save Flag
 				], 185);
 				device.log("Sent Efficiency PerLED Config Setup Packet.");
+				this.firstRun = false;
 			} else {
 				device.send_report([
 					0x52, //enable, r,g,b, options, r,g,b,sync,seperator
@@ -1958,6 +1922,7 @@ class MysticLight {
 					0x00 //Save Flag
 				], 185);
 				device.log("Sent High Capacity PerLED Config Setup Packet.");
+				this.firstRun = false;
 			}
 
 		}

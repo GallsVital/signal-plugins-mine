@@ -12,6 +12,8 @@ shutdownColor:readonly
 LightingMode:readonly
 forcedColor:readonly
 autoReconnect:readonly
+xScale:readonly
+yScale:readonly
 */
 export function ControllableParameters() {
 	return [
@@ -19,27 +21,25 @@ export function ControllableParameters() {
 		{"property":"LightingMode", "group":"lighting", "label":"Lighting Mode", "type":"combobox", "values":["Canvas", "Forced"], "default":"Canvas"},
 		{"property":"forcedColor", "group":"lighting", "label":"Forced Color", "min":"0", "max":"360", "type":"color", "default":"#009bde"},
 		{"property":"autoReconnect", "group":"", "label":"Auto Reconnect to Devices When Lost", "type":"boolean", "default": "false"},
+		{ "property": "xScale", "group": "", "label": "Width Scale", "step": "1", "type": "number", "min": "1", "max": "10", "default": "5"},
+		{ "property": "yScale", "group": "", "label": "Height Scale", "step": "1", "type": "number", "min": "1", "max": "10", "default": "5" },
 	];
 }
 
+import {encode, decode} from "@SignalRGB/base64";
 
 export function Initialize() {
 	device.addFeature("udp");
 	device.addFeature("base64");
-	device.log("Hey I exist now!");
 	Twinkly.getFirmwareVersionFromDevice();
-	Twinkly.getDeviceStatus();
 	Twinkly.deviceLogin();
 	Twinkly.verifyToken(Twinkly.getAuthenticationToken(), Twinkly.getChallengeResponse());
 	Twinkly.getDeviceInformation();
 	Twinkly.getDeviceBrightness();
 	Twinkly.setDeviceBrightness("enabled", "A", 100);
-	Twinkly.getDeviceLEDEffects();
-	Twinkly.getCurrentLEDEffect();
-	Twinkly.getLEDMode();
-	Twinkly.setLEDMode("rt"); // 'movie', 'playlist', 'rt', 'demo', 'effect', 'color' or 'off'
+	Twinkly.setLEDMode("rt");
 	Twinkly.decodeAuthToken();
-	Twinkly.getDeviceLayout();
+	Twinkly.getDeviceLayoutType();
 }
 
 export function Render() {
@@ -48,8 +48,14 @@ export function Render() {
 }
 
 export function Shutdown(suspend) {
-	Twinkly.setLEDMode(Twinkly.getPreviousDeviceMode());
-	Twinkly.setCurrentLEDEffect(Twinkly.getPreviousDeviceEffect());
+}
+
+export function onxScaleChanged() {
+	Twinkly.getDeviceLayoutType();
+}
+
+export function onyScaleChanged() {
+	Twinkly.getDeviceLayoutType();
 }
 
 let savedConnectionCheckTimer = Date.now();
@@ -60,18 +66,17 @@ function checkConnectionStatus() {
 		return;
 	}
 	const validToken = Twinkly.getLEDMode();
-	device.log(`validToken Response ${validToken}`);
 
 	if(validToken !== "Ok") {
 		device.log(`Token: ${Twinkly.getAuthenticationToken()} invalidated.`);
 
 		if(autoReconnect) {
-			device.log("Attempting to fetch new authentication token and steal control back.")
+			device.log("Attempting to fetch new authentication token and steal control back.");
 			Twinkly.deviceLogin();
 			Twinkly.verifyToken(Twinkly.getAuthenticationToken(), Twinkly.getChallengeResponse());
-			Twinkly.setLEDMode("rt"); // 'movie', 'playlist', 'rt', 'demo', 'effect', 'color' or 'off'
+			Twinkly.setLEDMode("rt");
 			Twinkly.decodeAuthToken();
-			Twinkly.getDeviceLayout();
+			Twinkly.getDeviceLayoutType();
 		}
 	}
 
@@ -83,8 +88,8 @@ function sendColors(shutdown = false) {
 
 	let packetIDX = 0;
 
-	while(RGBData.length > 888) {
-		Twinkly.sendGen3RTFrame(packetIDX, RGBData.splice(0, 888));
+	while(RGBData.length > 900) {
+		Twinkly.sendGen3RTFrame(packetIDX, RGBData.splice(0, 900));
 		packetIDX++;
 	}
 
@@ -129,6 +134,8 @@ function hexToRgb(hex) {
 // -------------------------------------------<( Discovery Service )>--------------------------------------------------
 
 export function DiscoveryService() {
+	this.IconUrl = "https://marketplace.signalrgb.com/brands/products/twinkly/icon@2x.png";
+
 	this.firstRun = true;
 
 	this.Initialize = function(){
@@ -138,18 +145,49 @@ export function DiscoveryService() {
 
 	this.UdpBroadcastPort = 5555;
 	this.UdpListenPort = 59136;
+	this.UdpBroadcastAddress = "255.255.255.255";
 
 	this.lastPollTime = 0;
 	this.PollInterval = 60000;
 
-	this.CheckForDevices = function(){
-		if(Date.now() - discovery.lastPollTime < discovery.PollInterval){
+	this.valuesToReturn = {
+		ip : "",
+		id : "",
+		name : "",
+		port : "",
+		auth_Token : ""
+	};
+
+	this.activeDevices = [];
+
+	this.CheckForDevices = function(forceDiscovery = false){
+		if(Date.now() - discovery.lastPollTime < discovery.PollInterval && !forceDiscovery){
 			return;
 		}
 
 		discovery.lastPollTime = Date.now();
 		service.log("Broadcasting device scan...");
 		service.broadcast([0x01, 0x64, 0x69, 0x73, 0x63, 0x6f, 0x76, 0x65, 0x72 ]);
+	};
+
+	this.forceDiscover = function(ipaddress) {
+		if(!ipaddress || ipaddress === undefined) {
+			service.log(`Force Discovery IP Address is Undefined.`);
+		} else if (this.isValidIP(ipaddress)) {
+			service.log("Forcing Discovery for Twinkly device at IP: " + ipaddress);
+			this.UdpBroadcastAddress = ipaddress;
+			this.CheckForDevices(true);
+		} else {
+			service.log(`Invalid Force Discovery IP Address. Please Enter a Valid Force Discovery Address.`);
+		}
+	};
+
+	this.isValidIP = function(ipaddress) {
+		if (/^(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$/.test(ipaddress)) {
+			return true;
+		}
+
+		return false;
 	};
 
 	this.Update = function(){
@@ -166,13 +204,16 @@ export function DiscoveryService() {
 
 	this.Discovered = function(value) {
 
-		service.log(Object.keys(value));
 		service.log(`Response: ${value.response}`);
 
 		if(value.response.toString().includes("OKTwinkly")) {
 			service.log("Possible Twinkly Lights Found!");
-			this.CreateControllerDevice(value);
-			//this.confirmTwinklyDevice(value);
+
+			if(!this.activeDevices.includes(value.ip)) {
+				this.confirmTwinklyDevice(value);
+			} else {
+				service.log("Device Already Added. Skipping.");
+			}
 		} else {
 			service.log("Got bad response from device. Device most likely is not a set of Twinkly Lights");
 		}
@@ -193,7 +234,7 @@ export function DiscoveryService() {
 	};
 
 	this.confirmTwinklyDevice = function(value) {
-		const challengeInput = base64.Encode(Array.from({length: 32}, () => Math.floor(Math.random() * 32)));
+		const challengeInput = encode(Array.from({length: 32}, () => Math.floor(Math.random() * 32)));
 		let authToken;
 		let challenge_response;
 
@@ -202,11 +243,11 @@ export function DiscoveryService() {
 				const deviceLoginPacket = JSON.parse(xhr.response);
 				service.log(`Authentication Token: ${deviceLoginPacket.authentication_token}`);
 				service.log(`Challenge Response: ${deviceLoginPacket["challenge-response"]}`);
+				service.log(`Login Return Code: ${deviceLoginPacket.code}`);
 				authToken = deviceLoginPacket.authentication_token;
 				challenge_response = deviceLoginPacket["challenge-response"];
-				this.CreateControllerDevice(value);
 			}
-		}, {"challenge" : challengeInput}, true);
+		}, {"challenge" : challengeInput});
 
 
 		XmlHttp.PostWithAuth(`http://${value.ip}/xled/v1/verify`, (xhr) => {
@@ -214,10 +255,27 @@ export function DiscoveryService() {
 				service.log(`Token Verification Response Code: ${JSON.parse(xhr.response).code}`);
 
 				if(JSON.parse(xhr.response).code === 1000) {
-					this.CreateControllerDevice(value);
+					this.valuesToReturn.ip = value.ip;
+					this.valuesToReturn.id = value.id;
+					this.valuesToReturn.port = value.port;
+					this.valuesToReturn.auth_Token = authToken;
 				}
 			}
-		}, {"challenge-response" : challenge_response}, authToken, true);
+		}, {"challenge-response" : challenge_response}, authToken);
+
+		XmlHttp.GetWithAuth(`http://${this.valuesToReturn.ip}/xled/v1/device_name`, (xhr) => {
+			if(xhr.readyState === 4) {
+				const deviceNamePacket = JSON.parse(xhr.response);
+				service.log(`Device Name Packet Code: ${deviceNamePacket.code}`);
+
+				if(JSON.parse(xhr.response).code === 1000) {
+					service.log(`Device Name: ${deviceNamePacket.name}`);
+					this.valuesToReturn.name = deviceNamePacket.name;
+					this.activeDevices.push(this.valuesToReturn.ip);
+					this.CreateControllerDevice(this.valuesToReturn);
+				} //3 layers of checks. OKTwinkly, login, verify. Lord so help me if someone manages to get their toaster to appear as a twinkly device.
+			}
+		}, authToken, false);
 	};
 }
 
@@ -284,11 +342,10 @@ class XmlHttp{
 		xhr.send(JSON.stringify(data));
 	}
 }
-
 class TwinklyProtocol {
 	constructor() {
-		this.authentication_token = [];
-		this.challenge_response = [];
+		this.authentication_token = "";
+		this.challenge_response = "";
 
 		this.statusCodes = {
 			1000 : "Ok",
@@ -306,14 +363,18 @@ class TwinklyProtocol {
 		this.config = {
 			firmwareVersion : "",
 			hardwareRevision: "",
-			previousDeviceMode : "",
-			previousDeviceEffect : -1,
 			previousDeviceBrightness : -1,
 			numberOfDeviceLEDs : -1,
 			bytesPerLED : -1,
 			decodedAuthToken : [],
 			vLedNames : [],
 			vLedPositions : []
+		};
+
+		this.layoutScale = {
+			"25x25" : 12.5,
+			"50x50" : 25,
+			"100x100" : 50
 		};
 	}
 
@@ -331,12 +392,6 @@ class TwinklyProtocol {
 
 	getPrevousDeviceBrightness() { return this.config.previousDeviceBrightness; }
 	setPreviousDeviceBrightness(previousDeviceBrightness) { this.config.previousDeviceBrightness = previousDeviceBrightness; }
-
-	getPreviousDeviceEffect() { return this.config.previousDeviceEffect;}
-	setPreviousDeviceEffect(previousDeviceEffect) { this.config.previousDeviceEffect = previousDeviceEffect; }
-
-	getPreviousDeviceMode() { return this.config.previousDeviceMode; }
-	setPreviousDeviceMode(previousDeviceMode) { this.config.previousDeviceMode = previousDeviceMode; }
 
 	getAuthenticationToken() { return this.authentication_token; }
 	setAuthenticationToken(authenticationToken) {this.authentication_token = authenticationToken; }
@@ -370,15 +425,6 @@ class TwinklyProtocol {
 		});
 	}
 
-	getDeviceStatus() {
-		XmlHttp.Get(`http://${controller.ip}/xled/v1/status`, (xhr) => {
-			if(xhr.readyState === 4) {
-				const statusPacket = JSON.parse(xhr.response);
-				device.log(`Device Status Packet: ${statusPacket.code}`);
-			}
-		});
-	}
-
 	getDeviceBrightness() {
 		XmlHttp.GetWithAuth(`http://${controller.ip}/xled/v1/led/out/brightness`, (xhr) => {
 			if(xhr.readyState === 4) {
@@ -407,8 +453,7 @@ class TwinklyProtocol {
 		XmlHttp.GetWithAuth(`http://${controller.ip}/xled/v1/led/effects`, (xhr) => {
 			if(xhr.readyState === 4) {
 				const deviceSupportedEffectPacket = JSON.parse(xhr.response);
-				device.log(`Device Supported Effects Packet Code: ${deviceSupportedEffectPacket.code}`);
-				//device.log(`Device Supported Effects IDs: ${deviceSupportedEffectPacket.unique_ids}`);
+				device.log(`Device Supported Effects IDs: ${deviceSupportedEffectPacket.unique_ids}`);
 				device.log(`Device Number of Supported Effects: ${deviceSupportedEffectPacket.effects_number}`);
 			}
 		});
@@ -418,10 +463,8 @@ class TwinklyProtocol {
 		XmlHttp.GetWithAuth(`http://${controller.ip}/xled/v1/led/effects/current`, (xhr) => {
 			if(xhr.readyState === 4) {
 				const deviceCurrentEffectPacket = JSON.parse(xhr.response);
-				device.log(`Device Current Effect Packet Code: ${deviceCurrentEffectPacket.code}`);
 				device.log(`Device Current Effect: ${deviceCurrentEffectPacket.preset_id}`);
-				//device.log(`Device Current Effect Unique ID: ${deviceCurrentEffectPacket.unique_id}`);
-				this.setPreviousDeviceEffect(deviceCurrentEffectPacket.preset_id);
+				device.log(`Device Current Effect Unique ID: ${deviceCurrentEffectPacket.unique_id}`);
 			}
 		});
 	}
@@ -432,12 +475,9 @@ class TwinklyProtocol {
 			if(xhr.readyState === 4) {
 				const deviceLEDModePacket = JSON.parse(xhr.response);
 				packetStatus = this.statusCodes[deviceLEDModePacket.code];
-				device.log(`Device Current Mode Packet Code: ${deviceLEDModePacket.code}`);
 				device.log(`Device Current Mode: ${deviceLEDModePacket.mode}`);
 
 				if(deviceLEDModePacket.mode !== "rt") { packetStatus = "Incorrect Mode"; }
-
-				this.setPreviousDeviceMode(deviceLEDModePacket.mode);
 			}
 		});
 
@@ -467,12 +507,12 @@ class TwinklyProtocol {
 			if(xhr.readyState === 4) {
 				const deviceInformationPacket = JSON.parse(xhr.response);
 				//device.log(`Device Information Packet: ${Object.keys(deviceInformationPacket)}`);
-				//device.log(`Device Product Name: ${deviceInformationPacket.product_name}`);
+				device.log(`Device Product Name: ${deviceInformationPacket.product_name}`);
 				device.log(`Device Hardware Version: ${deviceInformationPacket.hardware_version}`);
 				device.log(`Device Bytes Per LED: ${deviceInformationPacket.bytes_per_led}`);
-				//device.log(`Device Hardware ID: ${deviceInformationPacket.hw_id}`);
+				device.log(`Device Hardware ID: ${deviceInformationPacket.hw_id}`);
 				device.log(`Device LED Type: ${deviceInformationPacket.led_type}`);
-				//device.log(`Device Product Code: ${deviceInformationPacket.product_code}`);
+				device.log(`Device Product Code: ${deviceInformationPacket.product_code}`);
 				device.log(`Device Name: ${deviceInformationPacket.device_name}`);
 				device.log(`Device Number of LEDs: ${deviceInformationPacket.number_of_led}`);
 				this.setNumberOfBytesPerLED(deviceInformationPacket.bytes_per_led);
@@ -483,7 +523,7 @@ class TwinklyProtocol {
 		});
 	}
 
-	getDeviceLayout() {
+	getDeviceLayoutType() {
 		XmlHttp.GetWithAuth(`http://${controller.ip}/xled/v1/led/layout/full`, (xhr) => {
 			if(xhr.readyState === 4) {
 				const deviceLayoutPacket = JSON.parse(xhr.response);
@@ -491,20 +531,24 @@ class TwinklyProtocol {
 
 				device.log(`Device Layout Source: ${deviceLayoutPacket.source}`);
 
-				const vLedNames = [];
-				const vLedPositions = [];
-
-				this.setvLedNames(vLedNames);
-				this.setvLedPositions(vLedPositions);
 
 				const xRoundingArray = [];
 				const yRoundingArray = [];
 
-				for(const coordinate in deviceLayoutPacket.coordinates) { //height does not have a -1 max or min. I do not know if Y is always the Z axis.
-					const XCoordinate = deviceLayoutPacket.coordinates[coordinate].x;
-					const YCoordinate = deviceLayoutPacket.coordinates[coordinate].z;
-					xRoundingArray.push(XCoordinate);
-					yRoundingArray.push(YCoordinate);
+				if(deviceLayoutPacket.source === "3d") {
+					for(const coordinate in deviceLayoutPacket.coordinates) {
+						const XCoordinate = deviceLayoutPacket.coordinates[coordinate].x;
+						const YCoordinate = deviceLayoutPacket.coordinates[coordinate].z;
+						xRoundingArray.push(XCoordinate);
+						yRoundingArray.push(YCoordinate);
+					}
+				} else if(deviceLayoutPacket.source === "2d") {
+					for(const coordinate in deviceLayoutPacket.coordinates) {
+						const XCoordinate = deviceLayoutPacket.coordinates[coordinate].x;
+						const YCoordinate = deviceLayoutPacket.coordinates[coordinate].z;
+						xRoundingArray.push(XCoordinate);
+						yRoundingArray.push(YCoordinate);
+					}
 				}
 
 				device.log(`X Max: ${Math.max(...xRoundingArray)}`);
@@ -512,29 +556,39 @@ class TwinklyProtocol {
 				device.log(`Y Max: ${Math.max(...yRoundingArray)}`);
 				device.log(`Y Min: ${Math.min(...yRoundingArray)}`);
 
-				if(deviceLayoutPacket.source === "3d") {
-					for(let coordinate = 0; coordinate < Object.keys(deviceLayoutPacket.coordinates).length; coordinate++) {
-						const XCoordinate = Math.round((deviceLayoutPacket.coordinates[coordinate].x+1) * 50);
-						const YCoordinate = Math.round((deviceLayoutPacket.coordinates[coordinate].z+1) * 50);
-						vLedPositions.push([XCoordinate, YCoordinate]);
-						vLedNames.push(`LED ${coordinate+1}`);
-					}
-				} else if(deviceLayoutPacket.source === "2d") {
-					for(let coordinate = 0; coordinate < Object.keys(deviceLayoutPacket.coordinates).length; coordinate++) {
-						const XCoordinate = Math.round((deviceLayoutPacket.coordinates[coordinate].x+1) * 50);
-						const YCoordinate = Math.round((deviceLayoutPacket.coordinates[coordinate].y+1) * 50);
-						vLedPositions.push([XCoordinate, YCoordinate]);
-						vLedNames.push(`LED ${coordinate+1}`);
-					}
-				}
-
-
-				this.setvLedNames(vLedNames);
-				this.setvLedPositions(vLedPositions);
-				device.setSize([101, 101]);
-				device.setControllableLeds(this.getvLedNames(), this.getvLedPositions());
+				this.configureDeviceLayout(deviceLayoutPacket);
 			}
 		});
+	}
+
+	configureDeviceLayout(deviceLayoutPacket) {
+		const vLedNames = [];
+		const vLedPositions = [];
+
+		this.setvLedNames(vLedNames); //clear the variables? idk why we're doing this
+		this.setvLedPositions(vLedPositions);
+
+		if(deviceLayoutPacket.source === "3d") {
+			for(let coordinate = 0; coordinate < Object.keys(deviceLayoutPacket.coordinates).length; coordinate++) {
+				const XCoordinate = Math.round((deviceLayoutPacket.coordinates[coordinate].x+1) * (5*xScale));
+				const YCoordinate = Math.round((deviceLayoutPacket.coordinates[coordinate].z+1) * (5*yScale));
+				vLedPositions.push([XCoordinate, YCoordinate]);
+				vLedNames.push(`LED ${coordinate+1}`);
+			}
+		} else if(deviceLayoutPacket.source === "2d") {
+			for(let coordinate = 0; coordinate < Object.keys(deviceLayoutPacket.coordinates).length; coordinate++) {
+				const XCoordinate = Math.round((deviceLayoutPacket.coordinates[coordinate].x+1) * (5*xScale));
+				const YCoordinate = Math.round((deviceLayoutPacket.coordinates[coordinate].y+1) * (5*yScale));
+				vLedPositions.push([XCoordinate, YCoordinate]);
+				vLedNames.push(`LED ${coordinate+1}`);
+			}
+		}
+
+
+		this.setvLedNames(vLedNames);
+		this.setvLedPositions(vLedPositions);
+		device.setSize([10*xScale + 1, 10*yScale + 1]);
+		device.setControllableLeds(this.getvLedNames(), this.getvLedPositions());
 	}
 
 	deviceLogin() {
@@ -559,23 +613,24 @@ class TwinklyProtocol {
 	}
 
 	sendGen1RTFrame(numberOfLEDs, RGBData) {
-		udp.send(controller.ip, 7777, [0x01].concat(this.getDecodedAuthenticationToken()).concat(numberOfLEDs).concat(RGBData));
+		udp.send(controller.ip, 7777, [0x01].concat(this.getDecodedAuthenticationToken()).concat(numberOfLEDs).concat(RGBData)); //I Require users
 	}
 	sendGen2RTFrame(numberOfLEDs, RGBData) {
-		udp.send(controller.ip, 7777, [0x02].concat(this.getDecodedAuthenticationToken()).concat(numberOfLEDs).concat(RGBData)); //Follows with movie format, which we don't want to use. Will probably throw a fw warning
+		udp.send(controller.ip, 7777, [0x02].concat(this.getDecodedAuthenticationToken()).concat(numberOfLEDs).concat(RGBData)); //I Still Require Users. Both of these should work but I need to do some tinkering.
 	}
 	sendGen3RTFrame(packetIDX, RGBData) {
 		udp.send(controller.ip, 7777, [0x03].concat(this.getDecodedAuthenticationToken()).concat([0x00, 0x00, packetIDX]).concat(RGBData));
 	}
 }
 
-const Twinkly = new TwinklyProtocol(); //https://marketplace.signalrgb.com/brands/products/twinkly/icon@2x.png
+const Twinkly = new TwinklyProtocol();
 
 class TwinklyController{
 	constructor(value){
 		this.id = value.id;
 		this.port = value.port;
 		this.ip = value.ip;
+		this.name = value.name;
 
 		this.initialized = false;
 	}
@@ -586,10 +641,8 @@ class TwinklyController{
 	updateWithValue(value){
 		this.id = value.id;
 		this.port = value.port;
-
-		const response = JSON.parse(value.response).msg.data;
-
-		this.ip = response.ip;
+		this.ip = value.ip;
+		this.name = value.name;
 
 		service.updateController(this);
 	}
