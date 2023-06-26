@@ -925,6 +925,18 @@ class MysticLight {
 				ForceZoneBased	  : false,
 				JARGB_V2		  : false
 			},
+			0x7D51 : //X570S Unify-X Max
+			{
+				OnboardLEDs    : 0,
+				RGBHeaders     : 1,
+				ARGBHeaders    : 2,
+				JPipeLEDs	   : 0,
+				CorsairHeaders : 1,
+				//PERLED
+				PerLEDOnboardLEDs : 0,
+				ForceZoneBased	  : false,
+				JARGB_V2		  : false
+			},
 			0x7D52 : //X570 Carbon Max Wifi
 			{
 				OnboardLEDs    : 6,

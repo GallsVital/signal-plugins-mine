@@ -524,6 +524,8 @@ class Asus_Ampere_Lovelace_IDs {
 		this.RTX4070TI_12GB_STRIX_GAMING_OC		   = 0X88A7;
 		this.RTX4070TI_12GB_STRIX_GAMING_OC_2      = 0x88DC;
 		this.RTX4070TI_TUF_GAMING				   = 0x88A6;
+		this.RTX4070TI_TUF_GAMING_2                = 0x88DD;
+
 		this.RTX4070TI_TUF_GAMING_OC_2			   = 0x88A4;
 		this.RTX4070TI_12GB_TUF					   = 0x88dd;
 
@@ -535,6 +537,7 @@ class Asus_Ampere_Lovelace_IDs {
 		this.RTX4080_STRIX_GAMING_OC 			   = 0x88BF;
 		this.RTX4080_STRIX_GAMING_2				   = 0x88C0;
 		this.RTX4080_STRIX_GAMING_OC_WHITE		   = 0x88C8;
+		this.RTX4080_STRIX_GAMING_WHITE			   = 0x88C9;
 		this.RTX4080_TUF_GAMING_OC				   = 0x88CA;
 
 		this.RTX4090_STRIX_GAMING                  = 0x889C;
@@ -650,8 +653,7 @@ const Asus3000GPUIDs =
 	new AsusGPUIdentifier(Nvidia.RTX4070TI, AsusID.RTX4070TI_TUF_GAMING_OC, "Asus TUF RTX 4070Ti Gaming OC"),
 	new AsusGPUIdentifier(Nvidia.RTX4070TI, AsusID.RTX4070TI_TUF_GAMING_OC_2, "Asus TUF RTX 4070Ti Gaming OC"),
 	new AsusGPUIdentifier(Nvidia.RTX4070TI, AsusID.RTX4070TI_TUF_GAMING, "Asus TUF RTX 4070Ti 12GB Gaming"),
-	new AsusGPUIdentifier(Nvidia.RTX4070TI, AsusID.RTX4070TI_12GB_TUF, "Asus TUF RTX 4070Ti 12GB Gaming"),
-
+	new AsusGPUIdentifier(Nvidia.RTX4070TI, AsusID.RTX4070TI_TUF_GAMING_2, "Asus TUF RTX 4070Ti 12GB Gaming"),
 	new AsusGPUIdentifier(Nvidia.RTX4080, AsusID.RTX4080_TUF_GAMING, "Asus TUF RTX 4080 Gaming"),
 	new AsusGPUIdentifier(Nvidia.RTX4080, AsusID.RTX4080_TUF_GAMING_2, "Asus TUF RTX 4080 Gaming"),
 	new AsusGPUIdentifier(Nvidia.RTX4080, AsusID.RTX4080_TUF_GAMING_3, "Asus TUF RTX 4080 Gaming"),
@@ -659,6 +661,7 @@ const Asus3000GPUIDs =
 	new AsusGPUIdentifier(Nvidia.RTX4080, AsusID.RTX4080_STRIX_GAMING_2, "Asus ROG Strix RTX 4080 Gaming"),
 	new AsusGPUIdentifier(Nvidia.RTX4080, AsusID.RTX4080_STRIX_GAMING_3, "Asus ROG Strix RTX 4080 Gaming"),
 	new AsusGPUIdentifier(Nvidia.RTX4080, AsusID.RTX4080_STRIX_GAMING_OC, "Asus ROG Strix 4080 Gaming OC"),
+	new AsusGPUIdentifier(Nvidia.RTX4080, AsusID.RTX4080_STRIX_GAMING_WHITE, "Asus ROG Strix 4080 Gaming White"),
 	new AsusGPUIdentifier(Nvidia.RTX4080, AsusID.RTX4080_STRIX_GAMING_OC_WHITE, "Asus ROG Strix 4080 Gaming OC White"),
 	new AsusGPUIdentifier(Nvidia.RTX4080, AsusID.RTX4080_TUF_GAMING_OC, "Asus TUF RTX 4080 Gaming OC"),
 

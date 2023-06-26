@@ -94,7 +94,7 @@ function GigabyteVisionGpuCheck(bus, address, log = false){
 	const ValidReturnCodes = [0x10, 0x11, 0x12, 0x14];
 	// 0x62 (Gaming OC) cards use a 8 byte write length.
 	// GPU will softlock if this is wrong.
-	const WriteLength = [0x62, 0x71].includes(address) ? 8 : 4;
+	const WriteLength = [0x32, 0x62, 0x71].includes(address) ? 8 : 4;
 
 	let data;
 
@@ -186,7 +186,7 @@ class GigabyteVisionProtocol {
 	}
 
 	determineWriteLength() {
-		this.config.writeLength = [0x62].includes(bus.GetAddress()) ? 8 : 4;
+		this.config.writeLength = [0x32, 0x62].includes(bus.GetAddress()) ? 8 : 4;
 	}
 
 	setMode(mode) {
@@ -407,7 +407,7 @@ class GigabyteVisionGPuList {
 			new GigabyteVisionIdentifier(Nvidia.RTX3060,        GigabyteVisionIds.RTX3060_EAGLE_OC_REV2,         0x32, "GIGABYTE 3060 Eagle OC Rev 2.0"),
 			new GigabyteVisionIdentifier(Nvidia.RTX3060,        GigabyteVisionIds.RTX3060_EAGLE_OC_REV2,         0x63, "GIGABYTE 3060 Eagle OC Rev 2.0"),
 			new GigabyteVisionIdentifier(Nvidia.RTX3060_LHR,    GigabyteVisionIds.RTX3060_EAGLE_OC_REV2,         0x32, "GIGABYTE 3060 Eagle OC Rev 2.0 LHR"),
-			new GigabyteVisionIdentifier(Nvidia.RTX3060_LHR,    GigabyteVisionIds.RTX3060_EAGLE_OC_REV2,         0x62, "GIGABYTE 3060 Eagle OC Rev 2.0 LHR"),
+			new GigabyteVisionIdentifier(Nvidia.RTX3060_LHR,    GigabyteVisionIds.RTX3060_EAGLE_OC_REV2,         0x63, "GIGABYTE 3060 Eagle OC Rev 2.0 LHR"),
 			new GigabyteVisionIdentifier(Nvidia.RTX3060_GA104,  GigabyteVisionIds.RTX3060_EAGLE_OC_REV2,         0x32, "GIGABYTE 3060 Eagle OC LHR (GA104)"),
 			new GigabyteVisionIdentifier(Nvidia.RTX3060_GA104,  GigabyteVisionIds.RTX3060_EAGLE_OC_REV2,         0x63, "GIGABYTE 3060 Eagle OC LHR (GA104)"),
 			new GigabyteVisionIdentifier(Nvidia.RTX3060,        GigabyteVisionIds.RTX3060_GAMING_OC_12GB,        0x62, "GIGABYTE 3060 Gaming OC"),
