@@ -23,7 +23,7 @@ const vLedNames = [
 	"Keyboard"
 ];
 
-const vKeyPositions = [
+const vLedPositions = [
 	[0, 0]
 ];
 
@@ -32,7 +32,7 @@ export function LedNames() {
 }
 
 export function LedPositions() {
-	return vKeyPositions;
+	return vLedPositions;
 }
 
 export function Initialize() {
@@ -41,7 +41,7 @@ export function Initialize() {
 
 export function Render() {
 	sendColors();
-	device.pause(1);
+	device.pause(1000);
 }
 
 export function Shutdown(SystemSuspending) {
@@ -59,8 +59,8 @@ function sendColors(overrideColor) {
 	packet[1] = 0x0E;
 	packet[8] = 0x29;
 
-	const iPxX = vKeyPositions[0][0];
-	const iPxY = vKeyPositions[0][1];
+	const iPxX = vLedPositions[0][0];
+	const iPxY = vLedPositions[0][1];
 	let color;
 
 	if(overrideColor){
