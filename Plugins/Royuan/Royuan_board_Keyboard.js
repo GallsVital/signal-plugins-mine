@@ -1,6 +1,6 @@
-export function Name() { return "FL-Esports MK750"; }
+export function Name() { return "Royuan board"; }
 export function VendorId() { return 0x3151; }
-export function ProductId() { return 0x4015; }
+export function ProductId() { return [0x4003, 0x4015]; }
 export function Publisher() { return "WhirlwindFX"; }
 export function Documentation(){ return "troubleshooting/brand"; }
 export function Size() { return [1, 1]; }
@@ -89,9 +89,13 @@ function hexToRgb(hex) {
 }
 
 export function Validate(endpoint) {
-	return endpoint.interface === 2 && endpoint.usage === 0x002 && endpoint.usage_page === 0xffff && endpoint.collection === 0x0000;
+	if (device.productId() === 0x4015){
+		return endpoint.interface === 2 && endpoint.usage === 0x0002 && endpoint.usage_page === 0xffff && endpoint.collection === 0x0000;
+	}
+
+	return endpoint.interface === 0 && endpoint.usage === 0x0006 && endpoint.usage_page === 0x0001 && endpoint.collection === 0x0000;
 }
 
-export function Image() {
-	return "";
+export function ImageUrl() {
+	return "https://marketplace.signalrgb.com/devices/default/keyboard-60.png";
 }
