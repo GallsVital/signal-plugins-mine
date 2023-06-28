@@ -14,7 +14,11 @@ declare class BusBase{
 		public Product(): number
 		public SubDevice(): number
 		public Port(): number
-	
+
+		public TransactionLock(): void
+		public TransactionUnlock(): void
+		public HasTransactionLock(): boolean
+
 		public log(Data: any, options?: LogOptions): void
 	
 		/**
