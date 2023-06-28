@@ -213,9 +213,12 @@ class CrucialBallistix{
 	}
 
 	SendRGBData(RedData, GreenData, BlueData){
+		bus.TransactionLock();
 		this.Interface.WriteBlock(this.registers.RedColorChannel, RedData);
 		this.Interface.WriteBlock(this.registers.GreenColorChannel, GreenData);
 		this.Interface.WriteBlock(this.registers.BlueColorChannel, BlueData);
+		bus.TransactionUnlock();
+
 	}
 
 	CheckForFreeAddresses() {
