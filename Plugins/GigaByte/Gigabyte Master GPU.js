@@ -460,10 +460,10 @@ class GigabyteMasterProtocol {
 	}
 
 	UpdateStandardLED(RGBData, led) {
-		const packet = [this.registers.Color];
-		packet.push(...RGBData);
+		const packet = [this.registers.Color].concat(RGBData);
 		packet.push(led);
-		this.setMode(this.modes.static, led+1);
+
+		this.setMode(this.modes.static, led + 1);
 		this.WriteBlockSafe(packet);
 	}
 
