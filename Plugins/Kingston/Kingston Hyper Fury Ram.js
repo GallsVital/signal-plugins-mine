@@ -29,18 +29,18 @@ const vLedPositions = [
 
 export function Initialize() {
 	SetMode();
+	SendColors(false, true);
 }
 
 export function Render() {
 	SendColors();
+	device.pause(10);
 }
 
 export function Shutdown() {
 	//SendColors(true);
 }
-// Address pairs
-// 51 -> 49 -> 61?
-// 53 -> 4B -> 63?
+
 export function Scan(bus) {
 
 	const PossibleAddresses = [0x60, 0x61, 0x62, 0x63];
@@ -53,7 +53,6 @@ export function Scan(bus) {
 	  }
 
 	  const validAddress = bus.WriteQuick(addr);
-	  //bus.log(`Address: ${addr} returned ${validAddress}`, {toFile: true});
 
 	  // Skip any address that fails a quick write
 	  if (validAddress !== 0){
@@ -69,57 +68,64 @@ export function Scan(bus) {
 	return FoundAddresses;
 }
 
-const AddressPairs = {
-	0x60: [0x50, 0x48],
-	0x61: [0x51, 0x49],
-	0x62: [0x52, 0x4A],
-	0x63: [0x53, 0x4B]
+const addressDict = {
+	0x60 : 0x50,
+	0x61 : 0x51,
+	0x62 : 0x52,
+	0x63 : 0x53
 };
 
-function CheckForHyperFuryRam(bus, addr){
-	if(!AddressPairs.hasOwnProperty(addr)){
+function CheckForHyperFuryRam(bus, addr) {
+	if(!addressDict.hasOwnProperty(addr)){
 		return false;
 	}
 
-	const SubAddresses = AddressPairs[addr];
+	const SubAddress = addressDict[addr];
 
-	const iReturn = bus.ReadByte(SubAddresses[0], 0x31); // Value changes every time
-	bus.log(`Address [${SubAddresses[0]}], Reg 31: ${iReturn}`, {toFile: true});
+	const iRet1 = bus.ReadByte(SubAddress, 0x00);
+	bus.log(`Address [${SubAddress}], Reg 00: ${iRet1}`, {toFile: true});
 
-	if(iReturn >= 0){
-		const iRet1 = bus.ReadByte(SubAddresses[1], 0x21);
-		bus.log(`Address [${SubAddresses[1]}], Reg 21: ${iRet1}`, {toFile: true});
+	const iRet2 = bus.ReadByte(SubAddress, 0x80);
+	bus.log(`Address [${SubAddress}], Reg 80: ${iRet2}`, {toFile: true});
 
-		const iRet2 = bus.ReadByte(SubAddresses[1], 0x25);
-		bus.log(`Address [${SubAddresses[1]}], Reg 25: ${iRet2}`, {toFile: true});
 
-		const iRet3 = bus.ReadByte(SubAddresses[1], 0x27);
-		bus.log(`Address [${SubAddresses[1]}], Reg 27: ${iRet3}`, {toFile: true});
+	bus.WriteByte(addr, 0x08, 0x53);
 
-		const ExpectedValues = [120, 130, 180, 200, 220, 240];
+	const nameReturnBytes = [];
 
-		return ExpectedValues.includes(iRet1) && ExpectedValues.includes(iRet2) && ExpectedValues.includes(iRet3);
+	for(let bytesToRead = 0; bytesToRead < 4; bytesToRead++) {
+		const returnByte = BinaryUtils.WriteInt16LittleEndian(bus.ReadWord(addr, bytesToRead+1));
+		bus.log(`Return Byte ${bytesToRead} returned ${returnByte[1]}`, {toFile : true});
+		nameReturnBytes.push(returnByte[1]);
 	}
 
-	return false;
+	bus.log(`Fury Identifier Return: ${nameReturnBytes}`, {toFile : true});
 
+	const deviceCheck = String.fromCharCode(...nameReturnBytes).includes("FURY");
+
+	bus.log(`Return Contains FURY String: ${deviceCheck}`, {toFile : true});
+
+	const modelByte = BinaryUtils.WriteInt16LittleEndian(bus.ReadWord(addr, 0x06))[1]; //byte 0 is 0x5A header.
+	bus.log(`Model Byte: ${modelByte}`, {toFile : true});
+
+	bus.WriteByte(addr, 0x08, 0x44);
+
+	return iRet1 === 81 && iRet2 > 0 && deviceCheck;
 }
 
 function SetMode(){
 	bus.WriteByte(0x08, 0x53); // start Command
-	bus.WriteByte(0x0b, 0x00);
-	bus.WriteByte(0x09, 0x10);
-	bus.WriteByte(0x27, 0x02);
+	bus.WriteByte(0x0b, 0x00); //LED index
+	bus.WriteByte(0x09, 0x10); //Mode set to direct
 
-	bus.WriteByte(0x0C, 0x01);
-	bus.WriteByte(0x18, 0x18);
-	bus.WriteByte(0x20, 0x50);
+	bus.WriteByte(0x0C, 0x01); //Effect Direction. Why does this even need set when we're in direct mode??!?!?!
+	bus.WriteByte(0x20, 0x50); //Brightness, why does this get set to 0x50/80??
 
 	bus.WriteByte(0x08, 0x44); // End Command
 }
 
 
-function SendColors(shutdown = false){
+function SendColors(shutdown = false, firstRun = false){
 	const RGBData = [];
 
 	//Fetch Colors
@@ -137,18 +143,21 @@ function SendColors(shutdown = false){
 		RGBData.push(...Color);
  	}
 
-	WriteRGBData(RGBData);
+	WriteRGBData(RGBData, firstRun);
 }
 
 const OldRGBData = [];
 
-function WriteRGBData(RGBData){
+function WriteRGBData(RGBData, firstRun){
 	//const start = Date.now();
 
 	bus.WriteByte(0x08, 0x53);
-	bus.WriteByte(0x0b, 0x00);
-	bus.WriteByte(0x09, 0x10);
-	bus.WriteByte(0x27, 0x02);
+	device.pause(3);
+
+	if(firstRun) {
+		bus.WriteByte(0x0b, 0x00);
+		bus.WriteByte(0x09, 0x10);
+	}
 
 	for(let i = 0; i < RGBData.length; i++){
 		if(RGBData[i] != OldRGBData[i]){
@@ -158,7 +167,7 @@ function WriteRGBData(RGBData){
 
 			while(returnCode != 0 && retryCount > 0){
 				retryCount -= 1;
-				device.pause(1);
+				device.pause(3);
 				returnCode = bus.WriteByte(0x50 + i, RGBData[i]);
 
 				if(returnCode === 0){
@@ -175,6 +184,7 @@ function WriteRGBData(RGBData){
 	}
 
 	bus.WriteByte(0x08, 0x44);
+	device.pause(3);
 
 	const end = Date.now();
 	//device.log(`Frame Took ${end - start}ms!`);
@@ -193,4 +203,35 @@ function hexToRgb(hex) {
 
 export function ImageUrl() {
 	return "https://marketplace.signalrgb.com/devices/default/ram.png";
+}
+
+class BinaryUtils {
+	static WriteInt16LittleEndian(value) {
+		return [value & 0xFF, (value >> 8) & 0xFF];
+	}
+	static WriteInt16BigEndian(value) {
+		return this.WriteInt16LittleEndian(value).reverse();
+	}
+	static ReadInt16LittleEndian(array) {
+		return (array[0] & 0xFF) | (array[1] & 0xFF) << 8;
+	}
+	static ReadInt16BigEndian(array) {
+		return this.ReadInt16LittleEndian(array.slice(0, 2).reverse());
+	}
+	static ReadInt32LittleEndian(array) {
+		return (array[0] & 0xFF) | ((array[1] << 8) & 0xFF00) | ((array[2] << 16) & 0xFF0000) | ((array[3] << 24) & 0xFF000000);
+	}
+	static ReadInt32BigEndian(array) {
+		if (array.length < 4) {
+			array.push(...new Array(4 - array.length).fill(0));
+		}
+
+		return this.ReadInt32LittleEndian(array.slice(0, 4).reverse());
+	}
+	static WriteInt32LittleEndian(value) {
+		return [value & 0xFF, ((value >> 8) & 0xFF), ((value >> 16) & 0xFF), ((value >> 24) & 0xFF)];
+	}
+	static WriteInt32BigEndian(value) {
+		return this.WriteInt32LittleEndian(value).reverse();
+	}
 }
