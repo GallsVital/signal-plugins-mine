@@ -307,9 +307,9 @@ export class LegacyCorsairLibrary {
 				maxDPI : 12400
 			},
 			"Glaive Pro" : {
-				vLedNames : [ "Mouse" ],
-				vLedPositions : [ [1, 1] ],
-				vKeys : [ 3 ], //was 1 but that no worky
+				vLedNames : [ "Logo Zone", "Light Edge Zone", "Front Zone" ],
+				vLedPositions : [ [1, 2], [1, 0], [1, 1] ],
+				vKeys : [ 2, 6, 1 ],
 				size : [3, 3],
 				maxDPI : 12400
 			},
@@ -498,9 +498,9 @@ export class LegacyCorsairProtocol {
 			2 : "Middle Click",
 			3 : "Backwards",
 			4 : "Forwards",
-			5 : "null 5",
-			6 : "null 6",
-			7 : "null 7",
+			5 : "DPI Up",
+			6 : "DPI Down",
+			7 : "Sniper",
 			8 : "Keypad 1",
 			9 : "Keypad 2",
 			10 : "Keypad 3",
@@ -517,9 +517,36 @@ export class LegacyCorsairProtocol {
 			24 : "Profile Up",
 			25 : "Profile Down"
 		};
+
+		this.defaultBinds = {
+			0 : 0,
+			1 : 0,
+			2 : 0,
+			3 : 0,
+			4 : 0,
+			5 : 0,
+			6 : 0,
+			7 : 0,
+			8 :  97,
+			9 :  98,
+			10 : 99,
+			11 : 100,
+			12 : 101,
+			13 : 102,
+			14 : 103,
+			15 : 104,
+			16 : 105,
+			17 : 96,
+			18 : 109,
+			19 : 107,
+			20 : 0,
+			24 : 0,
+			25 : 0
+		};
 	}
 
 	getPressedKey(keyIdx) { return this.keyIdx[keyIdx]; }
+	getKeycode(keyIdx) { return this.defaultBinds[keyIdx]; }
 
 	getDeviceName() { return this.Config.deviceName; }
 	setDeviceName(deviceName) { this.Config.deviceName = deviceName; }
@@ -742,6 +769,7 @@ export class LegacyCorsairProtocol {
 		}
 
 		device.addFeature("mouse");
+		device.addFeature("keyboard");
 	}
 	/** Configure the device based on the dictionary and data gathered in Device Initialization. */
 	configureDevice() {
@@ -1126,7 +1154,7 @@ class BitArray {
 					};
 
 					mouse.sendEvent(eventData, "Button Press");
-
+					//keyboard.sendHid(LegacyCorsair.getKeycode(bitIdx), {released : !isPressed}); //handler for no macro sys.
 				}
 				}
 			}
