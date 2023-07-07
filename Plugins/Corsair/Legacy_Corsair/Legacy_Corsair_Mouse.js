@@ -769,7 +769,7 @@ export class LegacyCorsairProtocol {
 		}
 
 		device.addFeature("mouse");
-		device.addFeature("keyboard");
+		//device.addFeature("keyboard");
 	}
 	/** Configure the device based on the dictionary and data gathered in Device Initialization. */
 	configureDevice() {
