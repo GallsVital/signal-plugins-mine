@@ -131,7 +131,7 @@ Item {
 			    	font.family: "Poppins"
 			    	font.pixelSize: 15
 			    	verticalAlignment: TextInput.AlignVCenter
-			    	placeholderText: "192.168.0.1"
+			    	placeholderText: "IP Address"
 			    	onEditingFinished: {
 			    		discovery.forceDiscover(discoverIP.text);
 			    	}
