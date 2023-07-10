@@ -648,9 +648,10 @@ class GigabyteMasterGPuList {
 
 		this.devices = [
 			new GigabyteMasterIdentifier(Nvidia.RTX2060S,       GigabyteMasterIds.RTX2060S_AORUS_P,         		0x50, "GIGABYTE AORUS 2060 Super OC"),
-			new GigabyteMasterIdentifier(Nvidia.RTX2060S_OC,    GigabyteMasterIds.RTX2060S_AORUS_OC,         		0x50, "GIGABYTE AORUS 2060 Super AORUS OC"),
+			new GigabyteMasterIdentifier(Nvidia.RTX2060S_OC,    GigabyteMasterIds.RTX2060S_AORUS_OC,         		0x50, "GIGABYTE AORUS 2060 Super OC"),
 			new GigabyteMasterIdentifier(Nvidia.RTX2060S_OC,	GigabyteMasterIds.RTX2060S_AORUS_P,         		0x50, "GIGABYTE AORUS 2060 Super OC"),
-			new GigabyteMasterIdentifier(Nvidia.RTX2080_A,		GigabyteMasterIds.RTX2080S_AORUS,					0x50, "GIGABYTE AORUS 2080"),
+			new GigabyteMasterIdentifier(Nvidia.RTX2080_A,		GigabyteMasterIds.RTX2080_AORUS,					0x50, "GIGABYTE AORUS 2080"),
+			new GigabyteMasterIdentifier(Nvidia.RTX2080_A,		GigabyteMasterIds.RTX2080S_AORUS,					0x50, "GIGABYTE AORUS 2080 Super"),
 			new GigabyteMasterIdentifier(Nvidia.RTX2080S,       GigabyteMasterIds.RTX2080S_AORUS,         			0x50, "GIGABYTE AORUS 2080 Super OC"),
 			new GigabyteMasterIdentifier(Nvidia.RTX2080S,       GigabyteMasterIds.RTX2080S_AORUS_P,         		0x50, "GIGABYTE AORUS 2080 Super"),
 			new GigabyteMasterIdentifier(Nvidia.RTX3060_LHR,    GigabyteMasterIds.RTX3060_GAMING_OC_12GB,        	0x62, "GIGABYTE 3060 Gaming OC LHR"),
