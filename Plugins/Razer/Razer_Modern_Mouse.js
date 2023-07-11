@@ -199,34 +199,12 @@ function deviceInitialization(wake = false) {
 	if (!wake) {
 		device.set_endpoint(Razer.Config.deviceEndpoint[`interface`], Razer.Config.deviceEndpoint[`usage`], Razer.Config.deviceEndpoint[`usage_page`]);
 		Razer.getDeviceTransactionID();
-
-		if(Razer.getDeviceInitializationStatus()) {
-			deviceConfiguration();
-		}
 	}
 
 	device.set_endpoint(Razer.Config.deviceEndpoint[`interface`], Razer.Config.deviceEndpoint[`usage`], Razer.Config.deviceEndpoint[`usage_page`]);
 
-	if (settingControl) {
-		if (razerDeviceLibrary.LEDLibrary[razerDeviceLibrary.PIDLibrary[device.productId()]]["hyperscrollWheel"]) {
-			RazerMouse.setDeviceScrollMode(ScrollMode);
-			RazerMouse.setDeviceScrollAccel(ScrollAccel);
-			RazerMouse.setDeviceSmartReel(SmartReel);
-		}
-
-		if (razerDeviceLibrary.LEDLibrary[razerDeviceLibrary.PIDLibrary[device.productId()]]["wireless"]) {
-			Razer.setDeviceIdleTimeout(idleTimeout);
-			Razer.setDeviceLowPowerPercentage(lowPowerPercentage);
-		}
-
-		RazerMouse.setDeviceLOD(asymmetricLOD, liftOffDistance);
-		Razer.setDevicePollingRate(pollingRate);
-
-		if (!OnboardDPI) {
-			Razer.setDeviceMode("Software Mode");
-			DPIHandler.setActiveControl(true);
-			DPIHandler.update();
-		}
+	if(Razer.getDeviceInitializationStatus()) {
+		deviceConfiguration();
 	}
 }
 
@@ -257,6 +235,28 @@ function deviceConfiguration() {
 		} else {
 			Razer.setDeviceMode("Software Mode");
 			DPIHandler.update(); //Yet again I hate edge cases.
+		}
+	}
+
+	if (settingControl) {
+		if (razerDeviceLibrary.LEDLibrary[razerDeviceLibrary.PIDLibrary[device.productId()]]["hyperscrollWheel"]) {
+			RazerMouse.setDeviceScrollMode(ScrollMode);
+			RazerMouse.setDeviceScrollAccel(ScrollAccel);
+			RazerMouse.setDeviceSmartReel(SmartReel);
+		}
+
+		if (razerDeviceLibrary.LEDLibrary[razerDeviceLibrary.PIDLibrary[device.productId()]]["wireless"]) {
+			Razer.setDeviceIdleTimeout(idleTimeout);
+			Razer.setDeviceLowPowerPercentage(lowPowerPercentage);
+		}
+
+		RazerMouse.setDeviceLOD(asymmetricLOD, liftOffDistance);
+		Razer.setDevicePollingRate(pollingRate);
+
+		if (!OnboardDPI) {
+			Razer.setDeviceMode("Software Mode");
+			DPIHandler.setActiveControl(true);
+			DPIHandler.update();
 		}
 	}
 }
@@ -727,7 +727,8 @@ export class deviceLibrary {
 				size: [3, 3],
 				vLedNames: ["ScrollWheel", "Logo", "Side Panel"],
 				vLedPositions: [[0, 0], [0, 2], [1, 1]],
-				maxDPI: 18000
+				maxDPI: 18000,
+				requiresApplyPacket : true
 			},
 			"Naga Pro":
 			{
@@ -862,56 +863,56 @@ const razerDeviceLibrary = new deviceLibrary();
 export class RazerProtocol {
 	constructor() {
 		/** Defines for the 3 device modes that a Razer device can be set to. FactoryMode should never be used, but is here as reference. */
-		this.DeviceModes =
-		{
-			"Hardware Mode": 0x00,
-			"Factory Mode": 0x02,
-			"Software Mode": 0x03,
-			0x00: "Hardware Mode",
-			0x02: "Factory Mode",
-			0x03: "Software Mode"
-		};
+		this.DeviceModes = Object.freeze(
+			{
+				"Hardware Mode": 0x00,
+				"Factory Mode": 0x02,
+				"Software Mode": 0x03,
+				0x00: "Hardware Mode",
+				0x02: "Factory Mode",
+				0x03: "Software Mode"
+			});
 		/** Defines for responses coming from a device in response to commands. */
-		this.DeviceResponses =
-		{
-			0x01: "Device Busy",
-			0x02: "Command Success",
-			0x03: "Command Failure",
-			0x04: "Command Time Out",
-			0x05: "Command Not Supported"
-		};
+		this.DeviceResponses = Object.freeze(
+			{
+				0x01: "Device Busy",
+				0x02: "Command Success",
+				0x03: "Command Failure",
+				0x04: "Command Time Out",
+				0x05: "Command Not Supported"
+			});
 		/** These are used to identify what LED zone we're poking at on a device. Makes no difference for RGB Sends as it doesn't work with Legacy devices, but it does tell us what zones a modern device has to some extent.*/
-		this.LEDIDs =
-		{
-			"Scroll_Wheel": 0x01,
-			"Battery": 0x02,
-			"Logo": 0x03,
-			"Backlight": 0x04,
-			"Macro": 0x05, //pretty sure this just screams that it's a keyboard.
-			"Game": 0x06,
-			"Underglow": 0x0A,
-			"Red_Profile": 0x0C,
-			"Green_Profile": 0x0D,
-			"Blue_Profile": 0x0E,
-			"Unknown6": 0x0F,
-			"Right_Side_Glow": 0x10,
-			"Left_Side_Glow": 0x11,
-			"Charging": 0x20,
-			0x01: "Scroll_Wheel",
-			0x02: "Battery",
-			0x03: "Logo",
-			0x04: "Backlight",
-			0x05: "Macro",
-			0x06: "Game",
-			0x0A: "Underglow",
-			0x0C: "Red_Profile",
-			0x0D: "Green_Profile",
-			0x0E: "Blue_Profile",
-			0x0F: "Unknown6",
-			0x10: "Right_Side_Glow",
-			0x11: "Left_Side_Glow",
-			0x20: "Charging"
-		};
+		this.LEDIDs = Object.freeze(
+			{
+				"Scroll_Wheel": 0x01,
+				"Battery": 0x02,
+				"Logo": 0x03,
+				"Backlight": 0x04,
+				"Macro": 0x05, //pretty sure this just screams that it's a keyboard.
+				"Game": 0x06,
+				"Underglow": 0x0A,
+				"Red_Profile": 0x0C,
+				"Green_Profile": 0x0D,
+				"Blue_Profile": 0x0E,
+				"Unknown6": 0x0F,
+				"Right_Side_Glow": 0x10,
+				"Left_Side_Glow": 0x11,
+				"Charging": 0x20,
+				0x01: "Scroll_Wheel",
+				0x02: "Battery",
+				0x03: "Logo",
+				0x04: "Backlight",
+				0x05: "Macro",
+				0x06: "Game",
+				0x0A: "Underglow",
+				0x0C: "Red_Profile",
+				0x0D: "Green_Profile",
+				0x0E: "Blue_Profile",
+				0x0F: "Unknown6",
+				0x10: "Right_Side_Glow",
+				0x11: "Left_Side_Glow",
+				0x20: "Charging"
+			});
 
 		this.Config =
 		{
@@ -953,6 +954,8 @@ export class RazerProtocol {
 			DeviceInitialized : false,
 			/** Variable Used to Indicate if a Device Requires an Apply Packet for Lighting Data. */
 			requiresApplyPacket : false,
+			/** Variable Used to Indicate if a Device Uses the Standard Modern Matrix. */
+			supportsModernMatrix : false,
 
 			SupportedFeatures:
 			{
@@ -1001,6 +1004,9 @@ export class RazerProtocol {
 
 	getInputDict() { return this.Config.inputDict; }
 	setInputDict(InputDict) { this.Config.inputDict = InputDict; }
+
+	getSupportsModernMatrix() { return this.Config.supportsModernMatrix; }
+	setSupportsModernMatrix(supportsModernMatrix) { this.Config.supportsModernMatrix = supportsModernMatrix; }
 
 	getNumberOfLEDs() { return this.Config.NumberOfLEDs; }
 	/** Function for setting the number of LEDs a device has on it.*/
@@ -1080,33 +1086,33 @@ export class RazerProtocol {
 	detectSupportedFeatures() { //This list is not comprehensive, but is a good start.
 		const BatterySupport = this.getDeviceBatteryLevel();
 
-		if (BatterySupport > -1) {
+		if (BatterySupport !== -1) {
 			this.Config.SupportedFeatures.BatterySupport = true;
 			device.addFeature("battery");
 		}
 		const DPIStageSupport = RazerMouse.getDeviceDPIStages();
 
-		if (DPIStageSupport > -1) {
+		if (DPIStageSupport !== -1) {
 			this.Config.SupportedFeatures.DPIStageSupport = true;
 		}
 		const PollingRateSupport = this.getDevicePollingRate();
 
-		if (PollingRateSupport > -1) {
+		if (PollingRateSupport !== -1) {
 			this.Config.SupportedFeatures.PollingRateSupport = true;
 		}
 		const FirmwareVersionSupport = this.getDeviceFirmwareVersion();
 
-		if (FirmwareVersionSupport > -1) {
+		if (FirmwareVersionSupport !== -1) {
 			this.Config.SupportedFeatures.FirmwareVersionSupport = true;
 		}
 		const SerialNumberSupport = this.getDeviceSerial();
 
-		if (SerialNumberSupport > -1) {
+		if (SerialNumberSupport !== -1) {
 			this.Config.SupportedFeatures.SerialNumberSupport = true;
 		}
 		const DeviceModeSupport = this.getDeviceMode();
 
-		if (DeviceModeSupport > -1) {
+		if (DeviceModeSupport !== -1) {
 			this.Config.SupportedFeatures.DeviceModeSupport = true;
 		}
 		const HyperspeedSupport = this.getCurrentlyConnectedDongles();
@@ -1116,28 +1122,28 @@ export class RazerProtocol {
 		}
 		const ScrollAccelerationSupport = RazerMouse.getDeviceScrollAccel();
 
-		if (ScrollAccelerationSupport > -1) {
+		if (ScrollAccelerationSupport !== -1) {
 			this.Config.SupportedFeatures.ScrollAccelerationSupport = true;
 		}
 		const ScrollModeSupport = RazerMouse.getDeviceScrollMode();
 
-		if (ScrollModeSupport > -1) {
+		if (ScrollModeSupport !== -1) {
 			this.Config.SupportedFeatures.ScrollModeSupport = true;
 		}
 		const SmartReelSupport = RazerMouse.getDeviceSmartReel();
 
-		if (SmartReelSupport > -1) {
+		if (SmartReelSupport !== -1) {
 			this.Config.SupportedFeatures.SmartReelSupport = true;
 		}
 		const IdleTimeoutSupport = this.getDeviceIdleTimeout();
 
-		if (IdleTimeoutSupport > -1) {
+		if (IdleTimeoutSupport !== -1) {
 			this.Config.SupportedFeatures.IdleTimeoutSupport = true;
 		}
 
 		const lowBatteryPercentageSupport = this.getDeviceLowPowerPercentage();
 
-		if(lowBatteryPercentageSupport > -1) {
+		if(lowBatteryPercentageSupport !== -1) {
 			this.Config.SupportedFeatures.LowPowerPercentage = true;
 		}
 	}
@@ -1226,9 +1232,14 @@ export class RazerProtocol {
 			for (let testTransactionID = 0x00; testTransactionID < possibleTransactionIDs.length; testTransactionID++) {
 				const TransactionID = possibleTransactionIDs[testTransactionID];
 				const packet = [0x02, 0x00, 0x82];
-				this.ConfigPacketSend(packet, TransactionID);
 
-				const returnPacket = this.ConfigPacketRead(TransactionID);
+				const [returnPacket, errorCode] = this.ConfigPacketSend(packet, TransactionID);
+
+				if (errorCode !== 2) {
+
+					device.log("Error fetching Device Charging Status. Error Code: " + this.DeviceResponses[errorCode], { toFile: true });
+				}
+
 				const Serialpacket = returnPacket.slice(8, 23);
 
 				if (Serialpacket.every(item => item !== 0)) {
@@ -1251,6 +1262,8 @@ export class RazerProtocol {
 	}
 	/**Function to ensure that a grabbed transaction ID is not for a device we've already found a transaction ID for.*/
 	checkDeviceTransactionID(TransactionID, SerialString, devicesFound) {
+		device.log(`Serial String ${SerialString}`);
+
 		if (SerialString.length === 15 && devicesFound === 0) {
 			this.Config.TransactionID = TransactionID;
 			devicesFound++;
@@ -1277,10 +1290,6 @@ export class RazerProtocol {
 
 			device.log("Error fetching Device Charging Status. Error Code: " + this.DeviceResponses[errorCode], { toFile: true });
 
-			if (errorCode === 1) {
-				return -2;
-			}
-
 			return -1;
 		}
 
@@ -1298,7 +1307,7 @@ export class RazerProtocol {
 			return batteryStatus + 1;
 		}
 
-		return -3;
+		return -1;
 	}
 	/** Function to check a device's battery percentage.*/
 	getDeviceBatteryLevel(retryAttempts = 5) {
@@ -1321,10 +1330,6 @@ export class RazerProtocol {
 
 			device.log("Error fetching Device Battery Level. Error Code: " + this.DeviceResponses[errorCode], { toFile: true });
 
-			if (errorCode === 1) {
-				return -2;
-			}
-
 			return -1;
 		}
 
@@ -1345,7 +1350,7 @@ export class RazerProtocol {
 			return -1;
 		}
 
-		return -3;
+		return -1;
 	}
 	/** Function to fetch a device's serial number. This serial is the same as the one printed on the physical device.*/
 	getDeviceSerial(retryAttempts = 5) {
@@ -1368,10 +1373,6 @@ export class RazerProtocol {
 
 			device.log("Error fetching Device Serial. Error Code: " + this.DeviceResponses[errorCode], { toFile: true });
 
-			if (errorCode === 1) {
-				return -2;
-			}
-
 			return -1;
 		}
 
@@ -1385,7 +1386,7 @@ export class RazerProtocol {
 			return SerialString;
 		}
 
-		return -3;
+		return -1;
 	}
 	/** Function to check a device's firmware version.*/
 	getDeviceFirmwareVersion(retryAttempts = 5) {
@@ -1408,10 +1409,6 @@ export class RazerProtocol {
 
 			device.log("Error fetching Device Firmware Version. Error Code: " + this.DeviceResponses[errorCode], { toFile: true });
 
-			if (errorCode === 1) {
-				return -2;
-			}
-
 			return -1;
 		}
 
@@ -1424,7 +1421,7 @@ export class RazerProtocol {
 		}
 
 
-		return -3;
+		return -1;
 	}
 	/** Function to fetch all of a device's LED Zones.*/
 	getDeviceLEDZones() {
@@ -1473,10 +1470,6 @@ export class RazerProtocol {
 
 			device.log("Error fetching Current Device Mode. Error Code: " + this.DeviceResponses[errorCode], { toFile: true });
 
-			if (errorCode === 1) {
-				return -2;
-			}
-
 			return -1;
 		}
 
@@ -1487,7 +1480,7 @@ export class RazerProtocol {
 			return deviceMode;
 		}
 
-		return -3;
+		return -1;
 	}
 	/** Function to set a device's mode between hardware and software.*/
 	setDeviceMode(mode, retryAttempts = 5) {
@@ -1510,10 +1503,6 @@ export class RazerProtocol {
 		if (errorCode !== 2) {
 
 			device.log("Error Setting Device Mode. Error Code: " + this.DeviceResponses[errorCode], { toFile: true });
-
-			if (errorCode === 1) {
-				return -2;
-			}
 
 			return -1;
 		}
@@ -1541,10 +1530,6 @@ export class RazerProtocol {
 
 			device.log("Error fetching Device Low Power Percentage. Error Code: " + this.DeviceResponses[errorCode], { toFile: true });
 
-			if (errorCode === 1) {
-				return -2;
-			}
-
 			return -1;
 		}
 
@@ -1555,7 +1540,7 @@ export class RazerProtocol {
 			return lowPowerPercentage;
 		}
 
-		return -3;
+		return -1;
 	}
 	/** Function to set at what battery percentage a device will enter low power mode.*/
 	setDeviceLowPowerPercentage(lowPowerPercentage, retryAttempts = 5) {
@@ -1578,10 +1563,6 @@ export class RazerProtocol {
 
 			device.log("Error setting Device Low Power Percentage. Error Code: " + this.DeviceResponses[errorCode], { toFile: true });
 
-			if (errorCode === 1) {
-				return -2;
-			}
-
 			return -1;
 		}
 
@@ -1595,10 +1576,6 @@ export class RazerProtocol {
 		if (errorCode !== 2) {
 
 			device.log("Error fetching Current Device Polling Rate. Error Code: " + this.DeviceResponses[errorCode], { toFile: true });
-
-			if (errorCode === 1) {
-				return -2;
-			}
 
 			return -1;
 		}
@@ -1616,7 +1593,7 @@ export class RazerProtocol {
 			device.log("Error fetching Current Device High Polling Rate. Error Code: " + secondaryErrorCode, { toFile: true });
 
 			if (secondaryErrorCode === 1) {
-				return -2;
+				return -1;
 			}
 
 			return -1;
@@ -1630,7 +1607,7 @@ export class RazerProtocol {
 			return pollingRate;
 		}
 
-		return -3;
+		return -1;
 	}
 	/** Function to set a device's polling rate.*/
 	setDevicePollingRate(pollingRate) {
@@ -1649,10 +1626,6 @@ export class RazerProtocol {
 
 			device.log("Error fetching Current Device Polling Rate. Error Code: " + this.DeviceResponses[errorCode], { toFile: true });
 
-			if (errorCode === 1) {
-				return -2;
-			}
-
 			return -1;
 		}
 
@@ -1667,10 +1640,6 @@ export class RazerProtocol {
 
 			device.log("Error fetching Current Device Polling Rate. Error Code: " + this.DeviceResponses[errorCode], { toFile: true });
 
-			if (errorCode === 1) {
-				return -2;
-			}
-
 			return -1;
 		}
 		const secondaryReturnValues = this.ConfigPacketSend([0x02, 0x00, 0x40, 0x01, 8000 / pollingRate]);
@@ -1681,7 +1650,7 @@ export class RazerProtocol {
 			device.log("Error fetching Current Device Polling Rate. Error Code: " + secondaryErrorCode, { toFile: true });
 
 			if (secondaryErrorCode === 1) {
-				return -2;
+				return -1;
 			}
 
 			return -1;
@@ -1697,10 +1666,6 @@ export class RazerProtocol {
 
 			device.log("Error fetching Current Device Idle Timeout Setting. Error Code: " + this.DeviceResponses[errorCode], { toFile: true });
 
-			if (errorCode === 1) {
-				return -2;
-			}
-
 			return -1;
 		}
 
@@ -1711,7 +1676,7 @@ export class RazerProtocol {
 			return idleTimeout;
 		}
 
-		return -3;
+		return -1;
 	}
 	/** Function to set the device idle timeout on supported devices. */
 	setDeviceIdleTimeout(timeout) {
@@ -1724,10 +1689,6 @@ export class RazerProtocol {
 
 			device.log("Error setting Current Device Idle Timeout Setting. Error Code: " + this.DeviceResponses[errorCode], { toFile: true });
 
-			if (errorCode === 1) {
-				return -2;
-			}
-
 			return -1;
 		}
 
@@ -1738,6 +1699,7 @@ export class RazerProtocol {
 		const ModernMatrix = this.getModernMatrixEffect();
 
 		if (ModernMatrix > -1) {
+			this.setSupportsModernMatrix(true);
 			this.setModernSoftwareLightingMode();
 		} else if (this.Config.MouseType === "Modern") {
 			this.setLegacyMatrixEffect(); ///MMM Edge cases are tasty.
@@ -1752,10 +1714,6 @@ export class RazerProtocol {
 		if (errorCode !== 2) {
 
 			device.log("Error setting Legacy Matrix Effect. Error Code: " + this.DeviceResponses[errorCode], { toFile: true });
-
-			if (errorCode === 1) {
-				return -2;
-			}
 
 			return -1;
 		}
@@ -1772,10 +1730,6 @@ export class RazerProtocol {
 
 			device.log("Error fetching Modern Matrix Effect. Error Code: " + this.DeviceResponses[errorCode], { toFile: true });
 
-			if (errorCode === 1) {
-				return -2;
-			}
-
 			return -1;
 		}
 
@@ -1790,10 +1744,6 @@ export class RazerProtocol {
 		if (errorCode !== 2) {
 
 			device.log("Error setting Modern Matrix Effect. Error Code: " + this.DeviceResponses[errorCode], { toFile: true });
-
-			if (errorCode === 1) {
-				return -2;
-			}
 
 			return -1;
 		}
@@ -1812,10 +1762,6 @@ export class RazerProtocol {
 
 			device.log("Error fetching Charging Dock Brightness. Error Code: " + this.DeviceResponses[errorCode], { toFile: true });
 
-			if (errorCode === 1) {
-				return -2;
-			}
-
 			return -1;
 		}
 
@@ -1826,7 +1772,7 @@ export class RazerProtocol {
 			return dockBrightness;
 		}
 
-		return -3;
+		return -1;
 	}
 	/** Function to set the Chroma Charging Dock brightness.*/
 	setChargingDockBrightness(brightness) {
@@ -1836,10 +1782,6 @@ export class RazerProtocol {
 		if (errorCode !== 2) {
 
 			device.log("Error setting Charging Dock Brightness. Error Code: " + this.DeviceResponses[errorCode], { toFile: true });
-
-			if (errorCode === 1) {
-				return -2;
-			}
 
 			return -1;
 		}
@@ -1856,10 +1798,6 @@ export class RazerProtocol {
 
 			device.log("Error setting Hyperspeed Dongle to Pairing Mode. Error Code: " + this.DeviceResponses[errorCode], { toFile: true });
 
-			if (errorCode === 1) {
-				return -2;
-			}
-
 			return -1;
 		}
 
@@ -1874,10 +1812,6 @@ export class RazerProtocol {
 
 			device.log("Error fetching Devices Currently Connected to Hyperspeed Dongle. Error Code: " + this.DeviceResponses[errorCode], { toFile: true });
 
-			if (errorCode === 1) {
-				return -2;
-			}
-
 			return -1;
 		}
 
@@ -1885,7 +1819,7 @@ export class RazerProtocol {
 			if (returnPacket[10] === undefined || returnPacket[11] === undefined || returnPacket[13] === undefined || returnPacket[14] === undefined) {
 				device.log("Error fetching Devices Currently Connected to dongle, due to out of spec packet response.", { toFile: true });
 
-				return -2; //return -2 as this should be a retry.
+				return -1; //return -1 as this should be a retry.
 			}
 
 			const device1ConnectionStatus = returnPacket[1];
@@ -1916,7 +1850,7 @@ export class RazerProtocol {
 			return pairedPids;
 		}
 
-		return -3;
+		return -1;
 	}
 	/** Function to fetch connected device dongles from the connected dongle?!?!?*/
 	getNumberOfPairedDongles() {
@@ -1925,10 +1859,6 @@ export class RazerProtocol {
 		if (errorCode !== 2) {
 
 			device.log("Error fetching number of devices current paired to dongle. Error Code: " + this.DeviceResponses[errorCode], { toFile: true });
-
-			if (errorCode === 1) {
-				return -2;
-			}
 
 			return -1;
 		}
@@ -1949,7 +1879,7 @@ export class RazerProtocol {
 			return numberOfPairedDongles;
 		}
 
-		return -3;
+		return -1;
 	}
 	/** Function to set a modern keyboard's led colors.*/
 	setKeyboardDeviceColor(NumberOfLEDs, RGBData, packetidx) {
@@ -1982,10 +1912,6 @@ class RazerMouseFunctions {
 
 			device.log("Error setting Device Lift Off Distance. Error Code: " + Razer.DeviceResponses[errorCode], { toFile: true });
 
-			if (errorCode === 1) {
-				return -2;
-			}
-
 			return -1;
 		}
 
@@ -1999,10 +1925,6 @@ class RazerMouseFunctions {
 
 			device.log("Error fetching Current Device DPI. Error Code: " + Razer.DeviceResponses[errorCode], { toFile: true });
 
-			if (errorCode === 1) {
-				return -2;
-			}
-
 			return -1;
 		}
 
@@ -2010,7 +1932,7 @@ class RazerMouseFunctions {
 			if (returnPacket[9] === undefined || returnPacket[10] === undefined || returnPacket[11] === undefined || returnPacket[12] === undefined) {
 				device.log("Error fetching Current Device DPI. Device returned out of spec response", { toFile: true });
 
-				return -2;
+				return -1;
 			}
 
 			const dpiX = returnPacket[9] * 256 + returnPacket[10];
@@ -2021,7 +1943,7 @@ class RazerMouseFunctions {
 			return [dpiX, dpiY];
 		}
 
-		return -3;
+		return -1;
 	}
 	/** Function to set a device's current stage dpi. We leverage this with software buttons to emulate multiple stages.*/
 	setDeviceSoftwareDPI(dpi) {
@@ -2033,10 +1955,6 @@ class RazerMouseFunctions {
 		if (errorCode !== 2) {
 
 			device.log("Error setting Device Software DPI. Error Code: " + Razer.DeviceResponses[errorCode], { toFile: true });
-
-			if (errorCode === 1) {
-				return -2;
-			}
 
 			return -1;
 		}
@@ -2071,10 +1989,6 @@ class RazerMouseFunctions {
 
 			device.log("Error fetching Device Onboard DPI Stages. Error Code: " + Razer.DeviceResponses[errorCode], { toFile: true });
 
-			if (errorCode === 1) {
-				return -2;
-			}
-
 			return -1;
 		}
 
@@ -2083,7 +1997,9 @@ class RazerMouseFunctions {
 			const packet = [0x26, 0x04, 0x06, 0x00];
 
 			for(let bytes = 0; bytes < 40; bytes ++) {
-				packet[bytes + 4] = returnPacket[bytes + 9];
+				if(typeof returnPacket[bytes + 9] === "number") {
+					packet[bytes + 4] = returnPacket[bytes + 9]??0;
+				}
 			}
 
 			let errorCode = 0;
@@ -2107,7 +2023,7 @@ class RazerMouseFunctions {
 				device.log("Error setting Onboard Device DPI Stages. Error Code: " + Razer.DeviceResponses[errorCode], { toFile: true });
 
 				if (errorCode === 1) {
-					return -2;
+					return -1;
 				}
 
 				return -1;
@@ -2116,7 +2032,7 @@ class RazerMouseFunctions {
 			device.pause(10);
 		}
 
-		return -3;
+		return -1;
 	}
 	/** Function to fetch a device's onboard DPI levels.*/
 	getDeviceDPIStages(retryAttempts = 5) {//DPI6 does not get included in here.
@@ -2139,10 +2055,6 @@ class RazerMouseFunctions {
 		if (errorCode !== 2) {
 
 			device.log("Error fetching Device Onboard DPI Stages. Error Code: " + Razer.DeviceResponses[errorCode], { toFile: true });
-
-			if (errorCode === 1) {
-				return -2;
-			}
 
 			return -1;
 		}
@@ -2183,7 +2095,7 @@ class RazerMouseFunctions {
 			return [numberOfStages, currentStage, dpi1X, dpi1Y, dpi2X, dpi2Y, dpi3X, dpi3Y, dpi4X, dpi4Y, dpi5X, dpi5Y]; //Return 0 until I take the time to parse this properly.
 		}
 
-		return -3;
+		return -1;
 	}
 	/** Function to set multiple dpi stages. We can set how many stages a device has, and this is saved onboard. This works with hardware buttons.*/
 	setDeviceDPI(stage, dpiStages, saveToFlash = false, retryAttempts = 5) {
@@ -2203,7 +2115,6 @@ class RazerMouseFunctions {
 			} catch (error) {
 				device.log("Tried to Call a nonexistent DPI Stage.", {toFile : true});
 			}
-
 		}
 
 		let errorCode = 0;
@@ -2225,10 +2136,6 @@ class RazerMouseFunctions {
 		if (errorCode !== 2) {
 
 			device.log("Error setting Onboard Device DPI Stages. Error Code: " + Razer.DeviceResponses[errorCode], { toFile: true });
-
-			if (errorCode === 1) {
-				return -2;
-			}
 
 			return -1;
 		}
@@ -2258,10 +2165,6 @@ class RazerMouseFunctions {
 
 			device.log("Error fetching Current Device Scroll Mode. Error Code: " + Razer.DeviceResponses[errorCode], { toFile: true });
 
-			if (errorCode === 1) {
-				return -2;
-			}
-
 			return -1;
 		}
 
@@ -2272,7 +2175,7 @@ class RazerMouseFunctions {
 			return ScrollMode;
 		}
 
-		return -3;
+		return -1;
 	}
 	/** Function to set the scroll mode for supported mice. */
 	setDeviceScrollMode(ScrollMode, retryAttempts = 5) {
@@ -2294,10 +2197,6 @@ class RazerMouseFunctions {
 		if (errorCode !== 2) {
 
 			device.log("Error setting Current Device Scroll Mode. Error Code: " + Razer.DeviceResponses[errorCode], { toFile: true });
-
-			if (errorCode === 1) {
-				return -2;
-			}
 
 			return -1;
 		}
@@ -2325,10 +2224,6 @@ class RazerMouseFunctions {
 
 			device.log("Error fetching Current Scroll Acceleration Setting. Error Code: " + Razer.DeviceResponses[errorCode], { toFile: true });
 
-			if (errorCode === 1) {
-				return -2;
-			}
-
 			return -1;
 		}
 
@@ -2340,10 +2235,10 @@ class RazerMouseFunctions {
 				return ScrollAccel;
 			}
 
-			return -2; //An invalid response but not an invalid packet should prompt a refetch.
+			return -1; //An invalid response but not an invalid packet should prompt a refetch.
 		}
 
-		return -3;
+		return -1;
 	}
 	/** Function to set whether Scroll Acceleration is on for supported mice. */
 	setDeviceScrollAccel(ScrollAccel, retryAttempts = 5) {
@@ -2365,10 +2260,6 @@ class RazerMouseFunctions {
 		if (errorCode !== 2) {
 
 			device.log("Error setting Device Scroll Acceleration Mode. Error Code: " + Razer.DeviceResponses[errorCode], { toFile: true });
-
-			if (errorCode === 1) {
-				return -2;
-			}
 
 			return -1;
 		}
@@ -2396,10 +2287,6 @@ class RazerMouseFunctions {
 
 			device.log("Error fetching Current Device Smart Reel Setting. Error Code: " + Razer.DeviceResponses[errorCode], { toFile: true });
 
-			if (errorCode === 1) {
-				return -2;
-			}
-
 			return -1;
 		}
 
@@ -2412,7 +2299,7 @@ class RazerMouseFunctions {
 			}
 		}
 
-		return -3;
+		return -1;
 	}
 	/** Function to set whether SmartReel is on for supported mice. */
 	setDeviceSmartReel(SmartReel, retryAttempts = 5) {
@@ -2435,10 +2322,6 @@ class RazerMouseFunctions {
 
 			device.log("Error setting Device Smart Reel Mode. Error Code: " + Razer.DeviceResponses[errorCode], { toFile: true });
 
-			if (errorCode === 1) {
-				return -2;
-			}
-
 			return -1;
 		}
 
@@ -2452,7 +2335,11 @@ class RazerMouseFunctions {
 			Razer.StandardPacketSend([(NumberOfLEDs * 3 + 5), 0x0F, 0x03, 0x00, 0x00, 0x00, 0x00, NumberOfLEDs - 1].concat(RGBData));
 
 			if(Razer.getRequiresApplyPacket()) {
-				Razer.setModernMatrixEffect([0x00, 0x00, 0x08, 0x00, 0x01]);
+				if(!Razer.getSupportsModernMatrix()) {
+					Razer.setLegacyMatrixEffect();
+				} else {
+					Razer.setModernMatrixEffect([0x00, 0x00, 0x08, 0x00, 0x01]);
+				}
 			}
 		}
 	}
@@ -2479,10 +2366,6 @@ class RazerMouseFunctions {
 				device.log("Error fetching Modern Mouse LED Brightness. Error Code: " + Razer.DeviceResponses[errorCode], { toFile: true });
 			}
 
-			if (errorCode === 1) {
-				return -2;
-			}
-
 			return -1;
 		}
 
@@ -2493,7 +2376,7 @@ class RazerMouseFunctions {
 			return brightness * 100 / 255;
 		}
 
-		return -3;
+		return -1;
 	}
 	/** Function to set a modern mouse's led brightness. If we use 0, it does all of the zones in the matrix.*/
 	setModernMouseLEDBrightness(brightness, led = 0, detection = false, retryAttempts = 5) {
@@ -2516,10 +2399,6 @@ class RazerMouseFunctions {
 
 			if(!detection) {
 				device.log("Error setting Modern Mouse LED Brightness. Error Code: " + Razer.DeviceResponses[errorCode], { toFile: true });
-			}
-
-			if (errorCode === 1) {
-				return -2;
 			}
 
 			return -1;
@@ -2611,7 +2490,8 @@ export default class DpiController {
 		const dpi = dpiWrapper();
 		this.log("Current DPI: " + dpi);
 
-		return dpi;
+		// eslint-disable-next-line consistent-return
+		return dpi; //ESlint complains about not wanting a return. The dpi call checks if it has a return. If there's no return it does nothing. ESLint can't see that though.
 	}
 	/** Increment DPIStage */
 	increment() {
@@ -2667,7 +2547,7 @@ export default class DpiController {
 				continue;
 			}
 
-			if (stage >= this.maxStageIdx) {
+			if (+stage >= this.maxStageIdx) {
 				this.log(`Removing Stage: ${+stage+1}`);
 				device.removeProperty(`dpi${+stage+1}`);
 				this.dpiMap.delete(+stage+1);
