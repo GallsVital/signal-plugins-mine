@@ -86,7 +86,7 @@ function hexToRgb(hex) {
 }
 
 export function Validate(endpoint) {
-	return endpoint.interface === 2 | -1;
+	return endpoint.interface === 0 || endpoint.interface === 2;
 }
 
 class MysticLight {
