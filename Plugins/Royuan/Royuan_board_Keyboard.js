@@ -41,7 +41,7 @@ export function Initialize() {
 
 export function Render() {
 	sendColors();
-	device.pause(1000);
+	device.pause(1);
 }
 
 export function Shutdown(SystemSuspending) {
@@ -57,7 +57,6 @@ function sendColors(overrideColor) {
 	const packet = [];
 	packet[0] = 0x00; //Zero Padding
 	packet[1] = 0x0E;
-	packet[8] = 0x29;
 
 	const iPxX = vLedPositions[0][0];
 	const iPxY = vLedPositions[0][1];
@@ -74,8 +73,20 @@ function sendColors(overrideColor) {
 	packet[2]   = color[0];
 	packet[3]   = color[1];
 	packet[4]   = color[2];
+	packet[8] = CalculateCrc(packet);
 
 	device.send_report(packet, 65); // Send commands
+}
+
+function CalculateCrc(report) {
+	const iCrc = 255;
+	let sum = 0;
+
+	for (let iIdx = 1; iIdx < 5; iIdx++) {
+		sum += report[iIdx];
+	}
+
+	return iCrc - sum;
 }
 
 function hexToRgb(hex) {
