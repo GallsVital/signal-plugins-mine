@@ -58,6 +58,7 @@ export function Initialize() {
 	MSIMotherboard.detectGen2Support(); //Kind of cheating to call this detection, but welcome to MSI. Abandon all hope of autodetection.
 	MSIMotherboard.createLEDs();
 
+	if(perLED) { MSIMotherboard.setPerledMode(true); }
 
 	device.setName(device.getMotherboardName());
 	//device.write([0x01, 0xbb, 0x00, 0x00, 0x00, 0x00, 0x01], 64); //Let's make sure users have their leds on in bios.
@@ -785,9 +786,9 @@ class MysticLight {
 			{
 				OnboardLEDs    : 8,
 				RGBHeaders     : 1,
-				ARGBHeaders    : 2,
+				ARGBHeaders    : 3,
 				JPipeLEDs	   : 0, //This board has a Jpipe? It says to combine so idk what led is on that, we'll bypass it assuming it's PERLED
-				CorsairHeaders : 1,
+				CorsairHeaders : 0,
 				//PERLED
 				PerLEDOnboardLEDs : 8,
 				ForceZoneBased	  : false,
@@ -1450,7 +1451,6 @@ class MysticLight {
 		this.header2LEDCount = 0;
 		this.header3LEDCount = 0;
 
-		this.firstRun = true;
 	}
 
 	checkPerLEDSupport() {
@@ -1871,8 +1871,8 @@ class MysticLight {
 		return false;
 	}
 
-	setPerledMode() {
-		if(this.checkChangedLengths() || this.firstRun) {
+	setPerledMode(bypass = false) {
+		if(this.checkChangedLengths() || bypass) {
 			if(this.getTotalLEDCount()) {
 				device.send_report([
 					0x52, //enable, r,g,b, options, r,g,b,sync,seperator
@@ -1897,7 +1897,6 @@ class MysticLight {
 					0x00 //Save Flag
 				], 185);
 				device.log("Sent Efficiency PerLED Config Setup Packet.");
-				this.firstRun = false;
 			} else {
 				device.send_report([
 					0x52, //enable, r,g,b, options, r,g,b,sync,seperator
@@ -1922,7 +1921,6 @@ class MysticLight {
 					0x00 //Save Flag
 				], 185);
 				device.log("Sent High Capacity PerLED Config Setup Packet.");
-				this.firstRun = false;
 			}
 
 		}
