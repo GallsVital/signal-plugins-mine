@@ -6,13 +6,12 @@ export function Type() { return "SMBUS"; }
 export function Size() { return [2, 12]; }
 export function DefaultPosition(){return [150, 40];}
 export function DefaultScale(){return 10.0;}
-export function LedNames() { return vLedNames; }
-export function LedPositions() { return vLedPositions; }
 export function ControllableParameters(){
 	return [
 		{"property":"shutdownColor", "group":"lighting", "label":"Shutdown Color", "min":"0", "max":"360", "type":"color", "default":"#009bde"},
 		{"property":"LightingMode", "group":"lighting", "label":"Lighting Mode", "type":"combobox", "values":["Canvas", "Forced"], "default":"Canvas"},
 		{"property":"forcedColor", "group":"lighting", "label":"Forced Color", "min":"0", "max":"360", "type":"color", "default":"#009bde"},
+		{ "property": "highSpeedMode", "group": "lighting", "label": "Single Color Mode (Higher Speed)", "type": "boolean", "default": "false" },
 	];
 }
 
@@ -20,25 +19,64 @@ export function ControllableParameters(){
 shutdownColor:readonly
 LightingMode:readonly
 forcedColor:readonly
+highSpeedMode:readonly
 */
 
 const vLedNames = ["Led 12", "Led 11", "Led 10", "Led 9", "Led 8", "Led 7", "Led 6", "Led 5", "Led 4", "Led 3", "Led 2", "Led 1"];
-const vLedPositions = [
-	[0, 11], [0, 10], [0, 9], [0, 8], [0, 7], [0, 6], [0, 5], [0, 4], [0, 3], [0, 2], [0, 1], [0, 0]
-];
+const vLedPositions = [ [0, 11], [0, 10], [0, 9], [0, 8], [0, 7], [0, 6], [0, 5], [0, 4], [0, 3], [0, 2], [0, 1], [0, 0] ];
+
+const vSingleLEDPosition = [ [0, 5] ];
+const vSingleLEDName = [ "Main LED" ];
+
+export function LedNames() {
+	if(!highSpeedMode) {
+		return vLedNames;
+	}
+
+	return vSingleLEDName;
+}
+
+export function LedPositions() {
+	if(!highSpeedMode) {
+		return vLedPositions;
+	}
+
+	return vSingleLEDPosition;
+}
 
 export function Initialize() {
 	SetMode();
-	SendColors(false, true);
+
+	if(!highSpeedMode) {
+		SendColors(false, true);
+	}
 }
 
 export function Render() {
-	SendColors();
-	device.pause(10);
+	if(highSpeedMode) {
+		sendSingleColor();
+	} else {
+		SendColors();
+		device.pause(10);
+	}
+
 }
 
 export function Shutdown() {
-	//SendColors(true);
+	if(highSpeedMode) {
+		sendSingleColor(true);
+	} else {
+		SendColors(true);
+	}
+}
+
+export function onhighSpeedModeChanged() {
+	if(!highSpeedMode) {
+		device.setControllableLeds(vLedNames, vLedPositions);
+		SendColors(false, true);
+	} else {
+		device.setControllableLeds(vSingleLEDName, vSingleLEDPosition);
+	}
 }
 
 export function Scan(bus) {
@@ -114,14 +152,14 @@ function CheckForHyperFuryRam(bus, addr) {
 }
 
 function SetMode(){
-	bus.WriteByte(0x08, 0x53); // start Command
+	bus.WriteByte(0x08, 0x53); //start Command
 	bus.WriteByte(0x0b, 0x00); //LED index
 	bus.WriteByte(0x09, 0x10); //Mode set to direct
 
 	bus.WriteByte(0x0C, 0x01); //Effect Direction. Why does this even need set when we're in direct mode??!?!?!
-	bus.WriteByte(0x20, 0x50); //Brightness, why does this get set to 0x50/80??
+	bus.WriteByte(0x20, 0x50); //Brightness, why does this get set to 0x50/80?
 
-	bus.WriteByte(0x08, 0x44); // End Command
+	bus.WriteByte(0x08, 0x44); //End Command
 }
 
 
@@ -144,6 +182,40 @@ function SendColors(shutdown = false, firstRun = false){
  	}
 
 	WriteRGBData(RGBData, firstRun);
+}
+
+let lastRGBData = [];
+
+function sendSingleColor(shutdown = false) {
+
+	let Color;
+
+	if(shutdown){
+		Color = hexToRgb(shutdownColor);
+	}else if(LightingMode === "Forced") {
+		Color = hexToRgb(forcedColor);
+	} else {
+		Color = device.color(vSingleLEDPosition[0][0], vSingleLEDPosition[0][1]);
+	}
+
+	if(!CompareArrays(lastRGBData, Color)) {
+		bus.WriteByte(0x08, 0x53);
+		device.pause(1);
+		bus.WriteByte(0x09, 0x00);
+		device.pause(1);
+		bus.WriteByte(0x30, 0x01);
+		device.pause(1);
+
+		for(let bytes = 0; bytes < 3; bytes++) {
+			bus.WriteByte(0x31+bytes, Color[bytes]);
+			device.pause(1);
+		}
+
+		bus.WriteByte(0x08, 0x44); // End Command
+		device.pause(1);
+		lastRGBData = Color;
+	}
+
 }
 
 const OldRGBData = [];
@@ -203,6 +275,11 @@ function hexToRgb(hex) {
 
 export function ImageUrl() {
 	return "https://marketplace.signalrgb.com/devices/default/ram.png";
+}
+
+function CompareArrays(array1, array2) {
+	return array1.length === array2.length &&
+	array1.every(function(value, index) { return value === array2[index];});
 }
 
 class BinaryUtils {
