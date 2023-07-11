@@ -112,6 +112,18 @@ class MysticLight {
 				ForceZoneBased	  : false,
 				JARGB_V2		  : true,
 			},
+			0x0ABE : //X670E Godlike
+			{
+				OnboardLEDs    : 0,
+				RGBHeaders     : 0,
+				ARGBHeaders    : 0,
+				JPipeLEDs	   : 0,
+				CorsairHeaders : 0,
+				//PERLED
+				PerLEDOnboardLEDs : 10,
+				ForceZoneBased	  : false,
+				JARGB_V2		  : true,
+			},
 		};
 
 		this.OffsetDict =
