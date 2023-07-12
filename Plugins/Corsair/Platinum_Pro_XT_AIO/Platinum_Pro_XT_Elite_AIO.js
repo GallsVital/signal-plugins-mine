@@ -95,6 +95,7 @@ function burstFans(firstRun = false) {
 
 	if(firstRun) { //Only send this command once. No need to abuse the device.
 		device.log("Bursting Fans!");
+		PlatCooler.sendCoolingPacket(PlatCooler.deviceFanModes.fixedPWMWithFallback, 0xff, PlatCooler.deviceFanModes.fixedPWMWithFallback, 0xff, PlatCooler.coolingModes.balanced, true);
 		PlatCooler.sendCoolingPacket(PlatCooler.deviceFanModes.fixedPWMWithFallback, 0xff, PlatCooler.deviceFanModes.fixedPWMWithFallback, 0xff, PlatCooler.coolingModes.balanced);
 	}
 
@@ -148,7 +149,11 @@ function PollFans() {
 		}
 	}
 
-	PlatCooler.sendCoolingPacket(PlatCooler.deviceFanModes.fixedPWMWithFallback, Math.round(fanOutputData[0] /100 * 255), PlatCooler.deviceFanModes.fixedPWMWithFallback, Math.round(fanOutputData[1] * 255 / 100), PlatCooler.coolingModes[fanProfile], PlatCooler.deviceFanModes.fixedPWMWithFallback, Math.round(fanOutputData[2] * 255 / 100));
+	if(PlatCooler.getNumberOfFans() === 3) {
+		PlatCooler.sendCoolingPacket(PlatCooler.deviceFanModes.fixedPWMWithFallback, Math.round(fanOutputData[2] /100 * 255), 0x00, 0x00, PlatCooler.coolingModes[fanProfile], true);
+	}
+
+	PlatCooler.sendCoolingPacket(PlatCooler.deviceFanModes.fixedPWMWithFallback, Math.round(fanOutputData[0] /100 * 255), PlatCooler.deviceFanModes.fixedPWMWithFallback, Math.round(fanOutputData[1] * 255 / 100), PlatCooler.coolingModes[fanProfile]);
 }
 
 let lastLoopRGBData = [];
@@ -250,6 +255,7 @@ class PlatinumProtocol {
 			0x0C20 : "H100/H115I",
 			0x0C21 : "H100/H115I",
 			0x0C2E : "H100/H115I",
+			0x0C35 : "H100/H115I",
 			0x0C2F : "H150I",
 			0x0C22 : "H150I",
 			0x0C37 : "H150I"
@@ -259,6 +265,7 @@ class PlatinumProtocol {
 			0x0C15 : "H100I Platinum",
 			0x0C18 : "H100I Platinum",
 			0x0C19 : "H100I Platinum SE",
+			0x0C35 : "H100I Elite",
 			0x0C20 : "H100I Pro XT",
 			0x0C21 : "H115I Pro XT",
 			0x0C2E : "H115I Pro XT",
@@ -610,12 +617,21 @@ class PlatinumProtocol {
 		this.sendPacketWithResponse(packet, "Color Packet");
 	}
 
-	sendCoolingPacket(fan1Mode, fan1Duty, fan2Mode, fan2Duty, pumpMode, fan3Mode, fan3Duty) {
-		const packetFill = new Array(65).fill(0xff);
+	sendCoolingPacket(fan1Mode, fan1Duty, fan2Mode, fan2Duty, pumpMode, fan3 = false) {
+		if(fan3) {
+			const packetFill = new Array(65).fill(0xff);
 
-		const packet = [0x00, 0x3F, this.getPacketSequence(), 0x14, 0x00, 0xFF, 0x05, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, fan1Mode, 0x00, 0x00, 0x00, 0x00, fan1Duty, fan2Mode, 0x00, 0x00, 0x00, 0x00, fan2Duty, pumpMode, 0x00, 0x00, fan3Mode, fan3Duty,].concat(packetFill);
-		packet[30] = 0x07;
-		this.sendPacketWithResponse(packet, "Cooling Packet");
+			const packet = [0x00, 0x3F, this.getPacketSequence(), 0x14, 0x00, 0xFF, 0x05, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, fan1Mode, 0x00, 0x00, 0x00, 0x00, fan1Duty, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF].concat(packetFill);
+			this.sendPacketWithResponse(packet, "3rd Fan Cooling Packet");
+			device.log("Fan 3 Packet Sent");
+		} else {
+			const packetFill = new Array(65).fill(0xff);
+
+			const packet = [0x00, 0x3F, this.getPacketSequence(), 0x14, 0x00, 0xFF, 0x05, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, fan1Mode, 0x00, 0x00, 0x00, 0x00, fan1Duty, fan2Mode, 0x00, 0x00, 0x00, 0x00, fan2Duty, pumpMode].concat(packetFill);
+			packet[30] = 0x07;
+			this.sendPacketWithResponse(packet, "Cooling Packet");
+		}
+
 	}
 
 	EnableSoftwareControl() {

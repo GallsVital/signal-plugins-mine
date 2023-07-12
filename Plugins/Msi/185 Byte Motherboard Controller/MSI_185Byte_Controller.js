@@ -785,9 +785,9 @@ class MysticLight {
 			{
 				OnboardLEDs    : 8,
 				RGBHeaders     : 1,
-				ARGBHeaders    : 2,
+				ARGBHeaders    : 3,
 				JPipeLEDs	   : 0, //This board has a Jpipe? It says to combine so idk what led is on that, we'll bypass it assuming it's PERLED
-				CorsairHeaders : 1,
+				CorsairHeaders : 0,
 				//PERLED
 				PerLEDOnboardLEDs : 8,
 				ForceZoneBased	  : false,

@@ -17,6 +17,6 @@ declare class service{
     public static announceController(instance: serviceObject);
     public static suppressController(instance: serviceObject)
     public static resolve(HostName: string, callback: Function): void
-    public static broadcast(message: number[]);
+    public static broadcast(message: String | number[] | Object);
     public static controllers: serviceObject[];
 }
