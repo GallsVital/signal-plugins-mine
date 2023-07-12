@@ -1,8 +1,8 @@
 export function Name() { return "Razer Ornata V3 X"; }
 export function VendorId() { return 0x1532; }
-export function ProductId() { return [0x0294, 0x02a2]; }
+export function ProductId() { return [0x0294, 0x02A2]; }
 export function Documentation(){ return "troubleshooting/razer"; }
-export function Publisher() { return "Orcus, Rafee"; }
+export function Publisher() { return "WhirlwindFX"; }
 export function Size() { return [3, 3]; }
 export function DefaultPosition(){return [240, 120];}
 export function DefaultScale(){return 8.0;}
@@ -27,9 +27,6 @@ const vLedPositions = [
 	[1, 1]
 ];
 
-export function Initialize() {
-}
-
 export function LedNames() {
 	return vLedNames;
 }
@@ -38,49 +35,41 @@ export function LedPositions() {
 	return vLedPositions;
 }
 
-export function Shutdown() {
-	SendColorPacket(true);
+export function Initialize() {
+	device.send_report([0x00, 0x00, 0x1F, 0x00, 0x00, 0x00, 0x06, 0x0F, 0x02, 0x00, 0x00, 0x08, 0x00, 0x01], 91); // Software mode
 }
 
-export function Validate(endpoint) {
-	return endpoint.interface === 0 && endpoint.usage === 0x0006 && endpoint.usage_page === 0x0001;
+export function Render() {
+	sendColors();
+	device.pause(1);
 }
 
-function CalculateCrc(report) {
-	let iCrc = 0;
+export function Shutdown(SystemSuspending) {
 
-	for (let iIdx = 3; iIdx < 89; iIdx++) {
-		iCrc ^= report[iIdx];
+	if(SystemSuspending){
+		sendColors("#000000"); // Go Dark on System Sleep/Shutdown
+	}else{
+		sendColors(shutdownColor);
 	}
 
-	return iCrc;
 }
 
-function SendColorPacket(shutdown = false) {
+function sendColors(overrideColor) {
 
 	const packet = [];
 	packet[0] = 0x00; //Zero Padding
-	packet[1] = 0x00;
-	packet[2] = 0x1f;
-	packet[3] = 0x00;
-	packet[4] = 0x00;
-	packet[5] = 0x00;
+	packet[2] = 0x1F;
 	packet[6] = 0x08;
-	packet[7] = 0x0f;
+	packet[7] = 0x0F;
 	packet[8] = 0x03;
-	packet[9] = 0x00;
-	packet[10] = 0x00;
-	packet[11] = 0x00;
-	packet[12] = 0x00;
-	packet[13] = 0x00;
 
 	const iX = vLedPositions[0][0];
 	const iY = vLedPositions[0][1];
 
 	let color;
 
-	if(shutdown){
-		color = hexToRgb(shutdownColor);
+	if(overrideColor){
+		color = hexToRgb(overrideColor);
 	}else if (LightingMode === "Forced") {
 		color = hexToRgb(forcedColor);
 	}else{
@@ -93,14 +82,18 @@ function SendColorPacket(shutdown = false) {
 
 	packet[89] = CalculateCrc(packet);
 
-	device.write(packet, 126);
+	device.send_report(packet, 91);
 	device.pause(1);
 }
 
-export function Render() {
+function CalculateCrc(report) {
+	let iCrc = 0;
 
-	SendColorPacket();
-	device.pause(1);
+	for (let iIdx = 3; iIdx < 89; iIdx++) {
+		iCrc ^= report[iIdx];
+	}
+
+	return iCrc;
 }
 
 function hexToRgb(hex) {
@@ -111,6 +104,17 @@ function hexToRgb(hex) {
 	colors[2] = parseInt(result[3], 16);
 
 	return colors;
+}
+
+export function Validate(endpoint) {
+	//return endpoint.interface === 0 && endpoint.usage === 0x0006 && endpoint.usage_page === 0x0001;
+	// return endpoint.interface === 1 && endpoint.usage === 0x0001 && endpoint.usage_page === 0x000c && endpoint.collection === 0x0002;
+	// return endpoint.interface === 1 && endpoint.usage === 0x0080 && endpoint.usage_page === 0x0001 && endpoint.collection === 0x0003;
+	// return endpoint.interface === 1 && endpoint.usage === 0x0000 && endpoint.usage_page === 0x0001 && endpoint.collection === 0x0004;
+	// return endpoint.interface === 0 && endpoint.usage === 0x0001 && endpoint.usage_page === 0x000c && endpoint.collection === 0x0003;
+	// return endpoint.interface === 1 && endpoint.usage === 0x0000 && endpoint.usage_page === 0x0001 && endpoint.collection === 0x0005;
+	return endpoint.interface === 2 && endpoint.usage === 0x0002 && endpoint.usage_page === 0x0001 && endpoint.collection === 0x0000;
+	// return endpoint.interface === 1 && endpoint.usage === 0x0006 && endpoint.usage_page === 0x0001 && endpoint.collection === 0x0001;
 }
 
 export function Image() {
