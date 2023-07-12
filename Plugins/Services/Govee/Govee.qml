@@ -1,6 +1,47 @@
 Item {
     anchors.fill: parent
 
+    Rectangle{
+        anchors{
+            top: parent.top
+            right: parent.right
+        }
+        width: 300
+        height: linkingCol.childrenRect.height + linkingCol.topPadding + linkingCol.bottomPadding
+        color: theme.background3
+        radius: theme.radius
+        Column{
+            id: linkingCol
+            spacing: 5
+            padding: 10
+            width: parent.width
+
+            Label{
+                font{
+                    pixelSize: 16
+                    family: theme.primaryfont
+                    weight: Font.Bold
+                }
+                color: theme.primarytextcolor
+                text: "Linking Instructions"
+            }
+            Label{
+                font{
+                    pixelSize: 14
+                    family: theme.secondarytextcolor
+                }
+                width: parent.width - 20
+                color: theme.secondarytextcolor
+                textFormat: Text.MarkdownText
+                wrapMode: Text.WrapAtWordBoundaryOrAnywhere
+                text: 
+"* The Device must be on a 2.4ghz WIFI network. \n
+* LAN Control must be enabled within the Govee App."
+            }
+
+        }
+    }
+
     Column{
         width: parent.width
         height: parent.height
