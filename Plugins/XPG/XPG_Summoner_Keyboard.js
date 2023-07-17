@@ -17,6 +17,9 @@ export function ControllableParameters() {
 		{"property":"forcedColor", "group":"lighting", "label":"Forced Color", "min":"0", "max":"360", "type":"color", "default":"009bde"},
 	];
 }
+export function ConflictingProcesses() {
+	return ["XPG-Prime.exe" ];
+}
 
 const vKeys = [
 	11,		22, 30, 25, 27,  7, 51, 57, 62, 86, 87, 83, 85,		 79, 72, 0, //16
