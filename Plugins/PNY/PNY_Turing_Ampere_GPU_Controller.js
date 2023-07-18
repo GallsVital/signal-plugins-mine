@@ -1,5 +1,5 @@
 // Modifying SMBUS Plugins is -DANGEROUS- and can -DESTROY- devices.
-export function Name() { return "PNY GPU"; }
+export function Name() { return "PNY Ampere GPU"; }
 export function Publisher() { return "WhirlwindFX"; }
 export function Type() { return "SMBUS"; }
 export function Size() { return [3, 1]; }
@@ -122,7 +122,7 @@ class GPUIdentifier {
 }
 
 class PNYGPUIdentifier extends GPUIdentifier {
-	constructor(Device, Brand, SubDevice, Name, Model = "") {
+	constructor(Brand, Device, SubDevice, Name, Model = "") {
 		super(0x10DE, Brand, Device, SubDevice, 0x49, Name, Model);
 	}
 }
@@ -130,31 +130,32 @@ export function BrandGPUList(){ return PNYGPUIDs; }
 
 const PNYGPUIDs =
 [
-	new PNYGPUIdentifier(0x2482, 0x10B0, 0x2482, "Gainward Phoenix RTX 3070TI"),
+	new PNYGPUIdentifier(0x196E, 0x2484, 0x136E, "PNY 3070 XLR8"),
+	new PNYGPUIdentifier(0x196E, 0x2216, 0x138B, "PNY 3080 XLR8"),
+	new PNYGPUIdentifier(0x196E, 0x2208, 0x1385, "PNY 3080TI Revel"),
+	new PNYGPUIdentifier(0x196E, 0x2206, 0x136B, "PNY 3080 XLR8 REVEL EPIC-X RGB"),
+	new PNYGPUIdentifier(0x196E, 0x2204, 0x136A, "PNY 3090 XLR8"),
 
-	new PNYGPUIdentifier(0x2486, 0x1569, 0x2486, "PALIT RTX 3060TI Dual OC"),
-	new PNYGPUIdentifier(0x2482, 0x1569, 0xf278, "PALIT RTX 3070TI GameRock"),
-	new PNYGPUIdentifier(0x2482, 0x1569, 0x2482, "PALIT RTX 3070TI Gaming Pro"),
-	new PNYGPUIdentifier(0x2204, 0x1569, 0xf278, "PALIT RTX 3090 GameRock"),
-	new PNYGPUIdentifier(0x2204, 0x1569, 0x2204, "PALIT RTX 3090 Gaming Pro"),
-	new PNYGPUIdentifier(0x2208, 0x1569, 0x2208, "PALIT RTX 3080TI Gaming Pro"),
-	new PNYGPUIdentifier(0x2216, 0x1569, 0x2216, "PALIT RTX 3080 Gaming Pro"),
-	new PNYGPUIdentifier(0x2206, 0x1569, 0x2206, "PALIT RTX 3080 Gaming Pro"),
-	new PNYGPUIdentifier(0x2484, 0x1569, 0x2484, "PALIT RTX 3070 Gaming Pro"),
-	new PNYGPUIdentifier(0x2488, 0x1569, 0x2488, "PALIT RTX 3070 Gaming Pro"),
-	new PNYGPUIdentifier(0x2484, 0x1569, 0xf280, "PALIT RTX 3070 JetStream"),
-	new PNYGPUIdentifier(0x2488, 0x1569, 0xf278, "PALIT RTX 3070 GameRock"),
+	new PNYGPUIdentifier(0x1569, 0x2486, 0x2486, "PALIT 3060TI Dual OC"),
+	new PNYGPUIdentifier(0x1569, 0x2482, 0xf278, "PALIT 3070TI GameRock"),
+	new PNYGPUIdentifier(0x1569, 0x2482, 0x2482, "PALIT 3070TI Gaming Pro"),
+	new PNYGPUIdentifier(0x1569, 0x2204, 0xf278, "PALIT 3090 GameRock"),
+	new PNYGPUIdentifier(0x1569, 0x2204, 0x2204, "PALIT 3090 Gaming Pro"),
+	new PNYGPUIdentifier(0x1569, 0x2208, 0x2208, "PALIT 3080TI Gaming Pro"),
+	new PNYGPUIdentifier(0x1569, 0x2216, 0x2216, "PALIT 3080 Gaming Pro"),
+	new PNYGPUIdentifier(0x1569, 0x2206, 0x2206, "PALIT 3080 Gaming Pro"),
+	new PNYGPUIdentifier(0x1569, 0x2484, 0x2484, "PALIT 3070 Gaming Pro"),
+	new PNYGPUIdentifier(0x1569, 0x2488, 0x2488, "PALIT 3070 Gaming Pro"),
+	new PNYGPUIdentifier(0x1569, 0x2484, 0xf280, "PALIT 3070 JetStream"),
+	new PNYGPUIdentifier(0x1569, 0x2488, 0xf278, "PALIT 3070 GameRock"),
+	new PNYGPUIdentifier(0x1569, 0x2782, 0xF298, "PALIT 4070TI Gaming Pro"),
+	new PNYGPUIdentifier(0x1569, 0x2704, 0xF296, "PALIT 4080 GameRock"),
+	new PNYGPUIdentifier(0x1569, 0x2684, 0xF296, "PALIT 4090 GameRock OC"),
 
+	new PNYGPUIdentifier(0x10B0, 0x2482, 0x2482, "Gainward 3070TI Phoenix"),
+	new PNYGPUIdentifier(0x10B0, 0x2782, 0xF299, "Gainward 4070Ti Phoenix GS"),
+	new PNYGPUIdentifier(0x10B0, 0x2704, 0xF299, "Gainward 4080 Phoenix GS"),
 
-	new PNYGPUIdentifier(0x2484, 0x196E, 0x136E, "PNY RTX 3070 XLR8"),
-	new PNYGPUIdentifier(0x2216, 0x196E, 0x138B, "PNY RTX 3080 XLR8"),
-	new PNYGPUIdentifier(0x2208, 0x196E, 0x1385, "PNY RTX 3080TI Revel"),
-	new PNYGPUIdentifier(0x2206, 0x196E, 0x136B, "PNY RTX 3080 XLR8 Gaming REVEL EPIC-X RGB Triple Fan Edition"),
-	new PNYGPUIdentifier(0x2204, 0x196E, 0x136A, "PNY RTX3090 XLR8"),
-
-	new PNYGPUIdentifier(0x2782, 0x1569, 0xF298, "Palit RTX 4070TI Gaming Pro"),
-	new PNYGPUIdentifier(0x2704, 0x1569, 0xF296, "Palit RTX 4080 GameRock"),
-	new PNYGPUIdentifier(0x2684, 0x1569, 0xF296, "Palit RTX 4090 GameRock OC")
 ];
 
 function hexToRgb(hex) {
