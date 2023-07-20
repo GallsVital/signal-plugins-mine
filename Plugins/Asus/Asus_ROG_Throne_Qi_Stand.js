@@ -1,6 +1,6 @@
-export function Name() { return "Asus Throne QI"; }
+export function Name() { return "Asus ROG Throne"; }
 export function VendorId() { return 0x0B05; }
-export function ProductId() { return 0x18C5; }
+export function ProductId() { return [0x18C5, 0x18D9]; }
 export function Publisher() { return "WhirlwindFX"; }
 export function Size() { return [18, 1]; }
 export function DefaultPosition(){return [10, 100]; }
