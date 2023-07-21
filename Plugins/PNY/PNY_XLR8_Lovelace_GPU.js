@@ -138,6 +138,7 @@ const PNYGPUIDs =
 
 	new PNYGPUIdentifier(0x2684, 0x13AD, "PNY 4090 XLR8"),
 	new PNYGPUIdentifier(0x2684, 0x13AE, "PNY 4090 XLR8"),
+	new PNYGPUIdentifier(0x2684, 0x13D8, "PNY 4090 XLR8 Verto Epic-X OC"),
 ];
 
 function hexToRgb(hex) {
