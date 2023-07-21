@@ -650,7 +650,7 @@ const Asus3000GPUIDs =
 	new AsusGPUIdentifier(Nvidia.RTX3090TI, AsusID.RTX3090TI_STRIX_LC_GAMING_OC, "Asus ROG Strix 3090TI LC OC"),
 	new AsusGPUIdentifier(Nvidia.RTX3090TI, AsusID.RTX3090TI_TUF_GAMING, "Asus TUF 3090TI Gaming"),
 
-	new AsusGPUIdentifier(Nvidia.RTX4060TI, AsusID.RTX4060TI_TUF_GAMING_OC, "Asus 4070 TUF Gaming OC"),
+	new AsusGPUIdentifier(Nvidia.RTX4060TI, AsusID.RTX4060TI_TUF_GAMING_OC, "Asus 4060Ti TUF Gaming OC"),
 
 	new AsusGPUIdentifier(Nvidia.RTX4070, AsusID.RTX4070_TUF_GAMING, "Asus TUF RTX 4070 Gaming"),
 
