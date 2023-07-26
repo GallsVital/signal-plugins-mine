@@ -71,9 +71,13 @@ export function Render() {
 	WritePacket();
 }
 
+export function Shutdown(SystemSuspending) {
 
-export function Shutdown() {
-	WritePacket(true);
+	if(SystemSuspending){
+		WritePacket("#000000"); // Go Dark on System Sleep/Shutdown
+	}else{
+		WritePacket(shutdownColor);
+	}
 }
 
 function GetRamVersion() {
@@ -94,8 +98,8 @@ const vPecTable = [
 	152, 159, 138, 141, 132, 131, 222, 217, 208, 215, 194, 197, 204, 203, 230, 225, 232, 239, 250, 253, 244, 243];
 
 
-function WritePacket(shutdown = false) {
-	if (iRamVersion === 4) { WritePacketV4(shutdown); } else if (iRamVersion === 3) {
+function WritePacket(overrideColor) {
+	if (iRamVersion === 4) { WritePacketV4(overrideColor); } else if (iRamVersion === 3) {
 		device.notify("Update RAM Firmware Through ICUE", "The Current Firmware version of your RAM is out of date. Please update using ICUE to use it with SignalRGB.", 1);
 	}
 }
@@ -150,7 +154,7 @@ function WritePacketV3(shutdown) {
 	bus.WriteByte(0x28, iCrc);
 }
 
-function WritePacketV4(shutdown) {
+function WritePacketV4(overrideColor) {
 	const vLedPacket = [0x0A];
 
 	// Set Colors.
@@ -158,8 +162,8 @@ function WritePacketV4(shutdown) {
 
 		let Color;
 
-		if(shutdown){
-			Color = hexToRgb(shutdownColor);
+		if(overrideColor){
+			Color = hexToRgb(overrideColor);
 		}else if(LightingMode === "Forced") {
 			Color = hexToRgb(forcedColor);
 		} else {
