@@ -57,7 +57,14 @@ export function Render() {
 	sendColors();
 }
 
-export function Shutdown() {
+export function Shutdown(SystemSuspending) {
+
+	if(SystemSuspending){
+		sendColors("#000000"); // Go Dark on System Sleep/Shutdown
+	}else{
+		sendColors(shutdownColor);
+	}
+
 }
 
 function SetGPUNameFromBusIds() {
@@ -72,7 +79,7 @@ function SetGPUNameFromBusIds() {
 	}
 }
 
-function sendColors(shutdown = false) {
+function sendColors(overrideColor) {
 	const RGBData = new Array(16);
 
 	RGBData[0] = 0x05;
@@ -85,8 +92,8 @@ function sendColors(shutdown = false) {
 		const iPxY = vLedPositions[iIdx][1];
 		var color;
 
-		if(shutdown) {
-			color = hexToRgb(shutdownColor);
+		if(overrideColor) {
+			color = hexToRgb(overrideColor);
 		} else if (LightingMode === "Forced") {
 			color = hexToRgb(forcedColor);
 		} else {
