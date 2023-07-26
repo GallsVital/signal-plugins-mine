@@ -339,7 +339,13 @@ class AsusAuraSMBusController {
         	0x8A : "DRAM",
         	0x8B : "PCIE",
         	0x91 : "RGBHeader_3",
-        	0x95 : "QLED"
+        	0x95 : "QLED",
+        	0x98 : "Power/Reset",
+        	0x99 : "Chipset Top",
+        	0x9A : "Chipset Middle",
+        	0x9B : "Chipset Bottom",
+        	0xA0 : "IOShield"
+
         };
 	}
 
