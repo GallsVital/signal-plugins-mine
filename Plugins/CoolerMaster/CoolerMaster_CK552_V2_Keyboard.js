@@ -55,12 +55,21 @@ export function LedPositions() {
 }
 
 export function Initialize() {
-	device.write([0x00, 0x51, 0x00, 0x00, 0x00, 0x05], 65); //Set Profile
+	device.write([0x00, 0x41, 0x80], 65);
+	device.pause(1);
+	device.write([0x00, 0x51, 0x28, 0x00, 0x00, 0x01], 65);
+	device.pause(1);
+	device.write([0x00, 0x56, 0x81 ,0x00, 0x00, 0x01, 0x00, 0x00, 0x00, 0x01, 0x00, 0x00, 0x00, 0xbb, 0xbb, 0xbb, 0xbb], 65);
+	device.pause(1);
+	device.write([0x00, 0x56, 0x83 ,0x00, 0x00, 0x01, 0x00, 0x00, 0x00, 0x04, 0xf0, 0x00, 0xc1], 65);
+	device.pause(1);
+	device.write([0x00, 0x51, 0x28, 0x00, 0x00, 0xff], 65);
+	device.pause(1);
 }
 
 export function Render() {
 	SendColors();
-	SendCommits();
+	device.clearReadBuffer();
 }
 
 export function Shutdown() {
@@ -89,44 +98,14 @@ function SendColors(shutdown = false){
 		RGBData[vKeys[iIdx]*3 +2 ] = mxPxColor[2];
 	}
 
-	device.write([0x00, 0x56, 0x81, 0x00, 0x00, 0x01, 0x00, 0x00, 0x00, 0x09, 0x00, 0x00, 0x00, 0xBB, 0xBB, 0xBB, 0xBB], 65);
-
-	//Send the left light bar and first column
-	let InitColorPacket = [0x00, 0x56, 0x83, 0x00, 0x00, 0x01, 0x00, 0x00, 0x00, 0x80, 0x01, 0x00, 0xFF, 0x00, 0x00, 0x00, 0x00, 0xFF, 0xFF, 0xFF, 0xFF, 0x00, 0x00, 0x00, 0x00];
-	InitColorPacket = InitColorPacket.concat(RGBData.splice(0, 40));
-	device.write(InitColorPacket, 65);
-
-	var packet = [];
-	packet = packet.concat(RGBData.splice(0, 60));
-	StreamPacket(1, packet);
-
-	var packet = [];
-	packet = packet.concat(RGBData.splice(0, 60));
-	StreamPacket(2, packet);
-
-	for(let packetCount = 3; packetCount < 9; packetCount++){
-		StreamPacket(packetCount,
-			RGBData.splice(0, 60)
-		);
+	
+	let keysSent = 0;
+	while(RGBData.length > 0) {
+		const keysToSend = Math.min(18, RGBData.length/3);
+		device.write([0x00, 0x56, 0x42, 0x00, 0x00, 0x02, keysToSend, keysSent, 0x00].concat(RGBData.splice(0, keysToSend*3)), 65);
+		device.pause(1);
+		keysSent += keysToSend;		
 	}
-
-}
-
-function StreamPacket(packetId, RGBData){
-	let packet = [];
-	packet[0] = 0x00;
-	packet[1] = 0x56;
-	packet[2] = 0x83;
-	packet[3] = packetId;
-	packet[4] = 0x00;
-	packet = packet.concat(RGBData);
-	device.write(packet, 65);
-	device.read(packet, 65);
-}
-
-function SendCommits(){
-	device.write([0x00, 0x51, 0x28, 0x00, 0x00, 0xFF], 65);
-	device.pause(3);
 }
 
 function hexToRgb(hex) {
