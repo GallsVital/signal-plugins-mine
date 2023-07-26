@@ -286,6 +286,7 @@ declare class device{
 	public static setSize(Size: number[]): void
 	public static setImageFromBase64(base64Image: string): void
 	public static setImageFromResource(resourceUrl: ImageResource): void
+	public static setImageFromUrl(imageUrl: string): void
 
 
 	/**
