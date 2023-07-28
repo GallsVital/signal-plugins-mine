@@ -425,6 +425,15 @@ const GoveeDeviceLibrary = {
 		supportFeast: false,
 		ledCount: 15
 	},
+	H61E0: {
+		productName: "LED Strip Light M1",
+		imageUrl: "https://d1f2504ijhdyjw.cloudfront.net/deals-img/5b311c4dd19e17c6eeaf5e662e66904d-pic_h61e1.png",
+		sku: "H61E0",
+		state: 1,
+		supportRazer: true,
+		supportFeast: true,
+		ledCount: 40
+	},
 	H61E1: {
 		productName: "LED Strip Light M1",
 		imageUrl: "https://d1f2504ijhdyjw.cloudfront.net/deals-img/5b311c4dd19e17c6eeaf5e662e66904d-pic_h61e1.png",
