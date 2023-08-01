@@ -1,6 +1,6 @@
 export function Name() { return "SteelSeries Aerox 5 Wireless Mode"; }
 export function VendorId() { return 0x1038; }
-export function ProductId() { return 0x1852; }
+export function ProductId() { return [0x1852, 0x1854]; }
 export function Publisher() { return "WhirlwindFX"; }
 export function Documentation(){ return "troubleshooting/steelseries"; }
 export function Size() { return [3, 3]; }
