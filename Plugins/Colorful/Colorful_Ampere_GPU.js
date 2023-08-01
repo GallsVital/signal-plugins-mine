@@ -134,7 +134,7 @@ const ColorfulGPUIDs =
 	new ColorfulGPUIdentifier(0x7377, 0x2544, 0x1500, "Colorful 3060 iGame Ultra"),
 	new ColorfulGPUIdentifier(0x7377, 0x2204, 0x140A, "Colorful 3090 iGame Advanced OC-V"),
 
-	//new ColorfulGPUIdentifier(0x7377, 0x2782, 0x2001, "Colorful 4070Ti Battle Axe"),
+	new ColorfulGPUIdentifier(0x7377, 0x2782, 0x2001, "Colorful 4070Ti Battle Axe"),
 ];
 
 function hexToRgb(hex) {
