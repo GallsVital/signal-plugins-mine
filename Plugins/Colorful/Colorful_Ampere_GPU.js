@@ -1,6 +1,6 @@
-export function Name() { return "Colorful GPU"; }
+export function Name() { return "Colorful Ampere GPU"; }
 export function Publisher() { return "WhirlwindFX"; }
-export function Documentation(){ return "troubleshooting/MSI"; }
+export function Documentation(){ return "troubleshooting"; }
 export function Type() { return "SMBUS"; }
 export function Size() { return [3, 1]; }
 export function DefaultPosition(){return [192, 127];}
@@ -66,16 +66,21 @@ export function Render() {
 	sendColors();
 }
 
-export function Shutdown() {
-	sendColors(true);
+export function Shutdown(SystemSuspending) {
+
+	if(SystemSuspending){
+		sendColors("#000000"); // Go Dark on System Sleep/Shutdown
+	}else{
+		sendColors(shutdownColor);
+	}
+
 }
 
-
-function sendColors(shutdown = false) {
+function sendColors(overrideColor) {
 	let color;
 
-	if(shutdown) {
-		color = hexToRgb(shutdownColor);
+	if(overrideColor) {
+		color = hexToRgb(overrideColor);
 	} else if (LightingMode === "Forced") {
 		color = hexToRgb(forcedColor);
 	} else {
@@ -116,15 +121,20 @@ class GPUIdentifier {
 }
 
 class ColorfulGPUIdentifier extends GPUIdentifier {
-	constructor(Device, Brand, SubDevice, Name, Model = "") {
+	constructor(Brand, Device, SubDevice, Name, Model = "") {
 		super(0x10DE, Brand, Device, SubDevice, 0x61, Name, Model);
 	}
 }
+
 export function BrandGPUList(){ return ColorfulGPUIDs; }
 
 const ColorfulGPUIDs =
 [
-	new ColorfulGPUIdentifier(0x2204, 0x7377, 0x140a, "Colorful iGame RTX 3090 Advanced OC-V"),
+	//new ColorfulGPUIdentifier(0x7377, 0x2504, 0x150A, "Colorful 3060 iGame Advanced OC-V"),
+	new ColorfulGPUIdentifier(0x7377, 0x2544, 0x1500, "Colorful 3060 iGame Ultra"),
+	new ColorfulGPUIdentifier(0x7377, 0x2204, 0x140A, "Colorful 3090 iGame Advanced OC-V"),
+
+	new ColorfulGPUIdentifier(0x7377, 0x2782, 0x2001, "Colorful 4070Ti Battle Axe"),
 ];
 
 function hexToRgb(hex) {
