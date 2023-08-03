@@ -1,21 +1,24 @@
-export function Name() { return "Redragon K556 Keyboard"; }
-export function VendorId() { return 0x0C45; }
-export function ProductId() { return 0x5004; }
+export function Name() { return "Redragon K556/K582 Keyboard"; }
+export function Version() { return "1.1.4"; }
+export function VendorId() { return 0x0000; }
+export function ProductId() { return 0x0000; }
 export function Publisher() { return "WhirlwindFX"; }
 export function Documentation(){ return "qmk/redragon-k556-k582"; }
 export function Size() { return [21, 6]; }
 export function DefaultPosition(){return [10, 100]; }
 export function DefaultScale(){return 8.0;}
 /* global
+shutdownMode:readonly
 shutdownColor:readonly
 LightingMode:readonly
 forcedColor:readonly
 */
 export function ControllableParameters() {
 	return [
-		{"property":"shutdownColor", "group":"lighting", "label":"Shutdown Color", "min":"0", "max":"360", "type":"color", "default":"009bde"},
+		{"property":"shutdownMode", "group":"lighting", "label":"Shutdown Mode", "type":"combobox", "values":["SignalRGB", "Hardware"], "default":"SignalRGB"},
+		{"property":"shutdownColor", "group":"lighting", "label":"Shutdown Color", "min":"0", "max":"360", "type":"color", "default":"#009bde"},
 		{"property":"LightingMode", "group":"lighting", "label":"Lighting Mode", "type":"combobox", "values":["Canvas", "Forced"], "default":"Canvas"},
-		{"property":"forcedColor", "group":"lighting", "label":"Forced Color", "min":"0", "max":"360", "type":"color", "default":"009bde"},
+		{"property":"forcedColor", "group":"lighting", "label":"Forced Color", "min":"0", "max":"360", "type":"color", "default":"#009bde"},
 	];
 }
 
@@ -49,6 +52,10 @@ const vKeyPositions =
 ];
 
 let LEDCount = 0;
+const IsViaKeyboard = false;
+const MainlineQMKFirmware = 1;
+const VIAFirmware = 2;
+const PluginProtocolVersion = "1.0.4";
 
 export function LedNames() {
 	return vKeyNames;
@@ -59,134 +66,182 @@ export function LedPositions() {
 }
 
 export function Initialize() {
-	ClearReadBuffer();
-	checkFirmwareType();
-	versionQMK();
-	versionSignalRGBProtocol();
-	uniqueIdentifier();
+	requestFirmwareType();
+	requestQMKVersion();
+	requestSignalRGBProtocolVersion();
+	requestUniqueIdentifier();
+	requestTotalLeds();
 	effectEnable();
-	totalLEDs();
 }
 
 export function Render() {
 	sendColors();
 }
 
-export function Shutdown() {
-	effectDisable();
+export function Shutdown(SystemSuspending) {
+
+	if(SystemSuspending) {
+		sendColors("#000000"); // Go Dark on System Sleep/Shutdown
+	} else {
+		if (shutdownMode === "SignalRGB") {
+			sendColors(shutdownColor);
+		} else {
+			effectDisable();
+		}
+	}
+
 }
 
-function checkFirmwareType() {
-	const packet = [];
-	packet[0] = 0x00;
-	packet[1] = 0x28;
+function commandHandler() {
+	const readCounts = [];
 
-	device.write(packet, 32);
+	do {
+		const returnpacket = device.read([0x00], 32, 10);
+		processCommands(returnpacket);
 
-	const returnpacket = device.read(packet, 32);
-	const FirmwareTypeByte = returnpacket[2];
+		readCounts.push(device.getLastReadSize());
 
-	if(FirmwareTypeByte !== 3) {
+		// Extra Read to throw away empty packets from Via
+		// Via always sends a second packet with the same Command Id.
+		if(IsViaKeyboard) {
+			device.read([0x00], 32, 10);
+		}
+	}
+	while(device.getLastReadSize() > 0);
+
+}
+
+function processCommands(data) {
+	switch(data[1]) {
+	case 0x21:
+		returnQMKVersion(data);
+		break;
+	case 0x22:
+		returnSignalRGBProtocolVersion(data);
+		break;
+	case 0x23:
+		returnUniqueIdentifier(data);
+		break;
+	case 0x24:
+		sendColors();
+		break;
+	case 0x27:
+		returnTotalLeds(data);
+		break;
+	case 0x28:
+		returnFirmwareType(data);
+		break;
+	}
+}
+
+function requestQMKVersion() { //Check the version of QMK Firmware that the keyboard is running
+	device.write([0x00, 0x21], 32);
+	device.pause(30);
+	commandHandler();
+}
+
+function returnQMKVersion(data) {
+	const QMKVersionByte1 = data[2];
+	const QMKVersionByte2 = data[3];
+	const QMKVersionByte3 = data[4];
+	device.log("QMK Version: " + QMKVersionByte1 + "." + QMKVersionByte2 + "." + QMKVersionByte3);
+	device.log("QMK SRGB Plugin Version: "+ Version());
+	device.pause(30);
+}
+
+function requestSignalRGBProtocolVersion() { //Grab the version of the SignalRGB Protocol the keyboard is running
+	device.write([0x00, 0x22], 32);
+	device.pause(30);
+	commandHandler();
+}
+
+function returnSignalRGBProtocolVersion(data) {
+	const ProtocolVersionByte1 = data[2];
+	const ProtocolVersionByte2 = data[3];
+	const ProtocolVersionByte3 = data[4];
+
+	const SignalRGBProtocolVersion = ProtocolVersionByte1 + "." + ProtocolVersionByte2 + "." + ProtocolVersionByte3;
+	device.log(`SignalRGB Protocol Version: ${SignalRGBProtocolVersion}`);
+
+
+	if(PluginProtocolVersion !== SignalRGBProtocolVersion) {
+		device.notify("Unsupported Protocol Version: ", `This plugin is intended for SignalRGB Protocol version ${PluginProtocolVersion}. This device is version: ${SignalRGBProtocolVersion}`, 1, "Documentation");
+	}
+
+	device.pause(30);
+}
+
+function requestUniqueIdentifier() { //Grab the unique identifier for this keyboard model
+
+	if(device.write([0x00, 0x23], 32) === -1) {
+		device.notify("Unsupported Firmware: ", `This device is not running SignalRGB-compatible firmware. Click the Open Troubleshooting Docs button to learn more.`, 1, "Documentation");
+	}
+
+	device.pause(30);
+	commandHandler();
+}
+
+function returnUniqueIdentifier(data) {
+	const UniqueIdentifierByte1 = data[2];
+	const UniqueIdentifierByte2 = data[3];
+	const UniqueIdentifierByte3 = data[4];
+
+	if(!(UniqueIdentifierByte1 === 0 && UniqueIdentifierByte2 === 0 && UniqueIdentifierByte3 === 0)) {
+		device.log("Unique Device Identifier: " + UniqueIdentifierByte1 + UniqueIdentifierByte2 + UniqueIdentifierByte3);
+	}
+
+	device.pause(30);
+}
+
+function requestTotalLeds() {//Calculate total number of LEDs
+	device.write([0x00, 0x27], 32);
+	device.pause(30);
+	commandHandler();
+}
+
+function returnTotalLeds(data) {
+	LEDCount = data[2];
+	device.log("Device Total LED Count: " + LEDCount);
+	device.pause(30);
+}
+
+function requestFirmwareType() {
+	device.write([0x00, 0x28], 32);
+	device.pause(30);
+	commandHandler();
+}
+
+function returnFirmwareType(data) {
+	const FirmwareTypeByte = data[2];
+
+	if(!(FirmwareTypeByte === MainlineQMKFirmware || FirmwareTypeByte === VIAFirmware)) {
 		device.notify("Unsupported Firmware: ", "Click Show Console, and then click on troubleshooting for your keyboard to find out more.", 1, "Documentation");
 	}
 
-	device.log("Firmware Type: " + FirmwareTypeByte);
-	device.pause(30);
-}
-
-function ClearReadBuffer(timeout = 10) //Clear Read buffer to get correct values out of our read functions
-{
-	let count = 0;
-	const readCounts = [];
-
-	while(device.getLastReadSize() > 0) {
-		device.read([0x00], 32, timeout);
-		count++;
-		readCounts.push(device.getLastReadSize());
+	if(FirmwareTypeByte === MainlineQMKFirmware) {
+		IsViaKeyboard = false;
+		device.log("Firmware Type: Mainline");
 	}
-}
 
-function versionQMK() //Check the version of QMK Firmware that the keyboard is running
-{
-	const packet = [];
-	packet[0] = 0x00;
-	packet[1] = 0x21;
+	if(FirmwareTypeByte === VIAFirmware) {
+		IsViaKeyboard = true;
+		device.log("Firmware Type: VIA");
+	}
 
-	device.write(packet, 32);
-
-	const returnpacket = device.read(packet, 32);
-	const QMKVersionByte1 = returnpacket[2];
-	const QMKVersionByte2 = returnpacket[3];
-	const QMKVersionByte3 = returnpacket[4];
-	device.log("QMK Version: " + QMKVersionByte1 + "." + QMKVersionByte2 + "." + QMKVersionByte3);
 	device.pause(30);
 }
 
-function versionSignalRGBProtocol() //Grab the version of the SignalRGB Protocol the keyboard is running
-{
-	const packet = [];
-	packet[0] = 0x00;
-	packet[1] = 0x22;
-
-	device.write(packet, 32);
-
-	const returnpacket = device.read(packet, 32);
-	const ProtocolVersionByte1 = returnpacket[2];
-	const ProtocolVersionByte2 = returnpacket[3];
-	const ProtocolVersionByte3 = returnpacket[4];
-	device.log("SignalRGB Protocol Version: " + ProtocolVersionByte1 + "." + ProtocolVersionByte2 + "." + ProtocolVersionByte3);
+function effectEnable() { //Enable the SignalRGB Effect Mode
+	device.write([0x00, 0x25], 32);
 	device.pause(30);
 }
 
-function uniqueIdentifier() //Grab the unique identifier for this keyboard model
-{
-	const packet = [];
-	packet[0] = 0x00;
-	packet[1] = 0x23;
-
-	device.write(packet, 32);
-
-	const returnpacket = device.read(packet, 32);
-	const UniqueIdentifierByte1 = returnpacket[2];
-	const UniqueIdentifierByte2 = returnpacket[3];
-	const UniqueIdentifierByte3 = returnpacket[4];
-	device.log("Unique Device Identifier: " + UniqueIdentifierByte1 + UniqueIdentifierByte2 + UniqueIdentifierByte3);
+function effectDisable() { //Revert to Hardware Mode
+	device.write([0x00, 0x26], 32);
 	device.pause(30);
 }
 
-function totalLEDs() //Calculate total number of LEDs
-{
-	const packet = [];
-	packet[0] = 0x00;
-	packet[1] = 0x27;
-
-	device.write(packet, 32);
-
-	const returnpacket = device.read(packet, 33);
-	LEDCount = returnpacket[2];
-	device.log("Device Total LED Count: " + LEDCount);
-}
-
-function effectEnable() //Enable the SignalRGB Effect Mode
-{
-	const packet = [];
-	packet[0] = 0x00;
-	packet[1] = 0x25;
-
-	device.write(packet, 32);
-	device.pause(30);
-}
-
-function effectDisable() //Revert to Hardware Mode
-{
-	const packet = [];
-	packet[0] = 0x00;
-	packet[1] = 0x26;
-
-	device.write(packet, 32);
-}
-
-function grabColors(shutdown = false) {
+function grabColors(overrideColor) {
 	const rgbdata = [];
 
 	for(let iIdx = 0; iIdx < vKeys.length; iIdx++) {
@@ -194,8 +249,8 @@ function grabColors(shutdown = false) {
 		const iPxY = vKeyPositions[iIdx][1];
 		let color;
 
-		if(shutdown) {
-			color = hexToRgb(shutdownColor);
+		if(overrideColor) {
+			color = hexToRgb(overrideColor);
 		} else if (LightingMode === "Forced") {
 			color = hexToRgb(forcedColor);
 		} else {
@@ -211,32 +266,26 @@ function grabColors(shutdown = false) {
 	return rgbdata;
 }
 
-function sendColors() {
-	const rgbdata = grabColors();
-	const totalpackets = Math.floor(LEDCount/9);
-	const finalpacketoffset = (totalpackets*9);
-	const finalpacketledstosend = (LEDCount - finalpacketoffset);
+function sendColors(overrideColor) {
+	const rgbdata = grabColors(overrideColor);
 
-	for(let index = 0; index < totalpackets; index++) {
-		const packet = [];
-		const offset = index * 9;
-		packet[0] = 0x00;
-		packet[1] = 0x24;
+	const LedsPerPacket = 9;
+	let BytesSent = 0;
+	let BytesLeft = rgbdata.length;
 
+	while(BytesLeft > 0) {
+		const BytesToSend = Math.min(LedsPerPacket * 3, BytesLeft);
+		StreamLightingData(Math.floor(BytesSent / 3), rgbdata.splice(0, BytesToSend));
 
-		packet[2] = offset;
-		packet[3] = 0x09;
-		packet.push(...rgbdata.splice(0, 27));
-		device.write(packet, 33);
+		BytesLeft -= BytesToSend;
+		BytesSent += BytesToSend;
 	}
+}
 
-	const packet = [];
-	packet[0] = 0x00;
-	packet[1] = 0x24;
+function StreamLightingData(StartLedIdx, RGBData) {
+	const packet = [0x00, 0x24, StartLedIdx, Math.floor(RGBData.length / 3)];
 
-	packet[2] = finalpacketoffset;
-	packet[3] = finalpacketledstosend;
-	packet.push(...rgbdata.splice(0, finalpacketledstosend*3));
+	packet.push(...RGBData);
 	device.write(packet, 33);
 }
 
