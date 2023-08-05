@@ -118,6 +118,19 @@ class MysticLight {
 				PerLEDOnboardLEDs : 0,
 				ForceZoneBased	  : false,
 			},
+
+			"MPG B550 GAMING EDGE WIFI (MS-7C91)" :
+			{
+				OnboardLEDs    : 6,
+				RGBHeaders     : 2,
+				ARGBHeaders    : 2,
+				JPipeLEDs	   : 0,
+				CorsairHeaders : 0,
+				//PERLED
+				PerLEDOnboardLEDs : 6,
+				ForceZoneBased	  : false,
+				JARGB_V2		  : false
+			},
 		};
 
 
