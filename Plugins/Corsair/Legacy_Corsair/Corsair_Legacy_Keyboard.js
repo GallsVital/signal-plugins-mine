@@ -1,4 +1,4 @@
-export function Name() { return "Corsair K70 RGB mkII"; }
+export function Name() { return "Corsair Legacy Keyboard"; }
 export function VendorId() { return 0x1b1c; }
 export function ProductId() { return Object.keys(deviceLibrary.PIDLibrary); }
 export function Publisher() { return "WhirlwindFX"; }
