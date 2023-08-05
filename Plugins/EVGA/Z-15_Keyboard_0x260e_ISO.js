@@ -80,7 +80,7 @@ function sendPacket(shutdown = false) {
 	for(let iIdx = 0; iIdx < vKeys.length; iIdx++) {
 		const iPxX = vKeyPositions[iIdx][0];
 		const iPxY = vKeyPositions[iIdx][1];
-		var color;
+		let color;
 
 		if(shutdown) {
 			color = hexToRgb(shutdownColor);
@@ -111,9 +111,9 @@ function hexToRgb(hex) {
 }
 
 export function Validate(endpoint) {
-	return endpoint.interface === 1 && endpoint.usage == 0x004b && endpoint.usage_page == 0x0008;
+	return endpoint.interface === 1 && endpoint.usage === 0x004b && endpoint.usage_page === 0x0008;
 }
 
 export function ImageUrl(){
-	return "https://marketplace.signalrgb.com/devices/default/keyboard-100.png";
+	return "https://marketplace.signalrgb.com/devices/brands/evga/keyboards/z15.png";
 }
