@@ -1705,6 +1705,7 @@ export class LogitechMouseDevice {
 		DPIHandler.setMaxDpi(Logitech.GetDeviceMaxDPI());
 		DPIHandler.setUpdateCallback((dpi, stage) => { return this.setDpi(dpi, stage); });
 		DPIHandler.addProperties();
+		DPIHandler.setRollover(dpiRollover);
 
 		if(settingControl && !OnboardState) {
 			DPIHandler.setActiveControl(settingControl);
