@@ -149,9 +149,9 @@ function PollFans() {
 		}
 	}
 
-	if(PlatCooler.getNumberOfFans() === 3) {
-		PlatCooler.sendCoolingPacket(PlatCooler.deviceFanModes.fixedPWMWithFallback, Math.round(fanOutputData[2] /100 * 255), 0x00, 0x00, PlatCooler.coolingModes[fanProfile], true);
-	}
+	//if(PlatCooler.getNumberOfFans() === 3) {
+	//	PlatCooler.sendCoolingPacket(PlatCooler.deviceFanModes.fixedPWMWithFallback, Math.round(fanOutputData[2] /100 * 255), 0x00, 0x00, PlatCooler.coolingModes[fanProfile], true);
+	//}
 
 	PlatCooler.sendCoolingPacket(PlatCooler.deviceFanModes.fixedPWMWithFallback, Math.round(fanOutputData[0] /100 * 255), PlatCooler.deviceFanModes.fixedPWMWithFallback, Math.round(fanOutputData[1] * 255 / 100), PlatCooler.coolingModes[fanProfile]);
 }
@@ -250,6 +250,7 @@ class PlatinumProtocol {
 		this.PIDLibrary = {
 			0x0C29 : "H60I",
 			0x0C15 : "H100/H115I",
+			0x0C17 : "H100/H115I",
 			0x0C18 : "H100/H115I",
 			0x0C19 : "H100/H115I",
 			0x0C20 : "H100/H115I",
@@ -263,6 +264,7 @@ class PlatinumProtocol {
 		this.nameLibrary = {
 			0x0C29 : "H60I Pro XT",
 			0x0C15 : "H100I Platinum",
+			0x0C17 : "H115I Platinum",
 			0x0C18 : "H100I Platinum",
 			0x0C19 : "H100I Platinum SE",
 			0x0C35 : "H100I Elite",
@@ -325,7 +327,7 @@ class PlatinumProtocol {
 				size: [5, 5]
 			},
 			"H150I" : {
-				numberOfFans : 3,
+				numberOfFans : 2, //This needs to be 3 but it's busted.
 				vLedNames : [
 					"Logo 1", "Ring 1", "Ring 2", "Ring 3",
 					"Ring 4", "Logo 2", "Ring 5",
