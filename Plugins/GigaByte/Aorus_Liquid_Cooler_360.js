@@ -41,7 +41,7 @@ const Mode = {
 
 const brightness = 100; // keep native brightness at max, instead use SignalRGB brightness slider that adjusts color values
 
-const vLedNames = ["Ring Led 1", "Ring Led 2", "Ring Led 3", "Ring Led 4", "Ring Led 5", "Ring Led 6", "Ring Led 7", "Ring Led 8"];
+const vLedNames = ["Ring Led 1", "Ring Led 2", "Ring Led 3", "Ring Led 4", "Ring Led 5", "Ring Led 6", "Ring Led 7", "Ring Led 8", "Ring Led 9"];
 const vLedPositions = [[4, 6], [9, 3], [8, 1], [7, 3], [7, 5], [7, 7], [8, 9], [9, 7], [9, 5]];
 
 let currentMode = null;
