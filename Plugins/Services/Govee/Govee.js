@@ -421,7 +421,7 @@ const GoveeDeviceLibrary = {
 		imageUrl: "",
 		sku: "H61C3",
 		state: 1,
-		supportRazer: false,
+		supportRazer: true,
 		supportFeast: false,
 		ledCount: 15
 	},
