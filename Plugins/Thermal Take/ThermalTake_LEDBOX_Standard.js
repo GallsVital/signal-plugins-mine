@@ -1,6 +1,6 @@
 export function Name() { return "ThermalTake LedBox"; }
 export function VendorId() { return 0x264A; }
-export function ProductId() { return [0x2260, 0x2261, 0x2262, 0x2263, 0x2264, 0x2265, 0x2266, 0x2267, 0x226f, 0x232B, 0x232C, 0x232D ]; }
+export function ProductId() { return [0x2260, 0x2261, 0x2262, 0x2263, 0x2264, 0x2265, 0x2266, 0x2267, 0x2268, 0x226f, 0x232B, 0x232C, 0x232D ]; }
 export function Publisher() { return "WhirlwindFX"; }
 export function Size() { return [1, 1]; }
 export function Type() { return "Hid"; }
