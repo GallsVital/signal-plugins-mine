@@ -306,6 +306,7 @@ class ASUSLegacyGPUDeviceIds{
 		this.ROG_STRIX_RTX2070_SUPER_8G			       = 0x8701;
 		this.ROG_STRIX_RTX2080_O8G_GAMING              = 0x865F;
 		this.ROG_STRIX_RTX2080_A8G_GAMING              = 0x8660;
+		this.ROG_STRIX_RTX2080_A8G_GAMING_2            = 0x8661;
 		this.ROG_STRIX_RTX2080_SUPER_GAMING            = 0x8711;
 		this.ROG_STRIX_RTX2080_SUPER_OC                = 0x8712;
 		this.ROG_STRIX_RTX2080_SUPER_A8G_GAMING        = 0x8713;
@@ -388,6 +389,7 @@ class ASUSLegacyGPUList{
 			new ASUSLegacyDeviceIdentifier(Nvidia.RTX2070S2,		ASUSLegacyGPUIds.ROG_STRIX_RTX2070_SUPER_8G,				0X2A, "ASUS ROG Strix RTX 2070 Super 8GB"),
 			new ASUSLegacyDeviceIdentifier(Nvidia.RTX2080_A,       	ASUSLegacyGPUIds.ROG_STRIX_RTX2080_O8G_GAMING,      		0x2A, "ASUS ROG Strix RTX 2080 Gaming OC"),
 			new ASUSLegacyDeviceIdentifier(Nvidia.RTX2080_A,       	ASUSLegacyGPUIds.ROG_STRIX_RTX2080_A8G_GAMING,      		0x2A, "ASUS ROG Strix RTX 2080 Gaming Advanced"),
+			new ASUSLegacyDeviceIdentifier(Nvidia.RTX2080_A,       	ASUSLegacyGPUIds.ROG_STRIX_RTX2080_A8G_GAMING_2,      		0x2A, "ASUS ROG Strix RTX 2080 Gaming Advanced"),
 			new ASUSLegacyDeviceIdentifier(Nvidia.RTX2080TI,       	ASUSLegacyGPUIds.ROG_STRIX_RTX2080TI_O11G_GAMING,   		0x2A, "ASUS ROG Strix RTX 2080Ti Gaming"),
 			new ASUSLegacyDeviceIdentifier(Nvidia.RTX2060_TU106,   	ASUSLegacyGPUIds.ROG_STRIX_RTX2060_EVO_V2_GAMING,   		0x2A, "ASUS ROG Strix RTX 2060 Evo V2"),
 			new ASUSLegacyDeviceIdentifier(Nvidia.RTX2080TI,       	ASUSLegacyGPUIds.ROG_STRIX_RTX2080TI_O11G_GAMING_OC,   		0x2A, "ASUS ROG Strix RTX 2080Ti Gaming OC"),
