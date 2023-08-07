@@ -20,7 +20,7 @@ export function ControllableParameters(){
 		{"property":"forcedColor", "group":"lighting", "label":"Forced Color", "min":"0", "max":"360", "type":"color", "default":"#009bde"},
 		{"property":"LIntensity", "group":"", "label":"Left Trigger Intensity", "step":"1", "type":"number", "min":"0", "max":"100", "default":"0"},
 		{"property":"RIntensity", "group":"", "label":"Right Trigger Intensity", "step":"1", "type":"number", "min":"0", "max":"100", "default":"0"},
-		{"property":"HapticsControl", "group":"", "label":"Haptics Control", "type":"boolean", "default": "true"},
+		{"property":"HapticsControl", "group":"", "label":"Haptics Control", "type":"boolean", "default": "false"},
 	];
 }
 
@@ -111,6 +111,6 @@ export function Validate(endpoint) {
 	return endpoint.interface === 3;
 }
 
-export function Image() {
-	return "";
+export function ImageUrl(){
+	return "https://marketplace.signalrgb.com/devices/brands/sony/dualsense-controller.png";
 }
