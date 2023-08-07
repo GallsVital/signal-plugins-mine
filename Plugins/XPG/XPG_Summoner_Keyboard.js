@@ -133,6 +133,6 @@ export function Validate(endpoint) {
 	//return endpoint.interface === 1 && endpoint.usage === 0x0002 && endpoint.usage_page === 0x0001 && endpoint.collection === 0x0003;
 }
 
-export function ImageUrl() {
-	return "";
+export function ImageUrl(){
+	return "https://marketplace.signalrgb.com/devices/brands/xpg/keyboards/summoner.png";
 }
