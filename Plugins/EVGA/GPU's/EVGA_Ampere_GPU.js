@@ -468,6 +468,7 @@ class EVGAAmpereDeviceIds{
 		this.RTX3080_12G_FTW3_ULTRA_HYBRID      = 0x4878;
 		this.RTX3080_12G_XC3_ULTRA_HYBRID       = 0x4868;
 		this.RTX3080_FTW3_GAMING                = 0x3895;
+		this.RTX3080_FTW3_ULTRA_LHR      		= 0x4297;
 		this.RTX3080_FTW3_ULTRA_GAMING          = 0x3897;
 		this.RTX3080_FTW3_ULTRA_GAMING_LHR      = 0x4897;
 		this.RTX3080_FTW3_ULTRA_HC              = 0x3899;
@@ -581,6 +582,7 @@ class EVGAAmpereGPUList{
 			new EVGAAmpereIdentifier(Nvidia.RTX3080,           EVGAAmpereIds.RTX3080_XC3_ULTRA_HC,              "EVGA RTX 3080 XC3 Ultra HydroCopper"),
 			new EVGAAmpereIdentifier(Nvidia.RTX3080_LHR,       EVGAAmpereIds.RTX3080_12G_XC3_ULTRA_HC,          "EVGA RTX 3080 XC3 Ultra HydroCopper"),
 			new EVGAAmpereIdentifier(Nvidia.RTX3080_GA102,	   EVGAAmpereIds.RTX3080_12G_XC3_ULTRA_HC_2,		"EVGA RTX 3080 XC3 Ultra HydroCopper GA102"),
+			new EVGAAmpereIdentifier(Nvidia.RTX3080_LHR,       EVGAAmpereIds.RTX3080_FTW3_ULTRA_LHR,		    "EVGA RTX 3080 FTW3 Ultra LHR"),
 			new EVGAAmpereIdentifier(Nvidia.RTX3080,           EVGAAmpereIds.RTX3080_FTW3_GAMING,               "EVGA RTX 3080 FTW3 Gaming"),
 			new EVGAAmpereIdentifier(Nvidia.RTX3080_LHR,       EVGAAmpereIds.RTX3080_FTW3_ULTRA_HYBRID_LHR,     "EVGA RTX 3080 FTW3 Ultra Hybrid LHR"),
 			new EVGAAmpereIdentifier(Nvidia.RTX3080,           EVGAAmpereIds.RTX3080_FTW3_ULTRA_HC,             "EVGA RTX 3080 FTW3 Ultra HydroCopper"),
