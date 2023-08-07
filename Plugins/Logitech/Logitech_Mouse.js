@@ -369,6 +369,7 @@ export class LogitechDeviceLibrary {
 			"c083" : "G403",
 			"c084" : "G203 Prodigy",
 			"c085" : "GPro Wired",
+			"c086" : "G903",
 			"c088" : "GPro Wireless",
 			"c08b" : "G502 Hero",
 			"c08c" : "GPro Wired", //AltPid (╯°□°）╯︵ ┻━┻
