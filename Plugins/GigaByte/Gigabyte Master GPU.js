@@ -369,6 +369,30 @@ class GigabyteMasterProtocol {
 						Mapping :	[ 0 ]}
 				}
 			},
+			0x37BF :// 2080TI AORUS
+			{
+				Size: [15, 9],
+				modeZones : [2, 3, 5, 6],
+				Zones:
+				{
+					0: {
+						Names :		[ "Fan 1 LED 1", "Fan 1 LED 2", "Fan 1 LED 3", "Fan 1 LED 4", "Fan 1 LED 5", "Fan 1 LED 6", "Fan 1 LED 7", "Fan 1 LED 8",],
+					 	Positions : [ [0, 5], [1, 4], [2, 3], [3, 4], [4, 5], [3, 6], [2, 7], [1, 8], ],
+						Mapping :	[ 0, 1, 2, 3, 4, 5, 6, 7 ]},
+					1: {
+						Names :		[ "Fan 2 LED 1", "Fan 2 LED 2", "Fan 2 LED 3", "Fan 2 LED 4", "Fan 2 LED 5", "Fan 2 LED 6", "Fan 2 LED 7", "Fan 2 LED 8",],
+						Positions : [ [5, 5], [6, 4], [7, 3], [8, 4], [9, 5], [8, 6], [7, 7], [6, 8], ],
+						Mapping :	[ 0, 1, 2, 3, 4, 5, 6, 7 ]},
+					2: {
+						Names :		[ "Fan 3 LED 1", "Fan 3 LED 2", "Fan 3 LED 3", "Fan 3 LED 4", "Fan 3 LED 5", "Fan 3 LED 6", "Fan 3 LED 7", "Fan 3 LED 8",],
+						Positions : [ [10, 5], [11, 4], [12, 3], [13, 4], [14, 5], [13, 6], [12, 7], [11, 8], ],
+						Mapping :	[ 0, 1, 2, 3, 4, 5, 6, 7 ]},
+					3: {
+						Names :		[ "Side Logo LED" ],
+						Positions : [ [11, 0] ],
+						Mapping :	[ 0 ]}
+				}
+			},
 			0x3FF3 :// 2080S AORUS
 			{
 				Size: [15, 9],
@@ -595,6 +619,7 @@ class GigabyteMasterDeviceIds {
 		this.RTX2080_AORUS					 = 0x37B3;
 		this.RTX2080S_AORUS                  = 0x3FF3;
 		this.RTX2080S_AORUS_P                = 0x3FF4;
+		this.RTX2080TI_AORUS				 = 0x37BF;
 		this.RTX2080TI_EXTREME				 = 0x37BD;
 		this.RTX2080TI_EXTREME_11G			 = 0x37BC;
 		this.RTX2080TI_WATERFORCE			 = 0x37b9;
@@ -654,6 +679,7 @@ class GigabyteMasterGPuList {
 			new GigabyteMasterIdentifier(Nvidia.RTX2080_A,		GigabyteMasterIds.RTX2080S_AORUS,					0x50, "GIGABYTE AORUS 2080 Super"),
 			new GigabyteMasterIdentifier(Nvidia.RTX2080S,       GigabyteMasterIds.RTX2080S_AORUS,         			0x50, "GIGABYTE AORUS 2080 Super OC"),
 			new GigabyteMasterIdentifier(Nvidia.RTX2080S,       GigabyteMasterIds.RTX2080S_AORUS_P,         		0x50, "GIGABYTE AORUS 2080 Super"),
+			new GigabyteMasterIdentifier(Nvidia.RTX2080TI,		GigabyteMasterIds.RTX2080TI_AORUS,					0x50, "GIGABYTE 2080TI AORUS"),
 			new GigabyteMasterIdentifier(Nvidia.RTX3060_LHR,    GigabyteMasterIds.RTX3060_GAMING_OC_12GB,        	0x62, "GIGABYTE 3060 Gaming OC LHR"),
 			new GigabyteMasterIdentifier(Nvidia.RTX3060TI,		GigabyteMasterIds.RTX3060_MASTER_O08G,       		0x66, "GIGABYTE AORUS 3060Ti Master 8GB"),
 			new GigabyteMasterIdentifier(Nvidia.RTX3060_GA104,  GigabyteMasterIds.RTX3060_GAMING_OC_12GB,        	0x32, "GIGABYTE 3060 Gaming OC"),
