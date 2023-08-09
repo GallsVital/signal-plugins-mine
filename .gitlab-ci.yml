@@ -49,6 +49,7 @@ validate:
     name: "Javascript Plugins"
     paths:
       - Plugins/**/*.js
+      - Plugins/**/*.qml
     exclude:
       - "Plugins/**/*.test.js"
       - "Plugins/*.js"
