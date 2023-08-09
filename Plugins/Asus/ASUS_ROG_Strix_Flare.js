@@ -21,27 +21,15 @@ export function ControllableParameters(){
 	];
 }
 
-function hexToRgb(hex) {
-	const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
-	const colors = [];
-	colors[0] = parseInt(result[1], 16);
-	colors[1] = parseInt(result[2], 16);
-	colors[2] = parseInt(result[3], 16);
-
-	return colors;
-}
-
 export function Initialize() {
-	//Direct mode init?
-//  51 2C 02 00 19 64 00 FF FF 00 00 00 00 00 00 00 00 00 70 05 FE FF FF FF F4 D9 8D 01 52 04 D4 75 7C 2A 50 77 90 E1 D4 75 98 06 00 00 00 00
-// 00 00 1C DA 8D 01 96 CC 8B 70 98 06 00 00 A6 CC 8B 70
+
 }
 
 
 export function Shutdown() {
 // revert to rainbow mode
-	sendPacketString("00 51 2C 04 00 48 64 00 00 02 07 0E F5 00 FF 1D 00 06 FF 2B 00 FA FF 39 01 FF 00 48 FF F6 00 56 FF 78 07 64 FF 00 0D", 65);
-	sendPacketString("00 50 55", 65);
+	device.write([0x00, 0x51, 0x2C, 0x04, 0x00, 0x48, 0x64, 0x00, 0x00, 0x02, 0x07, 0x0E, 0xF5, 0x00, 0xFF, 0x1D, 0x00, 0x06, 0xFF, 0x2B, 0x00, 0xFA, 0xFF, 0x39, 0x01, 0xFF, 0x00, 0x48, 0xFF, 0xF6, 0x00, 0x56, 0xFF, 0x78, 0x07, 0x64, 0xFF, 0x00, 0x0D], 65);
+	device.write([0x00, 0x50, 0x55], 65);
 }
 
 
@@ -100,7 +88,7 @@ function sendColors(shutdown = false){
 	for(let iIdx = 0; iIdx < vKeys.length; iIdx++) {
 		const iPxX = vKeyPositions[iIdx][0];
 		const iPxY = vKeyPositions[iIdx][1];
-		var col;
+		let col;
 
 		if(shutdown){
 			col = hexToRgb(shutdownColor);
@@ -114,7 +102,6 @@ function sendColors(shutdown = false){
 		RGBData[iIdx * 4 + 1] = col[0];
 		RGBData[iIdx * 4 + 2] = col[1];
 		RGBData[iIdx * 4 + 3] = col[2];
-		//TotalLedCount++;
 	}
 
 	let packetCount = 0;
@@ -129,28 +116,24 @@ function sendColors(shutdown = false){
 		packet[3] = 0x90 - (0x0F * packetCount++);
 		packet[4] = 0x00;
 		packet = packet.concat(RGBData.splice(0, ledsToSend*4));
-		device.write(packet, 65);
-		//device.read(packet,65)
+		device.write([0x00, 0xC0, 0x81, 0x90 - (0x0F * packetCount++), 0x00].concat(RGBData.splice(0, ledsToSend*4)), 65);
 		TotalLedCount -= ledsToSend;
 	}
 
 }
 
+function hexToRgb(hex) {
+	let result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+	let colors = [];
+	colors[0] = parseInt(result[1], 16);
+	colors[1] = parseInt(result[2], 16);
+	colors[2] = parseInt(result[3], 16);
+
+	return colors;
+}
 
 export function Validate(endpoint) {
 	return endpoint.interface === 1;
-}
-
-function sendPacketString(string, size){
-
-	const packet= [];
-	const data = string.split(' ');
-
-	for(let i = 0; i < data.length; i++){
-		packet[i] =parseInt(data[i], 16);//.toString(16)
-	}
-
-	device.write(packet, size);
 }
 
 export function ImageUrl(){
