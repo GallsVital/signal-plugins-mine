@@ -45,7 +45,7 @@ function SetupChannels(init = false) {
 			device.removeChannel(ChannelArray[i]);
 		}
 
-		device.addChannel(ChannelArray[i], ChMaxLeds);
+		device.addChannel(ChannelArray[i], ChMaxLeds, ChMaxLeds);
 		DeviceLedLimit += ChMaxLeds;
 
 		const packet = [];

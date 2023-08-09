@@ -29,22 +29,28 @@ const DeviceMaxLedLimit = 240;
 const transactionID = 0x1f;
 
 //Channel Name, Led Limit
+/** @type {ChannelConfigArray} */
 const ChannelArray = [
-	["Channel 1", 80],
-	["Channel 2", 80],
-	["Channel 3", 80],
-	["Channel 4", 80],
-	["Channel 5", 80],
-	["Channel 6", 80],
+	["Channel 1", 80, 40],
+	["Channel 2", 80, 40],
+	["Channel 3", 80, 40],
+	["Channel 4", 80, 40],
+	["Channel 5", 80, 40],
+	["Channel 6", 80, 40],
 ];
 
 function SetupChannels() {
 	device.SetLedLimit(DeviceMaxLedLimit);
 
 	for(let i = 0; i < ChannelArray.length; i++) {
-		device.addChannel(ChannelArray[i][0], ChannelArray[i][1]);
+		const channelInfo = ChannelArray[i];
+
+		if(channelInfo){
+			device.addChannel(...channelInfo);
+		}
 	}
 }
+
 export function LedNames() {
 	return vLedNames;
 }

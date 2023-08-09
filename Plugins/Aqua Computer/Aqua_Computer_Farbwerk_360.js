@@ -22,19 +22,24 @@ export function ControllableParameters() {
 export function SubdeviceController(){ return true; }
 
 const DeviceMaxLedLimit = 360;
+/** @type {ChannelConfigArray} */
 const ChannelArray =
 [
-	["Channel 1", 90],
-	["Channel 2", 90],
-	["Channel 3", 90],
-	["Channel 4", 90],
+	["Channel 1", 90, 90],
+	["Channel 2", 90, 90],
+	["Channel 3", 90, 90],
+	["Channel 4", 90, 90],
 ];
 
 function SetupChannels() {
 	device.SetLedLimit(DeviceMaxLedLimit);
 
 	for(let i = 0; i < ChannelArray.length; i++) {
-		device.addChannel(ChannelArray[i][0], ChannelArray[i][1]);
+		const channelInfo = ChannelArray[i];
+
+		if(channelInfo){
+			device.addChannel(...channelInfo);
+		}
 	}
 }
 
