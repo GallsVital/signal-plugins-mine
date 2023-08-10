@@ -268,6 +268,7 @@ class NvidiaGPUDeviceIds {
 		this.RTX3080TI       = 0x2208;
 		this.RTX3090         = 0x2204;
 		this.RTX3090TI       = 0x2203;
+		this.RTX4060TI		 = 0x2803;
 		this.RTX4070		 = 0x2786;
 		this.RTX4070TI 		 = 0x2782;
 		this.RTX4080		 = 0x2704;
@@ -336,6 +337,7 @@ class GigabyteVisionDeviceIds {
 		this.RTX3080TI_GAMING_OC            = 0x4088;
 		this.RTX3090_GAMING_OC_24GB         = 0x4043;
 		this.RTX3080_12G_GAMING_OC          = 0x40A2;
+		this.RTX4060TI_GAMING_OC            = 0x40F8;
 		this.RTX4070TI_GAMING_OC            = 0x40c6;
 		this.RTX4070TI_EAGLE_12G			= 0x40D2;
 		this.RTX4070TI_EAGLE_OC_12G			= 0x40CA;
@@ -465,6 +467,7 @@ class GigabyteVisionGPuList {
 			new GigabyteVisionIdentifier(Nvidia.RTX3080_LHR,    GigabyteVisionIds.RTX3080_EAGLE_OC,    		 	 0x63, "GIGABYTE 3080 Eagle OC LHR"),
 			new GigabyteVisionIdentifier(Nvidia.RTX3090,        GigabyteVisionIds.RTX3090_VISION_OC_24G,         0x63, "GIGABYTE 3090 Vision OC"),
 			new GigabyteVisionIdentifier(Nvidia.RTX3090,        GigabyteVisionIds.RTX3090_GAMING_OC_24GB,        0x62, "GIGABYTE 3090 Gaming OC 24G"), // Confirmed
+			new GigabyteVisionIdentifier(Nvidia.RTX4060TI,		GigabyteVisionIds.RTX4060TI_GAMING_OC,			 0x71, "GIGABYTE 4060Ti Gaming OC"),
 			new GigabyteVisionIdentifier(Nvidia.RTX4070,		GigabyteVisionIds.RTX4070_AERO,					 0x71, "GIGABYTE 4070 Aero"),
 			new GigabyteVisionIdentifier(Nvidia.RTX4070,		GigabyteVisionIds.RTX4070_EAGLE_OC,				 0x71, "GIGABYTE 4070 Eagle OC"),
 			new GigabyteVisionIdentifier(Nvidia.RTX4070TI,		GigabyteVisionIds.RTX4070TI_EAGLE,				 0x71, "GIGABYTE 4070Ti Eagle"),
