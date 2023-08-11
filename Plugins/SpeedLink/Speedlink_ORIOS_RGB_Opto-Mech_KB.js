@@ -6,11 +6,13 @@ export function Size() { return [22, 6]; }
 export function DefaultPosition(){return [20, 20];}
 export function DefaultScale(){return 10.0;}
 /* global
+shutdownColor:readonly
 LightingMode:readonly
 forcedColor:readonly
 */
 export function ControllableParameters() {
 	return [
+		{"property":"shutdownColor", "label":"Shutdown Color", "min":"0", "max":"360", "type":"color", "default":"#009bde"},
 		{"property":"LightingMode", "group":"lighting", "label":"Lighting Mode", "type":"combobox", "values":["Canvas", "Forced"], "default":"Canvas"},
 		{"property":"forcedColor", "group":"lighting", "label":"Forced Color", "min":"0", "max":"360", "type":"color", "default":"#009bde"},
 	];
@@ -62,10 +64,16 @@ export function Initialize() {
 }
 
 export function Render() {
-	SendPacket();
+	sendColors();
 }
 
-export function Shutdown() {
+export function Shutdown(SystemSuspending) {
+
+	if(SystemSuspending){
+		sendColors("#000000"); // Go Dark on System Sleep/Shutdown
+	}else{
+		sendColors(shutdownColor);
+	}
 
 }
 
@@ -73,7 +81,7 @@ const row_packet_four = [ 0x38, 0x38, 0x38, 0x38, 0x38, 0x38, 0x2a ];
 const row_packet_five = [ 0x00, 0x38, 0x70, 0xa8, 0xe0, 0x18, 0x50 ];
 const row_packet_six  = [ 0x00, 0x00, 0x00, 0x00, 0x00, 0x01, 0x01 ];
 
-function SendPacket() {
+function sendColors(overrideColor) {
 	let mxPxColor;
 	const RGBData = new Array(392).fill(0x00);
 
@@ -81,7 +89,9 @@ function SendPacket() {
 		const iPxX = vKeyPositions[iIdx][0];
 		const iPxY = vKeyPositions[iIdx][1];
 
-		if (LightingMode === "Forced") {
+		if(overrideColor){
+			mxPxColor = hexToRgb(overrideColor);
+		}else if (LightingMode === "Forced") {
 			mxPxColor = hexToRgb(forcedColor);
 		} else {
 			mxPxColor = device.color(iPxX, iPxY);

@@ -6,11 +6,13 @@ export function Size() { return [5, 6]; }
 export function DefaultPosition(){return [100, 100];}
 export function DefaultScale(){return 10.0;}
 /* global
+shutdownColor:readonly
 LightingMode:readonly
 forcedColor:readonly
 */
 export function ControllableParameters() {
 	return [
+		{"property":"shutdownColor", "label":"Shutdown Color", "min":"0", "max":"360", "type":"color", "default":"#009bde"},
 		{"property":"LightingMode", "group":"lighting", "label":"Lighting Mode", "type":"combobox", "values":["Canvas", "Forced"], "default":"Canvas"},
 		{"property":"forcedColor", "group":"lighting", "label":"Forced Color", "min":"0", "max":"360", "type":"color", "default":"#009bde"},
 	];
@@ -34,15 +36,21 @@ export function Initialize() {
 }
 
 export function Render() {
-	SendPacket();
+	sendColors();
 	device.pause(1);
 }
 
-export function Shutdown() {
+export function Shutdown(SystemSuspending) {
+
+	if(SystemSuspending){
+		sendColors("#000000"); // Go Dark on System Sleep/Shutdown
+	}else{
+		sendColors(shutdownColor);
+	}
 
 }
 
-function SendPacket() {
+function sendColors(overrideColor) {
 	let color;
 	const packet = [0x04, 0x00, 0x00, 0x12, 0x38, 0x00, 0x00, 0x00];
 
@@ -50,7 +58,9 @@ function SendPacket() {
 		const iPxX = vLedPositions[iIdx][0];
 		const iPxY = vLedPositions[iIdx][1];
 
-		if (LightingMode === "Forced") {
+		if(overrideColor){
+			color = hexToRgb(overrideColor);
+		}else if (LightingMode === "Forced") {
 			color = hexToRgb(forcedColor);
 		} else {
 			color = device.color(iPxX, iPxY);
