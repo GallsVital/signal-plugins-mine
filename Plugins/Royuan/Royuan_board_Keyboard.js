@@ -23,7 +23,7 @@ const vLedNames = [
 	"Keyboard"
 ];
 
-const vLedPositions = [
+const vKeyPositions = [
 	[0, 0]
 ];
 
@@ -32,7 +32,7 @@ export function LedNames() {
 }
 
 export function LedPositions() {
-	return vLedPositions;
+	return vKeyPositions;
 }
 
 export function Initialize() {
@@ -41,7 +41,7 @@ export function Initialize() {
 
 export function Render() {
 	sendColors();
-	device.pause(1);
+	device.pause(5);
 }
 
 export function Shutdown(SystemSuspending) {
@@ -55,11 +55,13 @@ export function Shutdown(SystemSuspending) {
 function sendColors(overrideColor) {
 
 	const packet = [];
+	let crc		 = 255;
+
 	packet[0] = 0x00; //Zero Padding
 	packet[1] = 0x0E;
 
-	const iPxX = vLedPositions[0][0];
-	const iPxY = vLedPositions[0][1];
+	const iPxX = vKeyPositions[0][0];
+	const iPxY = vKeyPositions[0][1];
 	let color;
 
 	if(overrideColor){
@@ -73,20 +75,14 @@ function sendColors(overrideColor) {
 	packet[2]   = color[0];
 	packet[3]   = color[1];
 	packet[4]   = color[2];
-	packet[8] = CalculateCrc(packet);
 
-	device.send_report(packet, 65); // Send commands
-}
-
-function CalculateCrc(report) {
-	const iCrc = 255;
-	let sum = 0;
-
-	for (let iIdx = 1; iIdx < 5; iIdx++) {
-		sum += report[iIdx];
+	for (let i = 1; i < 5; i++) {
+		crc -= packet[i];
 	}
 
-	return iCrc - sum;
+	packet[8] = crc;
+
+	device.send_report(packet, 65); // Send commands
 }
 
 function hexToRgb(hex) {
@@ -108,5 +104,5 @@ export function Validate(endpoint) {
 }
 
 export function ImageUrl() {
-	return "https://marketplace.signalrgb.com/devices/default/keyboard-60.png";
+	return "";
 }
