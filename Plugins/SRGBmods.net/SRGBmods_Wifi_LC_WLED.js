@@ -78,13 +78,21 @@ function requestFirmwareVersion() {
 	compareFirmwareVersion();
 }
 
-export function Shutdown() {
-	for(let i = 0; i < ChannelArray.length; i++) {
-		SendChannel(i, true);
+export function Shutdown(SystemSuspending) {
+
+	if(SystemSuspending){
+		for(let i = 0; i < ChannelArray.length; i++) {
+			SendChannel(i, "#000000"); // Go Dark on System Sleep/Shutdown
+		}
+	}else{
+		for(let i = 0; i < ChannelArray.length; i++) {
+			SendChannel(i, shutdownColor);
+		}
 	}
+
 }
 
-function SendChannel(Channel, shutdown = false) {
+function SendChannel(Channel, overrideColor) {
 	const componentChannel = device.channel(ChannelArray[Channel][0]);
 	let ChannelLedCount = componentChannel.ledCount > ChannelArray[Channel][1] ? ChannelArray[Channel][1] : componentChannel.ledCount;
 
@@ -93,8 +101,8 @@ function SendChannel(Channel, shutdown = false) {
 
 	let RGBData = [];
 
-	if(shutdown) {
-		RGBData = device.createColorArray(shutdownColor, ChannelLedCount, "Inline");
+	if(overrideColor) {
+		RGBData = device.createColorArray(overrideColor, ChannelLedCount, "Inline");
 	} else if(LightingMode === "Forced") {
 		RGBData = device.createColorArray(forcedColor, ChannelLedCount, "Inline");
 	} else if(componentChannel.shouldPulseColors()) {
