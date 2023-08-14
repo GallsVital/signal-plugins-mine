@@ -129,7 +129,7 @@ function  getChannelColors(Channel, ledcount, shutdown, componentChannel) {
 	} else if(componentChannel.shouldPulseColors()) {
 		ledcount = 96;
 
-		const pulseColor = device.getChannelPulseColor(ChannelArray[Channel][0], ledcount);
+		const pulseColor = device.getChannelPulseColor(ChannelArray[Channel][0]);
 		RGBData = device.createColorArray(pulseColor, ledcount, "Inline", "RBG");
 
 	} else {
