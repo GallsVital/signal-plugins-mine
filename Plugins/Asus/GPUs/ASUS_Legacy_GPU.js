@@ -280,6 +280,7 @@ class ASUSLegacyGPUDeviceIds{
 		this.ROG_STRIX_GTX1660_SUPER_GAMING_OC		   = 0x8752;
 		this.ROG_STRIX_GTX1660_SUPER_GAMING_ADVANCED   = 0x8753;
 		this.ROG_GTX1660TI_OC                          = 0x86A5;
+		this.ROG_GTX1660TI_OC_2						   = 0x86A6;
 		this.ROG_STRIX_GTX1650_SUPER_GAMING_ADVANCED   = 0x8750;
 		this.ROG_STRIX_GTX1650_SUPER_GAMING_OC         = 0x8751;
 		this.ROG_STRIX_GTX1650_SUPER_OC                = 0x874F;
@@ -368,6 +369,7 @@ class ASUSLegacyGPUList{
 			new ASUSLegacyDeviceIdentifier(Nvidia.GTX1660S,        	ASUSLegacyGPUIds.ROG_STRIX_GTX1660_SUPER_GAMING_ADVANCED, 	0x2A, "ASUS ROG Strix GTX 1660 Super Gaming Advanced"),
 			new ASUSLegacyDeviceIdentifier(Nvidia.GTX1660S,			ASUSLegacyGPUIds.ROG_STRIX_GTX1660_SUPER_GAMING_OC, 		0x2A, "ASUS ROG Strix GTX 1660 Super Gaming OC"),
 			new ASUSLegacyDeviceIdentifier(Nvidia.GTX1660TI,       	ASUSLegacyGPUIds.ROG_GTX1660TI_OC,                  		0x2A, "ASUS ROG Strix GTX 1660TI OC"),
+			new ASUSLegacyDeviceIdentifier(Nvidia.GTX1660TI,       	ASUSLegacyGPUIds.ROG_GTX1660TI_OC_2,                  		0x2A, "ASUS ROG Strix GTX 1660TI OC"),
 			new ASUSLegacyDeviceIdentifier(Nvidia.RTX2060_TU106,   	ASUSLegacyGPUIds.ROG_STRIX_RTX2060_GAMING,          		0x2A, "ASUS ROG Strix RTX 2060 Gaming"),
 			new ASUSLegacyDeviceIdentifier(Nvidia.RTX2060_TU106,   	ASUSLegacyGPUIds.ROG_STRIX_RTX2060_O6G_GAMING,          	0x2A, "ASUS ROG Strix RTX 2060 Gaming 6gb"),
 			new ASUSLegacyDeviceIdentifier(Nvidia.RTX2060_TU106,   	ASUSLegacyGPUIds.ROG_STRIX_RTX2060_EVO_GAMING,      		0x2A, "ASUS ROG Strix RTX 2060 EVO Gaming"),
