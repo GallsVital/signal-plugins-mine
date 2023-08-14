@@ -8,6 +8,8 @@ export function DefaultPosition(){return [150, 40];}
 export function DefaultScale(){return 12.0;}
 export function LedNames() { return vLedNames; }
 export function LedPositions() { return vLedPositions; }
+export function ConflictingProcesses() { return ["LightingService.exe"]; }
+
 /* global
 shutdownColor:readonly
 LightingMode:readonly
