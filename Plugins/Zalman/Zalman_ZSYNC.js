@@ -74,21 +74,31 @@ export function Render() {
 	SubmitLightingColors();
 }
 
-export function Shutdown() {
-	for(let Channel = 0; Channel < 8; Channel++) {
-		device.write([0x00, CORSAIR_LIGHTING_CONTROLLER_MODE, Channel, CORSAIR_HARDWARE_MODE], 65);
+export function Shutdown(SystemSuspending) {
+
+	if(SystemSuspending){
+		for(let Channel = 0; Channel < 8; Channel++) {
+			SendChannel(Channel, "#000000"); // Go Dark on System Sleep/Shutdown
+		}
+
+		SubmitLightingColors();
+	}else{
+		for(let Channel = 0; Channel < 8; Channel++) {
+			device.write([0x00, CORSAIR_LIGHTING_CONTROLLER_MODE, Channel, CORSAIR_HARDWARE_MODE], 65);
+		}
 	}
 }
 
-function SendChannel(Channel) {
+function SendChannel(Channel, overrideColor) {
 	let ChannelLedCount = device.channel(ChannelArray[Channel][0]).LedCount();
 	const componentChannel = device.channel(ChannelArray[Channel][0]);
 
 	let ColorData = [];
 
-	if(LightingMode === "Forced") {
+	if(overrideColor){
+		ColorData = device.createColorArray(overrideColor, ChannelLedCount, "Seperate");
+	}else if(LightingMode === "Forced") {
 		ColorData = device.createColorArray(forcedColor, ChannelLedCount, "Seperate");
-
 	} else if(componentChannel.shouldPulseColors()) {
 		ChannelLedCount = 40;
 
