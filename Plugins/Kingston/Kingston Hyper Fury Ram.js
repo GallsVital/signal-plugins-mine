@@ -23,35 +23,31 @@ export function ControllableParameters(){
 }
 
 /** @type {LedPosition[]} */
-const vLedPositions = [ [0, 11], [0, 10], [0, 9], [0, 8], [0, 7], [0, 6], [0, 5], [0, 4], [0, 3], [0, 2], [0, 1], [0, 0] ];
-const vLedNames = ["Led 12", "Led 11", "Led 10", "Led 9", "Led 8", "Led 7", "Led 6", "Led 5", "Led 4", "Led 3", "Led 2", "Led 1"];
+const vPerLEDLedPositions = [ [0, 11], [0, 10], [0, 9], [0, 8], [0, 7], [0, 6], [0, 5], [0, 4], [0, 3], [0, 2], [0, 1], [0, 0] ];
+const vPerLEDLedNames = ["Led 12", "Led 11", "Led 10", "Led 9", "Led 8", "Led 7", "Led 6", "Led 5", "Led 4", "Led 3", "Led 2", "Led 1"];
 
 /** @type {LedPosition[]} */
 const vSingleLEDPosition = [ [0, 5] ];
 const vSingleLEDName = [ "Main LED" ];
 
-export function LedNames() {
-	if(!highSpeedMode) {
-		return vLedNames;
-	}
+let vLedNames = vPerLEDLedNames;
+let vLedPositions = vPerLEDLedPositions; 
 
-	return vSingleLEDName;
+export function LedNames() {
+	return vLedNames;
 }
 
 export function LedPositions() {
-	if(!highSpeedMode) {
-		return vLedPositions;
-	}
-
-	return vSingleLEDPosition;
+	return vLedPositions;
 }
 
 export function Initialize() {
 	SetMode();
+	setLEDs();
 
 	if(!highSpeedMode) {
 		SendColors(false, true);
-	} else { device.setControllableLeds(vSingleLEDName, vSingleLEDPosition); }
+	}
 }
 
 export function Render() {
@@ -73,11 +69,9 @@ export function Shutdown() {
 }
 
 export function onhighSpeedModeChanged() {
+	setLEDs();
 	if(!highSpeedMode) {
-		device.setControllableLeds(vLedNames, vLedPositions);
 		SendColors(false, true);
-	} else {
-		device.setControllableLeds(vSingleLEDName, vSingleLEDPosition);
 	}
 }
 
@@ -106,6 +100,17 @@ export function Scan(bus) {
 	}
 
 	return FoundAddresses;
+}
+
+function setLEDs() {
+	if(highSpeedMode) {
+		vLedNames = vSingleLEDName;
+		vLedPositions = vSingleLEDPosition;
+	} else {
+		vLedNames = vPerLEDLedNames;
+		vLedPositions = vPerLEDLedPositions;
+	}
+	device.setControllableLeds(vLedNames, vLedPositions);
 }
 
 const addressDict = {
