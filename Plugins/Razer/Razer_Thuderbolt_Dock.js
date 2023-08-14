@@ -114,6 +114,6 @@ export function Validate(endpoint) {
 	return endpoint.interface === 0 && endpoint.usage === 0x0001 && endpoint.usage_page === 0x000c && endpoint.collection === 0x0000;
 }
 
-export function ImageUrl() {
-	return "https://uc622533677efe0b2ed77f45a1cb.previews.dropboxusercontent.com/p/thumb/AB_n2Q04VRLLBwDmW1iqrsyunGyqQ7-XbZmVIsW8Gp_t2m6A-UC0YGJio4Zc6kXp9JTdULem-B3QlodLUMoEJkvuZwadezuvanNuZieUWRWG_-8NfyDWFwJBvgfdaBOUvpUezvEk2F4i5EH5xfZMm-hKhMtj0QPIWUkI_lm1dzF2f7gi6a74jpk7IlGOqEWzBZteDUAkEZb01FoUq7r8QfaN740du2EqzPKiE4MrwvttNSaLXiXHvV7ieDSsQ0GB0l924ZKK8yjizWgUzpwgtA4008VlTuauWSIMyelL74xEkupSfA8XpY2tcUQN-dnmpzBMrtYG_pvISlTblZzhP2RDN7JjA5qZQRiRxRV3wlBYPwCVjt8JeioAiX7hfRKEGaM/p.png";
+export function ImageUrl(){
+	return "https://marketplace.signalrgb.com/devices/brands/razer/other/thunderbolt-dock.png";
 }
