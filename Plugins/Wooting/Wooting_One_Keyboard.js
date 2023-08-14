@@ -107,19 +107,25 @@ export function Render() {
 	sendColors();
 }
 
-export function Shutdown() {
-	wooting_usb_send_feature(WOOTING_RESET_ALL_COMMAND, 0, 0, 0, 0);
+export function Shutdown(SystemSuspending) {
+
+	if(SystemSuspending){
+		sendColors("#000000"); // Go Dark on System Sleep/Shutdown
+	}else{
+		wooting_usb_send_feature(WOOTING_RESET_ALL_COMMAND, 0, 0, 0, 0);
+	}
+
 }
 
-function sendColors(shutdown = false) {
+function sendColors(overrideColor) {
 	let iPxX, iPxY, col;
 
 	for(let iIdx = 0; iIdx < vKeyPositions.length; iIdx++) {
 		iPxX = vKeyPositions[iIdx][0];
 		iPxY = vKeyPositions[iIdx][1];
 
-		if (shutdown) {
-			col = hexToRgb(shutdownColor);
+		if (overrideColor) {
+			col = hexToRgb(overrideColor);
 		} else if (LightingMode == "Forced") {
 			col = hexToRgb(forcedColor);
 		} else {
