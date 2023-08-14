@@ -11,7 +11,6 @@ export function DefaultScale(){return 15.0;}
 shutdownColor:readonly
 LightingMode:readonly
 forcedColor:readonly
-
 */
 export function ControllableParameters() {
 	return [
@@ -28,9 +27,9 @@ const DeviceMaxLedLimit = 18*3;
 
 //Channel Name, Led Limit
 const ChannelArray = [
-	["Channel 1", 18],
-	["Channel 2", 18],
-	["Channel 3", 18],
+	["Channel 1", 18, 18],
+	["Channel 2", 18, 18],
+	["Channel 3", 18, 18],
 ];
 
 export function LedNames() {
