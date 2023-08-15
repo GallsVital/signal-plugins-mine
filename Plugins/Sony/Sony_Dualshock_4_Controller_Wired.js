@@ -35,22 +35,28 @@ export function Initialize() {
 }
 
 export function Render() {
-	SendColorPacket();
+	sendColors();
 	device.pause(1);
 }
 
-export function Shutdown() {
-	SendColorPacket(true);
+export function Shutdown(SystemSuspending) {
+
+	if(SystemSuspending){
+		sendColors("#000000"); // Go Dark on System Sleep/Shutdown
+	}else{
+		sendColors(shutdownColor);
+	}
+
 }
 
-function SendColorPacket(shutdown = false) {
+function sendColors(overrideColor) {
 	const iX = vLedPositions[0][0];
 	const iY = vLedPositions[0][1];
 
 	let color;
 
-	if(shutdown) {
-		color = hexToRgb(shutdownColor);
+	if(overrideColor) {
+		color = hexToRgb(overrideColor);
 	} else if (LightingMode === "Forced") {
 		color = hexToRgb(forcedColor);
 	} else {
