@@ -56,13 +56,19 @@ export function Initialize() {
 }
 
 export function Render() {
-	SendPacket();
+	sendColors();
 	sendZonefake(6);
 	sendZonefake(7);
 }
 
-export function Shutdown() {
-	//Do nothing. Keeb reverts to hardware mode when streaming is stopped.
+export function Shutdown(SystemSuspending) {
+
+	if(SystemSuspending){
+		sendColors("#000000"); // Go Dark on System Sleep/Shutdown
+	}else{
+		//Do nothing. Keeb reverts to hardware mode when streaming is stopped.
+	}
+
 }
 
 function sendZonefake(zone) {
@@ -99,7 +105,7 @@ function StreamPacket(zone, data) {
 	device.pause(1);
 }
 
-function SendPacket(shutdown = false) {
+function sendColors(overrideColor) {
 	const RGBData = new Array(425).fill(0);
 
 	for(let iIdx = 0; iIdx < vKeys.length; iIdx++) {
@@ -107,8 +113,8 @@ function SendPacket(shutdown = false) {
 		const iPxY = vKeyPositions[iIdx][1];
 		var col;
 
-		if(shutdown) {
-			col = hexToRgb(shutdownColor);
+		if(overrideColor) {
+			col = hexToRgb(overrideColor);
 		} else if (LightingMode === "Forced") {
 			col = hexToRgb(forcedColor);
 		} else {
