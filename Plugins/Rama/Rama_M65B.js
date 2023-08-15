@@ -8,25 +8,19 @@ export function DefaultPosition(){return [10, 100];}
 const DESIRED_HEIGHT = 85;
 export function DefaultScale(){return Math.floor(DESIRED_HEIGHT/Size()[1]);}
 /* global
+shutdownColor:readonly
+LightingMode:readonly
+forcedColor:readonly
 */
 export function ControllableParameters(){
 	return [
-		//{"property":"shutdownColor", "group":"lighting", "label":"Shutdown Color","min":"0","max":"360","type":"color","default":"#009bde"},
-		//{"property":"LightingMode", "group":"lighting", "label":"Lighting Mode", "type":"combobox", "values":["Canvas","Forced"], "default":"Canvas"},
-		//{"property":"forcedColor", "group":"lighting", "label":"Forced Color","min":"0","max":"360","type":"color","default":"#009bde"},
+		{"property":"shutdownColor", "group":"lighting", "label":"Shutdown Color", "min":"0", "max":"360", "type":"color", "default":"#009bde"},
+		{"property":"LightingMode", "group":"lighting", "label":"Lighting Mode", "type":"combobox", "values":["Canvas", "Forced"], "default":"Canvas"},
+		{"property":"forcedColor", "group":"lighting", "label":"Forced Color", "min":"0", "max":"360", "type":"color", "default":"#009bde"},
 
 	];
 }
 
-function hexToRgb(hex) {
-	const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
-	const colors = [];
-	colors[0] = parseInt(result[1], 16);
-	colors[1] = parseInt(result[2], 16);
-	colors[2] = parseInt(result[3], 16);
-
-	return colors;
-}
 const vLedNames = [
 	"Esc", "F1", "F2", "F3", "F4", "F5", "F6", "F7", "F8", "F9", "F10", "F11", "F12",         "Print Screen", "Scroll Lock", "Pause Break",
 	"`", "1", "2", "3", "4", "5", "6", "7", "8", "9", "0", "-_", "=+", "Backspace",                        "Insert", "Home", "Page Up",
@@ -45,15 +39,6 @@ const vLedPositions = [
 	[0, 5], [1, 5], [2, 5],                      [6, 5],                      [10, 5], [11, 5], [12, 5], [13, 5],   [14, 5], [15, 5], [16, 5],
 ];
 
-/*var vLedIndices = [
-    9, 10, 11, 12, 13, 14, 15, 16, 17, 18           [14,0], [15,0], [16,0],
-    [0,1], [1,1], [2,1], [3,1], [4,1], [5,1], [6,1], [7,1], [8,1], [9,1], [10,1], [11,1], [12,1], [13,1],   [14,1], [15,1], [16,1],
-    [0,2], [1,2], [2,2], [3,2], [4,2], [5,2], [6,2], [7,2], [8,2], [9,2], [10,2], [11,2], [12,2], [13,2],   [14,2], [15,2], [16,2],
-    [0,3], [1,3], [2,3], [3,3], [4,3], [5,3], [6,3], [7,3], [8,3], [9,3], [10,3], [11,3],         [13,3],
-    [0,4], [1,4], [2,4], [3,4], [4,4], [5,4], [6,4], [7,4], [8,4], [9,4], [10,4],                 [13,4],           [15,4],
-    [0,5], [1,5], [2,5],                      [6,5],                      [10,5], [11,5], [12,5], [13,5],   [14,5], [15,5], [16,5],
-];*/
-
 export function LedNames() {
 	return vLedNames;
 }
@@ -66,7 +51,29 @@ export function Initialize() {
 
 }
 
-function SendPacket(offset) {
+export function Render() {
+	for(let i=0;i<73;i+=9){
+		sendColors(i);
+	}
+
+	Apply();
+}
+
+export function Shutdown(SystemSuspending) {
+
+	if(SystemSuspending){
+		for(let i=0;i<73;i+=9){
+			sendColors(i, "#000000"); // Go Dark on System Sleep/Shutdown
+		}
+	}else{
+		for(let i=0;i<73;i+=9){
+			sendColors(i, shutdownColor);
+		}
+	}
+
+}
+
+function sendColors(offset, overrideColor) {
 	const packet = [];
 	packet[0] = 0x00;
 	packet[1] = 0x07;
@@ -75,19 +82,25 @@ function SendPacket(offset) {
 
 	for(let iIdx = 0; iIdx < 9; iIdx++){
 		const iLedCoord = offset + iIdx;
-		const iPosX = iLedCoord % 15;
-		const iPosY = iLedCoord / 15;
-		const color = device.color(iPosX, iPosY);
+		const iPxX = iLedCoord % 15;
+		const iPxY = iLedCoord / 15;
+		let col;
+
+		if(overrideColor){
+			col = hexToRgb(overrideColor);
+		}else if (LightingMode === "Forced") {
+			col = hexToRgb(forcedColor);
+		}else{
+			col = device.color(iPxX, iPxY);
+		}
 
 		const iLedIdx = (iIdx*3) + 4;
-		packet[iLedIdx] = color[0];
-		packet[iLedIdx+1] = color[1];
-		packet[iLedIdx+2] = color[2];
+		packet[iLedIdx] = col[0];
+		packet[iLedIdx+1] = col[1];
+		packet[iLedIdx+2] = col[2];
 	}
 
 	device.write(packet, 64);
-
-	//device.pause(1);
 }
 
 
@@ -101,24 +114,15 @@ function Apply() {
 	//device.pause(10);
 }
 
+function hexToRgb(hex) {
+	const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+	const colors = [];
+	colors[0] = parseInt(result[1], 16);
+	colors[1] = parseInt(result[2], 16);
+	colors[2] = parseInt(result[3], 16);
 
-export function Render() {
-	SendPacket(0);
-	SendPacket(9);
-	SendPacket(18);
-	SendPacket(27);
-	SendPacket(36);
-	SendPacket(45);
-	SendPacket(54);
-	SendPacket(63);
-	SendPacket(72);
-	Apply();
+	return colors;
 }
-
-
-export function Shutdown() {
-}
-
 
 export function Validate(endpoint) {
 	return endpoint.usage === 0x61 && endpoint.usage_page === 0xFF60;
