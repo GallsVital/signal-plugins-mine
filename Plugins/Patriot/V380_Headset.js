@@ -43,18 +43,26 @@ export function Render() {
 	sendColors();
 }
 
-export function Shutdown() {
+export function Shutdown(SystemSuspending) {
+
+	if(SystemSuspending){
+		device.write([0xff, 0x03, 0x01, 0x01, 0x00, 0x0a, 0x00], 16);
+		sendColors("#000000"); // Go Dark on System Sleep/Shutdown
+	}else{
+		device.write([0xff, 0x03, 0x01, 0x01, 0x00, 0x0a, 0x00], 16);
+		sendColors(shutdownColor);
+	}
 
 }
 
-function sendColors(shutdown = false) {
+function sendColors(overrideColor) {
 	for(let iIdx = 0; iIdx < vLedPositions.length; iIdx++) {
 		const iPxX = vLedPositions[iIdx][0];
 		const iPxY = vLedPositions[iIdx][1];
-		var col;
+		let col;
 
-		if(shutdown) {
-			col = hexToRgb(shutdownColor);
+		if(overrideColor) {
+			col = hexToRgb(overrideColor);
 		} else if (LightingMode === "Forced") {
 			col = hexToRgb(forcedColor);
 		} else {
