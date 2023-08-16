@@ -24,7 +24,7 @@ const vLedNames = [
 
 	"L41", 		"Esc", "1", "2", "3", "4", "5", "6", "7", "8", "9", "0", "-", "+", "Backspace",  									"L16", // 16
 	"L40",		"Tab", "Q", "W", "E", "R", "T", "Z", "U", "I", "O", "P", "[", "]", 													"L17", // 15
-	"L39", 		"Caps Lock", "A", "S", "D", "F", "G", "H", "J", "K", "L", ";", "''", "#", "Enter", 									"L18", // 16
+	"L39", 		"Caps Lock", "A", "S", "D", "F", "G", "H", "J", "K", "L", ";", "'", "#", "Enter", 									"L18", // 16
 	"L38",		"Left Shift", "<>", "Y", "X", "C", "V", "B", "N", "M", ",", ".", "-", "Right Shift", "Up Arrow", "Entf", 			"L19", // 17
 	"L37",		"Left Ctrl", "Left Win", "Left Alt", "Space", "Right Alt", "Switch", "Left Arrow", "Down Arrow", "Right Arrow",		"L20", // 11
 
