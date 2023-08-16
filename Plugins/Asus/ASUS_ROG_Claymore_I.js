@@ -11,14 +11,12 @@ export function DefaultScale(){return Math.floor(DESIRED_HEIGHT/Size()[1]);}
 shutdownColor:readonly
 LightingMode:readonly
 forcedColor:readonly
-layout:readonly
 */
 export function ControllableParameters(){
 	return [
 		{"property":"shutdownColor", "group":"lighting", "label":"Shutdown Color", "min":"0", "max":"360", "type":"color", "default":"009bde"},
 		{"property":"LightingMode", "group":"lighting", "label":"Lighting Mode", "type":"combobox", "values":["Canvas", "Forced"], "default":"Canvas"},
 		{"property":"forcedColor", "group":"lighting", "label":"Forced Color", "min":"0", "max":"360", "type":"color", "default":"009bde"},
-		{"property":"layout", "group":"", "label":"Keyboard Layout", "type":"combobox", "values":["Right", "Left"], "default":"Right"},
 	];
 }
 
@@ -37,16 +35,16 @@ const vKeysRight =
 [
 	61,
 	0,  	    16, 24, 32, 40, 56, 64, 72, 80, 96, 104, 112,  120,   128, 136, 144,
-	1,  9,  17, 25, 33, 41, 49, 57, 65, 73, 81, 89, 97,    105,  129, 137, 145,   153, 161, 169, 177, 
-	2,  10, 18, 26, 34, 42, 50, 58, 66, 74, 82, 90, 98,    106,   130, 138, 146,   154, 162, 170, 178, 
-	3,  11, 19, 27, 35, 43, 51, 59, 67, 75, 83, 91,         107,                  155, 163, 171, 
-	4,  12, 20, 28, 36, 44, 52, 60, 68, 76, 84,             108,       140,       156, 164, 172, 180, 
+	1,  9,  17, 25, 33, 41, 49, 57, 65, 73, 81, 89, 97,    105,  129, 137, 145,   153, 161, 169, 177,
+	2,  10, 18, 26, 34, 42, 50, 58, 66, 74, 82, 90, 98,    106,   130, 138, 146,   154, 162, 170, 178,
+	3,  11, 19, 27, 35, 43, 51, 59, 67, 75, 83, 91,         107,                  155, 163, 171,
+	4,  12, 20, 28, 36, 44, 52, 60, 68, 76, 84,             108,       140,       156, 164, 172, 180,
 	5,  13, 21,      37,            77, 85, 93,    109,   133, 141, 149,   157, 173,
 ];
 
 const vKeyNames =
 [
-	"Logo", 
+	"Logo",
 	"Esc", "F1", "F2", "F3", "F4", "F5", "F6", "F7", "F8", "F9", "F10", "F11", "F12",         "Print Screen", "Scroll Lock", "Pause Break",
 	"`", "1", "2", "3", "4", "5", "6", "7", "8", "9", "0", "-_", "=+", "Backspace",                        "Insert", "Home", "Page Up",       "NumLock", "Num /", "Num *", "Num -",
 	"Tab", "Q", "W", "E", "R", "T", "Y", "U", "I", "O", "P", "[", "]", "\\",                               "Del", "End", "Page Down",         "Num 7", "Num 8", "Num 9", "Num +",
@@ -54,7 +52,7 @@ const vKeyNames =
 	"Left Shift", "Z", "X", "C", "V", "B", "N", "M", ",", ".", "/", "Right Shift",                                  "Up Arrow",               "Num 1", "Num 2", "Num 3", "Num Enter",
 	"Left Ctrl", "Left Win", "Left Alt", "Space", "Right Alt", "Fn", "Menu", "Right Ctrl",  "Left Arrow", "Down Arrow", "Right Arrow", "Num 0", "Num ."
 ];
-
+/** @type {LedPosition[]} */
 const vKeyPositionsRight =
 [
 	[10, 7],
@@ -66,6 +64,7 @@ const vKeyPositionsRight =
 	[0, 6],  [1, 6], [2, 6],                      [6, 6],                      [10, 6], [11, 6], [12, 6], [13, 6],    [14, 6], [15, 6], [16, 6],   [17, 6],         [19, 6],
 ];
 
+/** @type {LedPosition[]} */
 const vKeyPositionsLeft =
 [
 	[15, 7],
@@ -77,54 +76,83 @@ const vKeyPositionsLeft =
 	[4, 6],  [5, 6], [6, 6],                      [10, 6],                         [14, 6], [15, 6], [16, 6], [17, 6],   [18, 6], [19, 6], [20, 6],   [0, 6],        [2, 6],
 ];
 
-function LedKeys() {
-	if (layout === "Left") {
-		return vKeysLeft;
-	} else if (layout === "Right") {
-		return vKeysRight;
-	}
-
-	return [];
-
-}
 
 export function LedNames() {
 	return vKeyNames;
 }
 
 export function LedPositions() {
-	if (layout === "Left") {
-		return vKeyPositionsLeft;
-	} else if (layout === "Right") {
-		return vKeyPositionsRight;
-	}
-
-	return [];
-
+	return vKeyPositions;
 }
 
+let vKeys = vKeysRight;
+let vKeyPositions = vKeyPositionsRight;
 
 export function Initialize() {
-	sendPacketString("00 41 02", 65);
+	device.set_endpoint(1, 0x0001, 0xff00);
+	device.write([0x00, 0x41, 0x02], 65);
+	getNumpadLocation();
 }
 
 export function Render() {
+	getNumpadLocation();
 	sendColors();
+
 }
 
 export function Shutdown() {
 // revert to rainbow mode
-	sendPacketString("00 51 2C 04 00 48 64 00 00 02 07 0E F5 00 FF 1D 00 06 FF 2B 00 FA FF 39 01 FF 00 48 FF F6 00 56 FF 78 07 64 FF 00 0D", 65);
-	sendPacketString("00 50 55", 65);
+	device.write([0x00, 0x51, 0x2C, 0x04, 0x00, 0x48, 0x64, 0x00, 0x00, 0x02, 0x07, 0x0E, 0xF5, 0x00, 0xFF, 0x1D, 0x00, 0x06, 0xFF, 0x2B, 0x00, 0xFA, 0xFF, 0x39, 0x01, 0xFF, 0x00, 0x48, 0xFF, 0xF6, 0x00, 0x56, 0xFF, 0x78, 0x07, 0x64, 0xFF, 0x00, 0x0D], 65);
+	device.write([0x00, 0x50, 0x55], 65);
+}
+
+let layout = 2;
+let savedPollTimer = Date.now() - 15000;
+const PollModeInternal = 15000;
+
+function getNumpadLocation() {
+
+	if (Date.now() - savedPollTimer < PollModeInternal) {
+		return;
+	}
+
+	savedPollTimer = Date.now();
+
+	device.clearReadBuffer();
+
+	device.write([0x00, 0x40, 0x60], 65);
+
+	const returnPacket = device.read([0x00, 0x40, 0x60], 65);
+
+	if(returnPacket[5] !== layout && returnPacket[5] !== undefined)
+	{
+		device.log(`Layout Changed to ${returnPacket[5] ? "Left" : "Right"}`);
+		layout = returnPacket[5];
+		setLEDLayout(returnPacket[5] ? "Left" : "Right");
+	}
+
+
+}
+
+function setLEDLayout(numpadLocation) {
+	if(numpadLocation === "Right") {
+		vKeys = vKeysRight;
+		vKeyPositions = vKeyPositionsRight;
+	} else {
+		vKeys = vKeysLeft;
+		vKeyPositions = vKeyPositionsLeft;
+	}
+
+	device.setControllableLeds(vKeyNames, vKeyPositions);
 }
 
 function sendColors(shutdown = false) {
 	const RGBData = new Array(600).fill(255);
 	let TotalLedCount = 120;
 
-	for(let iIdx = 0; iIdx < LedKeys().length; iIdx++) {
-		const iPxX = LedPositions()[iIdx][0];
-		const iPxY = LedPositions()[iIdx][1];
+	for(let iIdx = 0; iIdx < vKeys.length; iIdx++) {
+		const iPxX = vKeyPositions[iIdx][0];
+		const iPxY = vKeyPositions[iIdx][1];
 		let col;
 
 		if(shutdown) {
@@ -135,7 +163,7 @@ function sendColors(shutdown = false) {
 			col = device.color(iPxX, iPxY);
 		}
 
-		RGBData[iIdx * 4 + 0] = LedKeys()[iIdx];
+		RGBData[iIdx * 4 + 0] = vKeys[iIdx];
 		RGBData[iIdx * 4 + 1] = col[0];
 		RGBData[iIdx * 4 + 2] = col[1];
 		RGBData[iIdx * 4 + 3] = col[2];
@@ -144,17 +172,11 @@ function sendColors(shutdown = false) {
 	while(TotalLedCount > 0){
 		const ledsToSend = TotalLedCount >= 15 ? 15 : TotalLedCount;
 
-		let packet = [0x00, 0xC0, 0x81, 0x0F, 0x00];
-		packet = packet.concat(RGBData.splice(0, ledsToSend*4));
-		device.write(packet, 65);
+		device.write([0x00, 0xC0, 0x81, 0x0F, 0x00].concat(RGBData.splice(0, ledsToSend*4)), 65);
 
 		TotalLedCount -= ledsToSend;
 	}
 
-}
-
-export function Validate(endpoint) {
-	return endpoint.interface === 1;
 }
 
 function hexToRgb(hex) {
@@ -167,15 +189,8 @@ function hexToRgb(hex) {
 	return colors;
 }
 
-function sendPacketString(string, size) {
-	const packet= [];
-	const data = string.split(' ');
-
-	for(let i = 0; i < data.length; i++) {
-		packet[i] =parseInt(data[i], 16);//.toString(16)
-	}
-
-	device.write(packet, size);
+export function Validate(endpoint) {
+	return endpoint.interface === 1 || endpoint.interface === 2;
 }
 
 export function ImageUrl(){

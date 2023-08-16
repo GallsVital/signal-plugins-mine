@@ -91,7 +91,7 @@ function SendChannel(Channel, overrideColor) {
 	} else if(componentChannel.shouldPulseColors()) {
 		ChannelLedCount = 90;
 
-		const pulseColor = device.getChannelPulseColor(ChannelArray[Channel][0], ChannelLedCount);
+		const pulseColor = device.getChannelPulseColor(ChannelArray[Channel][0]);
 		RGBData = device.createColorArray(pulseColor, ChannelLedCount, "Inline", "RBG");
 	} else {
 		RGBData = device.channel(ChannelArray[Channel][0]).getColors("Inline", "RBG");

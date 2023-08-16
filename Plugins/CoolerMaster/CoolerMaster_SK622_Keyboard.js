@@ -10,34 +10,28 @@ export function DefaultScale(){return 8.0;}
 shutdownColor:readonly
 LightingMode:readonly
 forcedColor:readonly
-layout:readonly
 */
 export function ControllableParameters(){
 	return [
 		{"property":"shutdownColor", "group":"lighting", "label":"Shutdown Color", "min":"0", "max":"360", "type":"color", "default":"#009bde"},
 		{"property":"LightingMode", "group":"lighting", "label":"Lighting Mode", "type":"combobox", "values":["Canvas", "Forced"], "default":"Canvas"},
 		{"property":"forcedColor", "group":"lighting", "label":"Forced Color", "min":"0", "max":"360", "type":"color", "default":"#009bde"},
-		{"property":"layout", "group":"", "label":"Keyboard Layout", "type":"combobox", "values":["ANSI", "ISO German"], "default":"ANSI"},
 	];
 }
 
-let vKeys = [];
-let vLedNames = [];
-let vLedPositions = [];
-
-const vLedNamesGer = [
+const vLedNames = [
 	"L1", "L2", "L3", "L4", "L5", "L6", "L7", "L8", "L9", "L10", "L11", "L12", "L13", "L14", "L15", //15
 
-	"L41", 		"Esc", "1", "2", "3", "4", "5", "6", "7", "8", "9", "0", "ß", "`", "Backspace",  									"L16", // 16
-	"L40",		"Tab", "Q", "W", "E", "R", "T", "Z", "U", "I", "O", "P", "Ü", "+", 													"L17", // 15
-	"L39", 		"Caps Lock", "A", "S", "D", "F", "G", "H", "J", "K", "L", "Ö", "Ä", "#", "Enter", 									"L18", // 16
+	"L41", 		"Esc", "1", "2", "3", "4", "5", "6", "7", "8", "9", "0", "-", "+", "Backspace",  									"L16", // 16
+	"L40",		"Tab", "Q", "W", "E", "R", "T", "Z", "U", "I", "O", "P", "[", "]", 													"L17", // 15
+	"L39", 		"Caps Lock", "A", "S", "D", "F", "G", "H", "J", "K", "L", ";", "'", "#", "Enter", 									"L18", // 16
 	"L38",		"Left Shift", "<>", "Y", "X", "C", "V", "B", "N", "M", ",", ".", "-", "Right Shift", "Up Arrow", "Entf", 			"L19", // 17
 	"L37",		"Left Ctrl", "Left Win", "Left Alt", "Space", "Right Alt", "Switch", "Left Arrow", "Down Arrow", "Right Arrow",		"L20", // 11
 
 	"L36",	    "L35", "L34", "L33", "L32", "L31", "L30", "L29", "L28", "L27", "L26", "L25", "L24", "L23", "L22", 					"L21"  // 16
 ];
 
-const vLedPositionsGer = [
+const vLedPositions = [
 	[1, 0], [2, 0], [3, 0], [4, 0], [5, 0], [6, 0], [7, 0], [8, 0], [9, 0], [10, 0], [11, 0], [12, 0], [13, 0], [14, 0], [15, 0],
 
 	[0, 1], 		[1, 1], [2, 1], [3, 1], [4, 1], [5, 1], [6, 1], [7, 1], [8, 1], [9, 1], [10, 1], [11, 1], [12, 1], [13, 1], [14, 1], 			[16, 1],
@@ -49,7 +43,7 @@ const vLedPositionsGer = [
 	[0, 6], 		[1, 6], [2, 6], [3, 6], [4, 6], [5, 6], [6, 6], [7, 6], [8, 6], [9, 6], [10, 6], [11, 6], [12, 6], [13, 6], [14, 6],			[16, 6]
 ];
 
-const vKeymapGer = [
+const vKeys = [
 	7, 14, 21, 28, 35, 42, 49, 56, 63, 70, 77, 84, 91, 98, 105,
 
 	0, 		8, 15, 22, 29, 36, 43, 50, 57, 64, 71, 78, 85, 92, 106, 			112,
@@ -61,82 +55,17 @@ const vKeymapGer = [
 	6, 		20, 27, 34, 41, 48, 55, 62, 69, 76, 83, 90, 97, 104, 111,			118
 ];
 
-
-const vLedNamesANSI = [
-	"L1", "L2", "L3", "L4", "L5", "L6", "L7", "L8", "L9", "L10", "L11", "L12", "L13", "L14", "L15", //15
-
-	"L41", 		"Esc", "1", "2", "3", "4", "5", "6", "7", "8", "9", "0", "-", "+", "Backspace",  									"L16", // 16
-	"L40",		"Tab", "Q", "W", "E", "R", "T", "Y", "U", "I", "O", "P", "{[", "}]", "|",											"L17", // 16
-	"L39", 		"Caps Lock", "A", "S", "D", "F", "G", "H", "J", "K", "L", ":;", "`", "Enter", 										"L18", // 15
-	"L38",		"Left Shift", "Z", "X", "C", "V", "B", "N", "M", ",", ".", "?", "Right Shift", "Up Arrow", "DEL", 					"L19", // 16
-	"L37",		"Left Ctrl", "Left Win", "Left Alt", "Space", "Right Alt", "Switch", "Left Arrow", "Down Arrow", "Right Arrow",		"L20", // 11
-
-	"L36",	    "L35", "L34", "L33", "L32", "L31", "L30", "L29", "L28", "L27", "L26", "L25", "L24", "L23", "L22", 					"L21"  // 16
-];
-
-const vLedPositionsANSI = [
-	[1, 0], [2, 0], [3, 0], [4, 0], [5, 0], [6, 0], [7, 0], [8, 0], [9, 0], [10, 0], [11, 0], [12, 0], [13, 0], [14, 0], [15, 0],
-
-	[0, 1], 		[1, 1], [2, 1], [3, 1], [4, 1], [5, 1], [6, 1], [7, 1], [8, 1], [9, 1], [10, 1], [11, 1], [12, 1], [13, 1], [14, 1],	 		[16, 1],
-	[0, 2], 		[1, 2], [2, 2], [3, 2], [4, 2], [5, 2], [6, 2], [7, 2], [8, 2], [9, 2], [10, 2], [11, 2], [12, 2], [13, 2], [14, 2],			[16, 2],
-	[0, 3], 		[1, 3], [2, 3], [3, 3], [4, 3], [5, 3], [6, 3], [7, 3], [8, 3], [9, 3], [10, 3], [11, 3], [12, 3], [13, 3],			 			[16, 3],
-	[0, 4], 		[1, 4], [2, 4], [3, 4], [4, 4], [5, 4], [6, 4], [7, 4], [8, 4], [9, 4], [10, 4], [11, 4], [12, 4], [13, 4], [14, 4], 		 	[16, 4],
-	[0, 5], 		[1, 5], [2, 5], [3, 5], 						[7, 5], 				[10, 5], [11, 5], [12, 5], [13, 5], [14, 5],			[16, 5],
-
-	[0, 6], 		[1, 6], [2, 6], [3, 6], [4, 6], [5, 6], [6, 6], [7, 6], [8, 6], [9, 6], [10, 6], [11, 6], [12, 6], [13, 6], [14, 6],			[16, 6]
-];
-
-const vKeymapANSI = [
-	7, 14, 21, 28, 35, 42, 49, 56, 63, 70, 77, 84, 91, 98, 105,
-
-	0, 		8, 15, 22, 29, 36, 43, 50, 57, 64, 71, 78, 85, 92, 106, 			112,
-	1,		9, 23, 30, 37, 44, 51, 58, 65, 72, 79, 86, 93, 100, 107,			113,
-	2,		10, 24, 31, 38, 45, 52, 59, 66, 73, 80, 87, 94, 108, 				114,
-	3,		11, 25, 32, 39, 46, 53, 60, 67, 74, 81, 88, 95, 102, 109, 			115,
-	4,		12, 19, 26, 54, 82, 89, 96, 103, 110, 								116,
-
-	6, 		20, 27, 34, 41, 48, 55, 62, 69, 76, 83, 90, 97, 104, 111,			118
-];
-
 export function LedNames() {
-	if (layout === "ANSI"){
-		vLedNames = vLedNamesANSI;
-	}else {
-		vLedNames = vLedNamesGer;
-	}
-
 	return vLedNames;
 }
 
 export function LedPositions() {
-	if (layout === "ANSI"){
-		vLedPositions = vLedPositionsANSI;
-	}else {
-		vLedPositions = vLedPositionsGer;
-	}
-
 	return vLedPositions;
-}
-
-export function onlayoutChanged() {
-	if (layout === "ANSI") {
-		vLedNames = vLedNamesANSI;
-		vLedPositions = vLedPositionsANSI;
-		vKeys = vKeymapANSI;
-	} else {
-		vLedNames = vLedNamesGer;
-		vLedPositions = vLedPositionsGer;
-		vKeys = vKeymapGer;
-	}
-
-	device.log(`Layout changed to ${layout}`);
-	device.setControllableLeds(vLedNames, vLedPositions);
 }
 
 export function Initialize() {
 	MagicStartupPacket();
 	device.write([0x00, 0x56, 0x81, 0x00, 0x00, 0x01, 0x00, 0x00, 0x00, 0x09, 0x00, 0x00, 0x00, 0xBB, 0xBB, 0xBB, 0xBB], 65);
-	onlayoutChanged();
 }
 
 export function Render() {
