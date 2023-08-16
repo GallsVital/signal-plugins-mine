@@ -1,3 +1,4 @@
+/// <reference path="./Fantech_Board_Keyboard.d.ts" />
 export function Name() { return "Fantech board"; }
 export function VendorId() { return 0x0416; }
 export function ProductId() { return 0xc345; }

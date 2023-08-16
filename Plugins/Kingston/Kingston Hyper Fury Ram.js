@@ -1,3 +1,4 @@
+/// <reference path="./Kingston_Hyper_Fury_Ram.d.ts" />
 // Modifying SMBUS Plugins is -DANGEROUS- and can -DESTROY- devices.
 export function Name() { return "Kingston Hyper Fury Ram"; }
 export function Publisher() { return "WhirlwindFX"; }
@@ -6,46 +7,43 @@ export function Type() { return "SMBUS"; }
 export function Size() { return [2, 12]; }
 export function DefaultPosition(){return [150, 40];}
 export function DefaultScale(){return 10.0;}
-export function ControllableParameters(){
-	return [
-		{"property":"shutdownColor", "group":"lighting", "label":"Shutdown Color", "min":"0", "max":"360", "type":"color", "default":"#009bde"},
-		{"property":"LightingMode", "group":"lighting", "label":"Lighting Mode", "type":"combobox", "values":["Canvas", "Forced"], "default":"Canvas"},
-		{"property":"forcedColor", "group":"lighting", "label":"Forced Color", "min":"0", "max":"360", "type":"color", "default":"#009bde"},
-		{ "property": "highSpeedMode", "group": "lighting", "label": "Single Color Mode (Higher Speed)", "type": "boolean", "default": "false" },
-	];
-}
-
 /* global
 shutdownColor:readonly
 LightingMode:readonly
 forcedColor:readonly
 highSpeedMode:readonly
 */
+export function ControllableParameters(){
+	return [
+		{"property":"shutdownColor", "group":"lighting", "label":"Shutdown Color", "min":"0", "max":"360", "type":"color", "default":"#009bde"},
+		{"property":"LightingMode", "group":"lighting", "label":"Lighting Mode", "type":"combobox", "values":["Canvas", "Forced"], "default":"Canvas"},
+		{"property":"forcedColor", "group":"lighting", "label":"Forced Color", "min":"0", "max":"360", "type":"color", "default":"#009bde"},
+		{"property":"highSpeedMode", "group":"lighting", "label":"Single Color Mode (Higher Speed)", "type":"boolean", "default":"false"},
+	];
+}
 
-const vLedNames = ["Led 12", "Led 11", "Led 10", "Led 9", "Led 8", "Led 7", "Led 6", "Led 5", "Led 4", "Led 3", "Led 2", "Led 1"];
-const vLedPositions = [ [0, 11], [0, 10], [0, 9], [0, 8], [0, 7], [0, 6], [0, 5], [0, 4], [0, 3], [0, 2], [0, 1], [0, 0] ];
+/** @type {LedPosition[]} */
+const vPerLEDLedPositions = [ [0, 11], [0, 10], [0, 9], [0, 8], [0, 7], [0, 6], [0, 5], [0, 4], [0, 3], [0, 2], [0, 1], [0, 0] ];
+const vPerLEDLedNames = ["Led 12", "Led 11", "Led 10", "Led 9", "Led 8", "Led 7", "Led 6", "Led 5", "Led 4", "Led 3", "Led 2", "Led 1"];
 
+/** @type {LedPosition[]} */
 const vSingleLEDPosition = [ [0, 5] ];
 const vSingleLEDName = [ "Main LED" ];
 
-export function LedNames() {
-	if(!highSpeedMode) {
-		return vLedNames;
-	}
+let vLedNames = vPerLEDLedNames;
+let vLedPositions = vPerLEDLedPositions; 
 
-	return vSingleLEDName;
+export function LedNames() {
+	return vLedNames;
 }
 
 export function LedPositions() {
-	if(!highSpeedMode) {
-		return vLedPositions;
-	}
-
-	return vSingleLEDPosition;
+	return vLedPositions;
 }
 
 export function Initialize() {
 	SetMode();
+	setLEDs();
 
 	if(!highSpeedMode) {
 		SendColors(false, true);
@@ -71,11 +69,9 @@ export function Shutdown() {
 }
 
 export function onhighSpeedModeChanged() {
+	setLEDs();
 	if(!highSpeedMode) {
-		device.setControllableLeds(vLedNames, vLedPositions);
 		SendColors(false, true);
-	} else {
-		device.setControllableLeds(vSingleLEDName, vSingleLEDPosition);
 	}
 }
 
@@ -104,6 +100,17 @@ export function Scan(bus) {
 	}
 
 	return FoundAddresses;
+}
+
+function setLEDs() {
+	if(highSpeedMode) {
+		vLedNames = vSingleLEDName;
+		vLedPositions = vSingleLEDPosition;
+	} else {
+		vLedNames = vPerLEDLedNames;
+		vLedPositions = vPerLEDLedPositions;
+	}
+	device.setControllableLeds(vLedNames, vLedPositions);
 }
 
 const addressDict = {
@@ -184,6 +191,7 @@ function SendColors(shutdown = false, firstRun = false){
 	WriteRGBData(RGBData, firstRun);
 }
 
+
 let lastRGBData = [];
 
 function sendSingleColor(shutdown = false) {
@@ -221,8 +229,6 @@ function sendSingleColor(shutdown = false) {
 const OldRGBData = [];
 
 function WriteRGBData(RGBData, firstRun){
-	//const start = Date.now();
-
 	bus.WriteByte(0x08, 0x53);
 	device.pause(3);
 
@@ -232,12 +238,12 @@ function WriteRGBData(RGBData, firstRun){
 	}
 
 	for(let i = 0; i < RGBData.length; i++){
-		if(RGBData[i] != OldRGBData[i]){
+		if(RGBData[i] !== OldRGBData[i]){
 			let returnCode = bus.WriteByte(0x50 + i, RGBData[i]);
 
 			let retryCount = 4;
 
-			while(returnCode != 0 && retryCount > 0){
+			while(returnCode !== 0 && retryCount > 0){
 				retryCount -= 1;
 				device.pause(3);
 				returnCode = bus.WriteByte(0x50 + i, RGBData[i]);
@@ -257,9 +263,6 @@ function WriteRGBData(RGBData, firstRun){
 
 	bus.WriteByte(0x08, 0x44);
 	device.pause(3);
-
-	const end = Date.now();
-	//device.log(`Frame Took ${end - start}ms!`);
 }
 
 

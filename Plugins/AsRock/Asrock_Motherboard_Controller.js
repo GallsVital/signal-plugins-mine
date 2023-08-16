@@ -775,7 +775,7 @@ function grabRGBData(Channel, overrideColor) {
 	} else if(componentChannel.shouldPulseColors()) {
 		ChannelLedCount = 80;
 
-		const pulseColor = device.getChannelPulseColor(ChannelArray[Channel][0], ChannelLedCount);
+		const pulseColor = device.getChannelPulseColor(ChannelArray[Channel][0]);
 		RGBData = device.createColorArray(pulseColor, ChannelLedCount, "Inline", RGBconfig);
 
 	} else {
