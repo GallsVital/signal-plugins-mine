@@ -53,8 +53,14 @@ export function Render() {
 	sendColors();
 }
 
-export function Shutdown() {
-	sendColors(true);
+export function Shutdown(SystemSuspending) {
+
+	if(SystemSuspending){
+		sendColors("#000000"); // Go Dark on System Sleep/Shutdown
+	}else{
+		sendColors(shutdownColor);
+	}
+
 }
 
 export function ondpi1Changed() {
@@ -155,7 +161,7 @@ function Header3()//Hidden function that changes lighting as dpi is changed
 	device.write(packet, 20);
 }
 
-function sendColors(shutdown = false) {
+function sendColors(overrideColor) {
 
 	const packet = [0x43, 0x97, 0x00, 0x10, 0x01, 0x3f];
 
@@ -163,8 +169,8 @@ function sendColors(shutdown = false) {
 	const iY = vLedPositions[0][1];
 	let col;
 
-	if(shutdown) {
-		col = hexToRgb(shutdownColor);
+	if(overrideColor) {
+		col = hexToRgb(overrideColor);
 	} else if (LightingMode == "Forced") {
 		col = hexToRgb(forcedColor);
 	} else {
