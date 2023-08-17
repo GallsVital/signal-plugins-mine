@@ -119,7 +119,7 @@ export function LedPositions() {
 
 export function Initialize() {
 	ClearBuffer();
-	device.setName(device.getMotherboardName());
+	device.setName(`Asrock ${device.getMotherboardName()}`);
 
 	if(ARGBMode === true) {
 		device.setControllableLeds(vARGBLedNames, vARGBLedPositions);
