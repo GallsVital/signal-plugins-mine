@@ -203,14 +203,14 @@ function CreateARGBHeaders(){
 	}
 }
 
-function SetMainboardLeds(shutdown = false) {
+function SetMainboardLeds(overrideColor) {
 	for(let iIdx = 0; iIdx < vLedMap.length; iIdx++) {
 		const iPxX = vLedPositions[iIdx][0];
 		const iPxY = vLedPositions[iIdx][1];
-		var col;
+		let col;
 
-		if(shutdown){
-			col = hexToRgb(shutdownColor);
+		if(overrideColor){
+			col = hexToRgb(overrideColor);
 		}else if (LightingMode == "Forced") {
 			col = hexToRgb(forcedColor);
 		}else{
@@ -221,13 +221,13 @@ function SetMainboardLeds(shutdown = false) {
 	}
 }
 
-function SetRGBHeaderLeds(shutdown = false){
+function SetRGBHeaderLeds(overrideColor){
 
 	for(let iIdx = 0; iIdx < HeaderArray.length; iIdx++) {
-		var col;
+		let col;
 
-		if(shutdown){
-			col = hexToRgb(shutdownColor);
+		if(overrideColor){
+			col = hexToRgb(overrideColor);
 		}else if (LightingMode == "Forced") {
 			col = hexToRgb(forcedColor);
 		}else{
@@ -238,12 +238,12 @@ function SetRGBHeaderLeds(shutdown = false){
 	}
 }
 
-function  SetARGBHeaderLeds(shutdown = false){
+function  SetARGBHeaderLeds(overrideColor){
 	for(let iIdx = 0; iIdx < ARGBHeaderArray.length; iIdx++){
-		var col;
+		let col;
 
-		if(shutdown){
-			col = hexToRgb(shutdownColor);
+		if(overrideColor){
+			col = hexToRgb(overrideColor);
 		}else if (LightingMode == "Forced") {
 			col = hexToRgb(forcedColor);
 		}else{
@@ -275,7 +275,26 @@ export function Render() {
 }
 
 
-export function Shutdown() {
+export function Shutdown(SystemSuspending) {
+	if(CheckPacketLength() != 162){
+		device.log("PACKET LENGTH ERROR. ABORTING RENDERING");
+
+		return;
+	}
+
+	if(SystemSuspending){
+		SetMainboardLeds("#000000"); // Go Dark on System Sleep/Shutdown
+		SetRGBHeaderLeds("#000000");
+		SetARGBHeaderLeds("#000000");
+		device.log(configPacket);
+		device.send_report(configPacket, 162);
+	}else{
+		SetMainboardLeds(shutdownColor);
+		SetRGBHeaderLeds(shutdownColor);
+		SetARGBHeaderLeds(shutdownColor);
+		device.log(configPacket);
+		device.send_report(configPacket, 162);
+	}
 
 }
 

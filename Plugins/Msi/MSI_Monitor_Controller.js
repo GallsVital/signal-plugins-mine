@@ -159,8 +159,14 @@ export function Initialize() {
 	setCurrentMonitor();
 }
 
-export function Shutdown() {
-	sendSubDevice(true);
+export function Shutdown(SystemSuspending) {
+
+	if(SystemSuspending){
+		sendSubDevice("#000000"); // Go Dark on System Sleep/Shutdown
+	}else{
+		sendSubDevice(shutdownColor);
+	}
+
 }
 
 export function LedNames() {
@@ -171,7 +177,7 @@ export function LedPositions() {
 	return vKeyPositions;
 }
 
-function sendSubDevice(shutdown = false) {
+function sendSubDevice(overrideColor) {
 	const packet = [];
 
 	//initial data
@@ -194,8 +200,8 @@ function sendSubDevice(shutdown = false) {
 		const curLedYCoord = currentMonitor.positioning[ledIndex][1];
 		let color;
 
-		if (shutdown) {
-			color = hexToRgb(shutdownColor);
+		if (overrideColor) {
+			color = hexToRgb(overrideColor);
 		} else if (LightingMode == "Forced") {
 			color = hexToRgb(forcedColor);
 		} else {

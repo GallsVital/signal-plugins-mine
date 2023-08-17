@@ -68,8 +68,14 @@ export function Render() {
 	MSIMotherboard.choosePacketSendType();
 }
 
-export function Shutdown() {
-	MSIMotherboard.choosePacketSendType(true);
+export function Shutdown(SystemSuspending) {
+
+	if(SystemSuspending){
+		MSIMotherboard.choosePacketSendType("#000000"); // Go Dark on System Sleep/Shutdown
+	}else{
+		MSIMotherboard.choosePacketSendType(shutdownColor);
+	}
+
 }
 
 export function onadvancedModeChanged() {
@@ -1656,20 +1662,20 @@ class MysticLight {
 		device.setSubdeviceSize(SubdeviceName, 3, 3);
 	}
 
-	setDeviceZones(shutdown = false) {
-		this.setZoneLeds(this.packetOffsets.mainboardDict, this.LEDArrays.OnboardArray, OnboardLEDs, shutdown);
-		this.setZoneLeds(this.packetOffsets.JPipeDict, this.LEDArrays.JPipeArray, JPipeLEDs, shutdown);
-		this.setZoneLeds(this.packetOffsets.ARGBHeaderDict, this.LEDArrays.ARGBHeaderArray, ARGBHeaders, shutdown);
-		this.setZoneLeds(this.packetOffsets.CorsairDict, this.LEDArrays.CorsairHeaderArray, CorsairHeaders, shutdown);
-		this.setZoneLeds(this.packetOffsets.RGBHeaderDict, this.LEDArrays.RGBHeaderArray, RGBHeaders, shutdown);
+	setDeviceZones(overrideColor) {
+		this.setZoneLeds(this.packetOffsets.mainboardDict, this.LEDArrays.OnboardArray, OnboardLEDs, overrideColor);
+		this.setZoneLeds(this.packetOffsets.JPipeDict, this.LEDArrays.JPipeArray, JPipeLEDs, overrideColor);
+		this.setZoneLeds(this.packetOffsets.ARGBHeaderDict, this.LEDArrays.ARGBHeaderArray, ARGBHeaders, overrideColor);
+		this.setZoneLeds(this.packetOffsets.CorsairDict, this.LEDArrays.CorsairHeaderArray, CorsairHeaders, overrideColor);
+		this.setZoneLeds(this.packetOffsets.RGBHeaderDict, this.LEDArrays.RGBHeaderArray, RGBHeaders, overrideColor);
 	}
 
-	setZoneLeds(zone, zoneArray, zoneLEDs, shutdown) {
+	setZoneLeds(zone, zoneArray, zoneLEDs, overrideColor) {
 		for(let iIdx = 0; iIdx < zoneLEDs; iIdx++) {
 			let col;
 
-			if(shutdown) {
-				col = hexToRgb(shutdownColor);
+			if(overrideColor) {
+				col = hexToRgb(overrideColor);
 			} else if (LightingMode === "Forced") {
 				col = hexToRgb(forcedColor);
 			} else {
@@ -1690,13 +1696,13 @@ class MysticLight {
 		device.send_report(this.initialPacket, 185);
 	}
 
-	GrabOnboardLEDs(iIdx, shutdown = false) {
+	GrabOnboardLEDs(iIdx, overrideColor) {
 		let col;
 
 		if(advancedMode === true) {
 
-			if(shutdown) {
-				col = hexToRgb(shutdownColor);
+			if(overrideColor) {
+				col = hexToRgb(overrideColor);
 			} else if (LightingMode === "Forced") {
 				col = hexToRgb(forcedColor);
 			} else {
@@ -1706,8 +1712,8 @@ class MysticLight {
 			return col;
 		}
 
-		if(shutdown){
-			col = hexToRgb(shutdownColor);
+		if(overrideColor){
+			col = hexToRgb(overrideColor);
 		}else if (LightingMode === "Forced") {
 			col = hexToRgb(forcedColor);
 		}else{
@@ -1717,11 +1723,11 @@ class MysticLight {
 		return col;
 	}
 
-	GrabRGBHeaders(iIdx, shutdown = false) {
+	GrabRGBHeaders(iIdx, overrideColor) {
 		let col;
 
-		if(shutdown) {
-			col = hexToRgb(shutdownColor);
+		if(overrideColor) {
+			col = hexToRgb(overrideColor);
 		} else if (LightingMode === "Forced") {
 			col = hexToRgb(forcedColor);
 		} else {
@@ -1731,14 +1737,14 @@ class MysticLight {
 		return col;
 	}
 
-	grabChannelRGBData(Channel, shutdown) {
+	grabChannelRGBData(Channel, overrideColor) {
     	let ChannelLedCount = device.channel(ChannelArray[Channel][0]).LedCount();
 		const componentChannel = device.channel(ChannelArray[Channel][0]);
 
 		let RGBData = [];
 
-		if(shutdown){
-			RGBData = device.createColorArray(shutdownColor, ChannelLedCount, "Inline");
+		if(overrideColor){
+			RGBData = device.createColorArray(overrideColor, ChannelLedCount, "Inline");
 		} else if(LightingMode === "Forced") {
 			RGBData = device.createColorArray(forcedColor, ChannelLedCount, "Inline");
 		} else if(componentChannel.shouldPulseColors()) {
@@ -1817,32 +1823,32 @@ class MysticLight {
 		device.write([0x01, 0x84, 0x00, 0x00, 0x00, 0x00, port, enable], 64);
 	}
 
-	grabZones(shutdown) {
+	grabZones(overrideColor) {
 		const OnboardLEDData = [];
 		const RGBHeaderData = [];
 
 		for(let iIdx = 0; iIdx < OnboardLEDs; iIdx++) {
-			OnboardLEDData.push(...this.GrabOnboardLEDs(iIdx, shutdown));
+			OnboardLEDData.push(...this.GrabOnboardLEDs(iIdx, overrideColor));
 		}
 
 		for(let iIdx = 0; iIdx < RGBHeaders; iIdx++) {
-			RGBHeaderData.push(...this.GrabRGBHeaders(iIdx, shutdown));
+			RGBHeaderData.push(...this.GrabRGBHeaders(iIdx, overrideColor));
 		}
 
 		return [ OnboardLEDData, RGBHeaderData ];
 	}
 
-	choosePacketSendType(shutdown = false) {
+	choosePacketSendType(overrideColor) {
 		if(perLED) {
 			MSIMotherboard.setPerledMode();
 
 			if(this.getTotalLEDCount()) {
-				this.sendGen1ARGB(shutdown);
+				this.sendGen1ARGB(overrideColor);
 			} else {
 				if(gen2Support) {
-					this.sendGen2SplitPacketARGB(shutdown);
+					this.sendGen2SplitPacketARGB(overrideColor);
 				} else {
-					this.sendGen1SplitPacketARGB(shutdown);
+					this.sendGen1SplitPacketARGB(overrideColor);
 				}
 			}
 		} else {
@@ -1951,8 +1957,8 @@ class MysticLight {
 		}
 	}
 
-	sendGen1ARGB(shutdown = false) {
-		const [OnboardLEDData, RGBHeaderData] = this.grabZones(shutdown);
+	sendGen1ARGB(overrideColor) {
+		const [OnboardLEDData, RGBHeaderData] = this.grabZones(overrideColor);
 		const packet = [0x53, 0x25, 0x06, 0x00, 0x00]; //Header for RGB Sends
 		packet.push(...OnboardLEDData.splice(0, 3*OnboardLEDs)); //Push Onboard LEDs First.
 		packet.push(...RGBHeaderData.splice(0, 3*RGBHeaders)); //Push Data From RGB Headers.
@@ -1975,16 +1981,16 @@ class MysticLight {
 		device.send_report(packet, 725);
 	}
 
-	sendGen1SplitPacketARGB(shutdown = false) {
-		const [OnboardLEDData, RGBHeaderData] = this.grabZones(shutdown);
+	sendGen1SplitPacketARGB(overrideColor) {
+		const [OnboardLEDData, RGBHeaderData] = this.grabZones(overrideColor);
 		OnboardLEDData.push(...RGBHeaderData); //Why did I separate these in the first place?
 
-		const header1Data = this.grabChannelRGBData(0, shutdown);
-		const header2Data = this.grabChannelRGBData(1, shutdown);
+		const header1Data = this.grabChannelRGBData(0, overrideColor);
+		const header2Data = this.grabChannelRGBData(1, overrideColor);
 		let header3Data = [];
 
 		if(ARGBHeaders > 2 || CorsairHeaders > 0) {
-			header3Data = this.grabChannelRGBData(2, shutdown);
+			header3Data = this.grabChannelRGBData(2, overrideColor);
 		}
 
 		if(header1Data.length > 0 && !this.CompareArrays(this.lastheader1Data, header1Data)) {
@@ -2017,12 +2023,12 @@ class MysticLight {
 		array1.every(function(value, index) { return value === array2[index];});
 	}
 
-	sendGen2SplitPacketARGB(shutdown = false) {
-		const [OnboardLEDData, RGBHeaderData] = this.grabZones(shutdown);
+	sendGen2SplitPacketARGB(overrideColor) {
+		const [OnboardLEDData, RGBHeaderData] = this.grabZones(overrideColor);
 		OnboardLEDData.push(...RGBHeaderData); //Why did I separate these in the first place?
 
-		const header1Data = this.grabChannelRGBData(0, shutdown);
-		const header2Data = this.grabChannelRGBData(1, shutdown);
+		const header1Data = this.grabChannelRGBData(0, overrideColor);
+		const header2Data = this.grabChannelRGBData(1, overrideColor);
 
 		if(header1Data.length > 0 && !this.CompareArrays(this.lastheader1Data, header1Data)) {
 			device.send_report([0x53, 0x25, 0x04, 0x00, 0x00].concat(header1Data), 725);
@@ -2036,7 +2042,7 @@ class MysticLight {
 		}
 
 		if(ARGBHeaders > 2) {
-			const header3Data = this.grabChannelRGBData(2, shutdown);
+			const header3Data = this.grabChannelRGBData(2, overrideColor);
 
 			if(header3Data.length > 0 && !this.CompareArrays(this.lastheader3Data, header3Data)) {
 				device.send_report([0x53, 0x25, 0x04, 0x02, 0x00].concat(header3Data), 725);

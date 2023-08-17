@@ -1,4 +1,4 @@
-export function Name() { return "MSI GPU"; }
+export function Name() { return "MSI Pascal GPU"; }
 export function Publisher() { return "WhirlwindFX"; }
 export function Documentation(){ return "troubleshooting/MSI"; }
 export function Type() { return "SMBUS"; }
@@ -66,7 +66,14 @@ export function Render() {
 	sendColors();
 }
 
-export function Shutdown() {
+export function Shutdown(SystemSuspending) {
+
+	if(SystemSuspending){
+		sendColors("#000000"); // Go Dark on System Sleep/Shutdown
+	}else{
+		sendColors(shutdownColor);
+	}
+
 }
 
 function CheckForIdMatch(bus, Gpu) {
@@ -85,11 +92,11 @@ function SetGPUNameFromBusIds(GPUList) {
 	}
 }
 
-function sendColors(shutdown = false) {
+function sendColors(overrideColor) {
 	let color;
 
-	if(shutdown) {
-		color = hexToRgb(shutdownColor);
+	if(overrideColor) {
+		color = hexToRgb(overrideColor);
 	} else if (LightingMode === "Forced") {
 		color = hexToRgb(forcedColor);
 	} else {
