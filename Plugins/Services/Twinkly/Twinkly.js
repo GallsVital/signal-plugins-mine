@@ -40,9 +40,10 @@ export function Initialize() {
 	Twinkly.setLEDMode("rt");
 	Twinkly.decodeAuthToken();
 	Twinkly.fetchDeviceLayoutType();
+	device.log("Device Initialized.");
 }
 
-export function Render() { //TODO: Add an IPCache Purge Button.
+export function Render() {
 	checkConnectionStatus();
 	sendColors();
 }
@@ -388,7 +389,8 @@ class TwinklyProtocol {
 			"TWB200STP" : "Spritzer",
 			"TWQ064STW" : "Squares",
 			"TWS100SPP" : "Strings",
-			"TWS250STP" : "Strings"
+			"TWS250STP" : "Strings",
+			"TWS600STP" : "Strings"
 		};
 
 		this.deviceImageLibrary = {
@@ -594,12 +596,12 @@ class TwinklyProtocol {
 				device.log(`Y Max: ${Math.max(...yRoundingArray)}`);
 				device.log(`Y Min: ${Math.min(...yRoundingArray)}`);
 
-				this.configureDeviceLayout(deviceLayoutPacket);
+				this.configureDeviceLayout(deviceLayoutPacket, Math.max(...xRoundingArray), Math.max(...yRoundingArray));
 			}
 		});
 	}
 
-	configureDeviceLayout(deviceLayoutPacket) {
+	configureDeviceLayout(deviceLayoutPacket, xMax, yMax) {
 		const vLedNames = [];
 		const vLedPositions = [];
 
@@ -608,15 +610,15 @@ class TwinklyProtocol {
 
 		if(deviceLayoutPacket.source === "3d") {
 			for(let coordinate = 0; coordinate < Object.keys(deviceLayoutPacket.coordinates).length; coordinate++) {
-				const XCoordinate = Math.round((deviceLayoutPacket.coordinates[coordinate].x+1) * (5*xScale));
-				const YCoordinate = Math.round((deviceLayoutPacket.coordinates[coordinate].z+1) * (5*yScale));
+				const XCoordinate = Math.round((deviceLayoutPacket.coordinates[coordinate].x+1) / xMax * (5*xScale));
+				const YCoordinate = Math.round((deviceLayoutPacket.coordinates[coordinate].z+1) / yMax * (5*yScale));
 				vLedPositions.push([XCoordinate, YCoordinate]);
 				vLedNames.push(`LED ${coordinate+1}`);
 			}
 		} else if(deviceLayoutPacket.source === "2d") {
 			for(let coordinate = 0; coordinate < Object.keys(deviceLayoutPacket.coordinates).length; coordinate++) {
-				const XCoordinate = Math.round((deviceLayoutPacket.coordinates[coordinate].x+1) * (5*xScale));
-				const YCoordinate = Math.round((deviceLayoutPacket.coordinates[coordinate].y+1) * (5*yScale));
+				const XCoordinate = Math.round((deviceLayoutPacket.coordinates[coordinate].x+1) / xMax * (5*xScale));
+				const YCoordinate = Math.round((deviceLayoutPacket.coordinates[coordinate].y+1) / yMax * (5*yScale));
 				vLedPositions.push([XCoordinate, YCoordinate]);
 				vLedNames.push(`LED ${coordinate+1}`);
 			}
