@@ -2,7 +2,7 @@ export function Name() { return "Asus ROG Throne"; }
 export function VendorId() { return 0x0B05; }
 export function ProductId() { return [0x18C5, 0x18D9]; }
 export function Publisher() { return "WhirlwindFX"; }
-export function Size() { return [18, 1]; }
+export function Size() { return [5, 7]; }
 export function DefaultPosition(){return [10, 100]; }
 export function DefaultScale(){return 8.0;}
 /* global
@@ -23,7 +23,7 @@ export function Initialize() {
 }
 
 const vLedNames = [ "Led 1", "Led 2", "Led 3", "Led 4", "Led 5", "Led 6", "Led 7", "Led 8", "Led 9", "Led 10", "Led 11", "Led 12", "Led 13", "Led 14", "Led 15", "Led 16", "Led 17", "Led 18" ];
-const vLedPositions = [ [0, 0], [1, 0], [2, 0], [3, 0], [4, 0], [5, 0], [6, 0], [7, 0], [8, 0], [9, 0], [10, 0], [11, 0], [12, 0], [13, 0], [14, 0], [15, 0], [16, 0], [17, 0]  ];
+const vLedPositions = [ [0, 0], [0, 1], [0, 2], [0, 3], [0, 4], [0, 5], [0, 6], [1, 6], [2, 6], [3, 6], [4, 6], [4, 5], [4, 4], [4, 3], [4, 2], [4, 1], [4, 0], [3, 0]  ];
 
 export function LedNames() {
 	return vLedNames;
