@@ -69,11 +69,17 @@ export function Render() {
 	sendColors();
 }
 
-export function Shutdown() {
-	sendColors(true);
+export function Shutdown(SystemSuspending) {
+
+	if(SystemSuspending){
+		sendColors("#000000"); // Go Dark on System Sleep/Shutdown
+	}else{
+		sendColors(shutdownColor);
+	}
+
 }
 
-function grabColors(shutdown) {
+function grabColors(overrideColor) {
 	const rgbdata = [];
 
 	for(let iIdx = 0; iIdx < vKeys.length; iIdx++) {
@@ -81,8 +87,8 @@ function grabColors(shutdown) {
 		const iPxY = vKeyPositions[iIdx][1];
 		let color;
 
-		if(shutdown) {
-			color = hexToRgb(shutdownColor);
+		if(overrideColor) {
+			color = hexToRgb(overrideColor);
 		} else if (LightingMode === "Forced") {
 			color = hexToRgb(forcedColor);
 		} else {
@@ -100,9 +106,9 @@ function grabColors(shutdown) {
 	return rgbdata;
 }
 
-function sendColors(shutdown = false) {
+function sendColors(overrideColor) {
 
-	const rgbdata = grabColors(shutdown);
+	const rgbdata = grabColors(overrideColor);
 
 	device.send_report([0x00, 0x34, 0x46, 0x23, 0xEA, 0x64, 0xC0], 65); //Probably brightness.
 	device.get_report([0x00], 65);

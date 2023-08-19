@@ -56,8 +56,14 @@ export function Render() {
 	macroEater();
 }
 
-export function Shutdown() {
-	sendColors(true);
+export function Shutdown(SystemSuspending) {
+
+	if(SystemSuspending){
+		sendColors("#000000"); // Go Dark on System Sleep/Shutdown
+	}else{
+		sendColors(shutdownColor);
+	}
+
 }
 
 function macroEater() { //tastes like chicken!
@@ -101,7 +107,7 @@ function macroHandler(buttonCode, isPressed) {
 	keyboard.sendEvent(eventData, "Key Press");
 }
 
-function grabColors(shutdown) {
+function grabColors(overrideColor) {
 	const rgbdata = [];
 
 	for(let iIdx = 0; iIdx < vKeys.length; iIdx++) {
@@ -109,8 +115,8 @@ function grabColors(shutdown) {
 		const iPxY = vKeyPositions[iIdx][1];
 		let color;
 
-		if(shutdown) {
-			color = hexToRgb(shutdownColor);
+		if(overrideColor) {
+			color = hexToRgb(overrideColor);
 		} else if (LightingMode === "Forced") {
 			color = hexToRgb(forcedColor);
 		} else {
@@ -127,9 +133,9 @@ function grabColors(shutdown) {
 	return rgbdata;
 }
 
-function sendColors(shutdown = false) {
+function sendColors(overrideColor) {
 
-	const rgbdata = grabColors(shutdown);
+	const rgbdata = grabColors(overrideColor);
 
 	StreamLightingData(rgbdata);
 }
