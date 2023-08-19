@@ -19,6 +19,9 @@ export function ControllableParameters(){
 	];
 }
 
+// 0x4003 MAXFIT61 Frost
+// 0x4015 Fl-Esports MK750
+
 const vLedNames = [
 	"Keyboard"
 ];
