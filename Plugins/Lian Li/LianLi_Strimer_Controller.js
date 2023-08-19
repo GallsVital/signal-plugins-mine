@@ -217,19 +217,34 @@ export function Render() {
 	}
 }
 
+export function Shutdown(SystemSuspending) {
 
-export function Shutdown() {
-	if(ATXCable) {
-		setMoboColors(true);
-	}
+	if(SystemSuspending){
+		if(ATXCable) {
+			setMoboColors("#000000");
+		}
 
-	if(GPUCable) 	{
-		if(GPUCableType === "Dual 8 Pin") {
-			setDualGPUColors(true);
-		} else if(GPUCableType === "Triple 8 Pin") {
-			setTripleGPUColors(true);
+		if(GPUCable) 	{
+			if(GPUCableType === "Dual 8 Pin") {
+				setDualGPUColors("#000000");
+			} else if(GPUCableType === "Triple 8 Pin") {
+				setTripleGPUColors("#000000");
+			}
+		}
+	}else{
+		if(ATXCable) {
+			setMoboColors(shutdownColor);
+		}
+
+		if(GPUCable) 	{
+			if(GPUCableType === "Dual 8 Pin") {
+				setDualGPUColors(shutdownColor);
+			} else if(GPUCableType === "Triple 8 Pin") {
+				setTripleGPUColors(shutdownColor);
+			}
 		}
 	}
+
 }
 
 export function onmoboSyncChanged() {
@@ -295,7 +310,7 @@ function addChannels() {
 	}
 }
 
-function setMoboColors(shutdown = false) {
+function setMoboColors(overrideColor) {
 	const RGBData = [];
 
 	for(let iIdx = 0; iIdx < v24PinLedPositions.length; iIdx++) {
@@ -303,8 +318,8 @@ function setMoboColors(shutdown = false) {
 		const iPxY = v24PinLedPositions[iIdx][1];
 		let color;
 
-		if(shutdown) {
-			color = hexToRgb(shutdownColor);
+		if(overrideColor) {
+			color = hexToRgb(overrideColor);
 		} else if (LightingMode === "Forced") {
 			color = hexToRgb(forcedColor);
 		} else {
@@ -326,7 +341,7 @@ function setMoboColors(shutdown = false) {
 	device.send_report([0xE0, 0x2c, 0x00, 0x3f], 255);
 }
 
-function setDualGPUColors(shutdown = false) {
+function setDualGPUColors(overrideColor) {
 	const RGBData = [];
 
 	for(let iIdx = 0; iIdx < vDual8PinLedPositions.length; iIdx++) {
@@ -334,8 +349,8 @@ function setDualGPUColors(shutdown = false) {
 		const iPxY = vDual8PinLedPositions[iIdx][1];
 		let color;
 
-		if(shutdown) {
-			color = hexToRgb(shutdownColor);
+		if(overrideColor) {
+			color = hexToRgb(overrideColor);
 		} else if (LightingMode === "Forced") {
 			color = hexToRgb(forcedColor);
 		} else {
@@ -357,7 +372,7 @@ function setDualGPUColors(shutdown = false) {
 	device.send_report([0xE0, 0x2c, 0x03, 0xc0], 255);
 }
 
-function setTripleGPUColors(shutdown = false) {
+function setTripleGPUColors(overrideColor) {
 	const RGBData = [];
 
 	for(let iIdx = 0; iIdx < vTriple8PinLedPositions.length; iIdx++) {
@@ -365,8 +380,8 @@ function setTripleGPUColors(shutdown = false) {
 		const iPxY = vTriple8PinLedPositions[iIdx][1];
 		let color;
 
-		if(shutdown) {
-			color = hexToRgb(shutdownColor);
+		if(overrideColor) {
+			color = hexToRgb(overrideColor);
 		} else if (LightingMode === "Forced") {
 			color = hexToRgb(forcedColor);
 		} else {

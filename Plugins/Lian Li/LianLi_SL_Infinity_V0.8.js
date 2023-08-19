@@ -192,7 +192,15 @@ export function Render() {
 
 }
 
-export function Shutdown() {
+export function Shutdown(SystemSuspending) {
+
+	if(!moboSync) {
+		if(SystemSuspending){
+			sendColors("#000000"); // Go Dark on System Sleep/Shutdown
+		}else{
+			sendColors(shutdownColor);
+		}
+	}
 
 }
 
@@ -200,11 +208,14 @@ export function Validate(endpoint) {
 	return endpoint.interface === 1;
 }
 
-function  getChannelColors(Channel, ledcount, shutdown = false) { //Grab our color data from the backend for a specific channel
+function  getChannelColors(Channel, ledcount, overrideColor) { //Grab our color data from the backend for a specific channel
 
 	let RGBData = [];
 
-	if(LightingMode === "Forced") {
+	if(overrideColor) {
+		RGBData = device.createColorArray(overrideColor, ledcount, "Inline", "RBG");
+
+	} else if(LightingMode === "Forced") {
 		RGBData = device.createColorArray(forcedColor, ledcount, "Inline", "RBG");
 
 	} else if(device.getLedCount() == 0) {
@@ -220,7 +231,7 @@ function  getChannelColors(Channel, ledcount, shutdown = false) { //Grab our col
 	return RGBData;
 }
 
-function sendColors() {
+function sendColors(overrideColor) {
 	for(let Channel = 0; Channel < 4; Channel++) //Create our 4 channels
 	{
 
@@ -228,7 +239,7 @@ function sendColors() {
 
 		if(ChannelLedCount > 0) //Check if we have more than zero leds on a channel. If we don't there's no reason to waste a precious packet write.
 		{
-			const ChannelRGBData = getChannelColors(Channel, ChannelLedCount); //Grab channel colors using above function
+			const ChannelRGBData = getChannelColors(Channel, ChannelLedCount, overrideColor); //Grab channel colors using above function
 			let innerRGBData = [];
 			let outerRGBData = [];
 

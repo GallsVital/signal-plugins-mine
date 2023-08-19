@@ -172,7 +172,23 @@ export function Render() //I don't care how jank it is, it works.
 	}
 }
 
-export function Shutdown() {
+export function Shutdown(SystemSuspending) {
+
+	if(moboSync === false) {
+		if(SystemSuspending){
+			if(newProtocol) {
+				sendV17Channels("#000000"); // Go Dark on System Sleep/Shutdown
+			} else {
+				sendChannels("#000000");
+			}
+		}else{
+			if(newProtocol) {
+				sendV17Channels(shutdownColor);
+			} else {
+				sendChannels(shutdownColor);
+			}
+		}
+	}
 
 }
 
@@ -187,7 +203,7 @@ function setFans() {
 	sendControlPacket(COMMAND_ADDRESS, packet, 16);
 }
 
-function sendV17Channels() {
+function sendV17Channels(overrideColor) {
 	for(let Channel = 0; Channel < 4; Channel++) {
 		const innerRGBData = [];
 		const outerRGBData = [];
@@ -195,7 +211,7 @@ function sendV17Channels() {
 		if (device.channel(ChannelArray[Channel][0]).LedCount() > 0) {
 
 			const ChannelLedCount = device.channel(ChannelArray[Channel][0]).LedCount();
-			ChannelRGBData = getChannelColors(Channel, ChannelLedCount);
+			ChannelRGBData = getChannelColors(Channel, ChannelLedCount, overrideColor);
 
 			for (let fan = 0; fan < 4; fan++) {
 				innerRGBData.push(...ChannelRGBData.splice(0, 8 * 3));
@@ -213,7 +229,7 @@ function sendV17Channels() {
 	}
 }
 
-function sendChannels() {
+function sendChannels(overrideColor) {
 
 	for(let Channel = 0; Channel < 4;Channel++) {
 		if (device.channel(ChannelArray[Channel][0]).LedCount() > 0) {
@@ -221,7 +237,7 @@ function sendChannels() {
 			fancount = 0;
 
 			const ChannelLedCount = device.channel(ChannelArray[Channel][0]).LedCount();
-			ChannelRGBData = getChannelColors(Channel, ChannelLedCount);
+			ChannelRGBData = getChannelColors(Channel, ChannelLedCount, overrideColor);
 
 			do {
 				fancount ++;
@@ -249,10 +265,13 @@ function sendChannels() {
 
 }
 
-function  getChannelColors(Channel, ledcount, shutdown = false) {
+function  getChannelColors(Channel, ledcount, overrideColor) {
 	let RGBData = [];
 
-	if(LightingMode === "Forced") {
+	if(overrideColor) {
+		RGBData = device.createColorArray(overrideColor, ledcount, "Inline", "RBG");
+
+	} else if(LightingMode === "Forced") {
 		RGBData = device.createColorArray(forcedColor, ledcount, "Inline", "RBG");
 
 	} else if(device.getLedCount() === 0) {

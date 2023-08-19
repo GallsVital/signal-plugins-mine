@@ -161,12 +161,6 @@ export function Initialize() {
 	BurstFans();
 }
 
-
-export function Shutdown() {
-
-}
-
-
 export function Render() {
 	PollFans();
 
@@ -177,8 +171,19 @@ export function Render() {
 
 }
 
+export function Shutdown(SystemSuspending) {
 
-function SendChannels(){
+	if(!moboSync) {
+		if(SystemSuspending){
+			SendChannels("#000000"); // Go Dark on System Sleep/Shutdown
+		}else{
+			SendChannels(shutdownColor);
+		}
+	}
+
+}
+
+function SendChannels(overrideColor){
 	//start configuation
 	let packet = [];
 	packet[0] = 0x34;
@@ -194,7 +199,7 @@ function SendChannels(){
 
 	//If no Active Channels Use Default Pulse on each Channel
 	if(device.getLedCount() === 0){
-	   SendSingleChannel(ChannelIndex);
+	   SendSingleChannel(ChannelIndex, overrideColor);
 	   ChannelIndex = (ChannelIndex + 1) % 4;
 	}else{
 		//set fan RGB one channel at a time
@@ -204,12 +209,12 @@ function SendChannels(){
 		}while(!isChannelActive(ChannelIndex));
 
 		device.log(ChannelIndex);
-		SendSingleChannel(ChannelIndex);
+		SendSingleChannel(ChannelIndex, overrideColor);
 	}
 }
 
-function SendSingleChannel(Channel){
-	let packet = getChannelColors(Channel);
+function SendSingleChannel(Channel, overrideColor){
+	let packet = getChannelColors(Channel, overrideColor);
 	sendControlPacket(ChannelObjectArray[Channel].action, packet, RGBPacketLength);
 
 	// This needs a slight delay to not step over itself
@@ -219,13 +224,16 @@ function SendSingleChannel(Channel){
 	sendControlPacket(ChannelObjectArray[Channel].commit, packet, 1);
 }
 
-function  getChannelColors(Channel) {
+function  getChannelColors(Channel, overrideColor) {
 	const ChannelName = ChannelArray[Channel][0];
 	let ChannelLedCount = device.channel(ChannelName).LedCount();
 	let RGBData = [];
 
 
-	if(LightingMode  === "Forced"){
+	if(overrideColor){
+		RGBData = device.createColorArray(overrideColor, ChannelLedCount, "Inline", "RBG");
+
+	}else if(LightingMode  === "Forced"){
 		RGBData = device.createColorArray(forcedColor, ChannelLedCount, "Inline", "RBG");
 
 	}else if(device.getLedCount() === 0){
