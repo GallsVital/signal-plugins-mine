@@ -31,7 +31,7 @@ const vSingleLEDPosition = [ [0, 5] ];
 const vSingleLEDName = [ "Main LED" ];
 
 let vLedNames = vPerLEDLedNames;
-let vLedPositions = vPerLEDLedPositions; 
+let vLedPositions = vPerLEDLedPositions;
 
 export function LedNames() {
 	return vLedNames;
@@ -60,16 +60,27 @@ export function Render() {
 
 }
 
-export function Shutdown() {
-	if(highSpeedMode) {
-		sendSingleColor(true);
-	} else {
-		SendColors(true);
+export function Shutdown(SystemSuspending) {
+
+	if(SystemSuspending){
+		if(highSpeedMode) {
+			sendSingleColor("#000000");
+		} else {
+			SendColors("#000000");
+		}
+	}else{
+		if(highSpeedMode) {
+			sendSingleColor(shutdownColor);
+		} else {
+			SendColors(shutdownColor);
+		}
 	}
+
 }
 
 export function onhighSpeedModeChanged() {
 	setLEDs();
+
 	if(!highSpeedMode) {
 		SendColors(false, true);
 	}
@@ -110,6 +121,7 @@ function setLEDs() {
 		vLedNames = vPerLEDLedNames;
 		vLedPositions = vPerLEDLedPositions;
 	}
+
 	device.setControllableLeds(vLedNames, vLedPositions);
 }
 
@@ -170,15 +182,15 @@ function SetMode(){
 }
 
 
-function SendColors(shutdown = false, firstRun = false){
+function SendColors(overrideColor, firstRun = false){
 	const RGBData = [];
 
 	//Fetch Colors
 	for(let iIdx = 0; iIdx < vLedPositions.length; iIdx++){
  		let Color;
 
-		if(shutdown){
-			Color = hexToRgb(shutdownColor);
+		if(overrideColor){
+			Color = hexToRgb(overrideColor);
 		}else if(LightingMode === "Forced") {
 			Color = hexToRgb(forcedColor);
 		} else {
@@ -194,12 +206,12 @@ function SendColors(shutdown = false, firstRun = false){
 
 let lastRGBData = [];
 
-function sendSingleColor(shutdown = false) {
+function sendSingleColor(overrideColor) {
 
 	let Color;
 
-	if(shutdown){
-		Color = hexToRgb(shutdownColor);
+	if(overrideColor){
+		Color = hexToRgb(overrideColor);
 	}else if(LightingMode === "Forced") {
 		Color = hexToRgb(forcedColor);
 	} else {
