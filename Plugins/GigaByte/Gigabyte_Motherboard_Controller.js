@@ -394,15 +394,15 @@ function CreateZ790IOPanel(Enable){
 	}
 }
 
-function SendSubdeviceAsARGBchannel(SubdeviceId, SubdeviceConfig, ChannelId, shutdown = false){
+function SendSubdeviceAsARGBchannel(SubdeviceId, SubdeviceConfig, ChannelId, overrideColor){
 	const RGBData = [];
 
 	for(let iIdx = 0 ; iIdx < SubdeviceConfig.positioning.length; iIdx++){
 		const Led = SubdeviceConfig.positioning[iIdx];
 		let col;
 
-		if(shutdown){
-			col = hexToRgb(shutdownColor);
+		if(overrideColor){
+			col = hexToRgb(overrideColor);
 		}else if (LightingMode === "Forced") {
 			col = hexToRgb(forcedColor);
 		}else{
@@ -438,32 +438,50 @@ export function Render() {
 	}
 }
 
+export function Shutdown(SystemSuspending) {
 
-export function Shutdown() {
-	if(Z790MA_Mode){
-		for(let i = 0x20; i < 0x28;i++){
-			sendColorPacket(i, [0, 0, 0]);
-			sendCommit();
+	if(SystemSuspending){
+		if(Z790MA_Mode){
+			for(let i = 0x20; i < 0x28;i++){
+				sendColorPacket(i, [0, 0, 0]);
+				sendCommit();
+			}
+
+			SendSubdeviceAsARGBchannel("Z790IOPanel", Z790_IO_Panel, 0x58, "#000000");
+		}else{
+			UpdateActiveZones("#000000");
+
+			for(let channel = 0; channel < vDLED_Zones.length; channel++){
+				UpdateARGBChannels(channel, "#000000");
+			}
 		}
-
-		SendSubdeviceAsARGBchannel("Z790IOPanel", Z790_IO_Panel, 0x58, true);
 	}else{
-		UpdateActiveZones(true);
+		if(Z790MA_Mode){
+			for(let i = 0x20; i < 0x28;i++){
+				sendColorPacket(i, [0, 0, 0]);
+				sendCommit();
+			}
 
-		for(let channel = 0; channel < vDLED_Zones.length; channel++){
-			UpdateARGBChannels(channel, true);
+			SendSubdeviceAsARGBchannel("Z790IOPanel", Z790_IO_Panel, 0x58, shutdownColor);
+		}else{
+			UpdateActiveZones(shutdownColor);
+
+			for(let channel = 0; channel < vDLED_Zones.length; channel++){
+				UpdateARGBChannels(channel, shutdownColor);
+			}
 		}
 	}
+
 }
 
-function UpdateActiveZones(shutdown = false){
+function UpdateActiveZones(overrideColor){
 
 	for(let iIdx = 0 ; iIdx < ActiveZones.length; iIdx++){
 		const zone = ActiveZones[iIdx];
 		let col;
 
-		if(shutdown){
-			col = hexToRgb(shutdownColor);
+		if(overrideColor){
+			col = hexToRgb(overrideColor);
 		}else if (LightingMode === "Forced") {
 			col = hexToRgb(forcedColor);
 		}else{
@@ -535,7 +553,7 @@ function SetMotherboardName(){
 }
 
 
-function UpdateARGBChannels(Channel, shutdown = false) {
+function UpdateARGBChannels(Channel, overrideColor) {
 	let ChannelLedCount = device.channel(ChannelArray[Channel][0]).LedCount();
 
 
@@ -557,8 +575,8 @@ function UpdateARGBChannels(Channel, shutdown = false) {
 
 		RGBData = device.createColorArray(pulseColor, ChannelLedCount, "Inline", RGBconfig);
 
-	}else if(shutdown){
-		RGBData = device.createColorArray(shutdownColor, ChannelLedCount, "Inline", RGBconfig);
+	}else if(overrideColor){
+		RGBData = device.createColorArray(overrideColor, ChannelLedCount, "Inline", RGBconfig);
 	}else{
 		RGBData = componentChannel.getColors("Inline", RGBconfig);
 	}

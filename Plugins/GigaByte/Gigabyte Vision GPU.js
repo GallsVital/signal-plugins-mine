@@ -126,22 +126,28 @@ export function Initialize() {
 }
 
 export function Render() {
-	SendRGB();
+	sendColors();
 
 	device.pause(10);
 }
 
 
-export function Shutdown() {
-	SendRGB(true);
+export function Shutdown(SystemSuspending) {
+
+	if(SystemSuspending){
+		sendColors("#000000"); // Go Dark on System Sleep/Shutdown
+	}else{
+		sendColors(shutdownColor);
+	}
+
 }
 
-function SendRGB(shutdown = false) {
+function sendColors(overrideColor) {
 
 	let Color;
 
-	if(shutdown) {
-		Color = hexToRgb(shutdownColor);
+	if(overrideColor) {
+		Color = hexToRgb(overrideColor);
 	} else if(LightingMode === "Forced") {
 		Color = hexToRgb(forcedColor);
 	} else {
