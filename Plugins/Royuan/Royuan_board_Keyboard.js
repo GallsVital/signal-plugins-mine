@@ -19,8 +19,10 @@ export function ControllableParameters(){
 	];
 }
 
-// 0x4003 MAXFIT61 Frost
-// 0x4015 Fl-Esports MK750
+const Models = {
+	0x4003: "MAXFIT61 Frost",
+	0x4015: "Fl-Esports MK750"
+};
 
 const vLedNames = [
 	"Keyboard"
@@ -39,6 +41,7 @@ export function LedPositions() {
 }
 
 export function Initialize() {
+	device.setName(Models[device.productId()]);
 	device.send_report([0x00, 0x07, 0x15, 0x04, 0x04, 0x07, 0x00, 0x00, 0x00, 0xD4], 65);
 }
 
