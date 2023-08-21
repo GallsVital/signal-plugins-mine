@@ -63,13 +63,17 @@ export function LedPositions() {
 	return vLedPositions;
 }
 
-export function Shutdown(){
-	sendReportString("00 00 00 02 05 02 00 01 FF 01 00 09", 65);
-	sendReportString("00 00 00 02 02 02 02 01 FF", 65);
-	sendReportString("00 00 00 02 02 02 02 00 FF", 65);
+export function Shutdown(SystemSuspending) {
+
+	if(SystemSuspending){
+		sendColors("#000000"); // Go Dark on System Sleep/Shutdown
+	}else{
+		sendReportString("00 00 00 02 05 02 00 01 FF 01 00 09", 65);
+		sendReportString("00 00 00 02 02 02 02 01 FF", 65);
+		sendReportString("00 00 00 02 02 02 02 00 FF", 65);
+	}
 
 }
-
 
 function sendReportString(string, size){
 	const packet= [];
@@ -150,7 +154,7 @@ function setDpi(){
 
 }
 
-function sendColors(shutdown = false){
+function sendColors(overrideColor){
 
 	const packet = [];
 	packet[0] = 0x00;
@@ -172,8 +176,8 @@ function sendColors(shutdown = false){
 		const iPxY = vLedPositions[iIdx][1];
 		var mxPxColor;
 
-		if(shutdown){
-			mxPxColor = hexToRgb(shutdownColor);
+		if(overrideColor){
+			mxPxColor = hexToRgb(overrideColor);
 		}else if (LightingMode === "Forced") {
 			mxPxColor = hexToRgb(forcedColor);
 		}else{
