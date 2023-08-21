@@ -82,7 +82,7 @@ function sendColors(overrideColor) {
 		const iPxX = vLedPositions[idx][0];
 		const iPxY = vLedPositions[idx][1];
 		const iLed = vLedIDs[idx];
-		var color;
+		let color;
 
 		if(overrideColor){
 			color = hexToRgb(overrideColor);
@@ -114,7 +114,7 @@ function hexToRgb(hex) {
 }
 
 export function Validate(endpoint) {
-	return endpoint.interface === -1 && endpoint.usage === 0x0001 && endpoint.usage_page === 0xff00;
+	return endpoint.interface === 0 && endpoint.usage === 0x0001 && endpoint.usage_page === 0xff00;
 }
 
 export function Image(){

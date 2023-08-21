@@ -1,7 +1,7 @@
 export function Name() { return "ASUS Spatha X Wireless"; }
 export function VendorId() { return 0x0B05; }
 export function Documentation(){ return "troubleshooting/asus"; }
-export function ProductId() { return 0x1979; }
+export function ProductId() { return [0x1979, 0x1977]; }
 export function Publisher() { return "WhirlwindFX"; }
 export function Size() { return [3, 3]; }
 export function DefaultPosition() {return [225, 120]; }
