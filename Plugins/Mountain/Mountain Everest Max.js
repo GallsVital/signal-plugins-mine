@@ -85,8 +85,14 @@ export function Render() {
 	sendColors();
 }
 
-export function Shutdown() {
-	sendColors(true);
+export function Shutdown(SystemSuspending) {
+
+	if(SystemSuspending){
+		sendColors("#000000"); // Go Dark on System Sleep/Shutdown
+	}else{
+		sendColors(shutdownColor);
+	}
+
 }
 
 export function onlayoutChanged() {
@@ -101,7 +107,7 @@ function setNumpadLocation(location) {
 	}
 }
 
-function grabColors(shutdown) {
+function grabColors(overrideColor) {
 	const rgbdata = new Array(300);
 	rgbdata.fill(0xff);
 
@@ -118,8 +124,8 @@ function grabColors(shutdown) {
 		const iPxY = keyPositions[iIdx][1];
 		let color;
 
-		if(shutdown) {
-			color = hexToRgb(shutdownColor);
+		if(overrideColor) {
+			color = hexToRgb(overrideColor);
 		} else if (LightingMode === "Forced") {
 			color = hexToRgb(forcedColor);
 		} else {
@@ -142,9 +148,9 @@ function CompareArrays(array1, array2) {
 	array1.every(function(value, index) { return value === array2[index];});
 }
 
-function sendColors(shutdown = false) {
+function sendColors(overrideColor) {
 
-	const rgbdata = grabColors(shutdown);
+	const rgbdata = grabColors(overrideColor);
 
 	if(!CompareArrays(rgbdata, oldRGBData)) {
 		oldRGBData = rgbdata;
