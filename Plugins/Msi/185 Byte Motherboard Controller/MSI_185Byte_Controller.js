@@ -5,7 +5,7 @@ export function Documentation(){ return "troubleshooting/msi"; }
 export function ProductId() { return Object.keys(MSIMotherboard.Library);}
 // YOU CAN BRICK THESE MOTHERBOARDS RGB CONTROLLER WITH ONE WRONG PACKET
 export function Publisher() { return "WhirlwindFX"; }
-export function Size() { return [0, 0]; }
+export function Size() { return [5, 5]; }
 export function Type() { return "Hid"; }
 export function DefaultPosition(){return [0, 0];}
 export function DefaultScale(){return 8.0;}
