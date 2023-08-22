@@ -167,5 +167,5 @@ export function Validate(endpoint) {
 }
 
 export function ImageUrl() {
-	return "https://dlcdnwebimgs.asus.com/gain/52914235-AAED-4F08-94D6-BBB255D9BFB6/w1000/h732.png";
+	return "";
 }
