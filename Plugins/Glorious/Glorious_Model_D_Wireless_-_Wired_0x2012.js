@@ -63,8 +63,13 @@ export function LedPositions() {
 	return vLedPositions;
 }
 
-export function Shutdown() {
-	sendColors(true);
+export function Shutdown(SystemSuspending) {
+
+	if(SystemSuspending){
+		sendColors("#000000"); // Go Dark on System Sleep/Shutdown
+	}else{
+		sendColors(shutdownColor);
+	}
 
 }
 
@@ -147,7 +152,7 @@ function setDpi(){
 
 }
 
-function sendColors(shutdown = false){
+function sendColors(overrideColor){
 
 	const packet = [];
 	packet[0] = 0x00;
@@ -169,8 +174,8 @@ function sendColors(shutdown = false){
 		const iPxY = vLedPositions[iIdx][1];
 		var mxPxColor;
 
-		if(shutdown){
-			mxPxColor = hexToRgb(shutdownColor);
+		if(overrideColor){
+			mxPxColor = hexToRgb(overrideColor);
 		}else if (LightingMode === "Forced") {
 			mxPxColor = hexToRgb(forcedColor);
 		}else{

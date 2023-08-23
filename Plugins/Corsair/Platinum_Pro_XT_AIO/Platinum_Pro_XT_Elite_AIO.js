@@ -27,15 +27,20 @@ const ConnectedProbes = [];
 const DeviceMaxLedLimit = 32;
 
 //Channel Name, Led Limit
+/** @type {ChannelConfigArray} */
 const ChannelArray = [
-	["Channel 1", 32],
+	["Channel 1", 32, 32],
 ];
 
-function SetupChannels(){
+function SetupChannels() {
 	device.SetLedLimit(DeviceMaxLedLimit);
 
-	for(let i = 0; i < ChannelArray.length; i++){
-		device.addChannel(ChannelArray[i][0], ChannelArray[i][1]);
+	for(let i = 0; i < ChannelArray.length; i++) {
+		const channelInfo = ChannelArray[i];
+
+		if(channelInfo){
+			device.addChannel(...channelInfo);
+		}
 	}
 }
 

@@ -113,7 +113,7 @@ function SendChannel(Channel, shutdown = false) {
 }
 
 export function Validate(endpoint) {
-	return endpoint.interface === -1;
+	return endpoint.interface === -1 || endpoint.interface === 0;
 }
 
 
