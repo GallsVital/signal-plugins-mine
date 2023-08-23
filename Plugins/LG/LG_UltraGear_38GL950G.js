@@ -167,7 +167,7 @@ function hexToBytes(hex) {
 }
 
 export function Validate(endpoint) {
-	return endpoint.interface === -1 && endpoint.usage === 1 && endpoint.usage_page === 0xff00;
+	return (endpoint.interface === -1 || endpoint.interface === 0) && endpoint.usage === 1 && endpoint.usage_page === 0xff00;
 }
 
 export function Image() {
