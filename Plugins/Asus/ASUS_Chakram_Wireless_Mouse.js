@@ -1,6 +1,6 @@
-export function Name() { return "ASUS Chakram Core"; }
+export function Name() { return "ASUS Chakram Wireless"; }
 export function VendorId() { return 0x0B05; }
-export function ProductId() { return 0x1958; }
+export function ProductId() { return [0x18E3, 0x18E5]; }
 export function Publisher() { return "WhirlwindFX"; }
 export function Documentation(){ return "troubleshooting/asus"; }
 export function Size() { return [5, 5]; }
@@ -21,11 +21,11 @@ export function ControllableParameters(){
 }
 
 const vKeyNames = [
-	"Scroll Wheel", "Logo"
+	"Scroll Wheel", "Logo", "Front Zone",
 ];
 
 const vKeyPositions = [
-	[1, 4], [1, 1],
+	[1, 4], [1, 1], [1, 0],
 ];
 
 export function LedNames() {
@@ -43,11 +43,13 @@ export function Initialize() {
 export function Render() {
 	sendColors(0);
 	sendColors(1);
+	sendColors(2);
 }
 
 export function Shutdown() {
 	sendColors(0, true);
 	sendColors(1, true);
+	sendColors(2, true);
 }
 
 function sendColors(zone, shutdown = false){
@@ -115,5 +117,5 @@ function hexToRgb(hex) {
 }
 
 export function ImageUrl() {
-	return "https://marketplace.signalrgb.com/devices/brands/asus/mice/chakram-standard.png";
+	return "https://marketplace.signalrgb.com/devices/brands/asus/mice/chakram-wireless.png";
 }

@@ -388,5 +388,5 @@ class EVGATuringGPUList extends GPUList{
 }
 
 export function ImageUrl() {
-	return "https://marketplace.signalrgb.com/devices/default/gpu.png";
+	return "https://marketplace.signalrgb.com/devices/brands/evga/gpus/gpu.png";
 }
