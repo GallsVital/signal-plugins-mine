@@ -555,6 +555,7 @@ class Asus_Ampere_Lovelace_IDs {
 		this.RTX4090_TUF_GAMING                    = 0x889A;
 		this.RTX4090_TUF_GAMING_2                  = 0x889B;
 		this.RTX4090_TUF_GAMING_OC				   = 0x88E6;
+		this.RTX4090_TUF_GAMING_OC_2               = 0x88E2;
 	}
 }
 
@@ -688,6 +689,7 @@ const Asus3000GPUIDs =
 	new AsusGPUIdentifier(Nvidia.RTX4090, AsusID.RTX4090_TUF_GAMING, "Asus TUF RTX 4090 Gaming"),
 	new AsusGPUIdentifier(Nvidia.RTX4090, AsusID.RTX4090_TUF_GAMING_2, "Asus TUF RTX 4090 Gaming"),
 	new AsusGPUIdentifier(Nvidia.RTX4090, AsusID.RTX4090_TUF_GAMING_OC, "Asus 4090 TUF Gaming OC"),
+	new AsusGPUIdentifier(Nvidia.RTX4090, AsusID.RTX4090_TUF_GAMING_OC_2, "Asus 4090 TUF Gaming OC"),
 ];
 
 function hexToRgb(hex) {
