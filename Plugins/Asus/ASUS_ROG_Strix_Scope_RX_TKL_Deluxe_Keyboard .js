@@ -150,5 +150,5 @@ function sendPacketString(string, size){
 }
 
 export function ImageUrl(){
-	return "https://marketplace.signalrgb.com/devices/brands/asus/keyboards/strix-scope-rx-tkl-deluxe.png";
+	return "https://marketplace.signalrgb.com/devices/brands/asus/keyboards/strix-scope-tkl.png";
 }
