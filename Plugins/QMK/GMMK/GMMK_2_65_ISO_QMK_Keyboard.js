@@ -305,5 +305,5 @@ export function Validate(endpoint) {
 }
 
 export function ImageUrl() {
-	return "https://marketplace.signalrgb.com/devices/default/keyboard-60.png";
+	return "https://marketplace.signalrgb.com/devices/brands/glorious/keyboards/gmmk2.png";
 }

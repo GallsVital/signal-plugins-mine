@@ -150,6 +150,7 @@ const PNYGPUIDs =
 	new PNYGPUIdentifier(0x1569, 0x2204, 0x2204, "PALIT 3090 Gaming Pro"),
 	new PNYGPUIdentifier(0x1569, 0x2208, 0x2208, "PALIT 3080TI Gaming Pro"),
 	new PNYGPUIdentifier(0x1569, 0x2216, 0x2216, "PALIT 3080 Gaming Pro"),
+	new PNYGPUIdentifier(0x1569, 0x2208, 0xf278, "PALIT 3080TI GameRock OC"),
 	new PNYGPUIdentifier(0x1569, 0x2206, 0x2206, "PALIT 3080 Gaming Pro"),
 	new PNYGPUIdentifier(0x1569, 0x2484, 0x2484, "PALIT 3070 Gaming Pro"),
 	new PNYGPUIdentifier(0x1569, 0x2488, 0x2488, "PALIT 3070 Gaming Pro"),
@@ -176,5 +177,5 @@ function hexToRgb(hex) {
 }
 
 export function ImageUrl() {
-	return "https://marketplace.signalrgb.com/devices/default/gpu.png";
+	return "https://marketplace.signalrgb.com/devices/brands/pny/gpus/gpu.png";
 }

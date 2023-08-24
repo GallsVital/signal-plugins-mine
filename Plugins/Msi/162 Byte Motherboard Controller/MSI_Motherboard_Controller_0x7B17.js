@@ -284,5 +284,5 @@ export function Validate(endpoint) {
 }
 
 export function ImageUrl() {
-	return "https://marketplace.signalrgb.com/devices/default/motherboard.png";
+	return "https://marketplace.signalrgb.com/devices/brands/msi/motherboards/motherboard.png";
 }

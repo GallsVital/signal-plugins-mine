@@ -139,5 +139,5 @@ function hexToRgb(hex) {
 }
 
 export function ImageUrl(){
-	return "https://marketplace.signalrgb.com/devices/brands/nzxt/aio/kraken-x72-aio.png";
+	return "https://marketplace.signalrgb.com/devices/brands/nzxt/aio/kraken-x72.png";
 }

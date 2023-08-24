@@ -441,7 +441,7 @@ class ENERam{
 			  ];
 
 			  device.setControllableLeds(vLedNames, vLedPositions);
-			  device.setSize([8, 2]);
+			  device.setSize([2, 8]);
 			  device.setName("T-Force XTREEM RAM");
 		} else {
 			for(let i = 0; i < this.config.deviceLEDCount; i++) {
