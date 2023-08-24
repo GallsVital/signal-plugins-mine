@@ -43,7 +43,19 @@ export function Render() {
 	sendColorBurstFour();
 }
 
-export function Shutdown() {
+export function Shutdown(SystemSuspending) {
+
+	if(SystemSuspending){
+		sendColorBurstOne("#000000"); // Go Dark on System Sleep/Shutdown
+		sendColorBurstTwo("#000000");
+		sendColorBurstThree("#000000");
+		sendColorBurstFour("#000000");
+	}else{
+		sendColorBurstOne(shutdownColor);
+		sendColorBurstTwo(shutdownColor);
+		sendColorBurstThree(shutdownColor);
+		sendColorBurstFour(shutdownColor);
+	}
 
 }
 
@@ -57,7 +69,7 @@ function Header2() {
 	device.write(packet, 10);
 }
 
-function sendColorBurstOne(shutdown = false) {
+function sendColorBurstOne(overrideColor) {
 	const packet = [];
 
 	for(let zone_idx = 0; zone_idx < 2; zone_idx++) {
@@ -66,8 +78,8 @@ function sendColorBurstOne(shutdown = false) {
 		const iY = vLedPositions[offset][1];
 		let col;
 
-		if(shutdown) {
-			col = hexToRgb(shutdownColor);
+		if(overrideColor) {
+			col = hexToRgb(overrideColor);
 		} else if (LightingMode === "Forced") {
 			col = hexToRgb(forcedColor);
 		} else {
@@ -118,7 +130,7 @@ function sendColorBurstOne(shutdown = false) {
 	device.write(packet, 65);
 }
 
-function sendColorBurstTwo(shutdown = false) {
+function sendColorBurstTwo(overrideColor) {
 
 	const packet = [];
 
@@ -128,8 +140,8 @@ function sendColorBurstTwo(shutdown = false) {
 		const iY = vLedPositions[offset][1];
 		let col;
 
-		if(shutdown) {
-			col = hexToRgb(shutdownColor);
+		if(overrideColor) {
+			col = hexToRgb(overrideColor);
 		} else if (LightingMode == "Forced") {
 			col = hexToRgb(forcedColor);
 		} else {
@@ -175,7 +187,7 @@ function sendColorBurstTwo(shutdown = false) {
 	device.write(packet, 65);
 }
 
-function sendColorBurstThree(shutdown = false) {
+function sendColorBurstThree(overrideColor) {
 	const packet = [];
 
 	for(let zone_idx = 0; zone_idx < 3; zone_idx++) {
@@ -184,8 +196,8 @@ function sendColorBurstThree(shutdown = false) {
 		const iY = vLedPositions[offset][1];
 		let col;
 
-		if(shutdown) {
-			col = hexToRgb(shutdownColor);
+		if(overrideColor) {
+			col = hexToRgb(overrideColor);
 		} else if (LightingMode === "Forced") {
 			col = hexToRgb(forcedColor);
 		} else {
@@ -245,7 +257,7 @@ function sendColorBurstThree(shutdown = false) {
 	device.write(packet, 65);
 }
 
-function sendColorBurstFour(shutdown = false) {
+function sendColorBurstFour(overrideColor) {
 	const packet = [];
 
 	for(let zone_idx = 0; zone_idx < 2; zone_idx++) {
@@ -254,8 +266,8 @@ function sendColorBurstFour(shutdown = false) {
 		const iY = vLedPositions[offset][1];
 		let col;
 
-		if(shutdown) {
-			col = hexToRgb(shutdownColor);
+		if(overrideColor) {
+			col = hexToRgb(overrideColor);
 		} else if (LightingMode == "Forced") {
 			col = hexToRgb(forcedColor);
 		} else {

@@ -75,10 +75,19 @@ export function Render() {
 	sendLogo();
 }
 
-export function Shutdown() {
-	sendchannelPumpColors(1, true);
-	sendchannel1Colors(0, true);
-	sendLogo(true);
+export function Shutdown(SystemSuspending) {
+
+	if(SystemSuspending){
+		sendchannelPumpColors(1, "#000000"); // Go Dark on System Sleep/Shutdown
+		sendchannel1Colors(0, "#000000");
+		sendLogo("#000000");
+	}else{
+
+		sendchannelPumpColors(1, shutdownColor);
+		sendchannel1Colors(0, shutdownColor);
+		sendLogo(shutdownColor);
+	}
+
 }
 
 function StreamLightingPacketChanneled(count, data, channel) {
@@ -97,7 +106,7 @@ function StreamLightingPacketChanneled(count, data, channel) {
 	}
 }
 
-function sendchannelPumpColors(channel, shutdown = false) {
+function sendchannelPumpColors(channel, overrideColor) {
 	const RGBdata = [];
 	let TotalLedCount = 0;
 
@@ -106,8 +115,8 @@ function sendchannelPumpColors(channel, shutdown = false) {
 		const iPxY = vLedPositions[iIdx][1];
 		let col;
 
-		if(shutdown) {
-			col = hexToRgb(shutdownColor);
+		if(overrideColor) {
+			col = hexToRgb(overrideColor);
 		} else if (LightingMode == "Forced") {
 			col = hexToRgb(forcedColor);
 		} else {
@@ -124,7 +133,7 @@ function sendchannelPumpColors(channel, shutdown = false) {
 	SubmitLightingColors(channel);
 }
 
-function sendchannel1Colors(Channel, shutdown = false) {
+function sendchannel1Colors(Channel, overrideColor) {
 	let ChannelLedCount = device.channel(ChannelArray[Channel][0]).LedCount();
 	const componentChannel = device.channel(ChannelArray[Channel][0]);
 
@@ -133,7 +142,9 @@ function sendchannel1Colors(Channel, shutdown = false) {
 	}
 	let RGBData = [];
 
-	if(LightingMode == "Forced") {
+	if(overrideColor){
+		RGBData = device.createColorArray(overrideColor, ChannelLedCount, "Inline", "GRB");
+	}else if(LightingMode == "Forced") {
 		RGBData = device.createColorArray(forcedColor, ChannelLedCount, "Inline", "GRB");
 	} else if(componentChannel.shouldPulseColors()) {
 		ChannelLedCount = 40;
@@ -148,14 +159,14 @@ function sendchannel1Colors(Channel, shutdown = false) {
 	SubmitLightingColors(Channel);
 }
 
-function sendLogo(shutdown = false) {
+function sendLogo(overrideColor) {
 	const iPxX = vLedPositions[8][0];
 	const iPxY = vLedPositions[8][1];
 
 	let col;
 
-	if(shutdown) {
-		col = hexToRgb(shutdownColor);
+	if(overrideColor) {
+		col = hexToRgb(overrideColor);
 	} else if (LightingMode == "Forced") {
 		col = hexToRgb(forcedColor);
 	} else {

@@ -52,8 +52,15 @@ export function Render() {
 	sendchannel1Colors(0);
 }
 
-export function Shutdown() {
-	sendchannel1Colors(0, true);
+export function Shutdown(SystemSuspending) {
+
+	if(SystemSuspending){
+		sendchannel1Colors(0, "#000000"); // Go Dark on System Sleep/Shutdown
+
+	}else{
+		sendchannel1Colors(0, shutdownColor);
+	}
+
 }
 
 let savedPollFanTimer = Date.now();
@@ -181,7 +188,7 @@ function StreamLightingPacketChanneled(count, data, channel) {
 	}
 }
 
-function sendchannel1Colors(Channel, shutdown = false) {
+function sendchannel1Colors(Channel, overrideColor) {
 	let ChannelLedCount = device.channel(ChannelArray[Channel][0]).LedCount();
 	const componentChannel = device.channel(ChannelArray[Channel][0]);
 
@@ -190,7 +197,9 @@ function sendchannel1Colors(Channel, shutdown = false) {
 	}
 	let RGBData = [];
 
-	if(LightingMode == "Forced") {
+	if(overrideColor){
+		RGBData = device.createColorArray(overrideColor, ChannelLedCount, "Inline", "GRB");
+	}else if(LightingMode == "Forced") {
 		RGBData = device.createColorArray(forcedColor, ChannelLedCount, "Inline", "GRB");
 	} else if(componentChannel.shouldPulseColors()) {
 

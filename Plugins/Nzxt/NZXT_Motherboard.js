@@ -50,7 +50,13 @@ export function Render() {
 	NZXT.sendRGB();
 }
 
-export function Shutdown() {
+export function Shutdown(SystemSuspending) {
+
+	if(SystemSuspending){
+		NZXT.sendRGB("#000000"); // Go Dark on System Sleep/Shutdown
+	}else{
+		NZXT.sendRGB(shutdownColor);
+	}
 
 }
 
@@ -150,11 +156,11 @@ export class NZXTProtocol {
 		}
 	}
 
-	sendRGB() {
+	sendRGB(overrideColor) {
 		const totalchannels = this.NZXTCHL + this.ARGBCHL;
 
 		for(let i = 0; i < totalchannels; i++) {
-			const RGBData = this.grabRGBData(i);
+			const RGBData = this.grabRGBData(i, overrideColor);
 
 			// no led on this channel, skip
 			if(!RGBData.length) {continue;}
@@ -166,11 +172,11 @@ export class NZXTProtocol {
 		}
 
 		for(let i = 0; i < this.RGBCHL; i++){
-			this.SendRGBHeader(i);
+			this.SendRGBHeader(i, overrideColor);
 		}
 	}
 
-	grabRGBData(Channel) {
+	grabRGBData(Channel, overrideColor) {
 		let ChannelID = Channel + 1;
 		let ChannelName = "ARGB Header";
 
@@ -185,7 +191,9 @@ export class NZXTProtocol {
 		const componentChannel = device.channel(ChannelName);
 		let RGBData = [];
 
-		if(LightingMode === "Forced") {
+		if(overrideColor){
+			RGBData = device.createColorArray(overrideColor, ChannelLedCount, "Inline", "GRB");
+		}else if(LightingMode === "Forced") {
 			RGBData = device.createColorArray(forcedColor, ChannelLedCount, "Inline", "GRB");
 		} else if(componentChannel.shouldPulseColors()) {
 			ChannelLedCount = 40;
@@ -211,7 +219,7 @@ export class NZXTProtocol {
 		device.write(packet, 64);
 	}
 
-	SendRGBHeader(channel, shutdown = false) {
+	SendRGBHeader(channel, overrideColor) {
 		const ChannelID = channel + 1;
 
 		const packet =
@@ -220,8 +228,8 @@ export class NZXTProtocol {
 		];
 		let col;
 
-		if(shutdown) {
-			col = hexToRgb(shutdownColor);
+		if(overrideColor) {
+			col = hexToRgb(overrideColor);
 		} else if (LightingMode === "Forced") {
 			col = hexToRgb(forcedColor);
 		} else {
