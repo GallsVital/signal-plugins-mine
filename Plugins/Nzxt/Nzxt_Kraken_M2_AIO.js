@@ -6,26 +6,42 @@ export function Publisher() { return "WhirlwindFX"; }
 export function Size() { return [9, 9]; }
 export function DefaultPosition(){return [165, 60];}
 export function DefaultScale(){return 3.0;}
-/* global
-shutdownColor:readonly
-LightingMode:readonly
-forcedColor:readonly
-*/
-export function ControllableParameters() {
-	return [
-		{"property":"shutdownColor", "group":"lighting", "label":"Shutdown Color", "min":"0", "max":"360", "type":"color", "default":"#009bde"},
-		{"property":"LightingMode", "group":"lighting", "label":"Lighting Mode", "type":"combobox", "values":["Canvas", "Forced"], "default":"Canvas"},
-		{"property":"forcedColor", "group":"lighting", "label":"Forced Color", "min":"0", "max":"360", "type":"color", "default":"#009bde"},
-	];
-}
-
 const vLedNames = [
 	"Led 1", "Led 2", "Led 3", "Led 4", "Led 5", "Led 6", "Led 7", "Led 8", "Led 9", "Logo"
 ];
 
-const vLedPositions = [
-	[4, 0], [5, 2], [7, 3], [5, 5], [4, 7], [3, 5], [1, 3], [3, 2], [4, 1], [4, 4]
-];
+const vLedPositions = [[4, 0], [5, 2], [7, 3], [5, 5], [4, 7],
+	[3, 5], [1, 3], [3, 2], [4, 1], [4, 4]];
+
+export function Initialize() {
+	// Kraken doesn't require a setup packet.
+	return "Hello, there!";
+}
+
+export function Shutdown() {
+	const packet = [];
+
+	// Header.
+	packet[0] = 0x02;
+	packet[1] = 0x4C;
+	packet[2] = 0x02;
+	packet[3] = 0x00;
+
+	// Speed?
+	packet[4] = 0x04;
+	packet[4] |= 0 << 3;
+	packet[4] |= 0 << 5;
+
+	// Colors.
+	for(let iIdx=0; iIdx < 9; iIdx++) {
+		const iLedIdx = 0x05 + (iIdx * 3);
+		packet[iLedIdx] = 25;
+		packet[iLedIdx+1] = 25;
+		packet[iLedIdx+2] = 25;
+	}
+
+	device.write(packet, 65);
+}
 
 export function LedNames() {
 	return vLedNames;
@@ -34,29 +50,9 @@ export function LedNames() {
 export function LedPositions() {
 	return vLedPositions;
 }
-export function Initialize() {
-
-}
 
 export function Render() {
-	sendColors();
-	sendLogo();
-}
-
-export function Shutdown(SystemSuspending) {
-
-	if(SystemSuspending){
-		sendColors("#000000"); // Go Dark on System Sleep/Shutdown
-		sendLogo("#000000");
-	}else{
-		sendColors(shutdownColor);
-		sendLogo(shutdownColor);
-	}
-
-}
-
-function sendColors(overrideColor) {
-	const packet = [];
+	var packet = [];
 
 	// Header.
 	packet[0] = 0x02;
@@ -71,31 +67,19 @@ function sendColors(overrideColor) {
 
 	// Colors.
 	for(let iIdx=0; iIdx < 9; iIdx++) {
-		const iPxX = vLedPositions[iIdx][0];
-		const iPxY = vLedPositions[iIdx][1];
-		let col;
-
-		if(overrideColor) {
-			col = hexToRgb(overrideColor);
-		} else if (LightingMode === "Forced") {
-			col = hexToRgb(forcedColor);
-		} else {
-			col = device.color(iPxX, iPxY);
-		}
-
-		const iLedIdx = (iIdx * 3) + 5;
-		packet[iLedIdx]     = col[0];
-		packet[iLedIdx+1]   = col[1];
-		packet[iLedIdx+2]   = col[2];
+		const iLedIdx = 0x05 + (iIdx * 3);
+		var x = vLedPositions[iIdx][0];
+		var y = vLedPositions[iIdx][1];
+		var col = device.color(x, y);
+		packet[iLedIdx] = col[0];
+		packet[iLedIdx+1] = col[1];
+		packet[iLedIdx+2] = col[2];
 	}
 
 	device.write(packet, 65);
-	device.pause(1);
 
-}
+	var packet = [];
 
-function sendLogo(overrideColor) {
-	const packet = [];
 
 	// Header.
 	packet[0] = 0x02;
@@ -109,34 +93,14 @@ function sendLogo(overrideColor) {
 	packet[4] |= 0 << 5;
 
 	// Logo Colors.
-	const iPxX = vLedPositions[9][0];
-	const iPxY = vLedPositions[9][1];
-	let col;
-
-	if(overrideColor) {
-		col = hexToRgb(overrideColor);
-	} else if (LightingMode === "Forced") {
-		col = hexToRgb(forcedColor);
-	} else {
-		col = device.color(iPxX, iPxY);
-	}
-
+	var x = vLedPositions[9][0];
+	var y = vLedPositions[9][1];
+	var col = device.color(x, y);
 	packet[5] = col[1]; //green
 	packet[6] = col[0]; //red
 	packet[7] = col[2]; //blue
 
 	device.write(packet, 65);
-	device.pause(1);
-}
-
-function hexToRgb(hex) {
-	const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
-	const colors = [];
-	colors[0] = parseInt(result[1], 16);
-	colors[1] = parseInt(result[2], 16);
-	colors[2] = parseInt(result[3], 16);
-
-	return colors;
 }
 
 export function Image() {
