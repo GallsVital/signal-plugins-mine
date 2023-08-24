@@ -59,8 +59,14 @@ export function Initialize() {
 	}
 }
 
-export function Shutdown() {
-	sendColors(true);
+export function Shutdown(SystemSuspending) {
+
+	if(SystemSuspending){
+		sendColors("#000000"); // Go Dark on System Sleep/Shutdown
+	}else{
+		sendColors(shutdownColor);
+	}
+
 }
 
 
@@ -138,7 +144,7 @@ function setDpi() {
 
 }
 
-function sendColors(shutdown = false) {
+function sendColors(overrideColor) {
 
 	const packet = [0x00, 0x00, 0x00, 0x02, 0x08, 0x02, 0x00, 0x01, 0xff, 0x04, 0x00, 0x09];
 
@@ -147,8 +153,8 @@ function sendColors(shutdown = false) {
 		const iPxY = vLedPositions[iIdx][1];
 		var mxPxColor;
 
-		if(shutdown) {
-			mxPxColor = hexToRgb(shutdownColor);
+		if(overrideColor) {
+			mxPxColor = hexToRgb(overrideColor);
 		} else if (LightingMode === "Forced") {
 			mxPxColor = hexToRgb(forcedColor);
 		} else {

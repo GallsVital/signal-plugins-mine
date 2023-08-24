@@ -152,6 +152,10 @@ function grabRGBData(Channel, overrideColor) {
 	return RGBData;
 }
 
+export function Validate(endpoint) {
+	return endpoint.interface === -1 || endpoint.interface === 0;
+}
+
 function hexToRgb(hex) {
 	const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
 	const colors = [];
@@ -160,10 +164,6 @@ function hexToRgb(hex) {
 	colors[2] = parseInt(result[3], 16);
 
 	return colors;
-}
-
-export function Validate(endpoint) {
-	return endpoint.interface === 0;
 }
 
 export function ImageUrl() {
