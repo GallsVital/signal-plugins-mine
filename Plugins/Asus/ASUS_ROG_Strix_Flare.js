@@ -108,14 +108,6 @@ function sendColors(shutdown = false){
 
 	while(TotalLedCount > 0){
 		const ledsToSend = TotalLedCount >= 15 ? 15 : TotalLedCount;
-
-		let packet = [];
-		packet[0] = 0x00;
-		packet[1] = 0xC0;
-		packet[2] = 0x81;
-		packet[3] = 0x90 - (0x0F * packetCount++);
-		packet[4] = 0x00;
-		packet = packet.concat(RGBData.splice(0, ledsToSend*4));
 		device.write([0x00, 0xC0, 0x81, 0x90 - (0x0F * packetCount++), 0x00].concat(RGBData.splice(0, ledsToSend*4)), 65);
 		TotalLedCount -= ledsToSend;
 	}
@@ -123,8 +115,8 @@ function sendColors(shutdown = false){
 }
 
 function hexToRgb(hex) {
-	let result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
-	let colors = [];
+	const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+	const colors = [];
 	colors[0] = parseInt(result[1], 16);
 	colors[1] = parseInt(result[2], 16);
 	colors[2] = parseInt(result[3], 16);
