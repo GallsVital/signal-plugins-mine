@@ -1,7 +1,7 @@
-export function Name() { return "ASUS Spatha X Wireless"; }
+export function Name() { return "ASUS ROG Gladius III Aimpoint"; }
 export function VendorId() { return 0x0B05; }
 export function Documentation(){ return "troubleshooting/asus"; }
-export function ProductId() { return [0x1979, 0x1977]; }
+export function ProductId() { return [0x1a72, 0x1A70]; }
 export function Publisher() { return "WhirlwindFX"; }
 export function Size() { return [3, 3]; }
 export function DefaultPosition() {return [225, 120]; }
@@ -30,10 +30,10 @@ export function ControllableParameters() {
 		{"property":"mousePolling", "group":"mouse", "label":"Polling Rate", "type":"combobox", "values":["125Hz", "250Hz", "500Hz", "1000Hz"], "default":"500Hz"},
 		{"property":"sleepTimeout", "group":"mouse", "label":"Sleep Mode Timeout (Minutes)", "type":"combobox", "values":["1", "2", "3", "5", "10", "Never"], "default":"5"},
 		{"property":"lowPowerPercentage", "group":"mouse", "label":"Low Battery Warning Percentage", "type":"combobox", "values":["Never", "10%", "15%", "20%", "25%", "30%"], "default":"20%"},
-		{"property":"dpi1", "group":"mouse", "label":"DPI 1", "step":"100", "type":"number", "min":"100", "max":"19000", "default":"800"},
-		{"property":"dpi2", "group":"mouse", "label":"DPI 2", "step":"100", "type":"number", "min":"100", "max":"19000", "default":"1200"},
-		{"property":"dpi3", "group":"mouse", "label":"DPI 3", "step":"100", "type":"number", "min":"100", "max":"19000", "default":"1500"},
-		{"property":"dpi4", "group":"mouse", "label":"DPI 4", "step":"100", "type":"number", "min":"100", "max":"19000", "default":"2000"},
+		{"property":"dpi1", "group":"mouse", "label":"DPI 1", "step":"100", "type":"number", "min":"100", "max":"36000", "default":"800"},
+		{"property":"dpi2", "group":"mouse", "label":"DPI 2", "step":"100", "type":"number", "min":"100", "max":"36000", "default":"1200"},
+		{"property":"dpi3", "group":"mouse", "label":"DPI 3", "step":"100", "type":"number", "min":"100", "max":"36000", "default":"1500"},
+		{"property":"dpi4", "group":"mouse", "label":"DPI 4", "step":"100", "type":"number", "min":"100", "max":"36000", "default":"2000"},
 
 	];
 }
@@ -66,9 +66,9 @@ const lowPowerPercentageDict =
 	"30%" : 0x1E
 };
 
-const vKeyNames = [ "Scroll Wheel", "Logo", "Side Zone 1", "Side Zone 2" ];
+const vKeyNames = [  "Logo" ];
 
-const vKeyPositions = [ [1, 2], [1, 0], [0, 0], [0, 1] ];
+const vKeyPositions = [  [1, 0]  ];
 
 export function LedNames() {
 	return vKeyNames;
@@ -82,9 +82,12 @@ export function Initialize() {
 	sendMouseSettings();
 	sendLightingSettings();
 	directLightingMode();
+	device.addFeature("battery");
+	fetchBatteryLevel();
 }
 
 export function Render() {
+	getDeviceBatteryStatus();
 	sendColors();
 }
 
@@ -119,6 +122,34 @@ export function onangleSnappingChanged() {
 export function onSettingControlChanged() {
 	sendMouseSettings();
 	sendLightingSettings();
+}
+
+const PollModeInternal = 15000;
+let savedPollTimer = Date.now();
+
+function getDeviceBatteryStatus() {
+	if (Date.now() - savedPollTimer < PollModeInternal) {
+		return;
+	}
+
+	savedPollTimer = Date.now();
+
+	fetchBatteryLevel();
+}
+
+function fetchBatteryLevel() {
+	device.clearReadBuffer();
+	device.write([0x00, 0x12, 0x07], 65);
+
+	const returnPacket = device.read([0x00, 0x12, 0x07], 65);
+
+	device.log(returnPacket);
+
+	const batteryState = returnPacket[4];
+	const batteryLevel = returnPacket[5];
+
+	battery.setBatteryLevel(batteryLevel);
+	battery.setBatteryState(batteryState + 1);
 }
 
 function directLightingMode() {
@@ -210,6 +241,6 @@ export function Validate(endpoint) {
 	return endpoint.interface === 0;
 }
 
-export function ImageUrl() {
-	return "https://marketplace.signalrgb.com/devices/brands/asus/mice/spatha-x.png";
+export function ImageUrl(){
+	return "https://marketplace.signalrgb.com/devices/brands/asus/mice/gladius-iii-aimpoint.png";
 }

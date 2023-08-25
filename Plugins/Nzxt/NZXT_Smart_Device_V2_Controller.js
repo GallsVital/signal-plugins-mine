@@ -7,12 +7,13 @@ export function Size() { return [1, 1]; }
 export function DefaultPosition(){return [0, 0];}
 export function DefaultScale(){return 1.0;}
 /* global
+shutdownColor:readonly
 LightingMode:readonly
 forcedColor:readonly
 */
 export function ControllableParameters(){
 	return [
-		// {"property":"shutdownColor", "group":"lighting", "label":"Shutdown Color", "min":"0", "max":"360", "type":"color", "default":"#009bde"},
+		{"property":"shutdownColor", "group":"lighting", "label":"Shutdown Color", "min":"0", "max":"360", "type":"color", "default":"#009bde"},
 		{"property":"LightingMode", "group":"lighting", "label":"Lighting Mode", "type":"combobox", "values":["Canvas", "Forced"], "default":"Canvas"},
 		{"property":"forcedColor", "group":"lighting", "label":"Forced Color", "min":"0", "max":"360", "type":"color", "default":"#009bde"},
 	];
@@ -76,10 +77,19 @@ export function Render() {
 	}
 }
 
-export function Shutdown() {
-	for(let i = 0; i < ChannelArray.length; i++){
-		SendChannel(i);
+export function Shutdown(SystemSuspending) {
+
+	if(SystemSuspending){
+		for(let i = 0; i < ChannelArray.length; i++){
+			SendChannel(i, "#000000"); // Go Dark on System Sleep/Shutdown
+		}
+	}else{
+
+		for(let i = 0; i < ChannelArray.length; i++){
+			SendChannel(i, shutdownColor);
+		}
 	}
+
 }
 
 function SubmitLightingColors(channel) {
@@ -111,7 +121,7 @@ export function LedPositions() {
 	return vKeyPositions;
 }
 
-function SendChannel(Channel, shutdown = false) {
+function SendChannel(Channel, overrideColor) {
 	const componentChannel = device.channel(ChannelArray[Channel][0]);
 
 	if(componentChannel == null){
@@ -121,7 +131,9 @@ function SendChannel(Channel, shutdown = false) {
 	let ChannelLedCount = componentChannel.LedCount();
 	let RGBData = [];
 
-	if(LightingMode === "Forced"){
+	if(overrideColor){
+		RGBData = device.createColorArray(overrideColor, ChannelLedCount, "Inline", "GRB");
+	}else if(LightingMode === "Forced"){
 		RGBData = device.createColorArray(forcedColor, ChannelLedCount, "Inline", "GRB");
 
 	}else if(componentChannel.shouldPulseColors()){

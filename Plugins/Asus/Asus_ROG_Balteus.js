@@ -88,5 +88,5 @@ function hexToRgb(hex) {
 }
 
 export function ImageUrl() {
-	return "https://marketplace.signalrgb.com/devices/default/mousepad.png";
+	return "https://marketplace.signalrgb.com/devices/brands/asus/mousepads/balteus-standard.png";
 }

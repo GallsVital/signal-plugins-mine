@@ -96,5 +96,5 @@ export function Validate(endpoint) {
 }
 
 export function ImageUrl(){
-	return "https://marketplace.signalrgb.com/devices/brands/hyperx/audio/quad-cast-s.png";
+	return "https://marketplace.signalrgb.com/devices/brands/hyperx/audio/duocast.png";
 }
