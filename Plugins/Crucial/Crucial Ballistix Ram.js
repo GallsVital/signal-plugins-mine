@@ -336,6 +336,6 @@ function hexToRgb(hex) {
 	return colors;
 }
 
-export function ImageUrl() {
-	return "https://marketplace.signalrgb.com/devices/default/ram.png";
+export function ImageUrl(){
+	return "https://marketplace.signalrgb.com/devices/brands/crucial/ram/ballistix-rgb.png";
 }
