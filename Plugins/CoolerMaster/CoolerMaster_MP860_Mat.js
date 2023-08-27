@@ -52,24 +52,30 @@ export function Initialize() {
 }
 
 export function Render() {
-	SendColors();
+	sendColors();
 }
 
-export function Shutdown() {
-	SendColors(true);
+export function Shutdown(SystemSuspending) {
+
+	if(SystemSuspending){
+		sendColors("#000000"); // Go Dark on System Sleep/Shutdown
+	}else{
+		sendColors(shutdownColor);
+	}
+
 }
 
-function SendColors(shutdown = false){
+function sendColors(overrideColor){
 	const RGBData = new Array(50).fill(0);
 	let TotalLedCount = 0;
 
 	for(let iIdx = 0; iIdx < vKeymap.length; iIdx++) {
 		const iPxX = vLedPositions[iIdx][0];
 		const iPxY = vLedPositions[iIdx][1];
-		var mxPxColor;
+		let mxPxColor;
 
-		if(shutdown){
-			mxPxColor = hexToRgb(shutdownColor);
+		if(overrideColor){
+			mxPxColor = hexToRgb(overrideColor);
 		}else if (LightingMode === "Forced") {
 			mxPxColor = hexToRgb(forcedColor);
 		}else{
