@@ -87,7 +87,7 @@ class PluginValidator {
 			const pluginModule = await import(PluginPath);
 
 			for (const validator of this.validators) {
-				this.AttemptValidator(validator, pluginModule, PluginPath);
+				await this.AttemptValidator(validator, pluginModule, PluginPath);
 			}
 
 		} catch (e) {
@@ -97,7 +97,7 @@ class PluginValidator {
 
 	async AttemptValidator(validatorCallback, pluginModule, PluginPath) {
 		try {
-			validatorCallback(pluginModule, this.#GetReportErrorCallback(PluginPath, validatorCallback.name), PluginPath);
+			await validatorCallback(pluginModule, this.#GetReportErrorCallback(PluginPath, validatorCallback.name), PluginPath);
 		} catch (e) {
 			this.#ReportError(PluginPath, validatorCallback.name, e);
 		}

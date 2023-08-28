@@ -1,5 +1,5 @@
 export function Name() { return "WLED"; }
-export function Version() { return "0.14.0"; }
+export function Version() { return "0.15.0"; }
 export function Type() { return "network"; }
 export function Publisher() { return "FeuerSturm"; }
 export function Documentation() { return "gettingstarted/srgbmods-net-info"; }
@@ -172,10 +172,23 @@ export function DiscoveryService() {
 
 				if (xhr.readyState === 4) {
 					if(xhr.status === 200) {
-						const devicedata = JSON.parse(xhr.response);
-						const wledname = devicedata.name === "WLED" ? "wled-" + devicedata.mac.substr(devicedata.mac.length - 6) : devicedata.name;
-						const forcedvalue = {"hostname":devicedata.ip, "mac":devicedata.mac, "name":wledname, "port":80, "forced":true};
-						instance.Discovered(forcedvalue);
+						let devicedata;
+
+						try {
+							devicedata = JSON.parse(xhr.response);
+						} catch (e) {
+							service.log("ERROR for IP " + instance.ip + ", JSON info could not be parsed!");
+
+							return;
+						}
+
+						if(devicedata.hasOwnProperty("brand") && devicedata.brand === "WLED") {
+							const wledname = devicedata.name === "WLED" ? "wled-" + devicedata.mac.substr(devicedata.mac.length - 6) : devicedata.name;
+							const forcedvalue = {"hostname":devicedata.ip, "mac":devicedata.mac, "name":wledname, "port":80, "forced":true};
+							instance.Discovered(forcedvalue);
+						} else {
+							service.log("ERROR for IP " + instance.ip + ", device is NOT a WLED flashed MCU!");
+						}
 					} else {
 						service.log("ERROR for IP " + instance.ip + ", device is OFFLINE or does not respond!");
 					}
@@ -196,7 +209,7 @@ export function DiscoveryService() {
 
 	this.Initialize = function() {
 		service.log("Initializing Plugin!");
-		service.log("Searching for network devices...");
+		service.log("Searching for WLED devices...");
 	};
 
 	this.loadForcedDevices = function() {
@@ -477,7 +490,6 @@ class XmlHttp {
 		const xhr = new XMLHttpRequest();
 		xhr.open("GET", url, async);
 
-		//xhr.timeout = 2000;
 		xhr.setRequestHeader("Accept", "application/json");
 		xhr.setRequestHeader("Content-Type", "application/json");
 
@@ -490,7 +502,6 @@ class XmlHttp {
 		const xhr = new XMLHttpRequest();
 		xhr.open("POST", url, async);
 
-		//xhr.timeout = 2000;
 		xhr.setRequestHeader("Accept", "application/json");
 		xhr.setRequestHeader("Content-Type", "application/json");
 

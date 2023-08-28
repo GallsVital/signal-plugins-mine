@@ -16,7 +16,7 @@ declare type ImageFormat = "JPEG" | "PNG" | "BMP"
 declare type DeviceFeature = "battery" | "mouse" | "keyboard" | "udp" | "dtls" | "base64";
 declare type hexToRgb = (HexString: string) => ColorArray;
 
-declare type ChannelConfig = [ChannelId, number];
+declare type ChannelConfig = [ChannelId, number, number?];
 declare type ChannelConfigArray = ChannelConfig[];
 
 declare type AlertPriority = 0 | 1 | 2 | 3;

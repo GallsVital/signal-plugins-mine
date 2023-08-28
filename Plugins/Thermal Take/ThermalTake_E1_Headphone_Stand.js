@@ -44,16 +44,23 @@ export function Initialize() {
 }
 
 export function Render() {
-	SendPacket(0, 0x0f);
-	SendPacket(0x0f, 0x0a);
+	sendColors(0, 0x0f);
+	sendColors(0x0f, 0x0a);
 }
 
-export function Shutdown() {
-	SendPacket(0, 0x0f, true);
-	SendPacket(0x0f, 0x0a, true);
+export function Shutdown(SystemSuspending) {
+
+	if(SystemSuspending){
+		sendColors(0, 0x0f, "#000000");
+		sendColors(0x0f, 0x0a, "#000000"); // Go Dark on System Sleep/Shutdown
+	}else{
+		sendColors(0, 0x0f, shutdownColor);
+		sendColors(0x0f, 0x0a, shutdownColor);
+	}
+
 }
 
-function SendPacket(startIdx, count, shutdown = false) {
+function sendColors(startIdx, count, overrideColor) {
 	const ColorPacket = [0x00, 0xC0, 0x01];
 	ColorPacket[3] = count;
 
@@ -62,10 +69,10 @@ function SendPacket(startIdx, count, shutdown = false) {
 		const iKeyIdx = startIdx + iIdx;
 		const iKeyPosX = vLedPositions[iKeyIdx][0];
 		const iKeyPosY = vLedPositions[iKeyIdx][1];
-		var color;
+		let color;
 
-		if(shutdown) {
-			color = hexToRgb(shutdownColor);
+		if(overrideColor) {
+			color = hexToRgb(overrideColor);
 		} else if (LightingMode === "Forced") {
 			color = hexToRgb(forcedColor);
 		} else {

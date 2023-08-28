@@ -71,7 +71,7 @@ function SendChannel(Channel) {
 	}else if(componentChannel.shouldPulseColors()){
 		ChannelLedCount = 120;
 
-		const pulseColor = device.getChannelPulseColor(ChannelArray[Channel][0], ChannelLedCount);
+		const pulseColor = device.getChannelPulseColor(ChannelArray[Channel][0]);
 		ColorData = device.createColorArray(pulseColor, ChannelLedCount, "Seperate");
 
 	}else{
@@ -102,7 +102,7 @@ export function Render() {
 }
 
 export function Validate(endpoint) {
-	return endpoint.interface === -1 || endpoint.interface === 2;
+	return endpoint.interface === -1 || endpoint.interface === 0 || endpoint.interface === 2;
 }
 
 /**

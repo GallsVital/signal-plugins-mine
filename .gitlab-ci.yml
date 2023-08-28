@@ -28,6 +28,14 @@ eslint:
     #- npm install
     - npm run lint:ci
 
+duplicate gpu check:
+  stage: duplicate gpu check
+  when: always
+  script:
+    #- apk add --update npm
+    #- npm install
+    - npm run test:CheckDuplicateGPU
+
 validate:
   stage: validate
   when: always
@@ -36,14 +44,15 @@ validate:
     #- apk add --update npm
     #- npm install
     - npm run test:validate
-
-duplicate gpu check:
-  stage: duplicate gpu check
-  when: always
-  script:
-    #- apk add --update npm
-    #- npm install
-    - npm run test:CheckDuplicateGPU
+  artifacts:
+    when: always
+    name: "Javascript Plugins"
+    paths:
+      - Plugins/**/*.js
+      - Plugins/**/*.qml
+    exclude:
+      - "Plugins/**/*.test.js"
+      - "Plugins/*.js"
 
 unit test:
   stage: unit test
@@ -59,20 +68,20 @@ unit test:
       junit:
         - junit.xml
 
-build:
-  stage: build
-  allow_failure: true # User Props will always throw errors in TS.
+# build:
+#   stage: build
+#   allow_failure: true # User Props will always throw errors in TS.
 
-  script:
-    #- apk add --update npm
-    #- npm install
-    - npm run build
+#   script:
+#     #- apk add --update npm
+#     #- npm install
+#     - npm run build
 
-  artifacts:
-    when: always
-    name: "Javascript Plugins"
-    paths:
-      - dist/**/*.js
-    reports:
-      junit:
-        - junit.xml
+#   artifacts:
+#     when: always
+#     name: "Javascript Plugins"
+#     paths:
+#       - dist/**/*.js
+#     reports:
+#       junit:
+#         - junit.xml
