@@ -214,4 +214,6 @@ export function Validate(endpoint) {
 	return endpoint.interface === 3;
 }
 
-export function ImageResource(){ return "default/keyboard";}
+export function ImageUrl() {
+	return "https://marketplace.signalrgb.com/devices/brands/hyperx/keyboards/alloy-origins.png";
+}

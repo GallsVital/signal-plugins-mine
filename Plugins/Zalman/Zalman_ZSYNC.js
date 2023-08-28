@@ -29,23 +29,28 @@ export function SubdeviceController(){ return true; }
 const DeviceMaxLedLimit = 192;
 
 //Channel Name, Led Limit
+/** @type {ChannelConfigArray} */
 const ChannelArray =
 [
-	["Channel 1", 40],
-	["Channel 2", 40],
-	["Channel 3", 40],
-	["Channel 4", 40],
-	["Channel 5", 40],
-	["Channel 6", 40],
-	["Channel 7", 40],
-	["Channel 8", 40]
+	["Channel 1", 40, 24],
+	["Channel 2", 40, 24],
+	["Channel 3", 40, 24],
+	["Channel 4", 40, 24],
+	["Channel 5", 40, 24],
+	["Channel 6", 40, 24],
+	["Channel 7", 40, 24],
+	["Channel 8", 40, 24]
 ];
 
 function SetupChannels() {
 	device.SetLedLimit(DeviceMaxLedLimit);
 
 	for(let i = 0; i < ChannelArray.length; i++) {
-		device.addChannel(ChannelArray[i][0], ChannelArray[i][1]);
+		const channelInfo = ChannelArray[i];
+
+		if(channelInfo){
+			device.addChannel(...channelInfo);
+		}
 	}
 }
 
@@ -69,25 +74,35 @@ export function Render() {
 	SubmitLightingColors();
 }
 
-export function Shutdown() {
-	for(let Channel = 0; Channel < 8; Channel++) {
-		device.write([0x00, CORSAIR_LIGHTING_CONTROLLER_MODE, Channel, CORSAIR_HARDWARE_MODE], 65);
+export function Shutdown(SystemSuspending) {
+
+	if(SystemSuspending){
+		for(let Channel = 0; Channel < 8; Channel++) {
+			SendChannel(Channel, "#000000"); // Go Dark on System Sleep/Shutdown
+		}
+
+		SubmitLightingColors();
+	}else{
+		for(let Channel = 0; Channel < 8; Channel++) {
+			device.write([0x00, CORSAIR_LIGHTING_CONTROLLER_MODE, Channel, CORSAIR_HARDWARE_MODE], 65);
+		}
 	}
 }
 
-function SendChannel(Channel) {
+function SendChannel(Channel, overrideColor) {
 	let ChannelLedCount = device.channel(ChannelArray[Channel][0]).LedCount();
 	const componentChannel = device.channel(ChannelArray[Channel][0]);
 
 	let ColorData = [];
 
-	if(LightingMode === "Forced") {
+	if(overrideColor){
+		ColorData = device.createColorArray(overrideColor, ChannelLedCount, "Seperate");
+	}else if(LightingMode === "Forced") {
 		ColorData = device.createColorArray(forcedColor, ChannelLedCount, "Seperate");
-
 	} else if(componentChannel.shouldPulseColors()) {
 		ChannelLedCount = 40;
 
-		const pulseColor = device.getChannelPulseColor(ChannelArray[Channel][0], ChannelLedCount);
+		const pulseColor = device.getChannelPulseColor(ChannelArray[Channel][0]);
 		ColorData = device.createColorArray(pulseColor, ChannelLedCount, "Seperate");
 
 	} else {
@@ -148,7 +163,7 @@ function SubmitLightingColors() {
 
 
 export function Validate(endpoint) {
-	return endpoint.interface === -1 ||  endpoint.interface === 2;
+	return endpoint.interface === -1 || endpoint.interface === 0 || endpoint.interface === 2;
 }
 
 export function Image(){

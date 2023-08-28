@@ -217,7 +217,7 @@ declare class device{
 	 * @param ChannelId Desired ChannelId name as a string.
 	 * @param LedLimit Sets the max Led Count of the Channel.
 	 */
-	public static addChannel(ChannelId: ChannelId, LedLimit?: number): void
+	public static addChannel(ChannelId: ChannelId, LedLimit?: number, DefaultLedCount?: number): void
 
 	/**
 	 * Removes a Component Channel on the device. The Component UI will disappear for the User if the last Channel is removed.
@@ -286,6 +286,7 @@ declare class device{
 	public static setSize(Size: number[]): void
 	public static setImageFromBase64(base64Image: string): void
 	public static setImageFromResource(resourceUrl: ImageResource): void
+	public static setImageFromUrl(imageUrl: string): void
 
 
 	/**

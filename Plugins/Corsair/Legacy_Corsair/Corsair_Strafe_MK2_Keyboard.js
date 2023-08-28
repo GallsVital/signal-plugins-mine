@@ -117,35 +117,14 @@ function sendPacketString(string, size){
 	device.write(packet, size);
 }
 
-export function Shutdown() {
-	const red = [144];
-	const green = [144];
-	const blue = [144];
+export function Shutdown(SystemSuspending) {
 
-
-	for(let iIdx = 0; iIdx < vKeys.length; iIdx++) {
-		const iPxX = vKeyPositions[iIdx][0];
-		const iPxY = vKeyPositions[iIdx][1];
-		const mxPxColor = device.color(iPxX, iPxY);
-		red[vKeys[iIdx]] = 255;
-		green[vKeys[iIdx]] = 0;
-		blue[vKeys[iIdx]] = 0;
+	if(SystemSuspending){
+		sendColors("#000000"); // Go Dark on System Sleep/Shutdown
+	}else{
+		sendColors(shutdownColor);
 	}
 
-	StreamPacket(1, 60, red.splice(0, 60));
-	StreamPacket(2, 60, red.splice(0, 60));
-	StreamPacket(3, 24, red.splice(0, 24));
-	SubmitKbColors(1, 3, 1);
-
-	StreamPacket(1, 60, green.splice(0, 60));
-	StreamPacket(2, 60, green.splice(0, 60));
-	StreamPacket(3, 24, green.splice(0, 24));
-	SubmitKbColors(2, 3, 1);
-
-	StreamPacket(1, 60, blue.splice(0, 60));
-	StreamPacket(2, 60, blue.splice(0, 60));
-	StreamPacket(3, 24, blue.splice(0, 24));
-	SubmitKbColors(3, 3, 2);
 }
 
 
@@ -177,7 +156,7 @@ function SubmitKbColors(color_channel, packet_count, finish_val) {
 }
 
 
-var vKeys = [
+const vKeys = [
 	125, 137, 8,                       47, 59,                               20,    // Special key row.
 	0,     12, 24, 36, 48,     60, 72, 84, 96,     108, 120, 132, 6,     18, 30, 42,    32, 44, 56,  68,  //20
 	1,   13, 25, 37, 49, 61, 73, 85, 97, 109, 121, 133, 7,       31,     54, 66, 78,    80, 92, 104, 116, //21
@@ -203,7 +182,7 @@ const vKeyNames = [
 
 // This array must be the same length as vKeys[], and represents the pixel color position in our pixel matrix that we reference.  For example,
 // item at index 3 [9,0] represents the corsair logo, and the render routine will grab its color from [9,0].
-var vKeyPositions = [
+const vKeyPositions = [
 	[1, 0], [2, 0], [3, 0],                                    [8, 0], [9, 0],                                                             [17, 0],   // Logo & specialkey row.
 	[0, 1], [1, 1], [2, 1], [3, 1], [4, 1], [5, 1], [6, 1], [7, 1], [8, 1], [9, 1], [10, 1], [11, 1],         [13, 1],   [14, 1], [15, 1], [16, 1],   [17, 1], [18, 1], [19, 1], [20, 1], //20
 	[0, 2], [1, 2], [2, 2], [3, 2], [4, 2], [5, 2], [6, 2], [7, 2], [8, 2], [9, 2], [10, 2], [11, 2], [12, 2], [13, 2],   [14, 2], [15, 2], [16, 2],   [17, 2], [18, 2], [19, 2], [20, 2], //21
@@ -228,7 +207,7 @@ export function Render() {
 	sendColors();
 }
 
-function sendColors(shutdown = false){
+function sendColors(overrideColor){
 
 	const red = [144];
 	const green = [144];
@@ -240,8 +219,8 @@ function sendColors(shutdown = false){
 		const iPxY = vKeyPositions[iIdx][1];
 		var mxPxColor;
 
-		if(shutdown){
-			mxPxColor = hexToRgb(shutdownColor);
+		if(overrideColor){
+			mxPxColor = hexToRgb(overrideColor);
 		}else if (LightingMode === "Forced") {
 			mxPxColor = hexToRgb(forcedColor);
 		}else{

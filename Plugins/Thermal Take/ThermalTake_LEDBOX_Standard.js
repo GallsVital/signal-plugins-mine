@@ -1,6 +1,6 @@
 export function Name() { return "ThermalTake LedBox"; }
 export function VendorId() { return 0x264A; }
-export function ProductId() { return [0x2260, 0x2261, 0x2262, 0x2263, 0x2264, 0x2265, 0x2266, 0x2267, 0x226f, 0x232B, 0x232C, 0x232D ]; }
+export function ProductId() { return [0x2260, 0x2261, 0x2262, 0x2263, 0x2264, 0x2265, 0x2266, 0x2267, 0x2268, 0x226f, 0x232B, 0x232C, 0x232D ]; }
 export function Publisher() { return "WhirlwindFX"; }
 export function Size() { return [1, 1]; }
 export function Type() { return "Hid"; }
@@ -21,14 +21,14 @@ export function SubdeviceController(){ return true; }
 const DeviceMaxLedLimit = 54 * 5 ;
 
 //Channel Name, Led Limit
+/** @type {ChannelConfigArray} */
 const ChannelArray =
 [
-	["Channel 1", 54],
-	["Channel 2", 54],
-	["Channel 3", 54],
-	["Channel 4", 54],
-	["Channel 5", 54],
-
+	["Channel 1", 54, 54],
+	["Channel 2", 54, 54],
+	["Channel 3", 54, 54],
+	["Channel 4", 54, 54],
+	["Channel 5", 54, 54],
 ];
 
 const ConnectedFans = [];
@@ -50,26 +50,39 @@ export function Render() {
 	PollFans();
 }
 
-export function Shutdown() {
-	device.pause(2000);
-	//Device Reverts to Hardware Mode.
+export function Shutdown(SystemSuspending) {
+
+	if(SystemSuspending){
+		for(let channel = 0; channel < 5; channel++) {
+			Sendchannel(channel, "#000000"); // Go Dark on System Sleep/Shutdown
+		}
+	}else{
+		device.pause(2000);
+	}
+
 }
 
 function SetupChannels() {
 	device.SetLedLimit(DeviceMaxLedLimit);
 
 	for(let i = 0; i < ChannelArray.length; i++) {
-		device.addChannel(ChannelArray[i][0], ChannelArray[i][1]);
+		const channelInfo = ChannelArray[i];
+
+		if(channelInfo){
+			device.addChannel(...channelInfo);
+		}
 	}
 }
 
-function Sendchannel(Channel) {
+function Sendchannel(Channel, overrideColor) {
 	let ChannelLedCount = device.channel(ChannelArray[Channel][0]).LedCount();
 	const componentChannel = device.channel(ChannelArray[Channel][0]);
 
 	let RGBData = [];
 
-	if(LightingMode === "Forced") {
+	if(overrideColor){
+		RGBData = device.createColorArray(overrideColor, ChannelLedCount, "Inline", "GRB");
+	}else if(LightingMode === "Forced") {
 		RGBData = device.createColorArray(forcedColor, ChannelLedCount, "Inline", "GRB");
 
 	} else if(componentChannel.shouldPulseColors()) {
@@ -164,7 +177,7 @@ function readFanRPM(channel) {
 }
 
 export function Validate(endpoint) {
-	return endpoint.interface === -1;
+	return endpoint.interface === -1 || endpoint.interface === 0;
 }
 
 export function Image() {

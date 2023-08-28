@@ -42,7 +42,11 @@ function SetupChannels() {
 	device.SetLedLimit(DeviceMaxLedLimit);
 
 	for(let i = 0; i < ChannelArray.length; i++) {
-		device.addChannel(ChannelArray[i][0], ChannelArray[i][1]);
+		const channelInfo = ChannelArray[i];
+
+		if(channelInfo){
+			device.addChannel(...channelInfo);
+		}
 	}
 }
 
@@ -56,8 +60,8 @@ const DeviceMaxLedLimit = 264;
 //Channel Name, Led Limit
 /** @type {ChannelConfig[]}  */
 const ChannelArray = [
-	["4 pin Ports", 204],
-	["3 Pin Lighting Channel", 128],
+	["4 pin Ports", 204, 204],
+	["3 Pin Lighting Channel", 128, 60],
 ];
 
 const FanControllerArray = [

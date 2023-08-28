@@ -5,6 +5,31 @@ Item {
 		height: parent.height
 		Column {
 			width: 450
+			height: 105
+			Rectangle {
+				width: parent.width
+				height: parent.height - 10
+				color: "#333bff"
+				radius: 5
+				Column {
+					x: 10
+					y: 10
+					width: parent.width - 20
+					spacing: 0
+					Text {
+						color: theme.primarytextcolor
+						textFormat: Text.RichText
+						text: "<table><tr><td width=\"24\" style=\"text-align:center;vertical-align:middle\"><img src=\"https://raw.githubusercontent.com/SRGBmods/public/main/images/wled/info-circle-fill.png\"></style></td><td><u><strong>Important:<strong></u><br>this service <strong>ONLY</strong> works for devices<br><strong>based on ESP8266 / ESP8285 / ESP32 micro controllers</strong><br><strong>flashed with <style>a:link { color: \"#FFFFFF\"; }</style><a href=\"https://kno.wled.ge/\">WLED firmware</a></strong>!</td></tr></table>"
+						onLinkActivated: Qt.openUrlExternally(link)
+						font.pixelSize: 12
+						font.family: "Poppins"
+						font.bold: false
+					}
+				}
+			}
+		}
+		Column {
+			width: 450
 			height: 115
 			Rectangle {
 				width: parent.width
@@ -126,7 +151,7 @@ Item {
 			id: controllerList
 			model: service.controllers   
 			width: contentItem.childrenRect.width + (controllerListScrollBar.width * 1.5)
-			height: parent.height - 150
+			height: parent.height - 265
 			clip: true
 
 			ScrollBar.vertical: ScrollBar {
