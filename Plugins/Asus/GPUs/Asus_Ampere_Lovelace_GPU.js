@@ -74,9 +74,15 @@ export function Render() {
 	sendColors();
 }
 
-export function Shutdown() {
-	AsusGPU.setDirectMode(0x00);
-	AsusGPU.setMode(AsusGPU.modes.rainbow);
+export function Shutdown(SystemSuspending) {
+
+	if(SystemSuspending){
+		sendColors("#000000"); // Go Dark on System Sleep/Shutdown
+	}else{
+		AsusGPU.setDirectMode(0x00);
+		AsusGPU.setMode(AsusGPU.modes.rainbow);
+	}
+
 }
 
 function SetGPUNameFromBusIds() {
@@ -93,7 +99,7 @@ function SetGPUNameFromBusIds() {
 
 let refreshColors = false;
 
-function sendColors(shutdown = false) {
+function sendColors(overrideColor) {
 
 	const RGBData = [];
 
@@ -102,8 +108,8 @@ function sendColors(shutdown = false) {
 		const iPxY = vLedPositions[iIdx][1];
 		let color;
 
-		if(shutdown) {
-			color = hexToRgb(shutdownColor);
+		if(overrideColor) {
+			color = hexToRgb(overrideColor);
 		} else if (LightingMode === "Forced") {
 			color = hexToRgb(forcedColor);
 		} else {

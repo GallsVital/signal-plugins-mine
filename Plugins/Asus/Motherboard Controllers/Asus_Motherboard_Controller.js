@@ -167,21 +167,38 @@ export function Initialize() {
 
 }
 
+export function Shutdown(SystemSuspending) {
 
-export function Shutdown() {
-	SendMainBoardLeds(true);
+	if(SystemSuspending){
+		SendMainBoardLeds("#000000"); // Go Dark on System Sleep/Shutdown
 
-	if(DeviceInfo.PolymoSupport) {
-		sendPolymoColors(true);
+		if(DeviceInfo.PolymoSupport) {
+			sendPolymoColors("#000000");
 
-		for(let channel = 0; channel < DeviceInfo.ARGBChannelCount; channel++){
-			SendARGBChannel(channel, true, true);
+			for(let channel = 0; channel < DeviceInfo.ARGBChannelCount; channel++){
+				SendARGBChannel(channel, true, "#000000");
+			}
+		} else {
+			for(let channel = 0; channel < DeviceInfo.ARGBChannelCount; channel++){
+				SendARGBChannel(channel, false, "#000000");
+			}
 		}
-	} else {
-		for(let channel = 0; channel < DeviceInfo.ARGBChannelCount; channel++){
-			SendARGBChannel(channel, false, true);
+	}else{
+		SendMainBoardLeds(shutdownColor);
+
+		if(DeviceInfo.PolymoSupport) {
+			sendPolymoColors(shutdownColor);
+
+			for(let channel = 0; channel < DeviceInfo.ARGBChannelCount; channel++){
+				SendARGBChannel(channel, true, shutdownColor);
+			}
+		} else {
+			for(let channel = 0; channel < DeviceInfo.ARGBChannelCount; channel++){
+				SendARGBChannel(channel, false, shutdownColor);
+			}
 		}
 	}
+
 }
 
 export function Render() {
@@ -216,7 +233,7 @@ function CreatePolymoSubdevice() {
 	}
 }
 
-function sendPolymoColors(shutdown = false) {
+function sendPolymoColors(overrideColor) {
 	const RGBData = [];
 
 	for(let polymoLEDs = 0; polymoLEDs < polymoDevice.Positions.length; polymoLEDs++) {
@@ -224,8 +241,8 @@ function sendPolymoColors(shutdown = false) {
 		const iY = polymoDevice.Positions[polymoLEDs][1];
 		let color;
 
-		if(shutdown) {
-			color = hexToRgb(shutdownColor);
+		if(overrideColor) {
+			color = hexToRgb(overrideColor);
 		} else if (LightingMode == "Forced") {
 			color = hexToRgb(forcedColor);
 		} else {
@@ -287,12 +304,12 @@ function Create12vHeaders(){
 }
 
 
-function SendMainBoardLeds(shutdown = false) {
+function SendMainBoardLeds(overrideColor) {
 	//Fetch Mainboard RGB Info
-	let [RGBData, TotalLedCount] = FetchMainBoardColors(shutdown);
+	let [RGBData, TotalLedCount] = FetchMainBoardColors(overrideColor);
 
 	//Fetch 12v Header RGB Info
-	const [HeaderRGBData, HeaderLedCount] = Fetch12VHeaderColors(shutdown);
+	const [HeaderRGBData, HeaderLedCount] = Fetch12VHeaderColors(overrideColor);
 
 	// Append 12v Header Info, Both are sent together with 12v Headers always at the end of the Mainboard LEDS
 	RGBData.push(...HeaderRGBData);
@@ -303,7 +320,7 @@ function SendMainBoardLeds(shutdown = false) {
 }
 
 
-function FetchMainBoardColors(shutdown = false){
+function FetchMainBoardColors(overrideColor){
 	const RGBData = [];
 	let TotalLedCount = 0;
 
@@ -312,8 +329,8 @@ function FetchMainBoardColors(shutdown = false){
 		const iPxY = vLedPositions[iIdx][1];
 		let col;
 
-		if(shutdown){
-			col = hexToRgb(shutdownColor);
+		if(overrideColor){
+			col = hexToRgb(overrideColor);
 		}else if (LightingMode === "Forced") {
 			col = hexToRgb(forcedColor);
 		}else{
@@ -331,15 +348,15 @@ function FetchMainBoardColors(shutdown = false){
 }
 
 
-function Fetch12VHeaderColors(shutdown = false){
+function Fetch12VHeaderColors(overrideColor){
 	const RGBData = [];
 	let TotalLedCount = 0;
 
 	for(let iIdx = 0; iIdx < DeviceInfo.RGBHeaderCount; iIdx++) {
 		let col;
 
-		if(shutdown){
-			col = hexToRgb(shutdownColor);
+		if(overrideColor){
+			col = hexToRgb(overrideColor);
 		}else if (LightingMode === "Forced") {
 			col = hexToRgb(forcedColor);
 		}else{
@@ -355,7 +372,7 @@ function Fetch12VHeaderColors(shutdown = false){
 	return [RGBData, TotalLedCount];
 }
 
-function SendARGBChannel(ChannelIdx, polymo = false, shutdown = false) {
+function SendARGBChannel(ChannelIdx, polymo = false, overrideColor) {
 	//Fetch Colors
 	let ChannelLedCount = device.channel(ChannelArray[ChannelIdx][0]).LedCount();
 	const componentChannel = device.channel(ChannelArray[ChannelIdx][0]);
@@ -371,8 +388,8 @@ function SendARGBChannel(ChannelIdx, polymo = false, shutdown = false) {
 		const pulseColor = device.getChannelPulseColor(ChannelArray[ChannelIdx][0], ChannelLedCount);
 		RGBData = device.createColorArray(pulseColor, ChannelLedCount, "Inline", RGBconfig);
 
-	}else if(shutdown){
-		RGBData = device.createColorArray(shutdownColor, ChannelLedCount, "Inline", RGBconfig);
+	}else if(overrideColor){
+		RGBData = device.createColorArray(overrideColor, ChannelLedCount, "Inline", RGBconfig);
 	}else{
 		RGBData = device.channel(ChannelArray[ChannelIdx][0]).getColors("Inline", RGBconfig);
 	}

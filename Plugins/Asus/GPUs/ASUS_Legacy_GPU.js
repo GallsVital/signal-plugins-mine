@@ -77,7 +77,7 @@ export function Initialize() {
 }
 
 export function Render() {
-	SendRGB();
+	sendColors();
 
 	PollHardwareModes();
 	// Mimic old Refresh Speed. Noticing slight color blending going from Blue to Red where a Purple color gets flashed
@@ -87,9 +87,14 @@ export function Render() {
 	//device.log(`Saved: [${savedPackets}] Sent: [${sentPackets}]`);
 }
 
+export function Shutdown(SystemSuspending) {
 
-export function Shutdown() {
-	ASUSLegacy.SetMode(ASUSLegacy.modes.colorCycle);
+	if(SystemSuspending){
+		sendColors("#000000"); // Go Dark on System Sleep/Shutdown
+	}else{
+		ASUSLegacy.SetMode(ASUSLegacy.modes.colorCycle);
+
+	}
 
 }
 
@@ -120,12 +125,12 @@ function CompareArrays(array1, array2){
 
 let OldRGB = [];
 
-function SendRGB(shutdown = false){
+function sendColors(overrideColor){
 
 	let Color;
 
-	if(shutdown){
-		Color = hexToRgb(shutdownColor);
+	if(overrideColor){
+		Color = hexToRgb(overrideColor);
 	}else if(LightingMode === "Forced") {
 		Color = hexToRgb(forcedColor);
 	} else {

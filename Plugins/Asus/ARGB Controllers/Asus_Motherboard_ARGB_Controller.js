@@ -68,7 +68,7 @@ function SetMotherboardName(){
 	}
 }
 
-function Sendchannel(Channel, shutdown = false) {
+function Sendchannel(Channel, overrideColor) {
 	let ChannelLedCount = device.channel(ChannelArray[Channel][0]).LedCount();
 	const componentChannel = device.channel(ChannelArray[Channel][0]);
 
@@ -83,8 +83,8 @@ function Sendchannel(Channel, shutdown = false) {
 		const pulseColor = device.getChannelPulseColor(ChannelArray[Channel][0]);
 		RGBData = device.createColorArray(pulseColor, ChannelLedCount, "Inline");
 
-	}else if(shutdown){
-		RGBData = device.createColorArray(shutdownColor, ChannelLedCount, "Inline");
+	}else if(overrideColor){
+		RGBData = device.createColorArray(overrideColor, ChannelLedCount, "Inline");
 	}else{
 		RGBData = device.channel(ChannelArray[Channel][0]).getColors("Inline");
 	}
@@ -120,6 +120,20 @@ export function Render() {
 	for(let channel = 0; channel < channelCount; channel++){
 		Sendchannel(channel);
 	}
+}
+
+export function Shutdown(SystemSuspending) {
+
+	if(SystemSuspending){
+		for(let channel = 0; channel < channelCount; channel++){
+			Sendchannel(channel, "#000000"); // Go Dark on System Sleep/Shutdown
+		}
+	}else{
+		for(let channel = 0; channel < channelCount; channel++){
+			Sendchannel(channel, shutdownColor);
+		}
+	}
+
 }
 
 function sendDirectPacket(channel, start, count, data){
@@ -178,10 +192,6 @@ function RequestConfig(){
 	device.log(`ARGB channel Count ${channelCount} `);
 }
 
-export function Shutdown() {
-
-}
-
 function sendPacketString(string, size){
 	const packet= [];
 	const data = string.split(' ');
@@ -199,5 +209,5 @@ export function Validate(endpoint) {
 }
 
 export function ImageUrl() {
-	return "https://marketplace.signalrgb.com/devices/default/motherboard.png";
+	return "https://marketplace.signalrgb.com/devices/brands/asus/motherboards/motherboard.png";
 }
