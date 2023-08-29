@@ -30,12 +30,6 @@ function hexToRgb(hex) {
 	return colors;
 }
 
-export function Initialize() {
-}
-
-export function Shutdown() {
-}
-
 const vKeyNames = [
 	"Scroll Wheel", "Logo", "Front Zone", "Front Zone 2", "Front Zone 3",
 ];
@@ -52,12 +46,27 @@ export function LedPositions() {
 	return vKeyPositions;
 }
 
+export function Initialize() {
+}
+
 export function Render() {
 	sendColors(4, 5);
 	sendColors(5, 0);
 }
 
-function sendColors(zone, zone2, shutdown = false){
+export function Shutdown(SystemSuspending) {
+
+	if(SystemSuspending){
+		sendColors(4, 5, "#000000"); // Go Dark on System Sleep/Shutdown
+		sendColors(5, 0, "#000000");
+	}else{
+		sendColors(4, 5, shutdownColor);
+		sendColors(5, 0, shutdownColor);
+	}
+
+}
+
+function sendColors(zone, zone2, overrideColor){
 
 	const packet = [];
 	packet[0] = 0x00;
@@ -72,8 +81,8 @@ function sendColors(zone, zone2, shutdown = false){
 		const iPxY = vKeyPositions[iIdx][1];
 		var color;
 
-		if(shutdown) {
-			color = hexToRgb(shutdownColor);
+		if(overrideColor) {
+			color = hexToRgb(overrideColor);
 		} else if (LightingMode === "Forced") {
 			color = hexToRgb(forcedColor);
 		} else {
