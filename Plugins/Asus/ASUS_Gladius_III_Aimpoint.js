@@ -91,8 +91,14 @@ export function Render() {
 	sendColors();
 }
 
-export function Shutdown() {
-	sendColors(true);
+export function Shutdown(SystemSuspending) {
+
+	if(SystemSuspending){
+		sendColors("#000000"); // Go Dark on System Sleep/Shutdown
+	}else{
+		sendColors(shutdownColor);
+	}
+
 }
 
 export function ondpi1Changed() {
@@ -158,7 +164,7 @@ function directLightingMode() {
 	packet = [0x00, 0x51, 0x29, 0xff]; //Direct Lighting Packets
 }
 
-function sendColors(shutdown = false) {
+function sendColors(overrideColor) {
 	const RGBData = [];
 
 	for(let iIdx = 0; iIdx < vKeyPositions.length; iIdx++) {
@@ -166,8 +172,8 @@ function sendColors(shutdown = false) {
 		const iPxY = vKeyPositions[iIdx][1];
 		let color;
 
-		if(shutdown) {
-			color = hexToRgb(shutdownColor);
+		if(overrideColor) {
+			color = hexToRgb(overrideColor);
 		} else if (LightingMode === "Forced") {
 			color = hexToRgb(forcedColor);
 		} else {

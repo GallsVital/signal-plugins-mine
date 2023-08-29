@@ -54,23 +54,6 @@ function hexToRgb(hex) {
 	return colors;
 }
 
-export function Initialize() {
-	//Direct mode init?
-//  51 2C 02 00 19 64 00 FF FF 00 00 00 00 00 00 00 00 00 70 05 FE FF FF FF F4 D9 8D 01 52 04 D4 75 7C 2A 50 77 90 E1 D4 75 98 06 00 00 00 00
-// 00 00 1C DA 8D 01 96 CC 8B 70 98 06 00 00 A6 CC 8B 70
-// if(SettingControl){
-//     sendMouseSettings();
-// }
-}
-
-
-export function Shutdown() {
-// revert to rainbow mode
-//sendPacketString("00 51 2C 04 00 48 64 00 00 02 07 0E F5 00 FF 1D 00 06 FF 2B 00 FA FF 39 01 FF 00 48 FF F6 00 56 FF 78 07 64 FF 00 0D",65);
-//sendPacketString("00 50 55",65);
-}
-
-
 const vKeyNames = [
 	"Scroll Wheel", "Logo", "Underglow"
 
@@ -90,21 +73,32 @@ export function LedPositions() {
 	return vKeyPositions;
 }
 
-export function Render() {
-	sendColors(0);
-	sendColors(1);
-	sendColors(2);
-	// if((savedDpi1 != dpi1 ||
-	//     savedDpi2 != dpi2 ||
-	//     savedAngleSnapping != angleSnapping ||
-	//     savedPollingRate != pollingDict[mousePolling] ||
-	//     savedMouseResponse != responseDict[mouseResponse]) &&
-	//     SettingControl){
-	//         sendMouseSettings();
-	// }
+export function Initialize() {
+
 }
 
-function sendColors(zone, shutdown = false){
+export function Render() {
+	for(let i = 0; i < 3; i++){
+		sendColors(i);
+	}
+}
+
+export function Shutdown(SystemSuspending) {
+
+	if(SystemSuspending){
+		// Go Dark on System Sleep/Shutdown
+		for(let i = 0; i < 3; i++){
+			sendColors(i, "#000000");
+		}
+	}else{
+		for(let i = 0; i < 3; i++){
+			sendColors(i, shutdownColor);
+		}
+	}
+
+}
+
+function sendColors(zone, overrideColor){
 
 	const packet = [];
 	packet[0] = 0x00;
@@ -119,8 +113,8 @@ function sendColors(zone, shutdown = false){
 	const iPxY = vKeyPositions[zone][1];
 	let col;
 
-	if(shutdown){
-		col = hexToRgb(shutdownColor);
+	if(overrideColor){
+		col = hexToRgb(overrideColor);
 	}else if (LightingMode === "Forced") {
 		col = hexToRgb(forcedColor);
 	}else{
@@ -156,18 +150,6 @@ function sendColors(zone, shutdown = false){
 
 export function Validate(endpoint) {
 	return endpoint.interface === 2;
-}
-
-function sendPacketString(string, size){
-
-	const packet= [];
-	const data = string.split(' ');
-
-	for(let i = 0; i < data.length; i++){
-		packet[i] =parseInt(data[i], 16);//.toString(16)
-	}
-
-	device.write(packet, size);
 }
 
 export function ImageUrl() {
