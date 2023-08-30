@@ -55,15 +55,10 @@ export function Render() {
 }
 
 export function Shutdown(SystemSuspending) {
-
-	if(SystemSuspending){
-		sendColors(4, 5, "#000000"); // Go Dark on System Sleep/Shutdown
-		sendColors(5, 0, "#000000");
-	}else{
-		sendColors(4, 5, shutdownColor);
-		sendColors(5, 0, shutdownColor);
-	}
-
+	// Go Dark on System Sleep/Shutdown
+	const color = SystemSuspending ? "#000000" : shutdownColor;
+	sendColors(4, 5, color);
+	sendColors(5, 0, color);
 }
 
 function sendColors(zone, zone2, overrideColor){
