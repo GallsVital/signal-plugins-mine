@@ -145,7 +145,7 @@ function SendChannel(Channel, GEN2 = false, overrideColor) {
 	} else if(componentChannel.shouldPulseColors()) {
 		ChannelLedCount = GEN2 ? Gen2ChLedLimit : Gen1ChLedLimit;
 
-		const pulseColor = device.getChannelPulseColor(ChannelArray[Channel], ChannelLedCount);
+		const pulseColor = device.getChannelPulseColor(ChannelArray[Channel]);
 		RGBData = device.createColorArray(pulseColor, ChannelLedCount, "Inline");
 	} else {
 		RGBData = componentChannel.getColors("Inline");
