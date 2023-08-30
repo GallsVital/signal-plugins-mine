@@ -60,11 +60,17 @@ export function Initialize() {
 }
 
 export function Render() {
-	SendColors();
+	sendColors();
 }
 
-export function Shutdown() {
-	SendColors(true);
+export function Shutdown(SystemSuspending) {
+
+	if(SystemSuspending){
+		sendColors("#000000"); // Go Dark on System Sleep/Shutdown
+	}else{
+		sendColors(shutdownColor);
+	}
+
 }
 
 function MagicStartupPacket() {
@@ -77,7 +83,7 @@ function MagicStartupPacket() {
 	device.write([0x00, 0x43, 0x00, 0x00, 0x00, 0x01], 65);
 }
 
-function SendColors(shutdown = false){
+function sendColors(overrideColor){
 	const packet = [];
 	packet[1] = 0x56;
 	packet[2] = 0x83;
@@ -97,8 +103,8 @@ function SendColors(shutdown = false){
 		const iPxY = vLedPositions[iIdx][1];
 		let mxPxColor;
 
-		if(shutdown){
-			mxPxColor = hexToRgb(shutdownColor);
+		if(overrideColor){
+			mxPxColor = hexToRgb(overrideColor);
 		}else if (LightingMode === "Forced") {
 			mxPxColor = hexToRgb(forcedColor);
 		}else{
