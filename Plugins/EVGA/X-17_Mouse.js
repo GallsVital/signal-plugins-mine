@@ -43,17 +43,12 @@ export function Render() {
 
 export function Shutdown(SystemSuspending) {
 
-	if(SystemSuspending){
-		sendColors(1, "#000000");
-		sendColors(2, "#000000");
-		Apply(1);
-		Apply(2);
-	}else{
-		sendColors(1, shutdownColor);
-		sendColors(2, shutdownColor);
-		Apply(1);
-		Apply(2);
-	}
+	const color = SystemSuspending ? "#000000" : shutdownColor;
+
+	sendColors(1, color);
+	sendColors(2, color);
+	Apply(1);
+	Apply(2);
 
 }
 
