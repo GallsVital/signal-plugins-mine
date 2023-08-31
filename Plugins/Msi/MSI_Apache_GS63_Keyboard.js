@@ -44,11 +44,11 @@ export function Render() {
 }
 
 export function Shutdown(SystemSuspending) {
-	if(SystemSuspending){
-		sendColors("#000000"); // Go Dark on System Sleep/Shutdown
-	}else{
-		sendColors(shutdownColor);
-	}
+
+	const color = SystemSuspending ? "#000000" : shutdownColor;
+
+	sendColors(color); // Go Dark on System Sleep/Shutdown
+
 }
 
 function sendColors(overrideColor) {

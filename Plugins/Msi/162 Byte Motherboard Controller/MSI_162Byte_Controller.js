@@ -1,10 +1,8 @@
-
-
-export function Name() { return "MSI B450 GAMING PRO CARBON AC (162 Byte)"; }
+export function Name() { return "MSI Mystic Light Controller (162 Byte)"; }
 export function VendorId() { return 0x1462; }
 export function Documentation(){ return "troubleshooting/msi"; }
 // DO NOT PID SWAP THIS IF YOU DONT KNOW WHAT YOUR DOING
-export function ProductId() { return 0x7B85;}
+export function ProductId() { return [0x1720, 0x7B17, 0x7B18, 0x7B85, 0xB926];}
 // YOU CAN BRICK THESE MOTHERBOARDS RGB CONTROLLER WITH ONE WRONG PACKET
 export function Publisher() { return "LIGHTVORTEX"; }
 export function Size() { return [10, 1]; }
@@ -207,11 +205,11 @@ function SetMainboardLeds(overrideColor) {
 	for(let iIdx = 0; iIdx < vLedMap.length; iIdx++) {
 		const iPxX = vLedPositions[iIdx][0];
 		const iPxY = vLedPositions[iIdx][1];
-		var col;
+		let col;
 
 		if(overrideColor){
 			col = hexToRgb(overrideColor);
-		}else if (LightingMode === "Forced") {
+		}else if (LightingMode == "Forced") {
 			col = hexToRgb(forcedColor);
 		}else{
 			col = device.color(iPxX, iPxY);
@@ -224,11 +222,11 @@ function SetMainboardLeds(overrideColor) {
 function SetRGBHeaderLeds(overrideColor){
 
 	for(let iIdx = 0; iIdx < HeaderArray.length; iIdx++) {
-		var col;
+		let col;
 
 		if(overrideColor){
 			col = hexToRgb(overrideColor);
-		}else if (LightingMode === "Forced") {
+		}else if (LightingMode == "Forced") {
 			col = hexToRgb(forcedColor);
 		}else{
 			col = device.subdeviceColor(HeaderArray[iIdx], 1, 1);
@@ -238,13 +236,13 @@ function SetRGBHeaderLeds(overrideColor){
 	}
 }
 
-function  SetARGBHeaderLeds(overrideColor){
+function SetARGBHeaderLeds(overrideColor){
 	for(let iIdx = 0; iIdx < ARGBHeaderArray.length; iIdx++){
-		var col;
+		let col;
 
 		if(overrideColor){
 			col = hexToRgb(overrideColor);
-		}else if (LightingMode === "Forced") {
+		}else if (LightingMode == "Forced") {
 			col = hexToRgb(forcedColor);
 		}else{
 			col = device.subdeviceColor(ARGBHeaderArray[iIdx], 1, 1);
@@ -253,7 +251,9 @@ function  SetARGBHeaderLeds(overrideColor){
 		SetZoneColor(configPacket, ARGBHeaderDict[iIdx], col);
 	}
 }
-var configPacket = initialPacket.slice();
+
+const configPacket = initialPacket.slice();
+
 export function Render() {
 	if(CheckPacketLength() != 162){
 		device.log("PACKET LENGTH ERROR. ABORTING RENDERING");
@@ -262,18 +262,14 @@ export function Render() {
 	}
 
 	SetMainboardLeds();
-
 	SetRGBHeaderLeds();
-
 	SetARGBHeaderLeds();
-
 	//LogPacket(configPacket)
 	device.log(configPacket);
 	device.send_report(configPacket, 162);
 
 	device.pause(30);
 }
-
 
 export function Shutdown(SystemSuspending) {
 	if(CheckPacketLength() != 162){
@@ -282,19 +278,13 @@ export function Shutdown(SystemSuspending) {
 		return;
 	}
 
-	if(SystemSuspending){
-		SetMainboardLeds("#000000"); // Go Dark on System Sleep/Shutdown
-		SetRGBHeaderLeds("#000000");
-		SetARGBHeaderLeds("#000000");
-		device.log(configPacket);
-		device.send_report(configPacket, 162);
-	}else{
-		SetMainboardLeds(shutdownColor);
-		SetRGBHeaderLeds(shutdownColor);
-		SetARGBHeaderLeds(shutdownColor);
-		device.log(configPacket);
-		device.send_report(configPacket, 162);
-	}
+	const color = SystemSuspending ? "#000000" : shutdownColor;
+
+	SetMainboardLeds(color); // Go Dark on System Sleep/Shutdown
+	SetRGBHeaderLeds(color);
+	SetARGBHeaderLeds(color);
+	device.log(configPacket);
+	device.send_report(configPacket, 162);
 
 }
 

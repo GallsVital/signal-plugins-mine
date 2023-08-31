@@ -161,11 +161,9 @@ export function Initialize() {
 
 export function Shutdown(SystemSuspending) {
 
-	if(SystemSuspending){
-		sendSubDevice("#000000"); // Go Dark on System Sleep/Shutdown
-	}else{
-		sendSubDevice(shutdownColor);
-	}
+	const color = SystemSuspending ? "#000000" : shutdownColor;
+
+	sendSubDevice(color); // Go Dark on System Sleep/Shutdown
 
 }
 

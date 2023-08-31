@@ -71,11 +71,9 @@ export function Render() {
 
 export function Shutdown(SystemSuspending) {
 
-	if(SystemSuspending){
-		MSIMotherboard.choosePacketSendType("#000000"); // Go Dark on System Sleep/Shutdown
-	}else{
-		MSIMotherboard.choosePacketSendType(shutdownColor);
-	}
+	const color = SystemSuspending ? "#000000" : shutdownColor;
+
+	MSIMotherboard.choosePacketSendType(color); // Go Dark on System Sleep/Shutdown
 
 }
 
