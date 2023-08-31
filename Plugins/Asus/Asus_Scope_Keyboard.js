@@ -24,7 +24,7 @@ export function Initialize() {
 }
 
 export function Render() {
-	//ASUS.sendColors();
+	ASUS.sendColors();
 }
 
 export function Shutdown(SystemSuspending) {
@@ -43,7 +43,7 @@ export class ASUS_Mouse_Protocol {
 		this.Config = {
 			DeviceProductID: 0x0000,
 			DeviceName: "Asus Scope",
-			DeviceEndpoint: { "interface": 0, "usage": 0x0001, "usage_page": 0xFF01, "collection": 0x0000 },
+			DeviceEndpoint: { "interface": 1, "usage": 0x0001, "usage_page": 0xFF00, "collection": 0x0000 },
 			Leds: [],
 			LedNames: [],
 			LedPositions: [],
@@ -88,7 +88,6 @@ export class ASUS_Mouse_Protocol {
 		device.setControllableLeds(this.getLedNames(), this.getLedPositions());
 		device.setImageFromUrl(this.getDeviceImage(this.getDeviceName()));
 		device.set_endpoint(DeviceProperties.endpoint[`interface`], DeviceProperties.endpoint[`usage`], DeviceProperties.endpoint[`usage_page`], DeviceProperties.endpoint[`collection`]);
-
 	}
 
 	sendColors(overrideColor) {
@@ -143,7 +142,7 @@ export class deviceLibrary {
 			0x19D0: "ROG Strix Scope TKL", // Moonlight White
 			0x1951: "ROG Strix Scope RX",
 			0x1A05: "ROG Strix Scope RX", // Deluxe
-			0x1AAE: "ROG Strix Scope II 96"
+			0x1AAE: "ROG Strix Scope II 96" // Wired
 		};
 
 		this.LEDLibrary	=	{
@@ -174,7 +173,7 @@ export class deviceLibrary {
 					[0, 4],      [1, 4], [2, 4], [3, 4], [4, 4], [5, 4], [6, 4], [7, 4], [8, 4], [9, 4], [10, 4],               [13, 4],           [15, 4],           [17, 4], [18, 4], [19, 4], [20, 4], // 17
 					[0, 5], [1, 5], [2, 5],                      [6, 5],                        [10, 5], [11, 5],  [12, 5], [13, 5],    [14, 5], [15, 5], [16, 5],   [17, 5],         [19, 5],               // 13
 				],
-				endpoint : { "interface": 1, "usage": 0x0001, "usage_page": 0xFF01, "collection": 0x0000 },
+				endpoint : { "interface": 1, "usage": 0x0001, "usage_page": 0xFF00, "collection": 0x0000 },
 			},
 			"ROG Strix Scope TKL":
 			{
@@ -210,7 +209,7 @@ export class deviceLibrary {
 
 					[0, 6], [0, 6], [1, 6], [1, 6], [2, 6], [3, 6], [4, 6], [4, 6], [5, 6],  [5, 6], [6, 6], [7, 6], [7, 6], [8, 6], [9, 6], [9, 6], [10, 6], [11, 6], [11, 6], [12, 6], [13, 6], [13, 6], [14, 6], [15, 6], [16, 6], [16, 6]
 				],
-				endpoint : { "interface": 1, "usage": 0x0001, "usage_page": 0xFF01, "collection": 0x0000 },
+				endpoint : { "interface": 1, "usage": 0x0001, "usage_page": 0xFF00, "collection": 0x0000 },
 			},
 			"ROG Strix Scope RX":
 			{
@@ -239,7 +238,7 @@ export class deviceLibrary {
 					[0, 4],  [1, 4], [2, 4], [3, 4], [4, 4], [5, 4], [6, 4], [7, 4], [8, 4], [9, 4], [10, 4], [11, 4],       [13, 4],           [15, 4],           [17, 4], [18, 4], [19, 4], [20, 4], // 18
 					[0, 5], [1, 5], [2, 5],                      [6, 5],                        [10, 5], [11, 5],  [12, 5], [13, 5],    [14, 5], [15, 5], [16, 5],   [17, 5],         [19, 5],               // 13
 				],
-				endpoint : { "interface": 1, "usage": 0x0001, "usage_page": 0xFF01, "collection": 0x0000 },
+				endpoint : { "interface": 1, "usage": 0x0001, "usage_page": 0xFF00, "collection": 0x0000 },
 			},
 			"ROG Strix Scope II 96":
 			{
@@ -268,7 +267,7 @@ export class deviceLibrary {
 					[0, 4],      [1, 4], [2, 4], [3, 4], [4, 4], [5, 4], [6, 4], [7, 4], [8, 4], [9, 4], [10, 4],               [13, 4],           [15, 4],           [17, 4], [18, 4], [19, 4], [20, 4], // 17
 					[0, 5], [1, 5], [2, 5],                      [6, 5],                        [10, 5], [11, 5],  [12, 5], [13, 5],    [14, 5], [15, 5], [16, 5],   [17, 5],         [19, 5],               // 13
 				],
-				endpoint : { "interface": 1, "usage": 0x0001, "usage_page": 0xFF01, "collection": 0x0000 },
+				endpoint : { "interface": 1, "usage": 0x0001, "usage_page": 0xFF00, "collection": 0x0000 },
 			},
 		};
 
@@ -299,5 +298,5 @@ export function Validate(endpoint) {
 }
 
 export function ImageUrl() {
-	return "https://marketplace.signalrgb.com/devices/brands/asus/mice/chakram-standard.png";
+	return "https://marketplace.signalrgb.com/devices/brands/asus/keyboards/strix-scope-standard.png";
 }
