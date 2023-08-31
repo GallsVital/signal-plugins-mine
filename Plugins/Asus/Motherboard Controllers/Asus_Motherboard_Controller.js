@@ -369,7 +369,7 @@ function SendARGBChannel(ChannelIdx, polymo = false, shutdown = false) {
 	}else if(componentChannel.shouldPulseColors()){
 		ChannelLedCount = Device_PulseLedCount;
 
-		const pulseColor = device.getChannelPulseColor(ChannelArray[ChannelIdx][0], ChannelLedCount);
+		const pulseColor = device.getChannelPulseColor(ChannelArray[ChannelIdx][0]);
 		RGBData = device.createColorArray(pulseColor, ChannelLedCount, "Inline", RGBconfig);
 
 	}else if(shutdown){
