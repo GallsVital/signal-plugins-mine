@@ -93,7 +93,7 @@ export class ASUS_Mouse_Protocol {
 	sendColors(overrideColor) {
 
 		const deviceLeds = this.getLeds();
-		const RGBData = new Array(600).fill(255);
+		const RGBData = [];
 		let TotalLedCount = 144;
 		let packetCount = 0;
 
@@ -136,6 +136,7 @@ export class ASUS_Mouse_Protocol {
 export class deviceLibrary {
 	constructor(){
 		this.PIDLibrary	=	{
+			0x18F6: "ROG Strix Scope", // Wireless
 			0x18F8: "ROG Strix Scope",
 			0x190C: "ROG Strix Scope TKL",
 			0x1954: "ROG Strix Scope TKL", // Electro Punk
