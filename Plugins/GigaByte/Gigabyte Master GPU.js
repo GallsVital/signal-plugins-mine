@@ -237,7 +237,7 @@ class GigabyteMasterProtocol {
 					3: {Names : [ "Logo" ], Positions : [ [3, 1] ], Mapping : [ 0 ]}
 				}
 			},
-			0x40bf :
+			0x40BF : // 4090 Gaming OC
 			{
 				Size: [5, 3],
 				modeZones : [0], //This is an odd card all the way around.
@@ -247,6 +247,24 @@ class GigabyteMasterProtocol {
 					//1: {Names : [ ], Positions : [ ], Mapping : [ ]},
 					//2: {Names : [ ], Positions : [ ], Mapping : [ ]},
 					3: {Names : [ "Logo" ], Positions : [ [3, 1] ], Mapping : [ 0 ]}
+				}
+			},
+			0x40E5 : // 4090 Gaming OC
+			{
+				Size: [5, 3],
+				modeZones : [0], //This is an odd card all the way around.
+				Zones:
+				{
+					0: {
+						Names : 	[ "Fan 1", "Fan 2", "Fan 3" ],
+						Positions : [ [1, 2], [2, 2], [3, 2] ],
+						Mapping : 	[ 0, 1, 2 ]
+					},
+					3: {
+						Names : 	[ "Logo" ],
+						Positions : [ [3, 1] ],
+						Mapping : 	[ 0 ]
+					}
 				}
 			},
 			0x0009 : //0x40b2 :
@@ -610,7 +628,6 @@ class NvidiaGPUDeviceIds {
 		this.RTX2080S        = 0x1E81;
 		this.RTX2080TI_TU102 = 0x1E04;
 		this.RTX2080TI       = 0x1E07;
-		this.RTX2080_SUPER   = 0x1E81;
 		this.RTX3050         = 0x2507;
 		this.RTX3060         = 0x2503;
 		this.RTX3060_LHR     = 0x2504;
@@ -671,6 +688,7 @@ class GigabyteMasterDeviceIds {
 		this.RTX4080_XTREME_WATERFORCE		 = 0x40c8;
 		this.RTX4090_AORUS_MASTER 			 = 0x40C0;
 		this.RTX4090_GAMING_OC_24GB			 = 0x40BF;
+		this.RTX4090_GAMING_OC_24GB_2		 = 0x40E5;
 	}
 }
 
@@ -698,54 +716,52 @@ class GigabyteMasterGPuList {
 		const GigabyteMasterIds  = new GigabyteMasterDeviceIds();
 
 		this.devices = [
-			new GigabyteMasterIdentifier(Nvidia.RTX2060S,       GigabyteMasterIds.RTX2060S_AORUS_P,         		0x50, "GIGABYTE AORUS 2060 Super OC"),
-			new GigabyteMasterIdentifier(Nvidia.RTX2060S_OC,    GigabyteMasterIds.RTX2060S_AORUS_OC,         		0x50, "GIGABYTE AORUS 2060 Super OC"),
-			new GigabyteMasterIdentifier(Nvidia.RTX2060S_OC,	GigabyteMasterIds.RTX2060S_AORUS_P,         		0x50, "GIGABYTE AORUS 2060 Super OC"),
-			new GigabyteMasterIdentifier(Nvidia.RTX2080_A,		GigabyteMasterIds.RTX2080_AORUS,					0x50, "GIGABYTE AORUS 2080"),
-			new GigabyteMasterIdentifier(Nvidia.RTX2080_A,		GigabyteMasterIds.RTX2080S_AORUS,					0x50, "GIGABYTE AORUS 2080 Super"),
-			new GigabyteMasterIdentifier(Nvidia.RTX2080S,       GigabyteMasterIds.RTX2080S_AORUS,         			0x50, "GIGABYTE AORUS 2080 Super OC"),
-			new GigabyteMasterIdentifier(Nvidia.RTX2080S,       GigabyteMasterIds.RTX2080S_AORUS_P,         		0x50, "GIGABYTE AORUS 2080 Super"),
-			new GigabyteMasterIdentifier(Nvidia.RTX2080TI,		GigabyteMasterIds.RTX2080TI_AORUS,					0x50, "GIGABYTE 2080TI AORUS"),
-			new GigabyteMasterIdentifier(Nvidia.RTX3060_LHR,    GigabyteMasterIds.RTX3060_GAMING_OC_12GB,        	0x62, "GIGABYTE 3060 Gaming OC LHR"),
-			new GigabyteMasterIdentifier(Nvidia.RTX3060TI,		GigabyteMasterIds.RTX3060_MASTER_O08G,       		0x66, "GIGABYTE AORUS 3060Ti Master 8GB"),
-			new GigabyteMasterIdentifier(Nvidia.RTX3060_GA104,  GigabyteMasterIds.RTX3060_GAMING_OC_12GB,        	0x32, "GIGABYTE 3060 Gaming OC"),
-			new GigabyteMasterIdentifier(Nvidia.RTX3070,        GigabyteMasterIds.RTX3070_MASTER,         			0x66, "GIGABYTE AORUS 3070 Master 8GB"),
-			new GigabyteMasterIdentifier(Nvidia.RTX3070_LHR,	GigabyteMasterIds.RTX3070_MASTER,					0x66, "GIGABYTE AORUS 3070 Master 8GB LHR"),
-			new GigabyteMasterIdentifier(Nvidia.RTX3070TI,		GigabyteMasterIds.RTX3070TI_MASTER,         		0x70, "GIGABYTE AORUS 3070Ti Master 8GB"),
-			new GigabyteMasterIdentifier(Nvidia.RTX3080,        GigabyteMasterIds.RTX3080_XTREME_WATERFORCE,   		0x64, "GIGABYTE AORUS 3080 XTREME Waterforce 10GB"),
-			new GigabyteMasterIdentifier(Nvidia.RTX3080_LHR,	GigabyteMasterIds.RTX3080_XTREME_WATERFORCE,		0x64, "GIGABYTE AORUS 3080 XTREME Waterforce 10GB LHR"),
-			new GigabyteMasterIdentifier(Nvidia.RTX3090,        GigabyteMasterIds.RTX3090_XTREME_WATERFORCE,		0x64, "GIGABYTE AORUS 3090 XTREME Waterforce 24GB"),
-			new GigabyteMasterIdentifier(Nvidia.RTX4090,        GigabyteMasterIds.RTX4090_GAMING_OC_24GB,			0x71, "GIGABYTE 4090 Gaming OC"),
-			new GigabyteMasterIdentifier(Nvidia.RTX4090, 		GigabyteMasterIds.RTX4090_AORUS_MASTER,				0x71, "GIGABYTE 4090 Aorus Master"),
-
-			//New
+			new GigabyteMasterIdentifier(Nvidia.RTX2060S,       GigabyteMasterIds.RTX2060S_AORUS_P,         		0x50, "GIGABYTE 2060 Super AORUS"),
+			new GigabyteMasterIdentifier(Nvidia.RTX2060S_OC,    GigabyteMasterIds.RTX2060S_AORUS_OC,         		0x50, "GIGABYTE 2060 Super AORUS OC"),
+			new GigabyteMasterIdentifier(Nvidia.RTX2060S_OC,	GigabyteMasterIds.RTX2060S_AORUS_P,         		0x50, "GIGABYTE 2060 Super AORUS OC"),
+			new GigabyteMasterIdentifier(Nvidia.RTX2080_A,		GigabyteMasterIds.RTX2080_AORUS,					0x50, "GIGABYTE 2080 AORUS"),
+			new GigabyteMasterIdentifier(Nvidia.RTX2080_A,		GigabyteMasterIds.RTX2080S_AORUS,					0x50, "GIGABYTE 2080 Super AORUS"),
 			new GigabyteMasterIdentifier(Nvidia.RTX2080_A, 		GigabyteMasterIds.RTX2080_EXTREME,					0x50, "GIGABYTE 2080 Extreme"),
+			new GigabyteMasterIdentifier(Nvidia.RTX2080S,       GigabyteMasterIds.RTX2080S_AORUS,         			0x50, "GIGABYTE 2080 Super AORUS"),
+			new GigabyteMasterIdentifier(Nvidia.RTX2080S,       GigabyteMasterIds.RTX2080S_AORUS_P,         		0x50, "GIGABYTE 2080 Super AORUS"),
+			new GigabyteMasterIdentifier(Nvidia.RTX2080TI,		GigabyteMasterIds.RTX2080TI_AORUS,					0x50, "GIGABYTE 2080TI AORUS"),
 			new GigabyteMasterIdentifier(Nvidia.RTX2080TI, 		GigabyteMasterIds.RTX2080TI_EXTREME,				0x50, "GIGABYTE 2080TI Extreme"),
-			//new GigabyteMasterIdentifier(Nvidia.RTX2080TI, 		GigabyteMasterIds.RTX2080TI_EXTREME_11G,           0x50, "GIGABYTE 2080TI Extreme 11G"), https://discord.com/channels/951628333504925756/1084435323938951168
 			new GigabyteMasterIdentifier(Nvidia.RTX2080TI, 		GigabyteMasterIds.RTX2080TI_WATERFORCE,				0x52, "GIGABYTE 2080TI XTREME Waterforce"),
-			new GigabyteMasterIdentifier(Nvidia.RTX3050,  	    GigabyteMasterIds.RTX3050_ELITE,					0x70, "GIGABYTE Aorus 3050 Elite"),
-			new GigabyteMasterIdentifier(Nvidia.RTX3060_LHR,	GigabyteMasterIds.RTX3060_ELITE_REV2,				0x70, "GIGABYTE Aorus 3060 Elite REV2 LHR"),
-			new GigabyteMasterIdentifier(Nvidia.RTX3060_GA104,	GigabyteMasterIds.RTX3060_ELITE_REV2,				0x70, "GIGABYTE Aorus 3060 Elite REV2 LHR"),
-			new GigabyteMasterIdentifier(Nvidia.RTX3060TI_LHR,  GigabyteMasterIds.RTX3060TI_ELITE_REV2,				0x70, "GIGABYTE Aorus 3060TI Elite REV2 LHR"),
-			new GigabyteMasterIdentifier(Nvidia.RTX3080,        GigabyteMasterIds.RTX3080_XTREME_WATERFORCE_10G,	0x65, "GIGABYTE AORUS 3080 XTREME Waterforce 10GB"),
-			new GigabyteMasterIdentifier(Nvidia.RTX3080_LHR,    GigabyteMasterIds.RTX3080_XTREME_WATERFORCE_10G,	0x65, "GIGABYTE AORUS 3080 XTREME Waterforce 10GB"),
-			new GigabyteMasterIdentifier(Nvidia.RTX3080TI,      GigabyteMasterIds.RTX3080TI_XTREME_WATERFORCE_12G,	0x64, "GIGABYTE AORUS 3080TI XTREME Waterforce 12GB"),
-			new GigabyteMasterIdentifier(Nvidia.RTX3090,        GigabyteMasterIds.RTX3090_XTREME_WATERFORCE_2,		0x65, "GIGABYTE AORUS 3090 XTREME Waterforce 24GB"),
-			new GigabyteMasterIdentifier(Nvidia.RTX4060, 		GigabyteMasterIds.RTX4060_AORUS,					0x71, "GIGABYTE 4060 Aorus Master"),
+			//new GigabyteMasterIdentifier(Nvidia.RTX2080TI, 		GigabyteMasterIds.RTX2080TI_EXTREME_11G,           0x50, "GIGABYTE 2080TI Extreme 11G"), https://discord.com/channels/951628333504925756/1084435323938951168
+
+			new GigabyteMasterIdentifier(Nvidia.RTX3050,  	    GigabyteMasterIds.RTX3050_ELITE,					0x70, "GIGABYTE 3050 AORUS Elite"),
+			new GigabyteMasterIdentifier(Nvidia.RTX3060_LHR,	GigabyteMasterIds.RTX3060_ELITE_REV2,				0x70, "GIGABYTE 3060 AORUS Elite REV2 LHR"),
+			new GigabyteMasterIdentifier(Nvidia.RTX3060_GA104,	GigabyteMasterIds.RTX3060_ELITE_REV2,				0x70, "GIGABYTE 3060 AORUS Elite REV2 LHR"),
+			new GigabyteMasterIdentifier(Nvidia.RTX3060TI_LHR,  GigabyteMasterIds.RTX3060TI_ELITE_REV2,				0x70, "GIGABYTE 3060TI AORUS Elite REV2 LHR"),
+			new GigabyteMasterIdentifier(Nvidia.RTX3060TI,		GigabyteMasterIds.RTX3060_MASTER_O08G,       		0x66, "GIGABYTE 3060TI AORUS Master 8GB"),
+			new GigabyteMasterIdentifier(Nvidia.RTX3060_GA104,  GigabyteMasterIds.RTX3060_GAMING_OC_12GB,        	0x32, "GIGABYTE 3060 Gaming OC"),
+			new GigabyteMasterIdentifier(Nvidia.RTX3060_LHR,    GigabyteMasterIds.RTX3060_GAMING_OC_12GB,        	0x62, "GIGABYTE 3060 Gaming OC LHR"),
+			new GigabyteMasterIdentifier(Nvidia.RTX3070,        GigabyteMasterIds.RTX3070_MASTER,         			0x66, "GIGABYTE 3070 AORUS Master 8GB"),
+			new GigabyteMasterIdentifier(Nvidia.RTX3070_LHR,	GigabyteMasterIds.RTX3070_MASTER,					0x66, "GIGABYTE 3070 AORUS Master 8GB LHR"),
+			new GigabyteMasterIdentifier(Nvidia.RTX3070TI,		GigabyteMasterIds.RTX3070TI_MASTER,         		0x70, "GIGABYTE 3070Ti AORUS Master 8GB"),
+			new GigabyteMasterIdentifier(Nvidia.RTX3080,        GigabyteMasterIds.RTX3080_XTREME_WATERFORCE,   		0x64, "GIGABYTE 3080 AORUS XTREME Waterforce 10GB"),
+			new GigabyteMasterIdentifier(Nvidia.RTX3080,        GigabyteMasterIds.RTX3080_XTREME_WATERFORCE_10G,	0x65, "GIGABYTE 3080 AORUS XTREME Waterforce 10GB"),
+			new GigabyteMasterIdentifier(Nvidia.RTX3080_LHR,    GigabyteMasterIds.RTX3080_XTREME_WATERFORCE_10G,	0x65, "GIGABYTE 3080 AORUS XTREME Waterforce 10GB"),
+			new GigabyteMasterIdentifier(Nvidia.RTX3080_LHR,	GigabyteMasterIds.RTX3080_XTREME_WATERFORCE,		0x64, "GIGABYTE 3080 AORUS XTREME Waterforce 10GB LHR"),
+			new GigabyteMasterIdentifier(Nvidia.RTX3080TI,      GigabyteMasterIds.RTX3080TI_XTREME_WATERFORCE_12G,	0x64, "GIGABYTE 3080TI AORUS XTREME Waterforce 12GB"),
+			new GigabyteMasterIdentifier(Nvidia.RTX3090,        GigabyteMasterIds.RTX3090_XTREME_WATERFORCE,		0x64, "GIGABYTE 3090 AORUS XTREME Waterforce 24GB"),
+			new GigabyteMasterIdentifier(Nvidia.RTX3090,        GigabyteMasterIds.RTX3090_XTREME_WATERFORCE_2,		0x65, "GIGABYTE 3090 AORUS XTREME Waterforce 24GB"),
+
+			new GigabyteMasterIdentifier(Nvidia.RTX4060, 		GigabyteMasterIds.RTX4060_AORUS,					0x71, "GIGABYTE 4060 AORUS Master"),
 			new GigabyteMasterIdentifier(Nvidia.RTX4070, 		GigabyteMasterIds.RTX4070_GAMING_OC_12G,			0x71, "GIGABYTE 4070 Gaming OC"),
+			new GigabyteMasterIdentifier(Nvidia.RTX4070, 		GigabyteMasterIds.RTX4070_MASTER,					0x71, "GIGABYTE 4070 AORUS Master"),
 			new GigabyteMasterIdentifier(Nvidia.RTX4070TI, 		GigabyteMasterIds.RTX4070TI_GAMING_OC_12G,			0x71, "GIGABYTE 4070TI Gaming OC"), // Yes, same PID for different SKUs
 			new GigabyteMasterIdentifier(Nvidia.RTX4070TI, 		GigabyteMasterIds.RTX4070TI_ELITE,					0x71, "GIGABYTE 4070TI Elite 12G"),
 			new GigabyteMasterIdentifier(Nvidia.RTX4080, 		GigabyteMasterIds.RTX4080_GAMING_OC_16G,			0x71, "GIGABYTE 4080 Gaming OC"),
 			new GigabyteMasterIdentifier(Nvidia.RTX4080, 		GigabyteMasterIds.RTX4080_GAMING_OC_16G_2,			0x71, "GIGABYTE 4080 Gaming OC"),
 			new GigabyteMasterIdentifier(Nvidia.RTX4080, 		GigabyteMasterIds.RTX4080_XTREME_WATERFORCE,		0x64, "GIGABYTE 4080 XTREME Waterforce 16GB"), //This card is single zone. Older ones were multizone. We'll see if it plays ball or not with sending multiple zones.
-
-			new GigabyteMasterIdentifier(Nvidia.RTX4070, 		GigabyteMasterIds.RTX4070_MASTER,		0x71, "GIGABYTE 4070 Aorus Master"),
-
-
+			new GigabyteMasterIdentifier(Nvidia.RTX4090,        GigabyteMasterIds.RTX4090_GAMING_OC_24GB,			0x71, "GIGABYTE 4090 Gaming OC"),
+			new GigabyteMasterIdentifier(Nvidia.RTX4090,        GigabyteMasterIds.RTX4090_GAMING_OC_24GB_2,			0x71, "GIGABYTE 4090 Gaming OC"),
+			new GigabyteMasterIdentifier(Nvidia.RTX4090, 		GigabyteMasterIds.RTX4090_AORUS_MASTER,				0x71, "GIGABYTE 4090 AORUS Master"),
 		];
 	}
 }
 
 export function ImageUrl() {
-	return "https://marketplace.signalrgb.com/devices/default/gpu.png";
+	return "https://marketplace.signalrgb.com/devices/brands/gigabyte/gpus/gpu.png";
 }

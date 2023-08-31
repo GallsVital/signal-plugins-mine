@@ -119,7 +119,7 @@ export function LedPositions() {
 
 export function Initialize() {
 	ClearBuffer();
-	device.setName(device.getMotherboardName());
+	device.setName(`Asrock ${device.getMotherboardName()}`);
 
 	if(ARGBMode === true) {
 		device.setControllableLeds(vARGBLedNames, vARGBLedPositions);
@@ -848,5 +848,5 @@ export function Validate(endpoint) {
 }
 
 export function ImageUrl() {
-	return "https://marketplace.signalrgb.com/devices/default/motherboard.png";
+	return "https://marketplace.signalrgb.com/devices/brands/asrock/motherboards/motherboard.png";
 }

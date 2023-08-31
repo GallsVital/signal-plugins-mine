@@ -219,5 +219,5 @@ export function Validate(endpoint) {
 }
 
 export function ImageUrl() {
-	return "https://marketplace.signalrgb.com/devices/default/keyboard-100.png";
+	return "https://marketplace.signalrgb.com/devices/brands/razer/keyboards/blackwidow-x-chroma.png";
 }

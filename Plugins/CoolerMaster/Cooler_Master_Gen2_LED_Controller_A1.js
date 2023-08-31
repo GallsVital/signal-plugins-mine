@@ -96,10 +96,31 @@ export function Initialize() {
 	setLEDCounts();
 }
 
-export function Shutdown() {
-	SendChannel(0, true, savedGenCh1 == 'GEN1' ? false : true);
-	SendChannel(1, true, savedGenCh2 == 'GEN1' ? false : true);
-	SendChannel(2, true, savedGenCh3 == 'GEN1' ? false : true);
+export function Render() {
+	if(savedGenCh1 != GenCh1 || savedGenCh2 != GenCh2 || savedGenCh3 != GenCh3) {
+		savedGenCh1 = GenCh1;
+		savedGenCh2 = GenCh2;
+		savedGenCh3 = GenCh3;
+		SetupChannels();
+	}
+
+	SendChannel(0, savedGenCh1 == 'GEN1' ? false : true);
+	SendChannel(1, savedGenCh2 == 'GEN1' ? false : true);
+	SendChannel(2, savedGenCh3 == 'GEN1' ? false : true);
+}
+
+export function Shutdown(SystemSuspending) {
+
+	if(SystemSuspending){
+		SendChannel(0, savedGenCh1 == 'GEN1' ? false : true, "#000000");
+		SendChannel(1, savedGenCh2 == 'GEN1' ? false : true, "#000000");
+		SendChannel(2, savedGenCh3 == 'GEN1' ? false : true, "#000000");
+	}else{
+		SendChannel(0, savedGenCh1 == 'GEN1' ? false : true, shutdownColor);
+		SendChannel(1, savedGenCh2 == 'GEN1' ? false : true, shutdownColor);
+		SendChannel(2, savedGenCh3 == 'GEN1' ? false : true, shutdownColor);
+	}
+
 }
 
 function setLEDCounts() {
@@ -111,20 +132,20 @@ function setLEDCounts() {
 	}
 }
 
-function SendChannel(Channel, shutdown = false, GEN2 = false) {
+function SendChannel(Channel, GEN2 = false, overrideColor) {
 	let ChannelLedCount = device.channel(ChannelArray[Channel]).ledCount;
 	const componentChannel = device.channel(ChannelArray[Channel]);
 
 	let RGBData = [];
 
-	if(shutdown) {
-		RGBData = device.createColorArray(shutdownColor, ChannelLedCount, "Inline");
+	if(overrideColor) {
+		RGBData = device.createColorArray(overrideColor, ChannelLedCount, "Inline");
 	} else if(LightingMode == "Forced") {
 		RGBData = device.createColorArray(forcedColor, ChannelLedCount, "Inline");
 	} else if(componentChannel.shouldPulseColors()) {
 		ChannelLedCount = GEN2 ? Gen2ChLedLimit : Gen1ChLedLimit;
 
-		const pulseColor = device.getChannelPulseColor(ChannelArray[Channel], ChannelLedCount);
+		const pulseColor = device.getChannelPulseColor(ChannelArray[Channel]);
 		RGBData = device.createColorArray(pulseColor, ChannelLedCount, "Inline");
 	} else {
 		RGBData = componentChannel.getColors("Inline");
@@ -182,19 +203,6 @@ function SendChannel(Channel, shutdown = false, GEN2 = false) {
 			device.pause(4);
 		}
 	}
-}
-
-export function Render() {
-	if(savedGenCh1 != GenCh1 || savedGenCh2 != GenCh2 || savedGenCh3 != GenCh3) {
-		savedGenCh1 = GenCh1;
-		savedGenCh2 = GenCh2;
-		savedGenCh3 = GenCh3;
-		SetupChannels();
-	}
-
-	SendChannel(0, false, savedGenCh1 == 'GEN1' ? false : true);
-	SendChannel(1, false, savedGenCh2 == 'GEN1' ? false : true);
-	SendChannel(2, false, savedGenCh3 == 'GEN1' ? false : true);
 }
 
 export function Validate(endpoint) {

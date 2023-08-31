@@ -224,5 +224,5 @@ export function Validate(endpoint) {
 }
 
 export function ImageUrl(){
-	return "https://marketplace.signalrgb.com/devices/default/keyboard-80.png";
+	return "https://marketplace.signalrgb.com/devices/brands/fantech/keyboards/mk876-tkl.png";
 }
