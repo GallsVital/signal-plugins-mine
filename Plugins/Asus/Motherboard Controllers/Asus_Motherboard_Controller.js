@@ -169,33 +169,19 @@ export function Initialize() {
 
 export function Shutdown(SystemSuspending) {
 
-	if(SystemSuspending){
-		SendMainBoardLeds("#000000"); // Go Dark on System Sleep/Shutdown
+	const color = SystemSuspending ? "#000000" : shutdownColor;
 
-		if(DeviceInfo.PolymoSupport) {
-			sendPolymoColors("#000000");
+	SendMainBoardLeds(color); // Go Dark on System Sleep/Shutdown
 
-			for(let channel = 0; channel < DeviceInfo.ARGBChannelCount; channel++){
-				SendARGBChannel(channel, true, "#000000");
-			}
-		} else {
-			for(let channel = 0; channel < DeviceInfo.ARGBChannelCount; channel++){
-				SendARGBChannel(channel, false, "#000000");
-			}
+	if(DeviceInfo.PolymoSupport) {
+		sendPolymoColors(color);
+
+		for(let channel = 0; channel < DeviceInfo.ARGBChannelCount; channel++){
+			SendARGBChannel(channel, true, color);
 		}
-	}else{
-		SendMainBoardLeds(shutdownColor);
-
-		if(DeviceInfo.PolymoSupport) {
-			sendPolymoColors(shutdownColor);
-
-			for(let channel = 0; channel < DeviceInfo.ARGBChannelCount; channel++){
-				SendARGBChannel(channel, true, shutdownColor);
-			}
-		} else {
-			for(let channel = 0; channel < DeviceInfo.ARGBChannelCount; channel++){
-				SendARGBChannel(channel, false, shutdownColor);
-			}
+	} else {
+		for(let channel = 0; channel < DeviceInfo.ARGBChannelCount; channel++){
+			SendARGBChannel(channel, false, color);
 		}
 	}
 

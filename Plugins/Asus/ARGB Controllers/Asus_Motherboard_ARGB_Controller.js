@@ -115,7 +115,6 @@ function Sendchannel(Channel, overrideColor) {
 	sendDirectApply(Channel);
 }
 
-
 export function Render() {
 	for(let channel = 0; channel < channelCount; channel++){
 		Sendchannel(channel);
@@ -124,14 +123,10 @@ export function Render() {
 
 export function Shutdown(SystemSuspending) {
 
-	if(SystemSuspending){
-		for(let channel = 0; channel < channelCount; channel++){
-			Sendchannel(channel, "#000000"); // Go Dark on System Sleep/Shutdown
-		}
-	}else{
-		for(let channel = 0; channel < channelCount; channel++){
-			Sendchannel(channel, shutdownColor);
-		}
+	const color = SystemSuspending ? "#000000" : shutdownColor;
+
+	for(let channel = 0; channel < channelCount; channel++){
+		Sendchannel(channel, color); // Go Dark on System Sleep/Shutdown
 	}
 
 }

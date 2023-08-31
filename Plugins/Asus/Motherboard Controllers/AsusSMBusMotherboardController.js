@@ -85,6 +85,9 @@ export function Render() {
 }
 
 export function Shutdown(SystemSuspending) {
+	if(!AsusMotherboard.ValidDeviceID) {
+		return;
+	}
 
 	if(SystemSuspending){
 		sendColors("#000000"); // Go Dark on System Sleep/Shutdown
