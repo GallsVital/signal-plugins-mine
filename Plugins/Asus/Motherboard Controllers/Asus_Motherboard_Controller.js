@@ -175,14 +175,10 @@ export function Shutdown(SystemSuspending) {
 
 	if(DeviceInfo.PolymoSupport) {
 		sendPolymoColors(color);
+	}
 
-		for(let channel = 0; channel < DeviceInfo.ARGBChannelCount; channel++){
-			SendARGBChannel(channel, true, color);
-		}
-	} else {
-		for(let channel = 0; channel < DeviceInfo.ARGBChannelCount; channel++){
-			SendARGBChannel(channel, false, color);
-		}
+	for(let channel = 0; channel < DeviceInfo.ARGBChannelCount; channel++){
+		SendARGBChannel(channel, Boolean(DeviceInfo.PolymoSupport), color);
 	}
 
 }
