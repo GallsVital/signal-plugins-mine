@@ -67,7 +67,7 @@ export function Render() {
 	}
 
 	sendColor();
-	device.pause(5);
+	device.pause(6);
 	PollFans();
 
 }
@@ -219,16 +219,16 @@ function sendColor(shutdown = false){
 		lastLoopRGBData = RGBdata;
 
 		PlatCooler.SendColorPacket(0b100, RGBdata.slice(0, 60));
-		device.pause(4);
+		device.pause(5);
 
 		if(TotalLedCount > 20) {
 			PlatCooler.SendColorPacket(0b101, RGBdata.slice(60, 120));
-			device.pause(4);
+			device.pause(5);
 		}
 
 		if(TotalLedCount > 40) {
 			PlatCooler.SendColorPacket(0b110, RGBdata.slice(120, 180));
-			device.pause(4);
+			device.pause(5);
 		}
 	}
 }
@@ -253,6 +253,7 @@ class PlatinumProtocol {
 		this.PIDLibrary = {
 			0x0C29 : "H60I",
 			0x0C15 : "H100/H115I",
+			0x0C17 : "H100/H115I",
 			0x0C18 : "H100/H115I",
 			0x0C19 : "H100/H115I",
 			0x0C20 : "H100/H115I",
@@ -266,6 +267,7 @@ class PlatinumProtocol {
 		this.nameLibrary = {
 			0x0C29 : "H60I Pro XT",
 			0x0C15 : "H100I Platinum",
+			0x0C17 : "H115I Platinum",
 			0x0C18 : "H100I Platinum",
 			0x0C19 : "H100I Platinum SE",
 			0x0C35 : "H100I Elite",
@@ -281,73 +283,73 @@ class PlatinumProtocol {
 				numberOfFans : 1,
 				vLedNames : [
 					"Ring 1", "Ring 2", "Ring 3",
-			"Ring 4",           "Logo 1",           "Ring 5",
-			"Ring 6",  "Logo 2",       "Logo 3",    "Ring 7",
-			"Ring 8",  			"Logo 4",			"Ring 9",
+					"Ring 4",           "Logo 1",           "Ring 5",
+					"Ring 6",  "Logo 2",       "Logo 3",    "Ring 7",
+					"Ring 8",  			"Logo 4",			"Ring 9",
 					  "Ring 10", "Ring 11", "Ring 12"
-		],
-		vLedPositions : [
+				],
+				vLedPositions : [
 					[1, 0], [2, 0], [3, 0],
-			[0, 1],         [2, 1],          [4, 1],
-			[0, 2], [1, 2],         [3, 2],  [4, 2],
-			[0, 3],         [2, 3],          [4, 3],
+					[0, 1],         [2, 1],          [4, 1],
+					[0, 2], [1, 2],         [3, 2],  [4, 2],
+					[0, 3],         [2, 3],          [4, 3],
 					[1, 4], [2, 4], [3, 4]
-		],
-		vLedIndexes : [
-			10,  11,  12,
-		9,      0,       13,
-		8,    3,   1,    14,
-		7,      2,       15,
-			6,  5,  4,
-		],
+				],
+				vLedIndexes : [
+					10,  11,  12,
+					9,      0,       13,
+					8,    3,   1,    14,
+					7,      2,       15,
+					6,  5,  4,
+				],
 				size: [5, 5]
 			},
 			"H100/H115I" : {
 				numberOfFans : 2,
 				vLedNames : [
 					"Ring 1", "Ring 2", "Ring 3",
-			"Ring 4",           "Logo 1",           "Ring 5",
-			"Ring 6",  "Logo 2",       "Logo 3",    "Ring 7",
-			"Ring 8",  			"Logo 4",			"Ring 9",
+					"Ring 4",           "Logo 1",           "Ring 5",
+					"Ring 6",  "Logo 2",       "Logo 3",    "Ring 7",
+					"Ring 8",  			"Logo 4",			"Ring 9",
 					  "Ring 10", "Ring 11", "Ring 12"
-		],
-		vLedPositions : [
+				],
+				vLedPositions : [
 					[1, 0], [2, 0], [3, 0],
-			[0, 1],         [2, 1],          [4, 1],
-			[0, 2], [1, 2],         [3, 2],  [4, 2],
-			[0, 3],         [2, 3],          [4, 3],
+					[0, 1],         [2, 1],          [4, 1],
+					[0, 2], [1, 2],         [3, 2],  [4, 2],
+					[0, 3],         [2, 3],          [4, 3],
 					[1, 4], [2, 4], [3, 4]
-		],
-		vLedIndexes : [
-				10,  11,  12,
-			9,      0,       13,
-			8,    3,   1,    14,
-			7,      2,       15,
-				6,  5,  4,
-			],
+				],
+				vLedIndexes : [
+					10,  11,  12,
+					9,      0,       13,
+					8,    3,   1,    14,
+					7,      2,       15,
+					6,  5,  4,
+				],
 				size: [5, 5]
 			},
 			"H150I" : {
 				numberOfFans : 3,
 				vLedNames : [
-							"Ring 1", "Ring 2", "Ring 3",
+					"Ring 1", "Ring 2", "Ring 3",
 					"Ring 4",           "Logo 1",           "Ring 5",
 					"Ring 6",  "Logo 2",       "Logo 3",    "Ring 7",
 					"Ring 8",  			"Logo 4",			"Ring 9",
 					      	"Ring 10", "Ring 11", "Ring 12"
 				],
 				vLedPositions : [
-							[1, 0], [2, 0], [3, 0],
+					[1, 0], [2, 0], [3, 0],
 					[0, 1],         [2, 1],          [4, 1],
 					[0, 2], [1, 2],         [3, 2],  [4, 2],
 					[0, 3],         [2, 3],          [4, 3],
-							[1, 4], [2, 4], [3, 4]
+					[1, 4], [2, 4], [3, 4]
 				],
 				vLedIndexes : [
 					10,  11,  12,
-				9,      0,       13,
-				8,    3,   1,    14,
-				7,      2,       15,
+					9,      0,       13,
+					8,    3,   1,    14,
+					7,      2,       15,
 					6,  5,  4,
 				],
 				size: [5, 5]
@@ -649,8 +651,6 @@ class PlatinumProtocol {
 			[ 0x28, 0x29, 0x2A, 0x2B, 0x2C, 0x2D, 0x2E, 0x2F, 0x30, 0x31, 0x32, 0x33, 0x34, 0x35, 0x36, 0x37, 0x38, 0x39, 0x3A, 0x3B, 0x3C, 0x3D, 0x3E, 0x3F, 0x40, 0x41, 0x42,
 				0x43, 0x44, 0x45, 0x46, 0x47, 0x48, 0x49, 0x4A, 0x4B, 0x4C, 0x4D, 0x4E, 0x4F, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF,
 				0xFF, 0xFF, 0xFF, 0xFF, 0xFF]);
-
-		
 	}
 }
 
