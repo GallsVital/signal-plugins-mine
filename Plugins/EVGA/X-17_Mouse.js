@@ -35,23 +35,33 @@ export function Initialize() {
 }
 
 export function Render() {
-	sendZone(1);
-	sendZone(2);
+	sendColors(1);
+	sendColors(2);
 	Apply(1);
 	Apply(2);
 }
 
+export function Shutdown(SystemSuspending) {
 
-function sendZone(zone, shutdown = false) {
+	const color = SystemSuspending ? "#000000" : shutdownColor;
+
+	sendColors(1, color);
+	sendColors(2, color);
+	Apply(1);
+	Apply(2);
+
+}
+
+function sendColors(zone, overrideColor) {
 	const packet = [0x07, 0xEA, zone, 0x02];
 
 	for(let iIdx = 0; iIdx < 4; iIdx++) {
 		const iPxX = vLedPositions[iIdx][0];
 		const iPxY = vLedPositions[iIdx][1];
-		var color;
+		let color;
 
-		if(shutdown) {
-			color = hexToRgb(shutdownColor);
+		if(overrideColor) {
+			color = hexToRgb(overrideColor);
 		} else if (LightingMode == "Forced") {
 			color = hexToRgb(forcedColor);
 		} else {
