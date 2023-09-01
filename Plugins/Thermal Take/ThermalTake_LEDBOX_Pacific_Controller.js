@@ -25,6 +25,7 @@ export function SubdeviceController(){ return true; }
 const DeviceMaxLedLimit = 180 ;
 
 //Channel Name, Led Limit
+/** @type {ChannelConfigArray} */
 const ChannelArray = [
 	["Channel 1", 36],
 	["Channel 2", 36],
@@ -53,7 +54,7 @@ function Sendchannel(Channel, overrideColor) {
 	}else if(device.getLedCount() == 0){
 		ChannelLedCount = 40;
 
-		const pulseColor = device.getChannelPulseColor(ChannelArray[Channel][0], ChannelLedCount);
+		const pulseColor = device.getChannelPulseColor(ChannelArray[Channel][0]);
 		RGBData = device.createColorArray(pulseColor, ChannelLedCount, "Inline", "GRB");
 
 	}else{
