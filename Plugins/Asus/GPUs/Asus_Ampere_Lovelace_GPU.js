@@ -550,6 +550,7 @@ class Asus_Ampere_Lovelace_IDs {
 
 		this.RTX4090_STRIX_GAMING                  = 0x889C;
 		this.RTX4090_STRIX_GAMING_2                = 0x889D;
+		this.RTX4090_STRIX_GAMING_OC			   = 0x88EF;
 		this.RTX4090_STRIX_GAMING_WHITE_OC		   = 0x88C3;
 		this.RTX4090_STRIX_GAMING_WHITE			   = 0x88C4;
 		this.RTX4090_TUF_GAMING                    = 0x889A;
@@ -684,6 +685,7 @@ const Asus3000GPUIDs =
 
 	new AsusGPUIdentifier(Nvidia.RTX4090, AsusID.RTX4090_STRIX_GAMING, "Asus ROG Strix 4090 Gaming OC"),
 	new AsusGPUIdentifier(Nvidia.RTX4090, AsusID.RTX4090_STRIX_GAMING_2, "Asus ROG Strix 4090 Gaming"),
+	new AsusGPUIdentifier(Nvidia.RTX4090, AsusID.RTX4090_STRIX_GAMING_OC, "Asus 4090 ROG Strix Gaming OC"),
 	new AsusGPUIdentifier(Nvidia.RTX4090, AsusID.RTX4090_STRIX_GAMING_WHITE, "Asus ROG Strix 4090 Gaming White"),
 	new AsusGPUIdentifier(Nvidia.RTX4090, AsusID.RTX4090_STRIX_GAMING_WHITE_OC, "Asus ROG Strix 4090 Gaming White OC"),
 	new AsusGPUIdentifier(Nvidia.RTX4090, AsusID.RTX4090_TUF_GAMING, "Asus TUF RTX 4090 Gaming"),
