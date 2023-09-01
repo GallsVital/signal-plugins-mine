@@ -356,7 +356,7 @@ class GigabyteVisionDeviceIds {
 		this.RTX3090_GAMING_OC_24GB         = 0x4043;
 
 		this.RTX4060TI_GAMING_OC            = 0x40F8;
-		this.RTX4060TI________OC            = 0x4112;
+		this.RTX4060TI_GAMING_OC_2			= 0x4112;
 		this.RTX4070_AERO					= 0x40E6;
 		this.RTX4070_EAGLE_OC				= 0x40ED;
 		this.RTX4070TI_GAMING_OC            = 0x40c6;
@@ -477,6 +477,7 @@ class GigabyteVisionGPuList {
 			new GigabyteVisionIdentifier(Nvidia.RTX3090,        GigabyteVisionIds.RTX3090_VISION_OC_24G,         0x63, "GIGABYTE 3090 Vision OC"),
 			new GigabyteVisionIdentifier(Nvidia.RTX3090,        GigabyteVisionIds.RTX3090_GAMING_OC_24GB,        0x62, "GIGABYTE 3090 Gaming OC 24G"), // Confirmed
 			new GigabyteVisionIdentifier(Nvidia.RTX4060TI,		GigabyteVisionIds.RTX4060TI_GAMING_OC,			 0x71, "GIGABYTE 4060Ti Gaming OC"),
+			new GigabyteVisionIdentifier(Nvidia.RTX4060TI_OC,	GigabyteVisionIds.RTX4060TI_GAMING_OC_2,		 0x71, "GIGABYTE 4060Ti Gaming OC"),
 			new GigabyteVisionIdentifier(Nvidia.RTX4070,		GigabyteVisionIds.RTX4070_AERO,					 0x71, "GIGABYTE 4070 Aero"),
 			new GigabyteVisionIdentifier(Nvidia.RTX4070,		GigabyteVisionIds.RTX4070_EAGLE_OC,				 0x71, "GIGABYTE 4070 Eagle OC"),
 			new GigabyteVisionIdentifier(Nvidia.RTX4070TI,		GigabyteVisionIds.RTX4070TI_EAGLE,				 0x71, "GIGABYTE 4070Ti Eagle"),
