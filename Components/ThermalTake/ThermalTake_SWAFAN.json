@@ -4,8 +4,8 @@
     "Brand": "ThermalTake",
     "Type": "Fan",
     "LedCount": 30,
-    "Width": 14,
-    "Height": 14,
+    "Width": 15,
+    "Height": 15,
     "LedMapping": [
         11,
         0,
