@@ -181,5 +181,5 @@ export function Validate(endpoint) {
 }
 
 export function ImageUrl(){
-	return "https://marketplace.signalrgb.com/devices/brands/razer/misc/basestation-chroma.png";
+	return "https://marketplace.signalrgb.com/devices/brands/thermaltake/lighting-controllers/led-box.png";
 }
