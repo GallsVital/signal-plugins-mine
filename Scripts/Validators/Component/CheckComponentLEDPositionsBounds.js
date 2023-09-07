@@ -1,5 +1,19 @@
 export function CheckComponentLedPositionsBounds(Component, ReportErrorCallback) {
 	if (typeof Component.LedCoordinates === "undefined") {
+		ReportErrorCallback(`Component is missing Led Coordinates?!`);
+
+		return;
+	}
+
+	if (typeof Component.Width === "undefined") {
+		ReportErrorCallback(`Component is missing Width?!`);
+
+		return;
+	}
+
+	if (typeof Component.Height === "undefined") {
+		ReportErrorCallback(`Component is missing Height?!`);
+
 		return;
 	}
 

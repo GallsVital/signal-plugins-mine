@@ -1,7 +1,16 @@
 export function CheckComponentLEDNameAndPositionLengthsMatch(Component, ReportErrorCallback) {
 	if (typeof Component.LedCoordinates === "undefined") {
+		ReportErrorCallback(`Component is missing Led Coordinates?!`);
+
 		return;
 	}
+
+	if (typeof Component.LedNames === "undefined") {
+		ReportErrorCallback(`Component is missing Led Names?!`);
+
+		return;
+	}
+
 	const LedNames = Component.LedNames;
 	const LedCoordinates = Component.LedCoordinates;
 

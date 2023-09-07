@@ -1,7 +1,8 @@
 import fs from 'fs';
 import DirectoryWalker from './DirectoryWalker.js';
-import { CheckComponentLEDNameAndPositionLengthsMatch } from './Validators/CheckComponentLEDNameAndPositionLengthsMatch.js';
-import { CheckComponentLedPositionsBounds } from './Validators/CheckComponentLEDPositionsBounds.js';
+import { CheckComponentLEDNameAndPositionLengthsMatch } from './Validators/Component/CheckComponentLEDNameAndPositionLengthsMatch.js';
+import { CheckComponentLedPositionsBounds } from './Validators/Component/CheckComponentLEDPositionsBounds.js';
+import { CheckComponentUsesFullSize } from './Validators/Component/CheckComponentUsesFullSize.js';
 
 class ComponentValidator {
 	constructor() {
@@ -12,6 +13,7 @@ class ComponentValidator {
 		this.validators = [
 			CheckComponentLEDNameAndPositionLengthsMatch,
 			CheckComponentLedPositionsBounds,
+			CheckComponentUsesFullSize
 		];
 		this.excludedFiles = []; // Reserving for future
 	}
