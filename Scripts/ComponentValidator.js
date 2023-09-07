@@ -1,6 +1,4 @@
 import fs from 'fs';
-import path from 'path';
-import * as url from 'url';
 import DirectoryWalker from './DirectoryWalker.js';
 import { CheckComponentLEDNameAndPositionLengthsMatch } from './Validators/CheckComponentLEDNameAndPositionLengthsMatch.js';
 import { CheckComponentLedPositionsBounds } from './Validators/CheckComponentLEDPositionsBounds.js';
