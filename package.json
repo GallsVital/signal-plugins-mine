@@ -34,6 +34,7 @@
 		"test": "jest --rootDir='./' --collectCoverage --coverageDirectory='coverage'",
 		"test:ci": "jest --rootDir='./' --ci --reporters=default --reporters=jest-junit",
 		"test:validate": "node ./Scripts/ValidatePluginsScript.js ../Plugins",
+		"test:componentValidate": "node ./Scripts/ValidateComponentsScript.js ../Components",
 		"test:CheckDuplicateGPU": "node ./Scripts/GPUIdCollector.js",
 		"test:extractImages": "node ./Scripts/ImageExtractor.js",
 		"docs": "jsdoc -c jsdoc.json",
