@@ -2,7 +2,7 @@ export function Name() { return "Fnatic MiniSTREAK"; }
 export function VendorId() { return 0x2F0E; }
 export function ProductId() { return 0x0102; }
 export function Publisher() { return "WhirlwindFX"; }
-export function Size() { return [22, 8]; }
+export function Size() { return [17, 7]; }
 export function DefaultPosition(){return [10, 100];}
 const DESIRED_HEIGHT = 85;
 export function DefaultScale(){return Math.floor(DESIRED_HEIGHT/Size()[1]);}
@@ -73,21 +73,27 @@ export function Render() {
 	sendColors();
 }
 
-export function Shutdown() {
-	sendColors(true);
+export function Shutdown(SystemSuspending) {
+
+	if(SystemSuspending){
+		sendColors("#000000"); // Go Dark on System Sleep/Shutdown
+	}else{
+		sendColors(shutdownColor);
+	}
+
 }
 
-function sendColors(shutdown = false) {
+function sendColors(overrideColor) {
 	const RGBData = new Array(144*3).fill(255);
 	let TotalLedCount = 0;
 
 	for(let iIdx = 0; iIdx < vKeys.length; iIdx++) {
 		const iPxX = vKeyPositions[iIdx][0];
 		const iPxY = vKeyPositions[iIdx][1];
-		var mxPxColor;
+		let mxPxColor;
 
-		if(shutdown) {
-			mxPxColor = hexToRgb(shutdownColor);
+		if(overrideColor) {
+			mxPxColor = hexToRgb(overrideColor);
 		} else if (LightingMode === "Forced") {
 			mxPxColor = hexToRgb(forcedColor);
 		} else {

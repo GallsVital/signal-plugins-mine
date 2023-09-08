@@ -45,9 +45,7 @@ export function Initialize() {
 
 	LegacyCorsair.deviceInitialization();
 
-	if(!LegacyCorsair.getWirelessDevice()) {
-		LegacyCorsair.configureDevice();
-	}
+	LegacyCorsair.configureDevice(); //Remove wireless checks as afaik there's no wireless NXP keebs.
 
 	//set key codes to get the keys working again, unless you wanna assign them all in software. Pls don't. I beg of you.
 	InitScanCodes();
@@ -247,7 +245,7 @@ class LegacyCorsairLibrary {
 					"`", "1", "2", "3", "4", "5", "6", "7", "8", "9", "0", "-_", "=+", "Backspace",                        "Insert", "Home", "Page Up",       "NumLock", "Num /", "Num *", "Num -",  //21
 					"Tab", "Q", "W", "E", "R", "T", "Y", "U", "I", "O", "P", "[", "]", "\\",                               "Del", "End", "Page Down",         "Num 7", "Num 8", "Num 9", "Num +",    //21
 					"CapsLock", "A", "S", "D", "F", "G", "H", "J", "K", "L", ";", "'", "Enter",                                                              "Num 4", "Num 5", "Num 6",             //16
-					"Left Shift", "Z", "X", "C", "V", "B", "N", "M", ",", ".", "/", "?","Right Shift",                                  "Up Arrow",               "Num 1", "Num 2", "Num 3", "Num Enter", //17
+					"Left Shift", "Z", "X", "C", "V", "B", "N", "M", ",", ".", "/", "?", "Right Shift",                                  "Up Arrow",               "Num 1", "Num 2", "Num 3", "Num Enter", //17
 					"Left Ctrl", "Left Win", "Left Alt", "Space", "Right Alt", "Fn", "Menu", "Right Ctrl",  "Left Arrow", "Down Arrow", "Right Arrow", "Num 0", "Num .",                       //13
 					//ISO
 					"ISO #", "ISO <"
@@ -816,11 +814,8 @@ class LegacyCorsairProtocol {
 	   	this.setKeyboardLayout(DeviceInformation[6]);
 		this.setDeviceType(DeviceInformation[5]);
 
-		if(this.getWirelessDevice()) {
-			this.checkWakeStatus();
-		} else {
-			this.setWakeStatus(true); //Wired devices will never have a wake status
-		}
+		this.setWakeStatus(true); //Wired devices will never have a wake status
+
 
 		device.addFeature("keyboard");
 		macroInputArray.setCallback(macroInputHandler);
@@ -832,7 +827,7 @@ class LegacyCorsairProtocol {
 		this.setSpecialFunctionControlMode(this.modes.SoftwareMode);
 
 		if(this.getWirelessDevice()) {
-			this.wirelessDeviceSetup();
+			//this.wirelessDeviceSetup();
 		}
 	}
 	/** Set Device to Function Control Mode.*/

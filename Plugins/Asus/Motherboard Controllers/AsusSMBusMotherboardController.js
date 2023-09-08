@@ -344,7 +344,11 @@ class AsusAuraSMBusController {
         	0x99 : "Chipset Top",
         	0x9A : "Chipset Middle",
         	0x9B : "Chipset Bottom",
-        	0xA0 : "IOShield"
+        	0x9C : "Chipset Bottom Zone 2",
+        	0xA0 : "IOShield",
+        	0xA2 : "M.2 Cover",
+        	0xA3 : "M.2 Cover Zone 2"
+
 
         };
 	}

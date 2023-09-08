@@ -1,7 +1,7 @@
 export function Name() { return "ASUS ROG Claymore II"; }
 export function VendorId() { return 0x0B05; }
 export function Documentation(){ return "troubleshooting/asus"; }
-export function ProductId() { return 0x196B; }
+export function ProductId() { return [0x196B, 0x1934]; }
 export function Publisher() { return "WhirlwindFX"; }
 export function Size() { return [21, 7]; }
 export function DefaultPosition(){return [10, 100];}
@@ -36,8 +36,8 @@ const vKeysLeft =
 	32,      56, 64, 72, 80, 96, 104, 112, 120, 128, 136, 144, 152,   160, 168, 176,
 	33,  49, 57, 65, 73, 81, 89, 97, 105, 113, 121, 129, 137,    153,   161, 169, 177,   1, 9, 17, 25,
 	34,  50, 58, 66, 74, 82, 90, 98, 106, 114, 122, 130, 138,    154,   162, 170, 178,   2, 10, 18, 26,
-	35,  51, 59, 67, 75, 83, 91, 99, 107, 115, 123, 131,         155,                  3, 11, 19,
-	36,  52, 60, 68, 76, 84, 92, 100, 108, 116, 124,              156,       172,       4, 12, 20, 28,
+	35,  51, 59, 67, 75, 83, 91, 99, 107, 115, 123, 131, 139,     155,                  3, 11, 19,
+	36,  44, 52, 60, 68, 76, 84, 92, 100, 108, 116, 124,              156,       172,       4, 12, 20, 28,
 	37,  45,  53,      85,           109, 125, 133,         157,   165, 173, 181,   5,   21,
 ];
 
@@ -58,8 +58,8 @@ const vKeyNames =
 	"Esc", "F1", "F2", "F3", "F4", "F5", "F6", "F7", "F8", "F9", "F10", "F11", "F12",         "Print Screen", "Scroll Lock", "Pause Break",
 	"`", "1", "2", "3", "4", "5", "6", "7", "8", "9", "0", "-_", "=+", "Backspace",                        "Insert", "Home", "Page Up",       "NumLock", "Num /", "Num *", "Num -",
 	"Tab", "Q", "W", "E", "R", "T", "Y", "U", "I", "O", "P", "[", "]", "\\",                               "Del", "End", "Page Down",         "Num 7", "Num 8", "Num 9", "Num +",
-	"CapsLock", "A", "S", "D", "F", "G", "H", "J", "K", "L", ";", "'", "Enter",                                                              "Num 4", "Num 5", "Num 6",
-	"Left Shift", "Z", "X", "C", "V", "B", "N", "M", ",", ".", "/", "Right Shift",                                  "Up Arrow",               "Num 1", "Num 2", "Num 3", "Num Enter",
+	"CapsLock", "A", "S", "D", "F", "G", "H", "J", "K", "L", ";", "'", "ISO_#", "Enter",                                                              "Num 4", "Num 5", "Num 6",
+	"Left Shift", "ISO_<", "Z", "X", "C", "V", "B", "N", "M", ",", ".", "/", "Right Shift",                                  "Up Arrow",               "Num 1", "Num 2", "Num 3", "Num Enter",
 	"Left Ctrl", "Left Win", "Left Alt", "Space", "Right Alt", "Fn", "Menu", "Right Ctrl",  "Left Arrow", "Down Arrow", "Right Arrow", "Num 0", "Num ."
 ];
 
@@ -77,12 +77,12 @@ const vKeyPositionsRight =
 const vKeyPositionsLeft =
 [
 	[4, 0],	[5, 0],
-	[4, 1],  [5, 1], [6, 1], [7, 1], [8, 1],        [10, 1], [11, 1], [12, 1], [13, 1], [14, 1], [15, 1], [16, 1], [17, 1],   [18, 1], [19, 1], [20, 1],
-	[4, 2],  [5, 2], [6, 2], [7, 2], [8, 2], [9, 2], [10, 2], [11, 2], [12, 2], [13, 2], [14, 2], [15, 2], [16, 2], [17, 2],   [18, 2], [19, 2], [20, 2],   [0, 2], [1, 2], [2, 2], [3, 2],
-	[4, 3],  [5, 3], [6, 3], [7, 3], [8, 3], [9, 3], [10, 3], [11, 3], [12, 3], [13, 3], [14, 3], [15, 3], [16, 3], [17, 3],   [18, 3], [19, 3], [20, 3],   [0, 3], [1, 3], [2, 3], [3, 3],
-	[4, 4],  [5, 4], [6, 4], [7, 4], [8, 4], [9, 4], [10, 4], [11, 4], [12, 4], [13, 4], [14, 4], [15, 4],         [17, 4],                             [0, 4], [1, 4], [2, 4],
-	[4, 5],  [5, 5], [6, 5], [7, 5], [8, 5], [9, 5], [10, 5], [11, 5], [12, 5], [13, 5], [14, 5],                 [17, 5],           [19, 5],           [0, 5], [1, 5], [2, 5], [3, 5],
-	[4, 6],  [5, 6], [6, 6],                      [10, 6],                         [14, 6], [15, 6], [16, 6], [17, 6],   [18, 6], [19, 6], [20, 6],   [0, 6],        [2, 6],
+	[4, 1], [5, 1], [6, 1], [7, 1], [8, 1],         [10, 1], [11, 1], [12, 1], [13, 1], [14, 1], [15, 1], [16, 1], [17, 1],   [18, 1], [19, 1], [20, 1],
+	[4, 2], [5, 2], [6, 2], [7, 2], [8, 2], [9, 2], [10, 2], [11, 2], [12, 2], [13, 2], [14, 2], [15, 2], [16, 2], [17, 2],   [18, 2], [19, 2], [20, 2],   [0, 2], [1, 2], [2, 2], [3, 2],
+	[4, 3], [5, 3], [6, 3], [7, 3], [8, 3], [9, 3], [10, 3], [11, 3], [12, 3], [13, 3], [14, 3], [15, 3], [16, 3], [17, 3],   [18, 3], [19, 3], [20, 3],   [0, 3], [1, 3], [2, 3], [3, 3],
+	[4, 4], [5, 4], [6, 4], [7, 4], [8, 4], [9, 4], [10, 4], [11, 4], [12, 4], [13, 4], [14, 4], [15, 4], [16, 4], [17, 4],                                [0, 4], [1, 4], [2, 4],
+	[4, 5], [5, 5], [6, 5], [7, 5], [8, 5], [9, 5], [10, 5], [11, 5], [12, 5], [13, 5], [14, 5], [15, 5],          [17, 5],            [19, 5],            [0, 5], [1, 5], [2, 5], [3, 5],
+	[4, 6], [5, 6], [6, 6],                         [10, 6],                            [14, 6], [15, 6], [16, 6], [17, 6],   [18, 6], [19, 6], [20, 6],   [0, 6],        [2, 6],
 ];
 
 let vKeys = vKeysRight;
@@ -142,16 +142,15 @@ function statusGrabber() {
 
 	device.write([0x00, 0x12], 65);
 
-	const returnpacket = device.read([0x00, 0x12], 65);
+	const returnPacket = device.read([0x00, 0x12], 65);
 
+	const numpadLocation = returnPacket[17];
 
-	//device.write([0x00, 0x12, 0x01], 65);
-	//returnpacket = device.read([0x00, 0x12, 0x01], 65);
-	//device.log(returnpacket);
+	if(numpadLocation === 0xff || numpadLocation === 0x01) {
+		setLEDLayout("Right");
+	} else { setLEDLayout("Left"); }
 
-	//device.write([0x00, 0x12, 0x02], 65);
-	//returnpacket = device.read([0x00, 0x12, 0x02], 65);
-	//device.log(returnpacket);
+	device.log(`Numpad Location: ${numpadLocation}`);
 }
 
 function pollBattery() {
@@ -187,6 +186,11 @@ function macroReadback() {
 
 	do {
 		const packet = device.read([0x00], 65, 0);
+
+		if(packet[0] === 0x03 && packet[1] === 0x81 && packet[2] === 0x04 && packet[3] === 0x00 && packet[4] === 0xff) {
+			device.log("No Plate attached");
+			setLEDLayout("Right");
+		}
 
 		if(packet[0] === 0x03 && packet[1] === 0x81 && packet[2] === 0x04 && packet[3] === 0x00 && packet[4] === 0x01) {
 			device.log("Right Plate attached");

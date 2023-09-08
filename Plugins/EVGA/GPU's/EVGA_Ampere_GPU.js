@@ -92,7 +92,7 @@ export function Initialize() {
 }
 
 export function Render() {
-	SendRGB();
+	sendColors();
 
 	HardwareModePoll.Poll();
 
@@ -104,8 +104,14 @@ export function Render() {
 }
 
 
-export function Shutdown() {
-	SendRGB(true);
+export function Shutdown(SystemSuspending) {
+
+	if(SystemSuspending){
+		sendColors("#000000"); // Go Dark on System Sleep/Shutdown
+	}else{
+		sendColors(shutdownColor);
+	}
+
 }
 
 class PolledFunction{
@@ -172,7 +178,7 @@ function HandleZoneDisables(){
 	RebuildLedArrays();
 }
 
-function SendRGB(shutdown = false){
+function sendColors(overrideColor){
 
 	for(const ZoneId in EVGAAmpere.Config.Zones){
 		const Zone = EVGAAmpere.Config.Zones[ZoneId];
@@ -183,8 +189,8 @@ function SendRGB(shutdown = false){
 
 		let Color;
 
-		if(shutdown){
-			Color = hexToRgb(shutdownColor);
+		if(overrideColor){
+			Color = hexToRgb(overrideColor);
 		}else if(LightingMode === "Forced") {
 			Color = hexToRgb(forcedColor);
 		} else {

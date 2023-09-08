@@ -1,6 +1,6 @@
-export function Name() { return "Lian Li Uni Fan Controller AL V2"; }
+export function Name() { return "Lian Li Uni Fan Controller SL V2"; }
 export function VendorId() { return  0x0CF2; }
-export function ProductId() { return 0xA104;}//0xA100; }
+export function ProductId() { return 0xA103;}//0xA100; }
 export function Publisher() { return "WhirlwindFX"; }
 export function Size() { return [1, 1]; }
 export function Type(){return "hybrid";}
@@ -30,14 +30,14 @@ export function DeviceMessages() {
 export function SubdeviceController(){ return true; }
 export function DefaultComponentBrand() { return "LianLi";}
 
-const DeviceMaxLedLimit = 480;
+const DeviceMaxLedLimit = 384;
 
 //Channel Name, Led Limit
 const ChannelArray = [
-	["Channel 1", 120],
-	["Channel 2", 120],
-	["Channel 3", 120],
-	["Channel 4", 120],
+	["Channel 1", 96],
+	["Channel 2", 96],
+	["Channel 3", 96],
+	["Channel 4", 96],
 ];
 
 function SetupChannels() {
@@ -48,10 +48,9 @@ function SetupChannels() {
 	}
 }
 
-const innerChannelRGBDict = [0x30, 0x32, 0x34, 0x36];
-const outerChannelRGBDict = [0x31, 0x33, 0x35, 0x37];
-const innerChannelRGBCommitDict = [0x10, 0x12, 0x14, 0x16];
-const outerChannelRGBCommitDict = [0x11, 0x13, 0x15, 0x17];
+const ChannelRGBDict = [0x30, 0x31, 0x32, 0x33];
+const ChannelRGBCommitDict = [0x10, 0x11, 0x12, 0x13];
+
 
 const vLedNames = [];
 const vLedPos = [];
@@ -69,10 +68,23 @@ export function LedPositions() {
 
 export function Initialize() {
 	device.send_report([0xE0, 0x10, 0x63, 0x00, 0x01, 0x02, 0x03, 0x08], 32);
+	device.get_report([0xE0, 0x10, 0x63, 0x00, 0x01, 0x02, 0x03, 0x08], 32);
 	device.send_report([0xE0, 0x10, 0x60, 0x01, 0x06], 32);
+	device.get_report([0xE0, 0x10, 0x60, 0x01, 0x06], 32);
+	device.send_report([0xE0, 0x30], 32);
+	device.get_report([0xE0, 0x30], 32);
 	device.send_report([0xE0, 0x10, 0x60, 0x02, 0x06], 32);
+	device.get_report([0xE0, 0x10, 0x60, 0x02, 0x06], 32);
+	device.send_report([0xE0, 0x32], 32);
+	device.get_report([0xE0, 0x32], 32);
 	device.send_report([0xE0, 0x10, 0x60, 0x03, 0x06], 32);
+	device.get_report([0xE0, 0x10, 0x60, 0x03, 0x06], 32);
+	device.send_report([0xE0, 0x34], 32);
+	device.get_report([0xE0, 0x34], 32);
 	device.send_report([0xE0, 0x10, 0x60, 0x04, 0x06], 32);
+	device.get_report([0xE0, 0x10, 0x60, 0x04, 0x06], 32);
+	device.send_report([0xE0, 0x36], 32);
+	device.get_report([0xE0, 0x36], 32);
 
 	setFanMode();
 	burstFans();
@@ -105,8 +117,6 @@ export function Shutdown() {
 
 function sendChannels(shutdown = false) {
 	for(let Channel = 0; Channel < 4; Channel++) {
-		const innerRGBData = [];
-		const outerRGBData = [];
 
 		const ChannelLedCount = device.channel(ChannelArray[Channel][0]).LedCount();
 		const componentChannel = device.channel(ChannelArray[Channel][0]);
@@ -115,18 +125,9 @@ function sendChannels(shutdown = false) {
 
 			ChannelRGBData = getChannelColors(Channel, ChannelLedCount, shutdown, componentChannel);
 
-			for (let fan = 0; fan < 6; fan++) {
-				innerRGBData.push(...ChannelRGBData.splice(0, 8 * 3));
-				outerRGBData.push(...ChannelRGBData.splice(0, 12 * 3));
-			}
-
-			device.write([0xe0, innerChannelRGBDict[Channel]].concat(innerRGBData), 353);
+			device.write([0xe0, ChannelRGBDict[Channel]].concat(ChannelRGBData), 353);
 			device.pause(5);
-			device.write([0xe0, outerChannelRGBDict[Channel]].concat(outerRGBData), 353);
-			device.pause(5);
-			device.send_report([0xe0, innerChannelRGBCommitDict[Channel], 0x01, 0x02], 353);
-			device.pause(5);
-			device.send_report([0xe0, outerChannelRGBCommitDict[Channel], 0x01, 0x02], 353);
+			device.send_report([0xe0, ChannelRGBCommitDict[Channel], 0x01, 0x02], 353);
 			device.pause(5);
 		}
 	}
@@ -141,7 +142,7 @@ function  getChannelColors(Channel, ledcount, shutdown, componentChannel) {
 	} else if(shutdown) {
 		RGBData = device.createColorArray(shutdownColor, ledcount, "Inline", "RBG");
 	} else if(componentChannel.shouldPulseColors()) {
-		ledcount = 120;
+		ledcount = 96;
 
 		const pulseColor = device.getChannelPulseColor(ChannelArray[Channel][0]);
 		RGBData = device.createColorArray(pulseColor, ledcount, "Inline", "RBG");

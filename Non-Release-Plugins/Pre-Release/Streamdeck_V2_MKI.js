@@ -5,6 +5,12 @@ export function Publisher() { return "l1berate"; }
 export function Size() { return [240, 136]; }
 export function DefaultPosition() { return [0, 0]; }
 export function DefaultScale() { return 1.333333333333; }
+/* global
+shutdownColor:readonly
+LightingMode:readonly
+forcedColor:readonly
+hwbrightness:readonly
+*/
 export function ControllableParameters() {
 	return [
 		{
@@ -91,7 +97,7 @@ function readKeys() {
 }
 
 function generateImage() {
-	if (false || LightingMode === "Forced") {
+	if (LightingMode === "Forced") {
 		return device.ConvertColorToImageBuffer(forcedColor, 480, 272, "JPEG");
 	}
 	const rawImageData = device.getImageBuffer(0, 0, 239, 135, {

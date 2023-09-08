@@ -50,21 +50,27 @@ export function Initialize() {
 }
 
 export function Render() {
-	SendChannel(0);
+	sendColors(0);
 }
 
-export function Shutdown() {
-	SendChannel(0, true);
+export function Shutdown(SystemSuspending) {
+
+	if(SystemSuspending){
+		sendColors(0, "#000000"); // Go Dark on System Sleep/Shutdown
+	}else{
+		sendColors(0, shutdownColor);
+	}
+
 }
 
-function SendChannel(Channel, shutdown = false) {
+function sendColors(Channel, overrideColor) {
 	let ChannelLedCount = device.channel(ChannelArray[Channel][0]).ledCount;
 	const componentChannel = device.channel(ChannelArray[Channel][0]);
 
 	let RGBData = [];
 
-	if(shutdown) {
-		RGBData = device.createColorArray(shutdownColor, ChannelLedCount, "Inline");
+	if(overrideColor) {
+		RGBData = device.createColorArray(overrideColor, ChannelLedCount, "Inline");
 	} else if(LightingMode === "Forced") {
 		RGBData = device.createColorArray(forcedColor, ChannelLedCount, "Inline");
 	} else if(componentChannel.shouldPulseColors()) {
