@@ -388,6 +388,7 @@ export class deviceLibrary {
 			0x1A59: "ROG Keris",
 			0x1846: "Pugio I",
 			0x1906: "Pugio II",
+			0x181C: "Spatha",
 			0x1979: "Spatha X Wireless",
 			0x1977: "Spatha X Wireless"
 		};
@@ -534,6 +535,15 @@ export class deviceLibrary {
 				endpoint : { "interface": 0, "usage": 0x0001, "usage_page": 0xFF01, "collection": 0x0000 },
 				protocol: "Legacy",
 
+			},
+			"Spatha":
+			{
+				size: [3, 3],
+				vLedNames: ["Scroll Wheel", "Logo", "Side Zone 1", "Side Zone 2"],
+				vLedPositions: [[1, 2], [1, 0], [0, 0], [0, 1]],
+				maxDPI: 16000,
+				endpoint : { "interface": 0, "usage": 0x0001, "usage_page": 0xFF01, "collection": 0x0000 },
+				protocol: "Legacy",
 			},
 			"Spatha X Wireless":
 			{
