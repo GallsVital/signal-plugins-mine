@@ -100,14 +100,14 @@ export class ASUS_Keyboard_Protocol {
 		this.setDeviceName(ASUSdeviceLibrary.PIDLibrary[this.getDeviceProductId()]);
 
 		const DeviceProperties = this.getDeviceProperties(this.getDeviceName());
-		this.setDeviceEndpoint(DeviceProperties.endpoint);
+		this.setDeviceEndpoint(DeviceProperties.Endpoint);
 		this.setLeds(DeviceProperties.vLeds);
 		this.setLedNames(DeviceProperties.vLedNames);
 		this.setLedPositions(DeviceProperties.vLedPositions);
 		this.setLedCount(DeviceProperties.LedCount);
 		this.setLedOffset(DeviceProperties.LedOffset);
 
-		if(DeviceProperties.battery){
+		if(DeviceProperties.Battery){
 			this.setBatteryFeature(true);
 
 			device.addFeature("battery");
@@ -121,7 +121,7 @@ export class ASUS_Keyboard_Protocol {
 		device.setControllableLeds(this.getLedNames(), this.getLedPositions());
 		device.setImageFromUrl(this.getDeviceImage(this.getDeviceName()));
 
-		device.set_endpoint(DeviceProperties.endpoint[`interface`], DeviceProperties.endpoint[`usage`], DeviceProperties.endpoint[`usage_page`]);
+		device.set_endpoint(DeviceProperties.Endpoint[`interface`], DeviceProperties.Endpoint[`usage`], DeviceProperties.Endpoint[`usage_page`]);
 	}
 
 	sendColors(overrideColor) {
@@ -236,7 +236,7 @@ export class deviceLibrary {
 					[0, 3], [1, 3], [2, 3], [3, 3], [4, 3], [5, 3], [6, 3], [7, 3], [8, 3], [9, 3], [10, 3], [11, 3], [12, 3],   [13, 3],  [14, 3],   //15
 					[0, 4], [1, 4], [2, 4],                         [6, 4],					[9, 4], [10, 4], [11, 4],   [12, 4], [13, 4], [14, 4],    //10
 				],
-				endpoint : { "interface": 1, "usage": 0x0001, "usage_page": 0xFF00, "collection": 0x0000 },
+				Endpoint : { "interface": 1, "usage": 0x0001, "usage_page": 0xFF00, "collection": 0x0000 },
 				LedCount: 144, // Testing purpose
 				LedOffset: 0x90, // Testing purpose
 			},
@@ -272,7 +272,7 @@ export class deviceLibrary {
 					//Logo,  left underglow, right underglow
 					[18, 0], [0, 2], [21, 2],
 				],
-				endpoint : { "interface": 1, "usage": 0x0001, "usage_page": 0xFF00, "collection": 0x0000 },
+				Endpoint : { "interface": 1, "usage": 0x0001, "usage_page": 0xFF00, "collection": 0x0000 },
 				LedCount: 144, // Testing purpose
 				LedOffset: 0x90, // Testing purpose
 			},
@@ -310,7 +310,7 @@ export class deviceLibrary {
 					// underglow
 					[0, 6], [1, 6], [2, 6], [3, 6], [4, 6], [4, 6], [5, 6], [6, 6], [7, 6], [7, 6], [8, 6], [9, 6], [10, 6], [10, 6], [11, 6], [12, 6], [13, 6], [13, 6], [14, 6], [15, 6], [16, 6], [16, 6], [17, 6], [18, 6], [19, 6], [20, 6], [20, 6], [21, 6], [22, 6], [23, 6],
 				],
-				endpoint : { "interface": 1, "usage": 0x0001, "usage_page": 0xFF00, "collection": 0x0000 },
+				Endpoint : { "interface": 1, "usage": 0x0001, "usage_page": 0xFF00, "collection": 0x0000 },
 				LedCount: 136, // Testing purpose
 				LedOffset: 0x87, // Testing purpose
 			},
@@ -341,7 +341,7 @@ export class deviceLibrary {
 					[0, 4],      [1, 4], [2, 4], [3, 4], [4, 4], [5, 4], [6, 4], [7, 4], [8, 4], [9, 4], [10, 4],               [13, 4],           [15, 4],           [17, 4], [18, 4], [19, 4], [20, 4], // 17
 					[0, 5], [1, 5], [2, 5],                      [6, 5],                        [10, 5], [11, 5],  [12, 5], [13, 5],    [14, 5], [15, 5], [16, 5],   [17, 5],         [19, 5],               // 13
 				],
-				endpoint : { "interface": 1, "usage": 0x0001, "usage_page": 0xFF00, "collection": 0x0000 },
+				Endpoint : { "interface": 1, "usage": 0x0001, "usage_page": 0xFF00, "collection": 0x0000 },
 				LedCount: 144, // Testing purpose
 				LedOffset: 0x90, // Testing purpose
 			},
@@ -379,7 +379,7 @@ export class deviceLibrary {
 
 					[0, 6], [0, 6], [1, 6], [1, 6], [2, 6], [3, 6], [4, 6], [4, 6], [5, 6],  [5, 6], [6, 6], [7, 6], [7, 6], [8, 6], [9, 6], [9, 6], [10, 6], [11, 6], [11, 6], [12, 6], [13, 6], [13, 6], [14, 6], [15, 6], [16, 6], [16, 6]
 				],
-				endpoint : { "interface": 1, "usage": 0x0001, "usage_page": 0xFF00, "collection": 0x0000 },
+				Endpoint : { "interface": 1, "usage": 0x0001, "usage_page": 0xFF00, "collection": 0x0000 },
 				LedCount: 144, // Testing purpose
 				LedOffset: 0x90, // Testing purpose
 
@@ -411,7 +411,7 @@ export class deviceLibrary {
 					[0, 4],  [1, 4], [2, 4], [3, 4], [4, 4], [5, 4], [6, 4], [7, 4], [8, 4], [9, 4], [10, 4], [11, 4],       [13, 4],           [15, 4],           [17, 4], [18, 4], [19, 4], [20, 4], // 18
 					[0, 5], [1, 5], [2, 5],                      [6, 5],                        [10, 5], [11, 5],  [12, 5], [13, 5],    [14, 5], [15, 5], [16, 5],   [17, 5],         [19, 5],               // 13
 				],
-				endpoint : { "interface": 1, "usage": 0x0001, "usage_page": 0xFF00, "collection": 0x0000 },
+				Endpoint : { "interface": 1, "usage": 0x0001, "usage_page": 0xFF00, "collection": 0x0000 },
 				LedCount: 144, // Testing purpose
 				LedOffset: 0x90, // Testing purpose
 
@@ -443,10 +443,10 @@ export class deviceLibrary {
 					[0, 4], [1, 4], [2, 4], [3, 4], [4, 4], [5, 4], [6, 4], [7, 4], [8, 4], [9, 4], [10, 4], [11, 4],          [13, 4], [14, 4], [15, 4], [16, 4], [17, 4], //17
 					[0, 5], [1, 5], [2, 5],			        [5, 5],	[6, 5], [7, 5],                 [10, 5], [11, 5], [12, 5], [13, 5], [14, 5], [15, 5], [16, 5], [17, 5], //14
 				],
-				endpoint : { "interface": 1, "usage": 0x0001, "usage_page": 0xFF00, "collection": 0x0000 },
+				Endpoint : { "interface": 1, "usage": 0x0001, "usage_page": 0xFF00, "collection": 0x0000 },
 				LedCount: 101, // Testing purpose
 				LedOffset: 0x65, // Testing purpose
-				battery: true
+				Battery: true
 			},
 			"ROG Strix Scope II 96 Wireless":
 			{
@@ -475,10 +475,10 @@ export class deviceLibrary {
 					[0, 4], [1, 4], [2, 4], [3, 4], [4, 4], [5, 4], [6, 4], [7, 4], [8, 4], [9, 4], [10, 4], [11, 4],          [13, 4], [14, 4], [15, 4], [16, 4], [17, 4], //17
 					[0, 5], [1, 5], [2, 5],			        [5, 5],	[6, 5], [7, 5],                 [10, 5], [11, 5], [12, 5], [13, 5], [14, 5], [15, 5], [16, 5], [17, 5], //14
 				],
-				endpoint : { "interface": 2, "usage": 0x0001, "usage_page": 0xFF00, "collection": 0x0000  },
+				Endpoint : { "interface": 2, "usage": 0x0001, "usage_page": 0xFF00, "collection": 0x0000  },
 				LedCount: 101, // Testing purpose
 				LedOffset: 0x65, // Testing purpose
-				battery: true
+				Battery: true
 			},
 		};
 
