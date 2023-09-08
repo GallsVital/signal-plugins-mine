@@ -15,6 +15,7 @@ angleSnapping:readonly
 mousePolling:readonly
 sleepTimeout:readonly
 lowPowerPercentage:readonly
+mouseResponse:readonly
 dpi1:readonly
 dpi2:readonly
 dpi3:readonly
@@ -117,33 +118,35 @@ export class ASUS_Mouse_Protocol {
 		this.setDeviceName(ASUSdeviceLibrary.PIDLibrary[this.getDeviceProductId()]);
 
 		const DeviceProperties = this.getDeviceProperties(this.getDeviceName());
-		this.setDeviceEndpoint(DeviceProperties.endpoint);
-		this.setDeviceProtocol(DeviceProperties.protocol);
+		this.setDeviceEndpoint(DeviceProperties.Endpoint);
+		this.setDeviceProtocol(DeviceProperties.Protocol);
 		this.setLedNames(DeviceProperties.vLedNames);
 		this.setLedPositions(DeviceProperties.vLedPositions);
+		device.set_endpoint(DeviceProperties.Endpoint[`interface`], DeviceProperties.Endpoint[`usage`], DeviceProperties.Endpoint[`usage_page`], DeviceProperties.Endpoint[`collection`]);
+		console.log("Initializing device...");
 
 		if(DeviceProperties.DPISupport === true){
 			this.setDPISupport(true);
+			this.setAngleSnapFeature(true);
+			this.setPollingFeature(true);
+
 			device.addProperty({"property":"SettingControl", "group":"mouse", "label":"Enable Setting Control", "type":"boolean", "default" :"false"});
 			device.addProperty({"property":"dpi1", "group":"mouse", "label":"DPI 1", "step":"100", "type":"number", "min":"100", "max": DeviceProperties.maxDPI, "default": "800", "live" : false});
 			device.addProperty({"property":"dpi2", "group":"mouse", "label":"DPI 2", "step":"100", "type":"number", "min":"100", "max": DeviceProperties.maxDPI, "default":"1200", "live" : false});
 			device.addProperty({"property":"dpi3", "group":"mouse", "label":"DPI 3", "step":"100", "type":"number", "min":"100", "max": DeviceProperties.maxDPI, "default":"1500", "live" : false});
 			device.addProperty({"property":"dpi4", "group":"mouse", "label":"DPI 4", "step":"100", "type":"number", "min":"100", "max": DeviceProperties.maxDPI, "default":"2000", "live" : false});
+			device.addProperty({"property":"angleSnapping", "group":"mouse", "label":"Angle snapping", "type":"boolean", "default":"false"});
+			device.addProperty({"property":"mousePolling", "group":"mouse", "label":"Polling Rate", "type":"combobox", "values":["125Hz", "250Hz", "500Hz", "1000Hz"], "default":"500Hz"});
+			device.addProperty({"property":"mouseResponse", "group":"mouse", "label":"button response", "type":"combobox", "values":["12ms", "16ms", "20ms", "24ms", "28ms", "32ms"], "default":"16ms"});
 
-			for(let i = 0; i< 4; i++){
+			for(let i = 0; i < 5; i++){
 				this.sendMouseSetting(i);
 			}
 
-			if(DeviceProperties.protocol === "Modern"){
-				this.setAngleSnapFeature(true);
-				this.setPollingFeature(true);
+			this.sendMouseSetting(6);
 
-				device.addProperty({"property":"angleSnapping", "group":"mouse", "label":"Angle snapping", "type":"boolean", "default":"false"});
-				device.addProperty({"property":"mousePolling", "group":"mouse", "label":"Polling Rate", "type":"combobox", "values":["125Hz", "250Hz", "500Hz", "1000Hz"], "default":"500Hz"});
-
+			if(DeviceProperties.Protocol === "Modern"){
 				this.modernDirectLightingMode();
-				this.sendMouseSetting(4);
-				this.sendMouseSetting(6);
 				console.log("This is a Modern device");
 
 				if(DeviceProperties.battery){
@@ -171,7 +174,6 @@ export class ASUS_Mouse_Protocol {
 		device.setSize(DeviceProperties.size);
 		device.setControllableLeds(this.getLedNames(), this.getLedPositions());
 		device.setImageFromUrl(this.getDeviceImage(this.getDeviceName()));
-		device.set_endpoint(DeviceProperties.endpoint[`interface`], DeviceProperties.endpoint[`usage`], DeviceProperties.endpoint[`usage_page`], DeviceProperties.endpoint[`collection`]);
 
 	}
 
@@ -317,49 +319,46 @@ export class ASUS_Mouse_Protocol {
 
 	sendMouseSetting(setting) {
 		if(SettingControl) {
-			console.log("Changing mouse property: " + setting);
-
 			switch (setting) {
 			case 0:
 				device.write([0x00, 0x51, 0x31, 0x00, 0x00, (dpi1/100 + 1)], 65);
-				device.write([0x00, 0x50, 0x03, 0x03], 65);
 				break;
 			case 1:
 				device.write([0x00, 0x51, 0x31, 0x01, 0x00, (dpi2/100 + 1)], 65);
-				device.write([0x00, 0x50, 0x03, 0x03], 65);
 				break;
 			case 2:
 				device.write([0x00, 0x51, 0x31, 0x02, 0x00, (dpi3/100 + 1)], 65);
-				device.write([0x00, 0x50, 0x03, 0x03], 65);
 				break;
 			case 3:
 				device.write([0x00, 0x51, 0x31, 0x03, 0x00, (dpi4/100 + 1)], 65);
-				device.write([0x00, 0x50, 0x03, 0x03], 65);
 				break;
 			case 4:
 				device.write([0x00, 0x51, 0x31, 0x04, 0x00, ASUSdeviceLibrary.pollingDict[mousePolling]], 65);
-				device.write([0x00, 0x50, 0x03, 0x03], 65);
+				break;
+			case 5:
+				device.write([0x00, 0x51, 0x31, 0x05, 0x00, ASUSdeviceLibrary.responseDict[mouseResponse]], 65);
 				break;
 			case 6:
 				device.write([0x00, 0x51, 0x31, 0x06, 0x00, angleSnapping ? 0x01 : 0x00], 65);
-				device.write([0x00, 0x50, 0x03, 0x03], 65);
 				break;
 			default:
 				console.log("Not a valid mouse setting: " + setting);
 				break;
 			}
 
+			device.write([0x00, 0x50, 0x03, 0x03], 65); // Apply
 		}
 	}
 
 	sendAllMouseSettings() {
 		if(SettingControl) {
-			device.write([0x00, 0x51, 0x31, 0x06, 0x00, angleSnapping ? 0x01 : 0x00], 65);
-			device.write([0x00, 0x51, 0x31, 0x04, 0x00, ASUSdeviceLibrary.pollingDict[mousePolling]], 65);
 			device.write([0x00, 0x51, 0x31, 0x00, 0x00, (dpi1/100 + 1)], 65);
 			device.write([0x00, 0x51, 0x31, 0x01, 0x00, (dpi2/100 + 1)], 65);
 			device.write([0x00, 0x51, 0x31, 0x02, 0x00, (dpi3/100 + 1)], 65);
 			device.write([0x00, 0x51, 0x31, 0x03, 0x00, (dpi4/100 + 1)], 65);
+			device.write([0x00, 0x51, 0x31, 0x04, 0x00, ASUSdeviceLibrary.pollingDict[mousePolling]], 65);
+			device.write([0x00, 0x51, 0x31, 0x05, 0x00, ASUSdeviceLibrary.responseDict[mouseResponse]], 65);
+			device.write([0x00, 0x51, 0x31, 0x06, 0x00, angleSnapping ? 0x01 : 0x00], 65);
 			device.write([0x00, 0x50, 0x03, 0x03], 65);
 		}
 	}
@@ -403,7 +402,7 @@ export class deviceLibrary {
 			0x1A59: "ROG Keris",
 			0x1846: "Pugio I",
 			0x1906: "Pugio II",
-			//0x181C: "Spatha", // Still on development
+			0x181C: "Spatha", // Still on development
 			0x1979: "Spatha X Wireless",
 			0x1977: "Spatha X Wireless"
 		};
@@ -415,8 +414,8 @@ export class deviceLibrary {
 				vLedNames: ["Scroll Wheel", "Logo"],
 				vLedPositions: [[1, 4], [1, 1]],
 				maxDPI: 16000,
-				endpoint : { "interface": 0, "usage": 0x0001, "usage_page": 0xFF01, "collection": 0x0000 }, // NEED CONFIRM
-				protocol: "Legacy",
+				Endpoint : { "interface": 0, "usage": 0x0001, "usage_page": 0xFF01, "collection": 0x0000 }, // NEED CONFIRM
+				Protocol: "Legacy",
 				DPISupport: true
 			},
 			"Chakram Wireless":
@@ -426,8 +425,8 @@ export class deviceLibrary {
 				vLedPositions: [[1, 4], [1, 1], [1, 0]],
 				maxDPI: 16000,
 				battery: true,
-				endpoint : { "interface": 0, "usage": 0x0001, "usage_page": 0xFF01, "collection": 0x0000 }, // NEED CONFIRM
-				protocol: "Legacy",
+				Endpoint : { "interface": 0, "usage": 0x0001, "usage_page": 0xFF01, "collection": 0x0000 }, // NEED CONFIRM
+				Protocol: "Legacy",
 				DPISupport: true
 			},
 			"Chakram X":
@@ -436,8 +435,8 @@ export class deviceLibrary {
 				vLedNames: ["Scroll Wheel", "Logo", "Front Zone", "Front Zone 2", "Front Zone 3"],
 				vLedPositions: [[1, 1], [1, 3], [0, 0], [1, 0], [2, 0]],
 				maxDPI: 36000,
-				endpoint : { "interface": 0, "usage": 0x0001, "usage_page": 0xFF01, "collection": 0x0000 }, // NEED CONFIRM
-				protocol: "ChakramX",
+				Endpoint : { "interface": 0, "usage": 0x0001, "usage_page": 0xFF01, "collection": 0x0000 }, // NEED CONFIRM
+				Protocol: "ChakramX",
 				DPISupport: true
 			},
 			"Gladius II Core":
@@ -446,8 +445,8 @@ export class deviceLibrary {
 				vLedNames: ["Logo", "Scroll Wheel"],
 				vLedPositions: [[3, 5], [3, 0]],
 				maxDPI: 6200,
-				endpoint : { "interface": 0, "usage": 0x0001, "usage_page": 0xFF01, "collection": 0x0000 }, // NEED CONFIRM
-				protocol: "Legacy",
+				Endpoint : { "interface": 0, "usage": 0x0001, "usage_page": 0xFF01, "collection": 0x0000 }, // NEED CONFIRM
+				Protocol: "Legacy",
 				DPISupport: true
 			},
 			"Gladius II Origin":
@@ -456,8 +455,8 @@ export class deviceLibrary {
 				vLedNames: ["Scroll Wheel", "Logo", "Underglow"],
 				vLedPositions: [[3, 0], [3, 5], [3, 6]],
 				maxDPI: 12000,
-				endpoint : { "interface": 2, "usage": 0x0001, "usage_page": 0xFF01, "collection": 0x0000 },
-				protocol: "Legacy",
+				Endpoint : { "interface": 2, "usage": 0x0001, "usage_page": 0xFF01, "collection": 0x0000 },
+				Protocol: "Legacy",
 				DPISupport: true
 			},
 			"Gladius II Wireless":
@@ -467,8 +466,8 @@ export class deviceLibrary {
 				vLedPositions: [[1, 2], [1, 0]],
 				maxDPI: 16000,
 				battery: true,
-				endpoint: 1,
-				protocol: "Legacy",
+				Endpoint: 1,
+				Protocol: "Legacy",
 				DPISupport: true
 			},
 			"Gladius III Wireless":
@@ -478,8 +477,8 @@ export class deviceLibrary {
 				vLedPositions: [[1, 2], [1, 0], [0, 0]],
 				maxDPI: 19000,
 				battery: true,
-				endpoint : { "interface": 0, "usage": 0x0001, "usage_page": 0xFF01, "collection": 0x0000 },
-				protocol: "Modern",
+				Endpoint : { "interface": 0, "usage": 0x0001, "usage_page": 0xFF01, "collection": 0x0000 },
+				Protocol: "Modern",
 				DPISupport: true
 			},
 			"Gladius III Aimpoint":
@@ -489,8 +488,8 @@ export class deviceLibrary {
 				vLedPositions: [[1, 0]],
 				maxDPI: 36000,
 				battery: true,
-				endpoint : { "interface": 0, "usage": 0x0001, "usage_page": 0xFF01, "collection": 0x0000 },
-				protocol: "Modern",
+				Endpoint : { "interface": 0, "usage": 0x0001, "usage_page": 0xFF01, "collection": 0x0000 },
+				Protocol: "Modern",
 				DPISupport: true
 			},
 			"Impact II":
@@ -499,8 +498,8 @@ export class deviceLibrary {
 				vLedNames: ["Scroll Wheel", "Logo"],
 				vLedPositions: [[1, 2], [1, 0]],
 				maxDPI: 6200,
-				endpoint : { "interface": 0, "usage": 0x0001, "usage_page": 0xFF01, "collection": 0x0000 }, // NEED CONFIRM
-				protocol: "Legacy",
+				Endpoint : { "interface": 0, "usage": 0x0001, "usage_page": 0xFF01, "collection": 0x0000 }, // NEED CONFIRM
+				Protocol: "Legacy",
 				DPISupport: true
 			},
 			"Impact II Electro Punk": //This is highly suspicious. Why does this have an extra zone?
@@ -509,8 +508,8 @@ export class deviceLibrary {
 				vLedNames: ["Scroll Wheel", "Logo", "Underglow"],
 				vLedPositions: [[1, 1], [1, 2], [1, 0]],
 				maxDPI: 6200,
-				endpoint : { "interface": 0, "usage": 0x0001, "usage_page": 0xFF01, "collection": 0x0000 }, // NEED CONFIRM
-				protocol: "Legacy",
+				Endpoint : { "interface": 0, "usage": 0x0001, "usage_page": 0xFF01, "collection": 0x0000 }, // NEED CONFIRM
+				Protocol: "Legacy",
 				DPISupport: true
 			},
 			"Impact II Wireless":
@@ -520,8 +519,8 @@ export class deviceLibrary {
 				vLedPositions: [[1, 2], [1, 0]],
 				maxDPI: 16000,
 				battery: true,
-				endpoint : { "interface": 0, "usage": 0x0001, "usage_page": 0xFF01, "collection": 0x0000 }, // NEED CONFIRM
-				protocol: "Legacy",
+				Endpoint : { "interface": 0, "usage": 0x0001, "usage_page": 0xFF01, "collection": 0x0000 }, // NEED CONFIRM
+				Protocol: "Legacy",
 				DPISupport: true
 			},
 			"ROG Keris":
@@ -530,8 +529,8 @@ export class deviceLibrary {
 				vLedNames: ["Logo", "Scroll Wheel"],
 				vLedPositions: [[3, 5], [3, 0]],
 				maxDPI: 16000,
-				endpoint : { "interface": 0, "usage": 0x0001, "usage_page": 0xFF01, "collection": 0x0000 },
-				protocol: "Legacy",
+				Endpoint : { "interface": 0, "usage": 0x0001, "usage_page": 0xFF01, "collection": 0x0000 },
+				Protocol: "Legacy",
 				DPISupport: true
 			},
 			"Pugio I":
@@ -540,8 +539,8 @@ export class deviceLibrary {
 				vLedNames: ["Scroll Wheel", "Logo", "Underglow"],
 				vLedPositions: [[3, 0], [3, 5], [3, 6]],
 				maxDPI: 7200,
-				endpoint : { "interface": 2, "usage": 0x0001, "usage_page": 0xFF01, "collection": 0x0000 },
-				protocol: "Legacy",
+				Endpoint : { "interface": 2, "usage": 0x0001, "usage_page": 0xFF01, "collection": 0x0000 },
+				Protocol: "Legacy",
 				DPISupport: true
 			},
 			"Pugio II":
@@ -550,8 +549,8 @@ export class deviceLibrary {
 				vLedNames: ["Logo", "Scroll Wheel", "Underglow"],
 				vLedPositions: [[3, 5], [3, 0], [3, 6]],
 				maxDPI: 16000,
-				endpoint : { "interface": 0, "usage": 0x0001, "usage_page": 0xFF01, "collection": 0x0000 },
-				protocol: "Legacy",
+				Endpoint : { "interface": 0, "usage": 0x0001, "usage_page": 0xFF01, "collection": 0x0000 },
+				Protocol: "Legacy",
 				DPISupport: true
 			},
 			"Spatha":
@@ -560,8 +559,8 @@ export class deviceLibrary {
 				vLedNames: ["Scroll Wheel", "Logo", "Side Zone 1", "Side Zone 2"],
 				vLedPositions: [[1, 2], [1, 0], [0, 0], [0, 1]],
 				maxDPI: 16000,
-				endpoint : { "interface": 0, "usage": 0x0001, "usage_page": 0xFF01, "collection": 0x0000 },
-				protocol: "Legacy",
+				Endpoint : { "interface": 1, "usage": 0x0001, "usage_page": 0x000C, "collection": 0x0002 },
+				Protocol: "Legacy",
 				DPISupport: true
 			},
 			"Spatha X Wireless":
@@ -571,8 +570,8 @@ export class deviceLibrary {
 				vLedPositions: [[1, 2], [1, 0], [0, 0], [0, 1]],
 				maxDPI: 19000,
 				battery: true,
-				endpoint : { "interface": 0, "usage": 0x0001, "usage_page": 0xFF01, "collection": 0x0000 },
-				protocol: "Modern",
+				Endpoint : { "interface": 0, "usage": 0x0001, "usage_page": 0xFF01, "collection": 0x0000 },
+				Protocol: "Modern",
 				DPISupport: true
 			},
 		};
@@ -595,16 +594,23 @@ export class deviceLibrary {
 			"Spatha X Wireless": 	"https://marketplace.signalrgb.com/devices/brands/asus/mice/spatha-x.png"
 		};
 
-		this.pollingDict =
-		{
+		this.pollingDict = {
 			"125Hz"  : 0,
 			"250Hz"  : 1,
 			"500Hz"  : 2,
 			"1000Hz" : 3,
 		};
 
-		this.sleepModeDict =
-		{
+		this.responseDict = {
+			"12ms" : 2,
+			"16ms" : 3,
+			"20ms" : 4,
+			"24ms" : 5,
+			"28ms" : 6,
+			"32ms" : 7,
+		};
+
+		this.sleepModeDict = {
 			"1" : 0x00,
 			"2" : 0x01,
 			"3" : 0x02,
@@ -613,8 +619,7 @@ export class deviceLibrary {
 			"Never" : 0xff
 		};
 
-		this.lowPowerPercentageDict =
-		{
+		this.lowPowerPercentageDict = {
 			"Never" : 0x00,
 			"10%" : 0x0A,
 			"15%" : 0x0F,
@@ -653,8 +658,20 @@ export function onangleSnappingChanged() {
 }
 
 export function onSettingControlChanged() {
-	ASUS.sendAllMouseSettings();
-	ASUS.sendLightingSettings();
+	if(ASUS.getDPISupport()){
+		for(let i = 0; i< 4; i++){
+			ASUS.sendMouseSetting(i);
+		}
+
+		if(ASUS.getDeviceProtocol() === "Modern"){
+			ASUS.sendMouseSetting(4);
+			ASUS.sendMouseSetting(6);
+
+			if(ASUS.getBatteryFeature()){
+				ASUS.sendLightingSettings();
+			}
+		}
+	}
 }
 
 function hexToRgb(hex) {
