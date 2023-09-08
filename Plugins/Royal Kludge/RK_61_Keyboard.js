@@ -1,20 +1,20 @@
 export function Name() { return "Royal Kludge RK61"; }
 export function VendorId() { return 0x258a; }
-export function ProductId() { return [0x0055, 0x007a, 0x0060, 0x004a]; }
+export function ProductId() { return [0x0055, 0x007a, 0x0060, 0x004a, 0x00ec]; }
 export function Publisher() { return "WhirlwindFX"; }
 export function Size() { return [14, 6]; }
 export function DefaultPosition(){return [240, 120];}
 export function DefaultScale(){return 8.0;}
 /* global
-shutdownColor:readonly
 LightingMode:readonly
 forcedColor:readonly
+rgSwap:readonly
 */
 export function ControllableParameters(){
 	return [
-		{"property":"shutdownColor", "group":"lighting", "label":"Shutdown Color", "min":"0", "max":"360", "type":"color", "default":"#009bde"},
 		{"property":"LightingMode", "group":"lighting", "label":"Lighting Mode", "type":"combobox", "values":["Canvas", "Forced"], "default":"Canvas"},
 		{"property":"forcedColor", "group":"lighting", "label":"Forced Color", "min":"0", "max":"360", "type":"color", "default":"#009bde"},
+		{"property":"rgSwap", "group":"", "label":"Swap Red and Green Color Order", "type":"boolean", "default":"true"},
 	];
 }
 
@@ -57,8 +57,8 @@ export function Initialize() {
 
 export function Render() {
 	sendColors();
-	sendZonefake(6);
-	sendZonefake(7);
+	sendPaddingZone(6);
+	sendPaddingZone(7);
 }
 
 export function Shutdown(SystemSuspending) {
@@ -71,37 +71,16 @@ export function Shutdown(SystemSuspending) {
 
 }
 
-function sendZonefake(zone) {
-	const packet = [];
-	packet[0x00] = 0x0a;
-	packet[0x01] = 0x07;
-	packet[0x02] = zone;
-
-	device.send_report(packet, 65);
+function sendPaddingZone(zone) { //These are empty zones that we still need to send because the protocol is used for boards with more keys.
+	device.send_report([0x0A, 0x07, zone], 65);
 }
 
 function sendInitalPacket(data) {
-	let packet = [];
-
-	packet[0x00] = 0x0A;
-	packet[0x01] = 0x07;
-	packet[0x02] = 0x01;
-	packet[0x03] = 0x06;
-
-	packet = packet.concat(data);
-
-	device.send_report(packet, 65);
+	device.send_report([0x0A, 0x07, 0x01, 0x06].concat(data), 65);
 }
 
 function StreamPacket(zone, data) {
-	let packet = [];
-
-	packet[0x00] = 0x0a;
-	packet[0x01] = 0x07;
-	packet[0x02] = zone;
-	packet = packet.concat(data);
-
-	device.send_report(packet, 65);
+	device.send_report([0x0A, 0x07, zone].concat(data), 65);
 	device.pause(1);
 }
 
@@ -111,7 +90,7 @@ function sendColors(overrideColor) {
 	for(let iIdx = 0; iIdx < vKeys.length; iIdx++) {
 		const iPxX = vKeyPositions[iIdx][0];
 		const iPxY = vKeyPositions[iIdx][1];
-		var col;
+		let col;
 
 		if(overrideColor) {
 			col = hexToRgb(overrideColor);
@@ -121,8 +100,8 @@ function sendColors(overrideColor) {
 			col = device.color(iPxX, iPxY);
 		}
 
-		RGBData[vKeys[iIdx] ] = col[1];
-		RGBData[vKeys[iIdx] +  1] = col[0];
+		RGBData[vKeys[iIdx] ] = rgSwap ? col[1] : col[0];
+		RGBData[vKeys[iIdx] +  1] = rgSwap ? col[0] : col[1];
 		RGBData[vKeys[iIdx] +  2] = col[2];
 	}
 

@@ -214,6 +214,6 @@ export function Validate(endpoint) {
 	return endpoint.interface === -1 || endpoint.interface === 0;
 }
 
-export function ImageUrl(){
+export function ImageUrl() {
 	return "https://marketplace.signalrgb.com/devices/brands/thermaltake/lighting-controllers/led-box.png";
 }

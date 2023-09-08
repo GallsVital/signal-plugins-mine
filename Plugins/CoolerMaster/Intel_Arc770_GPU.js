@@ -112,19 +112,31 @@ export function Render() {
 	device.pause(1);
 }
 
-export function Shutdown() {
-	sendColors(0x0f, 0, 14, true);
-	sendColors(0x0f, 15, 29, true);
-	sendColors(0x0f, 30, 44, true);
-	sendColors(0x0f, 45, 59, true);
-	sendColors(0x0f, 60, 74, true);
-	sendColors(0x02, 75, 76, true);
-	sendColors(0x05, 77, 81, true);
-	sendColors(0x08, 82, 89, true);
-	device.pause(1);
+export function Shutdown(SystemSuspending) {
+
+	if(SystemSuspending){
+		sendColors(0x0f, 0, 14, "#000000");
+		sendColors(0x0f, 15, 29, "#000000");
+		sendColors(0x0f, 30, 44, "#000000");
+		sendColors(0x0f, 45, 59, "#000000");
+		sendColors(0x0f, 60, 74, "#000000");
+		sendColors(0x02, 75, 76, "#000000");
+		sendColors(0x05, 77, 81, "#000000");
+		sendColors(0x08, 82, 89, "#000000");
+	}else{
+		sendColors(0x0f, 0, 14, shutdownColor);
+		sendColors(0x0f, 15, 29, shutdownColor);
+		sendColors(0x0f, 30, 44, shutdownColor);
+		sendColors(0x0f, 45, 59, shutdownColor);
+		sendColors(0x0f, 60, 74, shutdownColor);
+		sendColors(0x02, 75, 76, shutdownColor);
+		sendColors(0x05, 77, 81, shutdownColor);
+		sendColors(0x08, 82, 89, shutdownColor);
+	}
+
 }
 
-function sendColors(zone, start, end, shutdown = false) {
+function sendColors(zone, start, end, overrideColor) {
 
 	const packet = [];
 	packet[0] = 0x00; //Zero Padding
@@ -141,8 +153,8 @@ function sendColors(zone, start, end, shutdown = false) {
 		const iLed = vLeds[start+idx];
 		let color;
 
-		if(shutdown){
-			color = hexToRgb(shutdownColor);
+		if(overrideColor){
+			color = hexToRgb(overrideColor);
 		}else if (LightingMode === "Forced") {
 			color = hexToRgb(forcedColor);
 		}else{

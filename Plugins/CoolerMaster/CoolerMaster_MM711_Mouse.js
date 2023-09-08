@@ -80,7 +80,7 @@ export function Initialize() {
 }
 
 export function Render() {
-	SendColors();
+	sendColors();
 
 	if((savedDpi1 != dpi1 ||
         savedDpi2 != dpi2 ||
@@ -95,8 +95,14 @@ export function Render() {
 	}
 }
 
-export function Shutdown() {
-	SendColors(true);
+export function Shutdown(SystemSuspending) {
+
+	if(SystemSuspending){
+		sendColors("#000000"); // Go Dark on System Sleep/Shutdown
+	}else{
+		sendColors(shutdownColor);
+	}
+
 }
 
 function sendDpi(){
@@ -136,16 +142,16 @@ function sendDpi(){
 	device.write([0x00, 0x51, 0x10, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x05, 0x00, 0x00, 0x00, 0x01], 65);
 }
 
-function SendColors(shutdown = false){
+function sendColors(overrideColor){
 	const RGBData = [];
 
 	for(let iIdx = 0; iIdx < vKeymap.length; iIdx++) {
 		const iPxX = vLedPositions[iIdx][0];
 		const iPxY = vLedPositions[iIdx][1];
-		var mxPxColor;
+		let mxPxColor;
 
-		if(shutdown){
-			mxPxColor = hexToRgb(shutdownColor);
+		if(overrideColor){
+			mxPxColor = hexToRgb(overrideColor);
 		}else if (LightingMode === "Forced") {
 			mxPxColor = hexToRgb(forcedColor);
 		}else{

@@ -86,20 +86,24 @@ export function Initialize() {
 }
 
 export function Render() {
-	sendPackets();
+	sendColors();
 }
 
-export function Shutdown() {
-	sendPackets(true);
+export function Shutdown(SystemSuspending) {
+
+	if(SystemSuspending){
+		sendColors("#000000"); // Go Dark on System Sleep/Shutdown
+	}else{
+		sendColors(shutdownColor);
+	}
+
 }
 
-export function onkeyboardTypeChanged()
-{
+export function onkeyboardTypeChanged() {
 	setKeymap();
 }
 
-function setKeymap()
-{
+function setKeymap() {
 	if(keyboardType === "TKL") {
 		device.setSize([17, 6]);
 		device.setControllableLeds(vKeyNamesTKL, vKeyPositionsTKL);
@@ -109,8 +113,8 @@ function setKeymap()
 	}
 }
 
-function sendPackets(shutdown = false) {
-	const RGBData = grabColors(shutdown);
+function sendColors(overrideColor) {
+	const RGBData = grabColors(overrideColor);
 
 	for(let packets = 0; packets < 8; packets++) {
 		let packet = [ 0x01, 0x0f, 0x00, 0x00, packets, (packets === 7) ? 0x12 : 0x36 ];
@@ -119,7 +123,7 @@ function sendPackets(shutdown = false) {
 	}
 }
 
-function grabColors(shutdown) {
+function grabColors(overrideColor) {
 	const RGBData = new Array(464).fill(0);
 
 	if(keyboardType === "TKL") {
@@ -128,8 +132,8 @@ function grabColors(shutdown) {
 			const iPxY = vKeyPositionsTKL[iIdx][1];
 			let col;
 
-			if(shutdown) {
-				col = hexToRgb(shutdownColor);
+			if(overrideColor) {
+				col = hexToRgb(overrideColor);
 			} else if (LightingMode === "Forced") {
 				col = hexToRgb(forcedColor);
 			} else {
@@ -146,8 +150,8 @@ function grabColors(shutdown) {
 			const iPxY = vKeyPositions68[iIdx][1];
 			let col;
 
-			if(shutdown) {
-				col = hexToRgb(shutdownColor);
+			if(overrideColor) {
+				col = hexToRgb(overrideColor);
 			} else if (LightingMode === "Forced") {
 				col = hexToRgb(forcedColor);
 			} else {

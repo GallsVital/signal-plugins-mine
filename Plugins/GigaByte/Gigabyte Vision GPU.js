@@ -269,6 +269,7 @@ class NvidiaGPUDeviceIds {
 		this.RTX3090         = 0x2204;
 		this.RTX3090TI       = 0x2203;
 		this.RTX4060TI		 = 0x2803;
+		this.RTX4060TI_OC	 = 0x2805;
 		this.RTX4070		 = 0x2786;
 		this.RTX4070TI 		 = 0x2782;
 		this.RTX4080		 = 0x2704;
@@ -283,6 +284,7 @@ class GigabyteVisionDeviceIds {
 		this.GTX1050TI_G1_GAMING            = 0x372A;
 		this.GTX1060_G1_GAMING_OC           = 0x3739;
 		this.GTX1060_XTREME                 = 0x3776;
+		this.GTX1070_GAMING                 = 0x3772;
 		this.GTX1070_XTREME                 = 0x3778;
 		this.GTX1070_G1_GAMING              = 0x3701;
 		this.GTX1070TI_GAMING               = 0x3794;
@@ -292,78 +294,83 @@ class GigabyteVisionDeviceIds {
 		this.GTX1080TI_XTREME               = 0x3751;
 		this.GTX1080TI_XTREME_WATERFORCE    = 0x3762;
 		this.GTX1080TI_XTREME_WATERFORCE_2  = 0x376A;
+		this.GTX1080TI_AORUS_11G       		= 0x3752;
+
 		this.GTX1650_GAMING_OC              = 0x3FE4;
 		this.GTX1660_GAMING_OC_6GB          = 0x3FC7;
 		this.GTX1660TI_GAMING_OC_6GB        = 0x3FC5;
 		this.GTX1660S_GAMING_OC             = 0x4014;
+
 		this.RTX2060_GAMING_OC              = 0x37CE;
 		this.RTX2060_GAMING_OC_PRO          = 0x3FC2;
+		this.RTX2060_GAMING_OC_PRO_2		= 0x3FC9;
 		this.RTX2060_GAMING_OC_PRO_WHITE    = 0x3FD0;
 		this.RTX2060S_GAMING_OC_3X_WHITE    = 0x401E;
 		this.RTX2060S_GAMING                = 0x404A;
 		this.RTX2060S_GAMING_OC             = 0x3FED;
 		this.RTX2060S_GAMING_OC_WHITE       = 0x3FFE;
+		this.RTX2060S_GAMING_OC_3X_8GB		= 0x4009;
 		this.RTX2070_GAMING_OC              = 0x37AD;
 		this.RTX2070_WINDFORCE              = 0x37C2;
-		this.RTX2080_A_GAMING_OC            = 0x37A7;
-		this.RTX2080_GAMING_OC              = 0x37D6;
-		this.RTX2080S_GAMING_OC             = 0x3FE9;
 		this.RTX2070S_GAMING_OC             = 0x3FEB;
 		this.RTX2070S_GAMING_OC_V2          = 0x3FF6;
 		this.RTX2070S_GAMING_OC_3X          = 0x4008;
 		this.RTX2070S_GAMING_OC_3X_WHITE    = 0x400D;
+		this.RTX2070S_GAMING_OC_3X_2		= 0x4010;
+		this.RTX2070S_GAMING_WINDFORCE_OC   = 0x3FFC;
+		this.RTX2070S_GAMING_OC_WHITE 		= 0x3fff;
+		this.RTX2080_A_GAMING_OC            = 0x37A7;
+		this.RTX2080_WINDFORCE				= 0x379f;
+		this.RTX2080_GAMING_OC              = 0x37D6;
+		this.RTX2080S_GAMING_OC             = 0x3FE9;
+		this.RTX2080TI_GAMING_OC            = 0x37A9;
+
 		this.RTX3050_EAGLE_OC               = 0x40AA;
 		this.RTX3060_EAGLE_OC_REV          	= 0x4071;
 		this.RTX3060_EAGLE_OC_REV2          = 0x4072;
 		this.RTX3060_VISION_OC_12GB         = 0x4073;
 		this.RTX3060_GAMING_OC_12GB         = 0x4074;
+		this.RTX3060TI_VISION_OC			= 0x4077;
 		this.RTX3060TI_GAMING_OC            = 0x405A;
 		this.RTX3060TI_EAGLE_OC             = 0x405B;
 		this.RTX3060TI_EAGLE_OC_REV2_LHR    = 0x4060;
 		this.RTX3060TI_GAMING_OC_PRO        = 0x405E;
-		this.RTX3080_VISION_OC              = 0x404B;
 		this.RTX3070_GAMING_OC              = 0x404C;
 		this.RTX3070_VISION_OC              = 0x404D;
+		this.RTX3070_EAGLE_OC           	= 0x404E;
 		this.RTX3070TI_GAMING	            = 0x40B6;
 		this.RTX3070TI_GAMING_OC            = 0x408F;
 		this.RTX3070TI_EAGLE                = 0x408C;
 		this.RTX3070TI_EAGLE_OC             = 0x408D;
 		this.RTX3070TI_VISION_OC            = 0x4090;
+		this.RTX3080_VISION_OC              = 0x404B;
 		this.RTX3080_EAGLE_12GB_LHR         = 0x409F;
 		this.RTX3080_GAMING_OC              = 0x403F;
 		this.RTX3080TI_EAGLE                = 0x4085;
 		this.RTX3080TI_EAGLE_OC             = 0x4086;
 		this.RTX3080TI_VISION_OC            = 0x4087;
 		this.RTX3080TI_GAMING_OC            = 0x4088;
-		this.RTX3090_GAMING_OC_24GB         = 0x4043;
 		this.RTX3080_12G_GAMING_OC          = 0x40A2;
+		this.RTX3080_EAGLE_OC				= 0x4040;
+		this.RTX3090_VISION_OC_24G			= 0x4044;
+		this.RTX3090_GAMING_OC_24GB         = 0x4043;
+
 		this.RTX4060TI_GAMING_OC            = 0x40F8;
+		this.RTX4060TI_GAMING_OC_2			= 0x4112;
+		this.RTX4070_AERO					= 0x40E6;
+		this.RTX4070_EAGLE_OC				= 0x40ED;
 		this.RTX4070TI_GAMING_OC            = 0x40c6;
 		this.RTX4070TI_EAGLE_12G			= 0x40D2;
 		this.RTX4070TI_EAGLE_OC_12G			= 0x40CA;
 		this.RTX4070TI_AERO					= 0x40CB;
 		this.RTX4070TI_AERO_OC				= 0x40FF;
-		this.RTX4080_EAGLE_OC_16GD			= 0x40BE;
-		this.RTX4090_GAMING_OC_24GB			= 0x40BF;
-		this.GTX1070_GAMING                 = 0x3772;
-		this.GTX1080TI_AORUS_11G       		= 0x3752;
-		this.RTX2060_GAMING_OC_PRO          = 0x3FC9;
-		this.RTX2060S_GAMING_OC_3X_8GB		= 0x4009;
-		this.RTX2070S_GAMING_OC_3X_2		= 0x4010;
-		this.RTX2070S_GAMING_OC_WHITE 		= 0x3fff;
-		this.RTX2080_WINDFORCE				= 0x379f;
-		this.RTX2080TI_GAMING_OC            = 0x37A9;
-		this.RTX3060TI_VISION_OC			= 0x4077;
-		this.RTX3070_EAGLE_OC           	= 0x404E;
-		this.RTX3080_EAGLE_OC				= 0x4040;
-		this.RTX3090_VISION_OC_24G			= 0x4044;
-		this.RTX4070_AERO					= 0x40E6;
-		this.RTX4070_EAGLE_OC				= 0x40ED;
 		this.RTX4070TI_EAGLE				= 0x40EC;
 		this.RTX4070TI_MASTER_12G           = 0x40bb;
+		this.RTX4080_EAGLE_OC_16GD			= 0x40BE;
 		this.RTX4080_GAMING_OC	            = 0x40bc;
 		this.RTX4080_AERO_OC_16G			= 0x40C5;
 		this.RTX4090_AERO_OC				= 0x40E4;
+		this.RTX4090_GAMING_OC_24GB			= 0x40BF;
 	}
 }
 
@@ -406,6 +413,7 @@ class GigabyteVisionGPuList {
 			new GigabyteVisionIdentifier(Nvidia.RTX2070S,       GigabyteVisionIds.RTX2070S_GAMING_OC_V2,         0x47, "GIGABYTE 2070 Super Gaming OC V2"),
 			new GigabyteVisionIdentifier(Nvidia.RTX2070S,       GigabyteVisionIds.RTX2070S_GAMING_OC_3X,         0x47, "GIGABYTE 2070 Super Gaming OC 3x"),
 			new GigabyteVisionIdentifier(Nvidia.RTX2070S,       GigabyteVisionIds.RTX2070S_GAMING_OC_3X_WHITE,   0x47, "GIGABYTE 2070 Super Gaming OC 3x White Edition"),
+			new GigabyteVisionIdentifier(Nvidia.RTX2070S,       GigabyteVisionIds.RTX2070S_GAMING_WINDFORCE_OC,  0x47, "GIGABYTE 2070 Super Gaming OC Windforce 8GB"),
 			new GigabyteVisionIdentifier(Nvidia.RTX3050,        GigabyteVisionIds.RTX3050_EAGLE_OC,              0x62, "GIGABYTE 3050 Eagle OC"),
 			new GigabyteVisionIdentifier(Nvidia.RTX3060_LHR,    GigabyteVisionIds.RTX3060_EAGLE_OC_REV,          0x63, "GIGABYTE 3060 Eagle OC LHR"),
 			new GigabyteVisionIdentifier(Nvidia.RTX3060,        GigabyteVisionIds.RTX3060_EAGLE_OC_REV2,         0x32, "GIGABYTE 3060 Eagle OC Rev 2.0"),
@@ -452,6 +460,7 @@ class GigabyteVisionGPuList {
 			new GigabyteVisionIdentifier(Nvidia.GTX1080,      GigabyteVisionIds.GTX1080_G1_GAMING,               0x48, "GIGABYTE 1080 G1 Gaming"), //Confirmed!
 			new GigabyteVisionIdentifier(Nvidia.GTX1080TI,      GigabyteVisionIds.GTX1080TI_AORUS_11G,         	 0x47, "GIGABYTE 1080Ti AORUS"), //Confirmed
 			new GigabyteVisionIdentifier(Nvidia.RTX2060_TU104,  GigabyteVisionIds.RTX2060_GAMING_OC_PRO,         0x47, "GIGABYTE 2060 Gaming OC Pro"), //Very iffy.
+			new GigabyteVisionIdentifier(Nvidia.RTX2060_TU104,  GigabyteVisionIds.RTX2060_GAMING_OC_PRO_2,		 0x47, "GIGABYTE 2060 Gaming OC Pro"), //Very iffy.
 			new GigabyteVisionIdentifier(Nvidia.RTX2060S_OC,    GigabyteVisionIds.RTX2060S_GAMING_OC,     		 0x47, "GIGABYTE 2060 Super Gaming OC"), //Confirmed.
 			new GigabyteVisionIdentifier(Nvidia.RTX2060S_OC,    GigabyteVisionIds.RTX2060S_GAMING_OC_3X_8GB,     0x47, "GIGABYTE 2060 Super Gaming OC Windforce"), //Confirmed.
 			new GigabyteVisionIdentifier(Nvidia.RTX2060S_OC,    GigabyteVisionIds.RTX2060S_GAMING_OC_WHITE,      0x47, "GIGABYTE 2060 Super Gaming OC White"), //Confirmed.
@@ -468,6 +477,7 @@ class GigabyteVisionGPuList {
 			new GigabyteVisionIdentifier(Nvidia.RTX3090,        GigabyteVisionIds.RTX3090_VISION_OC_24G,         0x63, "GIGABYTE 3090 Vision OC"),
 			new GigabyteVisionIdentifier(Nvidia.RTX3090,        GigabyteVisionIds.RTX3090_GAMING_OC_24GB,        0x62, "GIGABYTE 3090 Gaming OC 24G"), // Confirmed
 			new GigabyteVisionIdentifier(Nvidia.RTX4060TI,		GigabyteVisionIds.RTX4060TI_GAMING_OC,			 0x71, "GIGABYTE 4060Ti Gaming OC"),
+			new GigabyteVisionIdentifier(Nvidia.RTX4060TI_OC,	GigabyteVisionIds.RTX4060TI_GAMING_OC_2,		 0x71, "GIGABYTE 4060Ti Gaming OC"),
 			new GigabyteVisionIdentifier(Nvidia.RTX4070,		GigabyteVisionIds.RTX4070_AERO,					 0x71, "GIGABYTE 4070 Aero"),
 			new GigabyteVisionIdentifier(Nvidia.RTX4070,		GigabyteVisionIds.RTX4070_EAGLE_OC,				 0x71, "GIGABYTE 4070 Eagle OC"),
 			new GigabyteVisionIdentifier(Nvidia.RTX4070TI,		GigabyteVisionIds.RTX4070TI_EAGLE,				 0x71, "GIGABYTE 4070Ti Eagle"),

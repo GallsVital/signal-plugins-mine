@@ -125,6 +125,39 @@ function setLEDs() {
 	device.setControllableLeds(vLedNames, vLedPositions);
 }
 
+const AddressPairs = {
+	0x60: [0x50, 0x48],
+	0x61: [0x51, 0x49],
+	0x62: [0x52, 0x4A],
+	0x63: [0x53, 0x4B]
+};
+
+function CheckForHyperFuryRam(bus, addr){ ///MMM I love checking SPD Values for Voltage to detect a RAM Kit.
+	if(!AddressPairs.hasOwnProperty(addr)){
+		return false;
+	}
+	const SubAddresses = AddressPairs[addr];
+	const iReturn = bus.ReadByte(SubAddresses[0], 0x31); // Value changes every time
+	bus.log(`Address [${SubAddresses[0]}], Reg 31: ${iReturn}`, {toFile: true});
+
+	if(iReturn >= 0){
+		const iRet1 = bus.ReadByte(SubAddresses[1], 0x21);
+		bus.log(`Address [${SubAddresses[1]}], Reg 21: ${iRet1}`, {toFile: true});
+
+		const iRet2 = bus.ReadByte(SubAddresses[1], 0x25);
+		bus.log(`Address [${SubAddresses[1]}], Reg 25: ${iRet2}`, {toFile: true});
+
+		const iRet3 = bus.ReadByte(SubAddresses[1], 0x27);
+		bus.log(`Address [${SubAddresses[1]}], Reg 27: ${iRet3}`, {toFile: true});
+
+		const ExpectedValues = [120, 130, 180, 200, 220, 240];
+
+		return ExpectedValues.includes(iRet1) && ExpectedValues.includes(iRet2) && ExpectedValues.includes(iRet3);
+	}
+
+	return false;
+}
+
 const addressDict = {
 	0x60 : 0x50,
 	0x61 : 0x51,
@@ -132,7 +165,7 @@ const addressDict = {
 	0x63 : 0x53
 };
 
-function CheckForHyperFuryRam(bus, addr) {
+function CheckForHyperFuryRamUsingWord(bus, addr) { //The Backend Function for this is busted af.
 	if(!addressDict.hasOwnProperty(addr)){
 		return false;
 	}
