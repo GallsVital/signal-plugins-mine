@@ -564,7 +564,7 @@ export class deviceLibrary {
 			"Gladius II Core": 		"https://marketplace.signalrgb.com/devices/brands/asus/mice/gladius-ii-core.png",
 			"Gladius II Origin": 	"https://marketplace.signalrgb.com/devices/brands/asus/mice/gladius-ii-origin.png",
 			"Gladius II Wireless": 	"https://marketplace.signalrgb.com/devices/brands/asus/mice/gladius-ii-wireless.png",
-			"Gladius III Wireless": "https://marketplace.signalrgb.com/devices/brands/asus/mice/gladius-ii-wireless.png",
+			"Gladius III Wireless": "https://marketplace.signalrgb.com/devices/brands/asus/mice/gladius-iii-wireless.png",
 			"Gladius III Aimpoint": "https://marketplace.signalrgb.com/devices/brands/asus/mice/gladius-iii-aimpoint.png",
 			"Impact II": 			"https://marketplace.signalrgb.com/devices/brands/asus/mice/impact-ii-standard.png",
 			"Impact II Electro Punk": "https://marketplace.signalrgb.com/devices/brands/asus/mice/impact-ii-electropunk.png",
