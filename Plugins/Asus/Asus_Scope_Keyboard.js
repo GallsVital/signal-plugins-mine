@@ -42,7 +42,7 @@ export function Shutdown(SystemSuspending) {
 
 }
 
-export class ASUS_Mouse_Protocol {
+export class ASUS_Keyboard_Protocol {
 	constructor() {
 		this.Config = {
 			DeviceProductID: 0x0000,
@@ -51,6 +51,8 @@ export class ASUS_Mouse_Protocol {
 			Leds: [],
 			LedNames: [],
 			LedPositions: [],
+			LedCount: 144, // Testing purpose
+			LedOffset: 0x90, // Testing purpose
 			SupportedFeatures:
 			{
 				BatterySupport: false,
@@ -81,6 +83,12 @@ export class ASUS_Mouse_Protocol {
 	getLedPositions() { return this.Config.LedPositions; }
 	setLedPositions(ledPositions) { this.Config.LedPositions = ledPositions; }
 
+	getLedCount() { return this.Config.LedCount; }
+	setLedCount(ledCount) { this.Config.LedCount = ledCount; }
+
+	getLedOffset() { return this.Config.LedOffset; }
+	setLedOffset(ledOffset) { this.Config.LedOffset = ledOffset; }
+
 	getBatteryFeature() { return this.Config.SupportedFeatures.BatterySupport; }
 	setBatteryFeature(battery) { this.Config.SupportedFeatures.BatterySupport = battery; }
 
@@ -96,6 +104,8 @@ export class ASUS_Mouse_Protocol {
 		this.setLeds(DeviceProperties.vLeds);
 		this.setLedNames(DeviceProperties.vLedNames);
 		this.setLedPositions(DeviceProperties.vLedPositions);
+		this.setLedCount(DeviceProperties.LedCount);
+		this.setLedOffset(DeviceProperties.LedOffset);
 
 		if(DeviceProperties.battery){
 			this.setBatteryFeature(true);
@@ -110,19 +120,23 @@ export class ASUS_Mouse_Protocol {
 		device.setSize(DeviceProperties.size);
 		device.setControllableLeds(this.getLedNames(), this.getLedPositions());
 		device.setImageFromUrl(this.getDeviceImage(this.getDeviceName()));
-		device.set_endpoint(DeviceProperties.endpoint[`interface`], DeviceProperties.endpoint[`usage`], DeviceProperties.endpoint[`usage_page`], DeviceProperties.endpoint[`collection`]);
+
+		device.set_endpoint(DeviceProperties.endpoint[`interface`], DeviceProperties.endpoint[`usage`], DeviceProperties.endpoint[`usage_page`]);
 	}
 
 	sendColors(overrideColor) {
 
 		const deviceLeds = this.getLeds();
+		const deviceLedPositions = this.getLedPositions();
+		const Offset = this.getLedOffset();
 		const RGBData = [];
-		let TotalLedCount = 144;
+
+		let TotalLedCount = this.getLedCount();
 		let packetCount = 0;
 
 		for (let iIdx = 0; iIdx < deviceLeds.length; iIdx++) {
-			const iPxX = deviceLeds[iIdx][0];
-			const iPxY = deviceLeds[iIdx][1];
+			const iPxX = deviceLedPositions[iIdx][0];
+			const iPxY = deviceLedPositions[iIdx][1];
 			let color;
 
 			if(overrideColor){
@@ -142,14 +156,7 @@ export class ASUS_Mouse_Protocol {
 		while(TotalLedCount > 0){
 			const ledsToSend = TotalLedCount >= 15 ? 15 : TotalLedCount;
 
-			let packet = [];
-			packet[0] = 0x00;
-			packet[1] = 0xC0;
-			packet[2] = 0x81;
-			packet[3] = 0x90 - (0x0F * packetCount++);
-			packet[4] = 0x00;
-			packet = packet.concat(RGBData.splice(0, ledsToSend*4));
-			device.write(packet, 65);
+			device.write([0x00, 0xC0, 0x81, Offset - (0x0F * packetCount++), 0x00].concat(RGBData.splice(0, ledsToSend*4)), 65);
 			TotalLedCount -= ledsToSend;
 		}
 	}
@@ -171,15 +178,15 @@ export class ASUS_Mouse_Protocol {
 
 	modernFetchBatteryLevel() {
 		device.clearReadBuffer();
-		device.write([0x00, 0x12, 0x07], 65);
 
-		const returnPacket = device.read([0x00, 0x12, 0x07], 65);
+		const packet = [0x00, 0x12, 0x01]; //0x00, 0x12, 0x00 is some sort of status. also hits 0x02
+		device.write(packet, 65);
+		device.pause(5);
 
-		const batteryState = returnPacket[4];
-		const batteryLevel = returnPacket[5];
-
-		battery.setBatteryLevel(batteryLevel);
-		battery.setBatteryState(batteryState + 1);
+		const returnpacket = device.read(packet, 65);
+		const BatteryPercentage = returnpacket[6];
+		battery.setBatteryLevel(BatteryPercentage);
+		battery.setBatteryState(returnpacket[9] + 1);
 	}
 }
 
@@ -193,7 +200,8 @@ export class deviceLibrary {
 			0x19D0: "ROG Strix Scope TKL", // Moonlight White
 			0x1951: "ROG Strix Scope RX",
 			0x1A05: "ROG Strix Scope RX", // Deluxe
-			0x1AAE: "ROG Strix Scope II 96" // Wired
+			0x1AAE: "ROG Strix Scope II 96", // Wired
+			0x1ACE: "ROG Strix Scope II 96 Wireless"
 		};
 
 		this.LEDLibrary	=	{
@@ -201,12 +209,12 @@ export class deviceLibrary {
 			{
 				size: [21, 6],
 				vLeds:[
-					0,      24, 32, 40, 48,   64, 72, 80, 88,  96, 104, 112, 120,	128, 136, 144,
-					1,  17, 25, 33, 41, 49, 57, 65, 73, 81, 89, 97, 105,    121,	129, 137, 145,	153, 161, 169, 177,
-					2,  18, 26, 34, 42, 50, 58, 66, 74, 82, 90, 98, 106,    122,	130, 138, 146,	154, 162, 170, 178,
-					3,    19, 27, 35, 43, 51, 59, 67, 75, 83, 91, 99,      123,						155, 163, 171,
-					4,    20, 28, 36, 44, 52, 60, 68, 76, 84, 92,          124,			140,		156, 164, 172, 180,
-					5,    21, 29,      53,            77, 93, 101,  125,   133, 	141, 149, 157,	173,
+					0,      24, 32, 40, 48,     64, 72, 80, 88, 96, 104, 112, 120,	 128, 136, 144,
+					1,  17, 25, 33, 41, 49, 57, 65, 73, 81, 89, 97, 105,      121,	 129, 137, 145,	 153, 161, 169, 177,
+					2,  18, 26, 34, 42, 50, 58, 66, 74, 82, 90, 98, 106,      122,	 130, 138, 146,	 154, 162, 170, 178,
+					3,  19, 27, 35, 43, 51, 59, 67, 75, 83, 91, 99,           123,					 155, 163, 171,
+					4,  20, 28, 36, 44, 52, 60, 68, 76, 84, 92,               124,		  140,		 156, 164, 172, 180,
+					5,  21, 29,      53,            77,     93, 101,          125,   133, 141, 149,  157,	   173,
 				],
 				vLedNames: [
 					"Esc", "F1", "F2", "F3", "F4", "F5", "F6", "F7", "F8", "F9", "F10", "F11", "F12",         "Print Screen", "Scroll Lock", "Pause Break",
@@ -225,6 +233,8 @@ export class deviceLibrary {
 					[0, 5], [1, 5], [2, 5],                      [6, 5],                        [10, 5], [11, 5],  [12, 5], [13, 5],    [14, 5], [15, 5], [16, 5],   [17, 5],         [19, 5],               // 13
 				],
 				endpoint : { "interface": 1, "usage": 0x0001, "usage_page": 0xFF00, "collection": 0x0000 },
+				LedCount: 144, // Testing purpose
+				LedOffset: 0x90, // Testing purpose
 
 			},
 			"ROG Strix Scope TKL":
@@ -262,6 +272,8 @@ export class deviceLibrary {
 					[0, 6], [0, 6], [1, 6], [1, 6], [2, 6], [3, 6], [4, 6], [4, 6], [5, 6],  [5, 6], [6, 6], [7, 6], [7, 6], [8, 6], [9, 6], [9, 6], [10, 6], [11, 6], [11, 6], [12, 6], [13, 6], [13, 6], [14, 6], [15, 6], [16, 6], [16, 6]
 				],
 				endpoint : { "interface": 1, "usage": 0x0001, "usage_page": 0xFF00, "collection": 0x0000 },
+				LedCount: 144, // Testing purpose
+				LedOffset: 0x90, // Testing purpose
 
 			},
 			"ROG Strix Scope RX":
@@ -292,37 +304,73 @@ export class deviceLibrary {
 					[0, 5], [1, 5], [2, 5],                      [6, 5],                        [10, 5], [11, 5],  [12, 5], [13, 5],    [14, 5], [15, 5], [16, 5],   [17, 5],         [19, 5],               // 13
 				],
 				endpoint : { "interface": 1, "usage": 0x0001, "usage_page": 0xFF00, "collection": 0x0000 },
+				LedCount: 144, // Testing purpose
+				LedOffset: 0x90, // Testing purpose
 
 			},
 			"ROG Strix Scope II 96":
 			{
-				size: [17, 6],
+				size: [18, 6],
 				vLeds:[
-					0, 24, 32, 40, 48, 64, 72, 80, 88, 96, 104, 112, 120, 128, 136, 144, 142, //17
-					1, 17, 25, 33, 41, 49, 57, 65, 73, 81, 89, 97, 105, 121, 129, 137, 145,	153, //18
-					2, 18, 26, 34, 42, 50, 58, 66, 74, 82, 90, 98, 106, 122, 130, 138, 146,	154, //18
-					3, 19, 27, 35, 43, 51, 59, 67, 75, 83, 91, 99, 123, 155, 163, 171, //16
-					4, 20, 28, 36, 44, 52, 60, 68, 76, 84, 92, 124, 140, 156, 164, 172, 180, //17
-					5, 21, 29,			53,            77, 93, 101,  125, 133, 141, 149, 157, //12
+					0, 8,  16, 24, 32, 40, 48, 56, 64, 72, 80, 88, 96,  104,  112, 120, 128, 136, //18
+					1, 9,  17, 25, 33, 41, 49, 57, 65, 73, 81, 89, 97,  105,       121, 129, 137, 145, //18
+					2, 10, 18, 26, 34, 42, 50, 58, 66, 74, 82, 90, 98,  106,	   122, 130, 138, 146, //18
+					3, 11, 19, 27, 35, 43, 51, 59, 67, 75, 83, 91,      107,       123, 131, 139, //16
+					4, 20, 28, 36, 44, 52, 60, 68,     76, 84, 92, 100,       116, 124, 132, 140, 148, //17
+					5, 13, 21,	   45, 53, 61,         85, 93, 101, 109, 117, 125, 133, 141//14
 				],
 				vLedNames: [
-					"Esc", "F1", "F2", "F3", "F4", "F5", "F6", "F7", "F8", "F9", "F10", "F11", "F12", "Ins", "Del", "PgUp", "PgDn", //17
+					"Esc", "F1", "F2", "F3", "F4", "F5", "F6", "F7", "F8", "F9", "F10", "F11", "F12", "Ins", "Del", "PgUp", "PgDn", "ROG Logo", //18
 					"`", "1", "2", "3", "4", "5", "6", "7", "8", "9", "0", "-_", "=+", "Backspace", "Num", "Num /", "Num *", "Num -", //18
 					"Tab", "Q", "W", "E", "R", "T", "Y", "U", "I", "O", "P", "[", "]", "\\", 		"Num 7", "Num 8", "Num 9", "Num +", //18
 					"CapsLock", "A", "S", "D", "F", "G", "H", "J", "K", "L", ";", "'", "Enter",		"Num 4", "Num 5", "Num 6", //16
 					"Left Shift", "Z", "X", "C", "V", "B", "N", "M", ",", ".", "/", "RS", "Up Arrow", "Num 1", "Num 2", "Num 3", "Num Enter", //17
-					"LCtrl", "LWin", "LAlt", "Space", "RAlt", "Fn", "RCtrl", "Left Arrow", "Down Arrow", "Right Arrow", "Num 0", "Num ." //12
+					"LCtrl", "LWin", "LAlt", "LSpace", "Space", "RSpace", "RAlt", "Fn", "RCtrl", "Left Arrow", "Down Arrow", "Right Arrow", "Num 0", "Num ." //14
 				],
 				vLedPositions: [
-					[0, 0], [1, 0], [2, 0], [3, 0], [4, 0], [5, 0], [6, 0], [7, 0], [8, 0], [ 9, 0], [10, 0], [11, 0], [12, 0], [13, 0], [14, 0], [15, 0], //17
-					[0, 1], [1, 1], [2, 1], [3, 1], [4, 1], [5, 1], [6, 1], [7, 1], [8, 1], [ 9, 1], [10, 1], [11, 1], [12, 1], [13, 1], [14, 1], [15, 1], [16, 1], //18
-					[0, 2], [1, 2], [2, 2], [3, 2], [4, 2], [5, 2], [6, 2], [7, 2], [8, 2], [ 9, 2], [10, 2], [11, 2], [12, 2], [13, 2], [14, 2], [15, 2], [16, 2], //18
-					[0, 3], [1, 3], [2, 3], [3, 3], [4, 3], [5, 3], [6, 3], [7, 3], [8, 3], [ 9, 3], [10, 3], [11, 3], [12, 3], [13, 3], [14, 3], //16
-					[0, 4], [1, 4], [2, 4], [3, 4], [4, 4], [5, 4], [6, 4], [7, 4], [8, 4], [ 9, 4], [10, 4], [11, 4], [12, 4], [13, 4], [14, 4], [15, 4], //17
-					[0, 5], [1, 5], [2, 5],					[5, 5],                         [ 9, 5], [10, 5], [11, 5], [12, 5], [13, 5], [14, 5], [15, 5], [16, 5], //12
+					[0, 0], [1, 0], [2, 0], [3, 0], [4, 0], [5, 0], [6, 0], [7, 0], [8, 0], [9, 0], [10, 0], [11, 0], [12, 0], [13, 0], [14, 0], [15, 0], [16, 0], [17, 0], //18
+					[0, 1], [1, 1], [2, 1], [3, 1], [4, 1], [5, 1], [6, 1], [7, 1], [8, 1], [9, 1], [10, 1], [11, 1], [12, 1], [13, 1], [14, 1], [15, 1], [16, 1], [17, 1], //18
+					[0, 2], [1, 2], [2, 2], [3, 2], [4, 2], [5, 2], [6, 2], [7, 2], [8, 2], [9, 2], [10, 2], [11, 2], [12, 2], [13, 2], [14, 2], [15, 2], [16, 2], [17, 2], //18
+					[0, 3], [1, 3], [2, 3], [3, 3], [4, 3], [5, 3], [6, 3], [7, 3], [8, 3], [9, 3], [10, 3], [11, 3], [12, 3],                   [15, 3], [16, 3], [17, 3], //16
+					[0, 4], [1, 4], [2, 4], [3, 4], [4, 4], [5, 4], [6, 4], [7, 4], [8, 4], [9, 4], [10, 4], [11, 4],          [13, 4], [14, 4], [15, 4], [16, 4], [17, 4], //17
+					[0, 5], [1, 5], [2, 5],			        [5, 5],	[6, 5], [7, 5],                 [10, 5], [11, 5], [12, 5], [13, 5], [14, 5], [15, 5], [16, 5], [17, 5], //14
 				],
 				endpoint : { "interface": 1, "usage": 0x0001, "usage_page": 0xFF00, "collection": 0x0000 },
-				battery: false
+				LedCount: 101, // Testing purpose
+				LedOffset: 0x65, // Testing purpose
+				battery: true
+			},
+			"ROG Strix Scope II 96 Wireless":
+			{
+				size: [18, 6],
+				vLeds:[
+					0, 8,  16, 24, 32, 40, 48, 56, 64, 72, 80, 88, 96,  104,  112, 120, 128, 136, //18
+					1, 9,  17, 25, 33, 41, 49, 57, 65, 73, 81, 89, 97,  105,       121, 129, 137, 145, //18
+					2, 10, 18, 26, 34, 42, 50, 58, 66, 74, 82, 90, 98,  106,	   122, 130, 138, 146, //18
+					3, 11, 19, 27, 35, 43, 51, 59, 67, 75, 83, 91,      107,       123, 131, 139, //16
+					4, 20, 28, 36, 44, 52, 60, 68,     76, 84, 92, 100,       116, 124, 132, 140, 148, //17
+					5, 13, 21,	   45, 53, 61,         85, 93, 101, 109, 117, 125, 133, 141//14
+				],
+				vLedNames: [
+					"Esc", "F1", "F2", "F3", "F4", "F5", "F6", "F7", "F8", "F9", "F10", "F11", "F12", "Ins", "Del", "PgUp", "PgDn", "ROG Logo", //18
+					"`", "1", "2", "3", "4", "5", "6", "7", "8", "9", "0", "-_", "=+", "Backspace", "Num", "Num /", "Num *", "Num -", //18
+					"Tab", "Q", "W", "E", "R", "T", "Y", "U", "I", "O", "P", "[", "]", "\\", 		"Num 7", "Num 8", "Num 9", "Num +", //18
+					"CapsLock", "A", "S", "D", "F", "G", "H", "J", "K", "L", ";", "'", "Enter",		"Num 4", "Num 5", "Num 6", //16
+					"Left Shift", "Z", "X", "C", "V", "B", "N", "M", ",", ".", "/", "RS", "Up Arrow", "Num 1", "Num 2", "Num 3", "Num Enter", //17
+					"LCtrl", "LWin", "LAlt", "LSpace", "Space", "RSpace", "RAlt", "Fn", "RCtrl", "Left Arrow", "Down Arrow", "Right Arrow", "Num 0", "Num ." //14
+				],
+				vLedPositions: [
+					[0, 0], [1, 0], [2, 0], [3, 0], [4, 0], [5, 0], [6, 0], [7, 0], [8, 0], [9, 0], [10, 0], [11, 0], [12, 0], [13, 0], [14, 0], [15, 0], [16, 0], [17, 0], //18
+					[0, 1], [1, 1], [2, 1], [3, 1], [4, 1], [5, 1], [6, 1], [7, 1], [8, 1], [9, 1], [10, 1], [11, 1], [12, 1], [13, 1], [14, 1], [15, 1], [16, 1], [17, 1], //18
+					[0, 2], [1, 2], [2, 2], [3, 2], [4, 2], [5, 2], [6, 2], [7, 2], [8, 2], [9, 2], [10, 2], [11, 2], [12, 2], [13, 2], [14, 2], [15, 2], [16, 2], [17, 2], //18
+					[0, 3], [1, 3], [2, 3], [3, 3], [4, 3], [5, 3], [6, 3], [7, 3], [8, 3], [9, 3], [10, 3], [11, 3], [12, 3],                   [15, 3], [16, 3], [17, 3], //16
+					[0, 4], [1, 4], [2, 4], [3, 4], [4, 4], [5, 4], [6, 4], [7, 4], [8, 4], [9, 4], [10, 4], [11, 4],          [13, 4], [14, 4], [15, 4], [16, 4], [17, 4], //17
+					[0, 5], [1, 5], [2, 5],			        [5, 5],	[6, 5], [7, 5],                 [10, 5], [11, 5], [12, 5], [13, 5], [14, 5], [15, 5], [16, 5], [17, 5], //14
+				],
+				endpoint : { "interface": 2, "usage": 0x0001, "usage_page": 0xFF00, "collection": 0x0000  },
+				LedCount: 101, // Testing purpose
+				LedOffset: 0x65, // Testing purpose
+				battery: true
 			},
 		};
 
@@ -330,13 +378,14 @@ export class deviceLibrary {
 			"ROG Strix Scope": 		"https://marketplace.signalrgb.com/devices/brands/asus/keyboards/strix-scope-standard.png",
 			"ROG Strix Scope TKL": 	"https://marketplace.signalrgb.com/devices/brands/asus/keyboards/strix-scope-tkl.png",
 			"ROG Strix Scope RX":	"https://marketplace.signalrgb.com/devices/brands/asus/keyboards/strix-scope-rx.png",
-			"ROG Strix Scope II 96":"https://m.media-amazon.com/images/I/71zmZbiUeAL._AC_UF894,1000_QL80_.jpg"
+			"ROG Strix Scope II 96":"https://marketplace.signalrgb.com/devices/brands/asus/keyboards/strix-scope-ii-96-wireless.png",
+			"ROG Strix Scope II 96 Wireless":"https://marketplace.signalrgb.com/devices/brands/asus/keyboards/strix-scope-ii-96-wireless.png",
 		};
 	}
 }
 
 const ASUSdeviceLibrary = new deviceLibrary();
-const ASUS = new ASUS_Mouse_Protocol();
+const ASUS = new ASUS_Keyboard_Protocol();
 
 function hexToRgb(hex) {
 	const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
