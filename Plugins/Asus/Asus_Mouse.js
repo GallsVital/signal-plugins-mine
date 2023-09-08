@@ -61,6 +61,7 @@ export class ASUS_Mouse_Protocol {
 			LedPositions: [],
 			SupportedFeatures:
 			{
+				DPISupport: false,
 				AngleSnapSupport: false,
 				PollingRateSupport: false,
 				BatterySupport: false,
@@ -90,6 +91,9 @@ export class ASUS_Mouse_Protocol {
 	getLedPositions() { return this.Config.LedPositions; }
 	setLedPositions(ledPositions) { this.Config.LedPositions = ledPositions; }
 
+	getDPISupport() { return this.Config.SupportedFeatures.DPISupport; }
+	setDPISupport(dpi) { this.Config.SupportedFeatures.DPISupport = dpi; }
+
 	getBatteryFeature() { return this.Config.SupportedFeatures.BatterySupport; }
 	setBatteryFeature(battery) { this.Config.SupportedFeatures.BatterySupport = battery; }
 
@@ -118,37 +122,48 @@ export class ASUS_Mouse_Protocol {
 		this.setLedNames(DeviceProperties.vLedNames);
 		this.setLedPositions(DeviceProperties.vLedPositions);
 
-		if(DeviceProperties.protocol === "Modern"){
-			this.setAngleSnapFeature(true);
-			this.setPollingFeature(true);
-
+		if(DeviceProperties.DPISupport === true){
+			this.setDPISupport(true);
 			device.addProperty({"property":"SettingControl", "group":"mouse", "label":"Enable Setting Control", "type":"boolean", "default" :"false"});
-			device.addProperty({"property":"angleSnapping", "group":"mouse", "label":"Angle snapping", "type":"boolean", "default":"false"});
-			device.addProperty({"property":"mousePolling", "group":"mouse", "label":"Polling Rate", "type":"combobox", "values":["125Hz", "250Hz", "500Hz", "1000Hz"], "default":"500Hz"});
 			device.addProperty({"property":"dpi1", "group":"mouse", "label":"DPI 1", "step":"100", "type":"number", "min":"100", "max": DeviceProperties.maxDPI, "default": "800", "live" : false});
 			device.addProperty({"property":"dpi2", "group":"mouse", "label":"DPI 2", "step":"100", "type":"number", "min":"100", "max": DeviceProperties.maxDPI, "default":"1200", "live" : false});
 			device.addProperty({"property":"dpi3", "group":"mouse", "label":"DPI 3", "step":"100", "type":"number", "min":"100", "max": DeviceProperties.maxDPI, "default":"1500", "live" : false});
 			device.addProperty({"property":"dpi4", "group":"mouse", "label":"DPI 4", "step":"100", "type":"number", "min":"100", "max": DeviceProperties.maxDPI, "default":"2000", "live" : false});
 
-			this.modernDirectLightingMode();
-			this.sendAllMouseSettings();
-			console.log("This is a Modern device");
+			for(let i = 0; i< 4; i++){
+				this.sendMouseSetting(i);
+			}
 
-			if(DeviceProperties.battery){
-				this.setBatteryFeature(true);
-				this.setSleepFeature(true);
-				this.setLowPowerFeature(true);
+			if(DeviceProperties.protocol === "Modern"){
+				this.setAngleSnapFeature(true);
+				this.setPollingFeature(true);
 
-				device.addFeature("battery");
-				console.log("Device has a battery and it's wireless");
-				device.addProperty({"property":"sleepTimeout", "group":"mouse", "label":"Sleep Mode Timeout (Minutes)", "type":"combobox", "values":["1", "2", "3", "5", "10", "Never"], "default":"5"});
-				device.addProperty({"property":"lowPowerPercentage", "group":"mouse", "label":"Low Battery Warning Percentage", "type":"combobox", "values":["Never", "10%", "15%", "20%", "25%", "30%"], "default":"20%"});
+				device.addProperty({"property":"angleSnapping", "group":"mouse", "label":"Angle snapping", "type":"boolean", "default":"false"});
+				device.addProperty({"property":"mousePolling", "group":"mouse", "label":"Polling Rate", "type":"combobox", "values":["125Hz", "250Hz", "500Hz", "1000Hz"], "default":"500Hz"});
 
-				this.sendLightingSettings();
-				this.modernFetchBatteryLevel();
+				this.modernDirectLightingMode();
+				this.sendMouseSetting(4);
+				this.sendMouseSetting(6);
+				console.log("This is a Modern device");
+
+				if(DeviceProperties.battery){
+					this.setBatteryFeature(true);
+					this.setSleepFeature(true);
+					this.setLowPowerFeature(true);
+
+					device.addFeature("battery");
+					console.log("Device has a battery and it's wireless");
+					device.addProperty({"property":"sleepTimeout", "group":"mouse", "label":"Sleep Mode Timeout (Minutes)", "type":"combobox", "values":["1", "2", "3", "5", "10", "Never"], "default":"5"});
+					device.addProperty({"property":"lowPowerPercentage", "group":"mouse", "label":"Low Battery Warning Percentage", "type":"combobox", "values":["Never", "10%", "15%", "20%", "25%", "30%"], "default":"20%"});
+
+					this.sendLightingSettings();
+					this.modernFetchBatteryLevel();
+				}
+			}else {
+				console.log("This is a Legacy device with DPI feature");
 			}
 		}else {
-			console.log("This is a Legacy device");
+			console.log("This is a Legacy device with no DPI feature");
 		}
 
 		device.log(`Device model found: ` + this.getDeviceName());
@@ -402,6 +417,7 @@ export class deviceLibrary {
 				maxDPI: 16000,
 				endpoint : { "interface": 0, "usage": 0x0001, "usage_page": 0xFF01, "collection": 0x0000 }, // NEED CONFIRM
 				protocol: "Legacy",
+				DPISupport: true
 			},
 			"Chakram Wireless":
 			{
@@ -412,7 +428,7 @@ export class deviceLibrary {
 				battery: true,
 				endpoint : { "interface": 0, "usage": 0x0001, "usage_page": 0xFF01, "collection": 0x0000 }, // NEED CONFIRM
 				protocol: "Legacy",
-
+				DPISupport: true
 			},
 			"Chakram X":
 			{
@@ -422,7 +438,7 @@ export class deviceLibrary {
 				maxDPI: 36000,
 				endpoint : { "interface": 0, "usage": 0x0001, "usage_page": 0xFF01, "collection": 0x0000 }, // NEED CONFIRM
 				protocol: "ChakramX",
-
+				DPISupport: true
 			},
 			"Gladius II Core":
 			{
@@ -432,7 +448,7 @@ export class deviceLibrary {
 				maxDPI: 6200,
 				endpoint : { "interface": 0, "usage": 0x0001, "usage_page": 0xFF01, "collection": 0x0000 }, // NEED CONFIRM
 				protocol: "Legacy",
-
+				DPISupport: true
 			},
 			"Gladius II Origin":
 			{
@@ -442,7 +458,7 @@ export class deviceLibrary {
 				maxDPI: 12000,
 				endpoint : { "interface": 2, "usage": 0x0001, "usage_page": 0xFF01, "collection": 0x0000 },
 				protocol: "Legacy",
-
+				DPISupport: true
 			},
 			"Gladius II Wireless":
 			{
@@ -453,7 +469,7 @@ export class deviceLibrary {
 				battery: true,
 				endpoint: 1,
 				protocol: "Legacy",
-
+				DPISupport: true
 			},
 			"Gladius III Wireless":
 			{
@@ -464,7 +480,7 @@ export class deviceLibrary {
 				battery: true,
 				endpoint : { "interface": 0, "usage": 0x0001, "usage_page": 0xFF01, "collection": 0x0000 },
 				protocol: "Modern",
-
+				DPISupport: true
 			},
 			"Gladius III Aimpoint":
 			{
@@ -475,6 +491,7 @@ export class deviceLibrary {
 				battery: true,
 				endpoint : { "interface": 0, "usage": 0x0001, "usage_page": 0xFF01, "collection": 0x0000 },
 				protocol: "Modern",
+				DPISupport: true
 			},
 			"Impact II":
 			{
@@ -484,7 +501,7 @@ export class deviceLibrary {
 				maxDPI: 6200,
 				endpoint : { "interface": 0, "usage": 0x0001, "usage_page": 0xFF01, "collection": 0x0000 }, // NEED CONFIRM
 				protocol: "Legacy",
-
+				DPISupport: true
 			},
 			"Impact II Electro Punk": //This is highly suspicious. Why does this have an extra zone?
 			{
@@ -494,7 +511,7 @@ export class deviceLibrary {
 				maxDPI: 6200,
 				endpoint : { "interface": 0, "usage": 0x0001, "usage_page": 0xFF01, "collection": 0x0000 }, // NEED CONFIRM
 				protocol: "Legacy",
-
+				DPISupport: true
 			},
 			"Impact II Wireless":
 			{
@@ -505,7 +522,7 @@ export class deviceLibrary {
 				battery: true,
 				endpoint : { "interface": 0, "usage": 0x0001, "usage_page": 0xFF01, "collection": 0x0000 }, // NEED CONFIRM
 				protocol: "Legacy",
-
+				DPISupport: true
 			},
 			"ROG Keris":
 			{
@@ -515,6 +532,7 @@ export class deviceLibrary {
 				maxDPI: 16000,
 				endpoint : { "interface": 0, "usage": 0x0001, "usage_page": 0xFF01, "collection": 0x0000 },
 				protocol: "Legacy",
+				DPISupport: true
 			},
 			"Pugio I":
 			{
@@ -524,7 +542,7 @@ export class deviceLibrary {
 				maxDPI: 7200,
 				endpoint : { "interface": 2, "usage": 0x0001, "usage_page": 0xFF01, "collection": 0x0000 },
 				protocol: "Legacy",
-
+				DPISupport: true
 			},
 			"Pugio II":
 			{
@@ -534,7 +552,7 @@ export class deviceLibrary {
 				maxDPI: 16000,
 				endpoint : { "interface": 0, "usage": 0x0001, "usage_page": 0xFF01, "collection": 0x0000 },
 				protocol: "Legacy",
-
+				DPISupport: true
 			},
 			"Spatha":
 			{
@@ -544,6 +562,7 @@ export class deviceLibrary {
 				maxDPI: 16000,
 				endpoint : { "interface": 0, "usage": 0x0001, "usage_page": 0xFF01, "collection": 0x0000 },
 				protocol: "Legacy",
+				DPISupport: true
 			},
 			"Spatha X Wireless":
 			{
@@ -554,6 +573,7 @@ export class deviceLibrary {
 				battery: true,
 				endpoint : { "interface": 0, "usage": 0x0001, "usage_page": 0xFF01, "collection": 0x0000 },
 				protocol: "Modern",
+				DPISupport: true
 			},
 		};
 
