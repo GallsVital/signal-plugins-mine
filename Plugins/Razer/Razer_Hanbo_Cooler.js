@@ -133,6 +133,6 @@ export function Validate(endpoint) {
 	return (endpoint.interface === -1 || endpoint.interface === 0) && endpoint.usage === 0x0001 && endpoint.usage_page === 0xFF00;
 }
 
-export function ImageUrl() {
-	return "https://marketplace.signalrgb.com/devices/default/aio-with-rad.png";
+export function ImageUrl(){
+	return "https://marketplace.signalrgb.com/devices/brands/razer/aios/hanbo.png";
 }
