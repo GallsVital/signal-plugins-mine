@@ -51,8 +51,8 @@ export class ASUS_Keyboard_Protocol {
 			Leds: [],
 			LedNames: [],
 			LedPositions: [],
-			LedCount: 144, // Testing purpose
-			LedOffset: 0x90, // Testing purpose
+			LedCount: 144,
+			LedOffset: 0x90,
 			SupportedFeatures:
 			{
 				BatterySupport: false,
@@ -237,8 +237,8 @@ export class deviceLibrary {
 					[0, 4], [1, 4], [2, 4],                         [6, 4],					[9, 4], [10, 4], [11, 4],   [12, 4], [13, 4], [14, 4],    //10
 				],
 				Endpoint : { "interface": 1, "usage": 0x0001, "usage_page": 0xFF00, "collection": 0x0000 },
-				LedCount: 144, // Testing purpose
-				LedOffset: 0x90, // Testing purpose
+				LedCount: 144,
+				LedOffset: 0x90,
 			},
 			"ROG Strix Flare":
 			{
@@ -273,8 +273,8 @@ export class deviceLibrary {
 					[18, 0], [0, 2], [21, 2],
 				],
 				Endpoint : { "interface": 1, "usage": 0x0001, "usage_page": 0xFF00, "collection": 0x0000 },
-				LedCount: 144, // Testing purpose
-				LedOffset: 0x90, // Testing purpose
+				LedCount: 144,
+				LedOffset: 0x90,
 			},
 			"ROG Strix Flare II":
 			{
@@ -311,8 +311,8 @@ export class deviceLibrary {
 					[0, 6], [1, 6], [2, 6], [3, 6], [4, 6], [4, 6], [5, 6], [6, 6], [7, 6], [7, 6], [8, 6], [9, 6], [10, 6], [10, 6], [11, 6], [12, 6], [13, 6], [13, 6], [14, 6], [15, 6], [16, 6], [16, 6], [17, 6], [18, 6], [19, 6], [20, 6], [20, 6], [21, 6], [22, 6], [23, 6],
 				],
 				Endpoint : { "interface": 1, "usage": 0x0001, "usage_page": 0xFF00, "collection": 0x0000 },
-				LedCount: 136, // Testing purpose
-				LedOffset: 0x87, // Testing purpose
+				LedCount: 136,
+				LedOffset: 0x87,
 			},
 			"ROG Strix Scope":
 			{
@@ -342,8 +342,8 @@ export class deviceLibrary {
 					[0, 5], [1, 5], [2, 5],                      [6, 5],                        [10, 5], [11, 5],  [12, 5], [13, 5],    [14, 5], [15, 5], [16, 5],   [17, 5],         [19, 5],               // 13
 				],
 				Endpoint : { "interface": 1, "usage": 0x0001, "usage_page": 0xFF00, "collection": 0x0000 },
-				LedCount: 144, // Testing purpose
-				LedOffset: 0x90, // Testing purpose
+				LedCount: 144,
+				LedOffset: 0x90,
 			},
 			"ROG Strix Scope TKL":
 			{
@@ -380,8 +380,8 @@ export class deviceLibrary {
 					[0, 6], [0, 6], [1, 6], [1, 6], [2, 6], [3, 6], [4, 6], [4, 6], [5, 6],  [5, 6], [6, 6], [7, 6], [7, 6], [8, 6], [9, 6], [9, 6], [10, 6], [11, 6], [11, 6], [12, 6], [13, 6], [13, 6], [14, 6], [15, 6], [16, 6], [16, 6]
 				],
 				Endpoint : { "interface": 1, "usage": 0x0001, "usage_page": 0xFF00, "collection": 0x0000 },
-				LedCount: 144, // Testing purpose
-				LedOffset: 0x90, // Testing purpose
+				LedCount: 144,
+				LedOffset: 0x90,
 
 			},
 			"ROG Strix Scope RX":
@@ -412,8 +412,8 @@ export class deviceLibrary {
 					[0, 5], [1, 5], [2, 5],                      [6, 5],                        [10, 5], [11, 5],  [12, 5], [13, 5],    [14, 5], [15, 5], [16, 5],   [17, 5],         [19, 5],               // 13
 				],
 				Endpoint : { "interface": 1, "usage": 0x0001, "usage_page": 0xFF00, "collection": 0x0000 },
-				LedCount: 144, // Testing purpose
-				LedOffset: 0x90, // Testing purpose
+				LedCount: 144,
+				LedOffset: 0x90,
 
 			},
 			"ROG Strix Scope II 96":
@@ -444,8 +444,8 @@ export class deviceLibrary {
 					[0, 5], [1, 5], [2, 5],			        [5, 5],	[6, 5], [7, 5],                 [10, 5], [11, 5], [12, 5], [13, 5], [14, 5], [15, 5], [16, 5], [17, 5], //14
 				],
 				Endpoint : { "interface": 1, "usage": 0x0001, "usage_page": 0xFF00, "collection": 0x0000 },
-				LedCount: 101, // Testing purpose
-				LedOffset: 0x65, // Testing purpose
+				LedCount: 101,
+				LedOffset: 0x65,
 				Battery: true
 			},
 			"ROG Strix Scope II 96 Wireless":
@@ -476,8 +476,8 @@ export class deviceLibrary {
 					[0, 5], [1, 5], [2, 5],			        [5, 5],	[6, 5], [7, 5],                 [10, 5], [11, 5], [12, 5], [13, 5], [14, 5], [15, 5], [16, 5], [17, 5], //14
 				],
 				Endpoint : { "interface": 2, "usage": 0x0001, "usage_page": 0xFF00, "collection": 0x0000  },
-				LedCount: 101, // Testing purpose
-				LedOffset: 0x65, // Testing purpose
+				LedCount: 101,
+				LedOffset: 0x65,
 				Battery: true
 			},
 		};
