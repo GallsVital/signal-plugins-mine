@@ -128,6 +128,6 @@ export function Validate(endpoint) {
 
 }
 
-export function Image() {
-	return "";
+export function ImageUrl(){
+	return "https://marketplace.signalrgb.com/devices/brands/razer/fan-controllers/pwm-controller.png";
 }

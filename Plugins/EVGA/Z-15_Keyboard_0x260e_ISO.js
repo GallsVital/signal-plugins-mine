@@ -65,25 +65,30 @@ export function Initialize() {
 }
 
 export function Render() {
-	sendPacket();
+	sendColors();
+}
+
+export function Shutdown(SystemSuspending) {
+
+	if(SystemSuspending){
+		sendColors("#000000"); // Go Dark on System Sleep/Shutdown
+	}else{
+		sendColors(shutdownColor);
+	}
 
 }
 
-export function Shutdown() {
-	sendPacket(true);
-}
-
-function sendPacket(shutdown = false) {
+function sendColors(overrideColor) {
 
 	const packet = [0x06, 0xEA, 0x02, 0x01, 0x00, 0x00, 0x00, 0x02];
 
 	for(let iIdx = 0; iIdx < vKeys.length; iIdx++) {
 		const iPxX = vKeyPositions[iIdx][0];
 		const iPxY = vKeyPositions[iIdx][1];
-		var color;
+		let color;
 
-		if(shutdown) {
-			color = hexToRgb(shutdownColor);
+		if(overrideColor) {
+			color = hexToRgb(overrideColor);
 		} else if (LightingMode === "Forced") {
 			color = hexToRgb(forcedColor);
 		} else {
@@ -111,9 +116,9 @@ function hexToRgb(hex) {
 }
 
 export function Validate(endpoint) {
-	return endpoint.interface === 1 && endpoint.usage == 0x004b && endpoint.usage_page == 0x0008;
+	return endpoint.interface === 1 && endpoint.usage === 0x004b && endpoint.usage_page === 0x0008;
 }
 
 export function ImageUrl(){
-	return "https://marketplace.signalrgb.com/devices/default/keyboard-100.png";
+	return "https://marketplace.signalrgb.com/devices/brands/evga/keyboards/z15.png";
 }

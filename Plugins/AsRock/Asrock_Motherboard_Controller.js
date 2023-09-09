@@ -119,7 +119,7 @@ export function LedPositions() {
 
 export function Initialize() {
 	ClearBuffer();
-	device.setName(device.getMotherboardName());
+	device.setName(`Asrock ${device.getMotherboardName()}`);
 
 	if(ARGBMode === true) {
 		device.setControllableLeds(vARGBLedNames, vARGBLedPositions);
@@ -775,7 +775,7 @@ function grabRGBData(Channel, overrideColor) {
 	} else if(componentChannel.shouldPulseColors()) {
 		ChannelLedCount = 80;
 
-		const pulseColor = device.getChannelPulseColor(ChannelArray[Channel][0], ChannelLedCount);
+		const pulseColor = device.getChannelPulseColor(ChannelArray[Channel][0]);
 		RGBData = device.createColorArray(pulseColor, ChannelLedCount, "Inline", RGBconfig);
 
 	} else {
@@ -848,5 +848,5 @@ export function Validate(endpoint) {
 }
 
 export function ImageUrl() {
-	return "https://marketplace.signalrgb.com/devices/default/motherboard.png";
+	return "https://marketplace.signalrgb.com/devices/brands/asrock/motherboards/motherboard.png";
 }

@@ -36,16 +36,23 @@ export function Initialize() {
 }
 
 export function Render() {
-	SendPacket(0, 15);
-	SendPacket(0x0f, 5);
+	sendColors(0, 15);
+	sendColors(0x0f, 5);
 }
 
-export function Shutdown() {
-	SendPacket(0, 15, true);
-	SendPacket(0x0f, 5, true);
+export function Shutdown(SystemSuspending) {
+
+	if(SystemSuspending){
+		sendColors(0, 15, "#000000");
+		sendColors(0x0f, 5, "#000000"); // Go Dark on System Sleep/Shutdown
+	}else{
+		sendColors(0, 15, shutdownColor);
+		sendColors(0x0f, 5, shutdownColor);
+	}
+
 }
 
-function SendPacket(startIdx, count, shutdown = false) {
+function sendColors(startIdx, count, overrideColor) {
 	const ColorPacket = [0x00, 0xC0, 0x01];
 	ColorPacket[3] = count;
 
@@ -56,8 +63,8 @@ function SendPacket(startIdx, count, shutdown = false) {
 		const iKeyPosY = vLedPositions[iKeyIdx][1];
 		var color;
 
-		if(shutdown) {
-			color = hexToRgb(shutdownColor);
+		if(overrideColor) {
+			color = hexToRgb(overrideColor);
 		} else if (LightingMode === "Forced") {
 			color = hexToRgb(forcedColor);
 		} else {
@@ -89,5 +96,5 @@ export function Validate(endpoint) {
 }
 
 export function ImageUrl() {
-	return "https://marketplace.signalrgb.com/devices/default/mousepad.png";
+	return "https://marketplace.signalrgb.com/devices/brands/thermaltake/mousepads/argent-mp1.png";
 }

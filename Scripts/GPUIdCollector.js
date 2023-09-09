@@ -32,7 +32,7 @@ class GPUIdCollector{
 
 	async FindGpus(){
 
-		for(const Path of DirectoryWalker.walkPaths(["../Non-Release-Plugins/SMBus/GPUs", "../Plugins"])){
+		for(const Path of DirectoryWalker.walkPaths(["../Non-Release-Plugins/", "../Plugins"])){
 			//console.log(Path);
 
 			try {
