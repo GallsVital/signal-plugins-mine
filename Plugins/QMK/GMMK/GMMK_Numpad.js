@@ -317,5 +317,5 @@ export function Validate(endpoint) {
 }
 
 export function ImageUrl() {
-	return "";
+	return "https://marketplace.signalrgb.com/devices/brands/glorious/keyboards/gmmk-numpad.png";
 }
