@@ -59,25 +59,32 @@ export function Initialize() {
 	device.pause(1);
 	device.write([0x00, 0x51, 0x28, 0x00, 0x00, 0x01], 65);
 	device.pause(1);
-	device.write([0x00, 0x56, 0x81 ,0x00, 0x00, 0x01, 0x00, 0x00, 0x00, 0x01, 0x00, 0x00, 0x00, 0xbb, 0xbb, 0xbb, 0xbb], 65);
+	device.write([0x00, 0x56, 0x81, 0x00, 0x00, 0x01, 0x00, 0x00, 0x00, 0x01, 0x00, 0x00, 0x00, 0xbb, 0xbb, 0xbb, 0xbb], 65);
 	device.pause(1);
-	device.write([0x00, 0x56, 0x83 ,0x00, 0x00, 0x01, 0x00, 0x00, 0x00, 0x04, 0xf0, 0x00, 0xc1], 65);
+	device.write([0x00, 0x56, 0x83, 0x00, 0x00, 0x01, 0x00, 0x00, 0x00, 0x04, 0xf0, 0x00, 0xc1], 65);
 	device.pause(1);
 	device.write([0x00, 0x51, 0x28, 0x00, 0x00, 0xff], 65);
 	device.pause(1);
 }
 
 export function Render() {
-	SendColors();
+	sendColors();
 	device.clearReadBuffer();
 }
 
-export function Shutdown() {
-	device.write([0x00, 0x41, 0x80], 65);
-	device.write([0x00, 0x51, 0x28, 0x00, 0x00, 0x01], 65);
+export function Shutdown(SystemSuspending) {
+
+	if(SystemSuspending){
+		sendColors("#000000"); // Go Dark on System Sleep/Shutdown
+		device.clearReadBuffer();
+	}else{
+		device.write([0x00, 0x41, 0x80], 65);
+		device.write([0x00, 0x51, 0x28, 0x00, 0x00, 0x01], 65);
+	}
+
 }
 
-function SendColors(shutdown = false){
+function sendColors(overrideColor){
 	const RGBData = [];
 
 	for(let iIdx = 0; iIdx < vLedPositions.length; iIdx++) {
@@ -85,8 +92,8 @@ function SendColors(shutdown = false){
 		const iPxY = vLedPositions[iIdx][1];
 		let mxPxColor;
 
-		if(shutdown){
-			mxPxColor = hexToRgb(shutdownColor);
+		if(overrideColor){
+			mxPxColor = hexToRgb(overrideColor);
 		}else if (LightingMode === "Forced") {
 			mxPxColor = hexToRgb(forcedColor);
 		}else{
@@ -98,13 +105,14 @@ function SendColors(shutdown = false){
 		RGBData[vKeys[iIdx]*3 +2 ] = mxPxColor[2];
 	}
 
-	
+
 	let keysSent = 0;
+
 	while(RGBData.length > 0) {
 		const keysToSend = Math.min(18, RGBData.length/3);
 		device.write([0x00, 0x56, 0x42, 0x00, 0x00, 0x02, keysToSend, keysSent, 0x00].concat(RGBData.splice(0, keysToSend*3)), 65);
 		device.pause(1);
-		keysSent += keysToSend;		
+		keysSent += keysToSend;
 	}
 }
 

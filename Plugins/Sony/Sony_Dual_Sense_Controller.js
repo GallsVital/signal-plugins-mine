@@ -20,7 +20,7 @@ export function ControllableParameters(){
 		{"property":"forcedColor", "group":"lighting", "label":"Forced Color", "min":"0", "max":"360", "type":"color", "default":"#009bde"},
 		{"property":"LIntensity", "group":"", "label":"Left Trigger Intensity", "step":"1", "type":"number", "min":"0", "max":"100", "default":"0"},
 		{"property":"RIntensity", "group":"", "label":"Right Trigger Intensity", "step":"1", "type":"number", "min":"0", "max":"100", "default":"0"},
-		{"property":"HapticsControl", "group":"", "label":"Haptics Control", "type":"boolean", "default": "true"},
+		{"property":"HapticsControl", "group":"", "label":"Haptics Control", "type":"boolean", "default": "false"},
 	];
 }
 
@@ -44,12 +44,18 @@ export function Render() {
 	sendColors();
 }
 
-export function Shutdown() {
-	sendColors(true);
+export function Shutdown(SystemSuspending) {
+
+	if(SystemSuspending){
+		sendColors("#000000"); // Go Dark on System Sleep/Shutdown
+	}else{
+		sendColors(shutdownColor);
+	}
+
 }
 
 
-function sendColors(shutdown = false) {
+function sendColors(overrideColor) {
 	const packet = [0x02, 0xfc, 0xd7, 0x44, 0x40, 0x7c, 0x02, 0x00];
 
 	packet[11] = HapticsControl;//0x00 turns it off 0x01 is linear, 0x02 clicks
@@ -79,8 +85,8 @@ function sendColors(shutdown = false) {
 		const iPxY = vLedPositions[iIdx][1];
 		var col;
 
-		if(shutdown){
-			col = hexToRgb(shutdownColor);
+		if(overrideColor){
+			col = hexToRgb(overrideColor);
 		}else if (LightingMode == "Forced") {
 			col = hexToRgb(forcedColor);
 		}else{
@@ -111,6 +117,6 @@ export function Validate(endpoint) {
 	return endpoint.interface === 3;
 }
 
-export function Image() {
-	return "";
+export function ImageUrl(){
+	return "https://marketplace.signalrgb.com/devices/brands/sony/dualsense-controller.png";
 }

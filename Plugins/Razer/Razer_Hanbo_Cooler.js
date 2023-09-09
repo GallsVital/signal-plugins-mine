@@ -11,7 +11,6 @@ export function DefaultScale(){return 15.0;}
 shutdownColor:readonly
 LightingMode:readonly
 forcedColor:readonly
-
 */
 export function ControllableParameters() {
 	return [
@@ -28,9 +27,9 @@ const DeviceMaxLedLimit = 18*3;
 
 //Channel Name, Led Limit
 const ChannelArray = [
-	["Channel 1", 18],
-	["Channel 2", 18],
-	["Channel 3", 18],
+	["Channel 1", 18, 18],
+	["Channel 2", 18, 18],
+	["Channel 3", 18, 18],
 ];
 
 export function LedNames() {
@@ -106,7 +105,7 @@ function SendChannel(Channel) {
 	} else if(componentChannel.shouldPulseColors()) {
 		ChannelLedCount = 18;
 
-		const pulseColor = device.getChannelPulseColor(ChannelArray[Channel][0], ChannelLedCount);
+		const pulseColor = device.getChannelPulseColor(ChannelArray[Channel][0]);
 		RGBData = device.createColorArray(pulseColor, ChannelLedCount, "Inline", "GRB");
 
 	} else {
@@ -134,6 +133,6 @@ export function Validate(endpoint) {
 	return (endpoint.interface === -1 || endpoint.interface === 0) && endpoint.usage === 0x0001 && endpoint.usage_page === 0xFF00;
 }
 
-export function ImageUrl() {
-	return "https://marketplace.signalrgb.com/devices/default/aio-with-rad.png";
+export function ImageUrl(){
+	return "https://marketplace.signalrgb.com/devices/brands/razer/aios/hanbo.png";
 }

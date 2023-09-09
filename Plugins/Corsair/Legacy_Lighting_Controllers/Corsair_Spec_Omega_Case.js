@@ -43,15 +43,20 @@ const CORSAIR_SOFTWARE_MODE = 0x02;
 const DeviceMaxLedLimit = 204;
 
 //Channel Name, Led Limit
+/** @type {ChannelConfigArray} */
 const ChannelArray = [
-	["Channel 1", 204],
+	["Channel 1", 204, 174],
 ];
 
-function SetupChannels(){
+function SetupChannels() {
 	device.SetLedLimit(DeviceMaxLedLimit);
 
-	for(let i = 0; i < ChannelArray.length; i++){
-		device.addChannel(ChannelArray[i][0], ChannelArray[i][1]);
+	for(let i = 0; i < ChannelArray.length; i++) {
+		const channelInfo = ChannelArray[i];
+
+		if(channelInfo){
+			device.addChannel(...channelInfo);
+		}
 	}
 }
 
@@ -122,7 +127,7 @@ function SendChannel(Channel) {
 	}else if(componentChannel.shouldPulseColors()){
 		ChannelLedCount = 120;
 
-		const pulseColor = device.getChannelPulseColor(ChannelArray[Channel][0], ChannelLedCount);
+		const pulseColor = device.getChannelPulseColor(ChannelArray[Channel][0]);
 		ColorData = device.createColorArray(pulseColor, ChannelLedCount, "Seperate");
 
 	}else{

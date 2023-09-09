@@ -1,3 +1,4 @@
+/// <reference path="./Asus_Zephyrus.d.ts" />
 export function Name() { return "Asus Laptop"; }
 export function VendorId() { return 0x0B05; }
 export function Documentation(){ return "troubleshooting/asus"; }
@@ -21,11 +22,12 @@ export function ControllableParameters() {
 	];
 }
 
-let vKeys = [ 1, 2, 3, 4, 12, 11, 10, 9, 8, 7  ];
+let vKeys = [ 0 ];
 
-let vKeyNames = [ "Keyboard Zone 1",  "Keyboard Zone 2",  "Keyboard Zone 3",  "Keyboard Zone 4",  "Outer LED 1",  "Outer LED 2",  "Outer LED 3",  "Outer LED 4",  "Outer LED 5",  "Outer LED 6" ];
+let vKeyNames = [ "Keyboard Zone" ];
 
-let vKeyPositions = [ [1, 0], [2, 0], [3, 0], [4, 0], [0, 2], [0, 3], [2, 3], [3, 3], [5, 3], [5, 2] ];
+/** @type {LedPosition[]} */
+let vKeyPositions = [ [0, 0] ];
 
 export function LedNames() {
 	return vKeyNames;
@@ -150,6 +152,7 @@ const library = {
 	"G513" : {
 		vKeys : [ 1, 2, 3, 4, 12, 11, 10, 9, 8, 7  ],
 		vKeyNames : [ "Keyboard Zone 1",  "Keyboard Zone 2",  "Keyboard Zone 3",  "Keyboard Zone 4",  "Outer LED 1",  "Outer LED 2",  "Outer LED 3",  "Outer LED 4",  "Outer LED 5",  "Outer LED 6" ],
+		/** @type {LedPosition[]} */
 		vKeyPositions : [ [1, 0], [2, 0], [3, 0], [4, 0], [0, 2], [0, 3], [2, 3], [3, 3], [5, 3], [5, 2] ],
 		size : [ 6, 4 ],
 		colorConfig : [2, 0, 1]
@@ -157,6 +160,7 @@ const library = {
 	"Zephyrus M15" : {
 		vKeys : [ 0 ],
 		vKeyNames : [ "Single Zone Keyboard" ],
+		/** @type {LedPosition[]} */
 		vKeyPositions : [ [0, 0] ],
 		size : [ 2, 2 ],
 		colorConfig : [2, 0, 1]
@@ -188,7 +192,7 @@ const library = {
 			"Left Ctrl", "Fn", "Left Win", "Left Alt", "Space", "Right Alt", "PrtSc", "Right Ctrl",  "Left Arrow",  "Down Arrow", "Right Arrow", //10
 			"Outer LED 1",  "Outer LED 2",  "Outer LED 3",  "Outer LED 4",  "Outer LED 5",  "Outer LED 6" //6
 		],
-
+		/** @type {LedPosition[]} */
 		vKeyPositions :
 		[
 			[8, 0],
@@ -219,4 +223,8 @@ function hexToRgb(hex) {
 
 export function Validate(endpoint) {
 	return endpoint.usage === 0x0079;
+}
+
+export function ImageUrl(){ //Use as placeholder.
+	return "https://marketplace.signalrgb.com/devices/brands/asus/misc/rog-strix-scar-2022-laptop.png";
 }

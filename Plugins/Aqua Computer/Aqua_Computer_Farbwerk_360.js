@@ -22,19 +22,24 @@ export function ControllableParameters() {
 export function SubdeviceController(){ return true; }
 
 const DeviceMaxLedLimit = 360;
+/** @type {ChannelConfigArray} */
 const ChannelArray =
 [
-	["Channel 1", 90],
-	["Channel 2", 90],
-	["Channel 3", 90],
-	["Channel 4", 90],
+	["Channel 1", 90, 90],
+	["Channel 2", 90, 90],
+	["Channel 3", 90, 90],
+	["Channel 4", 90, 90],
 ];
 
 function SetupChannels() {
 	device.SetLedLimit(DeviceMaxLedLimit);
 
 	for(let i = 0; i < ChannelArray.length; i++) {
-		device.addChannel(ChannelArray[i][0], ChannelArray[i][1]);
+		const channelInfo = ChannelArray[i];
+
+		if(channelInfo){
+			device.addChannel(...channelInfo);
+		}
 	}
 }
 
@@ -86,7 +91,7 @@ function SendChannel(Channel, overrideColor) {
 	} else if(componentChannel.shouldPulseColors()) {
 		ChannelLedCount = 90;
 
-		const pulseColor = device.getChannelPulseColor(ChannelArray[Channel][0], ChannelLedCount);
+		const pulseColor = device.getChannelPulseColor(ChannelArray[Channel][0]);
 		RGBData = device.createColorArray(pulseColor, ChannelLedCount, "Inline", "RBG");
 	} else {
 		RGBData = device.channel(ChannelArray[Channel][0]).getColors("Inline", "RBG");

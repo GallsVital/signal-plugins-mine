@@ -26,21 +26,25 @@ export function SubdeviceController(){ return true; }
 const DeviceMaxLedLimit = 270;
 
 //Channel Name, Led Limit
+/** @type {ChannelConfigArray} */
 const ChannelArray =
 [
-	["Channel 1", 54],
-	["Channel 2", 54],
-	["Channel 3", 54],
-	["Channel 4", 54],
-	["Channel 5", 54]
-
+	["Channel 1", 54, 54],
+	["Channel 2", 54, 54],
+	["Channel 3", 54, 54],
+	["Channel 4", 54, 54],
+	["Channel 5", 54, 54],
 ];
 
 function SetupChannels() {
 	device.SetLedLimit(DeviceMaxLedLimit);
 
 	for(let i = 0; i < ChannelArray.length; i++) {
-		device.addChannel(ChannelArray[i][0], ChannelArray[i][1]);
+		const channelInfo = ChannelArray[i];
+
+		if(channelInfo){
+			device.addChannel(...channelInfo);
+		}
 	}
 }
 
@@ -69,23 +73,33 @@ export function Render() {
 	PollFans();
 }
 
-export function Shutdown() {
-	device.pause(2000);
+export function Shutdown(SystemSuspending) {
+
+	if(SystemSuspending){
+		for(let channel = 0; channel < 5; channel++) {
+			Sendchannel(channel, "#000000"); // Go Dark on System Sleep/Shutdown
+		}
+	}else{
+		device.pause(2000);
+	}
+
 }
 
-function Sendchannel(Channel) {
+function Sendchannel(Channel, overrideColor) {
 	let ChannelLedCount = device.channel(ChannelArray[Channel][0]).ledCount;
 	const componentChannel = device.channel(ChannelArray[Channel][0]);
 
 	let RGBData = [];
 
-	if(LightingMode === "Forced") {
+	if(overrideColor){
+		RGBData = device.createColorArray(overrideColor, ChannelLedCount, "Inline", "GRB");
+	}else if(LightingMode === "Forced") {
 		RGBData = device.createColorArray(forcedColor, ChannelLedCount, "Inline", "GRB");
 
 	} else if(componentChannel.shouldPulseColors()) {
 		ChannelLedCount = 40;
 
-		const pulseColor = device.getChannelPulseColor(ChannelArray[Channel][0], ChannelLedCount);
+		const pulseColor = device.getChannelPulseColor(ChannelArray[Channel][0]);
 		RGBData = device.createColorArray(pulseColor, ChannelLedCount, "Inline", "GRB");
 
 	} else {
@@ -181,9 +195,9 @@ function readFanRPM(channel) {
 }
 
 export function Validate(endpoint) {
-	return endpoint.interface === -1;
+	return endpoint.interface === -1 || endpoint.interface === 0;
 }
 
-export function Image() {
-	return "";
+export function ImageUrl() {
+	return "https://marketplace.signalrgb.com/devices/brands/thermaltake/lighting-controllers/led-box.png";
 }

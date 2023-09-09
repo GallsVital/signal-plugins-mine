@@ -136,6 +136,8 @@ export function BrandGPUList(){ return PNYGPUIDs; }
 
 const PNYGPUIDs =
 [
+	new PNYGPUIdentifier(0x2786, 0x13CC, "PNY 4070 XLR8"),
+
 	new PNYGPUIdentifier(0x2782, 0x13B1, "PNY 4070Ti XLR8"),
 	new PNYGPUIdentifier(0x2782, 0x13B2, "PNY 4070Ti XLR8 VERTO"),
 
@@ -159,5 +161,5 @@ function hexToRgb(hex) {
 }
 
 export function ImageUrl() {
-	return "https://marketplace.signalrgb.com/devices/default/gpu.png";
+	return "https://marketplace.signalrgb.com/devices/brands/pny/gpus/gpu.png";
 }
