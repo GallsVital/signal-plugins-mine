@@ -1,3 +1,4 @@
+/// <reference path="./Kingston_Hyper_Fury_Ram.d.ts" />
 // Modifying SMBUS Plugins is -DANGEROUS- and can -DESTROY- devices.
 export function Name() { return "Kingston Hyper Fury Ram"; }
 export function Publisher() { return "WhirlwindFX"; }
@@ -6,39 +7,83 @@ export function Type() { return "SMBUS"; }
 export function Size() { return [2, 12]; }
 export function DefaultPosition(){return [150, 40];}
 export function DefaultScale(){return 10.0;}
-export function LedNames() { return vLedNames; }
-export function LedPositions() { return vLedPositions; }
+/* global
+shutdownColor:readonly
+LightingMode:readonly
+forcedColor:readonly
+highSpeedMode:readonly
+*/
 export function ControllableParameters(){
 	return [
 		{"property":"shutdownColor", "group":"lighting", "label":"Shutdown Color", "min":"0", "max":"360", "type":"color", "default":"#009bde"},
 		{"property":"LightingMode", "group":"lighting", "label":"Lighting Mode", "type":"combobox", "values":["Canvas", "Forced"], "default":"Canvas"},
 		{"property":"forcedColor", "group":"lighting", "label":"Forced Color", "min":"0", "max":"360", "type":"color", "default":"#009bde"},
+		{"property":"highSpeedMode", "group":"lighting", "label":"Single Color Mode (Higher Speed)", "type":"boolean", "default":"false"},
 	];
 }
 
-/* global
-shutdownColor:readonly
-LightingMode:readonly
-forcedColor:readonly
-*/
+/** @type {LedPosition[]} */
+const vPerLEDLedPositions = [ [0, 11], [0, 10], [0, 9], [0, 8], [0, 7], [0, 6], [0, 5], [0, 4], [0, 3], [0, 2], [0, 1], [0, 0] ];
+const vPerLEDLedNames = ["Led 12", "Led 11", "Led 10", "Led 9", "Led 8", "Led 7", "Led 6", "Led 5", "Led 4", "Led 3", "Led 2", "Led 1"];
 
-const vLedNames = ["Led 12", "Led 11", "Led 10", "Led 9", "Led 8", "Led 7", "Led 6", "Led 5", "Led 4", "Led 3", "Led 2", "Led 1"];
-const vLedPositions = [
-	[0, 11], [0, 10], [0, 9], [0, 8], [0, 7], [0, 6], [0, 5], [0, 4], [0, 3], [0, 2], [0, 1], [0, 0]
-];
+/** @type {LedPosition[]} */
+const vSingleLEDPosition = [ [0, 5] ];
+const vSingleLEDName = [ "Main LED" ];
+
+let vLedNames = vPerLEDLedNames;
+let vLedPositions = vPerLEDLedPositions;
+
+export function LedNames() {
+	return vLedNames;
+}
+
+export function LedPositions() {
+	return vLedPositions;
+}
 
 export function Initialize() {
 	SetMode();
-	SendColors(false, true);
+	setLEDs();
+
+	if(!highSpeedMode) {
+		SendColors(false, true);
+	}
 }
 
 export function Render() {
-	SendColors();
-	device.pause(10);
+	if(highSpeedMode) {
+		sendSingleColor();
+	} else {
+		SendColors();
+		device.pause(10);
+	}
+
 }
 
-export function Shutdown() {
-	//SendColors(true);
+export function Shutdown(SystemSuspending) {
+
+	if(SystemSuspending){
+		if(highSpeedMode) {
+			sendSingleColor("#000000");
+		} else {
+			SendColors("#000000");
+		}
+	}else{
+		if(highSpeedMode) {
+			sendSingleColor(shutdownColor);
+		} else {
+			SendColors(shutdownColor);
+		}
+	}
+
+}
+
+export function onhighSpeedModeChanged() {
+	setLEDs();
+
+	if(!highSpeedMode) {
+		SendColors(false, true);
+	}
 }
 
 export function Scan(bus) {
@@ -68,6 +113,51 @@ export function Scan(bus) {
 	return FoundAddresses;
 }
 
+function setLEDs() {
+	if(highSpeedMode) {
+		vLedNames = vSingleLEDName;
+		vLedPositions = vSingleLEDPosition;
+	} else {
+		vLedNames = vPerLEDLedNames;
+		vLedPositions = vPerLEDLedPositions;
+	}
+
+	device.setControllableLeds(vLedNames, vLedPositions);
+}
+
+const AddressPairs = {
+	0x60: [0x50, 0x48],
+	0x61: [0x51, 0x49],
+	0x62: [0x52, 0x4A],
+	0x63: [0x53, 0x4B]
+};
+
+function CheckForHyperFuryRam(bus, addr){ ///MMM I love checking SPD Values for Voltage to detect a RAM Kit.
+	if(!AddressPairs.hasOwnProperty(addr)){
+		return false;
+	}
+	const SubAddresses = AddressPairs[addr];
+	const iReturn = bus.ReadByte(SubAddresses[0], 0x31); // Value changes every time
+	bus.log(`Address [${SubAddresses[0]}], Reg 31: ${iReturn}`, {toFile: true});
+
+	if(iReturn >= 0){
+		const iRet1 = bus.ReadByte(SubAddresses[1], 0x21);
+		bus.log(`Address [${SubAddresses[1]}], Reg 21: ${iRet1}`, {toFile: true});
+
+		const iRet2 = bus.ReadByte(SubAddresses[1], 0x25);
+		bus.log(`Address [${SubAddresses[1]}], Reg 25: ${iRet2}`, {toFile: true});
+
+		const iRet3 = bus.ReadByte(SubAddresses[1], 0x27);
+		bus.log(`Address [${SubAddresses[1]}], Reg 27: ${iRet3}`, {toFile: true});
+
+		const ExpectedValues = [120, 130, 180, 200, 220, 240];
+
+		return ExpectedValues.includes(iRet1) && ExpectedValues.includes(iRet2) && ExpectedValues.includes(iRet3);
+	}
+
+	return false;
+}
+
 const addressDict = {
 	0x60 : 0x50,
 	0x61 : 0x51,
@@ -75,7 +165,7 @@ const addressDict = {
 	0x63 : 0x53
 };
 
-function CheckForHyperFuryRam(bus, addr) {
+function CheckForHyperFuryRamUsingWord(bus, addr) { //The Backend Function for this is busted af.
 	if(!addressDict.hasOwnProperty(addr)){
 		return false;
 	}
@@ -114,26 +204,26 @@ function CheckForHyperFuryRam(bus, addr) {
 }
 
 function SetMode(){
-	bus.WriteByte(0x08, 0x53); // start Command
+	bus.WriteByte(0x08, 0x53); //start Command
 	bus.WriteByte(0x0b, 0x00); //LED index
 	bus.WriteByte(0x09, 0x10); //Mode set to direct
 
 	bus.WriteByte(0x0C, 0x01); //Effect Direction. Why does this even need set when we're in direct mode??!?!?!
-	bus.WriteByte(0x20, 0x50); //Brightness, why does this get set to 0x50/80??
+	bus.WriteByte(0x20, 0x50); //Brightness, why does this get set to 0x50/80?
 
-	bus.WriteByte(0x08, 0x44); // End Command
+	bus.WriteByte(0x08, 0x44); //End Command
 }
 
 
-function SendColors(shutdown = false, firstRun = false){
+function SendColors(overrideColor, firstRun = false){
 	const RGBData = [];
 
 	//Fetch Colors
 	for(let iIdx = 0; iIdx < vLedPositions.length; iIdx++){
  		let Color;
 
-		if(shutdown){
-			Color = hexToRgb(shutdownColor);
+		if(overrideColor){
+			Color = hexToRgb(overrideColor);
 		}else if(LightingMode === "Forced") {
 			Color = hexToRgb(forcedColor);
 		} else {
@@ -146,11 +236,44 @@ function SendColors(shutdown = false, firstRun = false){
 	WriteRGBData(RGBData, firstRun);
 }
 
+
+let lastRGBData = [];
+
+function sendSingleColor(overrideColor) {
+
+	let Color;
+
+	if(overrideColor){
+		Color = hexToRgb(overrideColor);
+	}else if(LightingMode === "Forced") {
+		Color = hexToRgb(forcedColor);
+	} else {
+		Color = device.color(vSingleLEDPosition[0][0], vSingleLEDPosition[0][1]);
+	}
+
+	if(!CompareArrays(lastRGBData, Color)) {
+		bus.WriteByte(0x08, 0x53);
+		device.pause(1);
+		bus.WriteByte(0x09, 0x00);
+		device.pause(1);
+		bus.WriteByte(0x30, 0x01);
+		device.pause(1);
+
+		for(let bytes = 0; bytes < 3; bytes++) {
+			bus.WriteByte(0x31+bytes, Color[bytes]);
+			device.pause(1);
+		}
+
+		bus.WriteByte(0x08, 0x44); // End Command
+		device.pause(1);
+		lastRGBData = Color;
+	}
+
+}
+
 const OldRGBData = [];
 
 function WriteRGBData(RGBData, firstRun){
-	//const start = Date.now();
-
 	bus.WriteByte(0x08, 0x53);
 	device.pause(3);
 
@@ -160,12 +283,12 @@ function WriteRGBData(RGBData, firstRun){
 	}
 
 	for(let i = 0; i < RGBData.length; i++){
-		if(RGBData[i] != OldRGBData[i]){
+		if(RGBData[i] !== OldRGBData[i]){
 			let returnCode = bus.WriteByte(0x50 + i, RGBData[i]);
 
 			let retryCount = 4;
 
-			while(returnCode != 0 && retryCount > 0){
+			while(returnCode !== 0 && retryCount > 0){
 				retryCount -= 1;
 				device.pause(3);
 				returnCode = bus.WriteByte(0x50 + i, RGBData[i]);
@@ -185,9 +308,6 @@ function WriteRGBData(RGBData, firstRun){
 
 	bus.WriteByte(0x08, 0x44);
 	device.pause(3);
-
-	const end = Date.now();
-	//device.log(`Frame Took ${end - start}ms!`);
 }
 
 
@@ -201,8 +321,13 @@ function hexToRgb(hex) {
 	return colors;
 }
 
-export function ImageUrl() {
-	return "https://marketplace.signalrgb.com/devices/default/ram.png";
+export function ImageUrl(){
+	return "https://marketplace.signalrgb.com/devices/brands/kingston/ram/fury-ddr5.png";
+}
+
+function CompareArrays(array1, array2) {
+	return array1.length === array2.length &&
+	array1.every(function(value, index) { return value === array2[index];});
 }
 
 class BinaryUtils {

@@ -339,7 +339,17 @@ class AsusAuraSMBusController {
         	0x8A : "DRAM",
         	0x8B : "PCIE",
         	0x91 : "RGBHeader_3",
-        	0x95 : "QLED"
+        	0x95 : "QLED",
+        	0x98 : "Power/Reset",
+        	0x99 : "Chipset Top",
+        	0x9A : "Chipset Middle",
+        	0x9B : "Chipset Bottom",
+        	0x9C : "Chipset Bottom Zone 2",
+        	0xA0 : "IOShield",
+        	0xA2 : "M.2 Cover",
+        	0xA3 : "M.2 Cover Zone 2"
+
+
         };
 	}
 
@@ -499,5 +509,5 @@ function hexToRgb(hex) {
 }
 
 export function ImageUrl() {
-	return "https://marketplace.signalrgb.com/devices/default/motherboard.png";
+	return "https://marketplace.signalrgb.com/devices/brands/asus/motherboards/motherboard.png";
 }

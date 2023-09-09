@@ -54,7 +54,14 @@ export function Render() {
 	sendColors();
 }
 
-export function Shutdown() {
+export function Shutdown(SystemSuspending) {
+
+	if(SystemSuspending){
+		sendColors("#000000"); // Go Dark on System Sleep/Shutdown
+	}else{
+		sendColors(shutdownColor);
+	}
+
 }
 
 function SetGPUNameFromBusIds() {
@@ -69,15 +76,15 @@ function SetGPUNameFromBusIds() {
 	}
 }
 
-function sendColors(shutdown = false) {
+function sendColors(overrideColor) {
 
 	for(let zone = 0; zone < 3; zone++) {
 		const iPxX = vLedPositions[zone][0];
 		const iPxY = vLedPositions[zone][1];
 		let color;
 
-		if(shutdown) {
-			color = hexToRgb(shutdownColor);
+		if(overrideColor) {
+			color = hexToRgb(overrideColor);
 		} else if (LightingMode === "Forced") {
 			color = hexToRgb(forcedColor);
 		} else {
@@ -129,6 +136,8 @@ export function BrandGPUList(){ return PNYGPUIDs; }
 
 const PNYGPUIDs =
 [
+	new PNYGPUIdentifier(0x2786, 0x13CC, "PNY 4070 XLR8"),
+
 	new PNYGPUIdentifier(0x2782, 0x13B1, "PNY 4070Ti XLR8"),
 	new PNYGPUIdentifier(0x2782, 0x13B2, "PNY 4070Ti XLR8 VERTO"),
 
@@ -138,6 +147,7 @@ const PNYGPUIDs =
 
 	new PNYGPUIdentifier(0x2684, 0x13AD, "PNY 4090 XLR8"),
 	new PNYGPUIdentifier(0x2684, 0x13AE, "PNY 4090 XLR8"),
+	new PNYGPUIdentifier(0x2684, 0x13D8, "PNY 4090 XLR8 Verto Epic-X OC"),
 ];
 
 function hexToRgb(hex) {
@@ -151,5 +161,5 @@ function hexToRgb(hex) {
 }
 
 export function ImageUrl() {
-	return "https://marketplace.signalrgb.com/devices/default/gpu.png";
+	return "https://marketplace.signalrgb.com/devices/brands/pny/gpus/gpu.png";
 }

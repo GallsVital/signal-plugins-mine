@@ -65,28 +65,38 @@ export function Render() {
 	device.pause(1);
 }
 
-export function Shutdown() {
-	for(let i = 0; i < ChannelArray.length; i++) {
-		SendChannel(i, true);
+export function Shutdown(SystemSuspending) {
+
+	if(SystemSuspending){
+		for(let i = 0; i < ChannelArray.length; i++) {
+			SendChannel(i, "#000000");
+		}
+
+		device.pause(1); // Go Dark on System Sleep/Shutdown
+	}else{
+		for(let i = 0; i < ChannelArray.length; i++) {
+			SendChannel(i, shutdownColor);
+		}
+
+		device.pause(1);
 	}
 
-	device.pause(1);
 }
 
-function SendChannel(Channel, shutdown = false) {
+function SendChannel(Channel, overrideColor) {
 	let ChannelLedCount = device.channel(ChannelArray[Channel][0]).ledCount > ChannelArray[Channel][1] ? ChannelArray[Channel][1] : device.channel(ChannelArray[Channel][0]).ledCount;
 	const componentChannel = device.channel(ChannelArray[Channel][0]);
 
 	let RGBData = [];
 
-	if(shutdown) {
-		RGBData = device.createColorArray(shutdownColor, ChannelLedCount, "Inline");
+	if(overrideColor) {
+		RGBData = device.createColorArray(overrideColor, ChannelLedCount, "Inline");
 	} else if(LightingMode === "Forced") {
 		RGBData = device.createColorArray(forcedColor, ChannelLedCount, "Inline");
 	} else if(componentChannel.shouldPulseColors()) {
 		ChannelLedCount = 90;
 
-		const pulseColor = device.getChannelPulseColor(ChannelArray[Channel][0], ChannelLedCount);
+		const pulseColor = device.getChannelPulseColor(ChannelArray[Channel][0]);
 		RGBData = device.createColorArray(pulseColor, ChannelLedCount, "Inline");
 	} else {
 		RGBData = device.channel(ChannelArray[Channel][0]).getColors("Inline");
