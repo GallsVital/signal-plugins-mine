@@ -110,5 +110,5 @@ export function Validate(endpoint) {
 }
 
 export function ImageUrl() {
-	return "";
+	return "https://marketplace.signalrgb.com/devices/default/keyboards/65-keyboard-render.png";
 }
