@@ -25,24 +25,28 @@ export function DefaultComponentBrand() { return "Corsair";}
 export function Documentation(){ return "troubleshooting/corsair"; }
 
 //Channel Name, Led Limit
-/** @type {[string, number][]}  */
+/** @type {ChannelConfigArray}  */
 const ChannelArray = [
-	["Channel 1", 204],
-	["Channel 2", 204],
+	["Channel 1", 204, 120],
+	["Channel 2", 204, 120],
 ];
 
 const DeviceMaxLedLimit = 204;
 
-function SetupChannels(){
+function SetupChannels() {
 	device.SetLedLimit(DeviceMaxLedLimit);
 
-	for(let i = 0; i < ChannelArray.length; i++){
-		device.addChannel(ChannelArray[i][0], ChannelArray[i][1]);
+	for(let i = 0; i < ChannelArray.length; i++) {
+		const channelInfo = ChannelArray[i];
+
+		if(channelInfo){
+			device.addChannel(...channelInfo);
+		}
 	}
 }
 
 export function Validate(endpoint) {
-	return endpoint.interface === -1 || endpoint.interface === 2;
+	return endpoint.interface === -1 || endpoint.interface === 0 || endpoint.interface === 2;
 }
 
 export function Initialize() {

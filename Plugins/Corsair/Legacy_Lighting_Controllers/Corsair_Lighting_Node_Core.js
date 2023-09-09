@@ -37,15 +37,20 @@ export function Documentation(){ return "troubleshooting/corsair"; }
 
 const DeviceMaxLedLimit = 204;
 //Channel Name, Led Limit
+/** @type {ChannelConfigArray} */
 const ChannelArray = [
-	["Channel 1", 204],
+	["Channel 1", 204, 204],
 ];
 
-function SetupChannels(){
+function SetupChannels() {
 	device.SetLedLimit(DeviceMaxLedLimit);
 
-	for(let i = 0; i < ChannelArray.length; i++){
-		device.addChannel(ChannelArray[i][0], ChannelArray[i][1]);
+	for(let i = 0; i < ChannelArray.length; i++) {
+		const channelInfo = ChannelArray[i];
+
+		if(channelInfo){
+			device.addChannel(...channelInfo);
+		}
 	}
 }
 
@@ -167,8 +172,9 @@ function SubmitLightingColors() {
 	device.write(packet, 65);
 	device.read(packet, 17);
 }
+
 export function Validate(endpoint) {
-	return endpoint.interface === -1 | 2;
+	return endpoint.interface === -1 || endpoint.interface === 0 || endpoint.interface === 2;
 }
 
 

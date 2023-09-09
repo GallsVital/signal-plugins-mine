@@ -2,7 +2,8 @@ image: alpine:latest
 
 stages:
   - lint
-  - validate
+  - plugin validate
+  - component validate
   - duplicate gpu check
   - unit test
   - build
@@ -28,15 +29,6 @@ eslint:
     #- npm install
     - npm run lint:ci
 
-validate:
-  stage: validate
-  when: always
-  allow_failure: true
-  script:
-    #- apk add --update npm
-    #- npm install
-    - npm run test:validate
-
 duplicate gpu check:
   stage: duplicate gpu check
   when: always
@@ -44,6 +36,34 @@ duplicate gpu check:
     #- apk add --update npm
     #- npm install
     - npm run test:CheckDuplicateGPU
+
+plugin validate:
+  stage: plugin validate
+  when: always
+  allow_failure: true
+  script:
+    #- apk add --update npm
+    #- npm install
+    - npm run test:validate
+  artifacts:
+    when: always
+    name: "Javascript Plugins"
+    paths:
+      - Components/**/*.json"
+      - Plugins/**/*.js
+      - Plugins/**/*.qml
+    exclude:
+      - "Plugins/**/*.test.js"
+      - "Plugins/*.js"
+
+component validate:
+  stage: component validate
+  when: always
+  allow_failure: true
+  script:
+    #- apk add --update npm
+    #- npm install
+    - npm run test:componentValidate
 
 unit test:
   stage: unit test
@@ -59,20 +79,20 @@ unit test:
       junit:
         - junit.xml
 
-build:
-  stage: build
-  allow_failure: true # User Props will always throw errors in TS.
+# build:
+#   stage: build
+#   allow_failure: true # User Props will always throw errors in TS.
 
-  script:
-    #- apk add --update npm
-    #- npm install
-    - npm run build
+#   script:
+#     #- apk add --update npm
+#     #- npm install
+#     - npm run build
 
-  artifacts:
-    when: always
-    name: "Javascript Plugins"
-    paths:
-      - dist/**/*.js
-    reports:
-      junit:
-        - junit.xml
+#   artifacts:
+#     when: always
+#     name: "Javascript Plugins"
+#     paths:
+#       - dist/**/*.js
+#     reports:
+#       junit:
+#         - junit.xml

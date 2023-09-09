@@ -1,4 +1,4 @@
-export function Name() { return "Corsair K70 RGB mkII"; }
+export function Name() { return "Corsair Legacy Keyboard"; }
 export function VendorId() { return 0x1b1c; }
 export function ProductId() { return Object.keys(deviceLibrary.PIDLibrary); }
 export function Publisher() { return "WhirlwindFX"; }
@@ -45,9 +45,7 @@ export function Initialize() {
 
 	LegacyCorsair.deviceInitialization();
 
-	if(!LegacyCorsair.getWirelessDevice()) {
-		LegacyCorsair.configureDevice();
-	}
+	LegacyCorsair.configureDevice(); //Remove wireless checks as afaik there's no wireless NXP keebs.
 
 	//set key codes to get the keys working again, unless you wanna assign them all in software. Pls don't. I beg of you.
 	InitScanCodes();
@@ -195,11 +193,13 @@ function sendColors(shutdown = false) {
 		do {
 			const bytesToSend = Math.min(colorArray.length, 60);
 			LegacyCorsair.setSoftwareLightingStream(packetsSent+1, bytesToSend, colorArray.splice(0, bytesToSend));
+			device.pause(1);
 			packetsSent++;
 		}
 		while(colorArray.length > 0);
 
 		LegacyCorsair.ApplyLightingStream(colors, 3, colors === 3 ? 2 : 1);
+		device.pause(1);
 	}
 }
 
@@ -224,7 +224,7 @@ class LegacyCorsairLibrary {
 			0x1B33 : "K70 MKII", //Lux
 			0x1B13 : "K70 MKII", //OG K70
 			0x1B11 : "K95 RGB",
-			0x1B2D : "K95 Plat"
+			//0x1B2D : "K95 Plat"
 		};
 		this.deviceNameLibrary = {
 			0x1b49 : "K70 MKII",
@@ -235,7 +235,7 @@ class LegacyCorsairLibrary {
 			0x1B33 : "K70 Lux", //Lux
 			0x1B13 : "K70", //OG K70
 			0x1B11 : "K95 RGB",
-			0x1B2D : "K95 Platinum"
+			//0x1B2D : "K95 Platinum"
 		};
 		this.DeviceLibrary = {
 			"K70 MKII" : {
@@ -245,7 +245,7 @@ class LegacyCorsairLibrary {
 					"`", "1", "2", "3", "4", "5", "6", "7", "8", "9", "0", "-_", "=+", "Backspace",                        "Insert", "Home", "Page Up",       "NumLock", "Num /", "Num *", "Num -",  //21
 					"Tab", "Q", "W", "E", "R", "T", "Y", "U", "I", "O", "P", "[", "]", "\\",                               "Del", "End", "Page Down",         "Num 7", "Num 8", "Num 9", "Num +",    //21
 					"CapsLock", "A", "S", "D", "F", "G", "H", "J", "K", "L", ";", "'", "Enter",                                                              "Num 4", "Num 5", "Num 6",             //16
-					"Left Shift", "Z", "X", "C", "V", "B", "N", "M", ",", ".", "/", "?","Right Shift",                                  "Up Arrow",               "Num 1", "Num 2", "Num 3", "Num Enter", //17
+					"Left Shift", "Z", "X", "C", "V", "B", "N", "M", ",", ".", "/", "?", "Right Shift",                                  "Up Arrow",               "Num 1", "Num 2", "Num 3", "Num Enter", //17
 					"Left Ctrl", "Left Win", "Left Alt", "Space", "Right Alt", "Fn", "Menu", "Right Ctrl",  "Left Arrow", "Down Arrow", "Right Arrow", "Num 0", "Num .",                       //13
 					//ISO
 					"ISO #", "ISO <"
@@ -603,14 +603,14 @@ class LegacyCorsairProtocol {
 			127 : "G8",
 			128 : "G9",
 			129 : "G10",
-			130 : "G11",
-			131 : "G12",
-			132 : "G13",
-			133 : "G14",
-			134 : "G15",
-			135 : "G16",
-			136 : "G17",
-			137 : "G18"
+			136 : "G11",
+			137 : "G12",
+			138 : "G13",
+			139 : "G14",
+			140 : "G15",
+			141 : "G16",
+			142 : "G17",
+			143 : "G18"
 		};
 	}
 
@@ -647,7 +647,7 @@ class LegacyCorsairProtocol {
 		this.setvKeys(config.vKeys);
 		this.setvKeyNames(config.vLedNames);
 		this.setvLedPositions(config.vLedPositions);
-		this.setDeviceName(deviceLibrary.PIDLibrary[device.productId()]); //WJY DID THIS WORK WITHOUT THIS?!?!?!?
+		this.setDeviceName(deviceLibrary.PIDLibrary[device.productId()]);
 		device.setName("Corsair " + deviceLibrary.deviceNameLibrary[device.productId()]);
 		device.setSize(config.size);
 		device.setControllableLeds(this.Config.vKeyNames, this.Config.vKeyPositions);
@@ -814,11 +814,8 @@ class LegacyCorsairProtocol {
 	   	this.setKeyboardLayout(DeviceInformation[6]);
 		this.setDeviceType(DeviceInformation[5]);
 
-		if(this.getWirelessDevice()) {
-			this.checkWakeStatus();
-		} else {
-			this.setWakeStatus(true); //Wired devices will never have a wake status
-		}
+		this.setWakeStatus(true); //Wired devices will never have a wake status
+
 
 		device.addFeature("keyboard");
 		macroInputArray.setCallback(macroInputHandler);
@@ -830,7 +827,7 @@ class LegacyCorsairProtocol {
 		this.setSpecialFunctionControlMode(this.modes.SoftwareMode);
 
 		if(this.getWirelessDevice()) {
-			this.wirelessDeviceSetup();
+			//this.wirelessDeviceSetup();
 		}
 	}
 	/** Set Device to Function Control Mode.*/

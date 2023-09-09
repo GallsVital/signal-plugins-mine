@@ -96,20 +96,23 @@ function burstFans() {
 function setChannelMode(channel) {
 	const packet = [0x00, 0x00, 0x1f, 0x00, 0x00, 0x00, 0x03, 0x0d, 0x02, 0x01, channel + 0x05, 0x04]; //manual is 0x04
 	packetSend(packet, 91);
-	device.pause(2);
+	device.pause(10);
 }
 
 function setChannelRPM(channel, speed) {
 	const packet = [0x00, 0x00, 0x1f, 0x00, 0x00, 0x00, 0x03, 0x0d, 0x0d, 0x01, channel + 0x05, speed];
 	packetSend(packet, 91);
-	device.pause(2);
+	device.pause(10);
 }
 
-function getChannelRPM(channel) {
+function getChannelRPM(channel) { //Still the same on latest fw
 	const packet = [0x00, 0x00, 0x1f, 0x00, 0x00, 0x00, 0x06, 0x0d, 0x81, 0x01, channel + 0x05];
 	packetSend(packet, 91);
+	packetSend(packet, 91);
+	device.pause(10);
 
 	const returnpacket = device.get_report(packet, 91);
+	device.log(returnpacket);
 
 	const RPMHighByte = returnpacket[13];
 	const RPMLowByte = returnpacket[14];
@@ -125,6 +128,6 @@ export function Validate(endpoint) {
 
 }
 
-export function Image() {
-	return "";
+export function ImageUrl(){
+	return "https://marketplace.signalrgb.com/devices/brands/razer/fan-controllers/pwm-controller.png";
 }
