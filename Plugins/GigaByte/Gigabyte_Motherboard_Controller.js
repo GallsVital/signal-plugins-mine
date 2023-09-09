@@ -140,6 +140,18 @@ const MotherboardConfigs = {
 			0x24: ["12V Header Top", HeaderConfiguration]
 		}
 	},
+	"B550I AORUS PRO AX": {
+		ARGB:{
+			"5v ARGB Header 1": 0x58,
+		},
+		Mainboard:{
+			0x20: ["Side LED 1", MainboardConfiguration],
+			0x21: ["Side LED 2", MainboardConfiguration],
+			0x22: ["Side LED 3", MainboardConfiguration],
+			0x23: ["Side LED 4", MainboardConfiguration],
+			0x24: ["12v Header", HeaderConfiguration],
+		}
+	},
 	"B760I AORUS PRO DDR4": {
 		ARGB:{
 			"5v ARGB Header 1": 0x58,
@@ -682,5 +694,5 @@ function hexToRgb(hex) {
 }
 
 export function ImageUrl() {
-	return "https://marketplace.signalrgb.com/devices/default/motherboard.png";
+	return "https://marketplace.signalrgb.com/devices/brands/gigabyte/motherboard/motherboard.png";
 }

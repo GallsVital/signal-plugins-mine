@@ -7,17 +7,15 @@ export function Size() { return [4, 1]; }
 export function DefaultPosition(){return [0, 0]; }
 export function DefaultScale(){return 29.9; }
 /* global
-shutDownColor:readonly
-shutDownMode:readonly
+shutdownColor:readonly
 LightingMode:readonly
 forcedColor:readonly
 */
 export function ControllableParameters() {
 	return [
-		{property:"LightingMode", label:"Lighting Mode", type:"combobox", values:["Canvas", "Forced"], default:"Canvas"},
-		{property:"forcedColor", label:"Forced Color", min:"0", max:"360", type:"color", default:"#009bde"},
-		{property:"shutDownMode", label:"Shut Down Mode", type:"combobox", values: ["Turn Off", "Color"], default: "Turn Off"},
-		{property:"shutDownColor", label:"Shut Down Color", min:"0", max:"360", type:"color", default:"#FF0000"}
+		{"property":"shutdownColor", "group":"lighting", "label":"Shutdown Color", "min":"0", "max":"360", "type":"color", "default":"#009bde"},
+		{"property":"LightingMode", "group":"lighting", "label":"Lighting Mode", "type":"combobox", "values":["Canvas", "Forced"], "default":"Canvas"},
+		{"property":"forcedColor", "group":"lighting", "label":"Forced Color", "min":"0", "max":"360", "type":"color", "default":"#009bde"},
 	];
 }
 
@@ -45,14 +43,20 @@ export function Initialize() {
 }
 
 export function Render() {
-	SendColorPacket();
+	sendColors();
 }
 
-export function Shutdown() {
-	SendColorPacket(true);
+export function Shutdown(SystemSuspending) {
+
+	if(SystemSuspending){
+		sendColors("#000000"); // Go Dark on System Sleep/Shutdown
+	}else{
+		sendColors(shutdownColor);
+	}
+
 }
 
-function SendColorPacket(shutdown = false) {
+function sendColors(overrideColor) {
 	let packet = [0xcc, 0x16, 0x01, 0x01, 0x02];
 
 	for(let iIdx = 0; iIdx < 4; iIdx++){
@@ -60,18 +64,11 @@ function SendColorPacket(shutdown = false) {
 		const iPxY = vLedPositions[iIdx][1];
 		var color;
 
-		if (shutdown) {
-			switch(shutDownMode) {
-			case "Color":
-				color = hexToRgb(shutDownColor);
-				break;
-			case "Turn Off":
-				color = [0, 0, 0];
-				break;
-			}
-		} else if (LightingMode === "Forced") {
+		if(overrideColor){
+			color = hexToRgb(overrideColor);
+		}else if (LightingMode === "Forced") {
 			color = hexToRgb(forcedColor);
-		} else {
+		}else{
 			color = device.color(iPxX, iPxY);
 		}
 

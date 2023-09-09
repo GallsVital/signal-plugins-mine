@@ -1,5 +1,5 @@
 // Modifying SMBUS Plugins is -DANGEROUS- and can -DESTROY- devices.
-export function Name() { return "Patriot Viper Steel RAM Test"; }
+export function Name() { return "Patriot Viper Steel RAM"; }
 export function Publisher() { return "WhirlwindFX"; }
 export function Type() { return "SMBUS"; }
 export function Size() { return [1, 5]; }
@@ -94,12 +94,18 @@ export function Render() {
 	sendColors();
 }
 
-export function Shutdown() {
-	bus.WriteByte(0x01, 0x01);
-	bus.WriteByte(0x00, 0x00);
+export function Shutdown(SystemSuspending) {
+
+	if(SystemSuspending){
+		sendColors("#000000"); // Go Dark on System Sleep/Shutdown
+	}else{
+		bus.WriteByte(0x01, 0x01);
+		bus.WriteByte(0x00, 0x00);
+	}
+
 }
 
-function sendColors(shutdown = false) {
+function sendColors(overrideColor) {
 	let color;
 
 	for(let iIdx = 0; iIdx < 5; iIdx++) {
@@ -107,8 +113,8 @@ function sendColors(shutdown = false) {
 		const iPxY = vLedPositions[iIdx][1];
 
 
-		if(shutdown) {
-			color = hexToRgb(shutdownColor);
+		if(overrideColor) {
+			color = hexToRgb(overrideColor);
 		} else if (LightingMode === "Forced") {
 			color = hexToRgb(forcedColor);
 		} else {

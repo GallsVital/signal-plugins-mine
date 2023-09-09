@@ -5,7 +5,7 @@ export function Documentation(){ return "troubleshooting/msi"; }
 export function ProductId() { return Object.keys(MSIMotherboard.Library);}
 // YOU CAN BRICK THESE MOTHERBOARDS RGB CONTROLLER WITH ONE WRONG PACKET
 export function Publisher() { return "WhirlwindFX"; }
-export function Size() { return [0, 0]; }
+export function Size() { return [1, 1]; }
 export function Type() { return "Hid"; }
 export function DefaultPosition(){return [0, 0];}
 export function DefaultScale(){return 8.0;}
@@ -1744,7 +1744,7 @@ class MysticLight {
 		} else if(componentChannel.shouldPulseColors()) {
 			ChannelLedCount = 80;
 
-			const pulseColor = device.getChannelPulseColor(ChannelArray[Channel][0], ChannelLedCount);
+			const pulseColor = device.getChannelPulseColor(ChannelArray[Channel][0]);
 			RGBData = device.createColorArray(pulseColor, ChannelLedCount, "Inline");
 		} else {
 			RGBData = device.channel(ChannelArray[Channel][0]).getColors("Inline");
@@ -2054,5 +2054,5 @@ class MysticLight {
 const MSIMotherboard = new MysticLight();
 
 export function ImageUrl() {
-	return "https://marketplace.signalrgb.com/devices/default/motherboard.png";
+	return "https://marketplace.signalrgb.com/devices/brands/msi/motherboards/motherboard.png";
 }
