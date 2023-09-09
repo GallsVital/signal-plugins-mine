@@ -135,5 +135,5 @@ export function Validate(endpoint) {
 }
 
 export function ImageUrl() {
-	return "";
+	return "https://marketplace.signalrgb.com/devices/brands/razer/keyboards/ornata-v3-tkl.png";
 }
