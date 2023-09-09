@@ -130,5 +130,5 @@ export function Validate(endpoint) {
 }
 
 export function Image() {
-	return "";
+	return "https://marketplace.signalrgb.com/devices/brands/asus/misc/pg27uq.png";
 }
