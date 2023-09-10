@@ -258,6 +258,7 @@ class NvidiaGPUDeviceIds {
 		this.RTX3060_LHR     = 0x2504;
 		this.RTX3060_GA104   = 0x2487;
 		this.RTX3060TI       = 0x2486;
+		this.RTX3060TI_D6X	 = 0x24C9;
 		this.RTX3060TI_LHR   = 0x2489;
 		this.RTX3070         = 0x2484;
 		this.RTX3070_LHR     = 0x2488;
@@ -332,6 +333,7 @@ class GigabyteVisionDeviceIds {
 		this.RTX3060_GAMING_OC_12GB         = 0x4074;
 		this.RTX3060TI_VISION_OC			= 0x4077;
 		this.RTX3060TI_GAMING_OC            = 0x405A;
+		this.RTX3060TI_GAMING_OC_D6X		= 0x40CD;
 		this.RTX3060TI_EAGLE_OC             = 0x405B;
 		this.RTX3060TI_EAGLE_OC_REV2_LHR    = 0x4060;
 		this.RTX3060TI_GAMING_OC_PRO        = 0x405E;
@@ -438,6 +440,7 @@ class GigabyteVisionGPuList {
 			new GigabyteVisionIdentifier(Nvidia.RTX3060TI_LHR,  GigabyteVisionIds.RTX3060TI_GAMING_OC,           0x32, "GIGABYTE 3060Ti Gaming OC Rev 2.0"),
 			new GigabyteVisionIdentifier(Nvidia.RTX3060TI_LHR,  GigabyteVisionIds.RTX3060TI_GAMING_OC,           0x62, "GIGABYTE 3060Ti Gaming OC Rev 2.0"),
 			new GigabyteVisionIdentifier(Nvidia.RTX3060TI_LHR,  GigabyteVisionIds.RTX3060TI_GAMING_OC_PRO,       0x62, "GIGABYTE 3060Ti Gaming OC Pro Rev 3.0"),
+			new GigabyteVisionIdentifier(Nvidia.RTX3060TI_D6X,  GigabyteVisionIds.RTX3060TI_GAMING_OC_D6X,		 0x62, "GIGABYTE 3060Ti Gaming OC D6X"),
 			new GigabyteVisionIdentifier(Nvidia.RTX3070,        GigabyteVisionIds.RTX3070_GAMING_OC,             0x62, "GIGABYTE 3070 Gaming OC"),
 			new GigabyteVisionIdentifier(Nvidia.RTX3070_LHR,    GigabyteVisionIds.RTX3070_GAMING_OC,             0x62, "GIGABYTE 3070 Gaming OC LHR"),
 			new GigabyteVisionIdentifier(Nvidia.RTX3080_GA102,  GigabyteVisionIds.RTX3080_12G_GAMING_OC,     	 0x62, "GIGABYTE 3080 Gaming OC 12g LHR"),
