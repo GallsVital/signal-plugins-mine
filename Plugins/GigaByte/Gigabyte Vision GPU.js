@@ -368,6 +368,7 @@ class GigabyteVisionDeviceIds {
 		this.RTX4070TI_AERO_OC				= 0x40FF;
 		this.RTX4070TI_EAGLE				= 0x40EC;
 		this.RTX4070TI_MASTER_12G           = 0x40bb;
+		this.RTX4080_EAGLE_16GD				= 0x40CC;
 		this.RTX4080_EAGLE_OC_16GD			= 0x40BE;
 		this.RTX4080_GAMING_OC	            = 0x40bc;
 		this.RTX4080_AERO_OC_16G			= 0x40C5;
@@ -457,6 +458,7 @@ class GigabyteVisionGPuList {
 			new GigabyteVisionIdentifier(Nvidia.RTX3080TI,      GigabyteVisionIds.RTX3080TI_EAGLE_OC,            0x63, "GIGABYTE 3080Ti Eagle OC"),
 			new GigabyteVisionIdentifier(Nvidia.RTX4070TI,      GigabyteVisionIds.RTX4070TI_EAGLE_12G,        	 0x71, "GIGABYTE 4070TI Eagle"),
 			new GigabyteVisionIdentifier(Nvidia.RTX4070TI,      GigabyteVisionIds.RTX4070TI_EAGLE_OC_12G,        0x71, "GIGABYTE 4070TI Eagle OC"),
+			new GigabyteVisionIdentifier(Nvidia.RTX4080,        GigabyteVisionIds.RTX4080_EAGLE_16GD,			 0x71, "GIGABYTE 4080 Eagle"),
 			new GigabyteVisionIdentifier(Nvidia.RTX4080,        GigabyteVisionIds.RTX4080_EAGLE_OC_16GD,         0x71, "GIGABYTE 4080 Eagle OC"),
 			new GigabyteVisionIdentifier(Nvidia.GTX1070,        GigabyteVisionIds.GTX1070_GAMING,                0x47, "GIGABYTE 1070 Gaming"),
 			new GigabyteVisionIdentifier(Nvidia.GTX1070,		GigabyteVisionIds.GTX1070_G1_GAMING,			 0x48, "GIGABYTE 1070 G1 Gaming"),
