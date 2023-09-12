@@ -249,6 +249,24 @@ class GigabyteMasterProtocol {
 					3: {Names : [ "Logo" ], Positions : [ [3, 1] ], Mapping : [ 0 ]}
 				}
 			},
+			0x40E5 : // 4090 Gaming OC
+			{
+				Size: [5, 3],
+				modeZones : [0], //This is an odd card all the way around.
+				Zones:
+				{
+					0: {
+						Names : 	[ "Fan 1", "Fan 2", "Fan 3" ],
+						Positions : [ [1, 2], [2, 2], [3, 2] ],
+						Mapping : 	[ 0, 1, 2 ]
+					},
+					3: {
+						Names : 	[ "Logo" ],
+						Positions : [ [3, 1] ],
+						Mapping : 	[ 0 ]
+					}
+				}
+			},
 			0x0009 : //0x40b2 :
 			{
 				Size: [5, 3],
@@ -670,6 +688,7 @@ class GigabyteMasterDeviceIds {
 		this.RTX4080_XTREME_WATERFORCE		 = 0x40c8;
 		this.RTX4090_AORUS_MASTER 			 = 0x40C0;
 		this.RTX4090_GAMING_OC_24GB			 = 0x40BF;
+		this.RTX4090_GAMING_OC_24GB_2		 = 0x40E5;
 	}
 }
 
@@ -737,6 +756,7 @@ class GigabyteMasterGPuList {
 			new GigabyteMasterIdentifier(Nvidia.RTX4080, 		GigabyteMasterIds.RTX4080_GAMING_OC_16G_2,			0x71, "GIGABYTE 4080 Gaming OC"),
 			new GigabyteMasterIdentifier(Nvidia.RTX4080, 		GigabyteMasterIds.RTX4080_XTREME_WATERFORCE,		0x64, "GIGABYTE 4080 XTREME Waterforce 16GB"), //This card is single zone. Older ones were multizone. We'll see if it plays ball or not with sending multiple zones.
 			new GigabyteMasterIdentifier(Nvidia.RTX4090,        GigabyteMasterIds.RTX4090_GAMING_OC_24GB,			0x71, "GIGABYTE 4090 Gaming OC"),
+			new GigabyteMasterIdentifier(Nvidia.RTX4090,        GigabyteMasterIds.RTX4090_GAMING_OC_24GB_2,			0x71, "GIGABYTE 4090 Gaming OC"),
 			new GigabyteMasterIdentifier(Nvidia.RTX4090, 		GigabyteMasterIds.RTX4090_AORUS_MASTER,				0x71, "GIGABYTE 4090 AORUS Master"),
 		];
 	}

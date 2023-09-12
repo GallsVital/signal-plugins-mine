@@ -211,6 +211,6 @@ export function Validate(endpoint) {
 	return endpoint.interface === 1 && endpoint.usage === 1 && endpoint.usage_page === 0xff01;
 }
 
-export function Image() {
-	return "";
+export function ImageUrl(){
+	return "https://marketplace.signalrgb.com/devices/brands/lg/ultragear-27gn950.png";
 }
