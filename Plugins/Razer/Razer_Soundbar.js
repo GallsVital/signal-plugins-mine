@@ -1,5 +1,5 @@
 export function Name() { return "Razer Soundbar"; }
-export function VendorId() { return 0x0B05; }
+export function VendorId() { return 0x1532; }
 export function ProductId() { return Object.keys(RAZERdeviceLibrary.PIDLibrary); }
 export function Publisher() { return "WhirlwindFx"; }
 export function Documentation(){ return "troubleshooting/razer"; }
@@ -21,7 +21,10 @@ export function ControllableParameters() {
 
 export function Initialize() {
 
+
 	/*
+	// PRESENT ON V2 X
+	// NOT NEEDED FOR V2 PRO
 	packetSend([0x07, 0x00, 0x1f, 0x00, 0x00, 0x00, 0x06, 0x0f, 0x02, 0x00, 0x00, 0x08, 0x00, 0x01], 91);
 	device.pause(20);
 	packetSend([0x07, 0x00, 0x1f, 0x00, 0x00, 0x00, 0x06, 0x0f, 0x02, 0x00, 0x00, 0x08, 0x01, 0x01], 91);
@@ -37,6 +40,7 @@ export function Initialize() {
 	packetSend([0x07, 0x00, 0x1f, 0x00, 0x00, 0x00, 0x03, 0x0f, 0x04, 0x01, 0x00, 0xcc], 91);
 	device.pause(20);
 	*/
+
 	RAZER.InitializeRAZER();
 }
 
@@ -135,6 +139,8 @@ export class RAZER_Soundbar_Protocol {
 		this.setZones(DeviceProperties.Zones);
 		this.setPacketHeaders(DeviceProperties.PacketHeaders);
 		this.setPacketLEDs(DeviceProperties.PacketLEDs);
+		this.setWriteLength(DeviceProperties.WriteLength);
+		this.setReadLength(DeviceProperties.ReadLength);
 		device.set_endpoint(DeviceProperties.Endpoint[`interface`], DeviceProperties.Endpoint[`usage`], DeviceProperties.Endpoint[`usage_page`]);
 
 		console.log("Initializing device...");
@@ -157,7 +163,6 @@ export class RAZER_Soundbar_Protocol {
 		const PacketHeaders 		= this.getPacketHeaders();
 		const PacketLEDs 			= this.getPacketLEDs();
 		const DeviceZones 			= this.getZones();
-		const transactionID			= this.getTransactionID();
 
 		const RGBData = [];
 
@@ -188,21 +193,21 @@ export class RAZER_Soundbar_Protocol {
 
 	FindBufferLengths(){
 
-		const HidInfo = device.getHidInfo();
-
 		console.log(`Setting up device Buffer Lengths...`);
 
-		if(HidInfo.writeLength !== 0){
-			this.setWriteLength(HidInfo.writeLength);
-			console.log(`Write length set to ` + this.getWriteLength());
+		if (this.getWriteLength() === 0 || this.getReadLength() === 0){
+			const HidInfo = device.getHidInfo();
+
+			if(HidInfo.writeLength !== 0){
+				this.setWriteLength(HidInfo.writeLength);
+				console.log(`Write length set to ` + this.getWriteLength());
+			}
+
+			if(HidInfo.readLength !== 0){
+				this.setReadLength(HidInfo.readLength);
+				console.log(`Read length set to ` + this.getReadLength());
+			}
 		}
-
-
-		if(HidInfo.readLength !== 0){
-			this.setReadLength(HidInfo.readLength);
-			console.log(`Read length set to ` + this.getReadLength());
-		}
-
 	}
 
 	CalculateCrc(report) {
@@ -269,7 +274,7 @@ export class RAZER_Soundbar_Protocol {
 		if (SerialString.length === 15 && devicesFound === 0) {
 			this.setTransactionID(TransactionID);
 			devicesFound++;
-			device.log("Valid Serial Returned:" + SerialString);
+			device.log("Valid Serial Returned: " + SerialString);
 		} else {
 			device.log("Device serial not recognized! No TransactionID set.");
 		}
@@ -346,6 +351,8 @@ export class deviceLibrary {
 				Zones : 2,
 				PacketHeaders: [0x08, 0x20, 0x08],
 				PacketLEDs: 9,
+				WriteLength: 91,
+				ReadLength: 91
 			},
 			"Leviathan V2 X":
 			{
@@ -363,6 +370,8 @@ export class deviceLibrary {
 				Zones : 1,
 				PacketHeaders: [0x07, 0x2F, 0x0D],
 				PacketLEDs: 14,
+				WriteLength: 91,
+				ReadLength: 91
 			},
 			"Leviathan V2 Pro":
 			{
@@ -382,6 +391,8 @@ export class deviceLibrary {
 				Zones : 2,
 				PacketHeaders: [0x00, 0x32, 0x0E],
 				PacketLEDs: 15,
+				WriteLength: 65,
+				ReadLength: 65
 			},
 		};
 
