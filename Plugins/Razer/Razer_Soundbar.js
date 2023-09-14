@@ -21,10 +21,9 @@ export function ControllableParameters() {
 
 export function Initialize() {
 
-
 	/*
 	// PRESENT ON V2 X
-	// NOT NEEDED FOR V2 PRO
+	// NOT NEEDED FOR V2 PRO AND V2
 	packetSend([0x07, 0x00, 0x1f, 0x00, 0x00, 0x00, 0x06, 0x0f, 0x02, 0x00, 0x00, 0x08, 0x00, 0x01], 91);
 	device.pause(20);
 	packetSend([0x07, 0x00, 0x1f, 0x00, 0x00, 0x00, 0x06, 0x0f, 0x02, 0x00, 0x00, 0x08, 0x01, 0x01], 91);
@@ -227,7 +226,7 @@ export class RAZER_Soundbar_Protocol {
 		if(this.getDeviceProductId() === 0x0548) {
 			packet = [0x06, 0x0f, 0x02, 0x00, 0x00, 0x08, 0x00, 0x01]; // Modern software mode
 		} else {
-			packet = [0x08, 0x00, this.getTransactionID(), 0x00, 0x00, 0x00, 0x02, 0x00, 0x04, mode === true ? 0x03 : 0x00]; // Legacy software mode?
+			packet = [0x02, 0x00, 0x04, mode === true ? 0x03 : 0x00]; // Legacy software mode?
 		}
 
 		this.StandardPacketSend(packet);
@@ -316,8 +315,9 @@ export class RAZER_Soundbar_Protocol {
 
 	/** Wrapper function for Writing Standard Packets, such as RGB Data.*/
 	StandardPacketSend(data, TransactionID = this.getTransactionID()) {//Wrapper for always including our CRC
-		let packet = [0x00, 0x00, TransactionID, 0x00, 0x00, 0x00];
+		const PacketHeaders = this.getPacketHeaders();
 		const length = this.getWriteLength();
+		let packet = [PacketHeaders[0], 0x00, TransactionID, 0x00, 0x00, 0x00];
 
 		packet = packet.concat(data);
 		packet[length - 2] = this.CalculateCrc(packet);
