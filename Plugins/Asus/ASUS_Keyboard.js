@@ -217,7 +217,7 @@ export class deviceLibrary {
 					"Esc", "1", "2", "3", "4", "5", "6", "7", "8", "9", "0", "-_", "=+", "Backspace",								"Insert",
 					"Tab", "Q", "W", "E", "R", "T", "Y", "U", "I", "O", "P", "[", "]", "\\",				 /*EntTop*/					"Del",
 					"CapsLock", "A", "S", "D", "F", "G", "H", "J", "K", "L", ";", "'", "/",					"Enter",				"Page Up",
-					"Left Shift", "<",  "Z", "X", "C", "V", "B", "N", "M", ",", ".", "/", "Right Shift",		  "Up Arrow",	"Page Down",
+					"Left Shift", "ISO_<",  "Z", "X", "C", "V", "B", "N", "M", ",", ".", "ISO_#", "Right Shift",		  "Up Arrow",	"Page Down",
 					"Left Ctrl", "Left Win", "Left Alt", "Space", "Right Alt", "Fn", "Right Ctrl",  "Left Arrow", "Down Arrow", "Right Arrow",
 				],
 				vLedPositions: [
@@ -247,7 +247,7 @@ export class deviceLibrary {
 					"`", "1", "2", "3", "4", "5", "6", "7", "8", "9", "0", "-_", "=+", "Backspace",                        "Insert", "Home", "Page Up",       "NumLock", "Num /", "Num *", "Num -",  //21
 					"Tab", "Q", "W", "E", "R", "T", "Y", "U", "I", "O", "P", "[", "]", "\\",                               "Del", "End", "Page Down",         "Num 7", "Num 8", "Num 9", "Num +",    //21
 					"CapsLock", "A", "S", "D", "F", "G", "H", "J", "K", "L", ";", "'", "/", "Enter",                                                              "Num 4", "Num 5", "Num 6",             //16
-					"Left Shift", "<", "Z", "X", "C", "V", "B", "N", "M", ",", ".", "/", "Right Shift",                                  "Up Arrow",               "Num 1", "Num 2", "Num 3", "Num Enter", //17
+					"Left Shift", "ISO_<", "Z", "X", "C", "V", "B", "N", "M", ",", ".", "ISO_#", "Right Shift",                                  "Up Arrow",               "Num 1", "Num 2", "Num 3", "Num Enter", //17
 					"Left Ctrl", "Left Win", "Left Alt", "Space", "Right Alt", "Fn", "Menu", "Right Ctrl",  "Left Arrow", "Down Arrow", "Right Arrow", "Num 0", "Num .",                       //13
 					"Logo", "Left underglow", "Right underglow"
 				],
@@ -281,7 +281,7 @@ export class deviceLibrary {
 					"`", "1", "2", "3", "4", "5", "6", "7", "8", "9", "0", "-_", "=+", "Backspace",                        "Insert", "Home", "Page Up",       "NumLock", "Num /", "Num *", "Num -",  //21
 					"Tab", "Q", "W", "E", "R", "T", "Y", "U", "I", "O", "P", "[", "]", "\\",                               "Del", "End", "Page Down",         "Num 7", "Num 8", "Num 9", "Num +",    //21
 					"CapsLock", "A", "S", "D", "F", "G", "H", "J", "K", "L", ";", "'", "/", "Enter",                                                      "Num 4", "Num 5", "Num 6",             //16
-					"Left Shift", "<", "Z", "X", "C", "V", "B", "N", "M", ",", ".", "/", "Right Shift",                 "Up Arrow",                       "Num 1", "Num 2", "Num 3", "Num Enter", //17
+					"Left Shift", "ISO_<", "Z", "X", "C", "V", "B", "N", "M", ",", ".", "ISO_#", "Right Shift",                 "Up Arrow",                       "Num 1", "Num 2", "Num 3", "Num Enter", //17
 					"Left Ctrl", "Left Win", "Left Alt", "Space", "Right Alt", "Fn", "Menu", "Right Ctrl",  "Left Arrow", "Down Arrow", "Right Arrow", "Num 0", "Num .",                       //13
 
 					"Underglow 1", "Underglow 2", "Underglow 3", "Underglow 4", "Underglow 5", "Underglow 6", "Underglow 7", "Underglow 8", "Underglow 9", "Underglow 10", "Underglow 11", "Underglow 12", //12
@@ -316,7 +316,7 @@ export class deviceLibrary {
 					"`", "1", "2", "3", "4", "5", "6", "7", "8", "9", "0", "-_", "=+", "Backspace",                        "Insert", "Home", "Page Up",       "NumLock", "Num /", "Num *", "Num -",  //21
 					"Tab", "Q", "W", "E", "R", "T", "Y", "U", "I", "O", "P", "[", "]", "\\",                               "Del", "End", "Page Down",         "Num 7", "Num 8", "Num 9", "Num +",    //21
 					"CapsLock", "A", "S", "D", "F", "G", "H", "J", "K", "L", ";", "'", "/", "Enter",                                                              "Num 4", "Num 5", "Num 6",             //16
-					"Left Shift", "<", "Z", "X", "C", "V", "B", "N", "M", ",", ".", "/", "Right Shift",                                  "Up Arrow",               "Num 1", "Num 2", "Num 3", "Num Enter", //17
+					"Left Shift", "ISO_<", "Z", "X", "C", "V", "B", "N", "M", ",", ".", "ISO_#", "Right Shift",                                  "Up Arrow",               "Num 1", "Num 2", "Num 3", "Num Enter", //17
 					"Left Ctrl", "Left Win", "Left Alt", "Space", "Right Alt", "Fn", "Menu", "Right Ctrl",  "Left Arrow", "Down Arrow", "Right Arrow", "Num 0", "Num ."                       //13
 				],
 				vLedPositions: [
@@ -347,7 +347,7 @@ export class deviceLibrary {
 					"`", "1", "2", "3", "4", "5", "6", "7", "8", "9", "0", "-_", "=+", "Backspace",                        "Insert", "Home", "Page Up",
 					"Tab", "Q", "W", "E", "R", "T", "Y", "U", "I", "O", "P", "[", "]", "\\",                               "Del", "End", "Page Down",
 					"CapsLock", "A", "S", "D", "F", "G", "H", "J", "K", "L", ";", "'", "/", "Enter",
-					"Left Shift", "<", "Z", "X", "C", "V", "B", "N", "M", ",", ".", "/", "Right Shift",                                  "Up Arrow",
+					"Left Shift", "ISO_<", "Z", "X", "C", "V", "B", "N", "M", ",", ".", "ISO_#", "Right Shift",                                  "Up Arrow",
 					"Left Ctrl", "Left Win", "Left Alt", "Space", "Right Alt", "Fn", "Menu", "Right Ctrl",  "Left Arrow", "Down Arrow", "Right Arrow",
 
 					"LightBar Led 1", "LightBar Led 2", "LightBar Led 3", "LightBar Led 4", "LightBar Led 5", "LightBar Led 6", "LightBar Led 7", "LightBar Led 8", "LightBar Led 9",
@@ -383,7 +383,7 @@ export class deviceLibrary {
 					"`", "1", "2", "3", "4", "5", "6", "7", "8", "9", "0", "-_", "=+", "Backspace",                        "Insert", "Home", "Page Up",       "NumLock", "Num /", "Num *", "Num -",  //21
 					"Tab", "Q", "W", "E", "R", "T", "Z", "U", "I", "O", "P", "[", "]", "\\",                               "Del", "End", "Page Down",         "Num 7", "Num 8", "Num 9", "Num +",    //21
 					"CapsLock", "A", "S", "D", "F", "G", "H", "J", "K", "L", ";", "'", "/", "Enter",                                                          "Num 4", "Num 5", "Num 6",             //17
-					"Left Shift", "<", "Z", "X", "C", "V", "B", "N", "M", ",", ".", "/", "Right Shift",                             "Up Arrow",               "Num 1", "Num 2", "Num 3", "Num Enter", //18
+					"Left Shift", "ISO_<", "Z", "X", "C", "V", "B", "N", "M", ",", ".", "ISO_#", "Right Shift",                             "Up Arrow",               "Num 1", "Num 2", "Num 3", "Num Enter", //18
 					"Left Ctrl", "Left Win", "Left Alt", "Space", "Right Alt", "Fn", "Menu", "Right Ctrl",  "Left Arrow", "Down Arrow", "Right Arrow", "Num 0", "Num ."                       //13
 				],
 				vLedPositions: [
@@ -413,7 +413,7 @@ export class deviceLibrary {
 					"`", "1", "2", "3", "4", "5", "6", "7", "8", "9", "0", "-_", "=+", "Backspace", "Num", "Num /", "Num *", "Num -", //18
 					"Tab", "Q", "W", "E", "R", "T", "Y", "U", "I", "O", "P", "[", "]", "\\", 		"Num 7", "Num 8", "Num 9", "Num +", //18
 					"CapsLock", "A", "S", "D", "F", "G", "H", "J", "K", "L", ";", "'", "/", "Enter",		"Num 4", "Num 5", "Num 6", //16
-					"Left Shift", "<", "Z", "X", "C", "V", "B", "N", "M", ",", ".", "/", "Right Shift", "Up Arrow", "Num 1", "Num 2", "Num 3", "Num Enter", //17
+					"Left Shift", "ISO_<", "Z", "X", "C", "V", "B", "N", "M", ",", ".", "ISO_#", "Right Shift", "Up Arrow", "Num 1", "Num 2", "Num 3", "Num Enter", //17
 					"Left Ctrl", "Left Win", "Left Alt", "LSpace", "Space", "RSpace", "Right Alt", "Fn", "Right Ctrl", "Left Arrow", "Down Arrow", "Right Arrow", "Num 0", "Num ." //14
 				],
 				vLedPositions: [
@@ -443,7 +443,7 @@ export class deviceLibrary {
 					"`", "1", "2", "3", "4", "5", "6", "7", "8", "9", "0", "-_", "=+", "Backspace", "Num", "Num /", "Num *", "Num -", //18
 					"Tab", "Q", "W", "E", "R", "T", "Y", "U", "I", "O", "P", "[", "]", "\\", 		"Num 7", "Num 8", "Num 9", "Num +", //18
 					"CapsLock", "A", "S", "D", "F", "G", "H", "J", "K", "L", ";", "'", "/", "Enter",		"Num 4", "Num 5", "Num 6", //16
-					"Left Shift", "<", "Z", "X", "C", "V", "B", "N", "M", ",", ".", "/", "Right Shift", "Up Arrow", "Num 1", "Num 2", "Num 3", "Num Enter", //17
+					"Left Shift", "ISO_<", "Z", "X", "C", "V", "B", "N", "M", ",", ".", "ISO_#", "Right Shift", "Up Arrow", "Num 1", "Num 2", "Num 3", "Num Enter", //17
 					"LCtrl", "Left Win", "Left Alt", "LSpace", "Space", "RSpace", "Right Alt", "Fn", "Right Ctrl", "Left Arrow", "Down Arrow", "Right Arrow", "Num 0", "Num ." //14
 				],
 				vLedPositions: [
