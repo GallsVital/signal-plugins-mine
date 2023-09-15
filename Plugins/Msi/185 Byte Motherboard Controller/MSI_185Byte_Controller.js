@@ -1143,6 +1143,18 @@ class MysticLight {
 				ForceZoneBased	  : false,
 				JARGB_V2		  : true,
 			},
+			0x7D93 : //Z790 Gaming Pro Wifi
+			{
+				OnboardLEDs    : 6,
+				RGBHeaders     : 1,
+				ARGBHeaders    : 2,
+				JPipeLEDs	   : 0,
+				CorsairHeaders : 0,
+				//PERLED
+				PerLEDOnboardLEDs : 6,
+				ForceZoneBased	  : false,
+				JARGB_V2		  : true,
+			},
 			0x7D96 : //B760 Tomahawk Wifi
 			{
 				OnboardLEDs    : 0,
