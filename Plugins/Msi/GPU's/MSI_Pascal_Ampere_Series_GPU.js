@@ -327,6 +327,7 @@ class MSIGPUDeviceIDs {
 
 		this.MSI_RTX3080_GAMING_X_TRIO               = 0x3892;
 		this.MSI_RTX3080_GAMING_Z_TRIO               = 0x389B;
+		this.MSI_RTX3080_SUPRIM						 = 0x3895;
 
 		this.MSI_RTX3080_SUPRIM_X                    = 0x3897;
 		this.MSI_RTX3080TI_GAMING_X_TRIO             = 0x389B;
@@ -409,7 +410,8 @@ class MSIGPUList {
         	new MSIGPUIdentifier(Nvidia.RTX3070TI, MSIGPUIDs.MSI_RTX3070TI_GAMING_X_TRIO,       0x68, "MSI RTX 3070Ti Gaming X Trio"),
         	new MSIGPUIdentifier(Nvidia.RTX3070TI, MSIGPUIDs.MSI_RTX3070TI_SUPRIM_X,            0x68, "MSI RTX 3070Ti Suprim X"),
 
-        	new MSIGPUIdentifier(Nvidia.RTX3080, MSIGPUIDs.MSI_RTX3080_GAMING_X_TRIO,         0x68, "MSI RTX 3080 Gaming X Trio"),
+        	new MSIGPUIdentifier(Nvidia.RTX3080, MSIGPUIDs.MSI_RTX3080_SUPRIM,         0x68, "MSI RTX 3080 Suprim"),
+			new MSIGPUIdentifier(Nvidia.RTX3080, MSIGPUIDs.MSI_RTX3080_GAMING_X_TRIO,         0x68, "MSI RTX 3080 Gaming X Trio"),
         	new MSIGPUIdentifier(Nvidia.RTX3080_LHR, MSIGPUIDs.MSI_RTX3080_GAMING_Z_TRIO,         0x68, "MSI RTX 3080 Gaming Z Trio LHR"),
         	new MSIGPUIdentifier(Nvidia.RTX3080_GA102, MSIGPUIDs.MSI_RTX3080_GAMING_Z_TRIO,    0x68, "MSI RTX 3080 Gaming Z Trio 12g LHR"),
         	new MSIGPUIdentifier(Nvidia.RTX3080, MSIGPUIDs.MSI_RTX3080_SUPRIM_X,              0x68, "MSI RTX 3080 Suprim X"),
