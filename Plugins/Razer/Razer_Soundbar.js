@@ -20,24 +20,6 @@ export function ControllableParameters() {
 }
 
 export function Initialize() {
-
-	/*
-	// PRESENT ON V2 X
-	// NOT NEEDED FOR V2 PRO AND V2
-
-	packetSend([0x07, 0x00, 0x1f, 0x00, 0x00, 0x00, 0x2f, 0x0f, 0x03, 0x00, 0x00, 0x00, 0x00, 0x0d], 91);
-	device.pause(20);
-	packetSend([0x07, 0x00, 0x1f, 0x00, 0x00, 0x00, 0x06, 0x0f, 0x02, 0x00, 0x00, 0x08], 91);
-	device.pause(20);
-	packetSend([0x07, 0x00, 0x1f, 0x00, 0x00, 0x00, 0x02, 0x07, 0x03], 91);
-	device.pause(20);
-	packetSend([0x07, 0x00, 0x1f, 0x00, 0x00, 0x00, 0x2f, 0x0f, 0x03, 0x00, 0x00, 0x00, 0x00, 0x0d], 91);
-	device.pause(20);
-	packetSend([0x07, 0x00, 0x1f, 0x00, 0x00, 0x00, 0x03, 0x0f, 0x04, 0x01, 0x00, 0xcc], 91);
-	device.pause(20);
-
-	*/
-
 	RAZER.InitializeRAZER();
 }
 
@@ -141,11 +123,10 @@ export class RAZER_Soundbar_Protocol {
 		device.set_endpoint(DeviceProperties.Endpoint[`interface`], DeviceProperties.Endpoint[`usage`], DeviceProperties.Endpoint[`usage_page`]);
 
 		console.log("Initializing device...");
-		this.FindBufferLengths();
 		this.getDeviceTransactionID();
 		this.setDeviceSoftwareMode();
 
-		device.log(`Device model found: ` + this.getDeviceName());
+		console.log(`Device model found: ` + this.getDeviceName());
 		device.setName("RAZER " + this.getDeviceName());
 		device.setSize(DeviceProperties.size);
 		device.setControllableLeds(this.getLedNames(), this.getLedPositions());
@@ -188,25 +169,6 @@ export class RAZER_Soundbar_Protocol {
 		}
 	}
 
-	FindBufferLengths(){
-
-		console.log(`Setting up device Buffer Lengths...`);
-
-		if (this.getWriteLength() === 0 || this.getReadLength() === 0){
-			const HidInfo = device.getHidInfo();
-
-			if(HidInfo.writeLength !== 0){
-				this.setWriteLength(HidInfo.writeLength);
-				console.log(`Write length set to ` + this.getWriteLength());
-			}
-
-			if(HidInfo.readLength !== 0){
-				this.setReadLength(HidInfo.readLength);
-				console.log(`Read length set to ` + this.getReadLength());
-			}
-		}
-	}
-
 	CalculateCrc(report) {
 		let iCrc = 0;
 
@@ -218,15 +180,9 @@ export class RAZER_Soundbar_Protocol {
 	}
 
 	setDeviceSoftwareMode(mode = true) {
+		const packet = [0x02, 0x00, 0x04, mode === true ? 0x03 : 0x00];
 
-		let packet;
-
-		if(this.getDeviceProductId() === 0x0548) {
-			packet = [0x06, 0x0f, 0x02, 0x00, 0x00, 0x08, 0x00, 0x01]; // Modern software mode
-		} else {
-			packet = [0x02, 0x00, 0x04, mode === true ? 0x03 : 0x00]; // Legacy software mode?
-		}
-
+		console.log("Enabling software mode...");
 		this.StandardPacketSend(packet);
 	}
 
@@ -234,6 +190,12 @@ export class RAZER_Soundbar_Protocol {
 		const possibleTransactionIDs = [0x1f, 0x2f, 0x3f, 0x4f, 0x5f, 0x6f, 0x7f, 0x8f, 0x9f];
 		let devicesFound = 0;
 		let loops = 0;
+
+		if(this.getDeviceProductId() === 0x054A) {
+			return;  // This breaks on V2 X
+		}
+
+		console.log("Starting to search Transaction ID...");
 
 		do {
 			for (let testTransactionID = 0x00; testTransactionID < possibleTransactionIDs.length; testTransactionID++) {
@@ -244,7 +206,7 @@ export class RAZER_Soundbar_Protocol {
 
 				if (errorCode !== 2) {
 
-					device.log("Error fetching Device Charging Status. Error Code: " + this.DeviceResponses[errorCode], { toFile: true });
+					console.log("Error fetching Device Charging Status. Error Code: " + this.DeviceResponses[errorCode], { toFile: true });
 				}
 
 				const Serialpacket = returnPacket.slice(8, 23);
@@ -266,14 +228,14 @@ export class RAZER_Soundbar_Protocol {
 
 	/**Function to ensure that a grabbed transaction ID is not for a device we've already found a transaction ID for.*/
 	checkDeviceTransactionID(TransactionID, SerialString, devicesFound) {
-		device.log(`Serial String ${SerialString}`);
+		console.log(`Serial String ${SerialString}`);
 
 		if (SerialString.length === 15 && devicesFound === 0) {
 			this.setTransactionID(TransactionID);
 			devicesFound++;
-			device.log("Valid Serial Returned: " + SerialString);
+			console.log("Valid Serial Returned: " + SerialString);
 		} else {
-			device.log("Device serial not recognized! No TransactionID set.");
+			console.log("Device serial not recognized! No TransactionID set.");
 		}
 
 		return devicesFound;
@@ -364,7 +326,7 @@ export class deviceLibrary {
 				vLedPositions: [
 					[0, 0], [1, 0], [2, 0], [3, 0], [4, 0], [5, 0], [6, 0], [7, 0], [8, 0], [9, 0], [10, 0], [11, 0], [12, 0], [13, 0],
 				],
-				Endpoint : { "interface": 0, "usage": 0x0001, "usage_page": 0xFF00, "collection": 0x0000 },
+				Endpoint : { "interface": 0, "usage": 0x0001, "usage_page": 0x000C, "collection": 0x0000 },
 				Zones : 1,
 				PacketHeaders: [0x07, 0x2F, 0x0D],
 				PacketLEDs: 14,
@@ -416,7 +378,7 @@ function hexToRgb(hex) {
 }
 
 export function Validate(endpoint) {
-	return endpoint.interface === 1 || endpoint.interface === 2 || endpoint.interface === 4 || endpoint.interface === 5;
+	return endpoint.interface === 0 || endpoint.interface === 2 || endpoint.interface === 4;
 }
 
 export function ImageUrl() {
