@@ -3,7 +3,7 @@ export function VendorId() { return 0x1e7d; }
 export function ProductId() { return 0x343B; }
 export function Documentation(){ return "troubleshooting/roccat"; }
 export function Publisher() { return "WhirlwindFX"; }
-export function Size() { return [2, 2]; }
+export function Size() { return [10, 3]; }
 export function DefaultPosition() {return [75, 70]; }
 export function DefaultScale() {return 8.0; }
 /* global
@@ -20,51 +20,15 @@ export function ControllableParameters(){
 	];
 }
 
-function hexToRgb(hex) {
-	const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
-	const colors = [];
-	colors[0] = parseInt(result[1], 16);
-	colors[1] = parseInt(result[2], 16);
-	colors[2] = parseInt(result[3], 16);
-
-	return colors;
-}
-
-function sendPacketString(string, size){
-	const packet= [];
-	const data = string.split(' ');
-
-	for(let i = 0; i < data.length; i++){
-		packet[parseInt(i, 16)] =parseInt(data[i], 16);//.toString(16)
-	}
-
-}
-
-export function Initialize() {
-	sendReportString("01 FF 00 00 00", 5);
-
-
-}
-
-
-export function Shutdown() {
-	sendReportString("01 00 00 00 00", 5);
-
-
-}
-
-
 // This is an array of key indexes for setting colors in our render array, indexed left to right, row top to bottom.
 const vKeys = [
-
 	0, 1
 ];
-
 
 // This array must be the same length as vKeys[], and represents the pixel color position in our pixel matrix that we reference.  For example,
 // item at index 3 [9,0] represents the corsair logo, and the render routine will grab its color from [9,0].
 const vKeyPositions = [
-	[0, 0], [1, 0]
+	[0, 0], [9, 2],
 ];
 const vKeyNames = [
 	"Left Led", "Right Led",
@@ -78,22 +42,25 @@ export function LedPositions() {
 	return vKeyPositions;
 }
 
-function sendReportString(string, size){
-	const packet= [];
-	const data = string.split(' ');
-
-	for(let i = 0; i < data.length; i++){
-		packet[i] =parseInt(data[i], 16);//.toString(16)
-	}
-
-	device.send_report(packet, size);
+export function Initialize() {
+	device.send_report([0x01, 0xFF, 0x00, 0x00, 0x00], 5);
 }
 
 export function Render() {
 	sendColors();
 }
 
-function sendColors(shutdown = false){
+export function Shutdown(SystemSuspending) {
+
+	if(SystemSuspending){
+		sendColors("#000000"); // Go Dark on System Sleep/Shutdown
+	}else{
+		device.send_report([0x01, 0x00, 0x00, 0x00, 0x00], 5);
+	}
+
+}
+
+function sendColors(overrideColor){
 
 	device.set_endpoint(3, 0, 1);
 
@@ -103,10 +70,10 @@ function sendColors(shutdown = false){
 	for(let iIdx = 0; iIdx < vKeys.length; iIdx++) {
 		const iPxX = vKeyPositions[iIdx][0];
 		const iPxY = vKeyPositions[iIdx][1];
-		var col;
+		let col;
 
-		if(shutdown){
-			col = hexToRgb(shutdownColor);
+		if(overrideColor){
+			col = hexToRgb(overrideColor);
 		}else if (LightingMode === "Forced") {
 			col = hexToRgb(forcedColor);
 		}else{
@@ -120,8 +87,16 @@ function sendColors(shutdown = false){
 	}
 
 	device.send_report(packet, 9);
+}
 
+function hexToRgb(hex) {
+	const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+	const colors = [];
+	colors[0] = parseInt(result[1], 16);
+	colors[1] = parseInt(result[2], 16);
+	colors[2] = parseInt(result[3], 16);
 
+	return colors;
 }
 
 export function Validate(endpoint) {
