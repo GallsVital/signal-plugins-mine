@@ -466,7 +466,7 @@ export class deviceLibrary {
 				vLedPositions: [[1, 2], [1, 0]],
 				maxDPI: 16000,
 				battery: true,
-				Endpoint: 1,
+				Endpoint : { "interface": 2, "usage": 0x0001, "usage_page": 0xFF01, "collection": 0x0000 },
 				Protocol: "Legacy",
 				DPISupport: true
 			},
