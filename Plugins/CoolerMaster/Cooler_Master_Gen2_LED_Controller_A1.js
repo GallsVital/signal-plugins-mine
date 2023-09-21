@@ -30,20 +30,48 @@ export function SubdeviceController(){ return true; }
 const Gen1ChLedLimit = 60;
 const Gen2ChLedLimit = 80;
 const ChannelArray = [ "Channel 1", "Channel 2", "Channel 3" ];
-let savedGenCh1;
-let savedGenCh2;
-let savedGenCh3;
 
-function SetupChannels(init = false) {
+const vKeyNames = [];
+const vKeyPositions = [];
+
+export function LedNames() {
+	return vKeyNames;
+}
+
+export function LedPositions() {
+	return vKeyPositions;
+}
+
+export function Initialize() {
+	device.write([0x00, 0x80, 0x01, 0x02, 0x01], 65);
+	device.write([0x00, 0x00, 0x09, 0xff, 0xff, 0x90], 65);
+	device.write([0x00, 0x01, 0x09], 65);
+	device.write([0x00, 0x82, 0x09], 65);
+	SetupChannels();
+	setLEDCounts();
+}
+
+export function Render() {
+	SendChannel(0, GenCh1 == 'GEN1' ? false : true);
+	SendChannel(1, GenCh2 == 'GEN1' ? false : true);
+	SendChannel(2, GenCh3 == 'GEN1' ? false : true);
+}
+
+export function Shutdown(SystemSuspending) {
+
+	const color = SystemSuspending ? "#000000" : shutdownColor;
+	SendChannel(0, GenCh1 == 'GEN1' ? false : true, color);
+	SendChannel(1, GenCh2 == 'GEN1' ? false : true, color);
+	SendChannel(2, GenCh3 == 'GEN1' ? false : true, color);
+
+}
+
+function SetupChannels() {
 	let DeviceLedLimit = 0;
 
 	for(let i = 0; i < ChannelArray.length; i++) {
 		const ChannelGen = i == 0 ? GenCh1 : i == 1 ? GenCh2 : GenCh3;
 		const ChMaxLeds = ChannelGen == "GEN1" ? Gen1ChLedLimit : Gen2ChLedLimit;
-
-		if(!init) {
-			device.removeChannel(ChannelArray[i]);
-		}
 
 		device.addChannel(ChannelArray[i], ChMaxLeds, ChMaxLeds);
 		DeviceLedLimit += ChMaxLeds;
@@ -71,56 +99,6 @@ function SetupChannels(init = false) {
 	}
 
 	device.SetLedLimit(DeviceLedLimit);
-}
-
-const vKeyNames = [];
-const vKeyPositions = [];
-
-export function LedNames() {
-	return vKeyNames;
-}
-
-export function LedPositions() {
-	return vKeyPositions;
-}
-
-export function Initialize() {
-	device.write([0x00, 0x80, 0x01, 0x02, 0x01], 65);
-	device.write([0x00, 0x00, 0x09, 0xff, 0xff, 0x90], 65);
-	device.write([0x00, 0x01, 0x09], 65);
-	device.write([0x00, 0x82, 0x09], 65);
-	savedGenCh1 = GenCh1;
-	savedGenCh2 = GenCh2;
-	savedGenCh3 = GenCh3;
-	SetupChannels(true);
-	setLEDCounts();
-}
-
-export function Render() {
-	if(savedGenCh1 != GenCh1 || savedGenCh2 != GenCh2 || savedGenCh3 != GenCh3) {
-		savedGenCh1 = GenCh1;
-		savedGenCh2 = GenCh2;
-		savedGenCh3 = GenCh3;
-		SetupChannels();
-	}
-
-	SendChannel(0, savedGenCh1 == 'GEN1' ? false : true);
-	SendChannel(1, savedGenCh2 == 'GEN1' ? false : true);
-	SendChannel(2, savedGenCh3 == 'GEN1' ? false : true);
-}
-
-export function Shutdown(SystemSuspending) {
-
-	if(SystemSuspending){
-		SendChannel(0, savedGenCh1 == 'GEN1' ? false : true, "#000000");
-		SendChannel(1, savedGenCh2 == 'GEN1' ? false : true, "#000000");
-		SendChannel(2, savedGenCh3 == 'GEN1' ? false : true, "#000000");
-	}else{
-		SendChannel(0, savedGenCh1 == 'GEN1' ? false : true, shutdownColor);
-		SendChannel(1, savedGenCh2 == 'GEN1' ? false : true, shutdownColor);
-		SendChannel(2, savedGenCh3 == 'GEN1' ? false : true, shutdownColor);
-	}
-
 }
 
 function setLEDCounts() {
@@ -203,6 +181,33 @@ function SendChannel(Channel, GEN2 = false, overrideColor) {
 			device.pause(4);
 		}
 	}
+}
+
+export function onGenCh1Changed() {
+	const ChLimit = GenCh1 == "GEN1" ? Gen1ChLedLimit : Gen2ChLedLimit;
+	UpdateLedLimit(0, ChLimit);
+}
+
+export function onGenCh2Changed() {
+	const ChLimit = GenCh2 == "GEN1" ? Gen1ChLedLimit : Gen2ChLedLimit;
+	UpdateLedLimit(1, ChLimit);
+}
+
+export function onGenCh3Changed() {
+	const ChLimit = GenCh3 == "GEN1" ? Gen1ChLedLimit : Gen2ChLedLimit;
+	UpdateLedLimit(2, ChLimit);
+}
+
+export function UpdateLedLimit(channel, limit) {
+	let DeviceLedLimitUpdate = 0;
+
+	device.channel(ChannelArray[channel]).SetLedLimit(limit);
+
+	for(let i = 0; i < ChannelArray.length; i++){
+		DeviceLedLimitUpdate += device.channel(ChannelArray[i]).LedLimit();
+	}
+
+	device.SetLedLimit(DeviceLedLimitUpdate);
 }
 
 export function Validate(endpoint) {

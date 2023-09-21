@@ -22,6 +22,7 @@ export function ControllableParameters(){
 const PIDLibrary = {
 	0x1507: "Prism",
 	0x1514: "Prism",
+	0x1518: "Prism 4XL",
 	0x151c: "Prism Neo Noir Edition",
 };
 

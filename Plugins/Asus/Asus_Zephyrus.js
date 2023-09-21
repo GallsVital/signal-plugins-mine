@@ -224,3 +224,7 @@ function hexToRgb(hex) {
 export function Validate(endpoint) {
 	return endpoint.usage === 0x0079;
 }
+
+export function ImageUrl(){ //Use as placeholder.
+	return "https://marketplace.signalrgb.com/devices/brands/asus/misc/rog-strix-scar-2022-laptop.png";
+}

@@ -2,10 +2,10 @@ import fs from 'fs';
 import path from 'path';
 import * as url from 'url';
 import DirectoryWalker from './DirectoryWalker.js';
-import { CheckThatLEDNameAndPositionLengthsMatch } from './Validators/CheckThatLEDNameAndPositionLengthsMatch.js';
-import { CheckAllLedPositionsAreWithinBounds } from './Validators/CheckAllLedPositionsAreWithinBounds.js';
-import { CheckForImageExport } from './Validators/CheckForImageExport.js';
-import { DuplicateUSBPluginValidator } from './Validators/DuplicateUSBPluginValidator.js';
+import { CheckThatLEDNameAndPositionLengthsMatch } from './Validators/Plugin/CheckThatLEDNameAndPositionLengthsMatch.js';
+import { CheckAllLedPositionsAreWithinBounds } from './Validators/Plugin/CheckAllLedPositionsAreWithinBounds.js';
+import { CheckForImageExport } from './Validators/Plugin/CheckForImageExport.js';
+import { DuplicateUSBPluginValidator } from './Validators/Plugin/DuplicateUSBPluginValidator.js';
 
 function CheckForGPUListDuplicates(Plugin, ReportErrorCallback){
 	if(typeof Plugin.BrandGPUList !== "undefined"){
