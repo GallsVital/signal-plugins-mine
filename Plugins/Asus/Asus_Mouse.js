@@ -385,7 +385,7 @@ export class deviceLibrary {
 			0x18DD: "Gladius II Core",
 			0x1877: "Gladius II Origin",
 			0x1845: "Gladius II Origin",
-			0x189E: "Gladius II Wireless", // Wired Mode
+			0x189E: "Gladius II Wired",
 			0x18A0: "Gladius II Wireless",
 			0x197D: "Gladius III Wireless", // Wired mode
 			0x197F: "Gladius III Wireless",
@@ -459,6 +459,17 @@ export class deviceLibrary {
 				Protocol: "Legacy",
 				DPISupport: true
 			},
+			"Gladius II Wired":
+			{
+				size: [3, 3],
+				vLedNames: ["Scroll Wheel", "Logo"],
+				vLedPositions: [[1, 2], [1, 0]],
+				maxDPI: 16000,
+				battery: true,
+				Endpoint : { "interface": 1, "usage": 0x0001, "usage_page": 0xFF13, "collection": 0x0000 },
+				Protocol: "Legacy",
+				DPISupport: true
+			},
 			"Gladius II Wireless":
 			{
 				size: [3, 3],
@@ -502,7 +513,7 @@ export class deviceLibrary {
 				Protocol: "Legacy",
 				DPISupport: true
 			},
-			"Impact II Electro Punk": //This is highly suspicious. Why does this have an extra zone?
+			"Impact II Electro Punk":
 			{
 				size: [3, 3],
 				vLedNames: ["Scroll Wheel", "Logo", "Underglow"],
@@ -582,6 +593,7 @@ export class deviceLibrary {
 			"Chakram X": 			"https://marketplace.signalrgb.com/devices/brands/asus/mice/chakram-wireless.png",
 			"Gladius II Core": 		"https://marketplace.signalrgb.com/devices/brands/asus/mice/gladius-ii-core.png",
 			"Gladius II Origin": 	"https://marketplace.signalrgb.com/devices/brands/asus/mice/gladius-ii-origin.png",
+			"Gladius II Wired": 	"https://marketplace.signalrgb.com/devices/brands/asus/mice/gladius-ii-wireless.png",
 			"Gladius II Wireless": 	"https://marketplace.signalrgb.com/devices/brands/asus/mice/gladius-ii-wireless.png",
 			"Gladius III Wireless": "https://marketplace.signalrgb.com/devices/brands/asus/mice/gladius-iii-wireless.png",
 			"Gladius III Aimpoint": "https://marketplace.signalrgb.com/devices/brands/asus/mice/gladius-iii-aimpoint.png",
