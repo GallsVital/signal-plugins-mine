@@ -1,8 +1,8 @@
 export function Name() { return "SteelSeries Aerox Mouse Wired"; }
 export function VendorId() { return 0x1038; }
-export function Documentation(){ return "troubleshooting/steelseries"; }
 export function ProductId() { return Object.keys(Aerox.deviceDictionary); }
 export function Publisher() { return "WhirlwindFX"; }
+export function Documentation(){ return "troubleshooting/steelseries"; }
 export function Size() { return [3, 3]; }
 export function DefaultPosition() {return [225, 120]; }
 export function DefaultScale(){return 15.0;}
@@ -20,7 +20,7 @@ export function ControllableParameters(){
 		{"property":"forcedColor", "group":"lighting", "label":"Forced Color", "min":"0", "max":"360", "type":"color", "default":"009bde"},
 		{"property":"settingControl", "group":"mouse", "label":"Enable Setting Control", "type":"boolean", "default":"false"},
 		{"property":"dpi1", "group":"mouse", "label":"DPI", "step":"50", "type":"number", "min":"200", "max":"12400", "default":"800", "live" : "false"},
-	]; //This mouse does really unreliable things and needs some more love/investigation.
+	];
 }
 
 const vLedNames = [ "Front Zone", "Mid Zone", "Rear Zone" ];
@@ -98,24 +98,10 @@ function sendColors(overrideColor) {
 
 class AeroxMouse {
 	constructor() {
-		this.pollingDict =
-		{
-			"125" : 0x03,
-			"250" : 0x02,
-			"500" : 0x01,
-			"1000" : 0x00,
-		};
-
 		this.deviceDictionary = {
-			0x1836 : "Steelseries Aerox 3", //These are all wireless Mice. The Wired Only Mice need a separate file.
+			0x1836 : "Steelseries Aerox 3",
 			0x1850 : "Steelseries Aerox 5",
 		};
-	}
-
-	setPollingRate(pollingRate) {
-		device.write([0x00, 0x6b, this.pollingDict[pollingRate]], 65);
-		device.read([0x00, 0x6b, this.pollingDict[pollingRate]], 65);
-		device.pause(20);
 	}
 
 	setDPI(dpi) {
