@@ -79,7 +79,7 @@ function sendColors(idx, overrideColor) {
 	packet[11] = idx;
 	packet[13] = 0x15;
 
-	for(let iIdx = 0; iIdx < 24; iIdx++){
+	for(let iIdx = 0; iIdx < 21; iIdx++){
 		let col;
 
 		if(overrideColor){
