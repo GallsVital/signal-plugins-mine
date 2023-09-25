@@ -32,14 +32,7 @@ export function LedPositions() {
 }
 
 export function Initialize() {
-	const packet = [];
-	packet[0x00]   = 0x00;
-	packet[0x01]   = 0x90;
-	packet[0x02]   = 0x00;
-	packet[0x03]   = 0x00;
-	packet[0x04]   = 0x00;
-
-	device.write(packet, 65);
+	device.write([0x00, 0x90], 65);
 }
 
 export function Render() {
@@ -75,15 +68,6 @@ function sendColors(overrideColor){
 		packet[idx * 3 + 4] = col[1];
 		packet[idx * 3 + 5] = col[2];
 	}
-
-	device.write(packet, 65);
-}
-
-function Apply() {
-	const packet = [];
-	packet[0x00]   = 0x00;
-	packet[0x01]   = 0x23;
-	packet[0x02]   = 0x10;
 
 	device.write(packet, 65);
 }
