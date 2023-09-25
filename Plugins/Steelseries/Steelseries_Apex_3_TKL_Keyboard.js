@@ -1,9 +1,9 @@
 export function Name() { return "SteelSeries Apex 3 TKL"; }
 export function VendorId() { return 0x1038; }
-export function Documentation(){ return "troubleshooting/steelseries"; }
 export function ProductId() { return 0x1622; }
 export function Publisher() { return "WhirlwindFX"; }
-export function Size() { return [10, 3]; }
+export function Documentation(){ return "troubleshooting/steelseries"; }
+export function Size() { return [8, 3]; }
 export function DefaultPosition(){return [50, 100];}
 export function DefaultScale(){return 8.0;}
 /* global
@@ -21,7 +21,15 @@ export function ControllableParameters(){
 
 const vLedNames = [ "Zone 1", "Zone 2", "Zone 3", "Zone 4", "Zone 5", "Zone 6", "Zone 7", "Zone 8" ];
 
-const vLedPositions = [ [0, 0], [1, 0], [2, 0], [3, 0], [4, 0], [5, 0], [6, 0], [7, 0] ];
+const vLedPositions = [ [0, 1], [1, 1], [2, 1], [3, 1], [4, 1], [5, 1], [6, 1], [7, 1] ];
+
+export function LedNames() {
+	return vLedNames;
+}
+
+export function LedPositions() {
+	return vLedPositions;
+}
 
 export function Initialize() {
 	const packet = [];
@@ -34,26 +42,16 @@ export function Initialize() {
 	device.write(packet, 65);
 }
 
-export function LedNames() {
-	return vLedNames;
+export function Render() {
+	sendColors();
 }
 
-export function LedPositions() {
-	return vLedPositions;
+export function Shutdown(SystemSuspending) {
+	const color = SystemSuspending ? "#000000" : shutdownColor;
+	sendColors(color);
 }
 
-export function Shutdown() {
-	sendColors(true);
-
-}
-
-export function Validate(endpoint) {
-
-	return endpoint.interface === 1 && endpoint.usage === 1;
-}
-
-
-function sendColors(shutdown = false){
+function sendColors(overrideColor){
 	const packet = [];
 	packet[0x00] = 0x00;
 	packet[0x01] = 0x21;
@@ -63,10 +61,10 @@ function sendColors(shutdown = false){
 		const iPxX = vLedPositions[idx][0];
 		const iPxY = vLedPositions[idx][1];
 
-		var col;
+		let col;
 
-		if(shutdown){
-			col = hexToRgb(shutdownColor);
+		if(overrideColor){
+			col = hexToRgb(overrideColor);
 		}else if (LightingMode === "Forced") {
 			col = hexToRgb(forcedColor);
 		}else{
@@ -76,11 +74,9 @@ function sendColors(shutdown = false){
 		packet[idx * 3 + 3] = col[0];
 		packet[idx * 3 + 4] = col[1];
 		packet[idx * 3 + 5] = col[2];
-		packet[0x39] = 0xff;
 	}
 
 	device.write(packet, 65);
-	Apply();
 }
 
 function Apply() {
@@ -90,11 +86,10 @@ function Apply() {
 	packet[0x02]   = 0x10;
 
 	device.write(packet, 65);
-
 }
 
-export function Render() {
-	sendColors();
+export function Validate(endpoint) {
+	return endpoint.interface === 1 && endpoint.usage === 1;
 }
 
 function hexToRgb(hex) {
