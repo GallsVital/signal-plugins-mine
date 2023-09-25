@@ -747,7 +747,7 @@ class GigabyteMasterGPuList {
 			new GigabyteMasterIdentifier(Nvidia.RTX3090,        GigabyteMasterIds.RTX3090_XTREME_WATERFORCE,		0x64, "GIGABYTE 3090 AORUS XTREME Waterforce 24GB"),
 			new GigabyteMasterIdentifier(Nvidia.RTX3090,        GigabyteMasterIds.RTX3090_XTREME_WATERFORCE_2,		0x65, "GIGABYTE 3090 AORUS XTREME Waterforce 24GB"),
 
-			new GigabyteMasterIdentifier(Nvidia.RTX4060, 		GigabyteMasterIds.RTX4060_AORUS,					0x71, "GIGABYTE 4060 AORUS Master"),
+			new GigabyteMasterIdentifier(Nvidia.RTX4060, 		GigabyteMasterIds.RTX4060_AORUS,					0x71, "GIGABYTE 4060 AORUS Elite"),
 			new GigabyteMasterIdentifier(Nvidia.RTX4070, 		GigabyteMasterIds.RTX4070_GAMING_OC_12G,			0x71, "GIGABYTE 4070 Gaming OC"),
 			new GigabyteMasterIdentifier(Nvidia.RTX4070, 		GigabyteMasterIds.RTX4070_MASTER,					0x71, "GIGABYTE 4070 AORUS Master"),
 			new GigabyteMasterIdentifier(Nvidia.RTX4070TI, 		GigabyteMasterIds.RTX4070TI_GAMING_OC_12G,			0x71, "GIGABYTE 4070TI Gaming OC"), // Yes, same PID for different SKUs
