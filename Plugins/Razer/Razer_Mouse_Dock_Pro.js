@@ -213,5 +213,5 @@ export function Validate(endpoint) {
 }
 
 export function ImageUrl(){
-	return "https://marketplace.signalrgb.com/devices/brands/razer/misc/mouse-dock-chroma.png";
+	return "https://marketplace.signalrgb.com/devices/brands/razer/misc/mouse-dock-pro.png";
 }
