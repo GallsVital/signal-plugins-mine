@@ -141,18 +141,26 @@ export function Render() {
 
 }
 
-export function Shutdown() {
+export function Shutdown(SystemSuspending) {
+	// Go Dark on System Sleep/Shutdown
+	const color = SystemSuspending ? "#000000" : shutdownColor;
+
+	if(GigabyteMaster.config.perLEDSupport) {
+		GigabyteMaster.UpdatePerLED(color);
+	} else {
+		grabStandardRGB(color);
+	}
 }
 
-function grabStandardRGB(shutdown = false) {
+function grabStandardRGB(overrideColor) {
 
 	for(let Leds = 0; Leds < vLedPositions.length; Leds++) {
 		let Color;
 		const iPxX = vLedPositions[Leds][0];
 		const iPxY = vLedPositions[Leds][1];
 
-		if(shutdown) {
-			Color = hexToRgb(shutdownColor);
+		if(overrideColor) {
+			Color = hexToRgb(overrideColor);
 		} else if(LightingMode === "Forced") {
 			Color = hexToRgb(forcedColor);
 		} else {
@@ -163,7 +171,7 @@ function grabStandardRGB(shutdown = false) {
 	}
 }
 
-function grabPerLEDRGB(zoneId, ZoneInfo, shutdown = false) {
+function grabPerLEDRGB(zoneId, ZoneInfo, overrideColor) {
 	const zonePositions = ZoneInfo.Positions;
 	const RGBData = new Array(24);
 
@@ -172,8 +180,8 @@ function grabPerLEDRGB(zoneId, ZoneInfo, shutdown = false) {
 		const iPxX = zonePositions[zoneLeds][0];
 		const iPxY = zonePositions[zoneLeds][1];
 
-		if(shutdown) {
-			Color = hexToRgb(shutdownColor);
+		if(overrideColor) {
+			Color = hexToRgb(overrideColor);
 		} else if(LightingMode === "Forced") {
 			Color = hexToRgb(forcedColor);
 		} else {
@@ -541,11 +549,11 @@ class GigabyteMasterProtocol {
 		//bus.log(`Set Lighting Mode To [${mode}] and zone [${zone}]`);
 	}
 
-	UpdatePerLED() {
+	UpdatePerLED(overrideColor) {
 		this.setMode(this.modes.static, GigabyteMaster.model.modeZones[0]);
 
 		for(const [zoneId, ZoneInfo] of Object.entries(GigabyteMaster.model.Zones)) {
-			grabPerLEDRGB(zoneId, ZoneInfo);
+			grabPerLEDRGB(zoneId, ZoneInfo, overrideColor);
 		}
 	}
 

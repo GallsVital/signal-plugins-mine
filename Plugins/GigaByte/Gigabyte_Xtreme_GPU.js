@@ -81,9 +81,14 @@ export function Render() {
 	WriteRGB();
 }
 
+export function Shutdown(SystemSuspending) {
 
-export function Shutdown() {
-	WriteRGB(true);
+	if(SystemSuspending){
+		WriteRGB("#000000"); // Go Dark on System Sleep/Shutdown
+	}else{
+		WriteRGB(shutdownColor);
+	}
+
 }
 
 function buildLEDArray() {
@@ -99,14 +104,14 @@ function buildLEDArray() {
 	device.setControllableLeds(vLedNames, vLedPositions);
 }
 
-function grabColors(Zone, shutdown) {
+function grabColors(Zone, overrideColor) {
 	const RGBData = [];
 
 	for(let ledIdx = 0; ledIdx < Zone.Positions.length; ledIdx++) {
 		let Color;
 
-		if(shutdown) {
-			Color = hexToRgb(shutdownColor);
+		if(overrideColor) {
+			Color = hexToRgb(overrideColor);
 		} else if(LightingMode === "Forced") {
 			Color = hexToRgb(forcedColor);
 		} else {
@@ -121,12 +126,12 @@ function grabColors(Zone, shutdown) {
 	return RGBData;
 }
 
-function WriteRGB(shutdown) {
+function WriteRGB(overrideColor) {
 
 	for(let iIdx = 0; iIdx < Object.keys(GigabyteXtreme.LEDZones).length; iIdx++) {
 
 		const Zone = GigabyteXtreme.LEDZones[iIdx];
-		const RGBData = grabColors(Zone, shutdown);
+		const RGBData = grabColors(Zone, overrideColor);
 		const packet = [0xE6, Zone.ZoneIdentifier, 0x01, 0x64, 0x02, 0x03, Zone.Positions.length];
 		packet.push(...RGBData);
 		device.log(packet);
