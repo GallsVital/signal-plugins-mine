@@ -142,21 +142,14 @@ export function Render() {
 }
 
 export function Shutdown(SystemSuspending) {
+	// Go Dark on System Sleep/Shutdown
+	const color = SystemSuspending ? "#000000" : shutdownColor;
 
-	if(SystemSuspending){
-		if(GigabyteMaster.config.perLEDSupport) {
-			GigabyteMaster.UpdatePerLED("#000000");
-		} else {
-			grabStandardRGB("#000000");
-		} // Go Dark on System Sleep/Shutdown
-	}else{
-		if(GigabyteMaster.config.perLEDSupport) {
-			GigabyteMaster.UpdatePerLED(shutdownColor);
-		} else {
-			grabStandardRGB(shutdownColor);
-		}
+	if(GigabyteMaster.config.perLEDSupport) {
+		GigabyteMaster.UpdatePerLED(color);
+	} else {
+		grabStandardRGB(color);
 	}
-
 }
 
 function grabStandardRGB(overrideColor) {

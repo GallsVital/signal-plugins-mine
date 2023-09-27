@@ -439,39 +439,22 @@ export function Render() {
 }
 
 export function Shutdown(SystemSuspending) {
+	const color = SystemSuspending ? "#000000" : shutdownColor;
 
-	if(SystemSuspending){
-		if(Z790MA_Mode){
-			for(let i = 0x20; i < 0x28;i++){
-				sendColorPacket(i, [0, 0, 0]);
-				sendCommit();
-			}
-
-			SendSubdeviceAsARGBchannel("Z790IOPanel", Z790_IO_Panel, 0x58, "#000000");
-		}else{
-			UpdateActiveZones("#000000");
-
-			for(let channel = 0; channel < vDLED_Zones.length; channel++){
-				UpdateARGBChannels(channel, "#000000");
-			}
+	if(Z790MA_Mode){
+		for(let i = 0x20; i < 0x28;i++){
+			sendColorPacket(i, [0, 0, 0]);
+			sendCommit();
 		}
+
+		SendSubdeviceAsARGBchannel("Z790IOPanel", Z790_IO_Panel, 0x58, color);
 	}else{
-		if(Z790MA_Mode){
-			for(let i = 0x20; i < 0x28;i++){
-				sendColorPacket(i, [0, 0, 0]);
-				sendCommit();
-			}
+		UpdateActiveZones(color);
 
-			SendSubdeviceAsARGBchannel("Z790IOPanel", Z790_IO_Panel, 0x58, shutdownColor);
-		}else{
-			UpdateActiveZones(shutdownColor);
-
-			for(let channel = 0; channel < vDLED_Zones.length; channel++){
-				UpdateARGBChannels(channel, shutdownColor);
-			}
+		for(let channel = 0; channel < vDLED_Zones.length; channel++){
+			UpdateARGBChannels(channel, color);
 		}
 	}
-
 }
 
 function UpdateActiveZones(overrideColor){
