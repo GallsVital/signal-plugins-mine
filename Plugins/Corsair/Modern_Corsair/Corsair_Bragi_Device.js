@@ -29,7 +29,7 @@ export function ControllableParameters(){
 		{"property":"shutdownColor", "group":"lighting", "label":"Shutdown Color", "min":"0", "max":"360", "type":"color", "default":"#009bde"},
 		{"property":"LightingMode", "group":"lighting", "label":"Lighting Mode", "type":"combobox", "values":["Canvas", "Forced"], "default":"Canvas"},
 		{"property":"forcedColor", "group":"lighting", "label":"Forced Color", "min":"0", "max":"360", "type":"color", "default":"#009bde"},
-		{"property": "PollRate", "group":"", "label": "Poll Rate", "type": "combobox", "values": ["125hz", "250hz", "500hz", "1000hz"], "default": "1000hz" },
+		{"property": "PollRate", "group":"", "label": "Poll Rate", "type": "combobox", "values": ["125hz", "250hz", "500hz", "1000hz"], "default": "1000hz" }, //Add a high polling rate check and leverage dyn props.
 	];
 }
 
@@ -102,6 +102,7 @@ export function onPollRateChanged() {
 
 export function Initialize() {
 	device.set_endpoint(0x01, 0x01, 0xFF42);
+	device.setImageFromUrl("https://marketplace.signalrgb.com/devices/default/usb-dongle.png");
 	Corsair.SetMode("Software");
 	Corsair.FetchDeviceInformation();
 	fetchAndConfigureChildren();
@@ -232,7 +233,9 @@ function initializeDevice(deviceConfig, deviceID = 0) {
 		device.addFeature("keyboard");
 	}
 
-	if(device.productId() === 0x1B70 || device.productId() === 0x1b9e) {
+	const devicePID = Corsair.FetchProperty(Corsair.properties.pid);
+
+	if(devicePID === 0x1B70 || devicePID === 0x1b9e) {
 		configureMSeriesMice(deviceID);
 	}
 
@@ -372,7 +375,7 @@ function processMacroInputs(bitIdx, state) {
 			keyCode : 0,
 			"released": !state,
 		};
-
+		device.log(`Key ${keyName} is state ${state}`);
 		keyboard.sendEvent(eventData, "Key Press");
 	} else if(deviceType === "Mouse") {
 		if(state) {
@@ -392,7 +395,7 @@ function processMacroInputs(bitIdx, state) {
 					"released": !state,
 					"name":keyName
 				};
-
+				device.log(`Key ${keyName} is state ${state}`);
 				mouse.sendEvent(eventData, "Button Press");
 			}
 		} else {
@@ -400,7 +403,6 @@ function processMacroInputs(bitIdx, state) {
 		}
 	}
 
-	device.log(`Key ${keyName} is state ${state}`);
 }
 
 function configureMSeriesMice(deviceID) { //TODO: Rewrite this properly once I get user confirmation of functionality.
@@ -497,16 +499,20 @@ function addAndRemoveDevicesFromDongleNotifications(bitmask) {
 	const childrenToAdd = ConnectedChildren.filter(x => !mapChildren.includes(x));
 	const childrenToRemove = mapChildren.filter(x => !ConnectedChildren.includes(x));
 
-	for(const child of childrenToAdd) {
-		device.log(`Adding Child Device ${child}`);
-		addChildDevice(child);
-	}
-
 	for(const child of childrenToRemove) {
 		device.log(`Removing Child Device ${child}`);
 		BragiDongle.removeChildDevice(child);
 	}
 
+	for(const child of childrenToAdd) {
+		device.log(`Adding Child Device ${child}`);
+
+		if(mapChildren.length === 0 && !devFlags) { //All of this will be cleaned up when we deprecate and remove devflags.
+			addSinglePointChild(child);
+		} else if(devFlags) {
+			addChildDevice(child);
+		}
+	}
 }
 
 function setDeviceBatteryLevel(subdeviceId, value) {
@@ -769,7 +775,7 @@ class CorsairLibrary{
 			7: "Profile Switch",
 			//8: "Scroll Up",
 			//9: "Scroll Down",
-			200: "Sniper" //This is a placeholder
+			//200: "Sniper" //This is a placeholder
 		});
 	}
 
@@ -923,71 +929,71 @@ class CorsairLibrary{
 	}
 
 	static ProductIDList(){
-		if(devFlags) {
-			return Object.freeze({
-				0x1BA6 : "Multipoint Slip Stream Dongle", // Slip Stream Dongle (multipoint)
-				0x1B7F : "Dark Core Pro SE", //"Slip Stream Dongle", // Dark Core Pro SE Wireless Dongle
-				0x1B7E : "Dark Core Pro SE", // Dark Core Pro SE Wired
-				0x1B80 : "Dark Core Pro", //"Slip Stream Dongle", // Dark Core Pro Wireless //These receivers can be paired to any slipstream capable device.
-				0x1B81 : "Dark Core Pro", // Dark Core Pro Wired
-				0x1BB2 : "Darkstar",
-				0x1B98 : "Sabre RGB Pro Wireless",
-				0x1B79 : "Sabre RGB Pro",
-				0x1B14 : "Sabre RGB",
-				0x1B2F : "Sabre RGB",
-				0x1B5E : "Harpoon Wireless",
-				0x1B65 : "Harpoon Wireless",
-				0x1B4C : "Ironclaw Wireless",
-				0x1B66 : "Ironclaw Wireless",
-				0x1B70 : "M55",
-				0x1b9e : "M65 Ultra",
-				0x1B89 : "K95 Plat XT",
-				0x1BAB : "K100 Air",
-				0x1bb6 : "K70 Pro Mini",
-				0x1BC4 : "K70 Pro",
-				0x1BB3 : "K70 Pro",
-				0x1BD4 : "K70 Pro",
-				0x1BC6 : "K70 Pro",
-				0x1B7D : "K100",
-				0x1BC5 : "K100",
-				0x1B7C : "K100"
-			});
-		}
-
 		return Object.freeze({
-			//0x1BA6 : "Multipoint Slip Stream Dongle", // Slip Stream Dongle (multipoint)
-			//0x1B7F : "Dark Core Pro SE", //"Slip Stream Dongle", // Dark Core Pro SE Wireless Dongle
-			//0x1B7E : "Dark Core Pro SE", // Dark Core Pro SE Wired
-			//0x1B80 : "Dark Core Pro", //"Slip Stream Dongle", // Dark Core Pro Wireless //These receivers can be paired to any slipstream capable device.
-			//0x1B81 : "Dark Core Pro", // Dark Core Pro Wired
-			//0x1BB2 : "Darkstar",
-			//0x1B98 : "Sabre RGB Pro Wireless",
-			//0x1B79 : "Sabre RGB Pro",
-			//0x1B14 : "Sabre RGB",
-			//0x1B2F : "Sabre RGB",
-			//0x1B5E : "Harpoon Wireless",
-			//0x1B65 : "Harpoon Wireless",
-			//0x1B4C : "Ironclaw Wireless",
-			//0x1B66 : "Ironclaw Wireless",
-			//0x1B70 : "M55",
-			//0x1b9e : "M65 Ultra",
-			0x1bb6 : "K70 Pro Mini",
-			//0x1BC4 : "K70 Pro",
-			//0x1BB3 : "K70 Pro",
-			//0x1BD4 : "K70 Pro",
-			//0x1BC6 : "K70 Pro",
-			//0x1B89 : "K95 Plat XT",
+			0x1BA6 : "Multipoint Slip Stream Dongle", // Slip Stream Dongle (multipoint)
+			0x1B7F : "Dark Core Pro SE", //"Slip Stream Dongle", // Dark Core Pro SE Wireless Dongle
+			0x1B7E : "Dark Core Pro SE", // Dark Core Pro SE Wired
+			0x1B80 : "Dark Core Pro", //"Slip Stream Dongle", // Dark Core Pro Wireless //These receivers can be paired to any slipstream capable device.
+			0x1B81 : "Dark Core Pro", // Dark Core Pro Wired
+			0x1BB2 : "Darkstar",
+			0x1B98 : "Sabre RGB Pro Wireless",
+			0x1B79 : "Sabre RGB Pro",
+			0x1B14 : "Sabre RGB",
+			0x1B2F : "Sabre RGB",
+			0x1B5E : "Harpoon Wireless",
+			0x1B65 : "Harpoon Wireless",
+			0x1B4C : "Ironclaw Wireless",
+			0x1B66 : "Ironclaw Wireless",
+			0x1B70 : "M55",
+			0x1b9e : "M65 Ultra",
+			0x1B89 : "K95 Plat XT",
 			0x1BAB : "K100 Air",
-			//0x1B7D : "K100",
-			//0x1BC5 : "K100",
-			//0x1B7C : "K100"
+			0x1BA4 : "K55 Pro",
+			0x1BA1 : "K55 Pro XT",
+			0x1B6E : "K57",
+			0x1BA0 : "K60 Pro",
+			0x1BAD : "K60 Pro", //Low Profile
+			0x1B8D : "K60 Pro", //SE
+			0x1BAF : "K65 Mini",
+			0x1bcf : "K65 Mini",
+			0x1bc3 : "K65 Mini",
+			0x1BBD : "K65 Mini",
+			0x1bb6 : "K70 Pro Mini",
+			0x1BC4 : "K70 Pro",
+			0x1BB3 : "K70 Pro",
+			0x1BD4 : "K70 Pro",
+			0x1BC6 : "K70 Pro",
+			0x1bb9 : "K70 TKL",
+			0x1B73 : "K70 TKL",
+			0x1B7D : "K100",
+			0x1BC5 : "K100",
+			0x1B7C : "K100"
 		});
 	}
 
 	static DeviceImageLibrary() {
 		return Object.freeze({
-			"K70 Pro Mini" : "https://marketplace.signalrgb.com/devices/default/keyboards/keyboard-60.png",
-			"K100 Air" : "https://marketplace.signalrgb.com/devices/default/keyboards/full-size-keyboard-render.png"
+			"Dark Core Pro SE" : "https://marketplace.signalrgb.com/devices/default/mice/mouse.png",
+			"Dark Core Pro" : "https://marketplace.signalrgb.com/devices/default/mice/mouse.png",
+			"Darkstar" : "https://marketplace.signalrgb.com/devices/default/mice/mouse.png",
+			"Sabre RGB Pro Wireless" : "https://marketplace.signalrgb.com/devices/default/mice/mouse.png",
+			"Sabre RGB Pro" : "https://marketplace.signalrgb.com/devices/default/mice/mouse.png",
+			"Sabre RGB" : "https://marketplace.signalrgb.com/devices/default/mice/mouse.png",
+			"Harpoon Wireless" : "https://marketplace.signalrgb.com/devices/default/mice/mouse.png",
+			"Ironclaw Wireless" : "https://marketplace.signalrgb.com/devices/default/mice/mouse.png",
+			"M55" : "https://marketplace.signalrgb.com/devices/default/mice/mouse.png",
+			"M65 Ultra" : "https://marketplace.signalrgb.com/devices/default/mice/mouse.png",
+			"K55 Pro" : "https://marketplace.signalrgb.com/devices/default/keyboards/full-size-keyboard-render.png",
+			"K55 Pro XT" : "https://marketplace.signalrgb.com/devices/default/keyboards/full-size-keyboard-render.png",
+			"K57" : "https://marketplace.signalrgb.com/devices/default/keyboards/full-size-keyboard-render.png",
+			"K60 Pro" : "https://marketplace.signalrgb.com/devices/default/keyboards/full-size-keyboard-render.png",
+			"K65 Mini"  : "https://marketplace.signalrgb.com/devices/default/keyboards/65-keyboard-render.png",
+			"K70 Pro Mini"  : "https://marketplace.signalrgb.com/devices/default/keyboards/keyboard-60.png",
+			"K70 Pro" : "https://marketplace.signalrgb.com/devices/default/keyboards/full-size-keyboard-render.png",
+			"K70 TKL" : "https://marketplace.signalrgb.com/devices/default/keyboards/keyboard-80.png",
+			"K95 Plat XT" : "https://marketplace.signalrgb.com/devices/default/keyboards/full-size-keyboard-render.png",
+			"K100 Air" : "https://marketplace.signalrgb.com/devices/default/keyboards/full-size-keyboard-render.png",
+			"K100" : "https://marketplace.signalrgb.com/devices/default/keyboards/6-macro-keyboard-render.png.png",
 		});
 	}
 
@@ -1100,7 +1106,7 @@ class CorsairLibrary{
 			},
 			"M65 Ultra": {
 				name: "M65 Ultra",
-				size: [5, 3],
+				size: [5, 4],
 				ledNames: [ "Scroll wheel", "DPI button", "Logo" ],
 				ledPositions: [ [1, 1], [1, 2], [1, 3] ],
 				ledMap: [ 0, 1, 2 ],
@@ -1143,6 +1149,161 @@ class CorsairLibrary{
 				keymapType : "Mouse",
 				maxDPI : 26000
 			},
+			"K55 Pro": {
+				name: "K55 Pro",
+				size: [5, 3],
+				ledNames: [ "Zone 1", "Zone 2", "Zone 3", "Zone 4", "Zone 5", ],
+				ledPositions: [ [0, 0], [1, 0], [2, 0], [3, 0], [4, 0] ],
+				ledMap: [ 0, 1, 2, 3, 4 ],
+				devFirmware: "0.0.0",
+				ledSpacing: 5,
+				keymapType : "Keyboard",
+			},
+			"K55 Pro XT": {
+				name: "K55 Pro XT",
+				size: [24, 8],
+				ledNames: [
+					"G1", "Esc", "F1", "F2", "F3", "F4", "F5", "F6", "F7", "F8", "F9", "F10", "F11", "F12",        "Print Screen", "Scroll Lock", "Pause Break",
+					"G2", "`", "1", "2", "3", "4", "5", "6", "7", "8", "9", "0", "-_", "=+", "Backspace",                        "Insert", "Home", "Page Up",       "NumLock", "Num /", "Num *", "Num -",  //21
+					"G3", "Tab", "Q", "W", "E", "R", "T", "Y", "U", "I", "O", "P", "[", "]", "\\",                               "Del", "End", "Page Down",         "Num 7", "Num 8", "Num 9", "Num +",    //21
+					"G4", "CapsLock", "A", "S", "D", "F", "G", "H", "J", "K", "L", ";", "'", "Enter",                                                              "Num 4", "Num 5", "Num 6",             //16
+					"G5", "Left Shift", "Z", "X", "C", "V", "B", "N", "M", ",", ".", "/", "Right Shift",                                  "Up Arrow",               "Num 1", "Num 2", "Num 3", "Num Enter", //17
+					"G6", "Left Ctrl", "Left Win", "Left Alt", "Space", "Right Alt", "Fn", "Menu", "Right Ctrl",  "Left Arrow", "Down Arrow", "Right Arrow", "Num 0", "Num .",                       //13
+					"ISO #", "ISO <"
+				],
+				ledPositions: [
+					[0, 1],  [1, 1],    [3, 1], [4, 1], [5, 1], [6, 1],     [7, 1], [8, 1], [9, 1], [10, 1],   [12, 1], [13, 1], [14, 1], [15, 1],  [15, 1], [16, 1], [17, 1],
+					[0, 2],  [1, 2], [2, 2], [3, 2], [4, 2], [5, 2], [6, 2], [7, 2], [8, 2], [9, 2], [10, 2], [11, 2], [12, 2], [13, 2], [14, 2],   [15, 2], [16, 2], [17, 2],   [18, 2], [19, 2], [20, 2], [21, 2],
+					[0, 3],  [1, 3], [2, 3], [3, 3], [4, 3], [5, 3], [6, 3], [7, 3], [8, 3], [9, 3], [10, 3], [11, 3], [12, 3], [13, 3], [14, 3],   [15, 3], [16, 3], [17, 3],   [18, 3], [19, 3], [20, 3], [21, 3],
+					[0, 4],  [1, 4], [2, 4], [3, 4], [4, 4], [5, 4], [6, 4], [7, 4], [8, 4], [9, 4], [10, 4], [11, 4], [12, 4],         [14, 4],                             [18, 4], [19, 4], [20, 4],
+					[0, 5],  [1, 5],     [3, 5], [4, 5], [5, 5], [6, 5], [7, 5], [8, 5], [9, 5], [10, 5], [11, 5], [12, 5],            [14, 5],           [16, 5],           [18, 5], [19, 5], [20, 5], [21, 5],
+					[0, 6],  [1, 6], [2, 6], [3, 6],                      [7, 6],                       [11, 6], [12, 6], [13, 6], [14, 6],   [15, 6], [16, 6], [17, 6],   [18, 6],        [20, 6],
+					//ISO
+					[2, 5], [13, 4]
+				 ],
+				ledMap: [
+					//Main Keyboard
+					131,  41,       58,  59,  60,  61,       62,  63,  64,  65,       66,  67,  68,  69,  70,  71,  72,
+					132,  53,  30,  31,  32,  33,  34,  35,  36,  37,  38,  39,       45,  46,  42,       73,  74,  75,  83,  84,  85,  86,
+					133,  43,       20,  26,   8,  21,       23,  28,  24,  12,  18,  19,  47,  48,  49,  76,  77,  78,  95,  96,  97,  87,
+					134,  57,        4,  22,   7,   9,       10,  11,  13,  14,  15,  51,  52,       40,                 92,  93,  94,
+					135, 106,       29,  27,   6,  25,        5,       17,  16,  54,  55,  56, 110,            82,       89,  90,  91,  88,
+					136, 105, 108, 107,                      44,                     111, 122, 101, 109,  80,  81,  79,  98,    99,
+
+					100, 50 //ISO
+				 ],
+				devFirmware: "0.0.0",
+				ledSpacing: 137,
+				keymapType : "Keyboard",
+			},
+			"K57": {
+				name: "K57",
+				size: [22, 7],
+				ledNames: [
+					"G1", "Esc", "F1", "F2", "F3", "F4", "F5", "F6", "F7", "F8", "F9", "F10", "F11", "F12",        "Print Screen", "Scroll Lock", "Pause Break",
+					"G2", "`", "1", "2", "3", "4", "5", "6", "7", "8", "9", "0", "-_", "=+", "Backspace",                        "Insert", "Home", "Page Up",       "NumLock", "Num /", "Num *", "Num -",  //21
+					"G3", "Tab", "Q", "W", "E", "R", "T", "Y", "U", "I", "O", "P", "[", "]", "\\",                               "Del", "End", "Page Down",         "Num 7", "Num 8", "Num 9", "Num +",    //21
+					"G4", "CapsLock", "A", "S", "D", "F", "G", "H", "J", "K", "L", ";", "'", "Enter",                                                              "Num 4", "Num 5", "Num 6",             //16
+					"G5", "Left Shift", "Z", "X", "C", "V", "B", "N", "M", ",", ".", "/", "Right Shift",                                  "Up Arrow",               "Num 1", "Num 2", "Num 3", "Num Enter", //17
+					"G6", "Left Ctrl", "Left Win", "Left Alt", "Space", "Right Alt", "Fn", "Menu", "Right Ctrl",  "Left Arrow", "Down Arrow", "Right Arrow", "Num 0", "Num .",                       //13
+					"ISO #", "ISO <"
+				],
+				ledPositions: [
+					[0, 1],  [1, 1],    [3, 1], [4, 1], [5, 1], [6, 1],     [7, 1], [8, 1], [9, 1], [10, 1],   [12, 1], [13, 1], [14, 1], [15, 1],  [15, 1], [16, 1], [17, 1],
+					[0, 2],  [1, 2], [2, 2], [3, 2], [4, 2], [5, 2], [6, 2], [7, 2], [8, 2], [9, 2], [10, 2], [11, 2], [12, 2], [13, 2], [14, 2],   [15, 2], [16, 2], [17, 2],   [18, 2], [19, 2], [20, 2], [21, 2],
+					[0, 3],  [1, 3], [2, 3], [3, 3], [4, 3], [5, 3], [6, 3], [7, 3], [8, 3], [9, 3], [10, 3], [11, 3], [12, 3], [13, 3], [14, 3],   [15, 3], [16, 3], [17, 3],   [18, 3], [19, 3], [20, 3], [21, 3],
+					[0, 4],  [1, 4], [2, 4], [3, 4], [4, 4], [5, 4], [6, 4], [7, 4], [8, 4], [9, 4], [10, 4], [11, 4], [12, 4],         [14, 4],                             [18, 4], [19, 4], [20, 4],
+					[0, 5],  [1, 5],     [3, 5], [4, 5], [5, 5], [6, 5], [7, 5], [8, 5], [9, 5], [10, 5], [11, 5], [12, 5],            [14, 5],           [16, 5],           [18, 5], [19, 5], [20, 5], [21, 5],
+					[0, 6],  [1, 6], [2, 6], [3, 6],                      [7, 6],                       [11, 6], [12, 6], [13, 6], [14, 6],   [15, 6], [16, 6], [17, 6],   [18, 6],        [20, 6],
+					//ISO
+					[2, 5], [13, 4]
+				 ],
+				ledMap: [
+					//Main KeyBoard
+					131,  41,       58,  59,  60,  61,       62,  63,  64,  65,       66,  67,  68,  69,  70,  71,  72,
+					132,  53,  30,  31,  32,  33,  34,  35,  36,  37,  38,  39,       45,  46,  42,       73,  74,  75,  83,  84,  85,  86,
+					133,  43,       20,  26,   8,  21,       23,  28,  24,  12,  18,  19,  47,  48,  49,  76,  77,  78,  95,  96,  97,  87,
+					134,  57,        4,  22,   7,   9,       10,  11,  13,  14,  15,  51,  52,       40,                 92,  93,  94,
+					135, 106,       29,  27,   6,  25,        5,       17,  16,  54,  55,  56, 110,            82,       89,  90,  91,  88,
+					136, 105, 108, 107,                      44,                     111, 122, 101, 109,  80,  81,  79,  98,    99,
+
+					100, 50 //ISO
+				 ],
+				devFirmware: "0.0.0",
+				ledSpacing: 137,
+				keymapType : "Keyboard",
+			},
+			"K60 Pro": {
+				name: "K60 Pro",
+				size: [24, 8],
+				ledNames: [
+					"Esc", "F1", "F2", "F3", "F4", "F5", "F6", "F7", "F8", "F9", "F10", "F11", "F12",         "Print Screen", "Scroll Lock", "Pause Break",
+					"`", "1", "2", "3", "4", "5", "6", "7", "8", "9", "0", "-_", "=+", "Backspace",                        "Insert", "Home", "Page Up",       "NumLock", "Num /", "Num *", "Num -",  //21
+					"Tab", "Q", "W", "E", "R", "T", "Y", "U", "I", "O", "P", "[", "]", "\\",                               "Del", "End", "Page Down",         "Num 7", "Num 8", "Num 9", "Num +",    //21
+					"CapsLock", "A", "S", "D", "F", "G", "H", "J", "K", "L", ";", "'", "Enter",                                                              "Num 4", "Num 5", "Num 6",             //16
+					"Left Shift", "Z", "X", "C", "V", "B", "N", "M", ",", ".", "/", "Right Shift",                                  "Up Arrow",               "Num 1", "Num 2", "Num 3", "Num Enter", //17
+					"Left Ctrl", "Left Win", "Left Alt", "Space", "Right Alt", "Fn", "Menu", "Right Ctrl",  "Left Arrow", "Down Arrow", "Right Arrow", "Num 0", "Num .",                       //13
+
+					"ISO #", "ISO <"
+				],
+				ledPositions: [
+					[1, 1],    [3, 1], [4, 1], [5, 1], [6, 1],     [7, 1], [8, 1], [9, 1], [10, 1],   [12, 1], [13, 1], [14, 1], [15, 1],  [15, 1], [16, 1], [17, 1],     //[18,1], [19,1],[20,1], [21,1],
+					[1, 2], [2, 2], [3, 2], [4, 2], [5, 2], [6, 2], [7, 2], [8, 2], [9, 2], [10, 2], [11, 2], [12, 2], [13, 2], [14, 2],   [15, 2], [16, 2], [17, 2],   [18, 2], [19, 2], [20, 2], [21, 2],
+					[1, 3], [2, 3], [3, 3], [4, 3], [5, 3], [6, 3], [7, 3], [8, 3], [9, 3], [10, 3], [11, 3], [12, 3], [13, 3], [14, 3],   [15, 3], [16, 3], [17, 3],   [18, 3], [19, 3], [20, 3], [21, 3],
+					[1, 4], [2, 4], [3, 4], [4, 4], [5, 4], [6, 4], [7, 4], [8, 4], [9, 4], [10, 4], [11, 4], [12, 4],         [14, 4],                             [18, 4], [19, 4], [20, 4],
+					[1, 5],     [3, 5], [4, 5], [5, 5], [6, 5], [7, 5], [8, 5], [9, 5], [10, 5], [11, 5], [12, 5],            [14, 5],           [16, 5],           [18, 5], [19, 5], [20, 5], [21, 5],
+					[1, 6], [2, 6], [3, 6],                      [7, 6],                       [11, 6], [12, 6], [13, 6], [14, 6],   [15, 6], [16, 6], [17, 6],   [18, 6],        [20, 6],
+
+					//ISO
+					[2, 5], [13, 4]
+				 ],
+				ledMap: [
+					37,   54, 55, 56, 57,     58, 59, 60, 61,     62, 63, 64, 65,     66, 67, 68,    //120, 123, 121, 122,
+					49,   26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 41, 42,     38,     69, 70, 71,    79, 80, 81, 82,
+					39,   16, 22, 4, 17, 19, 24, 20, 8, 14, 15, 43,   44,   45,       72, 73, 74,    91, 92, 93, 83,
+					53,   0, 18, 3, 5, 6, 7, 9, 10, 11, 47, 48,         36,                        88, 89, 90,
+					102,  25, 23, 2, 21, 1, 13, 12, 50, 51, 52,          106,              78,        85, 86, 87, 84,
+					101,  104, 103,           40,              107, 108, 97, 105,      76, 77, 75,     94,    95,
+
+					//ISO
+					96, 46
+				 ],
+				devFirmware: "0.0.0",
+				ledSpacing: 109,
+				keymapType : "Keyboard",
+			},
+			"K65 Mini": { //Broken keymap is very very likely
+				name: "K65 Mini",
+				size: [14, 7],
+				ledNames: [
+					"Esc", "1", "2", "3", "4", "5", "6", "7", "8", "9", "0", "-_", "=+", "Backspace",
+					"Tab", "Q", "W", "E", "R", "T", "Y", "U", "I", "O", "P", "[", "]", "\\",
+					"CapsLock", "A", "S", "D", "F", "G", "H", "J", "K", "L", ";", "'", "Enter",
+					"Left Shift", "Z", "X", "C", "V", "B", "N", "M", ",", ".", "/", "Right Shift",
+					"Left Ctrl", "Left Win", "Left Alt", "Space Left", "Space", "Space Right", "Right Alt", "Fn", "Menu", "Right Ctrl",
+					"ISO #", "ISO <"
+				],
+				ledPositions: [
+					[0, 2], [1, 2], [2, 2], [3, 2], [4, 2], [5, 2], [6, 2], [7, 2], [8, 2], [9, 2],  [10, 2], [11, 2], [12, 2], [13, 2],
+					[0, 3], [1, 3], [2, 3], [3, 3], [4, 3], [5, 3], [6, 3], [7, 3], [8, 3], [9, 3],  [10, 3], [11, 3], [12, 3], [13, 3],
+					[0, 4], [1, 4], [2, 4], [3, 4], [4, 4], [5, 4], [6, 4], [7, 4], [8, 4], [9, 4],  [10, 4], [11, 4],         [13, 4],
+					[0, 5],        [2, 5], [3, 5], [4, 5], [5, 5], [6, 5], [7, 5], [8, 5], [9, 5],  [10, 5], [11, 5],         [13, 5],
+					[0, 6], [1, 6], [2, 6],        [4, 6],       [6, 6],         [8, 6],              [10, 6], [11, 6], [12, 6], [13, 6],
+					//ISO
+					[2, 5], [12, 4]
+				 ],
+				ledMap: [
+					41,   30, 31,  32, 33, 34, 35,  36,  37,  38, 39, 45, 46,   42,
+					43,   20, 26,  8,  21, 23, 28,  24,  12,  18, 19, 47, 48,   49,
+					57,   4,  22,  7,  9,  10, 11,  13,  14,  15, 51, 52,       40,
+					106,  29, 27,  6,  25, 5,  17,  16,  54,  55, 56,           110,
+					105,  108, 107, 0, 44, 1,  111, 122, 101,                   109,
+					100, 50 //ISO
+				 ],
+				devFirmware: "0.0.0",
+				ledSpacing: 0,
+				keymapType : "Keyboard",
+			},
 			"K70 Pro Mini": {
 				name: "K70 Pro Mini",
 				size: [16, 8],
@@ -1168,14 +1329,14 @@ class CorsairLibrary{
 					[2, 5], [12, 4]
 				],
 				ledMap: [
-					119,  120,  121,  122,  123,  124,  125,  126,  127,  128,  129,
-					156, 37,   26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 41, 42, 38, 167,
-					39,   16, 22, 4, 17, 19, 24, 20, 8, 14, 15, 43,   44, 45,
-					157, 53,   0, 18, 3, 5, 6, 7, 9, 10, 11, 47, 48,           36, 168,
-					158, 102,  25, 23, 2, 21, 1, 13, 12, 50, 51, 52,          106, 169,
-					159, 101,  104, 103,       -4,    40,  -3,  107, 118, 97, 105, 170,
-					189,  190,  191,  192,  193,  194,  195,  196,  197,  198,  199,
-					96, 46 //ISO
+					123, 124, 125, 126, 127, 128, 129, 130, 131, 132, 133,
+					160, 41, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 45, 46, 42, 171,
+					43, 20, 26, 8, 21, 23, 28, 24, 12, 18, 19, 47, 48, 49,
+					161, 57, 4, 22, 7, 9, 10, 11, 13, 14, 15, 51, 52, 40, 172,
+					162, 106, 29, 27, 6, 25, 5, 17, 16, 54, 55, 56, 110, 173,
+					163, 105, 108, 107, 0, 44, 1, 111, 122, 101, 109, 174,
+					193, 194, 195, 196, 197, 198, 199, 200, 201, 202, 203,
+					100, 50 //ISO
 				],
 				devFirmware: "0.0.0",
 				ledSpacing: 0,
@@ -1208,15 +1369,53 @@ class CorsairLibrary{
 					[13, 3], [2, 5]
 				],
 				ledMap: [
-					124, 109, 110, 							133, 134,								98,
-					37,   54, 55, 56, 57,     58, 59, 60, 61,     62, 63, 64, 65,  66, 67, 68,      119, 122, 120, 121,
-					49,   26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 41, 42,     38,     69, 70, 71,      79, 80, 81, 82,
-					39,   16, 22, 4, 17, 19, 24, 20, 8, 14, 15, 43,   44,   45,       72, 73, 74,      91, 92, 93, 83,
-					53,   0, 18, 3, 5, 6, 7, 9, 10, 11, 47, 48,         36,                            88, 89, 90,
-					102,  25, 23, 2, 21, 1, 13, 12, 50, 51, 52,          106,             78,          85, 86, 87, 84,
-					101,  104, 103,       136, 40, 137,          107, 118, 97, 105,      76, 77, 75,        94,    95,
+					128, 113, 114, 137, 138, 102,
+					41, 58, 59, 60, 61, 62, 63, 64, 65, 66, 67, 68, 69, 70, 71, 72, 123, 126, 124, 125,
+					53, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 45, 46, 42, 73, 74, 75, 83, 84, 85, 86,
+					43, 20, 26, 8, 21, 23, 28, 24, 12, 18, 19, 47, 48, 49, 76, 77, 78, 95, 96, 97, 87,
+					57, 4, 22, 7, 9, 10, 11, 13, 14, 15, 51, 52, 40, 92, 93, 94,
+					106, 29, 27, 6, 25, 5, 17, 16, 54, 55, 56, 110, 82, 89, 90, 91, 88,
+					105, 108, 107, 140, 44, 141, 111, 122, 101, 109, 80, 81, 79, 98, 99,
 
-					96, 46 //ISO
+					100, 50 //ISO
+				],
+				devFirmware: "0.0.0",
+				ledSpacing: 0,
+				keymapType : "Keyboard"
+			},
+			"K70 TKL": {
+				name: "K70 TKL",
+				size: [22, 8],
+				ledNames: [
+					"MediaStop", "MediaPreviousTrack", "MediaPlayPause", "MediaNextTrack",  "Logo 1", "Logo 2", "Profile", "Brightness", "Lock", "VOLUME_MUTE",
+					"Esc", "F1", "F2", "F3", "F4", "F5", "F6", "F7", "F8", "F9", "F10", "F11", "F12",         "Print Screen", "Scroll Lock", "Pause Break",
+					"`", "1", "2", "3", "4", "5", "6", "7", "8", "9", "0", "-_", "=+", "Backspace",                        "Insert", "Home", "Page Up",
+					"Tab", "Q", "W", "E", "R", "T", "Y", "U", "I", "O", "P", "[", "]", "\\",                               "Del", "End", "Page Down",
+					"CapsLock", "A", "S", "D", "F", "G", "H", "J", "K", "L", ";", "'", "Enter",
+					"Left Shift", "Z", "X", "C", "V", "B", "N", "M", ",", ".", "/", "Right Shift",                                  "Up Arrow",
+					"Left Ctrl", "Left Win", "Left Alt", "Space", "Right Alt", "Fn", "Menu", "Right Ctrl",  "Left Arrow", "Down Arrow", "Right Arrow",
+					"ISO #", "ISO <"
+				],
+				ledPositions: [
+					[0, 0], [1, 0], [2, 0],  [3, 0],         [7, 0], [8, 0],                               [11, 0], [12, 0], [13, 0],   [14, 0],
+					[0, 1],        [2, 1], [3, 1], [4, 1], [5, 1], [6, 1], [7, 1], [8, 1], [9, 1],  [10, 1], [11, 1], [12, 1], [13, 1],   [14, 1], [15, 1], [16, 1],
+					[0, 2], [1, 2], [2, 2], [3, 2], [4, 2], [5, 2], [6, 2], [7, 2], [8, 2], [9, 2],  [10, 2], [11, 2], [12, 2], [13, 2],   [14, 2], [15, 2], [16, 2],
+					[0, 3], [1, 3], [2, 3], [3, 3], [4, 3], [5, 3], [6, 3], [7, 3], [8, 3], [9, 3],  [10, 3], [11, 3], [12, 3], [13, 3],   [14, 3], [15, 3], [16, 3],
+					[0, 4], [1, 4], [2, 4], [3, 4], [4, 4], [5, 4], [6, 4], [7, 4], [8, 4], [9, 4],  [10, 4], [11, 4],         [13, 4],
+					[0, 5],        [2, 5], [3, 5], [4, 5], [5, 5], [6, 5], [7, 5], [8, 5], [9, 5],  [10, 5], [11, 5],         [13, 5],           [15, 5],
+					[0, 6], [1, 6], [2, 6],                      [6, 6],                       [10, 6], [11, 6], [12, 6], [13, 6],   [14, 6], [15, 6], [16, 6],
+					//ISO
+					[2, 5], [13, 4]
+				],
+				ledMap: [
+					123, 126, 124, 125, 3, 1, 128, 113, 114, 102,
+					41, 58, 59, 60, 61, 62, 63, 64, 65, 66, 67, 68, 69, 70, 71, 72,
+					53, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 45, 46, 42, 73, 74, 75,
+					43, 20, 26, 8, 21, 23, 28, 24, 12, 18, 19, 47, 48, 49, 76, 77, 78,
+					57, 4, 22, 7, 9, 10, 11, 13, 14, 15, 51, 52, 40,
+					106, 29, 27, 6, 25, 5, 17, 16, 54, 55, 56, 110, 82,
+					105, 108, 107, 44, 111, 122, 101, 109, 80, 81, 79,
+					100, 50 //ISO
 				],
 				devFirmware: "0.0.0",
 				ledSpacing: 0,
@@ -1551,7 +1750,7 @@ export class ModernCorsairProtocol{
 		 * @property {0xB0} ButtonResponseOptimization
 		 */
 
-		this.properties =  Object.freeze({
+		this.properties =  Object.freeze({ //55 and 5A both return their subdevices on the Link Hub. Not sure on other Bragi Proper devices. ICUE Logs note temp sensors and cooling sensors
 			pollingRate: 0x01,
 			brightness: 0x02,
 			mode: 0x03,
@@ -2018,12 +2217,12 @@ export class ModernCorsairProtocol{
 	 * @param {number} DPI Desired DPI value to be set.
 	 */
 	SetDPI(DPI, deviceID = 0){
-		const hasIndependentAxes = this.FetchProperty("DPI X", deviceID) !== -1; //TODO Should this be stored somewhere? It's an extra variable to add and is a single extra op. Though it does throw an error in console every time dpi is changed if it isn't independent axes.
-		//The only place to realistically shove that var is in Corsair Config. This can only be called by a single mouse, and only gets called if we have a mouse.
+		const hasIndependentAxes = this.FetchProperty("DPI X", deviceID) !== -1;
 
 		if(hasIndependentAxes) {
 			this.SetIndependentXYDPI(DPI, deviceID);
 		} else {
+			device.log(`Device uses Linked XY DPI's. Ignore Above Error Message.`);
 			this.SetLinkedXYDPI(DPI, deviceID);
 		}
 	}
@@ -2342,10 +2541,10 @@ export class ModernCorsairProtocol{
 	 * If the Handle given is currently open this function will close it and then re-attempt opening it.
 	 * @param {Handle} Handle - Handle to be used.
 	 * @param {number} Endpoint - Endpoint to be read from
-	 * @param {number} Command - CommandId that is contained in the return packet to verify the correct packet was read from the device.
 	 * @returns The entire packet read from the device.
 	 */
-	ReadFromEndpoint(Handle, Endpoint, deviceID = 0, Command) {
+	// * @param {number} Command - CommandId that is contained in the return packet to verify the correct packet was read from the device.
+	ReadFromEndpoint(Handle, Endpoint, deviceID = 0) {
 		if(typeof Handle === "string"){
 			Handle = this.handles[Handle];
 		}
@@ -2368,10 +2567,10 @@ export class ModernCorsairProtocol{
 
 		device.write([0x00, deviceID | 0x08, this.command.readEndpoint, Handle], this.GetWriteLength());
 
-		let Data = [];
-		Data = device.read([0x00], this.GetReadLength());
+		//let Data = [];
+		const Data = device.read([0x00], this.GetReadLength());
 
-		const RetryCount = 4;
+		//const RetryCount = 4;
 
 		// do {
 		// 	RetryCount--;
@@ -2417,10 +2616,9 @@ export class ModernCorsairProtocol{
 
 			return ErrorCode;
 		}
-		let packet = [0x00, deviceID | 0x08, this.command.writeEndpoint, Handle, ...BinaryUtils.WriteInt32LittleEndian(Data.length)];
-		packet = packet.concat(Data);
+
 		device.clearReadBuffer();
-		device.write(packet, this.GetWriteLength());
+		device.write([0x00, deviceID | 0x08, this.command.writeEndpoint, Handle, ...BinaryUtils.WriteInt32LittleEndian(Data.length)].concat(Data), this.GetWriteLength());
 
 		const returnPacket = device.read([0x00], this.GetReadLength());
 
@@ -2475,17 +2673,13 @@ export class ModernCorsairProtocol{
 
 	/** @private */
 	WriteLighting(LedCount, RGBData, deviceID = 0){
-		const packet = [0x00, deviceID, this.command.writeEndpoint, 0x00, ...BinaryUtils.WriteInt32LittleEndian(LedCount)].concat(RGBData);
-
-		device.write(packet, this.GetWriteLength());
+		device.write([0x00, deviceID, this.command.writeEndpoint, 0x00, ...BinaryUtils.WriteInt32LittleEndian(LedCount)].concat(RGBData), this.GetWriteLength());
 		device.pause(1);
 	}
 
 	/** @private */
 	StreamLighting(RGBData, deviceID = 0) {
-		const packet = [0x00, deviceID, this.command.streamEndpoint, 0x00].concat(RGBData);
-
-		device.write(packet, this.GetWriteLength());
+		device.write([0x00, deviceID, this.command.streamEndpoint, 0x00].concat(RGBData), this.GetWriteLength());
 		device.pause(1);
 	}
 
@@ -2574,7 +2768,7 @@ export class ModernCorsairProtocol{
 			return [];
 		}
 
-		const data = this.ReadFromEndpoint("Background", this.endpoints.FanRPM, 0x06, deviceID);
+		const data = this.ReadFromEndpoint("Background", this.endpoints.FanRPM, deviceID);
 
 		if(data.length === 0){
 			this.log("Failed To Read Fan RPM's.");
@@ -2602,7 +2796,7 @@ export class ModernCorsairProtocol{
 	}
 	/** */
 	FetchFanStates(deviceID = 0) {
-		const data = this.ReadFromEndpoint("Background", this.endpoints.FanStates, deviceID | 0x08, 0x09);
+		const data = this.ReadFromEndpoint("Background", this.endpoints.FanStates, deviceID | 0x08);
 
 		if(data.length === 0){
 			device.log(`CorsairProtocol: Failed To Read Fan States.`);
@@ -2666,7 +2860,7 @@ export class ModernCorsairProtocol{
 	FetchTemperatures(deviceID = 0) {
 		//device.log(`CorsairProtocol: Reading Temp Data.`);
 
-		const data = this.ReadFromEndpoint("Background", this.endpoints.TemperatureData, 0x10, deviceID);
+		const data = this.ReadFromEndpoint("Background", this.endpoints.TemperatureData, deviceID);
 
 		if(data.length === 0){
 			device.log(`CorsairProtocol: Failed To Read Temperature Data.`);
