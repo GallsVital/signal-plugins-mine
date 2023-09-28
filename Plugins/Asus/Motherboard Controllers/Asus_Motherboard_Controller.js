@@ -111,7 +111,7 @@ const ConfigurationOverrides = {
 	//"AULA3-6K75-0206":{MainboardCount: 7, ARGBChannelCount:3, RGBHeaderCount: 1},
 	//"AULA3-AR42-0207":{MainboardCount: 3, ARGBChannelCount:1, RGBHeaderCount: 2},
 	"TUF GAMING X570-PRO (WI-FI)": {MainboardCount: 3, ARGBChannelCount:1, RGBHeaderCount: 2},
-	"PRIME Z790-A Wifi" : {MainboardCount: 3, ARGBChannelCount:3, RGBHeaderCount: 1}
+	"PRIME Z790-A WIFI" : {MainboardCount: 3, ARGBChannelCount:3, RGBHeaderCount: 1}
 };
 
 const DeviceInfo = {
