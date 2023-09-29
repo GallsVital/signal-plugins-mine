@@ -3,7 +3,7 @@ export function VendorId() { return 0x1b1c; }
 export function ProductId() { return Object.keys(CorsairLibrary.ProductIDList()); }
 export function Publisher() { return "WhirlwindFX"; }
 export function Documentation(){ return "troubleshooting/corsair"; }
-export function Size() { return [0, 0]; }
+export function Size() { return [1, 1]; }
 export function DefaultPosition(){return [225, 120];}
 export function DefaultScale(){return 7.0;}
 /* global
