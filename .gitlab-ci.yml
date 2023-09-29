@@ -49,7 +49,7 @@ plugin validate:
     when: always
     name: "Javascript Plugins"
     paths:
-      - Components/**/*.json"
+      - Components/**/*.json
       - Plugins/**/*.js
       - Plugins/**/*.qml
     exclude:
@@ -64,6 +64,11 @@ component validate:
     #- apk add --update npm
     #- npm install
     - npm run test:componentValidate
+  artifacts:
+    when: always
+    name: "Component Json"
+    paths:
+      - Components/**/*.json
 
 unit test:
   stage: unit test

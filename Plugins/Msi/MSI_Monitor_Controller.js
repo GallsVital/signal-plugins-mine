@@ -115,7 +115,8 @@ class MSIMonitorProtocol {
 			72 : "MAG273R2",
 			65 : "MAG274QRFQD",
 			45 : "MAG272CQR",
-			52 : "MAG301CR2"
+			52 : "MAG301CR2",
+			50 : "MAG272CR"
 		};
 
 		this.modelDict = {

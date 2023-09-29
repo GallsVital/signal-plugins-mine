@@ -1637,8 +1637,8 @@ export class ModernCorsairProtocol{
 	 * @param {number[]} RGBData - RGBData to be written to the device in a RRRGGGBBB(Lighting Endpoint 0x01) or RGBRGBRGB(LightingController Endpoint 0x22) format.
 	 */
 	SendRGBData(RGBData, deviceID, ){
-		const InitialHeaderSize = 8;
-		const HeaderSize = 4;
+		const InitialHeaderSize = 9;
+		const HeaderSize = 5;
 
 		// All packets sent to the LightingController Endpoint have these 2 values added before any other data.
 		RGBData.splice(0, 0, ...[this.dataTypes.LightingController, 0x00]);
@@ -1674,7 +1674,7 @@ export class ModernCorsairProtocol{
 
 	/** @private */
 	StreamLighting(RGBData, deviceID = 0) {
-		const packet = [0x00, 0x00, deviceID, this.command.streamEndpoint, 0x00, 0x00, 0x00].concat(RGBData);
+		const packet = [0x00, 0x00, deviceID, this.command.streamEndpoint, 0x00].concat(RGBData);
 
 		device.write(packet, this.GetWriteLength());
 		device.pause(1);
