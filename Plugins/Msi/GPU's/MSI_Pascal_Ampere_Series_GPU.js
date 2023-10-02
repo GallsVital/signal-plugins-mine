@@ -315,6 +315,7 @@ class MSIGPUDeviceIDs {
 		this.MSI_RTX3060_GAMING_X_TRIO_LHR           = 0x3903;
 		this.MSI_RTX3060TI_GAMING_X_LHR              = 0x3973;
 		this.MSI_RTX3060TI_GAMING_X_TRIO_LHR         = 0x3903;
+		this.MSI_RTX3060TI_SUPER_3X					 = 0x505A;
 
 		this.MSI_RTX3060TI_GAMING_X_TRIO_LHR_GDDR6X = 0x5058;
 
@@ -399,6 +400,7 @@ class MSIGPUList {
         	new MSIGPUIdentifier(Nvidia.RTX3060TI_LHR, MSIGPUIDs.MSI_RTX3060TI_GAMING_X_LHR,        0x68, "MSI RTX 3060Ti Gaming X LHR"),
         	new MSIGPUIdentifier(Nvidia.RTX3060TI_LHR, MSIGPUIDs.MSI_RTX3060TI_GAMING_X_TRIO_LHR,   0x68, "MSI RTX 3060Ti Gaming X Trio LHR"),
         	new MSIGPUIdentifier(Nvidia.RTX3060TI_GDDR6X, MSIGPUIDs.MSI_RTX3060TI_GAMING_X_TRIO_LHR_GDDR6X,   0x68, "MSI RTX 3060Ti Gaming X Trio LHR"),
+        	new MSIGPUIdentifier(Nvidia.RTX3060TI_GDDR6X, MSIGPUIDs.MSI_RTX3060TI_SUPER_3X,         0x68, "MSI 3060Ti Super 3X"),
 
         	new MSIGPUIdentifier(Nvidia.RTX3070, MSIGPUIDs.MSI_RTX3070_GAMING_X_TRIO,         0x68, "MSI RTX 3070 Gaming X Trio"),
         	new MSIGPUIdentifier(Nvidia.RTX3070, MSIGPUIDs.MSI_RTX3070_GAMING_Z_TRIO,         0x68, "MSI RTX 3070 Gaming X Trio"),
@@ -411,7 +413,7 @@ class MSIGPUList {
         	new MSIGPUIdentifier(Nvidia.RTX3070TI, MSIGPUIDs.MSI_RTX3070TI_SUPRIM_X,            0x68, "MSI RTX 3070Ti Suprim X"),
 
         	new MSIGPUIdentifier(Nvidia.RTX3080, MSIGPUIDs.MSI_RTX3080_SUPRIM,         0x68, "MSI RTX 3080 Suprim"),
-			new MSIGPUIdentifier(Nvidia.RTX3080, MSIGPUIDs.MSI_RTX3080_GAMING_X_TRIO,         0x68, "MSI RTX 3080 Gaming X Trio"),
+        	new MSIGPUIdentifier(Nvidia.RTX3080, MSIGPUIDs.MSI_RTX3080_GAMING_X_TRIO,         0x68, "MSI RTX 3080 Gaming X Trio"),
         	new MSIGPUIdentifier(Nvidia.RTX3080_LHR, MSIGPUIDs.MSI_RTX3080_GAMING_Z_TRIO,         0x68, "MSI RTX 3080 Gaming Z Trio LHR"),
         	new MSIGPUIdentifier(Nvidia.RTX3080_GA102, MSIGPUIDs.MSI_RTX3080_GAMING_Z_TRIO,    0x68, "MSI RTX 3080 Gaming Z Trio 12g LHR"),
         	new MSIGPUIdentifier(Nvidia.RTX3080, MSIGPUIDs.MSI_RTX3080_SUPRIM_X,              0x68, "MSI RTX 3080 Suprim X"),
