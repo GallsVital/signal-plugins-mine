@@ -1465,7 +1465,7 @@ class CorsairLibrary{
 					100, 50
 				],
 				devFirmware: "0.0.0",
-				ledSpacing: 0,
+				ledSpacing: 156,
 				keymapType : "Keyboard"
 			},
 			"K100 Air": {
