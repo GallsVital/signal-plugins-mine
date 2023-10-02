@@ -20,6 +20,7 @@ export function ControllableParameters(){
 }
 
 const vLedNames = [
+	"< ISO", "# ISO", //ISO
 	"Esc", "F1", "F2", "F3", "F4", "F5", "F6", "F7", "F8", "F9", "F10", "F11", "F12",
 	"`", "1", "2", "3", "4", "5", "6", "7", "8", "9", "0", "-_", "=+", "Backspace",                        "Insert", "Home", "Page Up",
 	"Tab", "Q", "W", "E", "R", "T", "Y", "U", "I", "O", "P", "[", "]", "\\",                               "Del", "End", "Page Down",
@@ -29,6 +30,7 @@ const vLedNames = [
 ];
 
 const vLedPositions = [
+	[1, 4], [12, 3], //ISO
 	[0, 0], [1, 0], [2, 0], [3, 0], [4, 0], [5, 0], [6, 0], [7, 0], [8, 0], [9, 0], [10, 0], [11, 0], [12, 0],
 	[0, 1], [1, 1], [2, 1], [3, 1], [4, 1], [5, 1], [6, 1], [7, 1], [8, 1], [9, 1], [10, 1], [11, 1], [12, 1], [13, 1],   [14, 1], [15, 1], [16, 1],
 	[0, 2], [1, 2], [2, 2], [3, 2], [4, 2], [5, 2], [6, 2], [7, 2], [8, 2], [9, 2], [10, 2], [11, 2], [12, 2], [13, 2],   [14, 2], [15, 2], [16, 2],
@@ -38,6 +40,7 @@ const vLedPositions = [
 ];
 
 const vKeymap = [
+	100, 50, //ISO
 	41, 58, 59, 60, 61, 62, 63, 64, 65, 66, 67, 68, 69,
 	53, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 45, 46, 42,      73, 74, 75,
 	43, 20, 26, 8, 21, 23, 28, 24, 12, 18, 19, 47, 48, 49,       76, 77, 78,
@@ -75,10 +78,10 @@ function sendColorPacket(shutdown = false){
 	packet[0x01]   = 0x40;
 	packet[0x02]   = vKeymap.length;
 
-	for (var idx = 0; idx < vKeymap.length; idx++) {
+	for (let idx = 0; idx < vKeymap.length; idx++) {
 		const iPxX = vLedPositions[idx][0];
 		const iPxY = vLedPositions[idx][1];
-		var col;
+		let col;
 
 		if(shutdown){
 			col = hexToRgb(shutdownColor);
@@ -93,7 +96,7 @@ function sendColorPacket(shutdown = false){
 		blue[vKeymap[idx]] = col[2];
 	}
 
-	for(var idx = 0; idx < vKeymap.length; idx++){
+	for(let idx = 0; idx < vKeymap.length; idx++){
 		packet[(idx * 4) + 3] = vKeymap[idx];
 		packet[(idx * 4) + 4] = red[vKeymap[idx]];
 		packet[(idx * 4) + 5] = green[vKeymap[idx]];
