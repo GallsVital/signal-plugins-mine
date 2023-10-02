@@ -318,6 +318,7 @@ class GigabyteVisionDeviceIds {
 		this.RTX2060S_GAMING_OC_WHITE       = 0x3FFE;
 		this.RTX2060S_GAMING_OC_3X_8GB		= 0x4009;
 		this.RTX2070_GAMING_OC              = 0x37AD;
+		this.RTX2070_GAMING_OC_WHITE		= 0x37C6;
 		this.RTX2070_WINDFORCE              = 0x37C2;
 		this.RTX2070S_GAMING_OC             = 0x3FEB;
 		this.RTX2070S_GAMING_OC_V2          = 0x3FF6;
@@ -418,6 +419,7 @@ class GigabyteVisionGPuList {
 			new GigabyteVisionIdentifier(Nvidia.GTX1660S,       GigabyteVisionIds.GTX1660S_GAMING_OC,            0x47, "GIGABYTE 1660 Super Gaming OC"),
 			new GigabyteVisionIdentifier(Nvidia.RTX2060S_OC,    GigabyteVisionIds.RTX2060S_GAMING_OC_3X_WHITE,   0x47, "GIGABYTE 2060 Super Gaming OC Windforce White"),
 			new GigabyteVisionIdentifier(Nvidia.RTX2070_OC,     GigabyteVisionIds.RTX2070_GAMING_OC,             0x47, "GIGABYTE 2070 Gaming OC"),
+			new GigabyteVisionIdentifier(Nvidia.RTX2070_OC,     GigabyteVisionIds.RTX2070_GAMING_OC_WHITE,		 0x47, "GIGABYTE 2070 Gaming OC White"),
 			new GigabyteVisionIdentifier(Nvidia.RTX2070S,       GigabyteVisionIds.RTX2070S_GAMING_OC,            0x47, "GIGABYTE 2070 Super Gaming OC"),
 			new GigabyteVisionIdentifier(Nvidia.RTX2070S,       GigabyteVisionIds.RTX2070S_GAMING_OC_V2,         0x47, "GIGABYTE 2070 Super Gaming OC V2"),
 			new GigabyteVisionIdentifier(Nvidia.RTX2070S,       GigabyteVisionIds.RTX2070S_GAMING_OC_3X,         0x47, "GIGABYTE 2070 Super Gaming OC 3x"),
