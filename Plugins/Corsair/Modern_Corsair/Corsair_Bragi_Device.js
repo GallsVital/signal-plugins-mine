@@ -1464,7 +1464,7 @@ class CorsairLibrary{
 					136, 105, 108, 107, 44, 111, 112, 101, 109, 80, 81, 79, 98, 99,
 					100, 50
 				],
-				devFirmware: "0.0.0",
+				devFirmware: "4.22.30",
 				ledSpacing: 156,
 				keymapType : "Keyboard"
 			},
