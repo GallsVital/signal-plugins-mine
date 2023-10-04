@@ -403,7 +403,7 @@ export class deviceLibrary {
 			0x1A59: "ROG Keris",
 			0x1846: "Pugio I",
 			0x1906: "Pugio II",
-			0x181C: "Spatha", // Still on development
+			//0x181C: "Spatha", // Flash based according to captures
 			0x1979: "Spatha X Wireless",
 			0x1977: "Spatha X Wireless"
 		};
