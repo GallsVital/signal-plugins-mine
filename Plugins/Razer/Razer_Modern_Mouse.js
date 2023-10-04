@@ -2685,3 +2685,7 @@ class BinaryUtils {
 export function Validate(endpoint) {
 	return endpoint.interface === 0 && endpoint.usage === 0x0002 || endpoint.interface === 1 && endpoint.usage === 0x0000 || endpoint.interface === 3;
 }
+
+export function ImageUrl() {
+	return "https://marketplace.signalrgb.com/devices/default/misc/usb-drive-render.png";
+}
