@@ -402,6 +402,6 @@ export function Validate(endpoint) {
 	return endpoint.interface === 1;
 }
 
-//export function Image() {
-//	return "";
-//}
+export function ImageUrl() {
+	return "https://marketplace.signalrgb.com/devices/brands/lian-li/lighting-controllers/strimmer-controller.png";
+}
