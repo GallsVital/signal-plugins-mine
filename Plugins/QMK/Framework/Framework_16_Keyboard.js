@@ -314,3 +314,7 @@ function hexToRgb(hex) {
 export function Validate(endpoint) {
 	return endpoint.interface === 1;
 }
+
+export function ImageUrl(){
+	return "https://marketplace.signalrgb.com/devices/default/misc/laptop-render.png";
+}
