@@ -2187,3 +2187,7 @@ class StateSetFanSpeeds extends State{
 		this.controller.Shift();
 	};
 };
+
+export function ImageUrl() {
+	return "https://marketplace.signalrgb.com/devices/default/misc/usb-drive-render.png";
+}
