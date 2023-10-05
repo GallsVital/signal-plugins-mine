@@ -91,6 +91,11 @@ function CheckAllPotentialAddresses(bus){
 }
 
 function GigabyteVisionGpuCheck(bus, address, log = false){
+
+	if (bus.Product() === 0x2486 && bus.SubDevice() === 0x405E) {
+		return true;
+	}
+
 	const ValidReturnCodes = [0x10, 0x11, 0x12, 0x14];
 	// 0x62 (Gaming OC) cards use a 8 byte write length.
 	// GPU will softlock if this is wrong.
