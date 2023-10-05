@@ -1,6 +1,6 @@
 export function Name() { return "Corsair Dark Core RGB Pro SE Wireless Mode"; }
 export function VendorId() { return 0x1b1c; }
-export function ProductId() { return  [0x1B7F]; }
+export function ProductId() { return  [0x1BA6, 0x1B7F]; }
 export function Publisher() { return "WhirlwindFX"; }
 export function Documentation(){ return "troubleshooting/corsair"; }
 export function Size() { return [7, 7]; }
