@@ -22,9 +22,6 @@ export function ControllableParameters() {
 }
 export function Documentation(){ return "troubleshooting/corsair"; }
 
-let savedPollTimer = Date.now();
-const PollModeInternal = 15000;
-
 const LayoutDict =
 {
 	"ANSI":   [ 63, 65, 66, 70, 71, 81, 83, 85, 96, 111, 120, 121, 122, 123, 124, 125, 126, 127, 128, 129 ], //70 + 71 are profile and brightness 96 is lock.
@@ -45,7 +42,8 @@ export function Initialize() {
 
 	LegacyCorsair.deviceInitialization();
 
-	LegacyCorsair.configureDevice(); //Remove wireless checks as afaik there's no wireless NXP keebs.
+	this.setLightingControlMode(this.modes.SoftwareMode);
+	this.setSpecialFunctionControlMode(this.modes.SoftwareMode);
 
 	//set key codes to get the keys working again, unless you wanna assign them all in software. Pls don't. I beg of you.
 	InitScanCodes();
@@ -54,12 +52,7 @@ export function Initialize() {
 export function Render() {
 	readInputs();
 
-	if(!LegacyCorsair.getWakeStatus()) {
-		return;
-	}
-
 	sendColors();
-	getDeviceBatteryStatus();
 }
 
 export function Shutdown() {
@@ -71,32 +64,7 @@ export function onlayoutChanged() {
 	InitScanCodes();
 }
 
-function getDeviceBatteryStatus() {
-	if (Date.now() - savedPollTimer < PollModeInternal) {
-		return;
-	}
-
-	savedPollTimer = Date.now();
-
-	if (LegacyCorsair.getWirelessDevice()) {
-		const [batteryLevel, batteryStatus] = LegacyCorsair.getBatteryLevel();
-
-		battery.setBatteryState(batteryStatus);
-		battery.setBatteryLevel(batteryLevel);
-	}
-}
-
 function readInputs() {
-	if(LegacyCorsair.getWirelessDevice()) { //also future me could use this to detect if we have a dongle or not?
-		device.set_endpoint(0, 0x0002, 0xffc3); //Device Wake Endpoint. WHY DO WE NEED 3 ENDPOINTS
-
-		do {
-			const packet = device.read([0x00], 64, 0);
-			processInputs(packet);
-		}
-		while(device.getLastReadSize() > 0);
-	}
-
 	device.set_endpoint(0, 0x0002, 0xffc0); // Macro input endpoint
 
 	do {
@@ -109,10 +77,6 @@ function readInputs() {
 
 function processInputs(packet) {
 	device.set_endpoint(1, 0x0004, 0xffc2);
-
-	if(packet[0] === 0x04) {
-		LegacyCorsair.checkWakeStatus();
-	}
 
 	if(packet[0] === 0x03) {
     	macroInputArray.update(packet.slice(1, 19)); //needs resized to like 10
@@ -224,7 +188,7 @@ class LegacyCorsairLibrary {
 			0x1B33 : "K70 MKII", //Lux
 			0x1B13 : "K70 MKII", //OG K70
 			0x1B11 : "K95 RGB",
-			//0x1B2D : "K95 Plat"
+			0x1B2D : "K95 Plat"
 		};
 		this.deviceNameLibrary = {
 			0x1b49 : "K70 MKII",
@@ -235,7 +199,7 @@ class LegacyCorsairLibrary {
 			0x1B33 : "K70 Lux", //Lux
 			0x1B13 : "K70", //OG K70
 			0x1B11 : "K95 RGB",
-			//0x1B2D : "K95 Platinum"
+			0x1B2D : "K95 Platinum"
 		};
 		this.DeviceLibrary = {
 			"K70 MKII" : {
@@ -624,12 +588,6 @@ class LegacyCorsairProtocol {
 
 	setDeviceType(deviceType) { this.Config.deviceType = this.DeviceTypes[deviceType]; }
 
-	getWirelessDevice() { return this.Config.wirelessDevice; }
-	setWirelessDevice(wireless) { this.Config.wirelessDevice = wireless; }
-
-	getWakeStatus() { return this.Config.deviceAwake; }
-	setWakeStatus(wakeStatus) { this.Config.deviceAwake = wakeStatus; }
-
 	getvKeys() { return this.Config.vKeys; }
 	setvKeys(vKeys) { this.Config.vKeys = vKeys; }
 	getvKeyNames() { return this.Config.vKeyNames; }
@@ -639,10 +597,6 @@ class LegacyCorsairProtocol {
 
 	setDeviceInfo() {
 		const config = deviceLibrary.getDeviceByProductId(device.productId());
-
-		if(config.wireless) {
-			this.setWirelessDevice(true);
-		}
 
 		this.setvKeys(config.vKeys);
 		this.setvKeyNames(config.vLedNames);
@@ -675,24 +629,6 @@ class LegacyCorsairProtocol {
 		const packet = [0x00, this.stream];
 		packet.push(...data);
 		device.write(packet, 65);
-	}
-	wirelessDeviceSetup() { //good way to make sure users pair the right device to the right receiver
-		const wirelessFirmwarePacket = this.getCommand([0xae]);
-
-		device.log("Full Wireless Info Packet: " + wirelessFirmwarePacket);
-
-		const VendorID = wirelessFirmwarePacket[2].toString(16) + wirelessFirmwarePacket[1].toString(16);
-		device.log("Wireless Device Vendor ID: " + VendorID);
-
-		const ProductID = wirelessFirmwarePacket[4].toString(16) + wirelessFirmwarePacket[3].toString(16);
-		device.log("Wireless Device Product ID: " + ProductID);
-
-		const unknownWirelessPacket = this.getCommand([0x4a]);
-		device.addFeature("battery");
-
-		this.setCommand([0xAD, 0x00, 0x00, 0x64]); //Crank the brightness
-
-		getDeviceBatteryStatus();
 	}
 	/* eslint-disable complexity */
 	/** Grab Relevant Information off of the Device.*/
@@ -764,34 +700,6 @@ class LegacyCorsairProtocol {
 		return [firmwareVersion, bootloaderVersion, VendorID, ProductID, pollingRate, deviceType, layout];
 	}
 	/* eslint-enable complexity */
-	/** Grab Battery Level off of the Device.*/
-	getBatteryLevel() {
-		const batteryPacket = this.getCommand([0x50]);
-		const batteryLevel = this.batteryDict[batteryPacket[1]];
-		const batteryStatus = batteryPacket[2];
-
-		if(batteryLevel !== 0) {
-			device.log("Battery Level: " + batteryLevel + "%");
-
-			return [batteryLevel, batteryStatus];
-		}
-
-		device.log("Error Fetching Battery Level");
-
-		return [-1, -1];
-	}
-	/** Check if a device is awake using the battery level as a gauge. Does not forward battery percentage to Signal's UI.*/
-	checkWakeStatus() {
-		const wakeStatus = this.getBatteryLevel();
-
-		if(wakeStatus[0] !== undefined) {
-			this.setWakeStatus(true);
-			this.configureDevice();
-		} else {
-			this.setWakeStatus(false);
-			device.log("Device is taking a nap.");
-		}
-	}
 	/** Initialize the Device and Check That it is Connected and Awake. */
 	deviceInitialization() {
 
@@ -807,28 +715,15 @@ class LegacyCorsairProtocol {
 			}
 		}
 
-	   while(DeviceInformation[0] === -1 && attempts < 5);
+	    while(DeviceInformation[0] === -1 && attempts < 5);
 
-	   this.setDeviceInfo();
+	    this.setDeviceInfo();
 
-	   	this.setKeyboardLayout(DeviceInformation[6]);
+		this.setKeyboardLayout(DeviceInformation[6]);
 		this.setDeviceType(DeviceInformation[5]);
-
-		this.setWakeStatus(true); //Wired devices will never have a wake status
-
 
 		device.addFeature("keyboard");
 		macroInputArray.setCallback(macroInputHandler);
-	}
-	/** Configure the device based on the dictionary and data gathered in Device Initialization. */
-	configureDevice() {
-		device.log("Device Requires Config as it has woken from sleep or has been rebooted");
-		this.setLightingControlMode(this.modes.SoftwareMode);
-		this.setSpecialFunctionControlMode(this.modes.SoftwareMode);
-
-		if(this.getWirelessDevice()) {
-			//this.wirelessDeviceSetup();
-		}
 	}
 	/** Set Device to Function Control Mode.*/
 	setSpecialFunctionControlMode(mode) {
@@ -987,8 +882,7 @@ const macroInputArray = new BitArray(18);
 
 export function Validate(endpoint) {
 	return (endpoint.interface === 1 && endpoint.usage === 0x0004 && endpoint.usage_page === 0xffc2)  //Normal Endpoint
-	    || (endpoint.interface === 0 && endpoint.usage === 0x0002 && endpoint.usage_page === 0xffc0) //Macro Endpoint
-		|| (endpoint.interface === 0 && endpoint.usage === 0x0002 && endpoint.usage_page === 0xffc3);//Wake endpoint
+	    || (endpoint.interface === 0 && endpoint.usage === 0x0002 && endpoint.usage_page === 0xffc0); //Macro Endpoint
 }
 
 
