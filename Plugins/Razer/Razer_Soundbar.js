@@ -191,8 +191,8 @@ export class RAZER_Soundbar_Protocol {
 		let devicesFound = 0;
 		let loops = 0;
 
-		if(this.getDeviceProductId() === 0x054A) {
-			return;  // This breaks on V2 X
+		if([0x0532, 0x054A].includes(this.getDeviceProductId())) {
+			return;  // This breaks on V2 and X
 		}
 
 		console.log("Starting to search Transaction ID...");
@@ -307,7 +307,7 @@ export class deviceLibrary {
 				vLedPositions: [
 					[0, 0], [1, 0], [2, 0], [3, 0], [4, 0], [5, 0], [6, 0], [7, 0], [8, 0], [9, 0], [10, 0], [11, 0], [12, 0], [13, 0], [14, 0], [15, 0], [16, 0], [17, 0]
 				],
-				Endpoint : { "interface": 2, "usage": 0x0001, "usage_page": 0xFF00, "collection": 0x0000 },
+				Endpoint : { "interface": 2, "usage": 0x0001, "usage_page": 0x000C, "collection": 0x0000 },
 				Zones : 2,
 				PacketHeaders: [0x08, 0x20, 0x08],
 				PacketLEDs: 9,
