@@ -166,6 +166,7 @@ const PNYGPUIDs =
 	new PNYGPUIdentifier(0x10B0, 0x2482, 0x2482, "Gainward 3070TI Phoenix"),
 	new PNYGPUIdentifier(0x10B0, 0x2782, 0xF299, "Gainward 4070Ti Phoenix GS"),
 	new PNYGPUIdentifier(0x10B0, 0x2704, 0xF299, "Gainward 4080 Phoenix GS"),
+	new PNYGPUIdentifier(0x10B0, 0x2684, 0xf297, "Gainward 4090 Phantom GS"),
 
 ];
 
