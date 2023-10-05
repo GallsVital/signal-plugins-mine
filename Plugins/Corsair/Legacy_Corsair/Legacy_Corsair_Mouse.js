@@ -309,7 +309,7 @@ export class LegacyCorsairLibrary {
 			"Glaive Pro" : {
 				vLedNames : [ "Logo Zone", "Light Edge Zone", "Front Zone" ],
 				vLedPositions : [ [1, 2], [1, 0], [1, 1] ],
-				vKeys : [ 2, 6, 1 ],
+				vKeys : [ 0, 1, 2 ],
 				size : [3, 3],
 				maxDPI : 12400
 			},
