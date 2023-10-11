@@ -42,8 +42,8 @@ export function Initialize() {
 
 	LegacyCorsair.deviceInitialization();
 
-	this.setLightingControlMode(this.modes.SoftwareMode);
-	this.setSpecialFunctionControlMode(this.modes.SoftwareMode);
+	LegacyCorsair.setLightingControlMode(LegacyCorsair.modes.SoftwareMode);
+	LegacyCorsair.setSpecialFunctionControlMode(LegacyCorsair.modes.SoftwareMode);
 
 	//set key codes to get the keys working again, unless you wanna assign them all in software. Pls don't. I beg of you.
 	InitScanCodes();
