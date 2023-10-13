@@ -489,7 +489,7 @@ class GigabyteMasterProtocol {
 						Mapping :	[ 0, 1, 2, 3, 4, 5, 6, 7 ]
 					},
 					3: {
-						Names :		[ "Side Logo LED", "Side Logo LED", "Unknown LED", "Side Logo LED" ],
+						Names :		[ "Side Logo LED 1", "Side Logo LED 2", "Unknown LED", "Back Logo LED" ],
 						Positions : [ [11, 0], [11, 0], [11, 0], [11, 0] ],
 						Mapping :	[ 0, 1, 2, 3 ]
 					}
