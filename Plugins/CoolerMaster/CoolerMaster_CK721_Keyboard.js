@@ -1,6 +1,6 @@
 export function Name() { return "CoolerMaster CK721"; }
 export function VendorId() { return 0x2516; }
-export function ProductId() { return [0x016D, 0x01C3]; }
+export function ProductId() { return 0x016D; } // 0x01C3 Wireless
 export function Publisher() { return "WhirlwindFX"; }
 export function Documentation(){ return "troubleshooting/coolermaster"; }
 export function Size() { return [15, 5]; }
@@ -53,8 +53,8 @@ export function LedPositions() {
 }
 
 export function Initialize() {
-	device.write([0x00, 0x80, 0x01, 0x01, 0x02, 0x02], 65); //SW Mode?
-	//device.write([0x00, 0x41, 0x02, 0x00, 0x00, 0x00], 65);
+	device.write([0x00, 0x80, 0x01, 0x01, 0x02, 0x02], 65); //Software mode
+	device.write([0x00, 0x01, 0x81, 0xC8, 0x00, 0x01, 0x00, 0x12], 65); //CPU Effect mode
 }
 
 export function Render() {
@@ -108,18 +108,7 @@ function hexToRgb(hex) {
 }
 
 export function Validate(endpoint) {
-	if(device.productId() === 0x01C3){
-		return endpoint.interface === 4 && endpoint.usage === 0x0001 && endpoint.usage_page === 0xff0a && endpoint.collection === 0x0002;
-		//return endpoint.interface === 3 && endpoint.usage === 0x0001 && endpoint.usage_page === 0xff0a && endpoint.collection === 0x0000
-		//return endpoint.interface === 4 && endpoint.usage === 0x0001 && endpoint.usage_page === 0xff0a && endpoint.collection === 0x0003
-		//return endpoint.interface === 2 && endpoint.usage === 0x0001 && endpoint.usage_page === 0x000c && endpoint.collection === 0x0001
-		//return endpoint.interface === 2 && endpoint.usage === 0x0080 && endpoint.usage_page === 0x0001 && endpoint.collection === 0x0002
-		//return endpoint.interface === 0 && endpoint.usage === 0x0006 && endpoint.usage_page === 0x0001 && endpoint.collection === 0x0000
-		//return endpoint.interface === 1 && endpoint.usage === 0x0002 && endpoint.usage_page === 0x0001 && endpoint.collection === 0x0000
-		//return endpoint.interface === 4 && endpoint.usage === 0x0001 && endpoint.usage_page === 0xff0a && endpoint.collection === 0x0001
-	}
-
-	return endpoint.interface === 3 && endpoint.usage === 0x0002 && endpoint.usage_page === 0xff00 && endpoint.collection === 0x0000; // Wired
+	return endpoint.interface === 3 && endpoint.usage === 0x0002 && endpoint.usage_page === 0xff00 && endpoint.collection === 0x0000;
 }
 
 export function ImageUrl(){
