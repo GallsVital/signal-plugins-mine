@@ -1643,3 +1643,7 @@ class BinaryUtils {
 export function Validate(endpoint) {
 	return endpoint.interface === 0 || endpoint.interface === 1 || endpoint.interface === 2 || endpoint.interface === 3 || endpoint.interface === 4;
 }
+
+export function ImageUrl() {
+	return "https://marketplace.signalrgb.com/devices/brands/razer/keyboards/blackwidow-v4-pro.png";
+}
