@@ -773,6 +773,7 @@ class GigabyteMasterGPuList {
 			new GigabyteMasterIdentifier(Nvidia.RTX3060TI_LHR,  GigabyteMasterIds.RTX3060TI_ELITE_REV2,				0x70, "GIGABYTE 3060TI AORUS Elite REV2 LHR"),
 			new GigabyteMasterIdentifier(Nvidia.RTX3060TI,		GigabyteMasterIds.RTX3060_MASTER_O08G,       		0x66, "GIGABYTE 3060TI AORUS Master 8GB"),
 			new GigabyteMasterIdentifier(Nvidia.RTX3060_GA104,  GigabyteMasterIds.RTX3060_GAMING_OC_12GB,        	0x32, "GIGABYTE 3060 Gaming OC"),
+			new GigabyteMasterIdentifier(Nvidia.RTX3060_LHR,    GigabyteMasterIds.RTX3060_GAMING_OC_12GB,        	0x32, "GIGABYTE 3060 Gaming OC LHR"),
 			new GigabyteMasterIdentifier(Nvidia.RTX3060_LHR,    GigabyteMasterIds.RTX3060_GAMING_OC_12GB,        	0x62, "GIGABYTE 3060 Gaming OC LHR"),
 			new GigabyteMasterIdentifier(Nvidia.RTX3070,        GigabyteMasterIds.RTX3070_MASTER,         			0x66, "GIGABYTE 3070 AORUS Master 8GB"),
 			new GigabyteMasterIdentifier(Nvidia.RTX3070_LHR,	GigabyteMasterIds.RTX3070_MASTER,					0x66, "GIGABYTE 3070 AORUS Master 8GB LHR"),
