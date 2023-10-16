@@ -403,5 +403,5 @@ export function Validate(endpoint) {
 }
 
 export function ImageUrl() {
-	return "https://marketplace.signalrgb.com/devices/brands/lian-li/lighting-controllers/strimmer-controller.png";
+	return "https://marketplace.signalrgb.com/devices/brands/lian-li/fan-controllers/strimmer-controller.png";
 }

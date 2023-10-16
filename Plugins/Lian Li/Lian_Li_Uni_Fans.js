@@ -381,5 +381,5 @@ function sendCommit(){
 
 
 export function ImageUrl() {
-	return "https://marketplace.signalrgb.com/devices/brands/lian-li/lighting-controllers/uni-hub-controller.png";
+	return "https://marketplace.signalrgb.com/devices/brands/lian-li/fan-controllers/uni-hub-controller.png";
 }
