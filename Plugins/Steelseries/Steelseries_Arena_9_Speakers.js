@@ -123,6 +123,6 @@ export function Validate(endpoint) {
 	return endpoint.interface === 4 && endpoint.usage_page === 0xffc0;
 }
 
-export function Image() {
-	return "";
+export function ImageUrl() {
+	return "https://marketplace.signalrgb.com/devices/default/audio/speaker-render.png";
 }

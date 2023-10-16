@@ -3283,3 +3283,7 @@ class PolledFunction{
 		this.lastPollTime = Date.now();
 	}
 }
+
+export function ImageUrl() {
+	return "https://marketplace.signalrgb.com/devices/default/keyboards/full-size-keyboard-render.png";
+}
