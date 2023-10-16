@@ -467,6 +467,34 @@ class GigabyteMasterProtocol {
 						Mapping :	[ 0 ]}
 				}
 			},
+			0x3FF6 :// 2070S Gaming OC V2
+			{
+				Size: [15, 9],
+				modeZones : [2, 3, 5, 6],
+				Zones:
+				{
+					0: {
+						Names :		[ "Fan 1 LED 1", "Fan 1 LED 2", "Fan 1 LED 3", "Fan 1 LED 4", "Fan 1 LED 5", "Fan 1 LED 6", "Fan 1 LED 7", "Fan 1 LED 8",],
+					 	Positions : [ [0, 5], [1, 4], [2, 3], [3, 4], [4, 5], [3, 6], [2, 7], [1, 8], ],
+						Mapping :	[ 0, 1, 2, 3, 4, 5, 6, 7 ]}
+					,
+					1: {
+						Names :		[ "Fan 2 LED 1", "Fan 2 LED 2", "Fan 2 LED 3", "Fan 2 LED 4", "Fan 2 LED 5", "Fan 2 LED 6", "Fan 2 LED 7", "Fan 2 LED 8",],
+						Positions : [ [5, 5], [6, 4], [7, 3], [8, 4], [9, 5], [8, 6], [7, 7], [6, 8], ],
+						Mapping :	[ 0, 1, 2, 3, 4, 5, 6, 7 ]
+					},
+					2: {
+						Names :		[ "Fan 3 LED 1", "Fan 3 LED 2", "Fan 3 LED 3", "Fan 3 LED 4", "Fan 3 LED 5", "Fan 3 LED 6", "Fan 3 LED 7", "Fan 3 LED 8",],
+						Positions : [ [10, 5], [11, 4], [12, 3], [13, 4], [14, 5], [13, 6], [12, 7], [11, 8], ],
+						Mapping :	[ 0, 1, 2, 3, 4, 5, 6, 7 ]
+					},
+					3: {
+						Names :		[ "Side Logo LED 1", "Side Logo LED 2", "Unknown LED", "Back Logo LED" ],
+						Positions : [ [11, 0], [11, 0], [11, 0], [11, 0] ],
+						Mapping :	[ 0, 1, 2, 3 ]
+					}
+				}
+			},
 			0x3FF7 :// : 0x0001
 			{
 				Size: [15, 9],
@@ -666,6 +694,7 @@ class GigabyteMasterDeviceIds {
 
 		this.RTX2060S_AORUS_OC               = 0x3FF7;
 		this.RTX2060S_AORUS_P                = 0x3FF8;
+		this.RTX2070S_GAMING_OC_V2			 = 0x3FF6;
 		this.RTX2080_AORUS					 = 0x37B3;
 		this.RTX2080S_AORUS                  = 0x3FF3;
 		this.RTX2080S_AORUS_P                = 0x3FF4;
@@ -727,6 +756,7 @@ class GigabyteMasterGPuList {
 			new GigabyteMasterIdentifier(Nvidia.RTX2060S,       GigabyteMasterIds.RTX2060S_AORUS_P,         		0x50, "GIGABYTE 2060 Super AORUS"),
 			new GigabyteMasterIdentifier(Nvidia.RTX2060S_OC,    GigabyteMasterIds.RTX2060S_AORUS_OC,         		0x50, "GIGABYTE 2060 Super AORUS OC"),
 			new GigabyteMasterIdentifier(Nvidia.RTX2060S_OC,	GigabyteMasterIds.RTX2060S_AORUS_P,         		0x50, "GIGABYTE 2060 Super AORUS OC"),
+			new GigabyteMasterIdentifier(Nvidia.RTX2070S,		GigabyteMasterIds.RTX2070S_GAMING_OC_V2,			0x50, "GIGABYTE 2070 Super Gaming OC V2"),
 			new GigabyteMasterIdentifier(Nvidia.RTX2080_A,		GigabyteMasterIds.RTX2080_AORUS,					0x50, "GIGABYTE 2080 AORUS"),
 			new GigabyteMasterIdentifier(Nvidia.RTX2080_A,		GigabyteMasterIds.RTX2080S_AORUS,					0x50, "GIGABYTE 2080 Super AORUS"),
 			new GigabyteMasterIdentifier(Nvidia.RTX2080_A, 		GigabyteMasterIds.RTX2080_EXTREME,					0x50, "GIGABYTE 2080 Extreme"),
