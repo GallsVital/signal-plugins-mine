@@ -257,10 +257,12 @@ function addChildDevice(childDevice, uniqueId, deviceNumber) {
 
 	if(childDevice.deviceType === 7) {//if it starts with 02 and ends with 6103 then it's a cooler.
 		if(childDevice.IDString.includes("02") && childDevice.IDString.includes("03")) {
+			device.log(`Adding Child Cooler ${childDevice.IDString}`);
 			deviceConfig = CorsairLibrary.GetDeviceByCorsairLinkCoolerId(childDevice.coolerType);
 		}
 	} else if(childDevice.deviceType === 1) { //If it starts with 0100 and then has 2035 in it, presume QX fan.
 		if(childDevice.IDString.includes("0100") && childDevice.IDString.includes("2035")) {
+			device.log(`Adding Child QX Fan ${childDevice.IDString}`);
 			deviceConfig = CorsairLibrary.GetDeviceByCorsairLinkId("01000EAA520353FF2A"); //I find it fitting to use my model as the master
 		}
 	}
@@ -438,7 +440,8 @@ class CorsairLibrary{
 			"0" : "H100I Link",
 			"1" : "H115I Link", //This one is assumed btw. Considering mine was 0, and then we had 2 and 3.
 			"2" : "H150I Link",
-			"3" : "H170I Link"
+			"3" : "H170I Link",
+			"5" : "H150I Link" //mmmm, why is this like this
 		});
 	}
 
