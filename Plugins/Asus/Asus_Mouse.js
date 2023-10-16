@@ -387,6 +387,7 @@ export class deviceLibrary {
 			0x1845: "Gladius II Origin",
 			0x189E: "Gladius II Wired",
 			0x18A0: "Gladius II Wireless",
+			0x197B: "Gladius III", //WIP
 			0x197D: "Gladius III Wireless", // Wired mode
 			0x197F: "Gladius III Wireless",
 			0x1A72: "Gladius III Aimpoint",
@@ -402,7 +403,7 @@ export class deviceLibrary {
 			0x1A59: "ROG Keris",
 			0x1846: "Pugio I",
 			0x1906: "Pugio II",
-			0x181C: "Spatha", // Still on development
+			//0x181C: "Spatha", // Flash based according to captures
 			0x1979: "Spatha X Wireless",
 			0x1977: "Spatha X Wireless"
 		};
@@ -479,6 +480,17 @@ export class deviceLibrary {
 				battery: true,
 				Endpoint : { "interface": 2, "usage": 0x0001, "usage_page": 0xFF01, "collection": 0x0000 },
 				Protocol: "Legacy",
+				DPISupport: true
+			},
+			"Gladius III":
+			{
+				size: [3, 3],
+				vLedNames: ["Scroll Wheel", "Logo", "Side Zone 1"],
+				vLedPositions: [[1, 2], [1, 0], [0, 0]],
+				maxDPI: 19000,
+				battery: true,
+				Endpoint : { "interface": 0, "usage": 0x0001, "usage_page": 0xFF01, "collection": 0x0000 },
+				Protocol: "Modern",
 				DPISupport: true
 			},
 			"Gladius III Wireless":

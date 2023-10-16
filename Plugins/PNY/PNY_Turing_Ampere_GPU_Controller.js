@@ -138,6 +138,7 @@ export function BrandGPUList(){ return PNYGPUIDs; }
 const PNYGPUIDs =
 [
 	new PNYGPUIdentifier(0x196E, 0x2484, 0x136E, "PNY 3070 XLR8"),
+	new PNYGPUIdentifier(0x196E, 0x2488, 0x138A, "PNY 3070 XLR8"),
 	new PNYGPUIdentifier(0x196E, 0x2482, 0x138C, "PNY 3070TI XLR8"),
 	new PNYGPUIdentifier(0x196E, 0x2216, 0x138B, "PNY 3080 XLR8"),
 	new PNYGPUIdentifier(0x196E, 0x2208, 0x1385, "PNY 3080TI Revel"),
@@ -166,6 +167,7 @@ const PNYGPUIDs =
 	new PNYGPUIdentifier(0x10B0, 0x2482, 0x2482, "Gainward 3070TI Phoenix"),
 	new PNYGPUIdentifier(0x10B0, 0x2782, 0xF299, "Gainward 4070Ti Phoenix GS"),
 	new PNYGPUIdentifier(0x10B0, 0x2704, 0xF299, "Gainward 4080 Phoenix GS"),
+	new PNYGPUIdentifier(0x10B0, 0x2684, 0xf297, "Gainward 4090 Phantom GS"),
 
 ];
 

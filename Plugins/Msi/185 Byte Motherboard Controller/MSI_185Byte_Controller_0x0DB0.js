@@ -114,6 +114,18 @@ class MysticLight {
 				ForceZoneBased	  : false,
 				JARGB_V2		  : true,
 			},
+			0xE777 : //Z790 Godlike
+			{
+				OnboardLEDs    : 0,
+				RGBHeaders     : 2,
+				ARGBHeaders    : 2,
+				JPipeLEDs	   : 0,
+				CorsairHeaders : 0,
+				//PERLED
+				PerLEDOnboardLEDs : 0,
+				ForceZoneBased	  : false,
+				JARGB_V2		  : true,
+			},
 		};
 
 		this.OffsetDict =
