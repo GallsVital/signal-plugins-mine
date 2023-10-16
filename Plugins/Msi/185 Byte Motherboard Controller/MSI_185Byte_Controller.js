@@ -1118,6 +1118,18 @@ class MysticLight {
 				ForceZoneBased	  : false,
 				JARGB_V2		  : true,
 			},
+			0x7D85 : //Z790 Godlike
+			{
+				OnboardLEDs    : 0,
+				RGBHeaders     : 1,
+				ARGBHeaders    : 3,
+				JPipeLEDs	   : 0,
+				CorsairHeaders : 0,
+				//PERLED
+				PerLEDOnboardLEDs : 12,
+				ForceZoneBase	  : false,
+				JARGB_V2		  : true,
+			},
 			0x7D86 : //Z790 Ace
 			{
 				OnboardLEDs    : 7,
