@@ -112,5 +112,5 @@ export function Validate(endpoint) {
 }
 
 export function ImageUrl(){
-	return "https://marketplace.signalrgb.com/devices/brands/coolermaster/lighting-controllers/led-controller-gen2.png";
+	return "https://marketplace.signalrgb.com/devices/brands/acer/cases/predator-orion-9000.png";
 }
