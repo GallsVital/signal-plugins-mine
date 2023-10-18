@@ -6,7 +6,6 @@ export function Documentation(){ return "troubleshooting/royuan"; }
 export function Size() { return [1, 1]; }
 export function DefaultPosition(){return [0, 0];}
 export function DefaultScale(){return 1.0;}
-export function ConflictingProcesses() { return ["example.exe"]; }
 /* global
 shutdownColor:readonly
 LightingMode:readonly
