@@ -42,12 +42,19 @@ export function Render() {
 	sendLogo();
 }
 
-export function Shutdown() {
-	sendColors(true);
-	sendLogo(true);
+export function Shutdown(SystemSuspending) {
+
+	if(SystemSuspending){
+		sendColors("#000000"); // Go Dark on System Sleep/Shutdown
+		sendLogo("#000000");
+	}else{
+		sendColors(shutdownColor);
+		sendLogo(shutdownColor);
+	}
+
 }
 
-function sendColors(shutdown = false) {
+function sendColors(overrideColor) {
 	const packet = [];
 
 	// Header.
@@ -67,8 +74,8 @@ function sendColors(shutdown = false) {
 		const iPxY = vLedPositions[iIdx][1];
 		let col;
 
-		if(shutdown) {
-			col = hexToRgb(shutdownColor);
+		if(overrideColor) {
+			col = hexToRgb(overrideColor);
 		} else if (LightingMode === "Forced") {
 			col = hexToRgb(forcedColor);
 		} else {
@@ -86,7 +93,7 @@ function sendColors(shutdown = false) {
 
 }
 
-function sendLogo(shutdown = false) {
+function sendLogo(overrideColor) {
 	const packet = [];
 
 	// Header.
@@ -105,8 +112,8 @@ function sendLogo(shutdown = false) {
 	const iPxY = vLedPositions[9][1];
 	let col;
 
-	if(shutdown) {
-		col = hexToRgb(shutdownColor);
+	if(overrideColor) {
+		col = hexToRgb(overrideColor);
 	} else if (LightingMode === "Forced") {
 		col = hexToRgb(forcedColor);
 	} else {
@@ -132,5 +139,5 @@ function hexToRgb(hex) {
 }
 
 export function ImageUrl(){
-	return "https://marketplace.signalrgb.com/devices/brands/nzxt/aio/kraken-x72-aio.png";
+	return "https://marketplace.signalrgb.com/devices/brands/nzxt/aio/kraken-x72.png";
 }

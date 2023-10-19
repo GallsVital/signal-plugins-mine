@@ -4,7 +4,7 @@ export function VendorId() { return 0x5453; }
 export function ProductId() { return 0x0067; }
 export function Publisher() { return "WhirlwindFX"; }
 export function Documentation(){ return "qmk/srgbmods-qmk-firmware"; }
-export function Size() { return [21, 6]; }
+export function Size() { return [15, 5]; }
 export function DefaultPosition(){return [10, 100]; }
 export function DefaultScale(){return 8.0;}
 /* global
@@ -34,9 +34,9 @@ const vKeys =
  	52, 51, 50,         49, 48,     47, 46, 45, 44, 43,  42,
 	// Bottom Underglow
 	89, 90, 91, 92, 93, 94, 95, 96, 97, 98, 99, 100, 101, 69, 70,
-	88, 													71,
-	87, 													72,
-	86, 85, 84, 83, 82, 81, 80, 79, 78, 77, 76,	75, 74, 73,
+	 88, 													71,
+	 87, 													72,
+	 86, 85, 84, 83, 82, 81, 80, 79, 78, 77, 76,	75, 74, 73,
 
 ];
 
@@ -62,10 +62,10 @@ const vKeyPositions =
 	[0, 4], [1, 4], [2, 4], 				[5, 4], [6, 4],		            [9, 4], [10, 4], [11, 4], [12, 4], [13, 4], [14, 4],
 
 
-	[0, 1], [1, 1], [2, 1], [3, 1], [4, 1], [5, 1], [6, 1], [7, 1], [8, 1], [9, 1], [10, 1], [11, 1], [12, 1], [13, 1], [14, 1],
-	[0, 2], 																									             [14, 2],
-	[0, 3], 																									             [14, 3],
-	[0, 4], [1, 4], [2, 4], [3, 4], [4, 4], [5, 4], [6, 4], [7, 4], [8, 4], [9, 4], [10, 4], [11, 4], [12, 4], [13, 4], //[14, 4]
+	 [0, 1], [1, 1], [2, 1], [3, 1], [4, 1], [5, 1], [6, 1], [7, 1], [8, 1], [9, 1], [10, 1], [11, 1], [12, 1], [13, 1], [14, 1],
+	 [0, 2], 																									             [14, 2],
+	 [0, 3], 																									             [14, 3],
+	 [0, 4], [1, 4], [2, 4], [3, 4], [4, 4], [5, 4], [6, 4], [7, 4], [8, 4], [9, 4], [10, 4], [11, 4], [12, 4], [13, 4], //[14, 4]
 ];
 
 let LEDCount = 0;
@@ -93,7 +93,6 @@ export function Initialize() {
 	requestUniqueIdentifier();
 	requestTotalLeds();
 	effectEnable();
-
 }
 
 export function Render() {
@@ -288,7 +287,20 @@ function grabColors(overrideColor) {
 		const iLedIdx = vKeys[iIdx] * 3;
 		rgbdata[iLedIdx] = color[0];
 		rgbdata[iLedIdx+1] = color[1];
-		rgbdata[iLedIdx+2] = color[2];
+		rgbdata[iLedIdx+2] = color[2];// * .7;
+	}
+
+	let count = 0;
+
+	for(let i = 0; i < rgbdata.length; i++) {
+		count += rgbdata[i];
+	}
+	const brightness = Math.min(.6, Math.max(.10, 1 - (count / 60000)));
+
+	//console.log("Count: " + count + " Brightness: " + brightness);
+
+	for(let i = 0; i < rgbdata.length; i++) {
+		rgbdata[i] *= brightness;
 	}
 
 	return rgbdata;
@@ -329,6 +341,6 @@ export function Validate(endpoint) {
 	return endpoint.interface === 1;
 }
 
-export function Image() {
-	return "";
+export function ImageUrl(){
+	return "https://marketplace.signalrgb.com/devices/default/keyboards/65-keyboard-render.png";
 }

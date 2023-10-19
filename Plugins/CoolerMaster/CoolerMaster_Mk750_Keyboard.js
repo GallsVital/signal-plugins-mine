@@ -68,16 +68,23 @@ export function Initialize() {
 }
 
 export function Render() {
-	SendColors();
+	sendColors();
 	SendCommits();
 }
 
-export function Shutdown() {
-	device.write([0x00, 0x41, 0x80], 65);
-	device.write([0x00, 0x51, 0x28, 0x00, 0x00, 0x07], 65);
+export function Shutdown(SystemSuspending) {
+
+	if(SystemSuspending){
+		sendColors("#000000"); // Go Dark on System Sleep/Shutdown
+		SendCommits();
+	}else{
+		device.write([0x00, 0x41, 0x80], 65);
+		device.write([0x00, 0x51, 0x28, 0x00, 0x00, 0x01], 65);
+	}
+
 }
 
-function SendColors(shutdown = false){
+function sendColors(overrideColor){
 	const RGBData = [];
 
 	for(let iIdx = 0; iIdx < vLedPositions.length; iIdx++) {
@@ -85,8 +92,8 @@ function SendColors(shutdown = false){
 		const iPxY = vLedPositions[iIdx][1];
 		let mxPxColor;
 
-		if(shutdown){
-			mxPxColor = hexToRgb(shutdownColor);
+		if(overrideColor){
+			mxPxColor = hexToRgb(overrideColor);
 		}else if (LightingMode === "Forced") {
 			mxPxColor = hexToRgb(forcedColor);
 		}else{

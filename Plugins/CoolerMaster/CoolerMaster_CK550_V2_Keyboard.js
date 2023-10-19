@@ -29,22 +29,22 @@ const vLedNames = [
 ];
 
 const vLedPositions = [
-	[0, 0], 		[2, 0], [3, 0], [4, 0], [5, 0], [6, 0], [7, 0], [8, 0], [9, 0], [10, 0], [11, 0], [12, 0], [13, 0],     [14, 0], [15, 0], [16, 0],    //[17,1], [18,1], [19,1],
+	[0, 0],    [1, 0], [2, 0], [3, 0], [4, 0], [5, 0], [6, 0], [7, 0], [8, 0], [9, 0], [10, 0], [11, 0], [12, 0],          [14, 0], [15, 0], [16, 0],    //[17,1], [18,1], [19,1],
 	[0, 1], [1, 1], [2, 1], [3, 1], [4, 1], [5, 1], [6, 1], [7, 1], [8, 1], [9, 1], [10, 1], [11, 1], [12, 1], [13, 1],     [14, 1], [15, 1], [16, 1],   [17, 1], [18, 1], [19, 1], [20, 1], //21
 	[0, 2], [1, 2], [2, 2], [3, 2], [4, 2], [5, 2], [6, 2], [7, 2], [8, 2], [9, 2], [10, 2], [11, 2], [12, 2], [13, 2],     [14, 2], [15, 2], [16, 2],   [17, 2], [18, 2], [19, 2], [20, 2], //20
-	[0, 3], [1, 3], [2, 3], [3, 3], [4, 3], [5, 3], [6, 3], [7, 3], [8, 3], [9, 3], [10, 3], [11, 3],          [13, 3],                               	 [17, 3], [18, 3], [19, 3], // 17
-	[0, 4], [1, 4], [2, 4], [3, 4], [4, 4], [5, 4], [6, 4], [7, 4], [8, 4], [9, 4], [10, 4],                   [13, 4],              [15, 4],            [17, 4], [18, 4], [19, 4], [20, 4], // 17
-	[0, 5], [1, 5], [2, 5],                      [6, 5],                      		[10, 5], [11, 5], [12, 5], [13, 5],     [14, 5], [15, 5], [16, 5],   [17, 5],         [19, 5] // 13
+	[0, 3], [1, 3], [2, 3], [3, 3], [4, 3], [5, 3], [6, 3], [7, 3], [8, 3], [9, 3], [10, 3], [11, 3],         [13, 3],                               [17, 3], [18, 3], [19, 3], // 17
+	[0, 4], [1, 4], [2, 4], [3, 4], [4, 4], [5, 4], [6, 4], [7, 4], [8, 4], [9, 4], [10, 4],                 [13, 4],             [15, 4],           [17, 4], [18, 4], [19, 4], [20, 4], // 17
+	[0, 5], [1, 5], [2, 5],                      [6, 5],                      [10, 5], [11, 5], [12, 5], [13, 5],     [14, 5], [15, 5], [16, 5],   [17, 5],         [19, 5] // 13
 ];
-
 const vKeys = [
-	0,     18, 24, 30, 36, 42, 48, 54, 60, 66, 72,  78, 84, 90,  96, 102, 108,    //120,126,132,
+	0,     18, 24, 30, 36, 48, 54, 60, 66, 72,  78, 84, 90,  96, 102, 108,    //132,//126,132,
 	1,  13, 19, 25, 31, 37, 43, 49, 55, 61, 67, 73, 79,  91,  97, 103, 109,  115, 121, 127, 133,
 	2,  14, 20, 26, 32, 38, 44, 50, 56, 62, 68, 74, 80, 92,  98, 104, 110,  116, 122, 128, 134,
 	3,  15, 21, 27, 33, 39, 45, 51, 57, 63, 69, 75,    93,               117, 123, 129,
 	4,  16, 22, 28, 34, 40, 46, 52, 58, 64, 70,       94,    106,       118, 124, 130, 136,
-	5, 11, 17,         41,             65, 71, 77,   95, 101, 107, 113,      125, 131,
+	5, 11, 17,         41,             65, 71, 77,   95, 101, 107, 113,      125, 131
 ];
+
 
 export function LedNames() {
 	return vLedNames;
@@ -55,20 +55,36 @@ export function LedPositions() {
 }
 
 export function Initialize() {
-	device.write([0x00, 0x51, 0x00, 0x00, 0x00, 0x05], 65);
+	device.write([0x00, 0x41, 0x80], 65);
+	device.pause(1);
+	device.write([0x00, 0x51, 0x28, 0x00, 0x00, 0x01], 65);
+	device.pause(1);
+	device.write([0x00, 0x56, 0x81, 0x00, 0x00, 0x01, 0x00, 0x00, 0x00, 0x01, 0x00, 0x00, 0x00, 0xbb, 0xbb, 0xbb, 0xbb], 65);
+	device.pause(1);
+	device.write([0x00, 0x56, 0x83, 0x00, 0x00, 0x01, 0x00, 0x00, 0x00, 0x04, 0xf0, 0x00, 0xc1], 65);
+	device.pause(1);
+	device.write([0x00, 0x51, 0x28, 0x00, 0x00, 0xff], 65);
+	device.pause(1);
 }
 
 export function Render() {
-	SendColors();
-	SendCommits();
+	sendColors();
+	device.clearReadBuffer();
 }
 
-export function Shutdown() {
-	device.write([0x00, 0x41, 0x80], 65);
-	device.write([0x00, 0x51, 0x28, 0x00, 0x00, 0x01], 65);
+export function Shutdown(SystemSuspending) {
+
+	if(SystemSuspending){
+		sendColors("#000000"); // Go Dark on System Sleep/Shutdown
+		device.clearReadBuffer();
+	}else{
+		device.write([0x00, 0x41, 0x80], 65);
+		device.write([0x00, 0x51, 0x28, 0x00, 0x00, 0x01], 65);
+	}
+
 }
 
-function SendColors(shutdown = false){
+function sendColors(overrideColor){
 	const RGBData = [];
 
 	for(let iIdx = 0; iIdx < vLedPositions.length; iIdx++) {
@@ -76,8 +92,8 @@ function SendColors(shutdown = false){
 		const iPxY = vLedPositions[iIdx][1];
 		let mxPxColor;
 
-		if(shutdown){
-			mxPxColor = hexToRgb(shutdownColor);
+		if(overrideColor){
+			mxPxColor = hexToRgb(overrideColor);
 		}else if (LightingMode === "Forced") {
 			mxPxColor = hexToRgb(forcedColor);
 		}else{
@@ -89,44 +105,15 @@ function SendColors(shutdown = false){
 		RGBData[vKeys[iIdx]*3 +2 ] = mxPxColor[2];
 	}
 
-	device.write([0x00, 0x56, 0x81, 0x00, 0x00, 0x01, 0x00, 0x00, 0x00, 0x09, 0x00, 0x00, 0x00, 0xBB, 0xBB, 0xBB, 0xBB], 65);
 
-	//Send the left light bar and first column
-	let InitColorPacket = [0x00, 0x56, 0x83, 0x00, 0x00, 0x01, 0x00, 0x00, 0x00, 0x80, 0x01, 0x00, 0xFF, 0x00, 0x00, 0x00, 0x00, 0xFF, 0xFF, 0xFF, 0xFF, 0x00, 0x00, 0x00, 0x00];
-	InitColorPacket = InitColorPacket.concat(RGBData.splice(0, 40));
-	device.write(InitColorPacket, 65);
+	let keysSent = 0;
 
-	var packet = [];
-	packet = packet.concat(RGBData.splice(0, 60));
-	StreamPacket(1, packet);
-
-	var packet = [];
-	packet = packet.concat(RGBData.splice(0, 60));
-	StreamPacket(2, packet);
-
-	for(let packetCount = 3; packetCount < 9; packetCount++){
-		StreamPacket(packetCount,
-			RGBData.splice(0, 60)
-		);
+	while(RGBData.length > 0) {
+		const keysToSend = Math.min(18, RGBData.length/3);
+		device.write([0x00, 0x56, 0x42, 0x00, 0x00, 0x02, keysToSend, keysSent, 0x00].concat(RGBData.splice(0, keysToSend*3)), 65);
+		device.pause(1);
+		keysSent += keysToSend;
 	}
-
-}
-
-function StreamPacket(packetId, RGBData){
-	let packet = [];
-	packet[0] = 0x00;
-	packet[1] = 0x56;
-	packet[2] = 0x83;
-	packet[3] = packetId;
-	packet[4] = 0x00;
-	packet = packet.concat(RGBData);
-	device.write(packet, 65);
-	device.read(packet, 65);
-}
-
-function SendCommits(){
-	device.write([0x00, 0x51, 0x28, 0x00, 0x00, 0xFF], 65);
-	device.pause(3);
 }
 
 function hexToRgb(hex) {

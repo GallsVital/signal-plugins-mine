@@ -8,8 +8,7 @@ export function DefaultPosition(){return [150, 40];}
 export function DefaultScale(){return 12.0;}
 export function LedNames() { return vLedNames; }
 export function LedPositions() { return vLedPositions; }
-export function ConflictingProcesses() { return ["LightingService.exe"]; }
-
+export function ConflictingProcesses() { return ["LightingService.exe", "XPG-Prime.exe"]; }
 /* global
 shutdownColor:readonly
 LightingMode:readonly
@@ -437,21 +436,21 @@ class ENERam{
 				"LED 11", "LED 12", "LED 13", "LED 14", "LED 15"
 			];
 			vLedPositions = [
-				[0, 0], [1, 0], [2, 0], [3, 0], [4, 0], [5, 0], [6, 0], [7, 0],
-				[6, 1], [5, 1], [4, 1], [3, 1], [2, 1], [1, 1], [0, 1]
+				[0, 0], [0, 1], [0, 2], [0, 3], [0, 4], [0, 5], [0, 6], [0, 7],
+				[1, 6], [1, 5], [1, 4], [1, 3], [1, 2], [1, 1], [1, 0]
 			  ];
 
 			  device.setControllableLeds(vLedNames, vLedPositions);
-			  device.setSize([8, 2]);
+			  device.setSize([2, 8]);
 			  device.setName("T-Force XTREEM RAM");
 		} else {
 			for(let i = 0; i < this.config.deviceLEDCount; i++) {
 				vLedNames.push(`LED ${i + 1}`);
-				vLedPositions.push([ (this.config.deviceLEDCount - 1) - i, 0 ]);
+				vLedPositions.push([ 0, (this.config.deviceLEDCount - 1) - i ]);
 			}
 
 			device.setControllableLeds(vLedNames, vLedPositions);
-			device.setSize([this.config.deviceLEDCount, 1]);
+			device.setSize([1, this.config.deviceLEDCount]);
 		}
 	}
 

@@ -374,6 +374,6 @@ function hexToRgb(hex) {
 	return colors;
 }
 
-export function Image() {
-	return "";
+export function ImageUrl() {
+	return "https://marketplace.signalrgb.com/devices/default/audio/headset-render.png";
 }

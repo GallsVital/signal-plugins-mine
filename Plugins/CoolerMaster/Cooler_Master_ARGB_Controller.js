@@ -65,14 +65,24 @@ export function Render() {
 	}
 }
 
-export function Shutdown() {
-	if(!motherboardPass){
-		for(let channel = 0; channel < 4; channel++) {
-			SendChannel(channel, true);
-			device.pause(1);
-		}
+export function Shutdown(SystemSuspending) {
 
-		sendRGBHeader(RGBHeaderToggle, true);
+	if(!motherboardPass){
+		if(SystemSuspending){
+			for(let channel = 0; channel < 4; channel++) {
+				SendChannel(channel, "#000000");
+				device.pause(1);
+			}
+
+			sendRGBHeader(RGBHeaderToggle, "#000000");
+		}else{
+			for(let channel = 0; channel < 4; channel++) {
+				SendChannel(channel, shutdownColor);
+				device.pause(1);
+			}
+
+			sendRGBHeader(RGBHeaderToggle, shutdownColor);
+		}
 	}
 }
 
@@ -110,7 +120,7 @@ function setmotherboardPass(motherboardPass) {
 	}
 }
 
-function SendChannel(Channel, shutdown = false) {
+function SendChannel(Channel, overrideColor) {
 
 	let ChannelLedCount = device.channel(ChannelArray[Channel][0]).ledCount;
 	const componentChannel = device.channel(ChannelArray[Channel][0]);
@@ -123,11 +133,11 @@ function SendChannel(Channel, shutdown = false) {
 	}else if(componentChannel.shouldPulseColors()){
 		ChannelLedCount = 48;
 
-		const pulseColor = device.getChannelPulseColor(ChannelArray[Channel][0], ChannelLedCount);
+		const pulseColor = device.getChannelPulseColor(ChannelArray[Channel][0]);
 		RGBData = device.createColorArray(pulseColor, ChannelLedCount, "Inline");
 
-	}else if(shutdown){
-		RGBData = device.createColorArray(shutdownColor, ChannelLedCount, "Inline");
+	}else if(overrideColor){
+		RGBData = device.createColorArray(overrideColor, ChannelLedCount, "Inline");
 	}else{
 		RGBData = device.channel(ChannelArray[Channel][0]).getColors("Inline");
 	}
@@ -139,7 +149,7 @@ function SendChannel(Channel, shutdown = false) {
 	device.write([0x00, 0x82].concat(RGBData.splice(0, 62)), 65);
 }
 
-function sendRGBHeader(RGBHeaderToggle = false, shutdown = false){
+function sendRGBHeader(RGBHeaderToggle = false, overrideColor){
 	device.write([0x00, 0x080, 0x01, 0x03], 65);
 
 
@@ -149,8 +159,8 @@ function sendRGBHeader(RGBHeaderToggle = false, shutdown = false){
 		let Color;
 
 		//find colors
-		if(shutdown){
-			Color = hexToRgb(shutdownColor);
+		if(overrideColor){
+			Color = hexToRgb(overrideColor);
 		}else if (LightingMode === "Forced") {
 			Color = hexToRgb(forcedColor);
 		}else{
@@ -194,7 +204,7 @@ export function Validate(endpoint) {
 }
 
 export function ImageUrl(){
-	return "https://marketplace.signalrgb.com/devices/brands/coolermaster/lighting-controllers/led-controller-gen2.png";
+	return "https://marketplace.signalrgb.com/devices/brands/coolermaster/lighting-controllers/argb-controller-gen1.png";
 }
 
 const RGB_Header = {
