@@ -60,16 +60,13 @@ export function Render() {
 }
 
 export function Shutdown(SystemSuspending) {
+	const color = SystemSuspending ? "#000000" : shutdownColor;
 
-	if(SystemSuspending){
-		for(let i=0;i<73;i+=9){
-			sendColors(i, "#000000"); // Go Dark on System Sleep/Shutdown
-		}
-	}else{
-		for(let i=0;i<73;i+=9){
-			sendColors(i, shutdownColor);
-		}
+	for(let i=0;i<73;i+=9){
+		sendColors(i, color); // Go Dark on System Sleep/Shutdown
 	}
+
+	Apply();
 
 }
 
@@ -110,8 +107,6 @@ function Apply() {
 	packet[1] = 0x07;
 	packet[2] = 0x42;
 	device.write(packet, 64);
-
-	//device.pause(10);
 }
 
 function hexToRgb(hex) {
