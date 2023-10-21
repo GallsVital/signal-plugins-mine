@@ -1,7 +1,7 @@
 /// <reference path="./Fantech_Board_Keyboard.d.ts" />
 export function Name() { return "Fantech board"; }
 export function VendorId() { return 0x0416; }
-export function ProductId() { return 0xc345; }
+export function ProductId() { return 0xC345; }
 export function Publisher() { return "WhirlwindFX"; }
 export function DefaultPosition(){return [10, 100]; }
 export function DefaultScale(){return 8.0;}
@@ -22,6 +22,7 @@ boardModel:readonly
 //Credits:
 // arunasmazeika  MK870 TKL
 // 5vhled MAXFIT61 FROST
+// Binho Husky HAILSTORM ABNT2
 
 const boards = {
 
@@ -63,9 +64,9 @@ const boards = {
 		vKeys:  [
 			22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34,  36, 37,
 			44,  45, 46, 47, 48, 49, 50, 51, 52, 53, 54, 55, 56, 59,
-			66,   68, 69, 70, 71, 72, 73, 74, 75, 76, 77, 78, 79, 80, 81,
+			66, 68, 69, 70, 71, 72, 73, 74, 75, 76, 77, 78, 79, 80, 81,
 			88, 89, 90, 91, 92, 93, 94, 95, 96, 97, 98, 99, 101, 102, 103, 110,
-			111, 112, 113,         120,          121, 122, 123, 124, 125, 126,
+			111, 112, 116,         120,          121, 122, 123, 124, 125, 0,
 		],
 		vKeyPositions: [
 			[0, 0], [1, 0], [2, 0], [3, 0], [4, 0], [5, 0], [6, 0], [7, 0], [8, 0], [9, 0], [10, 0], [11, 0], [12, 0],   [13, 0], [14, 0],
