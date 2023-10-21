@@ -1,1 +1,1 @@
-declare var boardModel: "Fantech MAXFIT61" | "Husky HAILSTORM" | "FL-ESPORTS MK870TKL" | "Motospeed K24"
+declare var boardModel: "Fantech MAXFIT61" | "Husky HAILSTORM" | "FL-ESPORTS MK870TKL" | "Motospeed K24" | "DeepCool TKL" | "DeepCool 68%" | "Pulsar TKL"
