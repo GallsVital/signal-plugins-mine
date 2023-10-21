@@ -10,7 +10,7 @@ export function ControllableParameters() {
 		{"property":"shutdownColor", "group":"lighting", "label":"Shutdown Color", "min":"0", "max":"360", "type":"color", "default":"#009bde"},
 		{"property":"LightingMode", "group":"lighting", "label":"Lighting Mode", "type":"combobox", "values":["Canvas", "Forced"], "default":"Canvas"},
 		{"property":"forcedColor", "group":"lighting", "label":"Forced Color", "min":"0", "max":"360", "type":"color", "default":"#009bde"},
-		{"property":"boardModel", "group":"", "label":"Layout", "type":"combobox", "values":["MAXFIT61", "HAILSTORM", "MK870TKL", "K24"], "default":"MAXFIT61"},
+		{"property":"boardModel", "group":"", "label":"Model", "type":"combobox", "values":["MAXFIT61", "HAILSTORM", "MK870TKL", "K24"], "default":"MAXFIT61"},
 	];
 }
 /* global
@@ -159,26 +159,12 @@ export function LedPositions() {
 }
 
 export function onboardModelChanged () {
-
-	vKeyNames = boards[boardModel].vKeyNames;
-	vKeyPositions = boards[boardModel].vKeyPositions;
-	vKeys = boards[boardModel].vKeys;
-
-	device.setName(boards[boardModel].name);
-	device.setImageFromUrl(boards[boardModel].image);
-	device.log(`Model set to: ` + boards[boardModel].name);
-	device.setControllableLeds(vKeyNames, vKeyPositions);
+	updateProperties();
 }
 
 export function Initialize() {
 
-	vKeyNames = boards[boardModel].vKeyNames;
-	vKeyPositions = boards[boardModel].vKeyPositions;
-	vKeys = boards[boardModel].vKeys;
-
-	device.setControllableLeds(vKeyNames, vKeyPositions);
-	device.setName(boards[boardModel].name);
-	device.log(`Model set to: ` + boards[boardModel].name);
+	updateProperties();
 
 	device.write([0x01, 0x0D], 64);
 	device.write([0x01, 0x15], 64);
@@ -240,6 +226,18 @@ function sendColors(overrideColor) {
 	device.write([0x01, 0x0F, 0x01, 0x00, 0x01, 0x2D], 64);
 }
 
+function updateProperties() {
+	vKeyNames = boards[boardModel].vKeyNames;
+	vKeyPositions = boards[boardModel].vKeyPositions;
+	vKeys = boards[boardModel].vKeys;
+
+	device.setName(boards[boardModel].name);
+	device.setImageFromUrl(boards[boardModel].image);
+	device.setSize(boards[boardModel].size);
+	device.setControllableLeds(vKeyNames, vKeyPositions);
+	device.log(`Model set to: ` + boards[boardModel].name);
+}
+
 function hexToRgb(hex) {
 	const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
 	const colors = [];
@@ -255,5 +253,5 @@ export function Validate(endpoint) {
 }
 
 export function ImageUrl(){
-	return "";
+	return "https://marketplace.signalrgb.com/devices/default/keyboards/full-size-keyboard-render.png";
 }
