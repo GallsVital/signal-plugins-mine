@@ -1,1 +1,1 @@
-declare var boardModel: "MAXFIT61" | "MK870TKL" | "K24"
+declare var boardModel: "MAXFIT61" | "HAILSTORM" | "MK870TKL" | "K24"
