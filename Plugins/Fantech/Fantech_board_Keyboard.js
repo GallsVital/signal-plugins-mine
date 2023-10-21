@@ -10,7 +10,7 @@ export function ControllableParameters() {
 		{"property":"shutdownColor", "group":"lighting", "label":"Shutdown Color", "min":"0", "max":"360", "type":"color", "default":"#009bde"},
 		{"property":"LightingMode", "group":"lighting", "label":"Lighting Mode", "type":"combobox", "values":["Canvas", "Forced"], "default":"Canvas"},
 		{"property":"forcedColor", "group":"lighting", "label":"Forced Color", "min":"0", "max":"360", "type":"color", "default":"#009bde"},
-		{"property":"boardModel", "group":"", "label":"Layout", "type":"combobox", "values":["MAXFIT61", "MK870TKL", "K24"], "default":"MAXFIT61"},
+		{"property":"boardModel", "group":"", "label":"Layout", "type":"combobox", "values":["MAXFIT61", "HAILSTORM", "MK870TKL", "K24"], "default":"MAXFIT61"},
 	];
 }
 /* global
@@ -48,7 +48,34 @@ const boards = {
 			[0, 3],        [2, 3], [3, 3], [4, 3], [5, 3], [6, 3], [7, 3], [8, 3], [9, 3], [10, 3], [11, 3],             [13, 3],
 			[0, 4], [1, 4], [2, 4],                         [6, 4],                            [10, 4], [11, 4], [12, 4], [13, 4]
 		],
-		size: [14, 5]
+		size: [14, 5],
+		image: "https://marketplace.signalrgb.com/devices/brands/fantech/keyboards/maxfit61-standard.png",
+	},
+	HAILSTORM: {
+		name: "Husky HAILSTORM ABNT2",
+		vKeyNames: [
+			"Esc", "1", "2", "3", "4", "5", "6", "7", "8", "9", "0", "-_", "=+", "Backspace", "Del",
+			"Tab", "Q", "W", "E", "R", "T", "Y", "U", "I", "O", "P", "'", "[", "Home",
+			"CapsLock", "A", "S", "D", "F", "G", "H", "J", "K", "L", "Ç", "~", "]", "Enter", "PgUp",
+			"Left Shift", "\\", "Z", "X", "C", "V", "B", "N", "M", ",", ".", "/", "Right Shift", "Up Arrow", "PgDn",
+			"Left Ctrl", "Left Win", "Left Alt",        "Space",      "Right Alt", "Fn", "Right Ctrl", "Left Arrow", "Down Arrow", "Right Arrow"
+		],
+		vKeys:  [
+			22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34,  36, 37,
+			44,  45, 46, 47, 48, 49, 50, 51, 52, 53, 54, 55, 56, 59,
+			66,   68, 69, 70, 71, 72, 73, 74, 75, 76, 77, 78, 79, 80, 81,
+			88, 89, 90, 91, 92, 93, 94, 95, 96, 97, 98, 99, 101, 102, 103, 110,
+			111, 112, 113,         120,          121, 122, 123, 124, 125, 126,
+		],
+		vKeyPositions: [
+			[0, 0], [1, 0], [2, 0], [3, 0], [4, 0], [5, 0], [6, 0], [7, 0], [8, 0], [9, 0], [10, 0], [11, 0], [12, 0],   [13, 0], [14, 0],
+			[0, 1],  [1, 1], [2, 1], [3, 1], [4, 1], [5, 1], [6, 1], [7, 1], [8, 1], [9, 1], [10, 1], [11, 1], [12, 1],  		  [14, 1],
+			[0, 2],   [1, 2], [2, 2], [3, 2], [4, 2], [5, 2], [6, 2], [7, 2], [8, 2], [9, 2], [10, 2], [11, 2], [12, 2], [13, 2], [14, 2],
+			[0, 3], [1, 3], [2, 3], [3, 3], [4, 3], [5, 3], [6, 3], [7, 3], [8, 3], [9, 3], [10, 3], [11, 3], [12, 3],  [13, 3], [14, 3],
+			[0, 4], [1, 4], [2, 4],                         [6, 4],                [9, 4], [10, 4], [11, 4], [12, 4], [13, 4], [14, 4]
+		],
+		size: [15, 5],
+		image: "",
 	},
 	MK870TKL:{
 		name: "MK870TKL",
@@ -76,7 +103,8 @@ const boards = {
 			[0, 4],        [2, 4], [3, 4], [4, 4], [5, 4], [6, 4], [7, 4], [8, 4], [9, 4], [10, 4], [11, 4],             [13, 4],	[15, 4],
 			[0, 5], [1, 5], [2, 5],                         [6, 5],                            [10, 5], [11, 5], [12, 5], [13, 5],	[14, 5], [15, 5], [16, 5]
 		],
-		size: [17, 6]
+		size: [17, 6],
+		image: "https://marketplace.signalrgb.com/devices/brands/fantech/keyboards/mk876-tkl.png",
 	},
 	K24:{
 		name: "Motospeed K24",
@@ -104,7 +132,8 @@ const boards = {
 			[0, 4], [1, 4], [2, 4], [3, 4],
 			[0, 5],			[2, 5],
 		],
-		size: [4, 6]
+		size: [4, 6],
+		image: "",
 	}
 };
 
@@ -135,6 +164,7 @@ export function onboardModelChanged () {
 	vKeys = boards[boardModel].vKeys;
 
 	device.setName(boards[boardModel].name);
+	device.setImageFromUrl(boards[boardModel].image);
 	device.log(`Model set to: ` + boards[boardModel].name);
 	device.setControllableLeds(vKeyNames, vKeyPositions);
 }
@@ -224,5 +254,5 @@ export function Validate(endpoint) {
 }
 
 export function ImageUrl(){
-	return "https://marketplace.signalrgb.com/devices/brands/fantech/keyboards/mk876-tkl.png";
+	return "";
 }
