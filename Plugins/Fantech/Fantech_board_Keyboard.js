@@ -10,7 +10,7 @@ export function ControllableParameters() {
 		{"property":"shutdownColor", "group":"lighting", "label":"Shutdown Color", "min":"0", "max":"360", "type":"color", "default":"#009bde"},
 		{"property":"LightingMode", "group":"lighting", "label":"Lighting Mode", "type":"combobox", "values":["Canvas", "Forced"], "default":"Canvas"},
 		{"property":"forcedColor", "group":"lighting", "label":"Forced Color", "min":"0", "max":"360", "type":"color", "default":"#009bde"},
-		{"property":"boardModel", "group":"", "label":"Model", "type":"combobox", "values":["MAXFIT61", "HAILSTORM", "MK870TKL", "K24"], "default":"MAXFIT61"},
+		{"property":"boardModel", "group":"", "label":"Model", "type":"combobox", "values":["Fantech MAXFIT61", "Husky HAILSTORM", "FL-ESPORTS MK870TKL", "Motospeed K24"], "default":"Fantech MAXFIT61"},
 	];
 }
 /* global
@@ -20,14 +20,14 @@ forcedColor:readonly
 boardModel:readonly
 */
 //Credits:
-// arunasmazeika  MK870 TKL
-// 5vhled MAXFIT61 FROST
+// arunasmazeika FL-ESPORTS MK870 TKL
+// 5vhled Fantech MAXFIT61 FROST
 // Binho Husky HAILSTORM ABNT2
 
 const boards = {
 
-	MAXFIT61: {
-		name: "MAXFIT61",
+	"Fantech MAXFIT61": {
+		name: "Fantech MAXFIT61",
 		vKeyNames: [
 			"Esc", "1", "2", "3", "4", "5", "6", "7", "8", "9", "0", "-_", "=+", "Backspace",
 			"Tab", "Q", "W", "E", "R", "T", "Y", "U", "I", "O", "P", "[", "]", "\\",
@@ -52,8 +52,8 @@ const boards = {
 		size: [14, 5],
 		image: "https://marketplace.signalrgb.com/devices/brands/fantech/keyboards/maxfit61-standard.png",
 	},
-	HAILSTORM: {
-		name: "Husky HAILSTORM ABNT2",
+	"Husky HAILSTORM": {
+		name: "Husky HAILSTORM",
 		vKeyNames: [
 			"Esc", "1", "2", "3", "4", "5", "6", "7", "8", "9", "0", "-_", "=+", "Backspace", "Del",
 			"Tab", "Q", "W", "E", "R", "T", "Y", "U", "I", "O", "P", "'", "[", "Home",
@@ -78,8 +78,8 @@ const boards = {
 		size: [15, 5],
 		image: "",
 	},
-	MK870TKL:{
-		name: "MK870TKL",
+	"FL-ESPORTS MK870TKL":{
+		name: "FL-ESPORTS MK870TKL",
 		vKeyNames: [
 			"Esc",     "F1", "F2", "F3", "F4",   "F5", "F6", "F7", "F8",    "F9", "F10", "F11", "F12",  		  "Print Screen", "Scroll Lock", "Pause Break",
 			"`", "1", "2", "3", "4", "5", "6", "7", "8", "9", "0", "-_", "=+", "Backspace", 					  "Insert", "Home", "PgUp",
@@ -107,7 +107,7 @@ const boards = {
 		size: [17, 6],
 		image: "https://marketplace.signalrgb.com/devices/brands/fantech/keyboards/mk876-tkl.png",
 	},
-	K24:{
+	"Motospeed K24":{
 		name: "Motospeed K24",
 		vKeyNames: [
 			"Esc", "Tab", "Backspace", "FN",
