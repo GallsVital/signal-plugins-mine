@@ -102,6 +102,7 @@ const ASUS_MODE_DIRECT = 0xFF;
 // AULA3-6K75-0207 - 3 Mainboard, 1 ARGB, 2 12V - TUF GAMING X570-PLUS
 
 const ConfigurationOverrides = {
+	"ROG MAXIMUS Z790 HERO": { ARGBChannelCount: 4, RGBHeaderCount: 1 },
 	"AULA3-AR32-0207":{MainboardCount: 3, ARGBChannelCount:3, RGBHeaderCount: 1}, // THIS HAS A SPACE AT THE END?!?!?!
 	//"AULA3-AR32-0214":{MainboardCount: 2, ARGBChannelCount:3, RGBHeaderCount: 1}, // Asus TUF GAMING Z790-PLUS WIFI D4
 	"AULA3-AR32-0213":{MainboardCount: 2, ARGBChannelCount:3, RGBHeaderCount: 1},
@@ -227,7 +228,7 @@ function sendPolymoColors(shutdown = false) {
 
 		if(shutdown) {
 			color = hexToRgb(shutdownColor);
-		} else if (LightingMode == "Forced") {
+		} else if (LightingMode === "Forced") {
 			color = hexToRgb(forcedColor);
 		} else {
 			color = device.subdeviceColor("Polymo", iX, iY);
@@ -244,7 +245,7 @@ function sendPolymoColors(shutdown = false) {
 function SetMotherboardName(){
 	const MotherboardName = device.getMotherboardName();
 
-	if(MotherboardName != "Unknown"){
+	if(MotherboardName !== "Unknown"){
 		device.setName(`Asus ${MotherboardName} Controller`);
 	}
 }
@@ -388,7 +389,7 @@ function SendARGBChannel(ChannelIdx, polymo = false, shutdown = false) {
 
 
 function SetChannelModeDirect(ChannelIdx){
-	if(ChannelIdx == 0){
+	if(ChannelIdx === 0){
 		device.log(`Setting Mainboard to Direct Mode`);
 	}else{
 		device.log(`Setting Channel ${ChannelIdx} to Direct Mode`);
@@ -408,7 +409,7 @@ function StreamDirectColors(ChannelIdx, RGBData, LedCount){
 		const ledsToSend = Math.min(LedCount, Device_PacketLedLimit);
 		LedCount -= ledsToSend;
 		//Set apply falg when we're out of LED's
-		isApplyPacket = LedCount == 0;
+		isApplyPacket = LedCount === 0;
 		SendDirectPacket(ChannelIdx, ledsSent, ledsToSend, RGBData.splice(0, ledsToSend*3), isApplyPacket);
 		ledsSent += ledsToSend;
 	}
@@ -455,13 +456,13 @@ function FetchConfigTable(){
 function ParseConfigTable(){
 
 	let polymoOverride = false;
+	let configOverride = false;
 
 	for(const config in ConfigurationOverrides){
 		// If modelId matches, or if mobo name does
 		if(DeviceInfo.Model.localeCompare(config) == 0 || device.getMotherboardName() == config){
 			polymoOverride = LoadOverrideConfiguration(config);
-
-			return;
+			configOverride = true;
 		}
 	}
 
@@ -474,6 +475,8 @@ function ParseConfigTable(){
 		DeviceInfo.ARGBChannelCount = DeviceInfo.ConfigTable[ASUS_CONFIG_ARGB_CHANNELS];
 		device.log(`ARGB channel Count ${DeviceInfo.ARGBChannelCount} `, {toFile: true});
 	}
+
+	if(configOverride) {return;}
 
 	if(DeviceInfo.ConfigTable[ASUS_CONFIG_12V_HEADERS] === 3) //Weird offset edge case.
 	{
@@ -527,7 +530,7 @@ function FetchFirmwareVersion(){
 
 	const data = device.read([0x00], Device_Read_Length);
 
-	if(data[1] == ASUS_RESPONSE_FIRMWARE){
+	if(data[1] === ASUS_RESPONSE_FIRMWARE){
 		DeviceInfo.Model = "";
 
 		for(let i = 2; i < 18; i++){
