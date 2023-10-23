@@ -86,15 +86,21 @@ export function Initialize() {
 }
 
 export function Render() {
-	UpdateColors();
+	sendColors();
 }
 
-export function Shutdown() {
-	UpdateColors(true);
+export function Shutdown(SystemSuspending) {
+
+	if(SystemSuspending){
+		sendColors("#000000"); // Go Dark on System Sleep/Shutdown
+	}else{
+		sendColors(shutdownColor);
+	}
+
 }
 
 
-function UpdateColors(shutdown = false){
+function sendColors(overrideColor){
 	const RedColors = [];
 	const GreenColors = [];
 	const BlueColors = [];
@@ -103,8 +109,8 @@ function UpdateColors(shutdown = false){
 	for(let iIdx = 0; iIdx < vLedPositions.length; iIdx++){
  		let Color;
 
-		if(shutdown){
-			Color = hexToRgb(shutdownColor);
+		if(overrideColor){
+			Color = hexToRgb(overrideColor);
 		}else if(LightingMode === "Forced") {
 			Color = hexToRgb(forcedColor);
 		} else {
@@ -336,6 +342,6 @@ function hexToRgb(hex) {
 	return colors;
 }
 
-export function ImageUrl() {
-	return "https://marketplace.signalrgb.com/devices/default/ram.png";
+export function ImageUrl(){
+	return "https://marketplace.signalrgb.com/devices/brands/crucial/ram/ballistix-rgb.png";
 }

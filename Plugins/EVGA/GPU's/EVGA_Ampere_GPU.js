@@ -92,7 +92,7 @@ export function Initialize() {
 }
 
 export function Render() {
-	SendRGB();
+	sendColors();
 
 	HardwareModePoll.Poll();
 
@@ -104,8 +104,14 @@ export function Render() {
 }
 
 
-export function Shutdown() {
-	SendRGB(true);
+export function Shutdown(SystemSuspending) {
+
+	if(SystemSuspending){
+		sendColors("#000000"); // Go Dark on System Sleep/Shutdown
+	}else{
+		sendColors(shutdownColor);
+	}
+
 }
 
 class PolledFunction{
@@ -172,7 +178,7 @@ function HandleZoneDisables(){
 	RebuildLedArrays();
 }
 
-function SendRGB(shutdown = false){
+function sendColors(overrideColor){
 
 	for(const ZoneId in EVGAAmpere.Config.Zones){
 		const Zone = EVGAAmpere.Config.Zones[ZoneId];
@@ -183,8 +189,8 @@ function SendRGB(shutdown = false){
 
 		let Color;
 
-		if(shutdown){
-			Color = hexToRgb(shutdownColor);
+		if(overrideColor){
+			Color = hexToRgb(overrideColor);
 		}else if(LightingMode === "Forced") {
 			Color = hexToRgb(forcedColor);
 		} else {
@@ -468,6 +474,7 @@ class EVGAAmpereDeviceIds{
 		this.RTX3080_12G_FTW3_ULTRA_HYBRID      = 0x4878;
 		this.RTX3080_12G_XC3_ULTRA_HYBRID       = 0x4868;
 		this.RTX3080_FTW3_GAMING                = 0x3895;
+		this.RTX3080_FTW3_ULTRA_LHR      		= 0x4297;
 		this.RTX3080_FTW3_ULTRA_GAMING          = 0x3897;
 		this.RTX3080_FTW3_ULTRA_GAMING_LHR      = 0x4897;
 		this.RTX3080_FTW3_ULTRA_HC              = 0x3899;
@@ -481,6 +488,7 @@ class EVGAAmpereDeviceIds{
 		this.RTX3080_XC3_ULTRA                  = 0x3885;
 		this.RTX3080_XC3_ULTRA_GAMING_LHR		= 0x4865;
 		this.RTX3080_12G_XC3_ULTRA_HC		    = 0x4889;
+		this.RTX3080_12G_XC3_ULTRA_HC_2		    = 0x4869;
 		this.RTX3080_XC3_ULTRA_HC               = 0x3889;
 		this.RTX3080_XC3_ULTRA_HYBRID           = 0x3888;
 		this.RTX3080_XC3_ULTRA_HYBRID_LHR       = 0x4888;
@@ -579,6 +587,8 @@ class EVGAAmpereGPUList{
 			new EVGAAmpereIdentifier(Nvidia.RTX3080_LHR,       EVGAAmpereIds.RTX3080_XC3_ULTRA_HYBRID_LHR,      "EVGA RTX 3080 XC3 Ultra Hybrid LHR"),
 			new EVGAAmpereIdentifier(Nvidia.RTX3080,           EVGAAmpereIds.RTX3080_XC3_ULTRA_HC,              "EVGA RTX 3080 XC3 Ultra HydroCopper"),
 			new EVGAAmpereIdentifier(Nvidia.RTX3080_LHR,       EVGAAmpereIds.RTX3080_12G_XC3_ULTRA_HC,          "EVGA RTX 3080 XC3 Ultra HydroCopper"),
+			new EVGAAmpereIdentifier(Nvidia.RTX3080_GA102,	   EVGAAmpereIds.RTX3080_12G_XC3_ULTRA_HC_2,		"EVGA RTX 3080 XC3 Ultra HydroCopper GA102"),
+			new EVGAAmpereIdentifier(Nvidia.RTX3080_LHR,       EVGAAmpereIds.RTX3080_FTW3_ULTRA_LHR,		    "EVGA RTX 3080 FTW3 Ultra LHR"),
 			new EVGAAmpereIdentifier(Nvidia.RTX3080,           EVGAAmpereIds.RTX3080_FTW3_GAMING,               "EVGA RTX 3080 FTW3 Gaming"),
 			new EVGAAmpereIdentifier(Nvidia.RTX3080_LHR,       EVGAAmpereIds.RTX3080_FTW3_ULTRA_HYBRID_LHR,     "EVGA RTX 3080 FTW3 Ultra Hybrid LHR"),
 			new EVGAAmpereIdentifier(Nvidia.RTX3080,           EVGAAmpereIds.RTX3080_FTW3_ULTRA_HC,             "EVGA RTX 3080 FTW3 Ultra HydroCopper"),
@@ -625,5 +635,5 @@ class EVGAAmpereGPUList{
 }
 
 export function ImageUrl() {
-	return "https://marketplace.signalrgb.com/devices/default/gpu.png";
+	return "https://marketplace.signalrgb.com/devices/brands/evga/gpus/gpu.png";
 }

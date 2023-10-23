@@ -1,0 +1,1 @@
+declare var deviceType : "Zephyrus" | "G513" | "G533" 

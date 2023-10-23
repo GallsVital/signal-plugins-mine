@@ -1,3 +1,4 @@
+/// <reference path="./Fantech_Board_Keyboard.d.ts" />
 export function Name() { return "Fantech board"; }
 export function VendorId() { return 0x0416; }
 export function ProductId() { return 0xc345; }
@@ -223,5 +224,5 @@ export function Validate(endpoint) {
 }
 
 export function ImageUrl(){
-	return "https://marketplace.signalrgb.com/devices/default/keyboard-80.png";
+	return "https://marketplace.signalrgb.com/devices/brands/fantech/keyboards/mk876-tkl.png";
 }

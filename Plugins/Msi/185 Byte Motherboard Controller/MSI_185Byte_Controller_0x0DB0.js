@@ -5,7 +5,7 @@ export function Documentation(){ return "troubleshooting/msi"; }
 export function ProductId() { return Object.keys(MSIMotherboard.Library);}
 // YOU CAN BRICK THESE MOTHERBOARDS RGB CONTROLLER WITH ONE WRONG PACKET
 export function Publisher() { return "WhirlwindFX"; }
-export function Size() { return [0, 0]; }
+export function Size() { return [1, 1]; }
 export function Type() { return "Hid"; }
 export function DefaultPosition(){return [0, 0];}
 export function DefaultScale(){return 8.0;}
@@ -58,10 +58,12 @@ export function Initialize() {
 	MSIMotherboard.detectGen2Support(); //Kind of cheating to call this detection, but welcome to MSI. Abandon all hope of autodetection.
 	MSIMotherboard.createLEDs();
 
+	if(perLED) { MSIMotherboard.setPerledMode(true); }
 
 	device.setName(device.getMotherboardName());
 	//device.write([0x01, 0xbb, 0x00, 0x00, 0x00, 0x00, 0x01], 64); //Let's make sure users have their leds on in bios.
 }
+
 
 export function Render() {
 	MSIMotherboard.choosePacketSendType();
@@ -100,7 +102,7 @@ class MysticLight {
 
 		this.Library =
 		{
-			0x0076 : //X670E Tomahawk I doubt this is actually the pid or MSI god so help me.
+			0x0076 : //X670E Tomahawk Headers? // I doubt this is actually the pid or MSI god so help me.
 			{
 				OnboardLEDs    : 0,
 				RGBHeaders     : 2,
@@ -112,7 +114,7 @@ class MysticLight {
 				ForceZoneBased	  : false,
 				JARGB_V2		  : true,
 			},
-			0x0ABE : //X670E Godlike
+			0x0ABE : //X670E Godlike M.2 RGB zone
 			{
 				OnboardLEDs    : 0,
 				RGBHeaders     : 0,
@@ -121,6 +123,16 @@ class MysticLight {
 				CorsairHeaders : 0,
 				//PERLED
 				PerLEDOnboardLEDs : 10,
+			},
+			0xE777 : //Z790 Godlike M.2 RGB zone ?
+			{
+				OnboardLEDs    : 0,
+				RGBHeaders     : 2,
+				ARGBHeaders    : 2,
+				JPipeLEDs	   : 0,
+				CorsairHeaders : 0,
+				//PERLED
+				PerLEDOnboardLEDs : 0,
 				ForceZoneBased	  : false,
 				JARGB_V2		  : true,
 			},
@@ -336,7 +348,6 @@ class MysticLight {
 		this.header2LEDCount = 0;
 		this.header3LEDCount = 0;
 
-		this.firstRun = true;
 	}
 
 	checkPerLEDSupport() {
@@ -605,7 +616,7 @@ class MysticLight {
 		} else if(componentChannel.shouldPulseColors()) {
 			ChannelLedCount = 80;
 
-			const pulseColor = device.getChannelPulseColor(ChannelArray[Channel][0], ChannelLedCount);
+			const pulseColor = device.getChannelPulseColor(ChannelArray[Channel][0]);
 			RGBData = device.createColorArray(pulseColor, ChannelLedCount, "Inline");
 		} else {
 			RGBData = device.channel(ChannelArray[Channel][0]).getColors("Inline");
@@ -757,8 +768,8 @@ class MysticLight {
 		return false;
 	}
 
-	setPerledMode() {
-		if(this.checkChangedLengths() || this.firstRun) {
+	setPerledMode(bypass = false) {
+		if(this.checkChangedLengths() || bypass) {
 			if(this.getTotalLEDCount()) {
 				device.send_report([
 					0x52, //enable, r,g,b, options, r,g,b,sync,seperator
@@ -783,7 +794,6 @@ class MysticLight {
 					0x00 //Save Flag
 				], 185);
 				device.log("Sent Efficiency PerLED Config Setup Packet.");
-				this.firstRun = false;
 			} else {
 				device.send_report([
 					0x52, //enable, r,g,b, options, r,g,b,sync,seperator
@@ -808,7 +818,6 @@ class MysticLight {
 					0x00 //Save Flag
 				], 185);
 				device.log("Sent High Capacity PerLED Config Setup Packet.");
-				this.firstRun = false;
 			}
 
 		}
@@ -917,5 +926,5 @@ class MysticLight {
 const MSIMotherboard = new MysticLight();
 
 export function ImageUrl() {
-	return "https://marketplace.signalrgb.com/devices/default/motherboard.png";
+	return "https://marketplace.signalrgb.com/devices/brands/msi/motherboards/motherboard.png";
 }

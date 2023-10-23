@@ -43,14 +43,17 @@ function SetupChannels() {
 	device.SetLedLimit(DeviceMaxLedLimit);
 
 	for(let i = 0; i < ChannelArray.length; i++) {
-		device.addChannel(ChannelArray[i][0], ChannelArray[i][1]);
-	}
+		const channelInfo = ChannelArray[i];
 
+		if(channelInfo){
+			device.addChannel(...channelInfo);
+		}
+	}
 }
 
 /** @type {ChannelConfigArray} */
 const ChannelArray = [
-	["Channel 1", 233],
+	["Channel 1", 204, 204],
 ];
 
 let ConnectedFans = [];

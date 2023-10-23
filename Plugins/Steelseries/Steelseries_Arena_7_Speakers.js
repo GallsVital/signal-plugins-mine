@@ -3,7 +3,7 @@ export function VendorId() { return 0x1038; }
 export function Documentation(){ return "troubleshooting/steelseries"; }
 export function ProductId() { return 0x1A00; }
 export function Publisher() { return "WhirlwindFX"; }
-export function Size() { return [0, 0]; }
+export function Size() { return [1, 1]; }
 export function DefaultPosition() {return [225, 120]; }
 export function DefaultScale(){return 15.0;}
 /* global
@@ -123,6 +123,6 @@ export function Validate(endpoint) {
 	return endpoint.interface === 4 && endpoint.usage_page === 0xffc0;
 }
 
-export function Image() {
-	return "";
+export function ImageUrl() {
+	return "https://marketplace.signalrgb.com/devices/default/audio/speaker-render.png";
 }
