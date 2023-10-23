@@ -1,4 +1,4 @@
-export function Name() { return "MSI GPU"; }
+export function Name() { return "MSI Ampere GPU"; }
 export function Publisher() { return "WhirlwindFX"; }
 export function Documentation(){ return "troubleshooting/MSI"; }
 export function Type() { return "SMBUS"; }
@@ -259,8 +259,6 @@ class NvidiaGPUDeviceIds {
 		this.RTX3080TI       = 0x2208;
 		this.RTX3090         = 0x2204;
 		this.RTX3090TI       = 0x2203;
-		this.RTX4080		 = 0x2704;
-		this.RTX4090		 = 0x2684;
 	}
 };
 
