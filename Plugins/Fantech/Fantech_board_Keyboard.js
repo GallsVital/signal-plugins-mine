@@ -76,7 +76,7 @@ const boards = {
 			[0, 4], [1, 4], [2, 4],                         [6, 4],                [9, 4], [10, 4], [11, 4], [12, 4], [13, 4], [14, 4]
 		],
 		size: [15, 5],
-		image: "",
+		image: "https://marketplace.signalrgb.com/devices/brands/husky/keyboards/hailstorm.png",
 	},
 	"FL-ESPORTS MK870TKL":{
 		name: "FL-ESPORTS MK870TKL",
@@ -134,7 +134,7 @@ const boards = {
 			[0, 5],			[2, 5],
 		],
 		size: [4, 6],
-		image: "",
+		image: "https://marketplace.signalrgb.com/devices/brands/motospeed/keyboards/k24.png",
 	}
 };
 
