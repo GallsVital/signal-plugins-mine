@@ -955,6 +955,7 @@ class CorsairLibrary{
 			0x1BA0 : "K60 Pro",
 			0x1BAD : "K60 Pro", //Low Profile
 			0x1B8D : "K60 Pro", //SE
+			0x1BC7 : "K60 Pro TKL",
 			0x1BAF : "K65 Mini",
 			0x1bcf : "K65 Mini",
 			0x1bc3 : "K65 Mini",
@@ -989,6 +990,7 @@ class CorsairLibrary{
 			"K55 Pro XT" : "https://marketplace.signalrgb.com/devices/default/keyboards/full-size-keyboard-render.png",
 			"K57" : "https://marketplace.signalrgb.com/devices/default/keyboards/full-size-keyboard-render.png",
 			"K60 Pro" : "https://marketplace.signalrgb.com/devices/default/keyboards/full-size-keyboard-render.png",
+			"K60 Pro TKL" : "https://marketplace.signalrgb.com/devices/default/keyboards/tkl-keyboard-render.png",
 			"K65 Mini"  : "https://marketplace.signalrgb.com/devices/default/keyboards/65-keyboard-render.png",
 			"K70 Pro Mini"  : "https://marketplace.signalrgb.com/devices/default/keyboards/keyboard-60.png",
 			"K70 Pro" : "https://marketplace.signalrgb.com/devices/default/keyboards/full-size-keyboard-render.png",
@@ -1267,6 +1269,45 @@ class CorsairLibrary{
 					57, 4, 22, 7, 9, 10, 11, 13, 14, 15, 51, 52, 40, 92, 93, 94,
 					106, 29, 27, 6, 25, 5, 17, 16, 54, 55, 56, 110, 82, 89, 90, 91, 88,
 					105, 108, 107, 44, 111, 122, 101, 109, 80, 81, 79, 98, 99,
+
+					//ISO
+					100, 50
+				 ],
+				devFirmware: "0.0.0",
+				ledSpacing: 150,
+				keymapType : "Keyboard",
+			},
+			"K60 Pro TKL": {
+				name: "K60 Pro TKL",
+				size: [18, 7],
+				ledNames: [
+					"Esc", "F1", "F2", "F3", "F4", "F5", "F6", "F7", "F8", "F9", "F10", "F11", "F12",         "Print Screen", "Scroll Lock", "Pause Break",
+					"`", "1", "2", "3", "4", "5", "6", "7", "8", "9", "0", "-_", "=+", "Backspace",                        "Insert", "Home", "Page Up", //21
+					"Tab", "Q", "W", "E", "R", "T", "Y", "U", "I", "O", "P", "[", "]", "\\",                               "Del", "End", "Page Down", //21
+					"CapsLock", "A", "S", "D", "F", "G", "H", "J", "K", "L", ";", "'", "Enter", //16
+					"Left Shift", "Z", "X", "C", "V", "B", "N", "M", ",", ".", "/", "Right Shift",                                  "Up Arrow",  //17
+					"Left Ctrl", "Left Win", "Left Alt", "Space", "Right Alt", "Fn", "Menu", "Right Ctrl",  "Left Arrow", "Down Arrow", "Right Arrow",                    //13
+
+					"ISO #", "ISO <"
+				],
+				ledPositions: [
+					[1, 1],    [3, 1], [4, 1], [5, 1], [6, 1],     [7, 1], [8, 1], [9, 1], [10, 1],   [12, 1], [13, 1], [14, 1], [15, 1],  [15, 1], [16, 1], [17, 1],     //[18,1], [19,1],[20,1], [21,1],
+					[1, 2], [2, 2], [3, 2], [4, 2], [5, 2], [6, 2], [7, 2], [8, 2], [9, 2], [10, 2], [11, 2], [12, 2], [13, 2], [14, 2],   [15, 2], [16, 2], [17, 2],
+					[1, 3], [2, 3], [3, 3], [4, 3], [5, 3], [6, 3], [7, 3], [8, 3], [9, 3], [10, 3], [11, 3], [12, 3], [13, 3], [14, 3],   [15, 3], [16, 3], [17, 3],
+					[1, 4], [2, 4], [3, 4], [4, 4], [5, 4], [6, 4], [7, 4], [8, 4], [9, 4], [10, 4], [11, 4], [12, 4],         [14, 4],
+					[1, 5],     [3, 5], [4, 5], [5, 5], [6, 5], [7, 5], [8, 5], [9, 5], [10, 5], [11, 5], [12, 5],            [14, 5],           [16, 5],
+					[1, 6], [2, 6], [3, 6],                      [7, 6],                       [11, 6], [12, 6], [13, 6], [14, 6],   [15, 6], [16, 6], [17, 6],
+
+					//ISO
+					[2, 5], [13, 4]
+				 ],
+				ledMap: [
+					41, 58, 59, 60, 61, 62, 63, 64, 65, 66, 67, 68, 69, 70, 71, 72,    //120, 123, 121, 122,
+					53, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 45, 46, 42, 73, 74, 75,
+					43, 20, 26, 8, 21, 23, 28, 24, 12, 18, 19, 47, 48, 49, 76, 77, 78,
+					57, 4, 22, 7, 9, 10, 11, 13, 14, 15, 51, 52, 40,
+					106, 29, 27, 6, 25, 5, 17, 16, 54, 55, 56, 110, 82,
+					105, 108, 107, 44, 111, 122, 101, 109, 80, 81, 79,
 
 					//ISO
 					100, 50
@@ -3282,4 +3323,8 @@ class PolledFunction{
 
 		this.lastPollTime = Date.now();
 	}
+}
+
+export function ImageUrl() {
+	return "https://marketplace.signalrgb.com/devices/default/keyboards/full-size-keyboard-render.png";
 }

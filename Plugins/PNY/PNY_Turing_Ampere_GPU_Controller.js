@@ -138,6 +138,7 @@ export function BrandGPUList(){ return PNYGPUIDs; }
 const PNYGPUIDs =
 [
 	new PNYGPUIdentifier(0x196E, 0x2484, 0x136E, "PNY 3070 XLR8"),
+	new PNYGPUIdentifier(0x196E, 0x2488, 0x138A, "PNY 3070 XLR8"),
 	new PNYGPUIdentifier(0x196E, 0x2482, 0x138C, "PNY 3070TI XLR8"),
 	new PNYGPUIdentifier(0x196E, 0x2216, 0x138B, "PNY 3080 XLR8"),
 	new PNYGPUIdentifier(0x196E, 0x2208, 0x1385, "PNY 3080TI Revel"),
