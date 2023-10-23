@@ -88,7 +88,7 @@ function hexToRgb(hex) {
 }
 
 export function Validate(endpoint) {
-	return endpoint.interface === 2 | -1;
+	return endpoint.interface === 0 || endpoint.interface === 2;
 }
 
 class MysticLight {
@@ -102,7 +102,7 @@ class MysticLight {
 
 		this.Library =
 		{
-			0x0076 : //X670E Tomahawk I doubt this is actually the pid or MSI god so help me.
+			0x0076 : //X670E Tomahawk Headers? // I doubt this is actually the pid or MSI god so help me.
 			{
 				OnboardLEDs    : 0,
 				RGBHeaders     : 2,
@@ -114,7 +114,17 @@ class MysticLight {
 				ForceZoneBased	  : false,
 				JARGB_V2		  : true,
 			},
-			0xE777 : //Z790 Godlike
+			0x0ABE : //X670E Godlike M.2 RGB zone
+			{
+				OnboardLEDs    : 0,
+				RGBHeaders     : 0,
+				ARGBHeaders    : 0,
+				JPipeLEDs	   : 0,
+				CorsairHeaders : 0,
+				//PERLED
+				PerLEDOnboardLEDs : 10,
+			},
+			0xE777 : //Z790 Godlike M.2 RGB zone ?
 			{
 				OnboardLEDs    : 0,
 				RGBHeaders     : 2,
