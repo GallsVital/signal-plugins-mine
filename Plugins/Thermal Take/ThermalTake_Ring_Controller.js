@@ -1,6 +1,6 @@
 export function Name() { return "ThermalTake Riing Controller"; }
 export function VendorId() { return 0x264A; }
-export function ProductId() { return [0x2135, 0x2136, 0x2137]; } //will need to be changed based on PID shown in USB/PCI Info
+export function ProductId() { return [0x2135, 0x2136, 0x2137, 0x2143]; } //will need to be changed based on PID shown in USB/PCI Info
 export function Publisher() { return "ButtonBright"; }
 export function Size() { return [1, 1]; }
 export function Type() { return "Hid"; }
