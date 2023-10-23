@@ -345,85 +345,85 @@ class MSIGPUList {
 		this.devices =
         [
 
-        	new MSIGPUIdentifier(Nvidia.GTX1060, 			MSIGPUIDs.MSI_GTX1060_3GB,							0x68, "MSI GTX 1060 Gaming 3GB"), //Untested
-        	new MSIGPUIdentifier(Nvidia.GTX1060, 			MSIGPUIDs.MSI_GTX1060_6GB,							0x68, "MSI GTX 1060 Gaming 6GB"), //Untested
-        	new MSIGPUIdentifier(Nvidia.GTX1070, 			MSIGPUIDs.MSI_GTX1070_GAMING_X,						0x68, "MSI GTX 1070 Gaming X"),
-        	new MSIGPUIdentifier(Nvidia.GTX1070, 			MSIGPUIDs.MSI_GTX1070_GAMING_X_8G,					0x68, "MSI GTX 1070 Gaming X 8G"), //Untested
-        	// new MSIGPUIdentifier(Nvidia.GTX1080, 			MSIGPUIDs.MSI_GTX1080_DUKE,			0x68, "MSI GTX 1080 DUKE"), //Untested, and unlikely to work, based on nvapi capture provided
-        	// new MSIGPUIdentifier(Nvidia.GTX1080TI, 			MSIGPUIDs.MSI_GTX1080TI_GAMING_X,			0x68, "MSI GTX 1080 Gaming X"), //Untested and unlikely to work. Dev is 0x38.
+        	new MSIGPUIdentifier(Nvidia.GTX1060, 			MSIGPUIDs.MSI_GTX1060_3GB,							0x68, "MSI 1060 Gaming 3GB"), //Untested
+        	new MSIGPUIdentifier(Nvidia.GTX1060, 			MSIGPUIDs.MSI_GTX1060_6GB,							0x68, "MSI 1060 Gaming 6GB"), //Untested
+        	new MSIGPUIdentifier(Nvidia.GTX1070, 			MSIGPUIDs.MSI_GTX1070_GAMING_X,						0x68, "MSI 1070 Gaming X"),
+        	new MSIGPUIdentifier(Nvidia.GTX1070, 			MSIGPUIDs.MSI_GTX1070_GAMING_X_8G,					0x68, "MSI 1070 Gaming X 8G"), //Untested
+        	// new MSIGPUIdentifier(Nvidia.GTX1080, 			MSIGPUIDs.MSI_GTX1080_DUKE,			0x68, "MSI 1080 DUKE"), //Untested, and unlikely to work, based on nvapi capture provided
+        	// new MSIGPUIdentifier(Nvidia.GTX1080TI, 			MSIGPUIDs.MSI_GTX1080TI_GAMING_X,			0x68, "MSI 1080 Gaming X"), //Untested and unlikely to work. Dev is 0x38.
 
-        	new MSIGPUIdentifier(Nvidia.GTX1660, 			MSIGPUIDs.MSI_GTX1660_GAMING_X_6G,					0x68, "MSI GTX 1660 Gaming X 6G"),
-        	new MSIGPUIdentifier(Nvidia.GTX1660TI, 			MSIGPUIDs.MSI_GTX1660TI_GAMING_X_6G,				0x68, "MSI GTX 1060Ti Gaming X"),
-        	new MSIGPUIdentifier(Nvidia.GTX1660TI, 			MSIGPUIDs.MSI_GTX1660TI_GAMING_X_6G_2,				0x68, "MSI GTX 1060Ti Gaming X"), //Untested
-        	new MSIGPUIdentifier(Nvidia.GTX1660S, 			MSIGPUIDs.MSI_GTX1660_SUPER_GAMING_6G,				0x68, "MSI GTX 1660 Super Gaming 6G"),
-        	new MSIGPUIdentifier(Nvidia.GTX1660S, 			MSIGPUIDs.MSI_GTX1660_SUPER_GAMING_X_6G,			0x68, "MSI GTX 1660 Super Gaming X 6G"),
-        	new MSIGPUIdentifier(Nvidia.GTX1660S, 			MSIGPUIDs.MSI_GTX1660S_VENTUS_XS_OC,				0x68, "MSI GTX 1660 Super Ventos XS OC"),
+        	new MSIGPUIdentifier(Nvidia.GTX1660, 			MSIGPUIDs.MSI_GTX1660_GAMING_X_6G,					0x68, "MSI 1660 Gaming X 6G"),
+        	new MSIGPUIdentifier(Nvidia.GTX1660TI, 			MSIGPUIDs.MSI_GTX1660TI_GAMING_X_6G,				0x68, "MSI 1060Ti Gaming X"),
+        	new MSIGPUIdentifier(Nvidia.GTX1660TI, 			MSIGPUIDs.MSI_GTX1660TI_GAMING_X_6G_2,				0x68, "MSI 1060Ti Gaming X"), //Untested
+        	new MSIGPUIdentifier(Nvidia.GTX1660S, 			MSIGPUIDs.MSI_GTX1660_SUPER_GAMING_6G,				0x68, "MSI 1660 Super Gaming 6G"),
+        	new MSIGPUIdentifier(Nvidia.GTX1660S, 			MSIGPUIDs.MSI_GTX1660_SUPER_GAMING_X_6G,			0x68, "MSI 1660 Super Gaming X 6G"),
+        	new MSIGPUIdentifier(Nvidia.GTX1660S, 			MSIGPUIDs.MSI_GTX1660S_VENTUS_XS_OC,				0x68, "MSI 1660 Super Ventos XS OC"),
 
-        	new MSIGPUIdentifier(Nvidia.RTX2060_TU104,		MSIGPUIDs. MSI_RTX2060_GAMING_Z_6G,					0x68, "MSI RTX 2060 Gaming Z"),
-        	new MSIGPUIdentifier(Nvidia.RTX2060_TU106,		MSIGPUIDs. MSI_RTX2060_GAMING_Z_6G,					0x68, "MSI RTX 2060 Gaming Z"),
-        	new MSIGPUIdentifier(Nvidia.RTX2060_TU106,		MSIGPUIDs. MSI_RTX2060_GAMING_Z_6G_2,				0x68, "MSI RTX 2060 Gaming Z"),
-        	new MSIGPUIdentifier(Nvidia.RTX2060S_OC,		MSIGPUIDs.MSI_RTX2060_SUPER_GAMING_X,				0x68, "MSI RTX 2060 Super Gaming X"),
-        	new MSIGPUIdentifier(Nvidia.RTX2060S_OC,		MSIGPUIDs.MSI_RTX2060_SUPER_GAMING,					0x68, "MSI RTX 2060 Super Gaming"),
-        	new MSIGPUIdentifier(Nvidia.RTX2060S_OC,		MSIGPUIDs.MSI_RTX2060_SUPER_ARMOR_OC,				0x68, "MSI RTX 2060 Super Armor OC"),
-        	new MSIGPUIdentifier(Nvidia.RTX2070_OC,			MSIGPUIDs.MSI_RTX2070_GAMING_Z_SUB_DEV,				0x68, "MSI RTX 2070 Gaming Z"),
-        	new MSIGPUIdentifier(Nvidia.RTX2070, 			MSIGPUIDs.MSI_RTX2070_GAMING,						0x68, "MSI RTX 2070 Gaming"),
-        	new MSIGPUIdentifier(Nvidia.RTX2070, 			MSIGPUIDs.MSI_RTX2070_ARMOR,						0x68, "MSI RTX 2070 Armor"),
-        	new MSIGPUIdentifier(Nvidia.RTX2070_OC,			MSIGPUIDs.MSI_RTX2070_ARMOR,						0x68, "MSI RTX 2070 Armor OC"),
-        	new MSIGPUIdentifier(Nvidia.RTX2070S, 			MSIGPUIDs.MSI_RTX2070_SUPER_GAMING_TRIO,			0x68, "MSI RTX 2070 Super Gaming Trio"),
-        	new MSIGPUIdentifier(Nvidia.RTX2070S, 			MSIGPUIDs.MSI_RTX2070_SUPER_GAMING_X,				0x68, "MSI RTX 2070 Super Gaming X"),
-        	new MSIGPUIdentifier(Nvidia.RTX2070S, 			MSIGPUIDs.MSI_RTX2070_SUPER_GAMING_X_TRIO,			0x68, "MSI RTX 2070 Super Gaming X Trio"),
-        	new MSIGPUIdentifier(Nvidia.RTX2070S, 			MSIGPUIDs.MSI_RTX2070_SUPER_GAMING_Z_TRIO,			0x68, "MSI RTX 2070 Super Gaming Z Trio"),
-        	new MSIGPUIdentifier(Nvidia.RTX2080, 			MSIGPUIDs.MSI_RTX2080_GAMING_TRIO,					0x68, "MSI RTX 2080 Gaming Trio"),
-        	new MSIGPUIdentifier(Nvidia.RTX2080_A, 			MSIGPUIDs.MSI_RTX2080_GAMING_X_TRIO,				0x68, "MSI RTX 2080 Gaming X Trio"),
-        	new MSIGPUIdentifier(Nvidia.RTX2080_A, 			MSIGPUIDs.MSI_RTX2080_DUKE_OC,						0x68, "MSI RTX 2080 Duke OC"),
-        	new MSIGPUIdentifier(Nvidia.RTX2080_A, 			MSIGPUIDs.MSI_RTX2080_SEA_HAWK_EK_X,				0x68, "MSI RTX 2080 Sea Hawk EK x"),
-        	new MSIGPUIdentifier(Nvidia.RTX2080S, 			MSIGPUIDs.MSI_RTX2080S_GAMING_X_TRIO,				0x68, "MSI RTX 2080 Super Gaming X Trio"),
-        	new MSIGPUIdentifier(Nvidia.RTX2080S,			MSIGPUIDs.MSI_RTX2080_SUPER_SEA_HAWK_EK_X,			0x68, "MSI RTX 2080 Super SEA HAWK EK"),
-        	new MSIGPUIdentifier(Nvidia.RTX2080TI, 			MSIGPUIDs.MSI_RTX2080TI_GAMING_X_TRIO,				0x68, "MSI RTX 2080Ti Gaming X Trio"),
-        	new MSIGPUIdentifier(Nvidia.RTX2080TI, 			MSIGPUIDs.MSI_RTX2080TI_GAMING_Z_TRIO,				0x68, "MSI RTX 2080Ti Gaming Z Trio"), //Untested
-        	new MSIGPUIdentifier(Nvidia.RTX2080TI, 			MSIGPUIDs.MSI_RTX2080TI_SEA_HAWK_EK_X,				0x68, "MSI RTX 2080Ti Sea Hawk EK X"),
-        	new MSIGPUIdentifier(Nvidia.RTX2080TI, 			MSIGPUIDs.MSI_RTX2080TI_LIGHTNING_Z,				0x68, "MSI RTX 2080Ti Lightning Z"),    //Untested
-        	new MSIGPUIdentifier(Nvidia.RTX2080TI, 			MSIGPUIDs.MSI_RTX2080TI_DUKE_OC,					0x68, "MSI RTX 2080Ti DUKE OC"),
+        	new MSIGPUIdentifier(Nvidia.RTX2060_TU104,		MSIGPUIDs. MSI_RTX2060_GAMING_Z_6G,					0x68, "MSI 2060 Gaming Z"),
+        	new MSIGPUIdentifier(Nvidia.RTX2060_TU106,		MSIGPUIDs. MSI_RTX2060_GAMING_Z_6G,					0x68, "MSI 2060 Gaming Z"),
+        	new MSIGPUIdentifier(Nvidia.RTX2060_TU106,		MSIGPUIDs. MSI_RTX2060_GAMING_Z_6G_2,				0x68, "MSI 2060 Gaming Z"),
+        	new MSIGPUIdentifier(Nvidia.RTX2060S_OC,		MSIGPUIDs.MSI_RTX2060_SUPER_GAMING_X,				0x68, "MSI 2060 Super Gaming X"),
+        	new MSIGPUIdentifier(Nvidia.RTX2060S_OC,		MSIGPUIDs.MSI_RTX2060_SUPER_GAMING,					0x68, "MSI 2060 Super Gaming"),
+        	new MSIGPUIdentifier(Nvidia.RTX2060S_OC,		MSIGPUIDs.MSI_RTX2060_SUPER_ARMOR_OC,				0x68, "MSI 2060 Super Armor OC"),
+        	new MSIGPUIdentifier(Nvidia.RTX2070_OC,			MSIGPUIDs.MSI_RTX2070_GAMING_Z_SUB_DEV,				0x68, "MSI 2070 Gaming Z"),
+        	new MSIGPUIdentifier(Nvidia.RTX2070, 			MSIGPUIDs.MSI_RTX2070_GAMING,						0x68, "MSI 2070 Gaming"),
+        	new MSIGPUIdentifier(Nvidia.RTX2070, 			MSIGPUIDs.MSI_RTX2070_ARMOR,						0x68, "MSI 2070 Armor"),
+        	new MSIGPUIdentifier(Nvidia.RTX2070_OC,			MSIGPUIDs.MSI_RTX2070_ARMOR,						0x68, "MSI 2070 Armor OC"),
+        	new MSIGPUIdentifier(Nvidia.RTX2070S, 			MSIGPUIDs.MSI_RTX2070_SUPER_GAMING_TRIO,			0x68, "MSI 2070 Super Gaming Trio"),
+        	new MSIGPUIdentifier(Nvidia.RTX2070S, 			MSIGPUIDs.MSI_RTX2070_SUPER_GAMING_X,				0x68, "MSI 2070 Super Gaming X"),
+        	new MSIGPUIdentifier(Nvidia.RTX2070S, 			MSIGPUIDs.MSI_RTX2070_SUPER_GAMING_X_TRIO,			0x68, "MSI 2070 Super Gaming X Trio"),
+        	new MSIGPUIdentifier(Nvidia.RTX2070S, 			MSIGPUIDs.MSI_RTX2070_SUPER_GAMING_Z_TRIO,			0x68, "MSI 2070 Super Gaming Z Trio"),
+        	new MSIGPUIdentifier(Nvidia.RTX2080, 			MSIGPUIDs.MSI_RTX2080_GAMING_TRIO,					0x68, "MSI 2080 Gaming Trio"),
+        	new MSIGPUIdentifier(Nvidia.RTX2080_A, 			MSIGPUIDs.MSI_RTX2080_GAMING_X_TRIO,				0x68, "MSI 2080 Gaming X Trio"),
+        	new MSIGPUIdentifier(Nvidia.RTX2080_A, 			MSIGPUIDs.MSI_RTX2080_DUKE_OC,						0x68, "MSI 2080 Duke OC"),
+        	new MSIGPUIdentifier(Nvidia.RTX2080_A, 			MSIGPUIDs.MSI_RTX2080_SEA_HAWK_EK_X,				0x68, "MSI 2080 Sea Hawk EK x"),
+        	new MSIGPUIdentifier(Nvidia.RTX2080S, 			MSIGPUIDs.MSI_RTX2080S_GAMING_X_TRIO,				0x68, "MSI 2080 Super Gaming X Trio"),
+        	new MSIGPUIdentifier(Nvidia.RTX2080S,			MSIGPUIDs.MSI_RTX2080_SUPER_SEA_HAWK_EK_X,			0x68, "MSI 2080 Super SEA HAWK EK"),
+        	new MSIGPUIdentifier(Nvidia.RTX2080TI, 			MSIGPUIDs.MSI_RTX2080TI_GAMING_X_TRIO,				0x68, "MSI 2080Ti Gaming X Trio"),
+        	new MSIGPUIdentifier(Nvidia.RTX2080TI, 			MSIGPUIDs.MSI_RTX2080TI_GAMING_Z_TRIO,				0x68, "MSI 2080Ti Gaming Z Trio"), //Untested
+        	new MSIGPUIdentifier(Nvidia.RTX2080TI, 			MSIGPUIDs.MSI_RTX2080TI_SEA_HAWK_EK_X,				0x68, "MSI 2080Ti Sea Hawk EK X"),
+        	new MSIGPUIdentifier(Nvidia.RTX2080TI, 			MSIGPUIDs.MSI_RTX2080TI_LIGHTNING_Z,				0x68, "MSI 2080Ti Lightning Z"),    //Untested
+        	new MSIGPUIdentifier(Nvidia.RTX2080TI, 			MSIGPUIDs.MSI_RTX2080TI_DUKE_OC,					0x68, "MSI 2080Ti DUKE OC"),
 
-        	new MSIGPUIdentifier(Nvidia.RTX3050, 			MSIGPUIDs.MSI_RTX3050_GAMING_X_8G,					0x68, "MSI RTX 3050 Gaming X 8G"),
+        	new MSIGPUIdentifier(Nvidia.RTX3050, 			MSIGPUIDs.MSI_RTX3050_GAMING_X_8G,					0x68, "MSI 3050 Gaming X 8G"),
 
-        	new MSIGPUIdentifier(Nvidia.RTX3060, 			MSIGPUIDs.MSI_RTX3060_GAMING_X_TRIO_12G,			0x68, "MSI RTX 3060 Gaming X Trio 12G"),     //Duplicate sub dev id on different dev id
-        	new MSIGPUIdentifier(Nvidia.RTX3060_GA104,		MSIGPUIDs.MSI_RTX3060_GAMING_X_TRIO_12G,			0x68, "MSI RTX 3060 Gaming X Trio 12G"),     //Duplicate sub dev id on different dev id
-        	new MSIGPUIdentifier(Nvidia.RTX3060, 			MSIGPUIDs.MSI_RTX3060_GAMING_X_12G,					0x68, "MSI RTX 3060 Gaming X 12g"),
-        	new MSIGPUIdentifier(Nvidia.RTX3060_LHR,		MSIGPUIDs.MSI_RTX3060_GAMING_X_12G,					0x68, "MSI RTX 3060 Gaming X 12G LHR"),
-        	new MSIGPUIdentifier(Nvidia.RTX3060_GA104,		MSIGPUIDs.MSI_RTX3060_GAMING_X_12G,					0x68, "MSI RTX 3060 Gaming X 12G (GA104)"),
-        	new MSIGPUIdentifier(Nvidia.RTX3060_LHR,		MSIGPUIDs.MSI_RTX3060_GAMING_X_TRIO_LHR,			0x68, "MSI RTX 3060 Gaming X Trio 12G LHR"),
+        	new MSIGPUIdentifier(Nvidia.RTX3060, 			MSIGPUIDs.MSI_RTX3060_GAMING_X_TRIO_12G,			0x68, "MSI 3060 Gaming X Trio 12G"),     //Duplicate sub dev id on different dev id
+        	new MSIGPUIdentifier(Nvidia.RTX3060_GA104,		MSIGPUIDs.MSI_RTX3060_GAMING_X_TRIO_12G,			0x68, "MSI 3060 Gaming X Trio 12G"),     //Duplicate sub dev id on different dev id
+        	new MSIGPUIdentifier(Nvidia.RTX3060, 			MSIGPUIDs.MSI_RTX3060_GAMING_X_12G,					0x68, "MSI 3060 Gaming X 12g"),
+        	new MSIGPUIdentifier(Nvidia.RTX3060_LHR,		MSIGPUIDs.MSI_RTX3060_GAMING_X_12G,					0x68, "MSI 3060 Gaming X 12G LHR"),
+        	new MSIGPUIdentifier(Nvidia.RTX3060_GA104,		MSIGPUIDs.MSI_RTX3060_GAMING_X_12G,					0x68, "MSI 3060 Gaming X 12G (GA104)"),
+        	new MSIGPUIdentifier(Nvidia.RTX3060_LHR,		MSIGPUIDs.MSI_RTX3060_GAMING_X_TRIO_LHR,			0x68, "MSI 3060 Gaming X Trio 12G LHR"),
 
-        	new MSIGPUIdentifier(Nvidia.RTX3060TI, 			MSIGPUIDs.MSI_RTX3070_GAMING_X_TRIO,				0x68, "MSI RTX 3060Ti Gaming X Trio"), //Duplicate sub dev id on different dev id
-        	new MSIGPUIdentifier(Nvidia.RTX3060TI_LHR,		MSIGPUIDs.MSI_RTX3060TI_GAMING_X_LHR,				0x68, "MSI RTX 3060Ti Gaming X LHR"),
-        	new MSIGPUIdentifier(Nvidia.RTX3060TI_LHR,		MSIGPUIDs.MSI_RTX3060TI_GAMING_X_TRIO_LHR,			0x68, "MSI RTX 3060Ti Gaming X Trio LHR"),
-        	new MSIGPUIdentifier(Nvidia.RTX3060TI_GDDR6X,	MSIGPUIDs.MSI_RTX3060TI_GAMING_X_TRIO_LHR_GDDR6X,   0x68, "MSI RTX 3060Ti Gaming X Trio LHR"),
+        	new MSIGPUIdentifier(Nvidia.RTX3060TI, 			MSIGPUIDs.MSI_RTX3070_GAMING_X_TRIO,				0x68, "MSI 3060Ti Gaming X Trio"), //Duplicate sub dev id on different dev id
+        	new MSIGPUIdentifier(Nvidia.RTX3060TI_LHR,		MSIGPUIDs.MSI_RTX3060TI_GAMING_X_LHR,				0x68, "MSI 3060Ti Gaming X LHR"),
+        	new MSIGPUIdentifier(Nvidia.RTX3060TI_LHR,		MSIGPUIDs.MSI_RTX3060TI_GAMING_X_TRIO_LHR,			0x68, "MSI 3060Ti Gaming X Trio LHR"),
+        	new MSIGPUIdentifier(Nvidia.RTX3060TI_GDDR6X,	MSIGPUIDs.MSI_RTX3060TI_GAMING_X_TRIO_LHR_GDDR6X,   0x68, "MSI 3060Ti Gaming X Trio LHR"),
         	new MSIGPUIdentifier(Nvidia.RTX3060TI_GDDR6X,	MSIGPUIDs.MSI_RTX3060TI_SUPER_3X,					0x68, "MSI 3060Ti Super 3X"),
 
-        	new MSIGPUIdentifier(Nvidia.RTX3070, 			MSIGPUIDs.MSI_RTX3070_GAMING_X_TRIO,				0x68, "MSI RTX 3070 Gaming X Trio"),
-        	new MSIGPUIdentifier(Nvidia.RTX3070, 			MSIGPUIDs.MSI_RTX3070_GAMING_Z_TRIO,				0x68, "MSI RTX 3070 Gaming X Trio"),
-        	new MSIGPUIdentifier(Nvidia.RTX3070_LHR,		MSIGPUIDs.MSI_RTX3070_GAMING_Z_TRIO,				0x68, "MSI RTX 3070 Gaming Z Trio"),
-        	new MSIGPUIdentifier(Nvidia.RTX3070, 			MSIGPUIDs.MSI_RTX3070_SUPRIM_X,						0x68, "MSI RTX 3070 Suprim X"),
-        	new MSIGPUIdentifier(Nvidia.RTX3070_LHR,		MSIGPUIDs. MSI_RTX3070_SUPRIM_X,					0x68, "MSI RTX 3070 Suprim X LHR"),
-        	new MSIGPUIdentifier(Nvidia.RTX3070, 			MSIGPUIDs.MSI_RTX3070_SUPRIM,						0x68, "MSI RTX 3070 Suprim"),
-        	new MSIGPUIdentifier(Nvidia.RTX3070_LHR,		MSIGPUIDs.MSI_RTX3070_SUPRIM,						0x68, "MSI RTX 3070 Suprim LHR"),
-        	new MSIGPUIdentifier(Nvidia.RTX3070TI, 			MSIGPUIDs.MSI_RTX3070TI_GAMING_X_TRIO,				0x68, "MSI RTX 3070Ti Gaming X Trio"),
-        	new MSIGPUIdentifier(Nvidia.RTX3070TI, 			MSIGPUIDs.MSI_RTX3070TI_SUPRIM_X,					0x68, "MSI RTX 3070Ti Suprim X"),
+        	new MSIGPUIdentifier(Nvidia.RTX3070, 			MSIGPUIDs.MSI_RTX3070_GAMING_X_TRIO,				0x68, "MSI 3070 Gaming X Trio"),
+        	new MSIGPUIdentifier(Nvidia.RTX3070, 			MSIGPUIDs.MSI_RTX3070_GAMING_Z_TRIO,				0x68, "MSI 3070 Gaming X Trio"),
+        	new MSIGPUIdentifier(Nvidia.RTX3070_LHR,		MSIGPUIDs.MSI_RTX3070_GAMING_Z_TRIO,				0x68, "MSI 3070 Gaming Z Trio"),
+        	new MSIGPUIdentifier(Nvidia.RTX3070, 			MSIGPUIDs.MSI_RTX3070_SUPRIM_X,						0x68, "MSI 3070 Suprim X"),
+        	new MSIGPUIdentifier(Nvidia.RTX3070_LHR,		MSIGPUIDs. MSI_RTX3070_SUPRIM_X,					0x68, "MSI 3070 Suprim X LHR"),
+        	new MSIGPUIdentifier(Nvidia.RTX3070, 			MSIGPUIDs.MSI_RTX3070_SUPRIM,						0x68, "MSI 3070 Suprim"),
+        	new MSIGPUIdentifier(Nvidia.RTX3070_LHR,		MSIGPUIDs.MSI_RTX3070_SUPRIM,						0x68, "MSI 3070 Suprim LHR"),
+        	new MSIGPUIdentifier(Nvidia.RTX3070TI, 			MSIGPUIDs.MSI_RTX3070TI_GAMING_X_TRIO,				0x68, "MSI 3070Ti Gaming X Trio"),
+        	new MSIGPUIdentifier(Nvidia.RTX3070TI, 			MSIGPUIDs.MSI_RTX3070TI_SUPRIM_X,					0x68, "MSI 3070Ti Suprim X"),
 
-        	new MSIGPUIdentifier(Nvidia.RTX3080, 			MSIGPUIDs.MSI_RTX3080_SUPRIM,						0x68, "MSI RTX 3080 Suprim"),
-        	new MSIGPUIdentifier(Nvidia.RTX3080, 			MSIGPUIDs.MSI_RTX3080_GAMING_X_TRIO,				0x68, "MSI RTX 3080 Gaming X Trio"),
-        	new MSIGPUIdentifier(Nvidia.RTX3080_LHR,		MSIGPUIDs.MSI_RTX3080_GAMING_Z_TRIO,				0x68, "MSI RTX 3080 Gaming Z Trio LHR"),
-        	new MSIGPUIdentifier(Nvidia.RTX3080_GA102,		MSIGPUIDs.MSI_RTX3080_GAMING_Z_TRIO,				0x68, "MSI RTX 3080 Gaming Z Trio 12g LHR"),
-        	new MSIGPUIdentifier(Nvidia.RTX3080, 			MSIGPUIDs.MSI_RTX3080_SUPRIM_X,						0x68, "MSI RTX 3080 Suprim X"),
-        	new MSIGPUIdentifier(Nvidia.RTX3080_GA102,		MSIGPUIDs.MSI_RTX3080_SUPRIM_X,						0x68, "MSI RTX 3080 Suprim X 12g"),
-        	new MSIGPUIdentifier(Nvidia.RTX3080_LHR,		MSIGPUIDs.MSI_RTX3080_SUPRIM_X,						0x68, "MSI RTX 3080 Suprim X LHR"),
-        	new MSIGPUIdentifier(Nvidia.RTX3080, 			MSIGPUIDs.MSI_RTX3080TI_GAMING_X_TRIO,				0x68, "MSI RTX 3080 Suprim X"),
-        	new MSIGPUIdentifier(Nvidia.RTX3080TI, 			MSIGPUIDs.MSI_RTX3080TI_GAMING_X_TRIO,				0x68, "MSI RTX 3080Ti Gaming X Trio"),
-        	new MSIGPUIdentifier(Nvidia.RTX3080TI, 			MSIGPUIDs.MSI_RTX3080_SUPRIM_X,						0x68, "MSI RTX 3080Ti Suprim X"),
-        	new MSIGPUIdentifier(Nvidia.RTX3090, 			MSIGPUIDs.MSI_RTX3090_GAMING_X_TRIO,				0x68, "MSI RTX 3090 Gaming X Trio"),
-        	new MSIGPUIdentifier(Nvidia.RTX3090, 			MSIGPUIDs.MSI_RTX3090_SUPRIM_X,						0x68, "MSI RTX 3090 Suprim X"),
-        	new MSIGPUIdentifier(Nvidia.RTX3090TI, 			MSIGPUIDs.MSI_RTX3090TI_SUPRIX_X,					0x68, "MSI RTX 3090 TI Suprim X"), //Untested
-        	new MSIGPUIdentifier(Nvidia.RTX3090TI, 			MSIGPUIDs.MSI_RTX3090TI_GAMING_TRIO,				0x68, "MSI RTX 3090 TI Gaming Trio"), //Untested
+        	new MSIGPUIdentifier(Nvidia.RTX3080, 			MSIGPUIDs.MSI_RTX3080_SUPRIM,						0x68, "MSI 3080 Suprim"),
+        	new MSIGPUIdentifier(Nvidia.RTX3080, 			MSIGPUIDs.MSI_RTX3080_GAMING_X_TRIO,				0x68, "MSI 3080 Gaming X Trio"),
+        	new MSIGPUIdentifier(Nvidia.RTX3080_LHR,		MSIGPUIDs.MSI_RTX3080_GAMING_Z_TRIO,				0x68, "MSI 3080 Gaming Z Trio LHR"),
+        	new MSIGPUIdentifier(Nvidia.RTX3080_GA102,		MSIGPUIDs.MSI_RTX3080_GAMING_Z_TRIO,				0x68, "MSI 3080 Gaming Z Trio 12g LHR"),
+        	new MSIGPUIdentifier(Nvidia.RTX3080, 			MSIGPUIDs.MSI_RTX3080_SUPRIM_X,						0x68, "MSI 3080 Suprim X"),
+        	new MSIGPUIdentifier(Nvidia.RTX3080_GA102,		MSIGPUIDs.MSI_RTX3080_SUPRIM_X,						0x68, "MSI 3080 Suprim X 12g"),
+        	new MSIGPUIdentifier(Nvidia.RTX3080_LHR,		MSIGPUIDs.MSI_RTX3080_SUPRIM_X,						0x68, "MSI 3080 Suprim X LHR"),
+        	new MSIGPUIdentifier(Nvidia.RTX3080, 			MSIGPUIDs.MSI_RTX3080TI_GAMING_X_TRIO,				0x68, "MSI 3080 Suprim X"),
+        	new MSIGPUIdentifier(Nvidia.RTX3080TI, 			MSIGPUIDs.MSI_RTX3080TI_GAMING_X_TRIO,				0x68, "MSI 3080Ti Gaming X Trio"),
+        	new MSIGPUIdentifier(Nvidia.RTX3080TI, 			MSIGPUIDs.MSI_RTX3080_SUPRIM_X,						0x68, "MSI 3080Ti Suprim X"),
+        	new MSIGPUIdentifier(Nvidia.RTX3090, 			MSIGPUIDs.MSI_RTX3090_GAMING_X_TRIO,				0x68, "MSI 3090 Gaming X Trio"),
+        	new MSIGPUIdentifier(Nvidia.RTX3090, 			MSIGPUIDs.MSI_RTX3090_SUPRIM_X,						0x68, "MSI 3090 Suprim X"),
+        	new MSIGPUIdentifier(Nvidia.RTX3090TI, 			MSIGPUIDs.MSI_RTX3090TI_SUPRIX_X,					0x68, "MSI 3090 TI Suprim X"), //Untested
+        	new MSIGPUIdentifier(Nvidia.RTX3090TI, 			MSIGPUIDs.MSI_RTX3090TI_GAMING_TRIO,				0x68, "MSI 3090 TI Gaming Trio"), //Untested
         ];
 	}
 }
