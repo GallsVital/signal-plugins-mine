@@ -143,17 +143,17 @@ let vKeys = [];
 let vKeyPositions = [];
 
 export function Size() {
-	return boards[boardModel].size;
+	return boards["Fantech MAXFIT61"].size;
 }
 
 export function LedNames() {
-	vKeyNames = boards[boardModel].vKeyNames;
+	vKeyNames = boards["Fantech MAXFIT61"].vKeyNames;
 
 	return vKeyNames;
 }
 
 export function LedPositions() {
-	vKeyPositions = boards[boardModel].vKeyPositions;
+	vKeyPositions = boards["Fantech MAXFIT61"].vKeyPositions;
 
 	return vKeyPositions;
 }
