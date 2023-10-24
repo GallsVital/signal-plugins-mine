@@ -142,6 +142,7 @@ const PNYGPUIDs =
 	new PNYGPUIdentifier(0x2782, 0x13D4, "PNY 4070TI XLR8"),
 	new PNYGPUIdentifier(0x2782, 0x13B2, "PNY 4070Ti XLR8 VERTO"),
 
+	new PNYGPUIdentifier(0x2704, 0x13AF, "PNY 4080 XLR8"),
 	new PNYGPUIdentifier(0x2704, 0x13B0, "PNY 4080 XLR8 VERTO OC"),
 	new PNYGPUIdentifier(0x2704, 0x13BB, "PNY 4080 XLR8 VERTO"),
 	new PNYGPUIdentifier(0x2704, 0x13BC, "PNY 4080 XLR8 Gaming OC"),
