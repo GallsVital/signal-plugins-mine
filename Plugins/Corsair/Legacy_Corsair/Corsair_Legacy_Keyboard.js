@@ -188,7 +188,8 @@ class LegacyCorsairLibrary {
 			0x1B33 : "K70 MKII", //Lux
 			0x1B13 : "K70 MKII", //OG K70
 			0x1B11 : "K95 RGB",
-			0x1B2D : "K95 Plat"
+			0x1B2D : "K95 Plat",
+			0x1B82 : "K95 Plat", //SE
 		};
 		this.deviceNameLibrary = {
 			0x1b49 : "K70 MKII",
@@ -199,7 +200,8 @@ class LegacyCorsairLibrary {
 			0x1B33 : "K70 Lux", //Lux
 			0x1B13 : "K70", //OG K70
 			0x1B11 : "K95 RGB",
-			0x1B2D : "K95 Platinum"
+			0x1B2D : "K95 Platinum",
+			0x1B82 : "K95 Platinum SE"
 		};
 		this.DeviceLibrary = {
 			"K70 MKII" : {
@@ -392,7 +394,11 @@ class LegacyCorsairProtocol {
 			"Mouse" : 0x01,
 			"Keyboard" : 0x03,
 			"Mousepad" : 0x04,
-			"Headset Stand" : 0x05
+			"Headset Stand" : 0x05,
+			0x01 : "Mouse",
+			0x03 : "Keyboard",
+			0x04 : "Mousepad",
+			0x05 : "Headset Stand"
 		};
 
 		this.DeviceIdentifiers =
@@ -732,7 +738,7 @@ class LegacyCorsairProtocol {
 	}
 	/** Set Device Lighting Mode.*/
 	setLightingControlMode(mode) {
-		const packet = [this.Commands.lightingControl, mode, 0x00, this.Config.deviceType];
+		const packet = [this.Commands.lightingControl, mode, 0x00, 0x03];
 		this.setCommand(packet);
 	}
 	/** Set Software Lighting on the Dark Core and Dark Core SE. Things use a wacky packet send.*/

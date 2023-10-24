@@ -55,8 +55,8 @@ export function LedPositions() {
 
 export function Initialize() {
 	MSIMotherboard.checkPerLEDSupport();
-	MSIMotherboard.detectGen2Support(); //Kind of cheating to call this detection, but welcome to MSI. Abandon all hope of autodetection.
 	MSIMotherboard.createLEDs();
+	MSIMotherboard.detectGen2Support(); //Kind of cheating to call this detection, but welcome to MSI. Abandon all hope of autodetection.
 
 	if(perLED) { MSIMotherboard.setPerledMode(true); }
 
@@ -87,7 +87,7 @@ function hexToRgb(hex) {
 }
 
 export function Validate(endpoint) {
-	return endpoint.interface === 2 | -1;
+	return endpoint.interface === 2 || endpoint.interface === 0;
 }
 
 class MysticLight {
@@ -1022,6 +1022,18 @@ class MysticLight {
 				ForceZoneBased	  : false,
 				JARGB_V2		  : true,
 			},
+			0x7D68 : //X670E Godlike
+			{
+				OnboardLEDs    : 0,
+				RGBHeaders     : 1,
+				ARGBHeaders    : 3,
+				JPipeLEDs	   : 0,
+				CorsairHeaders : 0,
+				//PERLED
+				PerLEDOnboardLEDs : 0,
+				ForceZoneBased	  : false,
+				JARGB_V2		  : true,
+			},
 			0x7D69 : //X670E Ace
 			{
 				OnboardLEDs    : 6,
@@ -1523,8 +1535,7 @@ class MysticLight {
 			device.log("Motherboard is not PerLED 😔", {toFile:true});
 		}
 
-		if(this.Library[device.productId()]["ForceZoneBased"] === true) //I'm leaving this untouched, as no new boards are zone based. Lord so help me if that changes MSI.
-		{
+		if(this.Library[device.productId()]["ForceZoneBased"] === true) { //I'm leaving this untouched, as no new boards are zone based. Lord so help me if that changes MSI.
 			perLED = false;
 		}
 	}
@@ -1909,15 +1920,15 @@ class MysticLight {
 		let header3Count = 1;
 
 		if(ARGBHeaders > 0) {
-			header1Count = device.channel(ChannelArray[0][0]).LedCount();
+			header1Count = device.channel(ChannelArray[0][0])?.LedCount() ?? 0;
 
 			if(ARGBHeaders > 1) {
-				header2Count = device.channel(ChannelArray[1][0]).LedCount();
+				header2Count = device.channel(ChannelArray[1][0])?.LedCount() ?? 0;
 			}
 		}
 
 		if(ARGBHeaders > 2 || CorsairHeaders > 0) {
-			header3Count = device.channel(ChannelArray[2][0]).LedCount();
+			header3Count = device.channel(ChannelArray[2][0])?.LedCount() ?? 0;
 		}
 
 		if(header1Count !== this.header1LEDCount || header2Count !== this.header2LEDCount || header3Count !== this.header3LEDCount) {
@@ -2043,7 +2054,7 @@ class MysticLight {
 		if(OnboardLEDData.length > 0 && !this.CompareArrays(this.lastonboardData, OnboardLEDData)) {
 			device.send_report([0x53, 0x25, 0x06, 0x00, 0x00].concat(OnboardLEDData), 725);
 			device.pause(10);
-			this.lastonboardData = OnboardLEDData;
+			this.lastonboardData = OnboardLEDData ?? [];
 		}
 	}
 
@@ -2081,7 +2092,7 @@ class MysticLight {
 
 		if(OnboardLEDData.length > 0 && !this.CompareArrays(this.lastonboardData, OnboardLEDData)) {
 			device.send_report([0x53, 0x25, 0x06, 0x00, 0x00].concat(OnboardLEDData), 725);
-			this.lastonboardData = OnboardLEDData;
+			this.lastonboardData = OnboardLEDData ?? [];
 		}
 	}
 }

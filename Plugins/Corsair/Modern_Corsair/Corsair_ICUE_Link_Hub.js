@@ -256,9 +256,18 @@ function addChildDevice(childDevice, uniqueId, deviceNumber) {
 	let deviceConfig;
 
 	if(childDevice.deviceType === 7) {//if it starts with 02 and ends with 6103 then it's a cooler.
+		device.log(`Child Cooler ID: ${childDevice.IDString}`, {toFile : true});
+
 		if(childDevice.IDString.includes("02") && childDevice.IDString.includes("03")) {
 			device.log(`Adding Child Cooler ${childDevice.IDString}`);
 			deviceConfig = CorsairLibrary.GetDeviceByCorsairLinkCoolerId(childDevice.coolerType);
+		}
+	} else if(childDevice.deviceType === 6) {//4EOC6479CD6AD24319 is the only id I have thus far.
+		device.log(`Child LCD Cooler ID: ${childDevice.IDString}`, {toFile : true});
+
+		if(childDevice.IDString.includes("4E") && childDevice.IDString.includes("19")) {
+			device.log(`Adding Child LCD Cooler ${childDevice.IDString}`);
+			deviceConfig = CorsairLibrary.GetDeviceByCorsairLinkId("LCD");
 		}
 	} else if(childDevice.deviceType === 1) { //If it starts with 0100 and then has 2035 in it, presume QX fan.
 		if(childDevice.IDString.includes("0100") && childDevice.IDString.includes("2035")) {
@@ -425,7 +434,8 @@ class CorsairLibrary{
 			"0252B51E003EA86103" : "H100I Link", //489F0000 it'd be funny if Corsair just forgot to serialize these
 			"029250120000BS6103" : "H100I Link", //I'm thinking these specialized ID's may more have to do with where they go in the chain of devices / port.
 			"0292D70F00AEA46103" : "H150I Link",
-			"0232EA0100E5915D03" : "H150I Link"
+			"0232EA0100E5915D03" : "H150I Link",
+			"LCD"				 : "LCD Cooler"
 		});
 	}
 
@@ -535,6 +545,21 @@ class CorsairLibrary{
 				ledMap: [
 					0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19,
 				],
+			},
+			"LCD Cooler" : {
+				name : "ICUE Link Cooler With LCD Cap",
+				ledPositions: [
+					[6, 0], [5, 1], [7, 1], [4, 2], [8, 2], [3, 3], [9, 3], [2, 4], [10, 4], [1, 5], [11, 5], [0, 6], 
+					[12, 6], [1, 7], [11, 7], [2, 8], [10, 8], [4, 10], [8, 10], [3, 9], [9, 9], [5, 11], [7, 11], [6, 12]
+				],
+				ledMap: [
+					6, 5, 7, 4, 8, 3, 9, 2, 10, 1, 11, 0, 12, 23, 13, 22, 14, 21, 15, 20, 16, 19, 17, 18
+				],
+				LedNames: [
+					"Led 1", "Led 2", "Led 3", "Led 4", "Led 5", "Led 6", "Led 7", "Led 8", "Led 9", "Led 10", "Led 11", "Led 12", "Led 13", "Led 14", "Led 15", "Led 16",
+					"Led 17", "Led 18", "Led 19", "Led 20", "Led 21", "Led 22", "Led 23", "Led 24"
+				],
+				size: [13, 13]
 			}
 		});
 	}
