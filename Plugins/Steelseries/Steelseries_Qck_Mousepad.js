@@ -29,6 +29,14 @@ const PIDLibrary = {
 	0x1520: "XL Destiny Lightfall Edition"
 };
 
+export function updateImage(){
+	if(device.productId() === 0x150A || device.productId() === 0x150D){
+		return "https://marketplace.signalrgb.com/devices/default/mousepad.png";
+	}
+
+	return "https://marketplace.signalrgb.com/devices/default/mousepad-xl.png";
+}
+
 const vLedNames = [
 	"Mousemat Top", "Mousemap Bottom"
 ];
@@ -51,6 +59,7 @@ export function LedPositions() {
 
 export function Initialize() {
 	device.setName(Name() + PIDLibrary[ProductId]);
+	device.setImageFromUrl(updateImage());
 }
 
 export function Render() {
@@ -131,9 +140,5 @@ export function Validate(endpoint) {
 }
 
 export function ImageUrl() {
-	if(device.productId() === 0x150A || device.productId() === 0x150D){
-		return "https://marketplace.signalrgb.com/devices/default/mousepad.png";
-	}
-
 	return "https://marketplace.signalrgb.com/devices/default/mousepad-xl.png";
 }
