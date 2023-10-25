@@ -2,7 +2,7 @@
 export function Name() { return "PNY XLR8 GPU"; }
 export function Publisher() { return "WhirlwindFX"; }
 export function Type() { return "SMBUS"; }
-export function Size() { return [3, 3]; }
+export function Size() { return [3, 1]; }
 export function DefaultPosition(){return [5, 2];}
 export function DefaultScale(){return 2.5;}
 export function LedNames() { return vLedNames; }
@@ -21,7 +21,7 @@ export function ControllableParameters() {
 }
 
 const vLedNames = [ "LED 1", "LED 2", "LED 3" ];
-const vLedPositions = [ [0, 0], [0, 1], [0, 2] ];
+const vLedPositions = [ [0, 0], [1, 0], [2, 0] ];
 
 /** @param {FreeAddressBus} bus */
 export function Scan(bus) {

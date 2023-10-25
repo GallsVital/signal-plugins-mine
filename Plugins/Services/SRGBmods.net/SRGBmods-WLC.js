@@ -169,6 +169,10 @@ export function Shutdown(suspend) {
 	WLC.SendColorPackets(true);
 }
 
+export function ImageUrl() {
+	return "https://raw.githubusercontent.com/SRGBmods/public/main/images/wlc/wlc-service.png";
+}
+
 // -------------------------------------------<( Discovery Service )>--------------------------------------------------
 
 
