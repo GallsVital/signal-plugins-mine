@@ -35,7 +35,7 @@ export function ControllableParameters(){
 
 const devFlags = false;
 
-export function SubdeviceController() { return devFlags; }
+export function SubdeviceController() { return devFlags; } //Fix DPI Logic. If you remove too many stages, it blows up.
 
 export function onsettingControlChanged() {
 	if(settingControl) {
@@ -236,7 +236,7 @@ function initializeDevice(deviceConfig, deviceID = 0) {
 
 	const devicePID = Corsair.FetchProperty(Corsair.properties.pid);
 
-	if(devicePID === 0x1B70 || devicePID === 0x1b9e) {
+	if(devicePID === 0x1B70 || devicePID === 0x1b9e || devicePID === 0x1B79 || devicePID === 0x1BB2) {
 		configureMSeriesMice(deviceID);
 	}
 
@@ -365,11 +365,6 @@ function processMacroInputs(bitIdx, state) {
 	}
 	const keyName = CorsairLibrary.GetKeyMapping(bitIdx, deviceType);
 
-	if(keyName === undefined) {
-		return;
-	}
-
-
 	if(deviceType === "Keyboard") {
 		const eventData = {
 			key : keyName,
@@ -396,6 +391,7 @@ function processMacroInputs(bitIdx, state) {
 					"released": !state,
 					"name":keyName
 				};
+				device.log(`bitIdx ${bitIdx} is state ${state}`);
 				device.log(`Key ${keyName} is state ${state}`);
 				mouse.sendEvent(eventData, "Button Press");
 			}
@@ -1060,18 +1056,21 @@ class CorsairLibrary{
 			"Darkstar": {
 				name: "Darkstar Wireless",
 				size: [7, 7],
-				ledNames: ["Logo",
+				ledNames: [
+					"Logo",
 					"Side Led 1", "Side Led 2", "Side Led 3", "Side Led 4", "Side Led 5", "Side Led 6",
-					"Front Left", "Front Right"
+					"Front Left", "Front Right",
+					"Extra LED 1", "Extra LED 2", "Extra LED 3", "Extra LED 4", "Extra LED 5"
 				],
 				ledPositions: [
 					[2, 3],
 					[0, 1], [0, 2], [0, 3], [0, 4], [0, 5], [0, 6],
 					[0, 0], [4, 0],
+					[3, 0], [3, 1], [3, 2], [3, 3], [3, 4]
 				],
-				ledMap: [ 0, 1, 2, 3, 4, 5, 6, 7, 8 ],
+				ledMap: [ 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12],
 				devFirmware: "0.0.0",
-				ledSpacing: 9,
+				ledSpacing: 13,
 				keyCount: 15,
 				keymapType : "Mouse",
 				maxDPI : 26000
@@ -2493,6 +2492,7 @@ export class ModernCorsairProtocol{
 		const packet = [0x00, deviceID | 0x08, this.command.getProperty, ...BinaryUtils.WriteInt16LittleEndian(PropertyId)];
 		device.clearReadBuffer();
 		device.write(packet, this.GetWriteLength());
+		device.pause(1);
 
 		const returnPacket = device.read(packet, this.GetReadLength());
 
@@ -2520,6 +2520,7 @@ export class ModernCorsairProtocol{
 		const packet = [0x00, deviceID | 0x08, this.command.openEndpoint, Handle, Endpoint];
 		device.clearReadBuffer();
 		device.write(packet, this.GetWriteLength());
+		device.pause(1);
 
 		const returnPacket = device.read(packet, this.GetReadLength());
 
@@ -2544,6 +2545,7 @@ export class ModernCorsairProtocol{
 		const packet = [0x00, deviceID | 0x08, this.command.closeHandle, 1, Handle];
 		device.clearReadBuffer();
 		device.write(packet, this.GetWriteLength());
+		device.pause(1);
 
 		const returnPacket = device.read(packet, this.GetReadLength());
 
@@ -2584,6 +2586,7 @@ export class ModernCorsairProtocol{
 
 		const packet = [0x00, deviceID | 0x08, this.command.checkHandle, Handle, 0x00];
 		device.write(packet, this.GetWriteLength());
+		device.pause(1);
 
 		const returnPacket = device.read(packet, this.GetReadLength());
 		const isOpen = returnPacket[3] !== 3;
@@ -2606,6 +2609,7 @@ export class ModernCorsairProtocol{
 		const packet = [0x00, deviceID | 0x08, this.command.checkHandle, Handle, 0x00];
 		device.clearReadBuffer();
 		device.write(packet, this.GetWriteLength());
+		device.pause(1);
 
 		const returnPacket = device.read(packet, this.GetReadLength());
 
@@ -2651,6 +2655,7 @@ export class ModernCorsairProtocol{
 		device.clearReadBuffer();
 
 		device.write([0x00, deviceID | 0x08, this.command.readEndpoint, Handle], this.GetWriteLength());
+		device.pause(1);
 
 		//let Data = [];
 		const Data = device.read([0x00], this.GetReadLength());
@@ -2704,6 +2709,7 @@ export class ModernCorsairProtocol{
 
 		device.clearReadBuffer();
 		device.write([0x00, deviceID | 0x08, this.command.writeEndpoint, Handle, ...BinaryUtils.WriteInt32LittleEndian(Data.length)].concat(Data), this.GetWriteLength());
+		device.pause(1);
 
 		const returnPacket = device.read([0x00], this.GetReadLength());
 
