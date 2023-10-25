@@ -10,24 +10,15 @@ export function DefaultScale(){return Math.floor(DESIRED_HEIGHT/Size()[1]);}
 shutdownColor:readonly
 LightingMode:readonly
 forcedColor:readonly
-layout:readonly
 */
 export function ControllableParameters() {
 	return [
 		{"property":"shutdownColor", "group":"lighting", "label":"Shutdown Color", "min":"0", "max":"360", "type":"color", "default":"009bde"},
 		{"property":"LightingMode", "group":"lighting", "label":"Lighting Mode", "type":"combobox", "values":["Canvas", "Forced"], "default":"Canvas"},
 		{"property":"forcedColor", "group":"lighting", "label":"Forced Color", "min":"0", "max":"360", "type":"color", "default":"009bde"},
-		{"property":"layout", "group":"", "label":"Keyboard Layout", "type":"combobox", "values":["ANSI", "ISO", "ABNT2"], "default":"ANSI"},
 	];
 }
 export function Documentation(){ return "troubleshooting/corsair"; }
-
-const LayoutDict =
-{
-	"ANSI":   [ 63, 65, 66, 70, 71, 81, 83, 85, 96, 111, 120, 121, 122, 123, 124, 125, 126, 127, 128, 129 ], //70 + 71 are profile and brightness 96 is lock.
-	"ISO":    [ 63, 65, 66, 70, 71, 80, 83, 85, 96, 111, 120, 121, 122, 123, 124, 125, 126, 127, 128, 129 ],
-	"ABNT2" : [ 63, 65, 66, 70, 71, 80, 85, 96, 111, 120, 121, 122, 123, 124, 125, 126, 127, 128, 129 ]
-};
 
 export function LedNames() {
 	return LegacyCorsair.getvKeyNames();
@@ -44,6 +35,10 @@ export function Initialize() {
 
 	LegacyCorsair.setLightingControlMode(LegacyCorsair.modes.SoftwareMode);
 	LegacyCorsair.setSpecialFunctionControlMode(LegacyCorsair.modes.SoftwareMode);
+
+	if(device.productId() === 0x1B20 || device.productId() === 0x1B15 || device.productId() === 0x1B48) {
+		setStrafeLighting();
+	}
 
 	//set key codes to get the keys working again, unless you wanna assign them all in software. Pls don't. I beg of you.
 	InitScanCodes();
@@ -96,13 +91,17 @@ function macroInputHandler(bitIdx, isPressed) {
 	keyboard.sendEvent(eventData, "Key Press");
 }
 
+function setStrafeLighting() {
+	device.write([0x00, 0x07, 0x05, 0x08, 0x00, 0x00, 0x01], 65);//Strafe Specific Lighting! //pretty simple. Uses the Lighting Mode Control switch, then 0x08 is strafe specific, 0x00 always is a thing, then the 0x01 is an on argument.
+}
+
 function InitScanCodes() {
-	//sendPacketString("00 07 05 08 00 01", 65); //Strafe Specific Lighting! //pretty simple. Uses the Lighting Mode Control switch, then 0x08 is strafe specific, 0x00 always is a thing, then the 0x01 is an on argument.
-	//device.write([0x00, 0x07, 0x05, 0x08, 0x00, 0x00, 0x01], 65);
+
+	const layout = deviceLibrary.LayoutDict[LegacyCorsair.getKeyboardLayout()];
 	const ScanCodes = [];
 
-	for(let ScanCode = 0; ScanCode < 120 + LayoutDict[layout].length && ScanCode < 0x84; ScanCode++) {
-		if(LayoutDict[layout].includes(ScanCode)) {
+	for(let ScanCode = 0; ScanCode < 120 + layout.length && ScanCode < 0x84; ScanCode++) {
+		if(layout.includes(ScanCode)) {
 			continue; //If a scancode is in the dict, skip it. We have to skip them as we run out of registers otherwise
 		}
 
@@ -180,6 +179,10 @@ function hexToRgb(hex) {
 class LegacyCorsairLibrary {
 	constructor() {
 		this.PIDLibrary = {
+			0x1B17: "K65",
+			0x1B37: "K65",
+			0x1B39: "K65",
+			0x1B4F : "K68",
 			0x1b49 : "K70 MKII",
 			0x1b55 : "K70 MKII", //LP
 			0x1B6B : "K70 MKII", //SE
@@ -189,9 +192,16 @@ class LegacyCorsairLibrary {
 			0x1B13 : "K70 MKII", //OG K70
 			0x1B11 : "K95 RGB",
 			0x1B2D : "K95 Plat",
-			0x1B82 : "K95 Plat", //SE
+			0x1B82 : "K95 Plat", //SE,
+			0x1B20 : "Strafe",
+			0x1B15 : "Strafe",
+			0x1b48 : "Strafe"
 		};
 		this.deviceNameLibrary = {
+			0x1B17: "K65 RGB",
+			0x1B37: "K65 RGB Lux",
+			0x1B39: "K65 RGB Rapidfire",
+			0x1B4F : "K68",
 			0x1b49 : "K70 MKII",
 			0x1b55 : "K70 MKII Low Profile", //LP
 			0x1B6B : "K70 MKII SE", //SE
@@ -201,9 +211,86 @@ class LegacyCorsairLibrary {
 			0x1B13 : "K70", //OG K70
 			0x1B11 : "K95 RGB",
 			0x1B2D : "K95 Platinum",
-			0x1B82 : "K95 Platinum SE"
+			0x1B82 : "K95 Platinum SE",
+			0x1B20 : "Strafe",
+			0x1B15 : "Strafe",
+			0x1b48 : "Strafe MKII"
 		};
 		this.DeviceLibrary = {
+			"K65" : {
+				vLedNames : [
+					"Mute", "Volume Down", "Volume Up",    "Lock",
+					"Esc", "F1", "F2", "F3", "F4", "F5", "F6", "F7", "F8", "F9", "F10", "F11", "F12",         "Print Screen", "Scroll Lock", "Pause Break",
+					"`", "1", "2", "3", "4", "5", "6", "7", "8", "9", "0", "-_", "=+", "Backspace",                        "Insert", "Home", "Page Up",
+					"Tab", "Q", "W", "E", "R", "T", "Y", "U", "I", "O", "P", "[", "]", "\\",                               "Del", "End", "Page Down",
+					"CapsLock", "A", "S", "D", "F", "G", "H", "J", "K", "L", ";", "'", "Enter",
+					"Left Shift", "Z", "X", "C", "V", "B", "N", "M", ",", ".", "/", "Right Shift",                                  "Up Arrow",
+					"Left Ctrl", "Left Win", "Left Alt", "Space", "Right Alt", "Fn", "Menu", "Right Ctrl",  "Left Arrow", "Down Arrow", "Right Arrow",
+
+					//ISO
+					"ISO #", "ISO <"
+				],
+				vLedPositions : [
+					// eslint-disable-next-line indent
+					[10, 0], [11, 0], [12, 0], [13, 0],   // Logo & specialkey row.
+					[0, 1], [1, 1], [2, 1], [3, 1], [4, 1], [5, 1], [6, 1], [7, 1], [8, 1], [10, 1], [11, 1], [12, 1],        [13, 1],  [14, 1], [15, 1], [16, 1],
+					[0, 2], [1, 2], [2, 2], [3, 2], [4, 2], [5, 2], [6, 2], [7, 2], [8, 2], [9, 2], [10, 2], [11, 2], [12, 2], [13, 2],   [14, 2], [15, 2], [16, 2],
+					[0, 3], [1, 3], [2, 3], [3, 3], [4, 3], [5, 3], [6, 3], [7, 3], [8, 3], [9, 3], [10, 3], [11, 3], [12, 3], [13, 3],   [14, 3], [15, 3], [16, 3],
+					[0, 4], [1, 4], [2, 4], [3, 4], [4, 4], [5, 4], [6, 4], [7, 4], [8, 4], [9, 4], [10, 4], [11, 4],         [13, 4],
+					[0, 5], [1, 5], [2, 5], [3, 5], [4, 5], [5, 5], [6, 5], [7, 5], [8, 5], [9, 5], [10, 5],         [12, 5],            [15, 5],
+					[0, 6], [1, 6], [2, 6],                      [6, 6],                      [10, 6], [11, 6], [12, 6], [13, 6],   [14, 6], [15, 6], [16, 6],
+					//ISO
+					[2, 5], [13, 4]
+				],
+				vKeys : [
+					137, 20, 44, 32, // 8,  //59,     // Special key row.
+					0,     12, 24, 36, 48,     60, 72, 84, 96,     108, 120, 132, 6,     18, 30, 42,     //56,  68,  //20
+					1,   13, 25, 37, 49, 61, 73, 85, 97, 109, 121, 133, 7,       31,     54, 66, 78,    //80, 92, 104, 116, //21
+					2,   14, 26, 38, 50, 62, 74, 86, 98, 110, 122, 134,   90,   102,     43, 55, 67,    //9,  21, 33,  128, //21
+					3,   15, 27, 39, 51, 63, 75, 87, 99, 111, 123, 135,         126,                    //57, 69, 81,       //16
+					4,   28, 40, 52, 64, 76, 88, 100, 112, 124, 136,            79,          103,       //93, 105, 117, 140,
+					5,   17, 29,            53,                    89, 101, 113, 91,     115, 127, 139,   //129, 141
+					//ISO
+					16, 114
+				],
+				size : [21, 7]
+			},
+			"K68" : {
+				vLedNames : [
+					"Profile", "Brightness", "Lock",                                               "Mute", "Volume Down", "Volume Up",
+					"Esc", "F1", "F2", "F3", "F4", "F5", "F6", "F7", "F8", "F9", "F10", "F11", "F12",         "Print Screen", "Scroll Lock", "Pause Break",   "MediaStop", "MediaRewind", "MediaPlayPause", "MediaFastForward",
+					"`", "1", "2", "3", "4", "5", "6", "7", "8", "9", "0", "-_", "=+", "Backspace",                        "Insert", "Home", "Page Up",       "NumLock", "Num /", "Num *", "Num -",  //21
+					"Tab", "Q", "W", "E", "R", "T", "Y", "U", "I", "O", "P", "[", "]", "\\",                               "Del", "End", "Page Down",         "Num 7", "Num 8", "Num 9", "Num +",    //21
+					"CapsLock", "A", "S", "D", "F", "G", "H", "J", "K", "L", ";", "'", "Enter",                                                              "Num 4", "Num 5", "Num 6",             //16
+					"Left Shift", "Z", "X", "C", "V", "B", "N", "M", ",", ".", "/", "Right Shift",                                  "Up Arrow",               "Num 1", "Num 2", "Num 3", "Num Enter", //17
+					"Left Ctrl", "Left Win", "Left Alt", "Space", "Right Alt", "Fn", "Menu", "Right Ctrl",  "Left Arrow", "Down Arrow", "Right Arrow", "Num 0", "Num .",                       //13
+					//ISO
+					"ISO #", "ISO <"
+				],
+				vLedPositions : [
+					[14, 0], [14, 0], [15, 0],            [18, 0], [19, 0], [20, 0],   // Logo & specialkey row.
+					[0, 1], [1, 1], [2, 1], [3, 1], [4, 1], [5, 1], [6, 1], [7, 1], [8, 1], [9, 1], [10, 1], [11, 1],         [13, 1],   [14, 1], [15, 1], [16, 1],   [17, 1], [18, 1], [19, 1], [20, 1], //20
+					[0, 2], [1, 2], [2, 2], [3, 2], [4, 2], [5, 2], [6, 2], [7, 2], [8, 2], [9, 2], [10, 2], [11, 2], [12, 2], [13, 2],   [14, 2], [15, 2], [16, 2],   [17, 2], [18, 2], [19, 2], [20, 2], //21
+					[0, 3], [1, 3], [2, 3], [3, 3], [4, 3], [5, 3], [6, 3], [7, 3], [8, 3], [9, 3], [10, 3], [11, 3], [12, 3], [13, 3],   [14, 3], [15, 3], [16, 3],   [17, 3], [18, 3], [19, 3], [20, 3], //21
+					[0, 4], [1, 4], [2, 4], [3, 4], [4, 4], [5, 4], [6, 4], [7, 4], [8, 4], [9, 4], [10, 4], [11, 4],         [13, 4],                             [17, 4], [18, 4], [19, 4], // 16
+					[0, 5], [1, 5], [2, 5], [3, 5], [4, 5], [5, 5], [6, 5], [7, 5], [8, 5], [9, 5], [10, 5], [11, 5],                           [15, 5],           [17, 5], [18, 5], [19, 5], [20, 5], // 17
+					[0, 6], [1, 6], [2, 6],                      [6, 6],                      [10, 6], [11, 6], [12, 6], [13, 6],   [14, 6], [15, 6], [16, 6],   [17, 6],        [19, 6], // 14
+					//ISO
+					[2, 5], [13, 4]
+				],
+				vKeys : [
+					125, 137, 8,                                                      20, 142, 130,    // Special key row.
+					0,     12, 24, 36, 48,     60, 72, 84, 96,     108, 120, 132, 6,     18, 30, 42,    32, 44, 56,  68,  //20
+					1,   13, 25, 37, 49, 61, 73, 85, 97, 109, 121, 133, 7,       31,     54, 66, 78,    80, 92, 104, 116, //21
+					2,   14, 26, 38, 50, 62, 74, 86, 98, 110, 122, 134,   90,   102,     43, 55, 67,    9,  21, 33,  128, //21
+					3,   15, 27, 39, 51, 63, 75, 87, 99, 111, 123, 135,         126,                    57, 69, 81,       //16
+					4,   28, 40, 52, 64, 76, 88, 100, 112, 124, 136,          79,         103,       93, 105, 117, 140,
+					5,   17, 29,            53,                    89, 101, 113, 91,     115, 127, 139,   129, 141,
+					//ISO
+					16, 114
+				],
+				size : [21, 7]
+			},
 			"K70 MKII" : {
 				vLedNames : [
 					"Profile", "Brightness", "Lock",                  "Logo", "Logo2",                   "Mute",
@@ -319,7 +406,49 @@ class LegacyCorsairLibrary {
 					16, 114,																									// 2
 				],
 				size : [24, 8]
+			},
+			"Strafe" : {
+				vLedNames : [
+					"Profile", "Brightness", "Lock",                  "Logo",                   "Mute",
+					"Esc", "F1", "F2", "F3", "F4", "F5", "F6", "F7", "F8", "F9", "F10", "F11", "F12",         "Print Screen", "Scroll Lock", "Pause Break",   "MediaStop", "MediaRewind", "MediaPlayPause", "MediaFastForward",
+					"`", "1", "2", "3", "4", "5", "6", "7", "8", "9", "0", "-_", "=+", "Backspace",                        "Insert", "Home", "Page Up",       "NumLock", "Num /", "Num *", "Num -",  //21
+					"Tab", "Q", "W", "E", "R", "T", "Y", "U", "I", "O", "P", "[", "]", "\\",                               "Del", "End", "Page Down",         "Num 7", "Num 8", "Num 9", "Num +",    //21
+					"CapsLock", "A", "S", "D", "F", "G", "H", "J", "K", "L", ";", "'", "Enter",                                                              "Num 4", "Num 5", "Num 6",             //16
+					"Left Shift", "Z", "X", "C", "V", "B", "N", "M", ",", ".", "/", "Right Shift",                                  "Up Arrow",               "Num 1", "Num 2", "Num 3", "Num Enter", //17
+					"Left Ctrl", "Left Win", "Left Alt", "Space", "Right Alt", "Fn", "Menu", "Right Ctrl",  "Left Arrow", "Down Arrow", "Right Arrow", "Num 0", "Num .",                     //13
+					//ISO
+					"ISO #", "ISO <"
+				],
+				vLedPositions : [
+					[0, 0], [19, 0], [20, 0],                      [9, 0],                                                             [17, 0],   // Logo & specialkey row.
+					[0, 1], [1, 1], [2, 1], [3, 1], [4, 1], [5, 1], [6, 1], [7, 1], [8, 1], [9, 1], [10, 1], [11, 1],         [13, 1],   [14, 1], [15, 1], [16, 1],   [17, 1], [18, 1], [19, 1], [20, 1], //20
+					[0, 2], [1, 2], [2, 2], [3, 2], [4, 2], [5, 2], [6, 2], [7, 2], [8, 2], [9, 2], [10, 2], [11, 2], [12, 2], [13, 2],   [14, 2], [15, 2], [16, 2],   [17, 2], [18, 2], [19, 2], [20, 2], //21
+					[0, 3], [1, 3], [2, 3], [3, 3], [4, 3], [5, 3], [6, 3], [7, 3], [8, 3], [9, 3], [10, 3], [11, 3], [12, 3], [13, 3],   [14, 3], [15, 3], [16, 3],   [17, 3], [18, 3], [19, 3], [20, 3], //21
+					[0, 4], [1, 4], [2, 4], [3, 4], [4, 4], [5, 4], [6, 4], [7, 4], [8, 4], [9, 4], [10, 4], [11, 4],         [13, 4],                             [17, 4], [18, 4], [19, 4], // 16
+					[0, 5], [1, 5], [2, 5], [3, 5], [4, 5], [5, 5], [6, 5], [7, 5], [8, 5], [9, 5], [10, 5], [11, 5],         [13, 5],           [15, 5],           [17, 5], [18, 5], [19, 5], // 17
+					[0, 6], [1, 6], [2, 6],                      [6, 6],                      [10, 6], [11, 6], [12, 6], [13, 6],   [14, 6], [15, 6], [16, 6],   [17, 6],        [19, 6], // 14
+					//ISO
+					[2, 5], [13, 4]
+				],
+				vKeys : [
+					125, 137, 8,                       59,                               20,    // Special key row.
+					0,     12, 24, 36, 48,     60, 72, 84, 96,     108, 120, 132, 6,     18, 30, 42,    32, 44, 56,  68,  //20
+					1,   13, 25, 37, 49, 61, 73, 85, 97, 109, 121, 133, 7,       31,     54, 66, 78,    80, 92, 104, 116, //21
+					2,   14, 26, 38, 50, 62, 74, 86, 98, 110, 122, 134,   90,   102,     43, 55, 67,    9,  21, 33,  128, //21
+					3,   15, 27, 39, 51, 63, 75, 87, 99, 111, 123, 135,         126,                    57, 69, 81,       //16
+					4,   28, 40, 52, 64, 76, 88, 100, 112, 124, 136,          79,         103,       93, 105, 117, 140,
+					5,   17, 29,            53,                    89, 101, 113, 91,     115, 127, 139,   129, 141,
+					16, 114
+				],
+				size : [21, 7]
 			}
+		};
+
+		this.LayoutDict =
+		{
+			"ANSI":   [ 63, 65, 66, 70, 71, 81, 83, 85, 96, 111, 120, 121, 122, 123, 124, 125, 126, 127, 128, 129 ], //70 + 71 are profile and brightness 96 is lock.
+			"ISO":    [ 63, 65, 66, 70, 71, 80, 83, 85, 96, 111, 120, 121, 122, 123, 124, 125, 126, 127, 128, 129 ],
+			"ABNT2" : [ 63, 65, 66, 70, 71, 80, 85, 96, 111, 120, 121, 122, 123, 124, 125, 126, 127, 128, 129 ]
 		};
 	}
 
@@ -592,6 +721,7 @@ class LegacyCorsairProtocol {
 	getDeviceName() { return this.Config.deviceName; }
 	setDeviceName(deviceName) { this.Config.deviceName = deviceName; }
 
+	getDeviceType() { return this.Config.deviceType; }
 	setDeviceType(deviceType) { this.Config.deviceType = this.DeviceTypes[deviceType]; }
 
 	getvKeys() { return this.Config.vKeys; }

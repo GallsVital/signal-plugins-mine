@@ -102,6 +102,10 @@ export function Shutdown(suspend) {
 	WLED.changeDeviceState(turnOffOnShutdown);
 }
 
+export function ImageUrl() {
+	return "https://raw.githubusercontent.com/SRGBmods/public/main/images/wled/998_led_nodemcu.png";
+}
+
 // -------------------------------------------<( Discovery Service )>--------------------------------------------------
 
 
