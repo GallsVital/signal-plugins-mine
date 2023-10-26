@@ -19,7 +19,6 @@ export function ControllableParameters() {
 	];
 }
 
-
 export function LedNames() {
 	return MSIMonitor.getLedNames();
 }
@@ -115,7 +114,7 @@ class MSIMonitorProtocol {
 				size: [9, 1],
 				startingByte: 0x71,
 				protocol: "MAG",
-				endpoint: { "interface": 0, "usage": 0x0000, "usage_page": 0x0001, "collection": 0x0000 }, // NEED CONFIRM
+				endpoint: { "interface": 0, "usage": 0x0000, "usage_page": 0x0001, "collection": 0x0000 },
 			},
 			MAG273R2 : {
 				mapping: [
