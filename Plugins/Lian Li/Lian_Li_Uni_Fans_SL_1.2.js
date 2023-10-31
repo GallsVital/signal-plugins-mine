@@ -223,9 +223,9 @@ function setFanMode() {
 	if(savedFanMode != FanMode) {
 		savedFanMode = FanMode;
 
-		if(savedFanMode == "Manual") {
+		if(savedFanMode == "SignalRGB") {
 			setFanRPM(true);
-		} else if(savedFanMode == "PWM") {
+		} else if(savedFanMode == "Motherboard PWM") {
 			for(let channel = 0; channel < 4;channel++) {
 				const packet = [0x00, 0x31, 0x10, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x01];
 				packet[2] = (0x10 << channel) + 0x0F;
@@ -245,6 +245,7 @@ function sendChannels() {
 
 				device.pause(5);
 				sendControlPacket(channelArray[Channel].commit, PACKET_COMMIT, 192);
+				device.pause(5);
 			}
 		}
 	}
