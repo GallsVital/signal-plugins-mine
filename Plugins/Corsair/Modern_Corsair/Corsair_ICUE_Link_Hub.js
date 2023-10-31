@@ -85,6 +85,9 @@ export function Shutdown() {
 }
 
 function burstFansAndFindSensors() {
+
+	fetchTempSensors(true); //These are a decently reliable thing to use as they should never return 0.00 realistically on init.
+
 	if(device.fanControlDisabled()) {
 		// Reset if the system was disbled during runtime.
 		device.log("System Monitoring disabled, Clearing Connected Fans", {toFile: true});
@@ -92,8 +95,6 @@ function burstFansAndFindSensors() {
 
 		return;
 	}
-
-	fetchTempSensors(true); //These are a decently reliable thing to use as they should never return 0.00 realistically on init.
 
 	const fanIdArray = [];
 
@@ -187,8 +188,6 @@ function fetchChildDeviceSupport() {
 			BragiController = new CorsairBragiController();
 			fetchLinkDevices();
 		}
-
-
 	}
 }
 
@@ -196,12 +195,12 @@ function fetchLinkDevices() {
 	const childDevicePacket = Corsair.ReadFromEndpoint(0, 0x36, 0x01);
 	const childDeviceArray = [];
 
-	device.log(`Child Device Packet ${childDevicePacket}`);
+	device.log(`Child Device Packet ${childDevicePacket}`, {toFile : true});
 
 	for(let bytes = 8; bytes < childDevicePacket.length; bytes++) {
 		if(childDevicePacket[bytes] === 0x00 && childDevicePacket[bytes + 1] === 0x00 && childDevicePacket[bytes + 2] !== 0x00) {
 			if(childDevicePacket[bytes + 4] === 0x00 && childDevicePacket[bytes + 5] === 0x00) {
-				device.log(`Possible Child Device Found with Device Type ${childDevicePacket[bytes + 2]}`);
+				device.log(`Possible Child Device Found with Device Type ${childDevicePacket[bytes + 2]}`, {toFile : true});
 
 				const childDeviceID = childDevicePacket.slice(bytes, bytes + 34);
 				childDeviceArray.push({
@@ -236,8 +235,8 @@ function convertChildIdsToNames(childDeviceArray) {
 
 		const childDeviceIDString = String.fromCharCode(...idCharacterArray);
 		const childDeviceUniqueIDString = String.fromCharCode(...uniqueCharacterArray);
-		device.log(`Converted Device ID for Child Device ${childDevices+1}: ${childDeviceIDString}`);
-		device.log(`Converted Unique ID for Child Device ${childDevices+1}: ${childDeviceUniqueIDString}`);
+		device.log(`Converted Device ID for Child Device ${childDevices+1}: ${childDeviceIDString}`, {toFile : true});
+		device.log(`Converted Unique ID for Child Device ${childDevices+1}: ${childDeviceUniqueIDString}`, {toFile : true});
 
 		convertedChildDeviceArray.push({
 			deviceType: childDeviceArray[childDevices].deviceType,
@@ -259,19 +258,19 @@ function addChildDevice(childDevice, uniqueId, deviceNumber) {
 		device.log(`Child Cooler ID: ${childDevice.IDString}`, {toFile : true});
 
 		if(childDevice.IDString.includes("02") && childDevice.IDString.includes("03")) {
-			device.log(`Adding Child Cooler ${childDevice.IDString}`);
+			device.log(`Adding Child Cooler ${childDevice.IDString}`, {toFile : true});
 			deviceConfig = CorsairLibrary.GetDeviceByCorsairLinkCoolerId(childDevice.coolerType);
 		}
 	} else if(childDevice.deviceType === 6) {//4EOC6479CD6AD24319 is the only id I have thus far.
 		device.log(`Child LCD Cooler ID: ${childDevice.IDString}`, {toFile : true});
 
-		if(childDevice.IDString.includes("4E") && childDevice.IDString.includes("19")) {
-			device.log(`Adding Child LCD Cooler ${childDevice.IDString}`);
+		if(childDevice.IDString.includes("4EOC")) {
+			device.log(`Adding Child LCD Cooler ${childDevice.IDString}`, {toFile : true});
 			deviceConfig = CorsairLibrary.GetDeviceByCorsairLinkId("LCD");
 		}
 	} else if(childDevice.deviceType === 1) { //If it starts with 0100 and then has 2035 in it, presume QX fan.
 		if(childDevice.IDString.includes("0100") && childDevice.IDString.includes("2035")) {
-			device.log(`Adding Child QX Fan ${childDevice.IDString}`);
+			device.log(`Adding Child QX Fan ${childDevice.IDString}`, {toFile : true});
 			deviceConfig = CorsairLibrary.GetDeviceByCorsairLinkId("01000EAA520353FF2A"); //I find it fitting to use my model as the master
 		}
 	}
