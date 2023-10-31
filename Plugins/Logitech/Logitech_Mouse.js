@@ -368,7 +368,7 @@ function hexToRgb(hex) {
 export class LogitechDeviceLibrary {
 	constructor() {
 		/**Library to map Product and Device ID's to Device Types. */
-		this.ProductIDs = [ 0xc081, 0xc082, 0xc083, 0xc084, 0xc085, 0xc088, 0xc08b, 0xc08c, 0xc08d, 0xc08f, 0xc090, 0xc091, 0xc092, 0xc094, 0xc095, 0xc09d, 0xc332, 0xc33e, 0xc539, 0xc53a, 0xC547, 0xC541, 0xC545, 0xC343 ];
+		this.ProductIDs = [ 0xc081, 0xc082, 0xc083, 0xc084, 0xc085, 0xc088, 0xc08b, 0xc08c, 0xc08d, 0xc08f, 0xc090, 0xc091, 0xc092, 0xc094, 0xc095, 0xc09d, 0xc332, 0xc33e, 0xc539, 0xc53a, 0xC547, 0xC541, 0xC545, 0xC343, 0xC096 ];
 
 		this.DeviceIDs =
 		{
@@ -385,6 +385,7 @@ export class LogitechDeviceLibrary {
 			"c08d" : "G502 Lightspeed",
 			"c08f" : "G403 Hero",
 			"c090" : "G703",
+			"c096" : "G705",
 			"c091" : "G903",
 			"c092" : "G203 Lightsync",
 			"c094" : "GPro X Superlight",
@@ -697,6 +698,13 @@ export class LogitechDeviceLibrary {
 				hasSniperButton : true
 			},
 			"G703" : {
+				bodyStyle : "G200Body",
+				ledStyle : "TwoZoneMouse",
+				maxDPI : "25600",
+				Size : [3, 3],
+				DeviceType : "Mouse"
+			},
+			"G705" : {
 				bodyStyle : "G200Body",
 				ledStyle : "TwoZoneMouse",
 				maxDPI : "25600",
