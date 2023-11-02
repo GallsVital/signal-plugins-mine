@@ -7,6 +7,7 @@ export function Type() { return "SMBUS"; }
 export function Size() { return [2, 12]; }
 export function DefaultPosition(){return [150, 40];}
 export function DefaultScale(){return 10.0;}
+export function ConflictingProcesses() { return ["FuryControllerService.exe"]; }
 /* global
 shutdownColor:readonly
 LightingMode:readonly
