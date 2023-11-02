@@ -788,7 +788,7 @@ class LegacyCorsairProtocol {
 			return [-1, -1, -1, -1, -1, -1, -1];
 		}
 
-		if(returnPacket[7] !== undefined && returnPacket[8] !== undefined && returnPacket[7] > 0) {
+		if(returnPacket[7] !== undefined && returnPacket[8] !== undefined) {
 			bootloaderVersion = returnPacket[8].toString(16) + returnPacket[7].toString(16);
 			device.log("Device Bootloader Version:" + bootloaderVersion, {toFile: true});
 		}else {
