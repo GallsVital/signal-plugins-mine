@@ -126,7 +126,7 @@ function sendColors(shutdown = false){
 }
 
 export function Validate(endpoint) {
-	return endpoint.interface === 4 && endpoint.usage === 1;
+	return endpoint.interface === 3 && endpoint.usage === 0x0001 && endpoint.usage_page === 0xFF42;
 }
 
 export function Shutdown() {

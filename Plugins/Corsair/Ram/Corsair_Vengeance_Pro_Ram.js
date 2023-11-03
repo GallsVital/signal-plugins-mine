@@ -6,6 +6,7 @@ export function Size() { return [2, 10]; }
 export function DefaultPosition(){return [40, 30];}
 export function DefaultScale(){return 10.0;}
 export function Type() { return "SMBUS"; }
+export function ConflictingProcesses() { return ["iCUE.exe"]; }
 /* global
 shutdownColor:readonly
 LightingMode:readonly
