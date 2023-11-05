@@ -10,27 +10,15 @@ export function DefaultScale(){return Math.floor(DESIRED_HEIGHT/Size()[1]);}
 shutdownColor:readonly
 LightingMode:readonly
 forcedColor:readonly
-layout:readonly
 */
 export function ControllableParameters() {
 	return [
 		{"property":"shutdownColor", "group":"lighting", "label":"Shutdown Color", "min":"0", "max":"360", "type":"color", "default":"009bde"},
 		{"property":"LightingMode", "group":"lighting", "label":"Lighting Mode", "type":"combobox", "values":["Canvas", "Forced"], "default":"Canvas"},
 		{"property":"forcedColor", "group":"lighting", "label":"Forced Color", "min":"0", "max":"360", "type":"color", "default":"009bde"},
-		{"property":"layout", "group":"", "label":"Keyboard Layout", "type":"combobox", "values":["ANSI", "ISO", "ABNT2"], "default":"ANSI"},
 	];
 }
 export function Documentation(){ return "troubleshooting/corsair"; }
-
-let savedPollTimer = Date.now();
-const PollModeInternal = 15000;
-
-const LayoutDict =
-{
-	"ANSI":   [ 63, 65, 66, 70, 71, 81, 83, 85, 96, 111, 120, 121, 122, 123, 124, 125, 126, 127, 128, 129 ], //70 + 71 are profile and brightness 96 is lock.
-	"ISO":    [ 63, 65, 66, 70, 71, 80, 83, 85, 96, 111, 120, 121, 122, 123, 124, 125, 126, 127, 128, 129 ],
-	"ABNT2" : [ 63, 65, 66, 70, 71, 80, 85, 96, 111, 120, 121, 122, 123, 124, 125, 126, 127, 128, 129 ]
-};
 
 export function LedNames() {
 	return LegacyCorsair.getvKeyNames();
@@ -45,8 +33,11 @@ export function Initialize() {
 
 	LegacyCorsair.deviceInitialization();
 
-	if(!LegacyCorsair.getWirelessDevice()) {
-		LegacyCorsair.configureDevice();
+	LegacyCorsair.setLightingControlMode(LegacyCorsair.modes.SoftwareMode);
+	LegacyCorsair.setSpecialFunctionControlMode(LegacyCorsair.modes.SoftwareMode);
+
+	if(device.productId() === 0x1B20 || device.productId() === 0x1B15 || device.productId() === 0x1B48) {
+		setStrafeLighting();
 	}
 
 	//set key codes to get the keys working again, unless you wanna assign them all in software. Pls don't. I beg of you.
@@ -56,12 +47,7 @@ export function Initialize() {
 export function Render() {
 	readInputs();
 
-	if(!LegacyCorsair.getWakeStatus()) {
-		return;
-	}
-
 	sendColors();
-	getDeviceBatteryStatus();
 }
 
 export function Shutdown() {
@@ -73,32 +59,7 @@ export function onlayoutChanged() {
 	InitScanCodes();
 }
 
-function getDeviceBatteryStatus() {
-	if (Date.now() - savedPollTimer < PollModeInternal) {
-		return;
-	}
-
-	savedPollTimer = Date.now();
-
-	if (LegacyCorsair.getWirelessDevice()) {
-		const [batteryLevel, batteryStatus] = LegacyCorsair.getBatteryLevel();
-
-		battery.setBatteryState(batteryStatus);
-		battery.setBatteryLevel(batteryLevel);
-	}
-}
-
 function readInputs() {
-	if(LegacyCorsair.getWirelessDevice()) { //also future me could use this to detect if we have a dongle or not?
-		device.set_endpoint(0, 0x0002, 0xffc3); //Device Wake Endpoint. WHY DO WE NEED 3 ENDPOINTS
-
-		do {
-			const packet = device.read([0x00], 64, 0);
-			processInputs(packet);
-		}
-		while(device.getLastReadSize() > 0);
-	}
-
 	device.set_endpoint(0, 0x0002, 0xffc0); // Macro input endpoint
 
 	do {
@@ -111,10 +72,6 @@ function readInputs() {
 
 function processInputs(packet) {
 	device.set_endpoint(1, 0x0004, 0xffc2);
-
-	if(packet[0] === 0x04) {
-		LegacyCorsair.checkWakeStatus();
-	}
 
 	if(packet[0] === 0x03) {
     	macroInputArray.update(packet.slice(1, 19)); //needs resized to like 10
@@ -134,13 +91,17 @@ function macroInputHandler(bitIdx, isPressed) {
 	keyboard.sendEvent(eventData, "Key Press");
 }
 
+function setStrafeLighting() {
+	device.write([0x00, 0x07, 0x05, 0x08, 0x00, 0x00, 0x01], 65);//Strafe Specific Lighting! //pretty simple. Uses the Lighting Mode Control switch, then 0x08 is strafe specific, 0x00 always is a thing, then the 0x01 is an on argument.
+}
+
 function InitScanCodes() {
-	//sendPacketString("00 07 05 08 00 01", 65); //Strafe Specific Lighting! //pretty simple. Uses the Lighting Mode Control switch, then 0x08 is strafe specific, 0x00 always is a thing, then the 0x01 is an on argument.
-	//device.write([0x00, 0x07, 0x05, 0x08, 0x00, 0x00, 0x01], 65);
+
+	const layout = deviceLibrary.LayoutDict[LegacyCorsair.getKeyboardLayout()];
 	const ScanCodes = [];
 
-	for(let ScanCode = 0; ScanCode < 120 + LayoutDict[layout].length && ScanCode < 0x84; ScanCode++) {
-		if(LayoutDict[layout].includes(ScanCode)) {
+	for(let ScanCode = 0; ScanCode < 120 + layout.length && ScanCode < 0x84; ScanCode++) {
+		if(layout.includes(ScanCode)) {
 			continue; //If a scancode is in the dict, skip it. We have to skip them as we run out of registers otherwise
 		}
 
@@ -218,6 +179,10 @@ function hexToRgb(hex) {
 class LegacyCorsairLibrary {
 	constructor() {
 		this.PIDLibrary = {
+			0x1B17: "K65",
+			0x1B37: "K65",
+			0x1B39: "K65",
+			0x1B4F : "K68",
 			0x1b49 : "K70 MKII",
 			0x1b55 : "K70 MKII", //LP
 			0x1B6B : "K70 MKII", //SE
@@ -226,9 +191,17 @@ class LegacyCorsairLibrary {
 			0x1B33 : "K70 MKII", //Lux
 			0x1B13 : "K70 MKII", //OG K70
 			0x1B11 : "K95 RGB",
-			//0x1B2D : "K95 Plat"
+			0x1B2D : "K95 Plat",
+			0x1B82 : "K95 Plat", //SE,
+			0x1B20 : "Strafe",
+			0x1B15 : "Strafe",
+			0x1b48 : "Strafe"
 		};
 		this.deviceNameLibrary = {
+			0x1B17: "K65 RGB",
+			0x1B37: "K65 RGB Lux",
+			0x1B39: "K65 RGB Rapidfire",
+			0x1B4F : "K68",
 			0x1b49 : "K70 MKII",
 			0x1b55 : "K70 MKII Low Profile", //LP
 			0x1B6B : "K70 MKII SE", //SE
@@ -237,9 +210,87 @@ class LegacyCorsairLibrary {
 			0x1B33 : "K70 Lux", //Lux
 			0x1B13 : "K70", //OG K70
 			0x1B11 : "K95 RGB",
-			//0x1B2D : "K95 Platinum"
+			0x1B2D : "K95 Platinum",
+			0x1B82 : "K95 Platinum SE",
+			0x1B20 : "Strafe",
+			0x1B15 : "Strafe",
+			0x1b48 : "Strafe MKII"
 		};
 		this.DeviceLibrary = {
+			"K65" : {
+				vLedNames : [
+					"Mute", "Volume Down", "Volume Up",    "Lock",
+					"Esc", "F1", "F2", "F3", "F4", "F5", "F6", "F7", "F8", "F9", "F10", "F11", "F12",         "Print Screen", "Scroll Lock", "Pause Break",
+					"`", "1", "2", "3", "4", "5", "6", "7", "8", "9", "0", "-_", "=+", "Backspace",                        "Insert", "Home", "Page Up",
+					"Tab", "Q", "W", "E", "R", "T", "Y", "U", "I", "O", "P", "[", "]", "\\",                               "Del", "End", "Page Down",
+					"CapsLock", "A", "S", "D", "F", "G", "H", "J", "K", "L", ";", "'", "Enter",
+					"Left Shift", "Z", "X", "C", "V", "B", "N", "M", ",", ".", "/", "Right Shift",                                  "Up Arrow",
+					"Left Ctrl", "Left Win", "Left Alt", "Space", "Right Alt", "Fn", "Menu", "Right Ctrl",  "Left Arrow", "Down Arrow", "Right Arrow",
+
+					//ISO
+					"ISO #", "ISO <"
+				],
+				vLedPositions : [
+					// eslint-disable-next-line indent
+					[10, 0], [11, 0], [12, 0], [13, 0],   // Logo & specialkey row.
+					[0, 1], [1, 1], [2, 1], [3, 1], [4, 1], [5, 1], [6, 1], [7, 1], [8, 1], [10, 1], [11, 1], [12, 1],        [13, 1],  [14, 1], [15, 1], [16, 1],
+					[0, 2], [1, 2], [2, 2], [3, 2], [4, 2], [5, 2], [6, 2], [7, 2], [8, 2], [9, 2], [10, 2], [11, 2], [12, 2], [13, 2],   [14, 2], [15, 2], [16, 2],
+					[0, 3], [1, 3], [2, 3], [3, 3], [4, 3], [5, 3], [6, 3], [7, 3], [8, 3], [9, 3], [10, 3], [11, 3], [12, 3], [13, 3],   [14, 3], [15, 3], [16, 3],
+					[0, 4], [1, 4], [2, 4], [3, 4], [4, 4], [5, 4], [6, 4], [7, 4], [8, 4], [9, 4], [10, 4], [11, 4],         [13, 4],
+					[0, 5], [1, 5], [2, 5], [3, 5], [4, 5], [5, 5], [6, 5], [7, 5], [8, 5], [9, 5], [10, 5],         [12, 5],            [15, 5],
+					[0, 6], [1, 6], [2, 6],                      [6, 6],                      [10, 6], [11, 6], [12, 6], [13, 6],   [14, 6], [15, 6], [16, 6],
+					//ISO
+					[2, 5], [13, 4]
+				],
+				vKeys : [
+					137, 20, 44, 32, // 8,  //59,     // Special key row.
+					0,     12, 24, 36, 48,     60, 72, 84, 96,     108, 120, 132, 6,     18, 30, 42,     //56,  68,  //20
+					1,   13, 25, 37, 49, 61, 73, 85, 97, 109, 121, 133, 7,       31,     54, 66, 78,    //80, 92, 104, 116, //21
+					2,   14, 26, 38, 50, 62, 74, 86, 98, 110, 122, 134,   90,   102,     43, 55, 67,    //9,  21, 33,  128, //21
+					3,   15, 27, 39, 51, 63, 75, 87, 99, 111, 123, 135,         126,                    //57, 69, 81,       //16
+					4,   28, 40, 52, 64, 76, 88, 100, 112, 124, 136,            79,          103,       //93, 105, 117, 140,
+					5,   17, 29,            53,                    89, 101, 113, 91,     115, 127, 139,   //129, 141
+					//ISO
+					16, 114
+				],
+				size : [21, 7]
+			},
+			"K68" : {
+				vLedNames : [
+					"Profile", "Brightness", "Lock",                                               "Mute", "Volume Down", "Volume Up",
+					"Esc", "F1", "F2", "F3", "F4", "F5", "F6", "F7", "F8", "F9", "F10", "F11", "F12",         "Print Screen", "Scroll Lock", "Pause Break",   "MediaStop", "MediaRewind", "MediaPlayPause", "MediaFastForward",
+					"`", "1", "2", "3", "4", "5", "6", "7", "8", "9", "0", "-_", "=+", "Backspace",                        "Insert", "Home", "Page Up",       "NumLock", "Num /", "Num *", "Num -",  //21
+					"Tab", "Q", "W", "E", "R", "T", "Y", "U", "I", "O", "P", "[", "]", "\\",                               "Del", "End", "Page Down",         "Num 7", "Num 8", "Num 9", "Num +",    //21
+					"CapsLock", "A", "S", "D", "F", "G", "H", "J", "K", "L", ";", "'", "Enter",                                                              "Num 4", "Num 5", "Num 6",             //16
+					"Left Shift", "Z", "X", "C", "V", "B", "N", "M", ",", ".", "/", "Right Shift",                                  "Up Arrow",               "Num 1", "Num 2", "Num 3", "Num Enter", //17
+					"Left Ctrl", "Left Win", "Left Alt", "Space", "Right Alt", "Fn", "Menu", "Right Ctrl",  "Left Arrow", "Down Arrow", "Right Arrow", "Num 0", "Num .",                       //13
+					//ISO
+					"ISO #", "ISO <"
+				],
+				vLedPositions : [
+					[14, 0], [14, 0], [15, 0],            [18, 0], [19, 0], [20, 0],   // Logo & specialkey row.
+					[0, 1], [1, 1], [2, 1], [3, 1], [4, 1], [5, 1], [6, 1], [7, 1], [8, 1], [9, 1], [10, 1], [11, 1],         [13, 1],   [14, 1], [15, 1], [16, 1],   [17, 1], [18, 1], [19, 1], [20, 1], //20
+					[0, 2], [1, 2], [2, 2], [3, 2], [4, 2], [5, 2], [6, 2], [7, 2], [8, 2], [9, 2], [10, 2], [11, 2], [12, 2], [13, 2],   [14, 2], [15, 2], [16, 2],   [17, 2], [18, 2], [19, 2], [20, 2], //21
+					[0, 3], [1, 3], [2, 3], [3, 3], [4, 3], [5, 3], [6, 3], [7, 3], [8, 3], [9, 3], [10, 3], [11, 3], [12, 3], [13, 3],   [14, 3], [15, 3], [16, 3],   [17, 3], [18, 3], [19, 3], [20, 3], //21
+					[0, 4], [1, 4], [2, 4], [3, 4], [4, 4], [5, 4], [6, 4], [7, 4], [8, 4], [9, 4], [10, 4], [11, 4],         [13, 4],                             [17, 4], [18, 4], [19, 4], // 16
+					[0, 5], [1, 5], [2, 5], [3, 5], [4, 5], [5, 5], [6, 5], [7, 5], [8, 5], [9, 5], [10, 5], [11, 5],                           [15, 5],           [17, 5], [18, 5], [19, 5], [20, 5], // 17
+					[0, 6], [1, 6], [2, 6],                      [6, 6],                      [10, 6], [11, 6], [12, 6], [13, 6],   [14, 6], [15, 6], [16, 6],   [17, 6],        [19, 6], // 14
+					//ISO
+					[2, 5], [13, 4]
+				],
+				vKeys : [
+					125, 137, 8,                                                      20, 142, 130,    // Special key row.
+					0,     12, 24, 36, 48,     60, 72, 84, 96,     108, 120, 132, 6,     18, 30, 42,    32, 44, 56,  68,  //20
+					1,   13, 25, 37, 49, 61, 73, 85, 97, 109, 121, 133, 7,       31,     54, 66, 78,    80, 92, 104, 116, //21
+					2,   14, 26, 38, 50, 62, 74, 86, 98, 110, 122, 134,   90,   102,     43, 55, 67,    9,  21, 33,  128, //21
+					3,   15, 27, 39, 51, 63, 75, 87, 99, 111, 123, 135,         126,                    57, 69, 81,       //16
+					4,   28, 40, 52, 64, 76, 88, 100, 112, 124, 136,          79,         103,       93, 105, 117, 140,
+					5,   17, 29,            53,                    89, 101, 113, 91,     115, 127, 139,   129, 141,
+					//ISO
+					16, 114
+				],
+				size : [21, 7]
+			},
 			"K70 MKII" : {
 				vLedNames : [
 					"Profile", "Brightness", "Lock",                  "Logo", "Logo2",                   "Mute",
@@ -247,7 +298,7 @@ class LegacyCorsairLibrary {
 					"`", "1", "2", "3", "4", "5", "6", "7", "8", "9", "0", "-_", "=+", "Backspace",                        "Insert", "Home", "Page Up",       "NumLock", "Num /", "Num *", "Num -",  //21
 					"Tab", "Q", "W", "E", "R", "T", "Y", "U", "I", "O", "P", "[", "]", "\\",                               "Del", "End", "Page Down",         "Num 7", "Num 8", "Num 9", "Num +",    //21
 					"CapsLock", "A", "S", "D", "F", "G", "H", "J", "K", "L", ";", "'", "Enter",                                                              "Num 4", "Num 5", "Num 6",             //16
-					"Left Shift", "Z", "X", "C", "V", "B", "N", "M", ",", ".", "/", "?","Right Shift",                                  "Up Arrow",               "Num 1", "Num 2", "Num 3", "Num Enter", //17
+					"Left Shift", "Z", "X", "C", "V", "B", "N", "M", ",", ".", "/", "?", "Right Shift",                                  "Up Arrow",               "Num 1", "Num 2", "Num 3", "Num Enter", //17
 					"Left Ctrl", "Left Win", "Left Alt", "Space", "Right Alt", "Fn", "Menu", "Right Ctrl",  "Left Arrow", "Down Arrow", "Right Arrow", "Num 0", "Num .",                       //13
 					//ISO
 					"ISO #", "ISO <"
@@ -355,7 +406,49 @@ class LegacyCorsairLibrary {
 					16, 114,																									// 2
 				],
 				size : [24, 8]
+			},
+			"Strafe" : {
+				vLedNames : [
+					"Profile", "Brightness", "Lock",                  "Logo",                   "Mute",
+					"Esc", "F1", "F2", "F3", "F4", "F5", "F6", "F7", "F8", "F9", "F10", "F11", "F12",         "Print Screen", "Scroll Lock", "Pause Break",   "MediaStop", "MediaRewind", "MediaPlayPause", "MediaFastForward",
+					"`", "1", "2", "3", "4", "5", "6", "7", "8", "9", "0", "-_", "=+", "Backspace",                        "Insert", "Home", "Page Up",       "NumLock", "Num /", "Num *", "Num -",  //21
+					"Tab", "Q", "W", "E", "R", "T", "Y", "U", "I", "O", "P", "[", "]", "\\",                               "Del", "End", "Page Down",         "Num 7", "Num 8", "Num 9", "Num +",    //21
+					"CapsLock", "A", "S", "D", "F", "G", "H", "J", "K", "L", ";", "'", "Enter",                                                              "Num 4", "Num 5", "Num 6",             //16
+					"Left Shift", "Z", "X", "C", "V", "B", "N", "M", ",", ".", "/", "Right Shift",                                  "Up Arrow",               "Num 1", "Num 2", "Num 3", "Num Enter", //17
+					"Left Ctrl", "Left Win", "Left Alt", "Space", "Right Alt", "Fn", "Menu", "Right Ctrl",  "Left Arrow", "Down Arrow", "Right Arrow", "Num 0", "Num .",                     //13
+					//ISO
+					"ISO #", "ISO <"
+				],
+				vLedPositions : [
+					[0, 0], [19, 0], [20, 0],                      [9, 0],                                                             [17, 0],   // Logo & specialkey row.
+					[0, 1], [1, 1], [2, 1], [3, 1], [4, 1], [5, 1], [6, 1], [7, 1], [8, 1], [9, 1], [10, 1], [11, 1],         [13, 1],   [14, 1], [15, 1], [16, 1],   [17, 1], [18, 1], [19, 1], [20, 1], //20
+					[0, 2], [1, 2], [2, 2], [3, 2], [4, 2], [5, 2], [6, 2], [7, 2], [8, 2], [9, 2], [10, 2], [11, 2], [12, 2], [13, 2],   [14, 2], [15, 2], [16, 2],   [17, 2], [18, 2], [19, 2], [20, 2], //21
+					[0, 3], [1, 3], [2, 3], [3, 3], [4, 3], [5, 3], [6, 3], [7, 3], [8, 3], [9, 3], [10, 3], [11, 3], [12, 3], [13, 3],   [14, 3], [15, 3], [16, 3],   [17, 3], [18, 3], [19, 3], [20, 3], //21
+					[0, 4], [1, 4], [2, 4], [3, 4], [4, 4], [5, 4], [6, 4], [7, 4], [8, 4], [9, 4], [10, 4], [11, 4],         [13, 4],                             [17, 4], [18, 4], [19, 4], // 16
+					[0, 5], [1, 5], [2, 5], [3, 5], [4, 5], [5, 5], [6, 5], [7, 5], [8, 5], [9, 5], [10, 5], [11, 5],         [13, 5],           [15, 5],           [17, 5], [18, 5], [19, 5], // 17
+					[0, 6], [1, 6], [2, 6],                      [6, 6],                      [10, 6], [11, 6], [12, 6], [13, 6],   [14, 6], [15, 6], [16, 6],   [17, 6],        [19, 6], // 14
+					//ISO
+					[2, 5], [13, 4]
+				],
+				vKeys : [
+					125, 137, 8,                       59,                               20,    // Special key row.
+					0,     12, 24, 36, 48,     60, 72, 84, 96,     108, 120, 132, 6,     18, 30, 42,    32, 44, 56,  68,  //20
+					1,   13, 25, 37, 49, 61, 73, 85, 97, 109, 121, 133, 7,       31,     54, 66, 78,    80, 92, 104, 116, //21
+					2,   14, 26, 38, 50, 62, 74, 86, 98, 110, 122, 134,   90,   102,     43, 55, 67,    9,  21, 33,  128, //21
+					3,   15, 27, 39, 51, 63, 75, 87, 99, 111, 123, 135,         126,                    57, 69, 81,       //16
+					4,   28, 40, 52, 64, 76, 88, 100, 112, 124, 136,          79,         103,       93, 105, 117, 140,
+					5,   17, 29,            53,                    89, 101, 113, 91,     115, 127, 139,   129, 141,
+					16, 114
+				],
+				size : [21, 7]
 			}
+		};
+
+		this.LayoutDict =
+		{
+			"ANSI":   [ 63, 65, 66, 70, 71, 81, 83, 85, 96, 111, 120, 121, 122, 123, 124, 125, 126, 127, 128, 129 ], //70 + 71 are profile and brightness 96 is lock.
+			"ISO":    [ 63, 65, 66, 70, 71, 80, 83, 85, 96, 111, 120, 121, 122, 123, 124, 125, 126, 127, 128, 129 ],
+			"ABNT2" : [ 63, 65, 66, 70, 71, 80, 85, 96, 111, 120, 121, 122, 123, 124, 125, 126, 127, 128, 129 ]
 		};
 	}
 
@@ -430,7 +523,11 @@ class LegacyCorsairProtocol {
 			"Mouse" : 0x01,
 			"Keyboard" : 0x03,
 			"Mousepad" : 0x04,
-			"Headset Stand" : 0x05
+			"Headset Stand" : 0x05,
+			0x01 : "Mouse",
+			0x03 : "Keyboard",
+			0x04 : "Mousepad",
+			0x05 : "Headset Stand"
 		};
 
 		this.DeviceIdentifiers =
@@ -624,13 +721,8 @@ class LegacyCorsairProtocol {
 	getDeviceName() { return this.Config.deviceName; }
 	setDeviceName(deviceName) { this.Config.deviceName = deviceName; }
 
+	getDeviceType() { return this.Config.deviceType; }
 	setDeviceType(deviceType) { this.Config.deviceType = this.DeviceTypes[deviceType]; }
-
-	getWirelessDevice() { return this.Config.wirelessDevice; }
-	setWirelessDevice(wireless) { this.Config.wirelessDevice = wireless; }
-
-	getWakeStatus() { return this.Config.deviceAwake; }
-	setWakeStatus(wakeStatus) { this.Config.deviceAwake = wakeStatus; }
 
 	getvKeys() { return this.Config.vKeys; }
 	setvKeys(vKeys) { this.Config.vKeys = vKeys; }
@@ -641,10 +733,6 @@ class LegacyCorsairProtocol {
 
 	setDeviceInfo() {
 		const config = deviceLibrary.getDeviceByProductId(device.productId());
-
-		if(config.wireless) {
-			this.setWirelessDevice(true);
-		}
 
 		this.setvKeys(config.vKeys);
 		this.setvKeyNames(config.vLedNames);
@@ -678,24 +766,6 @@ class LegacyCorsairProtocol {
 		packet.push(...data);
 		device.write(packet, 65);
 	}
-	wirelessDeviceSetup() { //good way to make sure users pair the right device to the right receiver
-		const wirelessFirmwarePacket = this.getCommand([0xae]);
-
-		device.log("Full Wireless Info Packet: " + wirelessFirmwarePacket);
-
-		const VendorID = wirelessFirmwarePacket[2].toString(16) + wirelessFirmwarePacket[1].toString(16);
-		device.log("Wireless Device Vendor ID: " + VendorID);
-
-		const ProductID = wirelessFirmwarePacket[4].toString(16) + wirelessFirmwarePacket[3].toString(16);
-		device.log("Wireless Device Product ID: " + ProductID);
-
-		const unknownWirelessPacket = this.getCommand([0x4a]);
-		device.addFeature("battery");
-
-		this.setCommand([0xAD, 0x00, 0x00, 0x64]); //Crank the brightness
-
-		getDeviceBatteryStatus();
-	}
 	/* eslint-disable complexity */
 	/** Grab Relevant Information off of the Device.*/
 	getFirmwareInformation() { //Complexity of 21, but we don't really care. This is simply just a way to return all of our info and we parse like 2 bytes of it. If we do, then I may split it out into smaller functions.
@@ -718,7 +788,7 @@ class LegacyCorsairProtocol {
 			return [-1, -1, -1, -1, -1, -1, -1];
 		}
 
-		if(returnPacket[7] !== undefined && returnPacket[8] !== undefined && returnPacket[7] > 0) {
+		if(returnPacket[7] !== undefined && returnPacket[8] !== undefined) {
 			bootloaderVersion = returnPacket[8].toString(16) + returnPacket[7].toString(16);
 			device.log("Device Bootloader Version:" + bootloaderVersion, {toFile: true});
 		}else {
@@ -766,34 +836,6 @@ class LegacyCorsairProtocol {
 		return [firmwareVersion, bootloaderVersion, VendorID, ProductID, pollingRate, deviceType, layout];
 	}
 	/* eslint-enable complexity */
-	/** Grab Battery Level off of the Device.*/
-	getBatteryLevel() {
-		const batteryPacket = this.getCommand([0x50]);
-		const batteryLevel = this.batteryDict[batteryPacket[1]];
-		const batteryStatus = batteryPacket[2];
-
-		if(batteryLevel !== 0) {
-			device.log("Battery Level: " + batteryLevel + "%");
-
-			return [batteryLevel, batteryStatus];
-		}
-
-		device.log("Error Fetching Battery Level");
-
-		return [-1, -1];
-	}
-	/** Check if a device is awake using the battery level as a gauge. Does not forward battery percentage to Signal's UI.*/
-	checkWakeStatus() {
-		const wakeStatus = this.getBatteryLevel();
-
-		if(wakeStatus[0] !== undefined) {
-			this.setWakeStatus(true);
-			this.configureDevice();
-		} else {
-			this.setWakeStatus(false);
-			device.log("Device is taking a nap.");
-		}
-	}
 	/** Initialize the Device and Check That it is Connected and Awake. */
 	deviceInitialization() {
 
@@ -809,31 +851,15 @@ class LegacyCorsairProtocol {
 			}
 		}
 
-	   while(DeviceInformation[0] === -1 && attempts < 5);
+	    while(DeviceInformation[0] === -1 && attempts < 5);
 
-	   this.setDeviceInfo();
+	    this.setDeviceInfo();
 
-	   	this.setKeyboardLayout(DeviceInformation[6]);
+		this.setKeyboardLayout(DeviceInformation[6]);
 		this.setDeviceType(DeviceInformation[5]);
-
-		if(this.getWirelessDevice()) {
-			this.checkWakeStatus();
-		} else {
-			this.setWakeStatus(true); //Wired devices will never have a wake status
-		}
 
 		device.addFeature("keyboard");
 		macroInputArray.setCallback(macroInputHandler);
-	}
-	/** Configure the device based on the dictionary and data gathered in Device Initialization. */
-	configureDevice() {
-		device.log("Device Requires Config as it has woken from sleep or has been rebooted");
-		this.setLightingControlMode(this.modes.SoftwareMode);
-		this.setSpecialFunctionControlMode(this.modes.SoftwareMode);
-
-		if(this.getWirelessDevice()) {
-			this.wirelessDeviceSetup();
-		}
 	}
 	/** Set Device to Function Control Mode.*/
 	setSpecialFunctionControlMode(mode) {
@@ -842,7 +868,7 @@ class LegacyCorsairProtocol {
 	}
 	/** Set Device Lighting Mode.*/
 	setLightingControlMode(mode) {
-		const packet = [this.Commands.lightingControl, mode, 0x00, this.Config.deviceType];
+		const packet = [this.Commands.lightingControl, mode, 0x00, 0x03];
 		this.setCommand(packet);
 	}
 	/** Set Software Lighting on the Dark Core and Dark Core SE. Things use a wacky packet send.*/
@@ -992,8 +1018,7 @@ const macroInputArray = new BitArray(18);
 
 export function Validate(endpoint) {
 	return (endpoint.interface === 1 && endpoint.usage === 0x0004 && endpoint.usage_page === 0xffc2)  //Normal Endpoint
-	    || (endpoint.interface === 0 && endpoint.usage === 0x0002 && endpoint.usage_page === 0xffc0) //Macro Endpoint
-		|| (endpoint.interface === 0 && endpoint.usage === 0x0002 && endpoint.usage_page === 0xffc3);//Wake endpoint
+	    || (endpoint.interface === 0 && endpoint.usage === 0x0002 && endpoint.usage_page === 0xffc0); //Macro Endpoint
 }
 
 

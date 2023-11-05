@@ -95,6 +95,21 @@ export function Initialize() {
 
 	savedLedCount = -1;
 
+	const deviceIds = GetAttachedLedCounts();
+
+	if(deviceIds[0] === 160){
+		console.log(`Found 5000T case controller!`);
+		device.setName(`Corsair 5000T Case`);
+
+		// Set Default LED Counts;
+		for(const channel of ChannelArray){
+			if(channel[0] === "3 Pin Lighting Channel"){
+				channel[1] = 160;
+				channel[2] = 160;
+			}
+		}
+	}
+
 	SetupChannels();
 
 	// Set Led Counts to something we can use.
@@ -103,6 +118,33 @@ export function Initialize() {
 	//device.log(Corsair.FetchProperty(0x4)); // 60676 - 0xED04
 	//device.log(Corsair.FetchProperty(0x3D)); // 14560 - 2 * property 0x3E?
 	//device.log(Corsair.FetchProperty(0x3E)); // 7280
+}
+
+// Yes it's kind of wasteful to copy here.
+// Splicing is also bad given that's O(n) too...
+function* chunks(arr, n) {
+	for (let i = 0; i < arr.length; i += n) {
+	  yield arr.slice(i, i + n);
+	}
+}
+
+function GetAttachedLedCounts(){
+	let data = Corsair.ReadFromEndpoint(Corsair.Handles.Background, 0x20, 0x15);
+	const DATA_LENGTH = data[6] ?? 7;
+	data = data.splice(7, 4 * DATA_LENGTH);
+
+	const foundLedCounts = [];
+
+	for(const deviceId of chunks(data, 4)){
+		if(deviceId[0] !== 2){
+			foundLedCounts.push(0);
+			continue;
+		}
+
+		foundLedCounts.push(deviceId[2]);
+	}
+
+	return foundLedCounts;
 }
 
 export function Render() {

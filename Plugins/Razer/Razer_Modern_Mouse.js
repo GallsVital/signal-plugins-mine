@@ -522,6 +522,7 @@ export class deviceLibrary {
 			"Deathadder Elite" : "https://marketplace.signalrgb.com/devices/brands/razer/mice/deathadder-elite.png",
 			"Deathadder V2" : "https://marketplace.signalrgb.com/devices/brands/razer/mice/deathadder-v2.png",
 			"Deathadder V2 Pro" : "https://marketplace.signalrgb.com/devices/brands/razer/mice/deathadder-v2-pro.png",
+			"Deathadder V3" : "https://marketplace.signalrgb.com/devices/brands/razer/mice/deathadder-v3-pro.png",
 			"Deathadder V3 Pro" : "https://marketplace.signalrgb.com/devices/brands/razer/mice/deathadder-v3-pro.png",
 			"Lancehead Tournament Edition" : "https://marketplace.signalrgb.com/devices/brands/razer/mice/lancehead-tournament-edition.png",
 			"Lancehead" : "https://marketplace.signalrgb.com/devices/brands/razer/mice/lancehead-wireless.png",
@@ -563,10 +564,11 @@ export class deviceLibrary {
 			0x0084: "Deathadder V2",
 			0x007C: "Deathadder V2 Pro",
 			0x007D: "Deathadder V2 Pro",
+			0x00B2: "Deathadder V3",
 			0x00B7: "Deathadder V3 Pro",
-			0x0059: "Lancehead",
 			0x0070: "Lancehead",
 			0x006f: "Lancehead",
+			0x0059: "Lancehead Tournament Edition",
 			0x0060: "Lancehead Tournament Edition",
 			0x006c: "Mamba Elite",
 			0x0073: "Mamba",
@@ -688,6 +690,14 @@ export class deviceLibrary {
 				vLedPositions: [[1, 0], [1, 2], [0, 1]],
 				maxDPI: 20000,
 				wireless: true
+			},
+			"Deathadder V3":
+			{
+				size: [0, 0],
+				vLedNames: [],
+				vLedPositions: [],
+				maxDPI: 30000,
+				wireless: false
 			},
 			"Deathadder V3 Pro":
 			{
@@ -2684,4 +2694,8 @@ class BinaryUtils {
 
 export function Validate(endpoint) {
 	return endpoint.interface === 0 && endpoint.usage === 0x0002 || endpoint.interface === 1 && endpoint.usage === 0x0000 || endpoint.interface === 3;
+}
+
+export function ImageUrl() {
+	return "https://marketplace.signalrgb.com/devices/default/misc/usb-drive-render.png";
 }

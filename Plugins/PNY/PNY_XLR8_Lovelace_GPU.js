@@ -2,7 +2,7 @@
 export function Name() { return "PNY XLR8 GPU"; }
 export function Publisher() { return "WhirlwindFX"; }
 export function Type() { return "SMBUS"; }
-export function Size() { return [3, 3]; }
+export function Size() { return [3, 1]; }
 export function DefaultPosition(){return [5, 2];}
 export function DefaultScale(){return 2.5;}
 export function LedNames() { return vLedNames; }
@@ -21,7 +21,7 @@ export function ControllableParameters() {
 }
 
 const vLedNames = [ "LED 1", "LED 2", "LED 3" ];
-const vLedPositions = [ [0, 0], [0, 1], [0, 2] ];
+const vLedPositions = [ [0, 0], [1, 0], [2, 0] ];
 
 /** @param {FreeAddressBus} bus */
 export function Scan(bus) {
@@ -136,7 +136,11 @@ export function BrandGPUList(){ return PNYGPUIDs; }
 
 const PNYGPUIDs =
 [
+	new PNYGPUIdentifier(0x2786, 0x13CC, "PNY 4070 XLR8"),
+	new PNYGPUIdentifier(0x2786, 0x13CE, "PNY 4070 XLR8 VERTO"),
+
 	new PNYGPUIdentifier(0x2782, 0x13B1, "PNY 4070Ti XLR8"),
+	new PNYGPUIdentifier(0x2782, 0x13D4, "PNY 4070TI XLR8"),
 	new PNYGPUIdentifier(0x2782, 0x13B2, "PNY 4070Ti XLR8 VERTO"),
 
 	new PNYGPUIdentifier(0x2704, 0x13B0, "PNY 4080 XLR8 VERTO OC"),
@@ -146,6 +150,7 @@ const PNYGPUIDs =
 	new PNYGPUIdentifier(0x2684, 0x13AD, "PNY 4090 XLR8"),
 	new PNYGPUIdentifier(0x2684, 0x13AE, "PNY 4090 XLR8"),
 	new PNYGPUIdentifier(0x2684, 0x13D8, "PNY 4090 XLR8 Verto Epic-X OC"),
+	new PNYGPUIdentifier(0x2684, 0x13D9, "PNY 4090 XLR8 Verto Gaming"),
 ];
 
 function hexToRgb(hex) {

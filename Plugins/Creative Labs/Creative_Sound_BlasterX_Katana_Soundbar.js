@@ -41,14 +41,20 @@ export function LedPositions() {
 }
 
 export function Render() {
-	SendColorPalette();
+	sendColors();
 }
 
-export function Shutdown() {
-	SendColorPalette(true);
+export function Shutdown(SystemSuspending) {
+
+	if(SystemSuspending){
+		sendColors("#000000"); // Go Dark on System Sleep/Shutdown
+	}else{
+		sendColors(shutdownColor);
+	}
+
 }
 
-function SendColorPalette(shutdown = false) {
+function sendColors(overrideColor) {
 	const packet = [];
 	packet[0x00] = 0x00;
 	packet[0x01] = 0x5a;
@@ -66,8 +72,8 @@ function SendColorPalette(shutdown = false) {
 		let col;
 		const offset = 9 + iIdx * 4;
 
-		if(shutdown) {
-			col = hexToRgb(shutdownColor);
+		if(overrideColor) {
+			col = hexToRgb(overrideColor);
 		} else if (LightingMode === "Forced") {
 			col = hexToRgb(forcedColor);
 		} else {

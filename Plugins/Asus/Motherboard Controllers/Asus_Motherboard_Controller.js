@@ -106,11 +106,12 @@ const ConfigurationOverrides = {
 	//"AULA3-AR32-0214":{MainboardCount: 2, ARGBChannelCount:3, RGBHeaderCount: 1}, // Asus TUF GAMING Z790-PLUS WIFI D4
 	"AULA3-AR32-0213":{MainboardCount: 2, ARGBChannelCount:3, RGBHeaderCount: 1},
 	"AULA3-AR32-0218":{MainboardCount: 5, ARGBChannelCount:3, RGBHeaderCount: 1}, //Z790 Apex
+	"AULA3-6K75-0219":{MainboardCount: 5, ARGBChannelCount:3, RGBHeaderCount: 1}, //Also Z790 Apex
 	"Asus ROG MAXIMUS Z690 EXTREME GLACIAL":{MainboardCount: 7, ARGBChannelCount:4, RGBHeaderCount: 1, polymoOverride : true}, //The naming for this is a bit backwards. It forces polymo off.
 	//"AULA3-6K75-0206":{MainboardCount: 7, ARGBChannelCount:3, RGBHeaderCount: 1},
 	//"AULA3-AR42-0207":{MainboardCount: 3, ARGBChannelCount:1, RGBHeaderCount: 2},
 	"TUF GAMING X570-PRO (WI-FI)": {MainboardCount: 3, ARGBChannelCount:1, RGBHeaderCount: 2},
-	"PRIME Z790-A Wifi" : {MainboardCount: 3, ARGBChannelCount:3, RGBHeaderCount: 1}
+	"PRIME Z790-A WIFI" : {MainboardCount: 4, ARGBChannelCount:3, RGBHeaderCount: 1}
 };
 
 const DeviceInfo = {
@@ -367,7 +368,7 @@ function SendARGBChannel(ChannelIdx, polymo = false, overrideColor) {
 	}else if(componentChannel.shouldPulseColors()){
 		ChannelLedCount = Device_PulseLedCount;
 
-		const pulseColor = device.getChannelPulseColor(ChannelArray[ChannelIdx][0], ChannelLedCount);
+		const pulseColor = device.getChannelPulseColor(ChannelArray[ChannelIdx][0]);
 		RGBData = device.createColorArray(pulseColor, ChannelLedCount, "Inline", RGBconfig);
 
 	}else if(overrideColor){

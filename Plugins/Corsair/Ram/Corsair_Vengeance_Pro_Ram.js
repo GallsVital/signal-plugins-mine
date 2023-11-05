@@ -6,6 +6,7 @@ export function Size() { return [2, 10]; }
 export function DefaultPosition(){return [40, 30];}
 export function DefaultScale(){return 10.0;}
 export function Type() { return "SMBUS"; }
+export function ConflictingProcesses() { return ["iCUE.exe"]; }
 /* global
 shutdownColor:readonly
 LightingMode:readonly
@@ -83,6 +84,10 @@ export function Shutdown(SystemSuspending) {
 function GetRamVersion() {
 	iRamVersion = bus.ReadByte(0x44);
 	device.log("Vengeance Ram Version: "+iRamVersion);
+
+	if (iRamVersion === 3) {
+		device.notify("Update RAM Firmware Through ICUE", "The Current Firmware version of your RAM is out of date. Please update using ICUE to get higher frame rates", 1);
+	}
 }
 
 const vPecTable = [
@@ -99,12 +104,14 @@ const vPecTable = [
 
 
 function WritePacket(overrideColor) {
-	if (iRamVersion === 4) { WritePacketV4(overrideColor); } else if (iRamVersion === 3) {
-		device.notify("Update RAM Firmware Through ICUE", "The Current Firmware version of your RAM is out of date. Please update using ICUE to use it with SignalRGB.", 1);
+	if (iRamVersion === 4) {
+		 WritePacketV4(overrideColor);
+	}else{
+		WritePacketV3(overrideColor);
 	}
 }
 
-function WritePacketV3(shutdown) {
+function WritePacketV3(overrideColor) {
 	bus.WriteByte(0x10, 0x64);
 	bus.WriteByte(0x28, 0x49);
 
@@ -122,8 +129,8 @@ function WritePacketV3(shutdown) {
 
 		let Color;
 
-		if(shutdown){
-			Color = hexToRgb(shutdownColor);
+		if(overrideColor){
+			Color = hexToRgb(overrideColor);
 		}else if(LightingMode === "Forced") {
 			Color = hexToRgb(forcedColor);
 		} else {
@@ -132,8 +139,8 @@ function WritePacketV3(shutdown) {
 
 		packet[iRedIdx] = Color[0];
 		packet[iBlueIdx] = Color[1];
-		packet[iGreenIdxA] = 0xB0 | Color[2] & 0x0F;
-		packet[iGreenIdxB] = 0xB0 | Color[2] >> 4;
+		packet[iGreenIdxA] = 0xB0 | (Color[2] & 0x0F);
+		packet[iGreenIdxB] = 0xB0 | (Color[2] >> 4);
 	}
 
 	// Calc CRC.

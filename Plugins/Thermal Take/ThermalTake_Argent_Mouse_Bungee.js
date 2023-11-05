@@ -90,6 +90,6 @@ export function Validate(endpoint) {
 	return endpoint.interface === 1;
 }
 
-export function Image() {
-	return "";
+export function ImageUrl(){
+	return "https://marketplace.signalrgb.com/devices/brands/thermaltake/misc/argent-mouse-bungee.png";
 }

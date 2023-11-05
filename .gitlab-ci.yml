@@ -2,7 +2,8 @@ image: alpine:latest
 
 stages:
   - lint
-  - validate
+  - plugin validate
+  - component validate
   - duplicate gpu check
   - unit test
   - build
@@ -36,8 +37,8 @@ duplicate gpu check:
     #- npm install
     - npm run test:CheckDuplicateGPU
 
-validate:
-  stage: validate
+plugin validate:
+  stage: plugin validate
   when: always
   allow_failure: true
   script:
@@ -48,11 +49,26 @@ validate:
     when: always
     name: "Javascript Plugins"
     paths:
+      - Components/**/*.json
       - Plugins/**/*.js
       - Plugins/**/*.qml
     exclude:
       - "Plugins/**/*.test.js"
       - "Plugins/*.js"
+
+component validate:
+  stage: component validate
+  when: always
+  allow_failure: true
+  script:
+    #- apk add --update npm
+    #- npm install
+    - npm run test:componentValidate
+  artifacts:
+    when: always
+    name: "Component Json"
+    paths:
+      - Components/**/*.json
 
 unit test:
   stage: unit test

@@ -297,5 +297,5 @@ function arraysEquals(a1, a2) {
 }
 
 export function ImageUrl(){
-	return "https://marketplace.signalrgb.com/devices/default/aio-with-rad.png";
+	return "https://marketplace.signalrgb.com/devices/brands/gigabyte/aios/aorus-liquid-cooler-360.png";
 }

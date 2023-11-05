@@ -1,4 +1,4 @@
-export function Name() { return "MSI GPU"; }
+export function Name() { return "MSI Lovelace GPU"; }
 export function Publisher() { return "WhirlwindFX"; }
 export function Documentation(){ return "troubleshooting/MSI"; }
 export function Type() { return "SMBUS"; }
@@ -219,45 +219,7 @@ class MSIGPUIdentifier extends GPUIdentifier {
 
 class NvidiaGPUDeviceIds {
 	constructor() {
-		this.GTX1050TI       = 0x1C82;
-		this.GTX1060         = 0x1C03;
-		this.GTX1070         = 0x1B81;
-		this.GTX1070TI       = 0x1B82;
-		this.GTX1080         = 0x1B80;
-		this.GTX1080TI       = 0x1B06;
-		this.GTX1650         = 0x1F82;
-		this.GTX1650S        = 0x2187;
-		this.GTX1660         = 0x2184;
-		this.GTX1660TI       = 0x2182;
-		this.GTX1660S        = 0x21C4;
-		this.RTX2060_TU104   = 0x1E89;
-		this.RTX2060_TU106   = 0x1F08;
-		this.RTX2060S        = 0x1F47;
-		this.RTX2060S_OC     = 0x1F06;
-		this.RTX2070         = 0x1F02;
-		this.RTX2070_OC      = 0x1F07;
-		this.RTX2070S        = 0x1E84;
-		this.RTX2080         = 0x1E82;
-		this.RTX2080_A       = 0x1E87;
-		this.RTX2080S        = 0x1E81;
-		this.RTX2080TI_TU102 = 0x1E04;
-		this.RTX2080TI       = 0x1E07;
-		this.RTX2080_SUPER   = 0x1E81;
-		this.RTX3050         = 0x2507;
-		this.RTX3060         = 0x2503;
-		this.RTX3060_LHR     = 0x2504;
-		this.RTX3060_GA104   = 0x2487;
-		this.RTX3060TI       = 0x2486;
-		this.RTX3060TI_LHR   = 0x2489;
-		this.RTX3070         = 0x2484;
-		this.RTX3070_LHR     = 0x2488;
-		this.RTX3070TI       = 0x2482;
-		this.RTX3080         = 0x2206;
-		this.RTX3080_LHR     = 0x2216;
-		this.RTX3080_GA102   = 0x220A;
-		this.RTX3080TI       = 0x2208;
-		this.RTX3090         = 0x2204;
-		this.RTX3090TI       = 0x2203;
+		this.RTX4060TI       = 0x2803;
 		this.RTX4070		 = 0x2786;
 		this.RTX4070TI		 = 0x2782;
 		this.RTX4080		 = 0x2704;
@@ -269,6 +231,8 @@ const Nvidia = new NvidiaGPUDeviceIds();
 
 class MSIGPUDeviceIDs {
 	constructor() {
+		this.RTX4060TI_GAMING_X_TRIO                 = 0x5152;
+
 		this.RTX4070_GAMING_X_TRIO 					 = 0x5136;
 
 		this.RTX4070TI_GAMING_X_TRIO				 = 0x5132;
@@ -294,18 +258,19 @@ class MSIGPUList {
 		const MSIGPUIDs  = new MSIGPUDeviceIDs();
 		this.devices =
         [
-        	new MSIGPUIdentifier(Nvidia.RTX4070, MSIGPUIDs.RTX4070_GAMING_X_TRIO, 0x68, "MSI RTX 4070 GAMING X TRIO",),
-        	new MSIGPUIdentifier(Nvidia.RTX4070TI, MSIGPUIDs.RTX4070TI_GAMING_X_TRIO, 0x68, "MSI RTX 4070Ti GAMING X TRIO"),
-        	new MSIGPUIdentifier(Nvidia.RTX4070TI, MSIGPUIDs.RTX4070TI_GAMING_X_TRIO_W, 0x68, "MSI RTX 4070Ti GAMING X TRIO White"),
-        	new MSIGPUIdentifier(Nvidia.RTX4070TI, MSIGPUIDs.RTX4070TI_SUPRIM_X, 0x68, "MSI RTX 4070Ti SUPRIM X"),
-        	new MSIGPUIdentifier(Nvidia.RTX4080, MSIGPUIDs.RTX4080_SUPRIM, 0x68, "MSI RTX 4080 SUPRIM"),
-        	new MSIGPUIdentifier(Nvidia.RTX4080, MSIGPUIDs.RTX4080_GAMING_X_TRIO, 0x68, "MSI RTX 4080 GAMING X TRIO"),
-        	new MSIGPUIdentifier(Nvidia.RTX4080, MSIGPUIDs.RTX4080_GAMING_X_TRIO_W, 0x68, "MSI RTX 4080 GAMING X TRIO White"),
-        	new MSIGPUIdentifier(Nvidia.RTX4090, MSIGPUIDs.RTX4090_GAMING_TRIO, 0x68, "MSI RTX 4090 GAMING TRIO"),
-        	new MSIGPUIdentifier(Nvidia.RTX4090, MSIGPUIDs.RTX4090_SUPRIM_LIQUID_X, 0x68, "MSI RTX 4090 SUPRIM LIQUID X"),
-        	new MSIGPUIdentifier(Nvidia.RTX4090, MSIGPUIDs.RTX4090_SUPRRIM_X, 0x68, "MSI RTX 4090 SUPRIM X"),
-        	new MSIGPUIdentifier(Nvidia.RTX4090, MSIGPUIDs.RTX4090_SUPRIM_X_CLASSIC, 0x68, "MSI RTX 4090 SUPRIM X Classic"),
-        	new MSIGPUIdentifier(Nvidia.RTX4090, MSIGPUIDs.RTX4090_SUPRIM_X_CLASSIC_2, 0x68, "MSI RTX 4090 SUPRIM X Classic")
+        	new MSIGPUIdentifier(Nvidia.RTX4060TI,	MSIGPUIDs.RTX4060TI_GAMING_X_TRIO,		0x68, "MSI 4060Ti GAMING X TRIO"),
+        	new MSIGPUIdentifier(Nvidia.RTX4070,	MSIGPUIDs.RTX4070_GAMING_X_TRIO,		0x68, "MSI 4070 GAMING X TRIO",),
+        	new MSIGPUIdentifier(Nvidia.RTX4070TI,	MSIGPUIDs.RTX4070TI_GAMING_X_TRIO,		0x68, "MSI 4070Ti GAMING X TRIO"),
+        	new MSIGPUIdentifier(Nvidia.RTX4070TI,	MSIGPUIDs.RTX4070TI_GAMING_X_TRIO_W,	0x68, "MSI 4070Ti GAMING X TRIO White"),
+        	new MSIGPUIdentifier(Nvidia.RTX4070TI,	MSIGPUIDs.RTX4070TI_SUPRIM_X,			0x68, "MSI 4070Ti SUPRIM X"),
+        	new MSIGPUIdentifier(Nvidia.RTX4080,	MSIGPUIDs.RTX4080_SUPRIM,				0x68, "MSI 4080 SUPRIM"),
+        	new MSIGPUIdentifier(Nvidia.RTX4080,	MSIGPUIDs.RTX4080_GAMING_X_TRIO,		0x68, "MSI 4080 GAMING X TRIO"),
+        	new MSIGPUIdentifier(Nvidia.RTX4080,	MSIGPUIDs.RTX4080_GAMING_X_TRIO_W,		0x68, "MSI 4080 GAMING X TRIO White"),
+        	new MSIGPUIdentifier(Nvidia.RTX4090,	MSIGPUIDs.RTX4090_GAMING_TRIO,			0x68, "MSI 4090 GAMING TRIO"),
+        	new MSIGPUIdentifier(Nvidia.RTX4090,	MSIGPUIDs.RTX4090_SUPRIM_LIQUID_X,		0x68, "MSI 4090 SUPRIM LIQUID X"),
+        	new MSIGPUIdentifier(Nvidia.RTX4090,	MSIGPUIDs.RTX4090_SUPRRIM_X,			0x68, "MSI 4090 SUPRIM X"),
+        	new MSIGPUIdentifier(Nvidia.RTX4090,	MSIGPUIDs.RTX4090_SUPRIM_X_CLASSIC,		0x68, "MSI 4090 SUPRIM X Classic"),
+        	new MSIGPUIdentifier(Nvidia.RTX4090,	MSIGPUIDs.RTX4090_SUPRIM_X_CLASSIC_2,	0x68, "MSI 4090 SUPRIM X Classic")
         ];
 	}
 }

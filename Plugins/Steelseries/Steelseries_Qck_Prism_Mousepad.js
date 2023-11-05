@@ -22,8 +22,17 @@ export function ControllableParameters(){
 const PIDLibrary = {
 	0x1507: "Prism",
 	0x1514: "Prism",
+	0x1518: "Prism 4XL",
 	0x151c: "Prism Neo Noir Edition",
 };
+
+export function updateImage(){
+	if(device.productId() === 0x1507 || device.productId() === 0x1514){
+		return "https://marketplace.signalrgb.com/devices/default/mousepad.png";
+	}
+
+	return "https://marketplace.signalrgb.com/devices/default/mousepad-xl.png";
+}
 
 const vLedNames = [
 	"Led 1", "Led 2", "Led 3", "Led 4", "Led 5", "Led 6", "Led 7", "Led 8", "Led 9", "Led 10", "Led 11", "Led 12",
@@ -54,6 +63,7 @@ export function LedPositions() {
 
 export function Initialize() {
 	device.setName(Name() + PIDLibrary[ProductId]);
+	device.setImageFromUrl(updateImage());
 }
 
 export function Render() {
@@ -116,9 +126,5 @@ export function Validate(endpoint) {
 	return endpoint.interface === 0;
 }
 export function ImageUrl() {
-	if(device.productId() === 0x1507 || device.productId() === 0x1514){
-		return "https://marketplace.signalrgb.com/devices/default/mousepad.png";
-	}
-
 	return "https://marketplace.signalrgb.com/devices/default/mousepad-xl.png";
 }

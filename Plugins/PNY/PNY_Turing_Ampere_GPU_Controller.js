@@ -138,6 +138,8 @@ export function BrandGPUList(){ return PNYGPUIDs; }
 const PNYGPUIDs =
 [
 	new PNYGPUIdentifier(0x196E, 0x2484, 0x136E, "PNY 3070 XLR8"),
+	new PNYGPUIdentifier(0x196E, 0x2488, 0x138A, "PNY 3070 XLR8"),
+	new PNYGPUIdentifier(0x196E, 0x2482, 0x138C, "PNY 3070TI XLR8"),
 	new PNYGPUIdentifier(0x196E, 0x2216, 0x138B, "PNY 3080 XLR8"),
 	new PNYGPUIdentifier(0x196E, 0x2208, 0x1385, "PNY 3080TI Revel"),
 	new PNYGPUIdentifier(0x196E, 0x2206, 0x136B, "PNY 3080 XLR8 REVEL EPIC-X RGB"),
@@ -156,13 +158,16 @@ const PNYGPUIDs =
 	new PNYGPUIdentifier(0x1569, 0x2488, 0x2488, "PALIT 3070 Gaming Pro"),
 	new PNYGPUIdentifier(0x1569, 0x2484, 0xf280, "PALIT 3070 JetStream"),
 	new PNYGPUIdentifier(0x1569, 0x2488, 0xf278, "PALIT 3070 GameRock"),
+	new PNYGPUIdentifier(0x1569, 0x2484, 0xf278, "PALIT 3070 GameRock OC"),
 	new PNYGPUIdentifier(0x1569, 0x2782, 0xF298, "PALIT 4070TI Gaming Pro"),
+	new PNYGPUIdentifier(0x1569, 0x2782, 0xF294, "PALIT 4070TI GameRock Classic"),
 	new PNYGPUIdentifier(0x1569, 0x2704, 0xF296, "PALIT 4080 GameRock"),
 	new PNYGPUIdentifier(0x1569, 0x2684, 0xF296, "PALIT 4090 GameRock OC"),
 
 	new PNYGPUIdentifier(0x10B0, 0x2482, 0x2482, "Gainward 3070TI Phoenix"),
 	new PNYGPUIdentifier(0x10B0, 0x2782, 0xF299, "Gainward 4070Ti Phoenix GS"),
 	new PNYGPUIdentifier(0x10B0, 0x2704, 0xF299, "Gainward 4080 Phoenix GS"),
+	new PNYGPUIdentifier(0x10B0, 0x2684, 0xf297, "Gainward 4090 Phantom GS"),
 
 ];
 

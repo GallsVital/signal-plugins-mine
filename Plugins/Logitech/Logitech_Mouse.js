@@ -81,15 +81,20 @@ export function Render() {
 	}
 
 	PollBattery();
+	device.pause(2);
 	DetectInputs();
+	device.pause(2);
 	grabColors();
-	device.pause(5);
 }
 
 export function Shutdown() {
 	sendMousePad(true);
 	grabColors(true);
-	LogitechMouse.SetOnBoardState(true);
+
+	if(settingControl) {
+		LogitechMouse.SetOnBoardState(true);
+	}
+
 }
 
 export function ondpiLightChanged() {
@@ -144,7 +149,10 @@ export function ondpi6Changed() {
 }
 
 export function onOnboardStateChanged() {
-	LogitechMouse.SetOnBoardState(OnboardState);
+
+	if(settingControl) {
+		LogitechMouse.SetOnBoardState(OnboardState);
+	}
 
 	if(settingControl && !OnboardState) {
 		DPIHandler.setActiveControl(true);
@@ -215,7 +223,8 @@ function ProcessInputs(packet) {
 
 	if(packet[0] === Logitech.MessageTypes.LongMessage && packet[1] === Logitech.GetConnectionType() && packet[2] === Logitech.FeatureIDs.WirelessStatusID && packet[3] === 0x00 && packet[5] === 0x01) {
 		device.log("Waking From Sleep");
-		device.pause(2000); //Wait two seconds for handoff.
+		device.pause(1000); //Wait two seconds for handoff.
+		device.pause(1000);
 		Initialize();
 
 		return [];
@@ -359,7 +368,7 @@ function hexToRgb(hex) {
 export class LogitechDeviceLibrary {
 	constructor() {
 		/**Library to map Product and Device ID's to Device Types. */
-		this.ProductIDs = [ 0xc081, 0xc082, 0xc083, 0xc084, 0xc085, 0xc088, 0xc08b, 0xc08c, 0xc08d, 0xc08f, 0xc090, 0xc091, 0xc092, 0xc094, 0xc095, 0xc09d, 0xc332, 0xc33e, 0xc539, 0xc53a, 0xC547, 0xC541, 0xC545, 0xC343 ];
+		this.ProductIDs = [ 0xc081, 0xc082, 0xc083, 0xc084, 0xc085, 0xc088, 0xc08b, 0xc08c, 0xc08d, 0xc08f, 0xc090, 0xc091, 0xc092, 0xc094, 0xc095, 0xc09d, 0xc332, 0xc33e, 0xc539, 0xc53a, 0xC547, 0xC541, 0xC545, 0xC343, 0xC096 ];
 
 		this.DeviceIDs =
 		{
@@ -376,6 +385,7 @@ export class LogitechDeviceLibrary {
 			"c08d" : "G502 Lightspeed",
 			"c08f" : "G403 Hero",
 			"c090" : "G703",
+			"c096" : "G705",
 			"c091" : "G903",
 			"c092" : "G203 Lightsync",
 			"c094" : "GPro X Superlight",
@@ -688,6 +698,13 @@ export class LogitechDeviceLibrary {
 				hasSniperButton : true
 			},
 			"G703" : {
+				bodyStyle : "G200Body",
+				ledStyle : "TwoZoneMouse",
+				maxDPI : "25600",
+				Size : [3, 3],
+				DeviceType : "Mouse"
+			},
+			"G705" : {
 				bodyStyle : "G200Body",
 				ledStyle : "TwoZoneMouse",
 				maxDPI : "25600",
@@ -1625,13 +1642,14 @@ export class LogitechProtocol {
 		for(let Zones = 0; Zones < loops; Zones++) {
 
 			const zoneData = rgbdata.splice(0, 3);
-			const packet = [ (this.UsesHeroProtocol() ? this.FeatureIDs.RGB8071ID : this.FeatureIDs.RGB8070ID), (this.UsesHeroProtocol() ? 0x10 : 0x30), Zones, 0x01, zoneData[0], zoneData[1], zoneData[2], (this.UsesHeroProtocol() ? 0x02 :0x00)];
+			const packet = [ (this.UsesHeroProtocol() ? this.FeatureIDs.RGB8071ID : this.FeatureIDs.RGB8070ID), (this.UsesHeroProtocol() ? 0x10 : 0x30), Zones, 0x01, zoneData[0], zoneData[1], zoneData[2], (this.UsesHeroProtocol() ? 0x00 :0x02)];
 
 			if(this.DeviceID === "4067" || this.DeviceID === "4070" || this.UsesHeroProtocol()) {
 				packet[14] = 0x01;
 			}
 
 			this.setLongFeature(packet, true, "RGB Send", true);
+			device.pause(5);
 		}
 
 		if(this.DeviceID === "4079" || this.DeviceID === "405d") {
@@ -1688,16 +1706,6 @@ export class LogitechMouseDevice {
 		device.addFeature("mouse");
 		device.setImageFromBase64(mouseImage());
 
-		this.SetOnBoardState(OnboardState);
-
-		if(this.getHasDPILights()) {
-			device.addProperty({"property":"dpiLight", "group":"mouse", "label":"DPI Light Always On", "type":"boolean", "default": "true"});
-		}
-
-		if(this.getHasDPILights()) {
-			this.SetDpiLightAlwaysOn(dpiLight);
-		}
-
 		if(this.getHasSniperButton()) {
 			DPIHandler.addSniperProperty();
 		}
@@ -1707,6 +1715,18 @@ export class LogitechMouseDevice {
 		DPIHandler.setUpdateCallback((dpi, stage) => { return this.setDpi(dpi, stage); });
 		DPIHandler.addProperties();
 		DPIHandler.setRollover(dpiRollover);
+
+		if(settingControl) {
+			this.SetOnBoardState(OnboardState);
+		}
+
+		if(this.getHasDPILights()) {
+			device.addProperty({"property":"dpiLight", "group":"mouse", "label":"DPI Light Always On", "type":"boolean", "default": "true"});
+		}
+
+		if(this.getHasDPILights()) {
+			this.SetDpiLightAlwaysOn(dpiLight);
+		}
 
 		if(settingControl && !OnboardState) {
 			DPIHandler.setActiveControl(settingControl);
