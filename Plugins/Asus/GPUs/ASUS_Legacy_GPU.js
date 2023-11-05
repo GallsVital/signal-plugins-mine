@@ -9,12 +9,14 @@ export function DefaultScale(){return 12.5;}
 export function LedNames() { return vLedNames; }
 export function LedPositions() { return vLedPositions; }
 /* global
+shutdownMode:readonly
 shutdownColor:readonly
 LightingMode:readonly
 forcedColor:readonly
 */
-export function ControllableParameters(){
+export function ControllableParameters() {
 	return [
+		{"property":"shutdownMode", "group":"lighting", "label":"Shutdown Mode", "type":"combobox", "values":["SignalRGB", "Hardware"], "default":"Hardware"},
 		{"property":"shutdownColor", "group":"lighting", "label":"Shutdown Color", "min":"0", "max":"360", "type":"color", "default":"#009bde"},
 		{"property":"LightingMode", "group":"lighting", "label":"Lighting Mode", "type":"combobox", "values":["Canvas", "Forced"], "default":"Canvas"},
 		{"property":"forcedColor", "group":"lighting", "label":"Forced Color", "min":"0", "max":"360", "type":"color", "default":"#009bde"},
@@ -92,8 +94,11 @@ export function Shutdown(SystemSuspending) {
 	if(SystemSuspending){
 		sendColors("#000000"); // Go Dark on System Sleep/Shutdown
 	}else{
-		ASUSLegacy.SetMode(ASUSLegacy.modes.colorCycle);
-
+		if (shutdownMode === "SignalRGB") {
+			sendColors(shutdownColor);
+		} else {
+			ASUSLegacy.SetMode(ASUSLegacy.modes.colorCycle);
+		}
 	}
 
 }
