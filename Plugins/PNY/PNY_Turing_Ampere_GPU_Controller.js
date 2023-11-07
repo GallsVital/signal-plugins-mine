@@ -159,6 +159,7 @@ const PNYGPUIDs =
 	new PNYGPUIdentifier(0x1569, 0x2484, 0xf280, "PALIT 3070 JetStream"),
 	new PNYGPUIdentifier(0x1569, 0x2488, 0xf278, "PALIT 3070 GameRock"),
 	new PNYGPUIdentifier(0x1569, 0x2484, 0xf278, "PALIT 3070 GameRock OC"),
+	new PNYGPUIdentifier(0x1569, 0x2786, 0xF298, "PALIT 4070 Gaming Pro OC"),
 	new PNYGPUIdentifier(0x1569, 0x2782, 0xF298, "PALIT 4070TI Gaming Pro"),
 	new PNYGPUIdentifier(0x1569, 0x2782, 0xF294, "PALIT 4070TI GameRock Classic"),
 	new PNYGPUIdentifier(0x1569, 0x2704, 0xF296, "PALIT 4080 GameRock"),
