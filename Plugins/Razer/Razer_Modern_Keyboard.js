@@ -268,7 +268,7 @@ export class deviceLibrary {
 				endpoint : { "interface": 3, "usage": 0x0001, "usage_page": 0x000C },
 				DeviceType : "Keyboard",
 				ledsToSend : 15,
-				image: "https://marketplace.signalrgb.com/devices/brands/razer/keyboards/blackwidow-v3-mini.png"
+				image: "https://assets.signalrgb.com/devices/brands/razer/keyboards/blackwidow-v3-mini.png"
 			},
 			"Blackwidow V4" :
 			{
@@ -334,7 +334,7 @@ export class deviceLibrary {
 				endpoint : { "interface": 3, "usage": 0x0000, "usage_page": 0x0001 },
 				DeviceType : "Keyboard",
 				ledsToSend : 23,
-				image: "https://marketplace.signalrgb.com/devices/brands/razer/keyboards/blackwidow-v4.png"
+				image: "https://assets.signalrgb.com/devices/brands/razer/keyboards/blackwidow-v4.png"
 			},
 			"Blackwidow V4 X" :
 			{
@@ -391,7 +391,7 @@ export class deviceLibrary {
 				endpoint : { "interface": 3, "usage": 0x0000, "usage_page": 0x0001 },
 				DeviceType : "Keyboard",
 				ledsToSend : 23,
-				image: "https://marketplace.signalrgb.com/devices/brands/razer/keyboards/blackwidow-v4-x.png"
+				image: "https://assets.signalrgb.com/devices/brands/razer/keyboards/blackwidow-v4-x.png"
 			},
 			"Blackwidow V4 Pro" :
 			{
@@ -450,7 +450,7 @@ export class deviceLibrary {
 				endpoint : { "interface": 3, "usage": 0x0000, "usage_page": 0x0001 },
 				DeviceType : "Keyboard",
 				ledsToSend : 23,
-				image: "https://marketplace.signalrgb.com/devices/brands/razer/keyboards/blackwidow-v4-pro.png"
+				image: "https://assets.signalrgb.com/devices/brands/razer/keyboards/blackwidow-v4-pro.png"
 			},
 			"Blackwidow V4 75%" :
 			{
@@ -516,7 +516,7 @@ export class deviceLibrary {
 				endpoint : { "interface": 3, "usage": 0x0000, "usage_page": 0x0001 },
 				DeviceType : "Keyboard",
 				ledsToSend : 18,
-				image: "https://marketplace.signalrgb.com/devices/brands/razer/keyboards/blackwidow-v4-75.png"
+				image: "https://assets.signalrgb.com/devices/brands/razer/keyboards/blackwidow-v4-75.png"
 			},
 			"Huntsman V3 Pro" :
 			{
@@ -551,7 +551,7 @@ export class deviceLibrary {
 				endpoint : { "interface": 3, "usage": 0x0000, "usage_page": 0x0001 },
 				DeviceType : "Keyboard",
 				ledsToSend : 23,
-				image: "https://marketplace.signalrgb.com/devices/brands/razer/keyboards/huntsman-v3-pro.png"
+				image: "https://assets.signalrgb.com/devices/brands/razer/keyboards/huntsman-v3-pro.png"
 			},
 			"Huntsman V3 Pro TKL" :
 			{
@@ -586,7 +586,7 @@ export class deviceLibrary {
 				endpoint : { "interface": 3, "usage": 0x0001, "usage_page": 0x000C },
 				DeviceType : "Keyboard",
 				ledsToSend : 21,
-				image: "https://marketplace.signalrgb.com/devices/brands/razer/keyboards/huntsman-v3-pro-tkl.png"
+				image: "https://assets.signalrgb.com/devices/brands/razer/keyboards/huntsman-v3-pro-tkl.png"
 			},
 			"Huntsman V3 Pro Mini" :
 			{
@@ -620,7 +620,7 @@ export class deviceLibrary {
 				endpoint : { "interface": 3, "usage": 0x0001, "usage_page": 0x000C },
 				DeviceType : "Keyboard",
 				ledsToSend : 15,
-				image: "https://marketplace.signalrgb.com/devices/brands/razer/keyboards/huntsman-v3-pro-mini.png"
+				image: "https://assets.signalrgb.com/devices/brands/razer/keyboards/huntsman-v3-pro-mini.png"
 			},
 		};
 	}
@@ -2427,5 +2427,5 @@ export function Validate(endpoint) {
 }
 
 export function ImageUrl() {
-	return "https://marketplace.signalrgb.com/devices/default/keyboards/full-size-keyboard-render.png";
+	return "https://assets.signalrgb.com/devices/default/keyboards/full-size-keyboard-render.png";
 }
