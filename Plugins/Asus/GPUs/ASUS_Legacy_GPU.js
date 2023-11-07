@@ -298,6 +298,7 @@ class ASUSLegacyGPUDeviceIds{
 		this.ROG_STRIX_RTX2060_SUPER_O8G_GAMING        = 0x872F;
 		this.ROG_STRIX_RTX2060_SUPER_O8G_GAMING_OC     = 0x86FB;
 		this.ROG_STRIX_RTX2060_SUPER_A8G_GAMING_OC     = 0x86FC;
+		this.ROG_STRIX_RTX2060_SUPER_A8G_GAMING_OC_2   = 0x86FD;
 		this.ROG_STRIX_RTX2070_A8G_GAMING              = 0x8671;
 		this.ROG_STRIX_RTX2070_O8G_GAMING              = 0x8670;
 		this.ROG_STRIX_RTX2070_O8G                     = 0x8796;
@@ -381,6 +382,7 @@ class ASUSLegacyGPUList{
 			new ASUSLegacyDeviceIdentifier(Nvidia.RTX2060S_OC,     	ASUSLegacyGPUIds.ROG_STRIX_RTX2060_SUPER_O8G_GAMING, 		0x2A, "ASUS ROG Strix RTX 2060 Super Gaming"),
 			new ASUSLegacyDeviceIdentifier(Nvidia.RTX2060S_OC,     	ASUSLegacyGPUIds.ROG_STRIX_RTX2060_SUPER_O8G_GAMING_OC, 	0x2A, "ASUS ROG Strix RTX 2060 Super Gaming OC"),
 			new ASUSLegacyDeviceIdentifier(Nvidia.RTX2060S_OC,     	ASUSLegacyGPUIds.ROG_STRIX_RTX2060_SUPER_A8G_GAMING_OC, 	0x2A, "ASUS ROG Strix RTX 2060 Super Gaming Advanced OC"),
+			new ASUSLegacyDeviceIdentifier(Nvidia.RTX2060S_OC,     	ASUSLegacyGPUIds.ROG_STRIX_RTX2060_SUPER_A8G_GAMING_OC_2, 	0x2A, "ASUS 2060 Super ROG Strix Super Gaming Advanced OC"),
 			new ASUSLegacyDeviceIdentifier(Nvidia.RTX2060S_OC,      ASUSLegacyGPUIds.ROG_STRIX_RTX2060_SUPER_A8G_EVO_GAMING_OC,	0x2A, "ASUS ROG Strix RTX 2060 Super EVO Gaming OC"),
 			new ASUSLegacyDeviceIdentifier(Nvidia.RTX2060_TU106,   	ASUSLegacyGPUIds.ROG_STRIX_RTX2060_OC,              		0x2A, "ASUS ROG Strix RTX 2060 OC"),
 			new ASUSLegacyDeviceIdentifier(Nvidia.RTX2070_OC,      	ASUSLegacyGPUIds.ROG_STRIX_RTX2070_A8G_GAMING,      		0x2A, "ASUS ROG Strix RTX 2070 Gaming Advanced"),
