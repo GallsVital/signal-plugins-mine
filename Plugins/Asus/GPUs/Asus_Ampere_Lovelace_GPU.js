@@ -10,12 +10,14 @@ export function LedNames() { return vLedNames; }
 export function LedPositions() { return vLedPositions; }
 export function ConflictingProcesses() { return ["LightingService.exe"]; }
 /* global
+shutdownMode:readonly
 shutdownColor:readonly
 LightingMode:readonly
 forcedColor:readonly
 */
 export function ControllableParameters() {
 	return [
+		{"property":"shutdownMode", "group":"lighting", "label":"Shutdown Mode", "type":"combobox", "values":["SignalRGB", "Hardware"], "default":"Hardware"},
 		{"property":"shutdownColor", "group":"lighting", "label":"Shutdown Color", "min":"0", "max":"360", "type":"color", "default":"#009bde"},
 		{"property":"LightingMode", "group":"lighting", "label":"Lighting Mode", "type":"combobox", "values":["Canvas", "Forced"], "default":"Canvas"},
 		{"property":"forcedColor", "group":"lighting", "label":"Forced Color", "min":"0", "max":"360", "type":"color", "default":"#009bde"},
@@ -75,9 +77,19 @@ export function Render() {
 	sendColors();
 }
 
-export function Shutdown() {
-	AsusGPU.setDirectMode(0x00);
-	AsusGPU.setMode(AsusGPU.modes.rainbow);
+export function Shutdown(SystemSuspending) {
+
+	if(SystemSuspending){
+		sendColors("#000000"); // Go Dark on System Sleep/Shutdown
+	}else{
+		if (shutdownMode === "SignalRGB") {
+			sendColors(shutdownColor);
+		} else {
+			AsusGPU.setDirectMode(0x00);
+			AsusGPU.setMode(AsusGPU.modes.rainbow);
+		}
+	}
+
 }
 
 function SetGPUNameFromBusIds() {
@@ -94,7 +106,7 @@ function SetGPUNameFromBusIds() {
 
 let refreshColors = false;
 
-function sendColors(shutdown = false) {
+function sendColors(overrideColor) {
 
 	const RGBData = [];
 
@@ -103,8 +115,8 @@ function sendColors(shutdown = false) {
 		const iPxY = vLedPositions[iIdx][1];
 		let color;
 
-		if(shutdown) {
-			color = hexToRgb(shutdownColor);
+		if(overrideColor) {
+			color = hexToRgb(overrideColor);
 		} else if (LightingMode === "Forced") {
 			color = hexToRgb(forcedColor);
 		} else {
