@@ -8,13 +8,16 @@ export function DefaultPosition(){return [200, 125];}
 export function DefaultScale(){return 2.5;}
 export function LedNames() { return vLedNames; }
 export function LedPositions() { return vLedPositions; }
+export function ConflictingProcesses() { return ["LightingService.exe"]; }
 /* global
+shutdownMode:readonly
 shutdownColor:readonly
 LightingMode:readonly
 forcedColor:readonly
 */
 export function ControllableParameters() {
 	return [
+		{"property":"shutdownMode", "group":"lighting", "label":"Shutdown Mode", "type":"combobox", "values":["SignalRGB", "Hardware"], "default":"Hardware"},
 		{"property":"shutdownColor", "group":"lighting", "label":"Shutdown Color", "min":"0", "max":"360", "type":"color", "default":"#009bde"},
 		{"property":"LightingMode", "group":"lighting", "label":"Lighting Mode", "type":"combobox", "values":["Canvas", "Forced"], "default":"Canvas"},
 		{"property":"forcedColor", "group":"lighting", "label":"Forced Color", "min":"0", "max":"360", "type":"color", "default":"#009bde"},
@@ -74,9 +77,19 @@ export function Render() {
 	sendColors();
 }
 
-export function Shutdown() {
-	AsusGPU.setDirectMode(0x00);
-	AsusGPU.setMode(AsusGPU.modes.rainbow);
+export function Shutdown(SystemSuspending) {
+
+	if(SystemSuspending){
+		sendColors("#000000"); // Go Dark on System Sleep/Shutdown
+	}else{
+		if (shutdownMode === "SignalRGB") {
+			sendColors(shutdownColor);
+		} else {
+			AsusGPU.setDirectMode(0x00);
+			AsusGPU.setMode(AsusGPU.modes.rainbow);
+		}
+	}
+
 }
 
 function SetGPUNameFromBusIds() {
@@ -93,7 +106,7 @@ function SetGPUNameFromBusIds() {
 
 let refreshColors = false;
 
-function sendColors(shutdown = false) {
+function sendColors(overrideColor) {
 
 	const RGBData = [];
 
@@ -102,8 +115,8 @@ function sendColors(shutdown = false) {
 		const iPxY = vLedPositions[iIdx][1];
 		let color;
 
-		if(shutdown) {
-			color = hexToRgb(shutdownColor);
+		if(overrideColor) {
+			color = hexToRgb(overrideColor);
 		} else if (LightingMode === "Forced") {
 			color = hexToRgb(forcedColor);
 		} else {
@@ -560,6 +573,7 @@ class Asus_Ampere_Lovelace_IDs {
 		this.RTX4090_STRIX_GAMING_WHITE_OC		   = 0x88C3;
 		this.RTX4090_STRIX_GAMING_WHITE_OC_2       = 0x88F1;
 		this.RTX4090_STRIX_GAMING_WHITE			   = 0x88C4;
+		this.RTX4090_STRIX_GAMING_WHITE_2		   = 0x88F2;
 		this.RTX4090_STRIX_LC_OC				   = 0x88E8;
 		this.RTX4090_TUF_GAMING                    = 0x889A;
 		this.RTX4090_TUF_GAMING_2                  = 0x889B;
@@ -702,6 +716,7 @@ const Asus3000GPUIDs =
 	new AsusGPUIdentifier(Nvidia.RTX4090, AsusID.RTX4090_STRIX_GAMING_OC_2, "Asus 4090 ROG Strix Gaming OC"),
 	new AsusGPUIdentifier(Nvidia.RTX4090, AsusID.RTX4090_STRIX_GAMING_OC_3, "Asus 4090 ROG Strix Gaming OC"),
 	new AsusGPUIdentifier(Nvidia.RTX4090, AsusID.RTX4090_STRIX_GAMING_WHITE, "Asus ROG Strix 4090 Gaming White"),
+	new AsusGPUIdentifier(Nvidia.RTX4090, AsusID.RTX4090_STRIX_GAMING_WHITE_2, "Asus 4090 Strix Gaming White"),
 	new AsusGPUIdentifier(Nvidia.RTX4090, AsusID.RTX4090_STRIX_GAMING_WHITE_OC, "Asus ROG Strix 4090 Gaming White OC"),
 	new AsusGPUIdentifier(Nvidia.RTX4090, AsusID.RTX4090_STRIX_GAMING_WHITE_OC_2, "Asus ROG Strix 4090 Gaming White OC"),
 	new AsusGPUIdentifier(Nvidia.RTX4090, AsusID.RTX4090_STRIX_LC_OC, "Asus 4090 ROG Strix LC OC Edition"),
