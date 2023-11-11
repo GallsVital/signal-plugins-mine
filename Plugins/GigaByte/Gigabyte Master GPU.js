@@ -233,145 +233,63 @@ class GigabyteMasterProtocol {
 
 		this.library =
 		{ //So it begins.
-			0x000A : //0x40bd :
-			{
-				Size: [5, 3],
-				modeZones : [0], //This is an odd card all the way around.
-				Zones:
-				{
-					0: {Names : [ "Fan 1", "Fan 2", "Fan 3" ], Positions : [ [1, 2], [2, 2], [3, 2] ], Mapping : [ 0, 1, 2 ]},
-					//1: {Names : [ ], Positions : [ ], Mapping : [ ]},
-					//2: {Names : [ ], Positions : [ ], Mapping : [ ]},
-					3: {Names : [ "Logo" ], Positions : [ [3, 1] ], Mapping : [ 0 ]}
-				}
-			},
-			0x40BF : // 4090 Gaming OC
-			{
-				Size: [5, 3],
-				modeZones : [0], //This is an odd card all the way around.
-				Zones:
-				{
-					0: {Names : [ "Fan 1", "Fan 2", "Fan 3" ], Positions : [ [1, 2], [2, 2], [3, 2] ], Mapping : [ 0, 1, 2 ]},
-					//1: {Names : [ ], Positions : [ ], Mapping : [ ]},
-					//2: {Names : [ ], Positions : [ ], Mapping : [ ]},
-					3: {Names : [ "Logo" ], Positions : [ [3, 1] ], Mapping : [ 0 ]}
-				}
-			},
-			0x40E5 : // 4090 Gaming OC
-			{
-				Size: [5, 3],
-				modeZones : [0], //This is an odd card all the way around.
-				Zones:
-				{
-					0: {
-						Names : 	[ "Fan 1", "Fan 2", "Fan 3" ],
-						Positions : [ [1, 2], [2, 2], [3, 2] ],
-						Mapping : 	[ 0, 1, 2 ]
-					},
-					3: {
-						Names : 	[ "Logo" ],
-						Positions : [ [3, 1] ],
-						Mapping : 	[ 0 ]
-					}
-				}
-			},
-			0x0009 : //0x40b2 :
-			{
-				Size: [5, 3],
-				modeZones : [0],
-				Zones:
-				{
-					0: {Names : [ "Fan 1", "Fan 2", "Fan 3" ], Positions : [ [1, 2], [2, 2], [3, 2] ], Mapping : [ 0, 1, 2 ]},
-					//1: {Names : [ ], Positions : [ ], Mapping : [ ]},
-					//2: {Names : [ ], Positions : [ ], Mapping : [ ]},
-					3: {Names : [ "Logo" ], Positions : [ [3, 1] ], Mapping : [ 0 ]}
-				}
-			},
-			0x4076 : //0x0008 :
-			{
-				Size: [5, 3],
-				modeZones : [0],
-				Zones:
-				{
-					0: {Names : [ "Fan 1", "Fan 2", "Fan 3" ], Positions : [ [1, 2], [2, 2], [3, 2] ], Mapping : [ 0, 1, 2 ]},
-					//1: {Names : [ ], Positions : [ ], Mapping : [ ]},
-					//2: {Names : [ ], Positions : [ ], Mapping : [ ]},
-					3: {Names : [ "Logo" ], Positions : [ [3, 1] ], Mapping : [ 0 ]}
-				}
-			},
-			0x407b : // : 0x0007
-			{
-				Size: [5, 3],
-				modeZones : [0],
-				Zones:
-				{
-					0: {Names : [ "Fan 1", "Fan 2", "Fan 3" ], Positions : [ [1, 2], [2, 2], [3, 2] ], Mapping : [ 0, 1, 2 ]},
-					//1: {Names : [ ], Positions : [ ], Mapping : [ ]},
-					//2: {Names : [ ], Positions : [ ], Mapping : [ ]},
-					3: {Names : [ "Logo" ], Positions : [ [3, 1] ], Mapping : [ 0 ]}
-				}
-			},
-			0x40c6 ://RTX4070_GAMING_OC_12G
-			{
-				Size: [5, 3],
-				modeZones : [0],
-				Zones:
-				{
-					0: {Names : [ "Fan 1", "Fan 2", "Fan 3" ], Positions : [ [1, 2], [2, 2], [3, 2] ], Mapping : [ 0, 1, 2 ]},
-					//1: {Names : [ ], Positions : [ ], Mapping : [ ]},
-					//2: {Names : [ ], Positions : [ ], Mapping : [ ]},
-					3: {Names : [ "Logo", "Placeholder 1", "Placeholder 2" ], Positions : [ [3, 1], [0, 0], [1, 1] ], Mapping : [ 0 ]}
-				}
-			},
-			0x40bc: //0x0005 : GIGABYTE 4080 Gaming OC
-			{
-				Size: [5, 3],
-				modeZones : [0],
-				Zones:
-				{
-					0: {Names : [ "Fan 1", "Fan 2", "Fan 3" ], Positions : [ [1, 2], [2, 2], [3, 2] ], Mapping : [ 0, 1, 2 ]},
-					//1: {Names : [ ], Positions : [ ], Mapping : [ ]},
-					//2: {Names : [ ], Positions : [ ], Mapping : [ ]},
-					3: {Names : [ "Logo" ], Positions : [ [3, 1] ], Mapping : [ 0 ]}
-				}
-			},
-			0x0004 ://0x37B1 : //I'm making assumptions with this card. 2080 Extreme
-			{
-				Size: [15, 9],
-				modeZones : [0],
-				Zones:
-				{
-					0: {Names : [ "Fan 1 LED 1", "Fan 1 LED 2", "Fan 1 LED 3", "Fan 1 LED 4", "Fan 1 LED 5", "Fan 1 LED 6", "Fan 1 LED 7", "Fan 1 LED 8",], Positions : [ [0, 5], [1, 4], [2, 3], [3, 4], [4, 5], [3, 6], [2, 7], [1, 8], ], Mapping : [ 0, 1, 2, 3, 4, 5, 6, 7 ]},
-					1: {Names : [ "Fan 2 LED 1", "Fan 2 LED 2", "Fan 2 LED 3", "Fan 2 LED 4", "Fan 2 LED 5", "Fan 2 LED 6", "Fan 2 LED 7", "Fan 2 LED 8",], Positions : [ [5, 5], [6, 4], [7, 3], [8, 4], [9, 5], [8, 6], [7, 7], [6, 8], ], Mapping : [ 0, 1, 2, 3, 4, 5, 6, 7 ]},
-					2: {Names : [ "Fan 3 LED 1", "Fan 3 LED 2", "Fan 3 LED 3", "Fan 3 LED 4", "Fan 3 LED 5", "Fan 3 LED 6", "Fan 3 LED 7", "Fan 3 LED 8",], Positions : [ [10, 5], [11, 4], [12, 3], [13, 4], [14, 5], [13, 6], [12, 7], [11, 8], ], Mapping : [ 0, 1, 2, 3, 4, 5, 6, 7 ]},
-					3: {Names : [ "Side Logo LED 1", "Side Logo LED 2", "Face Logo LED", ], Positions : [ [11, 0], [12, 1], [12, 2],], Mapping : [ 0, 1, 2 ]}
-				}
-			},
-			0x0003 ://0x37BD : //I'm making assumptions with this card. 2080TI Extreme
-			{
-				Size: [15, 9],
-				modeZones : [0],
-				Zones:
-				{
-					0: {Names : [ "Fan 1 LED 1", "Fan 1 LED 2", "Fan 1 LED 3", "Fan 1 LED 4", "Fan 1 LED 5", "Fan 1 LED 6", "Fan 1 LED 7", "Fan 1 LED 8",], Positions : [ [0, 5], [1, 4], [2, 3], [3, 4], [4, 5], [3, 6], [2, 7], [1, 8], ], Mapping : [ 0, 1, 2, 3, 4, 5, 6, 7 ]},
-					1: {Names : [ "Fan 2 LED 1", "Fan 2 LED 2", "Fan 2 LED 3", "Fan 2 LED 4", "Fan 2 LED 5", "Fan 2 LED 6", "Fan 2 LED 7", "Fan 2 LED 8",], Positions : [ [5, 5], [6, 4], [7, 3], [8, 4], [9, 5], [8, 6], [7, 7], [6, 8], ], Mapping : [ 0, 1, 2, 3, 4, 5, 6, 7 ]},
-					2: {Names : [ "Fan 3 LED 1", "Fan 3 LED 2", "Fan 3 LED 3", "Fan 3 LED 4", "Fan 3 LED 5", "Fan 3 LED 6", "Fan 3 LED 7", "Fan 3 LED 8",], Positions : [ [10, 5], [11, 4], [12, 3], [13, 4], [14, 5], [13, 6], [12, 7], [11, 8], ], Mapping : [ 0, 1, 2, 3, 4, 5, 6, 7 ]},
-					3: {Names : [ "Side Logo LED 1", "Side Logo LED 2", "Face Logo LED", ], Positions : [ [11, 0], [12, 1], [12, 2],], Mapping : [ 0, 1, 2 ]}
-				}
-			},
-			0x40c0 :
+			0x3FF8 : // 2060S AORUS
 			{
 				Size: [15, 9],
 				modeZones : [2, 3, 5, 6],
 				Zones:
 				{
-					0: {Names : [ "Fan 1 LED 1", "Fan 1 LED 2", "Fan 1 LED 3", "Fan 1 LED 4", "Fan 1 LED 5", "Fan 1 LED 6", "Fan 1 LED 7", "Fan 1 LED 8",], Positions : [ [0, 5], [1, 4], [2, 3], [3, 4], [4, 5], [3, 6], [2, 7], [1, 8], ], Mapping : [ 0, 1, 2, 3, 4, 5, 6, 7 ]},
-					1: {Names : [ "Fan 2 LED 1", "Fan 2 LED 2", "Fan 2 LED 3", "Fan 2 LED 4", "Fan 2 LED 5", "Fan 2 LED 6", "Fan 2 LED 7", "Fan 2 LED 8",], Positions : [ [5, 5], [6, 4], [7, 3], [8, 4], [9, 5], [8, 6], [7, 7], [6, 8], ], Mapping : [ 0, 1, 2, 3, 4, 5, 6, 7 ]},
-					2: {Names : [ "Fan 3 LED 1", "Fan 3 LED 2", "Fan 3 LED 3", "Fan 3 LED 4", "Fan 3 LED 5", "Fan 3 LED 6", "Fan 3 LED 7", "Fan 3 LED 8",], Positions : [ [10, 5], [11, 4], [12, 3], [13, 4], [14, 5], [13, 6], [12, 7], [11, 8], ], Mapping : [ 0, 1, 2, 3, 4, 5, 6, 7 ]},
-					3: {Names : [ "Side Logo LED 1", "Top Logo LED 1", "Unknown LED 1", "Unknown LED 2", "Unknown LED 3", ], Positions : [ [11, 0], [12, 2], [12, 2], [12, 2], [12, 2], ], Mapping : [ 0, 2, 3, 4, 5 ]}
+					0: {
+						Names :		[ "Fan 1 LED 1", "Fan 1 LED 2", "Fan 1 LED 3", "Fan 1 LED 4", "Fan 1 LED 5", "Fan 1 LED 6", "Fan 1 LED 7", "Fan 1 LED 8",],
+						Positions : [ [0, 5], [1, 4], [2, 3], [3, 4], [4, 5], [3, 6], [2, 7], [1, 8], ],
+						Mapping :	[ 0, 1, 2, 3, 4, 5, 6, 7 ]
+					},
+					1: {
+						Names :		[ "Fan 2 LED 1", "Fan 2 LED 2", "Fan 2 LED 3", "Fan 2 LED 4", "Fan 2 LED 5", "Fan 2 LED 6", "Fan 2 LED 7", "Fan 2 LED 8",],
+						Positions : [ [5, 5], [6, 4], [7, 3], [8, 4], [9, 5], [8, 6], [7, 7], [6, 8], ],
+						Mapping :	[ 0, 1, 2, 3, 4, 5, 6, 7 ]
+					},
+					2: {
+						Names :		[ "Fan 3 LED 1", "Fan 3 LED 2", "Fan 3 LED 3", "Fan 3 LED 4", "Fan 3 LED 5", "Fan 3 LED 6", "Fan 3 LED 7", "Fan 3 LED 8",],
+						Positions : [ [10, 5], [11, 4], [12, 3], [13, 4], [14, 5], [13, 6], [12, 7], [11, 8], ],
+						Mapping :	[ 0, 1, 2, 3, 4, 5, 6, 7 ]
+					},
+					3: {
+						Names :		[ "Side Logo LED 1", "Side Logo LED 2", "Face Logo LED", ],
+						Positions : [ [11, 0], [12, 1], [12, 2],],
+						Mapping :	[ 0, 1, 3 ]
+					}
 				}
 			},
-			0x37B3 :// 2080 AORUS
+			0x3FF7 : // 2060S AORUS OC
+			{
+				Size: [15, 9],
+				modeZones : [2, 3, 5, 6],
+				Zones:
+				{
+					0: {
+						Names :		[ "Fan 1 LED 1", "Fan 1 LED 2", "Fan 1 LED 3", "Fan 1 LED 4", "Fan 1 LED 5", "Fan 1 LED 6", "Fan 1 LED 7", "Fan 1 LED 8",],
+						Positions : [ [0, 5], [1, 4], [2, 3], [3, 4], [4, 5], [3, 6], [2, 7], [1, 8], ],
+						Mapping :	[ 0, 1, 2, 3, 4, 5, 6, 7 ]
+					},
+					1: {
+						Names :		[ "Fan 2 LED 1", "Fan 2 LED 2", "Fan 2 LED 3", "Fan 2 LED 4", "Fan 2 LED 5", "Fan 2 LED 6", "Fan 2 LED 7", "Fan 2 LED 8",],
+						Positions : [ [5, 5], [6, 4], [7, 3], [8, 4], [9, 5], [8, 6], [7, 7], [6, 8], ],
+						Mapping :	[ 0, 1, 2, 3, 4, 5, 6, 7 ]
+					},
+					2: {
+						Names :		[ "Fan 3 LED 1", "Fan 3 LED 2", "Fan 3 LED 3", "Fan 3 LED 4", "Fan 3 LED 5", "Fan 3 LED 6", "Fan 3 LED 7", "Fan 3 LED 8",],
+						Positions : [ [10, 5], [11, 4], [12, 3], [13, 4], [14, 5], [13, 6], [12, 7], [11, 8], ],
+						Mapping :	[ 0, 1, 2, 3, 4, 5, 6, 7 ]
+					},
+					3: {
+						Names :		[ "Side Logo LED 1", "Side Logo LED 2", "Face Logo LED", ],
+						Positions : [ [11, 0], [12, 1], [12, 2],],
+						Mapping :	[ 0, 1, 3 ]
+					}
+				}
+			},
+			0x3FF6 :// 2070S Gaming OC V2
 			{
 				Size: [15, 9],
 				modeZones : [2, 3, 5, 6],
@@ -380,22 +298,26 @@ class GigabyteMasterProtocol {
 					0: {
 						Names :		[ "Fan 1 LED 1", "Fan 1 LED 2", "Fan 1 LED 3", "Fan 1 LED 4", "Fan 1 LED 5", "Fan 1 LED 6", "Fan 1 LED 7", "Fan 1 LED 8",],
 					 	Positions : [ [0, 5], [1, 4], [2, 3], [3, 4], [4, 5], [3, 6], [2, 7], [1, 8], ],
-						Mapping :	[ 0, 1, 2, 3, 4, 5, 6, 7 ]},
+						Mapping :	[ 0, 1, 2, 3, 4, 5, 6, 7 ]}
+					,
 					1: {
 						Names :		[ "Fan 2 LED 1", "Fan 2 LED 2", "Fan 2 LED 3", "Fan 2 LED 4", "Fan 2 LED 5", "Fan 2 LED 6", "Fan 2 LED 7", "Fan 2 LED 8",],
 						Positions : [ [5, 5], [6, 4], [7, 3], [8, 4], [9, 5], [8, 6], [7, 7], [6, 8], ],
-						Mapping :	[ 0, 1, 2, 3, 4, 5, 6, 7 ]},
+						Mapping :	[ 0, 1, 2, 3, 4, 5, 6, 7 ]
+					},
 					2: {
 						Names :		[ "Fan 3 LED 1", "Fan 3 LED 2", "Fan 3 LED 3", "Fan 3 LED 4", "Fan 3 LED 5", "Fan 3 LED 6", "Fan 3 LED 7", "Fan 3 LED 8",],
 						Positions : [ [10, 5], [11, 4], [12, 3], [13, 4], [14, 5], [13, 6], [12, 7], [11, 8], ],
-						Mapping :	[ 0, 1, 2, 3, 4, 5, 6, 7 ]},
+						Mapping :	[ 0, 1, 2, 3, 4, 5, 6, 7 ]
+					},
 					3: {
-						Names :		[ "Side Logo LED" ],
-						Positions : [ [11, 0] ],
-						Mapping :	[ 0 ]}
+						Names :		[ "Side Logo LED 1", "Side Logo LED 2", "Unknown LED", "Back Logo LED" ],
+						Positions : [ [11, 0], [11, 0], [11, 0], [11, 0] ],
+						Mapping :	[ 0, 1, 2, 3 ]
+					}
 				}
 			},
-			0x37BF :// 2080TI AORUS
+			0x37B3 :// 2080 AORUS
 			{
 				Size: [15, 9],
 				modeZones : [2, 3, 5, 6],
@@ -467,71 +389,7 @@ class GigabyteMasterProtocol {
 						Mapping :	[ 0 ]}
 				}
 			},
-			0x3FF6 :// 2070S Gaming OC V2
-			{
-				Size: [15, 9],
-				modeZones : [2, 3, 5, 6],
-				Zones:
-				{
-					0: {
-						Names :		[ "Fan 1 LED 1", "Fan 1 LED 2", "Fan 1 LED 3", "Fan 1 LED 4", "Fan 1 LED 5", "Fan 1 LED 6", "Fan 1 LED 7", "Fan 1 LED 8",],
-					 	Positions : [ [0, 5], [1, 4], [2, 3], [3, 4], [4, 5], [3, 6], [2, 7], [1, 8], ],
-						Mapping :	[ 0, 1, 2, 3, 4, 5, 6, 7 ]}
-					,
-					1: {
-						Names :		[ "Fan 2 LED 1", "Fan 2 LED 2", "Fan 2 LED 3", "Fan 2 LED 4", "Fan 2 LED 5", "Fan 2 LED 6", "Fan 2 LED 7", "Fan 2 LED 8",],
-						Positions : [ [5, 5], [6, 4], [7, 3], [8, 4], [9, 5], [8, 6], [7, 7], [6, 8], ],
-						Mapping :	[ 0, 1, 2, 3, 4, 5, 6, 7 ]
-					},
-					2: {
-						Names :		[ "Fan 3 LED 1", "Fan 3 LED 2", "Fan 3 LED 3", "Fan 3 LED 4", "Fan 3 LED 5", "Fan 3 LED 6", "Fan 3 LED 7", "Fan 3 LED 8",],
-						Positions : [ [10, 5], [11, 4], [12, 3], [13, 4], [14, 5], [13, 6], [12, 7], [11, 8], ],
-						Mapping :	[ 0, 1, 2, 3, 4, 5, 6, 7 ]
-					},
-					3: {
-						Names :		[ "Side Logo LED 1", "Side Logo LED 2", "Unknown LED", "Back Logo LED" ],
-						Positions : [ [11, 0], [11, 0], [11, 0], [11, 0] ],
-						Mapping :	[ 0, 1, 2, 3 ]
-					}
-				}
-			},
-			0x3FF7 :// : 0x0001
-			{
-				Size: [15, 9],
-				modeZones : [2, 3, 5, 6],
-				Zones:
-				{
-					0: {Names : [ "Fan 1 LED 1", "Fan 1 LED 2", "Fan 1 LED 3", "Fan 1 LED 4", "Fan 1 LED 5", "Fan 1 LED 6", "Fan 1 LED 7", "Fan 1 LED 8",], Positions : [ [0, 5], [1, 4], [2, 3], [3, 4], [4, 5], [3, 6], [2, 7], [1, 8], ], Mapping : [ 0, 1, 2, 3, 4, 5, 6, 7 ]},
-					1: {Names : [ "Fan 2 LED 1", "Fan 2 LED 2", "Fan 2 LED 3", "Fan 2 LED 4", "Fan 2 LED 5", "Fan 2 LED 6", "Fan 2 LED 7", "Fan 2 LED 8",], Positions : [ [5, 5], [6, 4], [7, 3], [8, 4], [9, 5], [8, 6], [7, 7], [6, 8], ], Mapping : [ 0, 1, 2, 3, 4, 5, 6, 7 ]},
-					2: {Names : [ "Fan 3 LED 1", "Fan 3 LED 2", "Fan 3 LED 3", "Fan 3 LED 4", "Fan 3 LED 5", "Fan 3 LED 6", "Fan 3 LED 7", "Fan 3 LED 8",], Positions : [ [10, 5], [11, 4], [12, 3], [13, 4], [14, 5], [13, 6], [12, 7], [11, 8], ], Mapping : [ 0, 1, 2, 3, 4, 5, 6, 7 ]},
-					3: {Names : [ "Side Logo LED 1", "Side Logo LED 2", "Face Logo LED", ], Positions : [ [11, 0], [12, 1], [12, 2],], Mapping : [ 0, 1, 3 ]}
-				}
-			},
-			0x3FF8 :// : 0x0001
-			{
-				Size: [15, 9],
-				modeZones : [2, 3, 5, 6],
-				Zones:
-				{
-					0: {Names : [ "Fan 1 LED 1", "Fan 1 LED 2", "Fan 1 LED 3", "Fan 1 LED 4", "Fan 1 LED 5", "Fan 1 LED 6", "Fan 1 LED 7", "Fan 1 LED 8",], Positions : [ [0, 5], [1, 4], [2, 3], [3, 4], [4, 5], [3, 6], [2, 7], [1, 8], ], Mapping : [ 0, 1, 2, 3, 4, 5, 6, 7 ]},
-					1: {Names : [ "Fan 2 LED 1", "Fan 2 LED 2", "Fan 2 LED 3", "Fan 2 LED 4", "Fan 2 LED 5", "Fan 2 LED 6", "Fan 2 LED 7", "Fan 2 LED 8",], Positions : [ [5, 5], [6, 4], [7, 3], [8, 4], [9, 5], [8, 6], [7, 7], [6, 8], ], Mapping : [ 0, 1, 2, 3, 4, 5, 6, 7 ]},
-					2: {Names : [ "Fan 3 LED 1", "Fan 3 LED 2", "Fan 3 LED 3", "Fan 3 LED 4", "Fan 3 LED 5", "Fan 3 LED 6", "Fan 3 LED 7", "Fan 3 LED 8",], Positions : [ [10, 5], [11, 4], [12, 3], [13, 4], [14, 5], [13, 6], [12, 7], [11, 8], ], Mapping : [ 0, 1, 2, 3, 4, 5, 6, 7 ]},
-					3: {Names : [ "Side Logo LED 1", "Side Logo LED 2", "Face Logo LED", ], Positions : [ [11, 0], [12, 1], [12, 2],], Mapping : [ 0, 1, 3 ]}
-				}
-			},
-			0x40c9 ://0x40C9 :
-			{
-				Size: [15, 9],
-				modeZones : [2, 5, 6],
-				Zones:
-				{
-					0: {Names : [ "Fan 1 LED 1", "Fan 1 LED 2", "Fan 1 LED 3", "Fan 1 LED 4", "Fan 1 LED 5", "Fan 1 LED 6", "Fan 1 LED 7", "Fan 1 LED 8",], Positions : [ [0, 5], [1, 4], [2, 3], [3, 4], [4, 5], [3, 6], [2, 7], [1, 8], ], Mapping : [ 0, 1, 2, 3, 4, 5, 6, 7 ]},
-					1: {Names : [ "Fan 2 LED 1", "Fan 2 LED 2", "Fan 2 LED 3", "Fan 2 LED 4", "Fan 2 LED 5", "Fan 2 LED 6", "Fan 2 LED 7", "Fan 2 LED 8",], Positions : [ [5, 5], [6, 4], [7, 3], [8, 4], [9, 5], [8, 6], [7, 7], [6, 8], ], Mapping : [ 0, 1, 2, 3, 4, 5, 6, 7 ]},
-					2: {Names : [ "Fan 3 LED 1", "Fan 3 LED 2", "Fan 3 LED 3", "Fan 3 LED 4", "Fan 3 LED 5", "Fan 3 LED 6", "Fan 3 LED 7", "Fan 3 LED 8",], Positions : [ [10, 5], [11, 4], [12, 3], [13, 4], [14, 5], [13, 6], [12, 7], [11, 8], ], Mapping : [ 0, 1, 2, 3, 4, 5, 6, 7 ]},
-					3: {Names : [ "Side Logo LED 1", "Top Logo LED 1", "Unknown LED 1", "Unknown LED 2", "Unknown LED 3", ], Positions : [ [11, 0], [12, 2], [12, 2], [12, 2], [12, 2], ], Mapping : [ 0, 2, 3, 4, 5 ]}
-				}
-			},
-			0x4105 :// 4060 AORUS
+			0x37BF :// 2080TI AORUS
 			{
 				Size: [15, 9],
 				modeZones : [2, 3, 5, 6],
@@ -553,6 +411,198 @@ class GigabyteMasterProtocol {
 						Names :		[ "Side Logo LED" ],
 						Positions : [ [11, 0] ],
 						Mapping :	[ 0 ]}
+				}
+			},
+			0x407B : // 3060 ELITE REV2
+			{
+				Size: [5, 3],
+				modeZones : [0],
+				Zones:
+				{
+					0: {
+						Names :		[ "Fan 1", "Fan 2", "Fan 3" ],
+						Positions : [ [1, 2], [2, 2], [3, 2] ],
+						Mapping :	[ 0, 1, 2 ]
+					},
+					3: {
+						Names :		[ "Logo" ],
+						Positions : [ [3, 1] ],
+						Mapping :	[ 0 ]
+					}
+				}
+			},
+			0x4076 : // 3060TI ELITE REV2
+			{
+				Size: [5, 3],
+				modeZones : [0],
+				Zones:
+				{
+					0: {
+						Names :		[ "Fan 1", "Fan 2", "Fan 3" ],
+						Positions : [ [1, 2], [2, 2], [3, 2] ],
+						Mapping :	[ 0, 1, 2 ]
+					},
+					3: {
+						Names :		[ "Logo" ],
+						Positions : [ [3, 1] ],
+						Mapping :	[ 0 ]
+					}
+				}
+			},
+			0x4105 : // 4060 AORUS
+			{
+				Size: [15, 9],
+				modeZones : [2, 3, 5, 6],
+				Zones:
+				{
+					0: {
+						Names :		[ "Fan 1 LED 1", "Fan 1 LED 2", "Fan 1 LED 3", "Fan 1 LED 4", "Fan 1 LED 5", "Fan 1 LED 6", "Fan 1 LED 7", "Fan 1 LED 8",],
+					 	Positions : [ [0, 5], [1, 4], [2, 3], [3, 4], [4, 5], [3, 6], [2, 7], [1, 8], ],
+						Mapping :	[ 0, 1, 2, 3, 4, 5, 6, 7 ]
+					},
+					1: {
+						Names :		[ "Fan 2 LED 1", "Fan 2 LED 2", "Fan 2 LED 3", "Fan 2 LED 4", "Fan 2 LED 5", "Fan 2 LED 6", "Fan 2 LED 7", "Fan 2 LED 8",],
+						Positions : [ [5, 5], [6, 4], [7, 3], [8, 4], [9, 5], [8, 6], [7, 7], [6, 8], ],
+						Mapping :	[ 0, 1, 2, 3, 4, 5, 6, 7 ]
+					},
+					2: {
+						Names :		[ "Fan 3 LED 1", "Fan 3 LED 2", "Fan 3 LED 3", "Fan 3 LED 4", "Fan 3 LED 5", "Fan 3 LED 6", "Fan 3 LED 7", "Fan 3 LED 8",],
+						Positions : [ [10, 5], [11, 4], [12, 3], [13, 4], [14, 5], [13, 6], [12, 7], [11, 8], ],
+						Mapping :	[ 0, 1, 2, 3, 4, 5, 6, 7 ]
+					},
+					3: {
+						Names :		[ "Side Logo LED" ],
+						Positions : [ [11, 0] ],
+						Mapping :	[ 0 ]
+					}
+				}
+			},
+			0x40C6 : // 4070 GAMING OC 12G
+			{
+				Size: [5, 3],
+				modeZones : [0],
+				Zones:
+				{
+					0: {
+						Names :		[ "Fan 1", "Fan 2", "Fan 3" ],
+						Positions : [ [1, 2], [2, 2], [3, 2] ],
+						Mapping :	[ 0, 1, 2 ]
+					},
+					3: {
+						Names :	[ "Logo", "Placeholder 1", "Placeholder 2" ],
+						Positions : [ [3, 1], [0, 0], [1, 1] ],
+						Mapping :	[ 0 ]
+					}
+				}
+			},
+			0x40C9 : // 4070TI ELITE
+			{
+				Size: [15, 9],
+				modeZones : [2, 5, 6],
+				Zones:
+				{
+					0: {
+						Names :		[ "Fan 1 LED 1", "Fan 1 LED 2", "Fan 1 LED 3", "Fan 1 LED 4", "Fan 1 LED 5", "Fan 1 LED 6", "Fan 1 LED 7", "Fan 1 LED 8",],
+						Positions : [ [0, 5], [1, 4], [2, 3], [3, 4], [4, 5], [3, 6], [2, 7], [1, 8], ],
+						Mapping :	[ 0, 1, 2, 3, 4, 5, 6, 7 ]
+					},
+					1: {
+						Names :		[ "Fan 2 LED 1", "Fan 2 LED 2", "Fan 2 LED 3", "Fan 2 LED 4", "Fan 2 LED 5", "Fan 2 LED 6", "Fan 2 LED 7", "Fan 2 LED 8",],
+						Positions : [ [5, 5], [6, 4], [7, 3], [8, 4], [9, 5], [8, 6], [7, 7], [6, 8], ],
+						Mapping :	[ 0, 1, 2, 3, 4, 5, 6, 7 ]
+					},
+					2: {
+						Names :		[ "Fan 3 LED 1", "Fan 3 LED 2", "Fan 3 LED 3", "Fan 3 LED 4", "Fan 3 LED 5", "Fan 3 LED 6", "Fan 3 LED 7", "Fan 3 LED 8",],
+						Positions : [ [10, 5], [11, 4], [12, 3], [13, 4], [14, 5], [13, 6], [12, 7], [11, 8], ],
+						Mapping :	[ 0, 1, 2, 3, 4, 5, 6, 7 ]
+					},
+					3: {
+						Names :		[ "Side Logo LED 1", "Top Logo LED 1", "Unknown LED 1", "Unknown LED 2", "Unknown LED 3", ],
+						Positions : [ [11, 0], [12, 2], [12, 2], [12, 2], [12, 2], ],
+						Mapping :	[ 0, 2, 3, 4, 5 ]
+					}
+				}
+			},
+			0x40BC: // 4080 Gaming OC
+			{
+				Size: [5, 3],
+				modeZones : [0],
+				Zones:
+				{
+					0: {
+						Names :		[ "Fan 1", "Fan 2", "Fan 3" ],
+						Positions : [ [1, 2], [2, 2], [3, 2] ],
+						Mapping :	[ 0, 1, 2 ]
+					},
+					3: {
+						Names :		[ "Logo" ],
+						Positions : [ [3, 1] ],
+						Mapping :	[ 0 ]
+					}
+				}
+			},
+			0x40C0 : // 4090 AORUS MASTER
+			{
+				Size: [15, 9],
+				modeZones : [2, 3, 5, 6],
+				Zones:
+				{
+					0: {
+						Names :		[ "Fan 1 LED 1", "Fan 1 LED 2", "Fan 1 LED 3", "Fan 1 LED 4", "Fan 1 LED 5", "Fan 1 LED 6", "Fan 1 LED 7", "Fan 1 LED 8",],
+						Positions : [ [0, 5], [1, 4], [2, 3], [3, 4], [4, 5], [3, 6], [2, 7], [1, 8], ],
+						Mapping :	[ 0, 1, 2, 3, 4, 5, 6, 7 ]
+					},
+					1: {
+						Names :		[ "Fan 2 LED 1", "Fan 2 LED 2", "Fan 2 LED 3", "Fan 2 LED 4", "Fan 2 LED 5", "Fan 2 LED 6", "Fan 2 LED 7", "Fan 2 LED 8",],
+						Positions : [ [5, 5], [6, 4], [7, 3], [8, 4], [9, 5], [8, 6], [7, 7], [6, 8], ],
+						Mapping :	[ 0, 1, 2, 3, 4, 5, 6, 7 ]
+					},
+					2: {
+						Names :		[ "Fan 3 LED 1", "Fan 3 LED 2", "Fan 3 LED 3", "Fan 3 LED 4", "Fan 3 LED 5", "Fan 3 LED 6", "Fan 3 LED 7", "Fan 3 LED 8",],
+						Positions : [ [10, 5], [11, 4], [12, 3], [13, 4], [14, 5], [13, 6], [12, 7], [11, 8], ],
+						Mapping :	[ 0, 1, 2, 3, 4, 5, 6, 7 ]
+					},
+					3: {
+						Names :		[ "Side Logo LED 1", "Top Logo LED 1", "Unknown LED 1", "Unknown LED 2", "Unknown LED 3", ],
+						Positions : [ [11, 0], [12, 2], [12, 2], [12, 2], [12, 2], ],
+						Mapping :	[ 0, 2, 3, 4, 5 ]
+					}
+				}
+			},
+			0x40BF : // 4090 Gaming OC
+			{
+				Size: [5, 3],
+				modeZones : [0], //This is an odd card all the way around.
+				Zones:
+				{
+					0: {
+						Names :		[ "Fan 1", "Fan 2", "Fan 3" ],
+						Positions : [ [1, 2], [2, 2], [3, 2] ],
+						Mapping :	[ 0, 1, 2 ]
+					},
+					3: {
+						Names :		[ "Logo" ],
+						Positions : [ [3, 1] ],
+						Mapping :	[ 0 ]
+					}
+				}
+			},
+			0x40E5 : // 4090 Gaming OC
+			{
+				Size: [5, 3],
+				modeZones : [0], //This is an odd card all the way around.
+				Zones:
+				{
+					0: {
+						Names : 	[ "Fan 1", "Fan 2", "Fan 3" ],
+						Positions : [ [1, 2], [2, 2], [3, 2] ],
+						Mapping : 	[ 0, 1, 2 ]
+					},
+					3: {
+						Names : 	[ "Logo" ],
+						Positions : [ [3, 1] ],
+						Mapping : 	[ 0 ]
+					}
 				}
 			},
 		};
