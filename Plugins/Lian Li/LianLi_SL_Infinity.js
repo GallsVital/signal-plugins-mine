@@ -1,4 +1,4 @@
-export function Name() { return "Lian Li Uni Fan Controller SL Infinity V0.8"; }
+export function Name() { return "Lian Li Uni Fan Controller SL Infinity"; }
 export function VendorId() { return  0x0CF2; }
 export function ProductId() { return 0xA102;}//0xA100; }
 export function Publisher() { return "WhirlwindFX"; }
