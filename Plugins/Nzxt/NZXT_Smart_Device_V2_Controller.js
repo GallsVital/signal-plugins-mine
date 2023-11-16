@@ -303,5 +303,5 @@ class NZXTSmartDevice2{
 const SmartDevice2 = new NZXTSmartDevice2();
 
 export function ImageUrl(){
-	return "https://marketplace.signalrgb.com/devices/brands/nzxt/fan-controllers/rgb-fan-controller.png";
+	return "https://assets.signalrgb.com/devices/brands/nzxt/fan-controllers/rgb-fan-controller.png";
 }

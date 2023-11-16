@@ -462,7 +462,7 @@ class CorsairLibrary{
 
 	static DeviceImageLibrary() {
 		return Object.freeze({
-			"K70 Pro Mini" : "https://marketplace.signalrgb.com/devices/default/keyboards/keyboard-60.png",
+			"K70 Pro Mini" : "https://assets.signalrgb.com/devices/default/keyboards/keyboard-60.png",
 		});
 	}
 
@@ -2216,5 +2216,5 @@ class StateSetFanSpeeds extends State{
 };
 
 export function ImageUrl() {
-	return "https://marketplace.signalrgb.com/devices/default/misc/usb-drive-render.png";
+	return "https://assets.signalrgb.com/devices/default/misc/usb-drive-render.png";
 }

@@ -986,8 +986,8 @@ class CorsairLibrary{
 
 	static DeviceImageLibrary() {
 		return Object.freeze({
-			"K70 Pro Mini" : "https://marketplace.signalrgb.com/devices/default/keyboards/keyboard-60.png",
-			"K100 Air" : "https://marketplace.signalrgb.com/devices/default/keyboards/full-size-keyboard-render.png"
+			"K70 Pro Mini" : "https://assets.signalrgb.com/devices/default/keyboards/keyboard-60.png",
+			"K100 Air" : "https://assets.signalrgb.com/devices/default/keyboards/full-size-keyboard-render.png"
 		});
 	}
 
@@ -3047,5 +3047,5 @@ class PolledFunction{
 }
 
 export function ImageUrl() {
-	return "https://marketplace.signalrgb.com/devices/default/keyboards/full-size-keyboard-render.png";
+	return "https://assets.signalrgb.com/devices/default/keyboards/full-size-keyboard-render.png";
 }

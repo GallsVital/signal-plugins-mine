@@ -624,5 +624,5 @@ function SendPacket(shutdown = false) {
 }
 
 export function ImageUrl(){
-	return "https://marketplace.signalrgb.com/devices/brands/razer/keyboards/cyanosa-chroma-pro.png";
+	return "https://assets.signalrgb.com/devices/brands/razer/keyboards/cyanosa-chroma-pro.png";
 }

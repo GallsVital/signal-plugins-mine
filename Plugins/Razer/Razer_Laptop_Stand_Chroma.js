@@ -222,5 +222,5 @@ export function Validate(endpoint) {
 }
 
 export function ImageUrl(){
-	return "https://marketplace.signalrgb.com/devices/brands/razer/misc/laptop-stand-chroma.png";
+	return "https://assets.signalrgb.com/devices/brands/razer/misc/laptop-stand-chroma.png";
 }

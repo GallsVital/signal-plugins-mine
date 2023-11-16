@@ -600,22 +600,22 @@ export class deviceLibrary {
 		};
 
 		this.imageLibrary = {
-			"Chakram Core": 		"https://marketplace.signalrgb.com/devices/brands/asus/mice/chakram-standard.png",
-			"Chakram Wireless": 	"https://marketplace.signalrgb.com/devices/brands/asus/mice/chakram-wireless.png",
-			"Chakram X": 			"https://marketplace.signalrgb.com/devices/brands/asus/mice/chakram-wireless.png",
-			"Gladius II Core": 		"https://marketplace.signalrgb.com/devices/brands/asus/mice/gladius-ii-core.png",
-			"Gladius II Origin": 	"https://marketplace.signalrgb.com/devices/brands/asus/mice/gladius-ii-origin.png",
-			"Gladius II Wired": 	"https://marketplace.signalrgb.com/devices/brands/asus/mice/gladius-ii-wireless.png",
-			"Gladius II Wireless": 	"https://marketplace.signalrgb.com/devices/brands/asus/mice/gladius-ii-wireless.png",
-			"Gladius III Wireless": "https://marketplace.signalrgb.com/devices/brands/asus/mice/gladius-iii-wireless.png",
-			"Gladius III Aimpoint": "https://marketplace.signalrgb.com/devices/brands/asus/mice/gladius-iii-aimpoint.png",
-			"Impact II": 			"https://marketplace.signalrgb.com/devices/brands/asus/mice/impact-ii-standard.png",
-			"Impact II Electro Punk": "https://marketplace.signalrgb.com/devices/brands/asus/mice/impact-ii-electropunk.png",
-			"Impact II Wireless": 	"https://marketplace.signalrgb.com/devices/brands/asus/mice/impact-ii-wireless.png",
-			"ROG Keris": 			"https://marketplace.signalrgb.com/devices/brands/asus/mice/keris-wireless.png",
-			"Pugio I": 				"https://marketplace.signalrgb.com/devices/brands/asus/mice/pugio-ii.png",
-			"Pugio II": 			"https://marketplace.signalrgb.com/devices/brands/asus/mice/pugio-ii.png",
-			"Spatha X Wireless": 	"https://marketplace.signalrgb.com/devices/brands/asus/mice/spatha-x.png"
+			"Chakram Core": 		"https://assets.signalrgb.com/devices/brands/asus/mice/chakram-standard.png",
+			"Chakram Wireless": 	"https://assets.signalrgb.com/devices/brands/asus/mice/chakram-wireless.png",
+			"Chakram X": 			"https://assets.signalrgb.com/devices/brands/asus/mice/chakram-wireless.png",
+			"Gladius II Core": 		"https://assets.signalrgb.com/devices/brands/asus/mice/gladius-ii-core.png",
+			"Gladius II Origin": 	"https://assets.signalrgb.com/devices/brands/asus/mice/gladius-ii-origin.png",
+			"Gladius II Wired": 	"https://assets.signalrgb.com/devices/brands/asus/mice/gladius-ii-wireless.png",
+			"Gladius II Wireless": 	"https://assets.signalrgb.com/devices/brands/asus/mice/gladius-ii-wireless.png",
+			"Gladius III Wireless": "https://assets.signalrgb.com/devices/brands/asus/mice/gladius-iii-wireless.png",
+			"Gladius III Aimpoint": "https://assets.signalrgb.com/devices/brands/asus/mice/gladius-iii-aimpoint.png",
+			"Impact II": 			"https://assets.signalrgb.com/devices/brands/asus/mice/impact-ii-standard.png",
+			"Impact II Electro Punk": "https://assets.signalrgb.com/devices/brands/asus/mice/impact-ii-electropunk.png",
+			"Impact II Wireless": 	"https://assets.signalrgb.com/devices/brands/asus/mice/impact-ii-wireless.png",
+			"ROG Keris": 			"https://assets.signalrgb.com/devices/brands/asus/mice/keris-wireless.png",
+			"Pugio I": 				"https://assets.signalrgb.com/devices/brands/asus/mice/pugio-ii.png",
+			"Pugio II": 			"https://assets.signalrgb.com/devices/brands/asus/mice/pugio-ii.png",
+			"Spatha X Wireless": 	"https://assets.signalrgb.com/devices/brands/asus/mice/spatha-x.png"
 		};
 
 		this.pollingDict = {
@@ -713,5 +713,5 @@ export function Validate(endpoint) {
 }
 
 export function ImageUrl() {
-	return "https://marketplace.signalrgb.com/devices/brands/asus/mice/chakram-standard.png";
+	return "https://assets.signalrgb.com/devices/brands/asus/mice/chakram-standard.png";
 }

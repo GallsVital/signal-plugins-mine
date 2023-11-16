@@ -223,5 +223,5 @@ function sendPacketString(string, size){
 }
 
 export function ImageUrl(){
-	return "https://marketplace.signalrgb.com/devices/brands/roccat/mice/kone-pro-air.png";
+	return "https://assets.signalrgb.com/devices/brands/roccat/mice/kone-pro-air.png";
 }

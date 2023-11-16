@@ -167,5 +167,5 @@ function hexToRgb(hex) {
 }
 
 export function ImageUrl(){
-	return "https://marketplace.signalrgb.com/devices/brands/asus/lighting-controllers/rog-terminal-controller.png";
+	return "https://assets.signalrgb.com/devices/brands/asus/lighting-controllers/rog-terminal-controller.png";
 }

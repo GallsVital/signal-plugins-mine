@@ -460,14 +460,14 @@ export class deviceLibrary {
 		};
 
 		this.imageLibrary = {
-			"ROG Falchion":			"https://marketplace.signalrgb.com/devices/brands/asus/keyboards/falchion.png",
-			"ROG Strix Flare":		"https://marketplace.signalrgb.com/devices/brands/asus/keyboards/strix-flare-standard.png",
-			"ROG Strix Flare II":	"https://marketplace.signalrgb.com/devices/brands/asus/keyboards/strix-flare-ii-animate.png",
-			"ROG Strix Scope": 		"https://marketplace.signalrgb.com/devices/brands/asus/keyboards/strix-scope-standard.png",
-			"ROG Strix Scope TKL": 	"https://marketplace.signalrgb.com/devices/brands/asus/keyboards/strix-scope-tkl.png",
-			"ROG Strix Scope RX":	"https://marketplace.signalrgb.com/devices/brands/asus/keyboards/strix-scope-rx.png",
-			"ROG Strix Scope II 96":"https://marketplace.signalrgb.com/devices/brands/asus/keyboards/strix-scope-ii-96-wireless.png",
-			"ROG Strix Scope II 96 Wireless":"https://marketplace.signalrgb.com/devices/brands/asus/keyboards/strix-scope-ii-96-wireless.png",
+			"ROG Falchion":			"https://assets.signalrgb.com/devices/brands/asus/keyboards/falchion.png",
+			"ROG Strix Flare":		"https://assets.signalrgb.com/devices/brands/asus/keyboards/strix-flare-standard.png",
+			"ROG Strix Flare II":	"https://assets.signalrgb.com/devices/brands/asus/keyboards/strix-flare-ii-animate.png",
+			"ROG Strix Scope": 		"https://assets.signalrgb.com/devices/brands/asus/keyboards/strix-scope-standard.png",
+			"ROG Strix Scope TKL": 	"https://assets.signalrgb.com/devices/brands/asus/keyboards/strix-scope-tkl.png",
+			"ROG Strix Scope RX":	"https://assets.signalrgb.com/devices/brands/asus/keyboards/strix-scope-rx.png",
+			"ROG Strix Scope II 96":"https://assets.signalrgb.com/devices/brands/asus/keyboards/strix-scope-ii-96-wireless.png",
+			"ROG Strix Scope II 96 Wireless":"https://assets.signalrgb.com/devices/brands/asus/keyboards/strix-scope-ii-96-wireless.png",
 		};
 	}
 }
@@ -490,5 +490,5 @@ export function Validate(endpoint) {
 }
 
 export function ImageUrl() {
-	return "https://marketplace.signalrgb.com/devices/brands/asus/keyboards/strix-scope-standard.png";
+	return "https://assets.signalrgb.com/devices/brands/asus/keyboards/strix-scope-standard.png";
 }

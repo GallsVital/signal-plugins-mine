@@ -226,5 +226,5 @@ export function Validate(endpoint) {
 }
 
 export function ImageUrl(){ //Use as placeholder.
-	return "https://marketplace.signalrgb.com/devices/brands/asus/misc/rog-strix-scar-2022-laptop.png";
+	return "https://assets.signalrgb.com/devices/brands/asus/misc/rog-strix-scar-2022-laptop.png";
 }

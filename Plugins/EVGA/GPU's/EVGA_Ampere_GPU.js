@@ -635,5 +635,5 @@ class EVGAAmpereGPUList{
 }
 
 export function ImageUrl() {
-	return "https://marketplace.signalrgb.com/devices/brands/evga/gpus/gpu.png";
+	return "https://assets.signalrgb.com/devices/brands/evga/gpus/gpu.png";
 }

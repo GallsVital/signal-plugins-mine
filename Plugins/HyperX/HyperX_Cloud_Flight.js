@@ -221,5 +221,5 @@ function CheckMicrophoneStatus() {
 }
 
 export function ImageUrl() {
-	return "https://marketplace.signalrgb.com/devices/brands/hyperx/audio/cloud-flight.png";
+	return "https://assets.signalrgb.com/devices/brands/hyperx/audio/cloud-flight.png";
 }

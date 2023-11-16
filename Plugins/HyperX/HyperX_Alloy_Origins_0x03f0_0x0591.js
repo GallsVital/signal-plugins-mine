@@ -215,5 +215,5 @@ export function Validate(endpoint) {
 }
 
 export function ImageUrl() {
-	return "https://marketplace.signalrgb.com/devices/brands/hyperx/keyboards/alloy-origins.png";
+	return "https://assets.signalrgb.com/devices/brands/hyperx/keyboards/alloy-origins.png";
 }

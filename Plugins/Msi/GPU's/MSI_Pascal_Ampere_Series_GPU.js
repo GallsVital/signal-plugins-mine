@@ -439,5 +439,5 @@ function hexToRgb(hex) {
 }
 
 export function ImageUrl() {
-	return "https://marketplace.signalrgb.com/devices/brands/msi/gpus/gpu.png";
+	return "https://assets.signalrgb.com/devices/brands/msi/gpus/gpu.png";
 }

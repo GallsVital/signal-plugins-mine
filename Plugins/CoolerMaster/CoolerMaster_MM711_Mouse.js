@@ -192,5 +192,5 @@ export function Validate(endpoint) {
 }
 
 export function ImageUrl() {
-	return "https://marketplace.signalrgb.com/devices/brands/coolermaster/mice/mm711.png";
+	return "https://assets.signalrgb.com/devices/brands/coolermaster/mice/mm711.png";
 }
