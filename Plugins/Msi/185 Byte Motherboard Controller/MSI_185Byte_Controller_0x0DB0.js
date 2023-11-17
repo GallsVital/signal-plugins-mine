@@ -96,7 +96,17 @@ class MysticLight {
 
 		this.ConfigurationOverrides =
 		{
-
+			"MPG Z790 EDGE TI MAX WIFI (MS-7E25)":
+			{
+				OnboardLEDs    : 0,
+				RGBHeaders     : 1,
+				ARGBHeaders    : 3,
+				JPipeLEDs	   : 0,
+				CorsairHeaders : 0,
+				//PERLED
+				PerLEDOnboardLEDs : 6,
+				ForceZoneBased	  : false,
+			},
 		};
 
 
