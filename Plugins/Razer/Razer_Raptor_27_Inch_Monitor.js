@@ -1,57 +1,10 @@
-function GetReport(cmd_class, cmd_id, size) {
-	const report = new Array(91).fill(0);
-
-	report[0] = 0;
-
-	// Status.
-	report[1] = 0x00;
-
-	// Transaction ID.
-	report[2] = 0xFF;
-
-	// Remaining packets.
-	report[3] = 0x00;
-	report[4] = 0x00;
-
-	// Protocol type.
-	report[5] = 0x00;
-
-	// Data size.
-	report[6] = size;
-
-	// Command class.
-	report[7] = cmd_class;
-
-	// Command id.
-	report[8] = cmd_id;
-
-	//report[8-87] = data;
-
-	//report[89] = crc;
-
-	//report[89] = reserved;
-
-	return report;
-}
-
-
-function CalculateCrc(report) {
-	let iCrc = 0;
-
-	for (let iIdx = 3; iIdx < 89; iIdx++) {
-		iCrc ^= report[iIdx];
-	}
-
-	return iCrc;
-}
-
-
 export function Name() { return "Razer Raptor 27 Inch"; }
 export function VendorId() { return 0x1532; }
-export function Documentation(){ return "troubleshooting/razer"; }
-export function ProductId() { return 0x0f12; }
+export function ProductId() { return [0x0F12, 0x0F28]; }
 export function Publisher() { return "WhirlwindFX"; }
+export function Documentation(){ return "troubleshooting/razer"; }
 export function Size() { return [15, 10]; }
+export function Type() { return "Hid"; }
 export function DefaultPosition(){return [50, 100];}
 export function DefaultScale(){return 8.0;}
 /* global
@@ -67,25 +20,12 @@ export function ControllableParameters(){
 	];
 }
 
-function hexToRgb(hex) {
-	const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
-	const colors = [];
-	colors[0] = parseInt(result[1], 16);
-	colors[1] = parseInt(result[2], 16);
-	colors[2] = parseInt(result[3], 16);
-
-	return colors;
-}
-export function Type() { return "Hid"; }
-
 
 const vLedNames = [
 	"Led 1", "Led 2", "Led 3", "Led 4", "Led 5", "Led 6", "Led 7", "Led 8", "Led 9", "Led 10", "Led 11", "Led 12"
 ];
 const vLedPositions = [
-
 	[0, 1], [0, 3], [0, 7], [0, 9], [5, 9], [7, 9], [11, 9], [14, 9], [14, 7], [14, 5], [14, 3], [14, 1]
-
 ];
 
 export function LedNames() {
@@ -96,29 +36,17 @@ export function LedPositions() {
 	return vLedPositions;
 }
 
-function EnableSoftwareControl() {
-	const report = GetReport(0x0F, 0x03, 0x47);
-
-	report[2] = 0x3F; // transaction id.
-
-	report[11] = 0; // row index.
-
-	report[13] = 15; // led count.
-
-	report[89] = CalculateCrc(report);
-
-
-	device.send_report(report, 91);
-}
-
-
-function ReturnToHardwareControl() {
-
-}
-
-
 export function Initialize() {
 
+}
+
+export function Render() {
+	SendPacket();
+}
+
+
+export function Shutdown() {
+	SendPacket(true);
 }
 
 function SendPacket(shutdown = false) {
@@ -138,12 +66,11 @@ function SendPacket(shutdown = false) {
 	packet[12] = 0x00;
 	packet[13] = 0x0B;
 
-
 	for(let iIdx = 0; iIdx < vLedPositions.length; iIdx++){
 
 		const iPxX = vLedPositions[iIdx][0];
 		const iPxY = vLedPositions[iIdx][1];
-		var col;
+		let col;
 
 		if(shutdown){
 			col = hexToRgb(shutdownColor);
@@ -164,33 +91,24 @@ function SendPacket(shutdown = false) {
 
 }
 
+function CalculateCrc(report) {
+	let iCrc = 0;
 
-function Apply() {
-	const packet = []; //new Array(91).fill(0);
-	packet[0] = 0x00;
-	packet[1] = 0x00;
-	packet[2] = 0x3F;
-	packet[3] = 0x00;
-	packet[4] = 0x00;
-	packet[5] = 0x00;
-	packet[6] = 0x0C;
-	packet[7] = 0x0F;
-	packet[8] = 0x02;
-	packet[11] = 0x08;
+	for (let iIdx = 3; iIdx < 89; iIdx++) {
+		iCrc ^= report[iIdx];
+	}
 
-	packet[89] = CalculateCrc(packet);
-
-	device.send_report(packet, 91);
+	return iCrc;
 }
 
+function hexToRgb(hex) {
+	const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+	const colors = [];
+	colors[0] = parseInt(result[1], 16);
+	colors[1] = parseInt(result[2], 16);
+	colors[2] = parseInt(result[3], 16);
 
-export function Render() {
-	SendPacket();
-}
-
-
-export function Shutdown() {
-	SendPacket(true);
+	return colors;
 }
 
 export function Validate(endpoint) {
