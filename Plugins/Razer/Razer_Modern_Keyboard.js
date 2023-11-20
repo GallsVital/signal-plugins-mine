@@ -68,7 +68,6 @@ function deviceInitialization(wake = false) {
 	Razer.detectSupportedFeatures();
 	Razer.setDeviceProperties();
 	Razer.setDeviceMacroProperties();
-	Razer.setNumberOfLEDs(Razer.getDeviceLEDPositions().length);
 	Razer.setSoftwareLightingMode(); //we'll need the wake handler at some point for keebs, but for now we don't do features because I could not be bothered.
 }
 
@@ -166,8 +165,9 @@ function grabLighting(overrideColor) {
 	const RGBData = [];
 	const vLedPositions = Razer.getDeviceLEDPositions();
 	const vKeys = Razer.getDeviceLEDIndexes();
-	const ledsToSend = Razer.getNumberOfLEDsPacket();
-	const packetsTotal = Math.ceil(vKeys.length / ledsToSend);
+	const LEDsTotal = Razer.getNumberOfLEDs();
+	const LEDsPerPacket = Razer.getNumberOfLEDsPacket();
+	const packetsTotal = Math.ceil(vKeys.length / LEDsPerPacket);
 
 	for(let iIdx = 0; iIdx < vKeys.length; iIdx++) {
 		let col;
@@ -189,7 +189,7 @@ function grabLighting(overrideColor) {
 	let packetCount = 0;
 
 	do {
-		Razer.setKeyboardDeviceColor(ledsToSend, RGBData.splice(0, ledsToSend*3), packetCount);
+		Razer.setKeyboardDeviceColor(LEDsTotal, LEDsPerPacket, RGBData.splice(0, LEDsPerPacket*3), packetCount);
 		packetCount++;
 	}while(packetCount <= packetsTotal);
 }
@@ -263,7 +263,7 @@ export class deviceLibrary {
 				],
 				endpoint : { "interface": 3, "usage": 0x0000, "usage_page": 0x0001 },
 				DeviceType : "Keyboard",
-				ledsToSend : 22,
+				LEDsPerPacket : 22,
 				image: "https://assets.signalrgb.com/devices/brands/razer/keyboards/blackwidow-v3.png"
 			},
 			"Blackwidow V3 Mini" :
@@ -303,7 +303,7 @@ export class deviceLibrary {
 				],
 				endpoint : { "interface": 3, "usage": 0x0001, "usage_page": 0x000C },
 				DeviceType : "Keyboard",
-				ledsToSend : 15,
+				LEDsPerPacket : 15,
 				image: "https://assets.signalrgb.com/devices/brands/razer/keyboards/blackwidow-v3-mini.png"
 			},
 			"Blackwidow V4" :
@@ -369,7 +369,7 @@ export class deviceLibrary {
 				],
 				endpoint : { "interface": 3, "usage": 0x0000, "usage_page": 0x0001 },
 				DeviceType : "Keyboard",
-				ledsToSend : 23,
+				LEDsPerPacket : 23,
 				image: "https://assets.signalrgb.com/devices/brands/razer/keyboards/blackwidow-v4.png"
 			},
 			"Blackwidow V4 X" :
@@ -426,7 +426,7 @@ export class deviceLibrary {
 				],
 				endpoint : { "interface": 3, "usage": 0x0000, "usage_page": 0x0001 },
 				DeviceType : "Keyboard",
-				ledsToSend : 23,
+				LEDsPerPacket : 23,
 				image: "https://assets.signalrgb.com/devices/brands/razer/keyboards/blackwidow-v4-x.png"
 			},
 			"Blackwidow V4 Pro" :
@@ -485,7 +485,7 @@ export class deviceLibrary {
 				],
 				endpoint : { "interface": 3, "usage": 0x0000, "usage_page": 0x0001 },
 				DeviceType : "Keyboard",
-				ledsToSend : 23,
+				LEDsPerPacket : 23,
 				image: "https://assets.signalrgb.com/devices/brands/razer/keyboards/blackwidow-v4-pro.png"
 			},
 			"Blackwidow V4 75%" :
@@ -551,7 +551,7 @@ export class deviceLibrary {
 				],
 				endpoint : { "interface": 3, "usage": 0x0000, "usage_page": 0x0001 },
 				DeviceType : "Keyboard",
-				ledsToSend : 18,
+				LEDsPerPacket : 18,
 				image: "https://assets.signalrgb.com/devices/brands/razer/keyboards/blackwidow-v4-75.png"
 			},
 			"Huntsman V3 Pro" :
@@ -586,7 +586,7 @@ export class deviceLibrary {
 				],
 				endpoint : { "interface": 3, "usage": 0x0000, "usage_page": 0x0001 },
 				DeviceType : "Keyboard",
-				ledsToSend : 23,
+				LEDsPerPacket : 23,
 				image: "https://assets.signalrgb.com/devices/brands/razer/keyboards/huntsman-v3-pro.png"
 			},
 			"Huntsman V3 Pro TKL" :
@@ -621,7 +621,8 @@ export class deviceLibrary {
 				],
 				endpoint : { "interface": 3, "usage": 0x0001, "usage_page": 0x000C },
 				DeviceType : "Keyboard",
-				ledsToSend : 21,
+				NumberOfLEDs : 71, // This doesn't really represent the amount of LEDs on the board, number get from USB Captures
+				LEDsPerPacket : 21,
 				image: "https://assets.signalrgb.com/devices/brands/razer/keyboards/huntsman-v3-pro-tkl.png"
 			},
 			"Huntsman V3 Pro Mini" :
@@ -655,7 +656,7 @@ export class deviceLibrary {
 				],
 				endpoint : { "interface": 3, "usage": 0x0001, "usage_page": 0x000C },
 				DeviceType : "Keyboard",
-				ledsToSend : 15,
+				LEDsPerPacket : 15,
 				image: "https://assets.signalrgb.com/devices/brands/razer/keyboards/huntsman-v3-pro-mini.png"
 			},
 		};
@@ -728,7 +729,7 @@ export class RazerProtocol {
 			AdditionalDeviceFirmwareVersions: [],
 			/** @type {string[]} Stored Serials for Hyperspeed dongles. */
 			AdditionalDeviceSerialNumbers: [],
-			/** Variable to indicate how many LEDs a device has, used in the color send packet for mice. Does not apply for keyboards. */
+			/** Variable to indicate how many LEDs a device has according to USB Captures, used in the color send packet for keyboards. */
 			NumberOfLEDs: -1,
 			/** Variable to indicate how many leds should be sent per packet. */
 			LEDsPerPacket: -1,
@@ -818,9 +819,9 @@ export class RazerProtocol {
 	setNumberOfLEDs(NumberOfLEDs) { this.Config.NumberOfLEDs = NumberOfLEDs; }
 
 	/** Function for setting the number of LEDs a device has to send on each packet */
-	getNumberOfLEDsPacket() { return this.Config.ledsToSend; }
+	getNumberOfLEDsPacket() { return this.Config.LEDsPerPacket; }
 	/** Function for setting device led per packet properties.*/
-	setNumberOfLEDsPacket(NumberOfLEDsPacket) { this.Config.ledsToSend = NumberOfLEDsPacket; }
+	setNumberOfLEDsPacket(NumberOfLEDsPacket) { this.Config.LEDsPerPacket = NumberOfLEDsPacket; }
 
 	/** Function for getting the device image property */
 	getDeviceImage() { return this.Config.image; }
@@ -839,7 +840,8 @@ export class RazerProtocol {
 
 			this.setDeviceLEDNames(layout.vLedNames);
 			this.setDeviceLEDPositions(layout.vLedPositions);
-			this.setNumberOfLEDsPacket(layout.ledsToSend);
+			this.setNumberOfLEDs(layout.NumberOfLEDs);
+			this.setNumberOfLEDsPacket(layout.LEDsPerPacket);
 			this.setDeviceProductId(device.productId()); //yay edge cases!
 			this.setDeviceImage(layout.image);
 
@@ -856,29 +858,10 @@ export class RazerProtocol {
 		}
 
 		device.setControllableLeds(this.getDeviceLEDNames(), this.getDeviceLEDPositions());
-		this.getDeviceLEDZones();
 
-		if (layout.hyperflux) { this.setHyperFluxProperties(); }
 	}
 	setDeviceMacroProperties() {
 		this.setInputDict(razerDeviceLibrary.keyboardInputDict);
-	}
-	setHyperFluxProperties() {
-		device.log("Device has a Hyperflux Pad!");
-		this.setHyperFlux(true);
-
-		const hyperflux = razerDeviceLibrary.LEDLibrary["Hyperflux Pad"];
-
-		device.createSubdevice("Hyperflux");
-		// Parent Device + Sub device Name + Ports
-		device.setSubdeviceName("Hyperflux", `Hyperflux Mousepad`);
-		//device.setSubdeviceImage("Hyperflux", Razer_Mamba.image);
-
-		if (hyperflux.size[0] !== undefined && hyperflux.size[1] !== undefined) {
-			device.setSubdeviceSize("Hyperflux", hyperflux.size[0], hyperflux.size[1]);
-		}
-
-		device.setSubdeviceLeds("Hyperflux", hyperflux.vLedNames, hyperflux.vLedPositions);
 	}
 	/* eslint-disable complexity */
 	/** Function for detection all of the features that a device supports.*/
@@ -1221,32 +1204,6 @@ export class RazerProtocol {
 
 
 		return -1;
-	}
-	/** Function to fetch all of a device's LED Zones.*/
-	getDeviceLEDZones() {
-		const activeZones = [];
-
-		for (let zones = 0; zones < 30; zones++) {
-			RazerMouse.setModernMouseLEDBrightness(100, 0, true);
-
-			const ledExists = RazerMouse.getModernMouseLEDBrightness(zones, true); //iirc main reason I use this is that it only applies to mice?
-
-
-			if (ledExists === 100) {
-				device.log(`LED Zone ${this.LEDIDs[zones]} Exists`, { toFile: true });
-				activeZones.push(zones);
-
-			}
-
-		}
-
-		if (activeZones.length > 0) {
-			device.log("Device uses Modern Protocol for Lighting.", { toFile: true });
-
-			return activeZones;
-		}
-
-		return -1; //Return -1 if we have no zones. I.E. device has no led zones 💀
 	}
 	/** Function to check if a device is in Hardware Mode or Software Mode. */
 	getDeviceMode(retryAttempts = 5) {
@@ -1685,8 +1642,8 @@ export class RazerProtocol {
 		return -1;
 	}
 	/** Function to set a modern keyboard's led colors.*/
-	setKeyboardDeviceColor(NumberOfLEDs, RGBData, packetidx) {
-		this.StandardPacketSend([(NumberOfLEDs*3 + 5), 0x0F, 0x03, 0x00, 0x00, packetidx, 0x00, NumberOfLEDs].concat(RGBData));
+	setKeyboardDeviceColor(NumberOfLEDs, LEDsPerPacket, RGBData, packetidx) {
+		this.StandardPacketSend([(NumberOfLEDs), 0x0F, 0x03, 0x00, 0x00, packetidx, 0x00, LEDsPerPacket].concat(RGBData));
 	}
 }
 
@@ -2198,81 +2155,6 @@ class RazerMouseFunctions {
 		if (errorCode !== 2) {
 
 			device.log("Error setting Device Smart Reel Mode. Error Code: " + Razer.DeviceResponses[errorCode], { toFile: true });
-
-			if (errorCode === 1) {
-				return -2;
-			}
-
-			return -1;
-		}
-
-		return 0;
-	}
-	/** Function to set Mouse Lighting.*/
-	setMouseLighting(RGBData, NumberOfLEDs = Razer.getNumberOfLEDs(), hyperflux = false) { //no returns on this or the led color sets. I do not care.
-		Razer.StandardPacketSend([(NumberOfLEDs * 3 + 5), 0x0F, 0x03, hyperflux ? 1 : 0, 0x00, 0x00, 0x00, NumberOfLEDs - 1].concat(RGBData));
-	}
-	/** Function to set a legacy mouse's led brightness. You cannot use zero for this one as it wants a specific zone. That being said we could scan for specific zones on a device.*/
-	getModernMouseLEDBrightness(led = 0, detection = false, retryAttempts = 5) {
-		let errorCode = 0;
-		let returnPacket = [];
-		let attempts = 0;
-
-		do {
-			 [returnPacket, errorCode] =  Razer.ConfigPacketSend([0x03, 0x0f, 0x84, 0x00, led]);
-
-			 if(errorCode !== 2) {
-				device.pause(10);
-				attempts++;
-			 }
-		}
-
-		while(errorCode !== 2 && attempts < retryAttempts);
-
-		if (errorCode !== 2) {
-
-			if(!detection) {
-				device.log("Error fetching Modern Mouse LED Brightness. Error Code: " + Razer.DeviceResponses[errorCode], { toFile: true });
-			}
-
-			if (errorCode === 1) {
-				return -2;
-			}
-
-			return -1;
-		}
-
-		if (returnPacket[10] !== undefined) {
-			const brightness = returnPacket[10] ?? 0;
-			device.log(`LED ${led} is set to ${brightness * 100 / 255}% brightness.`, { toFile: true });
-
-			return brightness * 100 / 255;
-		}
-
-		return -3;
-	}
-	/** Function to set a modern mouse's led brightness. If we use 0, it does all of the zones in the matrix.*/
-	setModernMouseLEDBrightness(brightness, led = 0, detection = false, retryAttempts = 5) {
-		let errorCode = 0;
-		let attempts = 0;
-
-		do {
-			 const returnValues = Razer.ConfigPacketSend([0x03, 0x0f, 0x04, 0x01, led, brightness * 255 / 100]);
-			 errorCode = returnValues[1];
-
-			 if(errorCode !== 2) {
-				device.pause(10);
-				attempts++;
-			 }
-		}
-
-		while(errorCode !== 2 && attempts < retryAttempts);
-
-		if (errorCode !== 2) {
-
-			if(!detection) {
-				device.log("Error setting Modern Mouse LED Brightness. Error Code: " + Razer.DeviceResponses[errorCode], { toFile: true });
-			}
 
 			if (errorCode === 1) {
 				return -2;
