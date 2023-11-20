@@ -98,17 +98,17 @@ class MysticLight {
 		{
 			"MPG Z790 EDGE TI MAX WIFI (MS-7E25)":
 			{
-				OnboardLEDs    : 0,
+				OnboardLEDs    : 6,
 				RGBHeaders     : 1,
 				ARGBHeaders    : 3,
 				JPipeLEDs	   : 0,
 				CorsairHeaders : 0,
 				//PERLED
-				PerLEDOnboardLEDs : 6,
+				PerLEDOnboardLEDs : 0,
 				ForceZoneBased	  : false,
+				JARGB_V2		  : true,
 			},
 		};
-
 
 		this.Library =
 		{
