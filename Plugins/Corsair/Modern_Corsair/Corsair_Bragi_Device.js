@@ -151,6 +151,15 @@ export function Shutdown() {
 	}
 }
 
+function setMacroKeys(deviceID = 0) {
+	//Corsair.OpenHandle(1, Corsair.endpoints.Buttons, deviceID);
+	const macroFill = new Array(135).fill(1);
+
+	device.log("Doing things to keys");
+	Corsair.WriteToEndpoint(1, Corsair.endpoints.Buttons, macroFill, deviceID);
+}
+
+
 function fetchAndConfigureChildren() {
 	if(Corsair.IsPropertySupported(Corsair.properties.subdeviceBitmask)){
 		device.log(`Wireless Dongle detected!`, {toFile : true});
@@ -212,7 +221,15 @@ function setupWiredDevice() {
 /* eslint-disable complexity */
 function initializeDevice(deviceConfig, deviceID = 0) {
 	Corsair.SetMode("Software", deviceID);
-	Corsair.SetHWBrightness(999, deviceID); //K100 Air reports 100% brightness even when not at 100% on Dev FW Version: 5.6.126.
+
+	const devicePID = Corsair.FetchProperty(Corsair.properties.pid);
+
+	if(devicePID === 0x1BAB) {
+		Corsair.SetHWBrightness(999, deviceID); //K100 Air reports 100% brightness even when not at 100% on Dev FW Version: 5.6.126.
+	} else {
+		Corsair.SetHWBrightness(1000, deviceID);
+	}
+
 	deviceConfig.supportsBattery = Corsair.FetchBatterySupport(deviceID);
 	device.log(`Device Battery Support: ${deviceConfig.supportsBattery}`);
 
@@ -230,15 +247,13 @@ function initializeDevice(deviceConfig, deviceID = 0) {
 
 	if(deviceConfig.keymapType === "Mouse") {
 		device.addFeature("mouse");
+		configureMouseButtons(deviceID);
 	} else if(deviceConfig.keymapType === "Keyboard") {
+		//setMacroKeys(deviceID);
 		device.addFeature("keyboard");
 	}
 
-	const devicePID = Corsair.FetchProperty(Corsair.properties.pid);
-
-	if(devicePID === 0x1B70 || devicePID === 0x1b9e || devicePID === 0x1B79 || devicePID === 0x1BB2) {
-		configureMSeriesMice(deviceID);
-	}
+	device.pause(5);
 
 	if(Corsair.FetchDPISupport(deviceID) && DPIHandler.minDpi === 50) { //safety check. We check if the DPIHandler prop was updated. If it hasn't been then there's only a single instance.
 		if(deviceConfig.hasSniperButton) {
@@ -371,7 +386,7 @@ function processMacroInputs(bitIdx, state) {
 			keyCode : 0,
 			"released": !state,
 		};
-		device.log(`Key ${keyName} is state ${state}`);
+		//device.log(`Key ${keyName} is state ${state}`);
 		keyboard.sendEvent(eventData, "Key Press");
 	} else if(deviceType === "Mouse") {
 		if(state) {
@@ -391,7 +406,7 @@ function processMacroInputs(bitIdx, state) {
 					"released": !state,
 					"name":keyName
 				};
-				device.log(`bitIdx ${bitIdx} is state ${state}`);
+				//device.log(`bitIdx ${bitIdx} is state ${state}`);
 				device.log(`Key ${keyName} is state ${state}`);
 				mouse.sendEvent(eventData, "Button Press");
 			}
@@ -402,12 +417,10 @@ function processMacroInputs(bitIdx, state) {
 
 }
 
-function configureMSeriesMice(deviceID) { //TODO: Rewrite this properly once I get user confirmation of functionality.
+function configureMouseButtons(deviceID) { //TODO: Rewrite this properly once I get user confirmation of functionality.
 	device.log("Made buttons do button things again!");
-	Corsair.SetKeyStates(0x01, 8, deviceID);
+	Corsair.SetKeyStates(0x01, 5, deviceID);
 	device.log(Corsair.ReadFromEndpoint(1, Corsair.endpoints.Buttons, deviceID));
-
-	Corsair.CloseHandle(1, deviceID);
 }
 
 function addSinglePointChild(subdeviceID) {
@@ -2700,6 +2713,7 @@ export class ModernCorsairProtocol{
 		}
 
 		let ErrorCode = this.OpenHandle(Handle, Endpoint, deviceID);
+		device.pause(5);
 
 		if(ErrorCode){
 			device.log(`CorsairProtocol: Failed to open Device Handle [${this.GetNameOfHandle(Handle)}, ${HexFormatter.toHex2(Handle)}]. Aborting WriteEndpoint operation.`);
@@ -2709,7 +2723,7 @@ export class ModernCorsairProtocol{
 
 		device.clearReadBuffer();
 		device.write([0x00, deviceID | 0x08, this.command.writeEndpoint, Handle, ...BinaryUtils.WriteInt32LittleEndian(Data.length)].concat(Data), this.GetWriteLength());
-		device.pause(1);
+		device.pause(5);
 
 		const returnPacket = device.read([0x00], this.GetReadLength());
 
@@ -2750,6 +2764,7 @@ export class ModernCorsairProtocol{
 		let TotalBytes = RGBData.length;
 		const InitialPacketSize = this.GetWriteLength() - InitialHeaderSize;
 
+		//device.log(`RGBData length: ${RGBData.length}`);
 		this.WriteLighting(RGBData.length, RGBData.splice(0, InitialPacketSize), deviceID);
 
 		TotalBytes -= InitialPacketSize;
@@ -2763,15 +2778,31 @@ export class ModernCorsairProtocol{
 	}
 
 	/** @private */
-	WriteLighting(LedCount, RGBData, deviceID = 0){
-		device.write([0x00, deviceID, this.command.writeEndpoint, 0x00, ...BinaryUtils.WriteInt32LittleEndian(LedCount)].concat(RGBData), this.GetWriteLength());
+	WriteLighting(LedCount, RGBData, deviceID = 0){ //We don't follow proper safety for this technically. There's no error checking in the pursuit of higher framerates.
+		device.write([0x00, deviceID | 0x08, this.command.writeEndpoint, 0x00, ...BinaryUtils.WriteInt32LittleEndian(LedCount)].concat(RGBData), this.GetWriteLength());
 		device.pause(1);
+
+		const returnPacket = device.read([0x00], this.GetReadLength());
+
+		const ErrorCode = this.CheckError(returnPacket, `WriteLighting`);
+
+		if(ErrorCode){
+			device.log(`WriteLighting Error`);
+		}
 	}
 
 	/** @private */
 	StreamLighting(RGBData, deviceID = 0) {
-		device.write([0x00, deviceID, this.command.streamEndpoint, 0x00].concat(RGBData), this.GetWriteLength());
+		device.write([0x00, deviceID | 0x08, this.command.streamEndpoint, 0x00].concat(RGBData), this.GetWriteLength());
 		device.pause(1);
+
+		const returnPacket = device.read([0x00], this.GetReadLength());
+
+		const ErrorCode = this.CheckError(returnPacket, `StreamLighting`);
+
+		if(ErrorCode){
+			device.log(`StreamLighting Error`);
+		}
 	}
 
 	/**
