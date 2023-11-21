@@ -568,7 +568,7 @@ class LegacyCorsairProtocol {
 		this.keyboardLayoutDict = {
 			0x00 : "ANSI",
 			0x01 : "ISO",
-			0x02 : "ABNT"
+			0x02 : "ABNT2"
 		};
 
 		this.keyIdx = {

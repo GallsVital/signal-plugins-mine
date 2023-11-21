@@ -8,6 +8,7 @@ export function DefaultPosition(){return [40, 30];}
 export function DefaultScale(){return 10.0;}
 export function LedNames() { return vLedNames; }
 export function LedPositions() { return vLedPositions; }
+export function ConflictingProcesses() { return ["iCUE.exe"]; }
 export function ControllableParameters(){
 	return [
 		{"property":"shutdownColor", "group":"lighting", "label":"Shutdown Color", "min":"0", "max":"360", "type":"color", "default":"#009bde"},

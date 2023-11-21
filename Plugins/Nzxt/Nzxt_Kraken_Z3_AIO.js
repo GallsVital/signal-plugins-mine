@@ -1,7 +1,7 @@
 export function Name() { return "NZXT Kraken Z3"; }
 export function VendorId() { return 0x1E71; }
 export function Documentation(){ return "troubleshooting/nzxt"; }
-export function ProductId() { return 0x3008; }
+export function ProductId() { return [0x3008, 0x300C]; } // 0x300C is Kraken Elite
 export function Publisher() { return "WhirlwindFX"; }
 export function Size() { return [4, 4]; }
 export function DefaultPosition(){return [165, 60];}
