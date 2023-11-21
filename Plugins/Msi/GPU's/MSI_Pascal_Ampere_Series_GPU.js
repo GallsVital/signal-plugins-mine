@@ -20,6 +20,12 @@ export function ControllableParameters() {
 	];
 }
 
+export function DeviceMessages() {
+	return [
+		{property: "Single Zone Control", message:"GPU is Limited to a Single Zone.", tooltip: "This device's firmware is limited to a single rgb zone while controlled directly."},
+	];
+}
+
 const vLedNames = [ "GPU" ];
 const vLedPositions = [ [3, 1]];
 
