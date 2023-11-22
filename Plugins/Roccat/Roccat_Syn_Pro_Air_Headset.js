@@ -178,5 +178,5 @@ export function Validate(endpoint) {
 }
 
 export function ImageUrl(){
-	return "https://marketplace.signalrgb.com/devices/brands/roccat/audio/syn-pro-air.png";
+	return "https://assets.signalrgb.com/devices/brands/roccat/audio/syn-pro-air.png";
 }

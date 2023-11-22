@@ -125,5 +125,5 @@ export function Validate(endpoint) {
 }
 
 export function ImageUrl(){
-	return "https://marketplace.signalrgb.com/devices/brands/speedlink/keyboards/orios-rgb-optomechanical.png";
+	return "https://assets.signalrgb.com/devices/brands/speedlink/keyboards/orios-rgb-optomechanical.png";
 }

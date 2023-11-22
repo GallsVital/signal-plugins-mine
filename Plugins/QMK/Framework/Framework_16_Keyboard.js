@@ -316,5 +316,5 @@ export function Validate(endpoint) {
 }
 
 export function ImageUrl(){
-	return "https://marketplace.signalrgb.com/devices/default/misc/laptop-render.png";
+	return "https://assets.signalrgb.com/devices/default/misc/laptop-render.png";
 }

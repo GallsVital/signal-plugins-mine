@@ -104,5 +104,5 @@ export function Validate(endpoint) {
 }
 
 export function ImageUrl() {
-	return "https://marketplace.signalrgb.com/devices/brands/creative-labs/audio/sound-blaster-x-katana.png";
+	return "https://assets.signalrgb.com/devices/brands/creative-labs/audio/sound-blaster-x-katana.png";
 }

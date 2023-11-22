@@ -20,6 +20,12 @@ export function ControllableParameters() {
 	];
 }
 
+export function DeviceMessages() {
+	return [
+		{property: "Single Zone Control", message:"Single RGB Zone", tooltip: "This device's firmware is limited to a single zone of rgb control while under direct control."},
+	];
+}
+
 const vLedNames = [ "GPU" ];
 const vLedPositions = [ [1, 0] ];
 
@@ -166,6 +172,7 @@ const PNYGPUIDs =
 	new PNYGPUIdentifier(0x1569, 0x2684, 0xF296, "PALIT 4090 GameRock OC"),
 
 	new PNYGPUIdentifier(0x10B0, 0x2482, 0x2482, "Gainward 3070TI Phoenix"),
+	new PNYGPUIdentifier(0x10B0, 0x2204, 0x2204, "Gainward 3090 Phoenix"),
 	new PNYGPUIdentifier(0x10B0, 0x2782, 0xF299, "Gainward 4070Ti Phoenix GS"),
 	new PNYGPUIdentifier(0x10B0, 0x2704, 0xF299, "Gainward 4080 Phoenix GS"),
 	new PNYGPUIdentifier(0x10B0, 0x2684, 0xf297, "Gainward 4090 Phantom GS"),
@@ -183,5 +190,5 @@ function hexToRgb(hex) {
 }
 
 export function ImageUrl() {
-	return "https://marketplace.signalrgb.com/devices/brands/pny/gpus/gpu.png";
+	return "https://assets.signalrgb.com/devices/brands/pny/gpus/gpu.png";
 }

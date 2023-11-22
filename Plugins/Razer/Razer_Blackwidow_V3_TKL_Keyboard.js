@@ -233,5 +233,5 @@ export function Validate(endpoint) {
 }
 
 export function ImageUrl() {
-	return "https://marketplace.signalrgb.com/devices/brands/razer/keyboards/blackwidow-v3-tkl.png";
+	return "https://assets.signalrgb.com/devices/brands/razer/keyboards/blackwidow-v3-tkl.png";
 }

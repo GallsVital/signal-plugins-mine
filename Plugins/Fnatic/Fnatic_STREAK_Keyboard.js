@@ -141,5 +141,5 @@ export function Validate(endpoint) {
 
 
 export function ImageUrl() {
-	return "https://marketplace.signalrgb.com/devices/brands/fnatic/keyboards/fnatic-streak.png";
+	return "https://assets.signalrgb.com/devices/brands/fnatic/keyboards/fnatic-streak.png";
 }

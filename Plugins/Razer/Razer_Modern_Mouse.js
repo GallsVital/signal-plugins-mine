@@ -513,35 +513,35 @@ export class deviceLibrary {
 		};
 
 		this.imageLibrary = {
-			"Abyssus Essential" : "https://marketplace.signalrgb.com/devices/brands/razer/mice/abyssus-essential.png",
-			"Basilisk" : "https://marketplace.signalrgb.com/devices/brands/razer/mice/basilisk-quartz-pink.png",
-			"Basilisk V2" : "https://marketplace.signalrgb.com/devices/brands/razer/mice/basilisk-v2.png",
-			"Basilisk V3" : "https://marketplace.signalrgb.com/devices/brands/razer/mice/basilisk-v3.png",
-			"Basilisk V3 Pro" : "https://marketplace.signalrgb.com/devices/brands/razer/mice/basilisk-v3-pro.png",
-			"Basilisk X Hyperspeed" : "https://marketplace.signalrgb.com/devices/brands/razer/mice/basilisk-x-hyperspeed.png",
-			"Deathadder Elite" : "https://marketplace.signalrgb.com/devices/brands/razer/mice/deathadder-elite.png",
-			"Deathadder V2" : "https://marketplace.signalrgb.com/devices/brands/razer/mice/deathadder-v2.png",
-			"Deathadder V2 Pro" : "https://marketplace.signalrgb.com/devices/brands/razer/mice/deathadder-v2-pro.png",
-			"Deathadder V3" : "https://marketplace.signalrgb.com/devices/brands/razer/mice/deathadder-v3-pro.png",
-			"Deathadder V3 Pro" : "https://marketplace.signalrgb.com/devices/brands/razer/mice/deathadder-v3-pro.png",
-			"Lancehead Tournament Edition" : "https://marketplace.signalrgb.com/devices/brands/razer/mice/lancehead-tournament-edition.png",
-			"Lancehead" : "https://marketplace.signalrgb.com/devices/brands/razer/mice/lancehead-wireless.png",
-			"Mamba" : "https://marketplace.signalrgb.com/devices/brands/razer/mice/mamba-standard.png",
-			"Mamba Elite" : "https://marketplace.signalrgb.com/devices/brands/razer/mice/mamba-elite.png",
-			"Mamba Tournament Edition" : "https://marketplace.signalrgb.com/devices/brands/razer/mice/mamba-tournament-edition.png",
-			"Mamba Hyperflux" : "https://marketplace.signalrgb.com/devices/brands/razer/mice/mamba-standard.png",
-			"Naga Trinity" : "https://marketplace.signalrgb.com/devices/brands/razer/mice/naga-trinity.png",
-			"Naga Chroma" : "https://marketplace.signalrgb.com/devices/brands/razer/mice/naga-chroma.png",
-			"Naga Lefthand" : "https://marketplace.signalrgb.com/devices/brands/razer/mice/naga-lefthand.png",
-			"Naga Pro" : "https://marketplace.signalrgb.com/devices/brands/razer/mice/naga-pro.png",
-			"Naga V2 Pro" : "https://marketplace.signalrgb.com/devices/brands/razer/mice/naga-v2-pro.png",
-			"Naga X" : "https://marketplace.signalrgb.com/devices/brands/razer/mice/naga-x.png",
-			"Orochi V2" : "https://marketplace.signalrgb.com/devices/brands/razer/mice/abyssus-essential.png", //I need one for this.
-			"Viper 8KHz" : "https://marketplace.signalrgb.com/devices/brands/razer/mice/viper-8KHz.png",
-			"Viper" : "https://marketplace.signalrgb.com/devices/brands/razer/mice/viper-standard.png",
-			"Viper V2 Pro" : "https://marketplace.signalrgb.com/devices/brands/razer/mice/viper-v2-pro.png",
-			"Viper Mini" : "https://marketplace.signalrgb.com/devices/brands/razer/mice/viper-mini.png",
-			"Viper Ultimate" : "https://marketplace.signalrgb.com/devices/brands/razer/mice/viper-ultimate.png"
+			"Abyssus Essential" : "https://assets.signalrgb.com/devices/brands/razer/mice/abyssus-essential.png",
+			"Basilisk" : "https://assets.signalrgb.com/devices/brands/razer/mice/basilisk-quartz-pink.png",
+			"Basilisk V2" : "https://assets.signalrgb.com/devices/brands/razer/mice/basilisk-v2.png",
+			"Basilisk V3" : "https://assets.signalrgb.com/devices/brands/razer/mice/basilisk-v3.png",
+			"Basilisk V3 Pro" : "https://assets.signalrgb.com/devices/brands/razer/mice/basilisk-v3-pro.png",
+			"Basilisk X Hyperspeed" : "https://assets.signalrgb.com/devices/brands/razer/mice/basilisk-x-hyperspeed.png",
+			"Deathadder Elite" : "https://assets.signalrgb.com/devices/brands/razer/mice/deathadder-elite.png",
+			"Deathadder V2" : "https://assets.signalrgb.com/devices/brands/razer/mice/deathadder-v2.png",
+			"Deathadder V2 Pro" : "https://assets.signalrgb.com/devices/brands/razer/mice/deathadder-v2-pro.png",
+			"Deathadder V3" : "https://assets.signalrgb.com/devices/brands/razer/mice/deathadder-v3-pro.png",
+			"Deathadder V3 Pro" : "https://assets.signalrgb.com/devices/brands/razer/mice/deathadder-v3-pro.png",
+			"Lancehead Tournament Edition" : "https://assets.signalrgb.com/devices/brands/razer/mice/lancehead-tournament-edition.png",
+			"Lancehead" : "https://assets.signalrgb.com/devices/brands/razer/mice/lancehead-wireless.png",
+			"Mamba" : "https://assets.signalrgb.com/devices/brands/razer/mice/mamba-standard.png",
+			"Mamba Elite" : "https://assets.signalrgb.com/devices/brands/razer/mice/mamba-elite.png",
+			"Mamba Tournament Edition" : "https://assets.signalrgb.com/devices/brands/razer/mice/mamba-tournament-edition.png",
+			"Mamba Hyperflux" : "https://assets.signalrgb.com/devices/brands/razer/mice/mamba-standard.png",
+			"Naga Trinity" : "https://assets.signalrgb.com/devices/brands/razer/mice/naga-trinity.png",
+			"Naga Chroma" : "https://assets.signalrgb.com/devices/brands/razer/mice/naga-chroma.png",
+			"Naga Lefthand" : "https://assets.signalrgb.com/devices/brands/razer/mice/naga-lefthand.png",
+			"Naga Pro" : "https://assets.signalrgb.com/devices/brands/razer/mice/naga-pro.png",
+			"Naga V2 Pro" : "https://assets.signalrgb.com/devices/brands/razer/mice/naga-v2-pro.png",
+			"Naga X" : "https://assets.signalrgb.com/devices/brands/razer/mice/naga-x.png",
+			"Orochi V2" : "https://assets.signalrgb.com/devices/brands/razer/mice/abyssus-essential.png", //I need one for this.
+			"Viper 8KHz" : "https://assets.signalrgb.com/devices/brands/razer/mice/viper-8KHz.png",
+			"Viper" : "https://assets.signalrgb.com/devices/brands/razer/mice/viper-standard.png",
+			"Viper V2 Pro" : "https://assets.signalrgb.com/devices/brands/razer/mice/viper-v2-pro.png",
+			"Viper Mini" : "https://assets.signalrgb.com/devices/brands/razer/mice/viper-mini.png",
+			"Viper Ultimate" : "https://assets.signalrgb.com/devices/brands/razer/mice/viper-ultimate.png"
 		};
 
 		this.PIDLibrary =
@@ -2697,5 +2697,5 @@ export function Validate(endpoint) {
 }
 
 export function ImageUrl() {
-	return "https://marketplace.signalrgb.com/devices/default/misc/usb-drive-render.png";
+	return "https://assets.signalrgb.com/devices/default/misc/usb-drive-render.png";
 }

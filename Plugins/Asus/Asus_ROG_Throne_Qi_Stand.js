@@ -105,5 +105,5 @@ export function Validate(endpoint) {
 }
 
 export function ImageUrl(){
-	return "https://marketplace.signalrgb.com/devices/brands/asus/misc/throne-qi.png";
+	return "https://assets.signalrgb.com/devices/brands/asus/misc/throne-qi.png";
 }

@@ -323,7 +323,7 @@ function hexToRgb(hex) {
 }
 
 export function ImageUrl(){
-	return "https://marketplace.signalrgb.com/devices/brands/kingston/ram/fury-ddr5.png";
+	return "https://assets.signalrgb.com/devices/brands/kingston/ram/fury-ddr5.png";
 }
 
 function CompareArrays(array1, array2) {

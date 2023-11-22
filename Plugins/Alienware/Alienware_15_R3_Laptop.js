@@ -98,5 +98,5 @@ export function Validate(endpoint) {
 }
 
 export function ImageUrl(){
-	return "https://marketplace.signalrgb.com/devices/brands/alienware/misc/15-r3-laptop.png";
+	return "https://assets.signalrgb.com/devices/brands/alienware/misc/15-r3-laptop.png";
 }

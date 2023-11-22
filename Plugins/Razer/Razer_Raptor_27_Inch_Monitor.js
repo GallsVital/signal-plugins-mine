@@ -199,5 +199,5 @@ export function Validate(endpoint) {
 }
 
 export function ImageUrl(){
-	return "https://marketplace.signalrgb.com/devices/brands/razer/misc/raptor-27-inch-monitor.png";
+	return "https://assets.signalrgb.com/devices/brands/razer/misc/raptor-27-inch-monitor.png";
 }

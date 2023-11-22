@@ -170,5 +170,5 @@ export function Validate(endpoint) {
 }
 
 export function ImageUrl(){
-	return "https://marketplace.signalrgb.com/devices/brands/razer/keyboards/deathstalker-v2-pro-tkl.png";
+	return "https://assets.signalrgb.com/devices/brands/razer/keyboards/deathstalker-v2-pro-tkl.png";
 }

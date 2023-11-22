@@ -91,5 +91,5 @@ export function Validate(endpoint) {
 }
 
 export function ImageUrl(){
-	return "https://marketplace.signalrgb.com/devices/brands/speedlink/mice/orios-rgb-gaming-mouse.png";
+	return "https://assets.signalrgb.com/devices/brands/speedlink/mice/orios-rgb-gaming-mouse.png";
 }
