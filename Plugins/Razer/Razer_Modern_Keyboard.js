@@ -263,6 +263,7 @@ export class deviceLibrary {
 				],
 				endpoint : { "interface": 3, "usage": 0x0000, "usage_page": 0x0001 },
 				DeviceType : "Keyboard",
+				NumberOfLEDs : 74, // This doesn't really represent the amount of LEDs on the board, number get from USB Captures
 				LEDsPerPacket : 22,
 				image: "https://assets.signalrgb.com/devices/brands/razer/keyboards/blackwidow-v3.png"
 			},
@@ -303,6 +304,7 @@ export class deviceLibrary {
 				],
 				endpoint : { "interface": 3, "usage": 0x0001, "usage_page": 0x000C },
 				DeviceType : "Keyboard",
+				NumberOfLEDs : 74, // This doesn't really represent the amount of LEDs on the board, number get from USB Captures
 				LEDsPerPacket : 15,
 				image: "https://assets.signalrgb.com/devices/brands/razer/keyboards/blackwidow-v3-mini.png"
 			},
@@ -369,6 +371,7 @@ export class deviceLibrary {
 				],
 				endpoint : { "interface": 3, "usage": 0x0000, "usage_page": 0x0001 },
 				DeviceType : "Keyboard",
+				NumberOfLEDs : 74, // This doesn't really represent the amount of LEDs on the board, number get from USB Captures
 				LEDsPerPacket : 23,
 				image: "https://assets.signalrgb.com/devices/brands/razer/keyboards/blackwidow-v4.png"
 			},
@@ -426,6 +429,7 @@ export class deviceLibrary {
 				],
 				endpoint : { "interface": 3, "usage": 0x0000, "usage_page": 0x0001 },
 				DeviceType : "Keyboard",
+				NumberOfLEDs : 74, // This doesn't really represent the amount of LEDs on the board, number get from USB Captures
 				LEDsPerPacket : 23,
 				image: "https://assets.signalrgb.com/devices/brands/razer/keyboards/blackwidow-v4-x.png"
 			},
@@ -485,6 +489,7 @@ export class deviceLibrary {
 				],
 				endpoint : { "interface": 3, "usage": 0x0000, "usage_page": 0x0001 },
 				DeviceType : "Keyboard",
+				NumberOfLEDs : 74, // This doesn't really represent the amount of LEDs on the board, number get from USB Captures
 				LEDsPerPacket : 23,
 				image: "https://assets.signalrgb.com/devices/brands/razer/keyboards/blackwidow-v4-pro.png"
 			},
@@ -551,6 +556,7 @@ export class deviceLibrary {
 				],
 				endpoint : { "interface": 3, "usage": 0x0000, "usage_page": 0x0001 },
 				DeviceType : "Keyboard",
+				NumberOfLEDs : 59, // This doesn't really represent the amount of LEDs on the board, number get from USB Captures
 				LEDsPerPacket : 18,
 				image: "https://assets.signalrgb.com/devices/brands/razer/keyboards/blackwidow-v4-75.png"
 			},
@@ -586,6 +592,7 @@ export class deviceLibrary {
 				],
 				endpoint : { "interface": 3, "usage": 0x0000, "usage_page": 0x0001 },
 				DeviceType : "Keyboard",
+				NumberOfLEDs : 74, // This doesn't really represent the amount of LEDs on the board, number get from USB Captures
 				LEDsPerPacket : 23,
 				image: "https://assets.signalrgb.com/devices/brands/razer/keyboards/huntsman-v3-pro.png"
 			},
@@ -656,6 +663,7 @@ export class deviceLibrary {
 				],
 				endpoint : { "interface": 3, "usage": 0x0001, "usage_page": 0x000C },
 				DeviceType : "Keyboard",
+				NumberOfLEDs : 74, // This doesn't really represent the amount of LEDs on the board, number get from USB Captures
 				LEDsPerPacket : 15,
 				image: "https://assets.signalrgb.com/devices/brands/razer/keyboards/huntsman-v3-pro-mini.png"
 			},
