@@ -24,6 +24,14 @@ export function ControllableParameters() {
 	];
 }
 
+/*
+V4 Working
+V4 X -
+V4 Pro -
+V4 75 -
+Huntsman V3 Pro TKL - Flickering
+*/
+
 let savedPollTimer = Date.now();
 const PollModeInternal = 15000;
 let macroTracker;
