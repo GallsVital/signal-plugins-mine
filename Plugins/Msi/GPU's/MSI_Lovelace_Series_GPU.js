@@ -254,6 +254,7 @@ class MSIGPUDeviceIDs {
 		this.RTX4090_SUPRIM_LIQUID_X                 = 0x5104;
 		this.RTX4090_SUPRIM_X_CLASSIC				 = 0x5105;
 		this.RTX4090_SUPRIM_X_CLASSIC_2				 = 0x5106;
+		this.RTX4090_GAMING_X_SLIM					 = 0x510B;
 	}
 }
 
@@ -276,7 +277,8 @@ class MSIGPUList {
         	new MSIGPUIdentifier(Nvidia.RTX4090,	MSIGPUIDs.RTX4090_SUPRIM_LIQUID_X,		0x68, "MSI 4090 SUPRIM LIQUID X"),
         	new MSIGPUIdentifier(Nvidia.RTX4090,	MSIGPUIDs.RTX4090_SUPRRIM_X,			0x68, "MSI 4090 SUPRIM X"),
         	new MSIGPUIdentifier(Nvidia.RTX4090,	MSIGPUIDs.RTX4090_SUPRIM_X_CLASSIC,		0x68, "MSI 4090 SUPRIM X Classic"),
-        	new MSIGPUIdentifier(Nvidia.RTX4090,	MSIGPUIDs.RTX4090_SUPRIM_X_CLASSIC_2,	0x68, "MSI 4090 SUPRIM X Classic")
+        	new MSIGPUIdentifier(Nvidia.RTX4090,	MSIGPUIDs.RTX4090_SUPRIM_X_CLASSIC_2,	0x68, "MSI 4090 SUPRIM X Classic"),
+        	new MSIGPUIdentifier(Nvidia.RTX4090,    MSIGPUIDs.RTX4090_GAMING_X_SLIM,		0x68, "MSI 4090 GAMING X SLIM")
         ];
 	}
 }
