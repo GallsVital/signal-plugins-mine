@@ -197,7 +197,7 @@ function grabLighting(overrideColor) {
 	let packetCount = 0;
 
 	do {
-		Razer.setKeyboardDeviceColor(LEDsTotal, LEDsPerPacket, RGBData.splice(0, LEDsPerPacket*3), packetCount);
+		Razer.setKeyboardDeviceColor(LEDsPerPacket, RGBData.splice(0, LEDsPerPacket*3), packetCount);
 		packetCount++;
 	}while(packetCount <= packetsTotal);
 }
@@ -506,22 +506,22 @@ export class deviceLibrary {
 				size : [17, 9],
 				vKeys :
 				[
-					0,   1,   2,   3,   4,   5,   6,   7,   8,   9,  10,  11,  12,  13,  14,		//15
-					23,  24,  25,  26,  27,  28,  29,  30,  31,  32,  33,  34,  35,  37,  38,		//15
-					46,  47,  48,  49,  50,  51,  52,  53,  54,  55,  56,  57,  58,  59,  60,		//15
-					69,  70,  71,  72,  73,  74,  75,  76,  77,  78,  79,  80,  82,       83,		//14
-					92,  94,  95,  96,  97,  98,  99, 100, 101, 102, 103, 105, 106, 107,			//14
-					115, 116, 117, 119,                122,                123, 125, 126, 127, 128,	//10
+					 0,  1,   2,   3,   4,   5,   6,   7,   8,   9,   10,   11,   12,   13,  14,	//15
+					17, 18,  19,  20,  21,  22,  23,  24,  25,  26,   27,   28,	  29,   31,  32,	//15
+					34, 35,  36,  37,  38,  39,  40,  41,  42,  43,   44,   45,   46,   47,  48,	//15
+					51, 52,  53,  54,  55,  56,  57,  58,  59,  60,   61,   62,         64,  65,	//14
+					68,      70,  71,  72,  73,  74,  75,  76,  77,   78,   79,   81,   82,  83,	//14
+					85, 86, 87,                  89,            92,   93,   95,   96,   97,  98,	//10
 
-					138, 147, //2
-					139, 148, //2
-					140, 149, //2
-					141, 150, //2
-					142, 151, //2
-					143, 152, //2
-					144, 153, //2
-					145, 154, //2
-					146, 155, //2
+					102, 103,	//2
+					104, 105,	//2
+					106, 107,	//2
+					108, 109,	//2
+					110, 111,	//2
+					112, 113,	//2
+					114, 115,	//2
+					116, 117,	//2
+					118, 119,	//2
 				],
 				vLedNames :
 				[
@@ -565,7 +565,7 @@ export class deviceLibrary {
 				endpoint : { "interface": 3, "usage": 0x0000, "usage_page": 0x0001 },
 				DeviceType : "Keyboard",
 				NumberOfLEDs : 59, // This doesn't really represent the amount of LEDs on the board, number get from USB Captures
-				LEDsPerPacket : 17,
+				LEDsPerPacket : 18,
 				image: "https://assets.signalrgb.com/devices/brands/razer/keyboards/blackwidow-v4-75.png"
 			},
 			"Huntsman V3 Pro" :
@@ -637,7 +637,7 @@ export class deviceLibrary {
 				endpoint : { "interface": 3, "usage": 0x0001, "usage_page": 0x000C },
 				DeviceType : "Keyboard",
 				NumberOfLEDs : 68, // This doesn't really represent the amount of LEDs on the board, number get from USB Captures
-				LEDsPerPacket : 21,
+				LEDsPerPacket : 22,
 				image: "https://assets.signalrgb.com/devices/brands/razer/keyboards/huntsman-v3-pro-tkl.png"
 			},
 			"Huntsman V3 Pro Mini" :
@@ -1658,8 +1658,8 @@ export class RazerProtocol {
 		return -1;
 	}
 	/** Function to set a modern keyboard's led colors.*/
-	setKeyboardDeviceColor(NumberOfLEDs, LEDsPerPacket, RGBData, packetidx) {
-		this.StandardPacketSend([(NumberOfLEDs), 0x0F, 0x03, 0x00, 0x00, packetidx, 0x00, LEDsPerPacket].concat(RGBData));
+	setKeyboardDeviceColor(LEDsPerPacket, RGBData, packetidx) {
+		this.StandardPacketSend([(LEDsPerPacket * 3) + 5, 0x0F, 0x03, 0x00, 0x00, packetidx, 0x00, LEDsPerPacket - 1].concat(RGBData));
 	}
 }
 
