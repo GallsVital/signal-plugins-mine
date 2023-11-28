@@ -106,5 +106,5 @@ export function Validate(endpoint) {
 }
 
 export function ImageUrl(){
-	return "https://marketplace.signalrgb.com/devices/brands/roccat/audio/elo-7-1-usb.png";
+	return "https://assets.signalrgb.com/devices/brands/roccat/audio/elo-7-1-usb.png";
 }

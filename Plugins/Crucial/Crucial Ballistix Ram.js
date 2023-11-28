@@ -344,5 +344,5 @@ function hexToRgb(hex) {
 }
 
 export function ImageUrl(){
-	return "https://marketplace.signalrgb.com/devices/brands/crucial/ram/ballistix-rgb.png";
+	return "https://assets.signalrgb.com/devices/brands/crucial/ram/ballistix-rgb.png";
 }

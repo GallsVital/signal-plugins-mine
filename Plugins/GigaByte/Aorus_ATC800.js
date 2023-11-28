@@ -297,5 +297,5 @@ function arraysEquals(a1, a2) {
 }
 
 export function ImageUrl(){
-	return "https://marketplace.signalrgb.com/devices/brands/gigabyte/other/atc800.png";
+	return "https://assets.signalrgb.com/devices/brands/gigabyte/other/atc800.png";
 }

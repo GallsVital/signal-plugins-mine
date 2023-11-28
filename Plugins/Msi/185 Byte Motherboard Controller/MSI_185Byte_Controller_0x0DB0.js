@@ -96,9 +96,19 @@ class MysticLight {
 
 		this.ConfigurationOverrides =
 		{
-
+			"MPG Z790 EDGE TI MAX WIFI (MS-7E25)":
+			{
+				OnboardLEDs    : 6,
+				RGBHeaders     : 1,
+				ARGBHeaders    : 3,
+				JPipeLEDs	   : 0,
+				CorsairHeaders : 0,
+				//PERLED
+				PerLEDOnboardLEDs : 0,
+				ForceZoneBased	  : false,
+				JARGB_V2		  : true,
+			},
 		};
-
 
 		this.Library =
 		{
@@ -926,5 +936,5 @@ class MysticLight {
 const MSIMotherboard = new MysticLight();
 
 export function ImageUrl() {
-	return "https://marketplace.signalrgb.com/devices/brands/msi/motherboards/motherboard.png";
+	return "https://assets.signalrgb.com/devices/brands/msi/motherboards/motherboard.png";
 }

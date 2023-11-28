@@ -49,7 +49,6 @@ plugin validate:
     when: always
     name: "Javascript Plugins"
     paths:
-      - Components/**/*.json
       - Plugins/**/*.js
       - Plugins/**/*.qml
     exclude:

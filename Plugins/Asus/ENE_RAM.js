@@ -698,5 +698,5 @@ function hexToRgb(hex) {
 }
 
 export function ImageUrl() {
-	return "https://marketplace.signalrgb.com/devices/default/ram.png";
+	return "https://assets.signalrgb.com/devices/default/ram.png";
 }

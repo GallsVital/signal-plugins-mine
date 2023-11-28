@@ -425,5 +425,5 @@ class ASUSLegacyGPUList{
 }
 
 export function ImageUrl() {
-	return "https://marketplace.signalrgb.com/devices/default/gpu.png";
+	return "https://assets.signalrgb.com/devices/default/gpu.png";
 }

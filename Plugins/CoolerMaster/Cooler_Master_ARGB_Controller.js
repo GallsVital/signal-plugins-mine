@@ -204,7 +204,7 @@ export function Validate(endpoint) {
 }
 
 export function ImageUrl(){
-	return "https://marketplace.signalrgb.com/devices/brands/coolermaster/lighting-controllers/argb-controller-gen1.png";
+	return "https://assets.signalrgb.com/devices/brands/coolermaster/lighting-controllers/argb-controller-gen1.png";
 }
 
 const RGB_Header = {
