@@ -689,7 +689,7 @@ export class deviceLibrary {
 				endpoint : { "interface": 3, "usage": 0x0001, "usage_page": 0x000C },
 				DeviceType : "Keyboard",
 				NumberOfLEDs : 68, // This doesn't really represent the amount of LEDs on the board, number get from USB Captures
-				LEDsPerPacket : 22,
+				LEDsPerPacket : 23,
 				image: "https://assets.signalrgb.com/devices/brands/razer/keyboards/huntsman-v3-pro-tkl.png"
 			},
 			"Huntsman V3 Pro Mini" :
@@ -819,6 +819,8 @@ export class RazerProtocol {
 			DeviceLEDPositions : [],
 			/** Variable that holds current device's LED vKeys. */
 			DeviceLedIndexes : [],
+			/** Variable that holds current device's layout. */
+			DeviceLayout : 0,
 			/** Variable that holds the current device's Product ID. */
 			DeviceProductId : 0x00,
 			/** Dict for button inputs to map them with names and things. */
@@ -912,6 +914,7 @@ export class RazerProtocol {
 			this.setNumberOfLEDsPacket(layout.LEDsPerPacket);
 			this.setDeviceProductId(device.productId()); //yay edge cases!
 			this.setDeviceImage(layout.image);
+			this.getDeviceLayout();
 
 			if(layout.vKeys) {
 				this.setDeviceLEDIndexes(layout.vKeys);
@@ -1302,6 +1305,39 @@ export class RazerProtocol {
 			device.log("Current Device Mode: " + this.DeviceModes[deviceMode]);
 
 			return deviceMode;
+		}
+
+		return -1;
+	}
+	getDeviceLayout(retryAttempts = 5){
+		let errorCode = 0;
+		let returnPacket = [];
+		let attempts = 0;
+
+		do {
+			 [returnPacket, errorCode] = this.ConfigPacketSend([0x02, 0x00, 0x86]);
+
+			 if(errorCode !== 2) {
+				device.pause(10);
+				attempts++;
+			 }
+		}
+
+		while(errorCode !== 2 && attempts < retryAttempts);
+
+		if (errorCode !== 2) {
+
+			device.log("Error fetching Device Layout. Error Code: " + this.DeviceResponses[errorCode], { toFile: true });
+
+			return -1;
+		}
+
+		if (returnPacket !== undefined) {
+			const layoutMode = returnPacket[0];
+			device.log("Current Layout: " + layoutMode);
+			this.Config.DeviceLayout = layoutMode;
+
+			return layoutMode;
 		}
 
 		return -1;
