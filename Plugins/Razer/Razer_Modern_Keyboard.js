@@ -565,7 +565,7 @@ export class deviceLibrary {
 				endpoint : { "interface": 3, "usage": 0x0000, "usage_page": 0x0001 },
 				DeviceType : "Keyboard",
 				NumberOfLEDs : 59, // This doesn't really represent the amount of LEDs on the board, number get from USB Captures
-				LEDsPerPacket : 18,
+				LEDsPerPacket : 17,
 				image: "https://assets.signalrgb.com/devices/brands/razer/keyboards/blackwidow-v4-75.png"
 			},
 			"Huntsman V3 Pro" :
@@ -636,7 +636,7 @@ export class deviceLibrary {
 				],
 				endpoint : { "interface": 3, "usage": 0x0001, "usage_page": 0x000C },
 				DeviceType : "Keyboard",
-				NumberOfLEDs : 71, // This doesn't really represent the amount of LEDs on the board, number get from USB Captures
+				NumberOfLEDs : 68, // This doesn't really represent the amount of LEDs on the board, number get from USB Captures
 				LEDsPerPacket : 21,
 				image: "https://assets.signalrgb.com/devices/brands/razer/keyboards/huntsman-v3-pro-tkl.png"
 			},
