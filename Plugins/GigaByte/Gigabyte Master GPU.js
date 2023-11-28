@@ -772,6 +772,7 @@ class GigabyteMasterDeviceIds {
 
 		this.RTX3080_XTREME_WATERFORCE       = 0x4038;
 		this.RTX3080_XTREME_WATERFORCE_10G	 = 0x4037;
+		this.RTX3080_XTREME_WATERFORCE_12G	 = 0x40A4;
 
 		this.RTX3080TI_XTREME_WATERFORCE_12G = 0x4082;
 
@@ -860,6 +861,7 @@ class GigabyteMasterGPuList {
 
 			new GigabyteMasterIdentifier(Nvidia.RTX3080,        GigabyteMasterIds.RTX3080_XTREME_WATERFORCE,   		0x64, "GIGABYTE 3080 AORUS XTREME Waterforce 10GB"),
 			new GigabyteMasterIdentifier(Nvidia.RTX3080,        GigabyteMasterIds.RTX3080_XTREME_WATERFORCE_10G,	0x65, "GIGABYTE 3080 AORUS XTREME Waterforce 10GB"),
+			new GigabyteMasterIdentifier(Nvidia.RTX3080,        GigabyteMasterIds.RTX3080_XTREME_WATERFORCE_12G,	0x65, "GIGABYTE 3080 AORUS XTREME Waterforce 12GB"),
 
 			new GigabyteMasterIdentifier(Nvidia.RTX3080_LHR,    GigabyteMasterIds.RTX3080_XTREME_WATERFORCE_10G,	0x65, "GIGABYTE 3080 AORUS XTREME Waterforce 10GB"),
 			new GigabyteMasterIdentifier(Nvidia.RTX3080_LHR,	GigabyteMasterIds.RTX3080_XTREME_WATERFORCE,		0x64, "GIGABYTE 3080 AORUS XTREME Waterforce 10GB LHR"),
