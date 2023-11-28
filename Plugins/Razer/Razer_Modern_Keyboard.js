@@ -173,7 +173,6 @@ function grabLighting(overrideColor) {
 	const RGBData = [];
 	const vLedPositions = Razer.getDeviceLEDPositions();
 	const vKeys = Razer.getDeviceLEDIndexes();
-	const LEDsTotal = Razer.getNumberOfLEDs();
 	const LEDsPerPacket = Razer.getNumberOfLEDsPacket();
 	const packetsTotal = Math.ceil(vKeys.length / LEDsPerPacket);
 
@@ -246,7 +245,7 @@ export class deviceLibrary {
 				size : [23, 7],
 				vKeys :
 				[
-					2,   4,   5,   6,   7,   8,  9,   10,  11,  12,  13,  14,  15,       16,  17,  18, //21
+					1,   4,   5,   6,   7,   8,  9,   10,  11,  12,  13,  14,  15,       16,  17,  18, //21
 					25,  26,  27,  28,  29,  30,  31,  32,  33,  34,  35,  36,  37,  38,  39,  40,  41,   42,  43,  44,  45,	//22
 					48,  49,  50,  51,  52,  53,  54,  55,  56,  57,  58,  59,  60,  61,	62,  63,  64,   65,  66,  67,  68,	//22
 					71,  72,  73,  74,  75,  76,  77,  78,  79,  80,  81,  82,       84,					88,  89,  90,		//17
@@ -273,7 +272,6 @@ export class deviceLibrary {
 				],
 				endpoint : { "interface": 2, "usage": 0x0002, "usage_page": 0x0001 },
 				DeviceType : "Keyboard",
-				NumberOfLEDs : 74, // This doesn't really represent the amount of LEDs on the board, number get from USB Captures
 				LEDsPerPacket : 21,
 				image: "https://assets.signalrgb.com/devices/brands/razer/keyboards/blackwidow-elite.png"
 			},
@@ -309,7 +307,6 @@ export class deviceLibrary {
 				],
 				endpoint : { "interface": 3, "usage": 0x0000, "usage_page": 0x0001 },
 				DeviceType : "Keyboard",
-				NumberOfLEDs : 74, // This doesn't really represent the amount of LEDs on the board, number get from USB Captures
 				LEDsPerPacket : 22,
 				image: "https://assets.signalrgb.com/devices/brands/razer/keyboards/blackwidow-v3.png"
 			},
@@ -350,7 +347,6 @@ export class deviceLibrary {
 				],
 				endpoint : { "interface": 3, "usage": 0x0001, "usage_page": 0x000C },
 				DeviceType : "Keyboard",
-				NumberOfLEDs : 74, // This doesn't really represent the amount of LEDs on the board, number get from USB Captures
 				LEDsPerPacket : 15,
 				image: "https://assets.signalrgb.com/devices/brands/razer/keyboards/blackwidow-v3-mini.png"
 			},
@@ -417,7 +413,6 @@ export class deviceLibrary {
 				],
 				endpoint : { "interface": 3, "usage": 0x0000, "usage_page": 0x0001 },
 				DeviceType : "Keyboard",
-				NumberOfLEDs : 74, // This doesn't really represent the amount of LEDs on the board, number get from USB Captures
 				LEDsPerPacket : 23,
 				image: "https://assets.signalrgb.com/devices/brands/razer/keyboards/blackwidow-v4.png"
 			},
@@ -475,7 +470,6 @@ export class deviceLibrary {
 				],
 				endpoint : { "interface": 3, "usage": 0x0000, "usage_page": 0x0001 },
 				DeviceType : "Keyboard",
-				NumberOfLEDs : 74, // This doesn't really represent the amount of LEDs on the board, number get from USB Captures
 				LEDsPerPacket : 23,
 				image: "https://assets.signalrgb.com/devices/brands/razer/keyboards/blackwidow-v4-x.png"
 			},
@@ -535,7 +529,6 @@ export class deviceLibrary {
 				],
 				endpoint : { "interface": 3, "usage": 0x0000, "usage_page": 0x0001 },
 				DeviceType : "Keyboard",
-				NumberOfLEDs : 74, // This doesn't really represent the amount of LEDs on the board, number get from USB Captures
 				LEDsPerPacket : 23,
 				image: "https://assets.signalrgb.com/devices/brands/razer/keyboards/blackwidow-v4-pro.png"
 			},
@@ -602,7 +595,6 @@ export class deviceLibrary {
 				],
 				endpoint : { "interface": 3, "usage": 0x0000, "usage_page": 0x0001 },
 				DeviceType : "Keyboard",
-				NumberOfLEDs : 59, // This doesn't really represent the amount of LEDs on the board, number get from USB Captures
 				LEDsPerPacket : 18,
 				image: "https://assets.signalrgb.com/devices/brands/razer/keyboards/blackwidow-v4-75.png"
 			},
@@ -653,7 +645,6 @@ export class deviceLibrary {
 				],
 				endpoint : { "interface": 3, "usage": 0x0000, "usage_page": 0x0001 },
 				DeviceType : "Keyboard",
-				NumberOfLEDs : 74, // This doesn't really represent the amount of LEDs on the board, number get from USB Captures (ledsperpacket * 3) +5
 				LEDsPerPacket : 23,
 				image: "https://assets.signalrgb.com/devices/brands/razer/keyboards/huntsman-v2%20-%20analog.png"
 			},
@@ -689,7 +680,6 @@ export class deviceLibrary {
 				],
 				endpoint : { "interface": 3, "usage": 0x0000, "usage_page": 0x0001 },
 				DeviceType : "Keyboard",
-				NumberOfLEDs : 74, // This doesn't really represent the amount of LEDs on the board, number get from USB Captures
 				LEDsPerPacket : 23,
 				image: "https://assets.signalrgb.com/devices/brands/razer/keyboards/huntsman-v3-pro.png"
 			},
@@ -725,8 +715,7 @@ export class deviceLibrary {
 				],
 				endpoint : { "interface": 3, "usage": 0x0001, "usage_page": 0x000C },
 				DeviceType : "Keyboard",
-				NumberOfLEDs : 68, // This doesn't really represent the amount of LEDs on the board, number get from USB Captures
-				LEDsPerPacket : 23,
+				LEDsPerPacket : 22,
 				image: "https://assets.signalrgb.com/devices/brands/razer/keyboards/huntsman-v3-pro-tkl.png"
 			},
 			"Huntsman V3 Pro Mini" :
@@ -760,7 +749,6 @@ export class deviceLibrary {
 				],
 				endpoint : { "interface": 3, "usage": 0x0001, "usage_page": 0x000C },
 				DeviceType : "Keyboard",
-				NumberOfLEDs : 74, // This doesn't really represent the amount of LEDs on the board, number get from USB Captures
 				LEDsPerPacket : 15,
 				image: "https://assets.signalrgb.com/devices/brands/razer/keyboards/huntsman-v3-pro-mini.png"
 			},
@@ -834,8 +822,6 @@ export class RazerProtocol {
 			AdditionalDeviceFirmwareVersions: [],
 			/** @type {string[]} Stored Serials for Hyperspeed dongles. */
 			AdditionalDeviceSerialNumbers: [],
-			/** Variable to indicate how many LEDs a device has according to USB Captures, used in the color send packet for keyboards. */
-			NumberOfLEDs: -1,
 			/** Variable to indicate how many leds should be sent per packet. */
 			LEDsPerPacket: -1,
 			/** Variable to indicate what type of device is connected. */
@@ -920,11 +906,6 @@ export class RazerProtocol {
 	getSupportsModernMatrix() { return this.Config.supportsModernMatrix; }
 	setSupportsModernMatrix(supportsModernMatrix) { this.Config.supportsModernMatrix = supportsModernMatrix; }
 
-	/** Function for getting the number of LEDs a device has on it.*/
-	getNumberOfLEDs() { return this.Config.NumberOfLEDs; }
-	/** Function for setting the number of LEDs a device has on it.*/
-	setNumberOfLEDs(NumberOfLEDs) { this.Config.NumberOfLEDs = NumberOfLEDs; }
-
 	/** Function for setting the number of LEDs a device has to send on each packet */
 	getNumberOfLEDsPacket() { return this.Config.LEDsPerPacket; }
 	/** Function for setting device led per packet properties.*/
@@ -947,7 +928,6 @@ export class RazerProtocol {
 
 			this.setDeviceLEDNames(layout.vLedNames);
 			this.setDeviceLEDPositions(layout.vLedPositions);
-			this.setNumberOfLEDs(layout.NumberOfLEDs);
 			this.setNumberOfLEDsPacket(layout.LEDsPerPacket);
 			this.setDeviceProductId(device.productId()); //yay edge cases!
 			this.setDeviceImage(layout.image);
