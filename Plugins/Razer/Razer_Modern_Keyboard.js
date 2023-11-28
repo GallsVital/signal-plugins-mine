@@ -225,6 +225,7 @@ export class deviceLibrary {
 
 		this.PIDLibrary =
 		{
+			0x0228 : "Blackwidow Elite",
 			0x024E : "Blackwidow V3", // Quartz
 			0x0271 : "Blackwidow V3 Mini",
 			0x0258 : "Blackwidow V3 Mini",
@@ -240,6 +241,42 @@ export class deviceLibrary {
 
 		this.LEDLibrary = //I'm tired of not being able to copy paste between files.
 		{
+			"Blackwidow Elite" :
+			{
+				size : [23, 7],
+				vKeys :
+				[
+					2,   4,   5,   6,   7,   8,  9,   10,  11,  12,  13,  14,  15,       16,  17,  18, //21
+					25,  26,  27,  28,  29,  30,  31,  32,  33,  34,  35,  36,  37,  38,  39,  40,  41,   42,  43,  44,  45,	//22
+					48,  49,  50,  51,  52,  53,  54,  55,  56,  57,  58,  59,  60,  61,	62,  63,  64,   65,  66,  67,  68,	//22
+					71,  72,  73,  74,  75,  76,  77,  78,  79,  80,  81,  82,       84,					88,  89,  90,		//17
+					94,  96,  97,  98,  99,  100, 101, 102, 103, 104, 105, 107,     			 109,		111, 112, 113, 114,	//18
+					117, 118, 119,                123,                127, 128, 129, 130, 131, 132, 133,	135,	  136,		//14
+				],
+				vLedNames :
+				[
+					"Esc", "F1", "F2", "F3", "F4", "F5", "F6", "F7", "F8", "F9", "F10", "F11", "F12",		"Print Screen", "Scroll Lock", "Pause Break",					//21
+					"`", "1",  "2", "3", "4", "5",  "6", "7", "8", "9", "0",  "-",   "+",  "Backspace",		"Insert",       "Home",        "Page Up",		"NumLock", "Num /", "Num *", "Num -",		//22
+					"Tab", "Q", "W", "E", "R", "T", "Y", "U", "I", "O", "P", "[", "]", "\\",				"Del",          "End",         "Page Down",		"Num 7", "Num 8", "Num 9", "Num +",		//22
+					"CapsLock", "A", "S", "D", "F", "G", "H", "J", "K", "L", ";", "'", "Enter",																"Num 4", "Num 5", "Num 6",				//17
+					"Left Shift", "Z", "X", "C", "V", "B", "N", "M", ",", ".", "/", "Right Shift",                   	   "Up Arrow",						"Num 1", "Num 2", "Num 3", "Num Enter",	//18
+					"Left Ctrl", "Left Win", "Left Alt", "Space", "Right Alt", "Fn", "Menu", "Right Ctrl",	"Left Arrow",  "Down Arrow", "Right Arrow",		"Num 0", "Num .",							//14
+				],
+				vLedPositions :
+				[
+					[0, 0], 		[2, 0], [3, 0], [4, 0], [5, 0], [6, 0], [7, 0], [8, 0], [9, 0], [10, 0], [11, 0], [12, 0], [13, 0],   [14, 0], [15, 0],	[16, 0],	//21
+					[0, 1], [1, 1], [2, 1], [3, 1], [4, 1], [5, 1], [6, 1], [7, 1], [8, 1], [9, 1], [10, 1], [11, 1], [12, 1], [13, 1],   [14, 1], [15, 1], [16, 1],	[17, 1], [18, 1], [19, 1], [20, 1],	//22
+					[0, 2], [1, 2], [2, 2], [3, 2], [4, 2], [5, 2], [6, 2], [7, 2], [8, 2], [9, 2], [10, 2], [11, 2], [12, 2], [13, 2],   [14, 2], [15, 2], [16, 2],	[17, 2], [18, 2], [19, 2], [20, 2],	//22
+					[0, 3], [1, 3], [2, 3], [3, 3], [4, 3], [5, 3], [6, 3], [7, 3], [8, 3], [9, 3], [10, 3], [11, 3], 		   [13, 3],									[17, 3], [18, 3], [19, 3],			//17
+					[0, 4], 		[2, 4], [3, 4], [4, 4], [5, 4], [6, 4], [7, 4], [8, 4], [9, 4], [10, 4], [11, 4],          [13, 4],            [15, 4],				[17, 4], [18, 4], [19, 4], [20, 4],	//18
+					[0, 5], [1, 5], [2, 5],                 		[6, 5],                       	[10, 5], [11, 5], [12, 5], [13, 5],   [14, 5], [15, 5], [16, 5],	[17, 5],		  [19, 5],			//14
+				],
+				endpoint : { "interface": 2, "usage": 0x0002, "usage_page": 0x0001 },
+				DeviceType : "Keyboard",
+				NumberOfLEDs : 74, // This doesn't really represent the amount of LEDs on the board, number get from USB Captures
+				LEDsPerPacket : 21,
+				image: "https://assets.signalrgb.com/devices/brands/razer/keyboards/blackwidow-elite.png"
+			},
 			"Blackwidow V3" :
 			{
 				size : [25, 9],
