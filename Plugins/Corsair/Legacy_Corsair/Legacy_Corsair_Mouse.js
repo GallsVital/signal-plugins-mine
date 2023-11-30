@@ -540,8 +540,8 @@ export class LegacyCorsairProtocol {
 			18 : 109,
 			19 : 107,
 			20 : 0,
-			24 : 0,
-			25 : 0
+			24 : 106,
+			25 : 108
 		};
 	}
 
@@ -581,6 +581,7 @@ export class LegacyCorsairProtocol {
 		}
 
 		if(config.maxDPI) {
+			device.log(`Setting Max DPI Based on Config: ${config.maxDPI}`);
 			this.setMaxDPI(config.maxDPI);
 		}
 
@@ -769,7 +770,7 @@ export class LegacyCorsairProtocol {
 		}
 
 		device.addFeature("mouse");
-		//device.addFeature("keyboard");
+		device.addFeature("keyboard");
 	}
 	/** Configure the device based on the dictionary and data gathered in Device Initialization. */
 	configureDevice() {
@@ -1147,14 +1148,16 @@ class BitArray {
 
 				default: {
 					const buttonName = LegacyCorsair.getPressedKey(bitIdx);
+					device.log(`Button Pressed: ${buttonName}`);
+
 					const eventData = {
 						"buttonCode": 0,
 						"released": !isPressed,
 						"name":buttonName
 					};
 
-					mouse.sendEvent(eventData, "Button Press");
-					//keyboard.sendHid(LegacyCorsair.getKeycode(bitIdx), {released : !isPressed}); //handler for no macro sys.
+					//mouse.sendEvent(eventData, "Button Press");
+					keyboard.sendHid(LegacyCorsair.getKeycode(bitIdx), {released : !isPressed}); //handler for no macro sys.
 				}
 				}
 			}
