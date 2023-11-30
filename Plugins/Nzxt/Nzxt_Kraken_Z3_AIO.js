@@ -1,7 +1,7 @@
 export function Name() { return "NZXT Kraken Z3"; }
 export function VendorId() { return 0x1E71; }
 export function Documentation(){ return "troubleshooting/nzxt"; }
-export function ProductId() { return [0x3008, 0x300C]; } // 0x300C is Kraken Elite
+export function ProductId() { return 0x3008; }
 export function Publisher() { return "WhirlwindFX"; }
 export function Size() { return [4, 4]; }
 export function DefaultPosition(){return [165, 60];}
@@ -20,6 +20,7 @@ export function ControllableParameters(){
 }
 
 export function DefaultComponentBrand() { return "NZXT";}
+export function SupportsFanControl(){ return true; }
 
 const DeviceMaxLedLimit = 40;
 const MinimumSpeed = 25;
@@ -33,6 +34,7 @@ let Pump_Speed;
 let Fan_RPM;
 let Fan_Speed;
 let Liquid_Temp;
+let ConnectedProbes = [];
 
 function SetupChannels(){
 	device.SetLedLimit(DeviceMaxLedLimit);
@@ -79,6 +81,19 @@ function PollFans() {
 	}
 
 	getStatus();//Grab all of our RPM's and make sure stuff is connected.
+
+	if(device.fanControlDisabled()){
+		return;
+	} // This catches the fanMode prop not being present.
+
+	if(!ConnectedProbes.includes(0) && Liquid_Temp !== 0){
+		ConnectedProbes.push(0);
+		device.createTemperatureSensor(`Liquid Temperature`);
+	}
+
+	if(Liquid_Temp !== 0) {
+		device.SetTemperature(`Liquid Temperature`, Liquid_Temp);
+	}
 
 	const pump = 1;
 	const pumprpm = Pump_RPM;
