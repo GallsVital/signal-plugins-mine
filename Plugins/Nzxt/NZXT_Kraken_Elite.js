@@ -1,32 +1,22 @@
-export function Name() { return "NZXT Kraken Z3"; }
+export function Name() { return "NZXT Kraken Elite"; }
 export function VendorId() { return 0x1E71; }
 export function Documentation(){ return "troubleshooting/nzxt"; }
-export function ProductId() { return 0x3008; }
+export function ProductId() { return 0x300C; } // 0x300C is Kraken Elite
 export function Publisher() { return "WhirlwindFX"; }
 export function Size() { return [4, 4]; }
 export function DefaultPosition(){return [165, 60];}
 export function DefaultScale(){return 7.0;}
 /* global
-shutdownColor:readonly
-LightingMode:readonly
-forcedColor:readonly
 */
 export function ControllableParameters(){
-	return [
-		{"property":"shutdownColor", "group":"lighting", "label":"Shutdown Color", "min":"0", "max":"360", "type":"color", "default":"#009bde"},
-		{"property":"LightingMode", "group":"lighting", "label":"Lighting Mode", "type":"combobox", "values":["Canvas", "Forced"], "default":"Canvas"},
-		{"property":"forcedColor", "group":"lighting", "label":"Forced Color", "min":"0", "max":"360", "type":"color", "default":"#009bde"},
-	];
+	return [ ];
 }
 
-export function DefaultComponentBrand() { return "NZXT";}
 export function SupportsFanControl(){ return true; }
 
-const DeviceMaxLedLimit = 40;
 const MinimumSpeed = 25;
 
 //Channel Name, Led Limit
-const ChannelArray = [ ["Channel 1", 40] ];
 const ConnectedFans = [];
 
 let Pump_RPM;
@@ -36,33 +26,15 @@ let Fan_Speed;
 let Liquid_Temp;
 let ConnectedProbes = [];
 
-function SetupChannels(){
-	device.SetLedLimit(DeviceMaxLedLimit);
-
-	for(let i = 0; i < ChannelArray.length; i++) {
-		device.addChannel(ChannelArray[i][0], ChannelArray[i][1]);
-	}
-}
-
 export function Initialize() {
-	SetupChannels();
 	BurstFans();
 }
 
 export function Render() {
 	PollFans();
-	sendchannel1Colors(0);
 }
 
 export function Shutdown(SystemSuspending) {
-
-	if(SystemSuspending){
-		sendchannel1Colors(0, "#000000"); // Go Dark on System Sleep/Shutdown
-
-	}else{
-		sendchannel1Colors(0, shutdownColor);
-	}
-
 }
 
 let savedPollFanTimer = Date.now();
@@ -184,54 +156,6 @@ function setPumpSpeed(speed) {
 	}
 
 	device.log(`Setting Kraken Pump to ${Math.round(speed)}% `);
-	device.write(packet, 64);
-}
-
-function StreamLightingPacketChanneled(count, data, channel) {
-
-	let packetNumber = 0;
-	let totalLedCount = count;
-
-	for(packetNumber = 0; packetNumber < 2; packetNumber++ ) {
-		const ledsToSend = totalLedCount >= 60 ? 60 : totalLedCount;
-		totalLedCount -= ledsToSend;
-
-		const packet = [0x22, 0x10 | packetNumber, 0x01 << channel, 0x00];
-		packet.push(...data.splice(0, ledsToSend));
-
-		device.write(packet, 64);
-	}
-}
-
-function sendchannel1Colors(Channel, overrideColor) {
-	let ChannelLedCount = device.channel(ChannelArray[Channel][0]).LedCount();
-	const componentChannel = device.channel(ChannelArray[Channel][0]);
-
-	if(!ChannelLedCount) {
-		return;
-	}
-	let RGBData = [];
-
-	if(overrideColor){
-		RGBData = device.createColorArray(overrideColor, ChannelLedCount, "Inline", "GRB");
-	}else if(LightingMode == "Forced") {
-		RGBData = device.createColorArray(forcedColor, ChannelLedCount, "Inline", "GRB");
-	} else if(componentChannel.shouldPulseColors()) {
-
-		ChannelLedCount = 40;
-
-		const pulseColor = device.getChannelPulseColor(ChannelArray[Channel][0]);
-		RGBData = device.createColorArray(pulseColor, ChannelLedCount, "Inline", "GRB");
-	} else {
-		RGBData = device.channel(ChannelArray[Channel][0]).getColors("Inline", "GRB");
-	}
-
-	StreamLightingPacketChanneled(ChannelLedCount*3, RGBData, Channel);
-	SubmitLightingColors(Channel);
-}
-
-function SubmitLightingColors(channel) {
-	const packet = [0x22, 0xA0, 1 << channel, 0x00, 0x01, 0x00, 0x00, 0x28, 0x00, 0x00, 0x80, 0x00, 0x32, 0x00, 0x00, 0x01];
 	device.write(packet, 64);
 }
 
