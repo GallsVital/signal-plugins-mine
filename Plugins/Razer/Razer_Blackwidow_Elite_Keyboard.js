@@ -152,7 +152,9 @@ function SendPacket(idx, shutdown = false) {
 			col = hexToRgb(forcedColor);
 		}else{
 			col = device.color(iIdx, idx);
-		}            const iLedIdx = (iIdx*3) + 14;
+		}
+
+		const iLedIdx = (iIdx*3) + 14;
 		packet[iLedIdx] = col[0];
 		packet[iLedIdx+1] = col[1];
 		packet[iLedIdx+2] = col[2];
@@ -190,9 +192,6 @@ export function Render() {
 	SendPacket(3);
 	SendPacket(4);
 	SendPacket(5);
-	SendPacket(6);
-	SendPacket(7);
-	SendPacket(8);
 
 }
 
@@ -204,9 +203,6 @@ export function Shutdown() {
 	SendPacket(3, true);
 	SendPacket(4, true);
 	SendPacket(5, true);
-	SendPacket(6, true);
-	SendPacket(7, true);
-	SendPacket(8, true);
 }
 
 export function Validate(endpoint) {
