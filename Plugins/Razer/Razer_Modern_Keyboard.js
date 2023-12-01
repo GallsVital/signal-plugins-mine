@@ -460,9 +460,9 @@ export class deviceLibrary {
 					[0, 12], [1, 12], [3, 12], [5, 12], [7, 12], [9, 12], [11, 12], [13, 12], [15, 12], [17, 12], [19, 12], [21, 12], [23, 12], [24, 12]
 
 				],
-				endpoint : { "interface": 1, "usage": 0x0001, "usage_page": 0x000C },
+				endpoint : { "interface": 2, "usage": 0x0002, "usage_page": 0x0001 },
 				DeviceType : "Keyboard",
-				LEDsPerPacket : 23,
+				LEDsPerPacket : 21,
 				image: "https://assets.signalrgb.com/devices/brands/razer/keyboards/blackwidow-v4-x.png"
 			},
 			"Blackwidow V4 Pro" :
