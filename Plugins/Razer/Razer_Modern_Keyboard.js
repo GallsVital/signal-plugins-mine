@@ -24,14 +24,6 @@ export function ControllableParameters() {
 	];
 }
 
-/*
-V4 Working
-V4 X -
-V4 Pro -
-V4 75 -
-Huntsman V3 Pro TKL - Flickering
-*/
-
 let savedPollTimer = Date.now();
 const PollModeInternal = 15000;
 let macroTracker;
@@ -229,7 +221,7 @@ export class deviceLibrary {
 			0x0271 : "Blackwidow V3 Mini",
 			0x0258 : "Blackwidow V3 Mini",
 			0x0287 : "Blackwidow V4",
-			//0x0000 : "Blackwidow V4 X",
+			0x0293 : "Blackwidow V4 X",
 			0x028D : "Blackwidow V4 Pro",
 			0x02A5 : "Blackwidow V4 75%",
 			0x0266 : "Huntsman V2 Analog",
@@ -468,7 +460,7 @@ export class deviceLibrary {
 					[0, 12], [1, 12], [3, 12], [5, 12], [7, 12], [9, 12], [11, 12], [13, 12], [15, 12], [17, 12], [19, 12], [21, 12], [23, 12], [24, 12]
 
 				],
-				endpoint : { "interface": 3, "usage": 0x0000, "usage_page": 0x0001 },
+				endpoint : { "interface": 1, "usage": 0x0001, "usage_page": 0x000C },
 				DeviceType : "Keyboard",
 				LEDsPerPacket : 23,
 				image: "https://assets.signalrgb.com/devices/brands/razer/keyboards/blackwidow-v4-x.png"
