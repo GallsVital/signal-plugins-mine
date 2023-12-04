@@ -297,5 +297,5 @@ function sendControlPacket(index, data, length) {
 }
 
 export function ImageUrl() {
-	return "https://marketplace.signalrgb.com/devices/brands/lian-li/fan-controllers/uni-hub-controller.png";
+	return "https://assets.signalrgb.com/devices/brands/lian-li/fan-controllers/uni-hub-controller.png";
 }

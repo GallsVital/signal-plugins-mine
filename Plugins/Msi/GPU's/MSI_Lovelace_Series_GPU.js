@@ -20,8 +20,14 @@ export function ControllableParameters() {
 	];
 }
 
+export function DeviceMessages() {
+	return [
+		{property: "Single Zone Control", message:"GPU is Limited to a Single Zone.", tooltip: "This device's firmware is limited to a single rgb zone while controlled directly."},
+	];
+}
+
 const vLedNames = [ "GPU" ];
-const vLedPositions = [ [0, 0]];
+const vLedPositions = [ [0, 0] ];
 
 let startupRed;
 let startupBlue;
@@ -234,6 +240,7 @@ class MSIGPUDeviceIDs {
 		this.RTX4060TI_GAMING_X_TRIO                 = 0x5152;
 
 		this.RTX4070_GAMING_X_TRIO 					 = 0x5136;
+		this.RTX4070_GAMING_X_SLIM 					 = 0x513F;
 
 		this.RTX4070TI_GAMING_X_TRIO				 = 0x5132;
 		this.RTX4070TI_SUPRIM_X						 = 0x5133;
@@ -248,6 +255,7 @@ class MSIGPUDeviceIDs {
 		this.RTX4090_SUPRIM_LIQUID_X                 = 0x5104;
 		this.RTX4090_SUPRIM_X_CLASSIC				 = 0x5105;
 		this.RTX4090_SUPRIM_X_CLASSIC_2				 = 0x5106;
+		this.RTX4090_GAMING_X_SLIM					 = 0x510B;
 	}
 }
 
@@ -259,18 +267,24 @@ class MSIGPUList {
 		this.devices =
         [
         	new MSIGPUIdentifier(Nvidia.RTX4060TI,	MSIGPUIDs.RTX4060TI_GAMING_X_TRIO,		0x68, "MSI 4060Ti GAMING X TRIO"),
+
         	new MSIGPUIdentifier(Nvidia.RTX4070,	MSIGPUIDs.RTX4070_GAMING_X_TRIO,		0x68, "MSI 4070 GAMING X TRIO",),
+        	new MSIGPUIdentifier(Nvidia.RTX4070,	MSIGPUIDs.RTX4070_GAMING_X_SLIM,		0x68, "MSI 4070 GAMING X SLIM",),
+
         	new MSIGPUIdentifier(Nvidia.RTX4070TI,	MSIGPUIDs.RTX4070TI_GAMING_X_TRIO,		0x68, "MSI 4070Ti GAMING X TRIO"),
         	new MSIGPUIdentifier(Nvidia.RTX4070TI,	MSIGPUIDs.RTX4070TI_GAMING_X_TRIO_W,	0x68, "MSI 4070Ti GAMING X TRIO White"),
         	new MSIGPUIdentifier(Nvidia.RTX4070TI,	MSIGPUIDs.RTX4070TI_SUPRIM_X,			0x68, "MSI 4070Ti SUPRIM X"),
+
         	new MSIGPUIdentifier(Nvidia.RTX4080,	MSIGPUIDs.RTX4080_SUPRIM,				0x68, "MSI 4080 SUPRIM"),
         	new MSIGPUIdentifier(Nvidia.RTX4080,	MSIGPUIDs.RTX4080_GAMING_X_TRIO,		0x68, "MSI 4080 GAMING X TRIO"),
         	new MSIGPUIdentifier(Nvidia.RTX4080,	MSIGPUIDs.RTX4080_GAMING_X_TRIO_W,		0x68, "MSI 4080 GAMING X TRIO White"),
+
         	new MSIGPUIdentifier(Nvidia.RTX4090,	MSIGPUIDs.RTX4090_GAMING_TRIO,			0x68, "MSI 4090 GAMING TRIO"),
         	new MSIGPUIdentifier(Nvidia.RTX4090,	MSIGPUIDs.RTX4090_SUPRIM_LIQUID_X,		0x68, "MSI 4090 SUPRIM LIQUID X"),
         	new MSIGPUIdentifier(Nvidia.RTX4090,	MSIGPUIDs.RTX4090_SUPRRIM_X,			0x68, "MSI 4090 SUPRIM X"),
         	new MSIGPUIdentifier(Nvidia.RTX4090,	MSIGPUIDs.RTX4090_SUPRIM_X_CLASSIC,		0x68, "MSI 4090 SUPRIM X Classic"),
-        	new MSIGPUIdentifier(Nvidia.RTX4090,	MSIGPUIDs.RTX4090_SUPRIM_X_CLASSIC_2,	0x68, "MSI 4090 SUPRIM X Classic")
+        	new MSIGPUIdentifier(Nvidia.RTX4090,	MSIGPUIDs.RTX4090_SUPRIM_X_CLASSIC_2,	0x68, "MSI 4090 SUPRIM X Classic"),
+        	new MSIGPUIdentifier(Nvidia.RTX4090,    MSIGPUIDs.RTX4090_GAMING_X_SLIM,		0x68, "MSI 4090 GAMING X SLIM")
         ];
 	}
 }
@@ -286,5 +300,5 @@ function hexToRgb(hex) {
 }
 
 export function ImageUrl() {
-	return "https://marketplace.signalrgb.com/devices/brands/msi/gpus/gpu.png";
+	return "https://assets.signalrgb.com/devices/brands/msi/gpus/gpu.png";
 }

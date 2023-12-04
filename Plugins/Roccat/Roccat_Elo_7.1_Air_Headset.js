@@ -183,5 +183,5 @@ export function Validate(endpoint) {
 
 
 export function ImageUrl(){
-	return "https://marketplace.signalrgb.com/devices/brands/roccat/audio/elo-7-1-air.png";
+	return "https://assets.signalrgb.com/devices/brands/roccat/audio/elo-7-1-air.png";
 }

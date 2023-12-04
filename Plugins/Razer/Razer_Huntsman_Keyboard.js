@@ -147,5 +147,5 @@ export function Validate(endpoint) {
 }
 
 export function ImageUrl(){
-	return "https://marketplace.signalrgb.com/devices/brands/razer/keyboards/huntsman-standard.png";
+	return "https://assets.signalrgb.com/devices/brands/razer/keyboards/huntsman-standard.png";
 }

@@ -20,6 +20,12 @@ export function ControllableParameters() {
 	];
 }
 
+export function DeviceMessages() {
+	return [
+		{property: "Single Zone Control", message:"GPU is Limited to a Single Zone.", tooltip: "This device's firmware is limited to a single rgb zone while controlled directly."},
+	];
+}
+
 const vLedNames = [ "GPU" ];
 const vLedPositions = [ [3, 1]];
 
@@ -331,6 +337,7 @@ class MSIGPUDeviceIDs {
 		this.MSI_RTX3080_SUPRIM_X                    = 0x3897;
 		this.MSI_RTX3080TI_GAMING_X_TRIO             = 0x389B;
 		this.MSI_RTX3090_GAMING_X_TRIO               = 0x3884;
+		this.MSI_RTX3090_GAMING_X_TRIO_2			 = 0x3885;
 		this.MSI_RTX3090_SUPRIM_X                    = 0x3882;
 		this.MSI_RTX3090TI_SUPRIX_X                  = 0x5090;
 		this.MSI_RTX3090TI_GAMING_TRIO               = 0x5091;
@@ -421,6 +428,7 @@ class MSIGPUList {
         	new MSIGPUIdentifier(Nvidia.RTX3080TI, 			MSIGPUIDs.MSI_RTX3080TI_GAMING_X_TRIO,				0x68, "MSI 3080Ti Gaming X Trio"),
         	new MSIGPUIdentifier(Nvidia.RTX3080TI, 			MSIGPUIDs.MSI_RTX3080_SUPRIM_X,						0x68, "MSI 3080Ti Suprim X"),
         	new MSIGPUIdentifier(Nvidia.RTX3090, 			MSIGPUIDs.MSI_RTX3090_GAMING_X_TRIO,				0x68, "MSI 3090 Gaming X Trio"),
+        	new MSIGPUIdentifier(Nvidia.RTX3090, 			MSIGPUIDs.MSI_RTX3090_GAMING_X_TRIO_2,				0x68, "MSI 3090 Gaming X Trio"),
         	new MSIGPUIdentifier(Nvidia.RTX3090, 			MSIGPUIDs.MSI_RTX3090_SUPRIM_X,						0x68, "MSI 3090 Suprim X"),
         	new MSIGPUIdentifier(Nvidia.RTX3090TI, 			MSIGPUIDs.MSI_RTX3090TI_SUPRIX_X,					0x68, "MSI 3090 TI Suprim X"), //Untested
         	new MSIGPUIdentifier(Nvidia.RTX3090TI, 			MSIGPUIDs.MSI_RTX3090TI_GAMING_TRIO,				0x68, "MSI 3090 TI Gaming Trio"), //Untested
@@ -439,5 +447,5 @@ function hexToRgb(hex) {
 }
 
 export function ImageUrl() {
-	return "https://marketplace.signalrgb.com/devices/brands/msi/gpus/gpu.png";
+	return "https://assets.signalrgb.com/devices/brands/msi/gpus/gpu.png";
 }

@@ -1190,6 +1190,18 @@ class MysticLight {
 				ForceZoneBased	  : false,
 				JARGB_V2		  : true,
 			},
+			0x7D94 : //Z790 Gaming Wifi
+			{
+				OnboardLEDs    : 0,
+				RGBHeaders     : 1,
+				ARGBHeaders    : 2,
+				JPipeLEDs	   : 0,
+				CorsairHeaders : 0,
+				//PERLED
+				PerLEDOnboardLEDs : 6,
+				ForceZoneBased	  : false,
+				JARGB_V2		  : true,
+			},
 			0x7D96 : //B760 Tomahawk Wifi
 			{
 				OnboardLEDs    : 0,
@@ -2100,5 +2112,5 @@ class MysticLight {
 const MSIMotherboard = new MysticLight();
 
 export function ImageUrl() {
-	return "https://marketplace.signalrgb.com/devices/brands/msi/motherboards/motherboard.png";
+	return "https://assets.signalrgb.com/devices/brands/msi/motherboards/motherboard.png";
 }

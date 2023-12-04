@@ -117,5 +117,5 @@ export function Validate(endpoint) {
 }
 
 export function ImageUrl() {
-	return "https://marketplace.signalrgb.com/devices/brands/razer/audio/nari-ultimate.png";
+	return "https://assets.signalrgb.com/devices/brands/razer/audio/nari-ultimate.png";
 }

@@ -374,6 +374,7 @@ class GigabyteVisionDeviceIds {
 		this.RTX4060TI_GAMING_OC_2			= 0x4112;
 		this.RTX4070_AERO					= 0x40E6;
 		this.RTX4070_EAGLE_OC				= 0x40ED;
+		this.RTX4070_WINDFORCE_OC			= 0x40EE;
 		this.RTX4070TI_GAMING_OC            = 0x40c6;
 		this.RTX4070TI_EAGLE_12G			= 0x40D2;
 		this.RTX4070TI_EAGLE_OC_12G			= 0x40CA;
@@ -416,101 +417,134 @@ class GigabyteVisionGPuList {
 		const GigabyteVisionIds  = new GigabyteVisionDeviceIds();
 
 		this.devices = [
-			new GigabyteVisionIdentifier(Nvidia.GTX1080TI,      GigabyteVisionIds.GTX1080TI_XTREME,              0x47, "GIGABYTE 1080Ti XTREME Edition"),
-			new GigabyteVisionIdentifier(Nvidia.GTX1080TI,      GigabyteVisionIds.GTX1080TI_GAMING_OC,     		 0x47, "GIGABYTE 1080Ti Gaming OC"),
-			new GigabyteVisionIdentifier(Nvidia.GTX1080TI,      GigabyteVisionIds.GTX1080TI_GAMING_OC_BLACK,     0x47, "GIGABYTE 1080Ti Gaming OC Black"),
+			new GigabyteVisionIdentifier(Nvidia.GTX1070,        GigabyteVisionIds.GTX1070_GAMING,				0x47, "GIGABYTE 1070 Gaming"),
+			new GigabyteVisionIdentifier(Nvidia.GTX1070,		GigabyteVisionIds.GTX1070_G1_GAMING,			0x48, "GIGABYTE 1070 G1 Gaming"),
+
+			new GigabyteVisionIdentifier(Nvidia.GTX1080,		GigabyteVisionIds.GTX1080_G1_GAMING,			0x48, "GIGABYTE 1080 G1 Gaming"), //Confirmed!
+
+			new GigabyteVisionIdentifier(Nvidia.GTX1080TI,      GigabyteVisionIds.GTX1080TI_AORUS_11G,			0x47, "GIGABYTE 1080Ti AORUS"), //Confirmed
+			new GigabyteVisionIdentifier(Nvidia.GTX1080TI,      GigabyteVisionIds.GTX1080TI_XTREME,				0x47, "GIGABYTE 1080Ti XTREME Edition"),
+			new GigabyteVisionIdentifier(Nvidia.GTX1080TI,      GigabyteVisionIds.GTX1080TI_GAMING_OC,			0x47, "GIGABYTE 1080Ti Gaming OC"),
+			new GigabyteVisionIdentifier(Nvidia.GTX1080TI,      GigabyteVisionIds.GTX1080TI_GAMING_OC_BLACK,	0x47, "GIGABYTE 1080Ti Gaming OC Black"),
 			new GigabyteVisionIdentifier(Nvidia.GTX1080TI,      GigabyteVisionIds.GTX1080TI_XTREME_WATERFORCE_2, 0x47, "GIGABYTE 1080Ti Waterforce Xtreme Edition"),
-			new GigabyteVisionIdentifier(Nvidia.GTX1660TI,      GigabyteVisionIds.GTX1660TI_GAMING_OC_6GB,       0x47, "GIGABYTE 1660Ti Gaming OC 6gb"),
-			new GigabyteVisionIdentifier(Nvidia.GTX1660,        GigabyteVisionIds.GTX1660_GAMING_OC_6GB,         0x47, "GIGABYTE 1660 Gaming OC 6gb"),
-			new GigabyteVisionIdentifier(Nvidia.GTX1660S,       GigabyteVisionIds.GTX1660S_GAMING_OC,            0x47, "GIGABYTE 1660 Super Gaming OC"),
-			new GigabyteVisionIdentifier(Nvidia.RTX2060S_OC,    GigabyteVisionIds.RTX2060S_GAMING_OC_3X_WHITE,   0x47, "GIGABYTE 2060 Super Gaming OC Windforce White"),
-			new GigabyteVisionIdentifier(Nvidia.RTX2070_OC,     GigabyteVisionIds.RTX2070_GAMING_OC,             0x47, "GIGABYTE 2070 Gaming OC"),
-			new GigabyteVisionIdentifier(Nvidia.RTX2070_OC,     GigabyteVisionIds.RTX2070_GAMING_OC_WHITE,		 0x47, "GIGABYTE 2070 Gaming OC White"),
-			new GigabyteVisionIdentifier(Nvidia.RTX2070_OC,		GigabyteVisionIds.RTX2070_XTREME_8G,			 0x50, "GIGABYTE 2070 XTREME OC 8G"),
-			new GigabyteVisionIdentifier(Nvidia.RTX2070S,       GigabyteVisionIds.RTX2070S_GAMING_OC,            0x47, "GIGABYTE 2070 Super Gaming OC"),
-			new GigabyteVisionIdentifier(Nvidia.RTX2070S,       GigabyteVisionIds.RTX2070S_GAMING_OC_3X,         0x47, "GIGABYTE 2070 Super Gaming OC 3x"),
-			new GigabyteVisionIdentifier(Nvidia.RTX2070S,       GigabyteVisionIds.RTX2070S_GAMING_OC_3X_WHITE,   0x47, "GIGABYTE 2070 Super Gaming OC 3x White Edition"),
-			new GigabyteVisionIdentifier(Nvidia.RTX2070S,       GigabyteVisionIds.RTX2070S_GAMING_WINDFORCE_OC,  0x47, "GIGABYTE 2070 Super Gaming OC Windforce 8GB"),
-			new GigabyteVisionIdentifier(Nvidia.RTX3050,        GigabyteVisionIds.RTX3050_EAGLE_OC,              0x62, "GIGABYTE 3050 Eagle OC"),
-			new GigabyteVisionIdentifier(Nvidia.RTX3060_LHR,    GigabyteVisionIds.RTX3060_EAGLE_OC_REV,          0x63, "GIGABYTE 3060 Eagle OC LHR"),
-			new GigabyteVisionIdentifier(Nvidia.RTX3060,        GigabyteVisionIds.RTX3060_EAGLE_OC_REV2,         0x32, "GIGABYTE 3060 Eagle OC Rev 2.0"),
-			new GigabyteVisionIdentifier(Nvidia.RTX3060,        GigabyteVisionIds.RTX3060_EAGLE_OC_REV2,         0x63, "GIGABYTE 3060 Eagle OC Rev 2.0"),
-			new GigabyteVisionIdentifier(Nvidia.RTX3060_LHR,    GigabyteVisionIds.RTX3060_EAGLE_OC_REV2,         0x32, "GIGABYTE 3060 Eagle OC Rev 2.0 LHR"),
-			new GigabyteVisionIdentifier(Nvidia.RTX3060_LHR,    GigabyteVisionIds.RTX3060_EAGLE_OC_REV2,         0x63, "GIGABYTE 3060 Eagle OC Rev 2.0 LHR"),
-			new GigabyteVisionIdentifier(Nvidia.RTX3060_GA104,  GigabyteVisionIds.RTX3060_EAGLE_OC_REV2,         0x32, "GIGABYTE 3060 Eagle OC LHR (GA104)"),
-			new GigabyteVisionIdentifier(Nvidia.RTX3060_GA104,  GigabyteVisionIds.RTX3060_EAGLE_OC_REV2,         0x63, "GIGABYTE 3060 Eagle OC LHR (GA104)"),
-			new GigabyteVisionIdentifier(Nvidia.RTX3060,        GigabyteVisionIds.RTX3060_GAMING_OC_12GB,        0x62, "GIGABYTE 3060 Gaming OC"),
-			new GigabyteVisionIdentifier(Nvidia.RTX3060_GA104,  GigabyteVisionIds.RTX3060_GAMING_OC_12GB,		 0x62, "GIGABYTE 3060 Gaming OC LHR (GA104)"),
-			new GigabyteVisionIdentifier(Nvidia.RTX3060,        GigabyteVisionIds.RTX3060_VISION_OC_12GB,        0x63, "GIGABYTE 3060 Vision OC"),
-			new GigabyteVisionIdentifier(Nvidia.RTX3060_LHR,    GigabyteVisionIds.RTX3060_VISION_OC_12GB,        0x63, "GIGABYTE 3060 Vision OC LHR"),
-			new GigabyteVisionIdentifier(Nvidia.RTX3060_GA104,  GigabyteVisionIds.RTX3060_VISION_OC_12GB,        0x63, "GIGABYTE 3060 Vision OC LHR (GA104)"),
-			new GigabyteVisionIdentifier(Nvidia.RTX3070,        GigabyteVisionIds.RTX3070_VISION_OC,             0x63, "GIGABYTE 3070 Vision OC"),
-			new GigabyteVisionIdentifier(Nvidia.RTX3070_LHR,    GigabyteVisionIds.RTX3070_VISION_OC,             0x63, "GIGABYTE 3070 Vision OC LHR"),
-			new GigabyteVisionIdentifier(Nvidia.RTX3070TI,      GigabyteVisionIds.RTX3070TI_EAGLE_OC,            0x63, "GIGABYTE 3070Ti Eagle OC LHR"),
-			new GigabyteVisionIdentifier(Nvidia.RTX3070TI,      GigabyteVisionIds.RTX3070TI_VISION_OC,           0x63, "GIGABYTE 3070Ti Vision OC LHR"),
-			new GigabyteVisionIdentifier(Nvidia.RTX3060TI,      GigabyteVisionIds.RTX3060TI_EAGLE_OC,            0x32, "GIGABYTE 3060Ti Eagle OC"),
-			new GigabyteVisionIdentifier(Nvidia.RTX3060TI,      GigabyteVisionIds.RTX3060TI_EAGLE_OC,            0x63, "GIGABYTE 3060Ti Eagle OC"),
-			new GigabyteVisionIdentifier(Nvidia.RTX3060TI_LHR,  GigabyteVisionIds.RTX3060TI_EAGLE_OC,            0x32, "GIGABYTE 3060Ti Eagle OC LHR"),
-			new GigabyteVisionIdentifier(Nvidia.RTX3060TI_LHR,  GigabyteVisionIds.RTX3060TI_EAGLE_OC,            0x63, "GIGABYTE 3060Ti Eagle OC LHR"),
-			new GigabyteVisionIdentifier(Nvidia.RTX3060TI_LHR,  GigabyteVisionIds.RTX3060TI_EAGLE_OC_REV2_LHR,   0x63, "GIGABYTE 3060Ti Eagle OC Rev 2.0 LHR"),
-			new GigabyteVisionIdentifier(Nvidia.RTX3060TI_LHR,  GigabyteVisionIds.RTX3060TI_GAMING_OC,           0x32, "GIGABYTE 3060Ti Gaming OC Rev 2.0"),
-			new GigabyteVisionIdentifier(Nvidia.RTX3060TI_LHR,  GigabyteVisionIds.RTX3060TI_GAMING_OC,           0x62, "GIGABYTE 3060Ti Gaming OC Rev 2.0"),
-			new GigabyteVisionIdentifier(Nvidia.RTX3060TI_LHR,  GigabyteVisionIds.RTX3060TI_GAMING_OC_PRO,       0x62, "GIGABYTE 3060Ti Gaming OC Pro Rev 3.0"),
-			new GigabyteVisionIdentifier(Nvidia.RTX3060TI_D6X,  GigabyteVisionIds.RTX3060TI_GAMING_OC_D6X,		 0x62, "GIGABYTE 3060Ti Gaming OC D6X"),
-			new GigabyteVisionIdentifier(Nvidia.RTX3070,        GigabyteVisionIds.RTX3070_GAMING_OC,             0x62, "GIGABYTE 3070 Gaming OC"),
-			new GigabyteVisionIdentifier(Nvidia.RTX3070_LHR,    GigabyteVisionIds.RTX3070_GAMING_OC,             0x62, "GIGABYTE 3070 Gaming OC LHR"),
-			new GigabyteVisionIdentifier(Nvidia.RTX3080_GA102,  GigabyteVisionIds.RTX3080_12G_GAMING_OC,     	 0x62, "GIGABYTE 3080 Gaming OC 12g LHR"),
-			new GigabyteVisionIdentifier(Nvidia.RTX3070TI,      GigabyteVisionIds.RTX3070TI_GAMING,				 0x62, "GIGABYTE 3070Ti Gaming"),
-			new GigabyteVisionIdentifier(Nvidia.RTX3070TI,      GigabyteVisionIds.RTX3070TI_GAMING_OC,           0x62, "GIGABYTE 3070Ti Gaming OC LHR"),
-			new GigabyteVisionIdentifier(Nvidia.RTX3080,        GigabyteVisionIds.RTX3080_GAMING_OC,             0x62, "GIGABYTE 3080 Gaming OC"),
-			new GigabyteVisionIdentifier(Nvidia.RTX3080_LHR,    GigabyteVisionIds.RTX3080_GAMING_OC,             0x62, "GIGABYTE 3080 Gaming OC LHR"),
-			new GigabyteVisionIdentifier(Nvidia.RTX3080,        GigabyteVisionIds.RTX3080_VISION_OC,             0x63, "GIGABYTE 3080 Vision OC"),
-			new GigabyteVisionIdentifier(Nvidia.RTX3080_LHR,    GigabyteVisionIds.RTX3080_VISION_OC,             0x63, "GIGABYTE 3080 Vision OC LHR"),
-			new GigabyteVisionIdentifier(Nvidia.RTX3080_GA102,  GigabyteVisionIds.RTX3080_EAGLE_12GB_LHR,    	 0x63, "GIGABYTE 3080 Eagle OC 12g LHR"),
-			new GigabyteVisionIdentifier(Nvidia.RTX3080TI,      GigabyteVisionIds.RTX3080TI_VISION_OC,           0x63, "GIGABYTE 3080Ti Vision OC"),
-			new GigabyteVisionIdentifier(Nvidia.RTX3080TI,      GigabyteVisionIds.RTX3080TI_GAMING_OC,           0x62, "GIGABYTE 3080Ti Gaming OC"),
-			new GigabyteVisionIdentifier(Nvidia.RTX3080TI,      GigabyteVisionIds.RTX3080TI_EAGLE,               0x63, "GIGABYTE 3080Ti Eagle"),
-			new GigabyteVisionIdentifier(Nvidia.RTX3080TI,      GigabyteVisionIds.RTX3080TI_EAGLE_OC,            0x63, "GIGABYTE 3080Ti Eagle OC"),
-			new GigabyteVisionIdentifier(Nvidia.RTX4070TI,      GigabyteVisionIds.RTX4070TI_EAGLE_12G,        	 0x71, "GIGABYTE 4070TI Eagle"),
-			new GigabyteVisionIdentifier(Nvidia.RTX4070TI,      GigabyteVisionIds.RTX4070TI_EAGLE_OC_12G,        0x71, "GIGABYTE 4070TI Eagle OC"),
-			new GigabyteVisionIdentifier(Nvidia.RTX4080,        GigabyteVisionIds.RTX4080_EAGLE_16GD,			 0x71, "GIGABYTE 4080 Eagle"),
-			new GigabyteVisionIdentifier(Nvidia.RTX4080,        GigabyteVisionIds.RTX4080_EAGLE_OC_16GD,         0x71, "GIGABYTE 4080 Eagle OC"),
-			new GigabyteVisionIdentifier(Nvidia.GTX1070,        GigabyteVisionIds.GTX1070_GAMING,                0x47, "GIGABYTE 1070 Gaming"),
-			new GigabyteVisionIdentifier(Nvidia.GTX1070,		GigabyteVisionIds.GTX1070_G1_GAMING,			 0x48, "GIGABYTE 1070 G1 Gaming"),
-			new GigabyteVisionIdentifier(Nvidia.GTX1080,      GigabyteVisionIds.GTX1080_G1_GAMING,               0x48, "GIGABYTE 1080 G1 Gaming"), //Confirmed!
-			new GigabyteVisionIdentifier(Nvidia.GTX1080TI,      GigabyteVisionIds.GTX1080TI_AORUS_11G,         	 0x47, "GIGABYTE 1080Ti AORUS"), //Confirmed
-			new GigabyteVisionIdentifier(Nvidia.RTX2060_TU104,  GigabyteVisionIds.RTX2060_GAMING_OC_PRO,         0x47, "GIGABYTE 2060 Gaming OC Pro"), //Very iffy.
-			new GigabyteVisionIdentifier(Nvidia.RTX2060_TU104,  GigabyteVisionIds.RTX2060_GAMING_OC_PRO_2,		 0x47, "GIGABYTE 2060 Gaming OC Pro"), //Very iffy.
-			new GigabyteVisionIdentifier(Nvidia.RTX2060S_OC,    GigabyteVisionIds.RTX2060S_GAMING_OC,     		 0x47, "GIGABYTE 2060 Super Gaming OC"), //Confirmed.
-			new GigabyteVisionIdentifier(Nvidia.RTX2060S_OC,    GigabyteVisionIds.RTX2060S_GAMING_OC_3X_8GB,     0x47, "GIGABYTE 2060 Super Gaming OC Windforce"), //Confirmed.
-			new GigabyteVisionIdentifier(Nvidia.RTX2060S_OC,    GigabyteVisionIds.RTX2060S_GAMING_OC_WHITE,      0x47, "GIGABYTE 2060 Super Gaming OC White"), //Confirmed.
-			new GigabyteVisionIdentifier(Nvidia.RTX2070S,      GigabyteVisionIds.RTX2070S_GAMING_OC_3X_2,       0x47, "GIGABYTE 2070 Super Gaming OC"),
-			new GigabyteVisionIdentifier(Nvidia.RTX2070S,      GigabyteVisionIds.RTX2070S_GAMING_OC_WHITE,       0x47, "GIGABYTE 2070 Super Gaming OC"),
-			new GigabyteVisionIdentifier(Nvidia.RTX2080_A,      GigabyteVisionIds.RTX2080_WINDFORCE,    		 0x47, "GIGABYTE 2080 Windforce OC"),
-			new GigabyteVisionIdentifier(Nvidia.RTX2080TI,      GigabyteVisionIds.RTX2080TI_GAMING_OC,    		 0x47, "GIGABYTE 2080TI Gaming OC"),
-			new GigabyteVisionIdentifier(Nvidia.RTX3060TI,      GigabyteVisionIds.RTX3060TI_GAMING_OC_PRO,       0x62, "GIGABYTE 3060Ti Gaming OC Pro Rev 1.0"), //Confirmed.
-			new GigabyteVisionIdentifier(Nvidia.RTX3060TI_LHR,  GigabyteVisionIds.RTX3060TI_VISION_OC,           0x63, "GIGABYTE 3060 Vision OC LHR"), //Confirmed.
-			new GigabyteVisionIdentifier(Nvidia.RTX3070_LHR,    GigabyteVisionIds.RTX3070_EAGLE_OC,              0x63, "GIGABYTE 3070 Eagle OC LHR"),
-			new GigabyteVisionIdentifier(Nvidia.RTX3070,        GigabyteVisionIds.RTX3070_EAGLE_OC,              0x63, "GIGABYTE 3070 Eagle OC"),
-			new GigabyteVisionIdentifier(Nvidia.RTX3070,        GigabyteVisionIds.RTX3070_EAGLE_OC,              0x62, "GIGABYTE 3070 Eagle OC"),
-			new GigabyteVisionIdentifier(Nvidia.RTX3080,	    GigabyteVisionIds.RTX3080_EAGLE_OC,    		 	 0x63, "GIGABYTE 3080 Eagle OC"),
-			new GigabyteVisionIdentifier(Nvidia.RTX3080_LHR,    GigabyteVisionIds.RTX3080_EAGLE_OC,    		 	 0x63, "GIGABYTE 3080 Eagle OC LHR"),
-			new GigabyteVisionIdentifier(Nvidia.RTX3090,        GigabyteVisionIds.RTX3090_VISION_OC_24G,         0x63, "GIGABYTE 3090 Vision OC"),
-			new GigabyteVisionIdentifier(Nvidia.RTX3090,        GigabyteVisionIds.RTX3090_GAMING_OC_24GB,        0x62, "GIGABYTE 3090 Gaming OC 24G"), // Confirmed
-			new GigabyteVisionIdentifier(Nvidia.RTX4060TI,		GigabyteVisionIds.RTX4060TI_GAMING_OC,			 0x71, "GIGABYTE 4060Ti Gaming OC"),
-			new GigabyteVisionIdentifier(Nvidia.RTX4060TI_OC,	GigabyteVisionIds.RTX4060TI_GAMING_OC_2,		 0x71, "GIGABYTE 4060Ti Gaming OC"),
-			new GigabyteVisionIdentifier(Nvidia.RTX4070,		GigabyteVisionIds.RTX4070_AERO,					 0x71, "GIGABYTE 4070 Aero"),
-			new GigabyteVisionIdentifier(Nvidia.RTX4070,		GigabyteVisionIds.RTX4070_EAGLE_OC,				 0x71, "GIGABYTE 4070 Eagle OC"),
-			new GigabyteVisionIdentifier(Nvidia.RTX4070TI,		GigabyteVisionIds.RTX4070TI_EAGLE,				 0x71, "GIGABYTE 4070Ti Eagle"),
-			new GigabyteVisionIdentifier(Nvidia.RTX4070TI,      GigabyteVisionIds.RTX4070TI_MASTER_12G,			 0x71, "GIGABYTE 4070Ti Master 12G"), //Confirmed
-			new GigabyteVisionIdentifier(Nvidia.RTX4080,        GigabyteVisionIds.RTX4080_AERO_OC_16G,           0x71, "GIGABYTE 4080 Aero OC"),
-			new GigabyteVisionIdentifier(Nvidia.RTX4070TI,		GigabyteVisionIds.RTX4070TI_AERO,				 0x71, "GIGABYTE 4070Ti Aero"),
-			new GigabyteVisionIdentifier(Nvidia.RTX4070TI,		GigabyteVisionIds.RTX4070TI_AERO_OC,			 0x71, "GIGABYTE 4070Ti Aero OC"),
-			new GigabyteVisionIdentifier(Nvidia.RTX4090,		GigabyteVisionIds.RTX4090_AERO_OC,				 0x71, "GIGABYTE 4090 Aero OC"),
+
+			new GigabyteVisionIdentifier(Nvidia.GTX1660,        GigabyteVisionIds.GTX1660_GAMING_OC_6GB,		0x47, "GIGABYTE 1660 Gaming OC 6gb"),
+
+			new GigabyteVisionIdentifier(Nvidia.GTX1660S,       GigabyteVisionIds.GTX1660S_GAMING_OC,			0x47, "GIGABYTE 1660 Super Gaming OC"),
+
+			new GigabyteVisionIdentifier(Nvidia.GTX1660TI,      GigabyteVisionIds.GTX1660TI_GAMING_OC_6GB,		0x47, "GIGABYTE 1660Ti Gaming OC 6gb"),
+
+			new GigabyteVisionIdentifier(Nvidia.RTX2060S_OC,    GigabyteVisionIds.RTX2060S_GAMING_OC_3X_WHITE,	0x47, "GIGABYTE 2060 Super Gaming OC Windforce White"),
+			new GigabyteVisionIdentifier(Nvidia.RTX2060S_OC,    GigabyteVisionIds.RTX2060S_GAMING_OC,			0x47, "GIGABYTE 2060 Super Gaming OC"), //Confirmed.
+			new GigabyteVisionIdentifier(Nvidia.RTX2060S_OC,    GigabyteVisionIds.RTX2060S_GAMING_OC_3X_8GB,	0x47, "GIGABYTE 2060 Super Gaming OC Windforce"), //Confirmed.
+			new GigabyteVisionIdentifier(Nvidia.RTX2060S_OC,    GigabyteVisionIds.RTX2060S_GAMING_OC_WHITE,		0x47, "GIGABYTE 2060 Super Gaming OC White"), //Confirmed.
+
+			new GigabyteVisionIdentifier(Nvidia.RTX2060_TU104,  GigabyteVisionIds.RTX2060_GAMING_OC_PRO,		0x47, "GIGABYTE 2060 Gaming OC Pro"), //Very iffy.
+			new GigabyteVisionIdentifier(Nvidia.RTX2060_TU104,  GigabyteVisionIds.RTX2060_GAMING_OC_PRO_2,		0x47, "GIGABYTE 2060 Gaming OC Pro"), //Very iffy.
+
+			new GigabyteVisionIdentifier(Nvidia.RTX2070_OC,     GigabyteVisionIds.RTX2070_GAMING_OC,			0x47, "GIGABYTE 2070 Gaming OC"),
+			new GigabyteVisionIdentifier(Nvidia.RTX2070_OC,     GigabyteVisionIds.RTX2070_GAMING_OC_WHITE,		0x47, "GIGABYTE 2070 Gaming OC White"),
+			new GigabyteVisionIdentifier(Nvidia.RTX2070_OC,		GigabyteVisionIds.RTX2070_XTREME_8G,			0x50, "GIGABYTE 2070 XTREME OC 8G"),
+
+			new GigabyteVisionIdentifier(Nvidia.RTX2070S,       GigabyteVisionIds.RTX2070S_GAMING_OC,			0x47, "GIGABYTE 2070 Super Gaming OC"),
+			new GigabyteVisionIdentifier(Nvidia.RTX2070S,       GigabyteVisionIds.RTX2070S_GAMING_OC_3X,		0x47, "GIGABYTE 2070 Super Gaming OC 3x"),
+			new GigabyteVisionIdentifier(Nvidia.RTX2070S,       GigabyteVisionIds.RTX2070S_GAMING_OC_3X_WHITE,	0x47, "GIGABYTE 2070 Super Gaming OC 3x White Edition"),
+			new GigabyteVisionIdentifier(Nvidia.RTX2070S,       GigabyteVisionIds.RTX2070S_GAMING_WINDFORCE_OC,	0x47, "GIGABYTE 2070 Super Gaming OC Windforce 8GB"),
+			new GigabyteVisionIdentifier(Nvidia.RTX2070S,		GigabyteVisionIds.RTX2070S_GAMING_OC_3X_2,		0x47, "GIGABYTE 2070 Super Gaming OC"),
+			new GigabyteVisionIdentifier(Nvidia.RTX2070S,		GigabyteVisionIds.RTX2070S_GAMING_OC_WHITE,		0x47, "GIGABYTE 2070 Super Gaming OC"),
+
+			new GigabyteVisionIdentifier(Nvidia.RTX2080_A,      GigabyteVisionIds.RTX2080_WINDFORCE,			0x47, "GIGABYTE 2080 Windforce OC"),
+
+			new GigabyteVisionIdentifier(Nvidia.RTX2080TI,      GigabyteVisionIds.RTX2080TI_GAMING_OC,			0x47, "GIGABYTE 2080TI Gaming OC"),
+
+			new GigabyteVisionIdentifier(Nvidia.RTX3050,        GigabyteVisionIds.RTX3050_EAGLE_OC,				0x62, "GIGABYTE 3050 Eagle OC"),
+
+			new GigabyteVisionIdentifier(Nvidia.RTX3060,        GigabyteVisionIds.RTX3060_EAGLE_OC_REV2,		0x32, "GIGABYTE 3060 Eagle OC Rev 2.0"),
+			new GigabyteVisionIdentifier(Nvidia.RTX3060,        GigabyteVisionIds.RTX3060_EAGLE_OC_REV2,		0x63, "GIGABYTE 3060 Eagle OC Rev 2.0"),
+			new GigabyteVisionIdentifier(Nvidia.RTX3060,        GigabyteVisionIds.RTX3060_GAMING_OC_12GB,		0x62, "GIGABYTE 3060 Gaming OC"),
+			new GigabyteVisionIdentifier(Nvidia.RTX3060,        GigabyteVisionIds.RTX3060_VISION_OC_12GB,		0x63, "GIGABYTE 3060 Vision OC"),
+
+			new GigabyteVisionIdentifier(Nvidia.RTX3060_LHR,    GigabyteVisionIds.RTX3060_EAGLE_OC_REV,			0x63, "GIGABYTE 3060 Eagle OC LHR"),
+			new GigabyteVisionIdentifier(Nvidia.RTX3060_LHR,    GigabyteVisionIds.RTX3060_EAGLE_OC_REV2,		0x32, "GIGABYTE 3060 Eagle OC Rev 2.0 LHR"),
+			new GigabyteVisionIdentifier(Nvidia.RTX3060_LHR,    GigabyteVisionIds.RTX3060_EAGLE_OC_REV2,		0x63, "GIGABYTE 3060 Eagle OC Rev 2.0 LHR"),
+			new GigabyteVisionIdentifier(Nvidia.RTX3060_LHR,    GigabyteVisionIds.RTX3060_VISION_OC_12GB,		0x63, "GIGABYTE 3060 Vision OC LHR"),
+
+			new GigabyteVisionIdentifier(Nvidia.RTX3060_GA104,  GigabyteVisionIds.RTX3060_EAGLE_OC_REV2,		0x32, "GIGABYTE 3060 Eagle OC LHR (GA104)"),
+			new GigabyteVisionIdentifier(Nvidia.RTX3060_GA104,  GigabyteVisionIds.RTX3060_EAGLE_OC_REV2,		0x63, "GIGABYTE 3060 Eagle OC LHR (GA104)"),
+			new GigabyteVisionIdentifier(Nvidia.RTX3060_GA104,  GigabyteVisionIds.RTX3060_GAMING_OC_12GB,		0x62, "GIGABYTE 3060 Gaming OC LHR (GA104)"),
+			new GigabyteVisionIdentifier(Nvidia.RTX3060_GA104,  GigabyteVisionIds.RTX3060_VISION_OC_12GB,		0x63, "GIGABYTE 3060 Vision OC LHR (GA104)"),
+
+			new GigabyteVisionIdentifier(Nvidia.RTX3060TI,      GigabyteVisionIds.RTX3060TI_EAGLE_OC,			0x32, "GIGABYTE 3060Ti Eagle OC"),
+			new GigabyteVisionIdentifier(Nvidia.RTX3060TI,      GigabyteVisionIds.RTX3060TI_EAGLE_OC,			0x63, "GIGABYTE 3060Ti Eagle OC"),
+			new GigabyteVisionIdentifier(Nvidia.RTX3060TI,      GigabyteVisionIds.RTX3060TI_GAMING_OC_PRO,		0x62, "GIGABYTE 3060Ti Gaming OC Pro Rev 1.0"), //Confirmed.
+
+			new GigabyteVisionIdentifier(Nvidia.RTX3060TI_LHR,  GigabyteVisionIds.RTX3060TI_VISION_OC,			0x63, "GIGABYTE 3060 Vision OC LHR"), //Confirmed.
+			new GigabyteVisionIdentifier(Nvidia.RTX3060TI_LHR,  GigabyteVisionIds.RTX3060TI_EAGLE_OC,			0x32, "GIGABYTE 3060Ti Eagle OC LHR"),
+			new GigabyteVisionIdentifier(Nvidia.RTX3060TI_LHR,  GigabyteVisionIds.RTX3060TI_EAGLE_OC,			0x63, "GIGABYTE 3060Ti Eagle OC LHR"),
+			new GigabyteVisionIdentifier(Nvidia.RTX3060TI_LHR,  GigabyteVisionIds.RTX3060TI_EAGLE_OC_REV2_LHR,	0x63, "GIGABYTE 3060Ti Eagle OC Rev 2.0 LHR"),
+			new GigabyteVisionIdentifier(Nvidia.RTX3060TI_LHR,  GigabyteVisionIds.RTX3060TI_GAMING_OC,			0x32, "GIGABYTE 3060Ti Gaming OC Rev 2.0"),
+			new GigabyteVisionIdentifier(Nvidia.RTX3060TI_LHR,  GigabyteVisionIds.RTX3060TI_GAMING_OC,			0x62, "GIGABYTE 3060Ti Gaming OC Rev 2.0"),
+			new GigabyteVisionIdentifier(Nvidia.RTX3060TI_LHR,  GigabyteVisionIds.RTX3060TI_GAMING_OC_PRO,		0x62, "GIGABYTE 3060Ti Gaming OC Pro Rev 3.0"),
+			new GigabyteVisionIdentifier(Nvidia.RTX3060TI_D6X,  GigabyteVisionIds.RTX3060TI_GAMING_OC_D6X,		0x62, "GIGABYTE 3060Ti Gaming OC D6X"),
+
+			new GigabyteVisionIdentifier(Nvidia.RTX3070,        GigabyteVisionIds.RTX3070_GAMING_OC,			0x62, "GIGABYTE 3070 Gaming OC"),
+			new GigabyteVisionIdentifier(Nvidia.RTX3070,        GigabyteVisionIds.RTX3070_EAGLE_OC,				0x63, "GIGABYTE 3070 Eagle OC"),
+			new GigabyteVisionIdentifier(Nvidia.RTX3070,        GigabyteVisionIds.RTX3070_EAGLE_OC,				0x62, "GIGABYTE 3070 Eagle OC"),
+			new GigabyteVisionIdentifier(Nvidia.RTX3070,        GigabyteVisionIds.RTX3070_VISION_OC,			0x63, "GIGABYTE 3070 Vision OC"),
+
+			new GigabyteVisionIdentifier(Nvidia.RTX3070_LHR,    GigabyteVisionIds.RTX3070_VISION_OC,			0x63, "GIGABYTE 3070 Vision OC LHR"),
+			new GigabyteVisionIdentifier(Nvidia.RTX3070_LHR,    GigabyteVisionIds.RTX3070_GAMING_OC,			0x62, "GIGABYTE 3070 Gaming OC LHR"),
+			new GigabyteVisionIdentifier(Nvidia.RTX3070_LHR,    GigabyteVisionIds.RTX3070_EAGLE_OC,				0x63, "GIGABYTE 3070 Eagle OC LHR"),
+
+			new GigabyteVisionIdentifier(Nvidia.RTX3070TI,      GigabyteVisionIds.RTX3070TI_EAGLE,				0x63, "GIGABYTE 3070Ti Eagle"),
+			new GigabyteVisionIdentifier(Nvidia.RTX3070TI,      GigabyteVisionIds.RTX3070TI_EAGLE_OC,			0x63, "GIGABYTE 3070Ti Eagle OC LHR"),
+			new GigabyteVisionIdentifier(Nvidia.RTX3070TI,      GigabyteVisionIds.RTX3070TI_VISION_OC,			0x63, "GIGABYTE 3070Ti Vision OC LHR"),
+			new GigabyteVisionIdentifier(Nvidia.RTX3070TI,      GigabyteVisionIds.RTX3070TI_GAMING,				0x62, "GIGABYTE 3070Ti Gaming"),
+			new GigabyteVisionIdentifier(Nvidia.RTX3070TI,      GigabyteVisionIds.RTX3070TI_GAMING_OC,			0x62, "GIGABYTE 3070Ti Gaming OC LHR"),
+
+			new GigabyteVisionIdentifier(Nvidia.RTX3080,        GigabyteVisionIds.RTX3080_GAMING_OC,			0x62, "GIGABYTE 3080 Gaming OC"),
+			new GigabyteVisionIdentifier(Nvidia.RTX3080,        GigabyteVisionIds.RTX3080_VISION_OC,			0x63, "GIGABYTE 3080 Vision OC"),
+			new GigabyteVisionIdentifier(Nvidia.RTX3080,	    GigabyteVisionIds.RTX3080_EAGLE_OC,				0x63, "GIGABYTE 3080 Eagle OC"),
+
+			new GigabyteVisionIdentifier(Nvidia.RTX3080_GA102,  GigabyteVisionIds.RTX3080_12G_GAMING_OC,		0x62, "GIGABYTE 3080 Gaming OC 12g LHR"),
+			new GigabyteVisionIdentifier(Nvidia.RTX3080_GA102,  GigabyteVisionIds.RTX3080_EAGLE_12GB_LHR,		0x63, "GIGABYTE 3080 Eagle OC 12g LHR"),
+
+			new GigabyteVisionIdentifier(Nvidia.RTX3080_LHR,    GigabyteVisionIds.RTX3080_GAMING_OC,			0x62, "GIGABYTE 3080 Gaming OC LHR"),
+			new GigabyteVisionIdentifier(Nvidia.RTX3080_LHR,    GigabyteVisionIds.RTX3080_VISION_OC,			0x63, "GIGABYTE 3080 Vision OC LHR"),
+			new GigabyteVisionIdentifier(Nvidia.RTX3080_LHR,    GigabyteVisionIds.RTX3080_EAGLE_OC,				0x63, "GIGABYTE 3080 Eagle OC LHR"),
+
+			new GigabyteVisionIdentifier(Nvidia.RTX3080TI,      GigabyteVisionIds.RTX3080TI_VISION_OC,			0x63, "GIGABYTE 3080Ti Vision OC"),
+			new GigabyteVisionIdentifier(Nvidia.RTX3080TI,      GigabyteVisionIds.RTX3080TI_GAMING_OC,			0x62, "GIGABYTE 3080Ti Gaming OC"),
+			new GigabyteVisionIdentifier(Nvidia.RTX3080TI,      GigabyteVisionIds.RTX3080TI_EAGLE,				0x63, "GIGABYTE 3080Ti Eagle"),
+			new GigabyteVisionIdentifier(Nvidia.RTX3080TI,      GigabyteVisionIds.RTX3080TI_EAGLE_OC,			0x63, "GIGABYTE 3080Ti Eagle OC"),
+
+			new GigabyteVisionIdentifier(Nvidia.RTX3090,        GigabyteVisionIds.RTX3090_VISION_OC_24G,		0x63, "GIGABYTE 3090 Vision OC"),
+			new GigabyteVisionIdentifier(Nvidia.RTX3090,        GigabyteVisionIds.RTX3090_GAMING_OC_24GB,		0x62, "GIGABYTE 3090 Gaming OC 24G"), // Confirmed
+
+			new GigabyteVisionIdentifier(Nvidia.RTX4060TI,		GigabyteVisionIds.RTX4060TI_GAMING_OC,			0x71, "GIGABYTE 4060Ti Gaming OC"),
+
+			new GigabyteVisionIdentifier(Nvidia.RTX4060TI_OC,	GigabyteVisionIds.RTX4060TI_GAMING_OC_2,		0x71, "GIGABYTE 4060Ti Gaming OC"),
+
+			new GigabyteVisionIdentifier(Nvidia.RTX4070,		GigabyteVisionIds.RTX4070_AERO,					0x71, "GIGABYTE 4070 Aero"),
+			new GigabyteVisionIdentifier(Nvidia.RTX4070,		GigabyteVisionIds.RTX4070_EAGLE_OC,				0x71, "GIGABYTE 4070 Eagle OC"),
+			new GigabyteVisionIdentifier(Nvidia.RTX4070, 		GigabyteVisionIds.RTX4070_WINDFORCE_OC,			0x71, "GIGABYTE 4070 Windforce OC"),
+
+			new GigabyteVisionIdentifier(Nvidia.RTX4070TI,		GigabyteVisionIds.RTX4070TI_EAGLE,				0x71, "GIGABYTE 4070Ti Eagle"),
+			new GigabyteVisionIdentifier(Nvidia.RTX4070TI,      GigabyteVisionIds.RTX4070TI_EAGLE_12G,			0x71, "GIGABYTE 4070TI Eagle"),
+			new GigabyteVisionIdentifier(Nvidia.RTX4070TI,      GigabyteVisionIds.RTX4070TI_EAGLE_OC_12G,		0x71, "GIGABYTE 4070TI Eagle OC"),
+			new GigabyteVisionIdentifier(Nvidia.RTX4070TI,      GigabyteVisionIds.RTX4070TI_MASTER_12G,			0x71, "GIGABYTE 4070Ti Master 12G"), //Confirmed
+			new GigabyteVisionIdentifier(Nvidia.RTX4070TI,		GigabyteVisionIds.RTX4070TI_AERO,				0x71, "GIGABYTE 4070Ti Aero"),
+			new GigabyteVisionIdentifier(Nvidia.RTX4070TI,		GigabyteVisionIds.RTX4070TI_AERO_OC,			0x71, "GIGABYTE 4070Ti Aero OC"),
+
+			new GigabyteVisionIdentifier(Nvidia.RTX4080,        GigabyteVisionIds.RTX4080_EAGLE_16GD,			0x71, "GIGABYTE 4080 Eagle"),
+			new GigabyteVisionIdentifier(Nvidia.RTX4080,        GigabyteVisionIds.RTX4080_EAGLE_OC_16GD,		0x71, "GIGABYTE 4080 Eagle OC"),
+			new GigabyteVisionIdentifier(Nvidia.RTX4080,        GigabyteVisionIds.RTX4080_AERO_OC_16G,			0x71, "GIGABYTE 4080 Aero OC"),
+
+			new GigabyteVisionIdentifier(Nvidia.RTX4090,		GigabyteVisionIds.RTX4090_AERO_OC,				0x71, "GIGABYTE 4090 Aero OC"),
 		];
 	}
 }
 
 export function ImageUrl() {
-	return "https://marketplace.signalrgb.com/devices/brands/gigabyte/gpus/gpu.png";
+	return "https://assets.signalrgb.com/devices/brands/gigabyte/gpus/gpu.png";
 }

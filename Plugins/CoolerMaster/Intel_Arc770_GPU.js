@@ -188,5 +188,5 @@ export function Validate(endpoint) {
 }
 
 export function ImageUrl() {
-	return "https://marketplace.signalrgb.com/devices/brands/intel/gpus/arc-a770-limited-edition.png";
+	return "https://assets.signalrgb.com/devices/brands/intel/gpus/arc-a770-limited-edition.png";
 }

@@ -159,8 +159,8 @@ export class deviceLibrary {
 		};
 
 		this.imageLibrary = {
-			"MAXFIT61 Frost": 		"https://marketplace.signalrgb.com/devices/default/keyboards/65-keyboard-render.png",
-			"FL-Esports MK750":		"https://marketplace.signalrgb.com/devices/default/keyboards/65-keyboard-render.png",
+			"MAXFIT61 Frost": 		"https://assets.signalrgb.com/devices/default/keyboards/65-keyboard-render.png",
+			"FL-Esports MK750":		"https://assets.signalrgb.com/devices/default/keyboards/65-keyboard-render.png",
 		};
 	}
 }
@@ -183,5 +183,5 @@ export function Validate(endpoint) {
 }
 
 export function ImageUrl() {
-	return "https://marketplace.signalrgb.com/devices/default/misc/usb-drive-render.png";
+	return "https://assets.signalrgb.com/devices/default/misc/usb-drive-render.png";
 }
