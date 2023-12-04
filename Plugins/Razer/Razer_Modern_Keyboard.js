@@ -304,7 +304,7 @@ export class deviceLibrary {
 					[0, 4], 		[2, 4], [3, 4], [4, 4], [5, 4], [6, 4], [7, 4], [8, 4], [9, 4], [10, 4], [11, 4],          [13, 4],            [15, 4],				[17, 4], [18, 4], [19, 4], [20, 4],	//18
 					[0, 5], [1, 5], [2, 5],                 		[6, 5],                       	[10, 5], [11, 5], [12, 5], [13, 5],   [14, 5], [15, 5], [16, 5],	[17, 5],		  [19, 5],			//14
 				],
-				endpoint : { "interface": 3, "usage": 0x0000, "usage_page": 0x0001 },
+				endpoint : { "interface": 3, "usage": 0x0001, "usage_page": 0x000C },
 				DeviceType : "Keyboard",
 				LEDsPerPacket : 22,
 				image: "https://assets.signalrgb.com/devices/brands/razer/keyboards/blackwidow-v3.png"
