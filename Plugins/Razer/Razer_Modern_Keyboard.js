@@ -185,7 +185,7 @@ function grabLighting(overrideColor) {
 		RGBData[iLedIdx+1]	= col[1];
 		RGBData[iLedIdx+2]	= col[2];
 	}
-	const packetsTotal = Math.ceil(RGBData.length / LEDsPerPacket);
+	const packetsTotal = Math.ceil((RGBData.length / 3) / LEDsPerPacket);
 	let packetCount = 0;
 
 	do {
