@@ -167,7 +167,6 @@ function grabLighting(overrideColor) {
 	const vLedPositions = Razer.getDeviceLEDPositions();
 	const vKeys = Razer.getDeviceLEDIndexes();
 	const LEDsPerPacket = Razer.getNumberOfLEDsPacket();
-	const packetsTotal = Math.ceil(vKeys.length / LEDsPerPacket);
 
 	for(let iIdx = 0; iIdx < vKeys.length; iIdx++) {
 		let col;
@@ -186,6 +185,7 @@ function grabLighting(overrideColor) {
 		RGBData[iLedIdx+1]	= col[1];
 		RGBData[iLedIdx+2]	= col[2];
 	}
+	const packetsTotal = Math.ceil(RGBData.length / LEDsPerPacket);
 	let packetCount = 0;
 
 	do {
@@ -755,12 +755,12 @@ export class deviceLibrary {
 				size : [17, 6],
 				vKeys :
 				[
-					0,   0,   0,   0,   0,   0,   0,   0,  0,  0,  0,  0,  0,       0,       0,
-					0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,
-					0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,
-					0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,       0,
-					0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,                0,
-					0, 0, 0,                0,                0, 0, 0, 0,  0, 0, 0,
+					1,   3,   4,   5,   6,   7,   8,   9,  10,  11,  12,  13,  14,       15,       18,
+					23,  24,  25,  26,  27,  28,  29,  30,  31,  32,  33,  34,  35,  36,  37,  38,  39,
+					45,  46,  47,  48,  49,  50,  51,  52,  53,  54,  55,  56,  57,  58,  59,  60,  61,
+					67,  68,  69,  70,  71,  72,  73,  74,  75,  76,  77,  78,       80,
+					89,  91,  92,  93,  94,  95,  96,  97,  98,  99,  100,  102,                104,
+					111, 112, 113,                117,                121, 122, 123, 124, 125, 126, 127,
 				],
 				vLedNames :
 				[
