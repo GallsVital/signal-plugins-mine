@@ -100,7 +100,7 @@ function GigabyteVisionGpuCheck(bus, address, log = false){
 	const ValidReturnCodes = [0x10, 0x11, 0x12, 0x14];
 	// 0x62 (Gaming OC) cards use a 8 byte write length.
 	// GPU will softlock if this is wrong.
-	const WriteLength = [0x32, 0x62, 0x71].includes(address) ? 8 : 4;
+	const WriteLength = [0x32, 0x50, 0x62, 0x71].includes(address) ? 8 : 4;
 
 	let data;
 
@@ -326,6 +326,7 @@ class GigabyteVisionDeviceIds {
 		this.RTX2070_GAMING_OC              = 0x37AD;
 		this.RTX2070_GAMING_OC_WHITE		= 0x37C6;
 		this.RTX2070_WINDFORCE              = 0x37C2;
+		this.RTX2070_XTREME_OC_8G			= 0x37B5;
 		this.RTX2070S_GAMING_OC             = 0x3FEB;
 		this.RTX2070S_GAMING_OC_3X          = 0x4008;
 		this.RTX2070S_GAMING_OC_3X_WHITE    = 0x400D;
@@ -444,6 +445,7 @@ class GigabyteVisionGPuList {
 
 			new GigabyteVisionIdentifier(Nvidia.RTX2070_OC,     GigabyteVisionIds.RTX2070_GAMING_OC,			0x47, "GIGABYTE 2070 Gaming OC"),
 			new GigabyteVisionIdentifier(Nvidia.RTX2070_OC,     GigabyteVisionIds.RTX2070_GAMING_OC_WHITE,		0x47, "GIGABYTE 2070 Gaming OC White"),
+			new GigabyteVisionIdentifier(Nvidia.RTX2070_OC,		GigabyteVisionIds.RTX2070_XTREME_OC_8G,			0x50, "GIGABYTE 2070 XTREME OC 8G"),
 
 			new GigabyteVisionIdentifier(Nvidia.RTX2070S,       GigabyteVisionIds.RTX2070S_GAMING_OC,			0x47, "GIGABYTE 2070 Super Gaming OC"),
 			new GigabyteVisionIdentifier(Nvidia.RTX2070S,       GigabyteVisionIds.RTX2070S_GAMING_OC_3X,		0x47, "GIGABYTE 2070 Super Gaming OC 3x"),
