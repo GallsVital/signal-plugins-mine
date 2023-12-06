@@ -26,6 +26,8 @@ export function SupportsFanControl(){ return true; }
 // Use the CorsairLink mutex any time this device is rendering.
 // if we don't our reads may be ruined by other programs
 export function UsesCorsairMutex(){ return true; }
+// Removing this can brick your device. Proceed at your own risk.
+export function AllowConflictBypass(){ return false;}
 
 /** @type {CorsairBragiController | undefined} */
 let BragiController;
@@ -548,7 +550,7 @@ class CorsairLibrary{
 			"LCD Cooler" : {
 				name : "ICUE Link Cooler With LCD Cap",
 				ledPositions: [
-					[6, 0], [5, 1], [7, 1], [4, 2], [8, 2], [3, 3], [9, 3], [2, 4], [10, 4], [1, 5], [11, 5], [0, 6], 
+					[6, 0], [5, 1], [7, 1], [4, 2], [8, 2], [3, 3], [9, 3], [2, 4], [10, 4], [1, 5], [11, 5], [0, 6],
 					[12, 6], [1, 7], [11, 7], [2, 8], [10, 8], [4, 10], [8, 10], [3, 9], [9, 9], [5, 11], [7, 11], [6, 12]
 				],
 				ledMap: [
