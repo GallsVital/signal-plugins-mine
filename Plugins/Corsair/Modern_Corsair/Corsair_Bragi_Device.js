@@ -29,7 +29,7 @@ export function ControllableParameters(){
 		{"property":"shutdownColor", "group":"lighting", "label":"Shutdown Color", "min":"0", "max":"360", "type":"color", "default":"#009bde"},
 		{"property":"LightingMode", "group":"lighting", "label":"Lighting Mode", "type":"combobox", "values":["Canvas", "Forced"], "default":"Canvas"},
 		{"property":"forcedColor", "group":"lighting", "label":"Forced Color", "min":"0", "max":"360", "type":"color", "default":"#009bde"},
-		{"property": "PollRate", "group":"", "label": "Poll Rate", "type": "combobox", "values": ["125hz", "250hz", "500hz", "1000hz"], "default": "1000hz" }, //Add a high polling rate check and leverage dyn props.
+
 	];
 }
 
@@ -41,6 +41,7 @@ export function onsettingControlChanged() {
 	if(settingControl) {
 		DPIHandler.setActiveControl(true);
 		DPIHandler.update();
+		setPollRate(PollRate);
 	} else {
 		DPIHandler.setActiveControl(false);
 	}
@@ -78,6 +79,12 @@ export function ondpi6Changed() {
 	DPIHandler.DPIStageUpdated(6);
 }
 
+export function onPollRateChanged() {
+	if(settingControl) {
+		setPollRate(PollRate);
+	}
+}
+
 /** @type {CorsairBragiDongle | undefined} */
 let BragiDongle;
 /** @type {CorsairBragiDevice | undefined} */
@@ -94,10 +101,6 @@ const options = {
 export function Validate(endpoint) {
 	return (endpoint.interface === 1 && endpoint.usage === 0x0001 && endpoint.usage_page === 0xFF42) ||
 	(endpoint.interface === 2 && endpoint.usage === 0x0002 && endpoint.usage_page === 0xFF42);
-}
-
-export function onPollRateChanged() {
-	setPollRate(PollRate);
 }
 
 export function Initialize() {
@@ -253,13 +256,16 @@ function initializeDevice(deviceConfig, deviceID = 0) {
 		} else { configureMouseButtons(deviceID); }
 
 	} else if(deviceConfig.keymapType === "Keyboard") {
-		setMacroKeys(deviceID);
+		//setMacroKeys(deviceID);
 		device.addFeature("keyboard");
 	}
 
 	device.pause(5);
 
 	if(Corsair.FetchDPISupport(deviceID) && DPIHandler.minDpi === 50) { //safety check. We check if the DPIHandler prop was updated. If it hasn't been then there's only a single instance.
+
+		addPollingRates(deviceID, true);
+
 		if(deviceConfig.hasSniperButton) {
 			DPIHandler.addSniperProperty();
 		}
@@ -274,11 +280,14 @@ function initializeDevice(deviceConfig, deviceID = 0) {
 			DPIHandler.setActiveControl(settingControl);
 			DPIHandler.update();
 		}
+	} else {
+		addPollingRates(deviceID);
 	}
 
 	deviceConfig.isLightingController = Corsair.FetchLightingControllerSupport(deviceID);
 	device.log(`Device Uses Lighting Controller Scheme: ${deviceConfig.isLightingController}`);
 	device.log("Let There Be Light!");
+	device.log(Corsair.FetchProperty(0x96));
 }
 /* eslint-enable complexity */
 
@@ -371,6 +380,56 @@ function ProcessInput(InputData){
 	}
 }
 
+function processFnKeys(key, isPressed) {
+	switch(key) {
+
+	case "F3" :
+		break;
+
+	case "F4" :
+		break;
+
+	case "F5" :
+		device.log("Toggling Mute");
+		keyboard.sendHid(0xAD, {released : !isPressed});
+		break;
+
+	case "F7" :
+		device.log("Volume Down");
+		keyboard.sendHid(0xAE, {released : !isPressed});
+		break;
+
+	case "F8" :
+		device.log("Volume Up");
+		keyboard.sendHid(0xAF, {released : !isPressed});
+		break;
+
+	case "F9" :
+		device.log("Stop");
+		keyboard.sendHid(0xB2, {released : !isPressed});
+		break;
+
+	case "F10" :
+		device.log("Rewind Track");
+		keyboard.sendHid(0xB1, {released : !isPressed});
+		break;
+
+	case "F11" :
+		device.log("Play/Pause");
+		keyboard.sendHid(0xB3, {released : !isPressed});
+		break;
+
+	case "F12" :
+		device.log("Skip Track");
+		keyboard.sendHid(0xB0, {released : !isPressed});
+		break;
+	}
+
+
+}
+
+let FnEnabled = false;
+
 function processMacroInputs(bitIdx, state) {
 	device.set_endpoint(0x01, 0x01, 0xFF42);
 
@@ -384,40 +443,64 @@ function processMacroInputs(bitIdx, state) {
 	const keyName = CorsairLibrary.GetKeyMapping(bitIdx, deviceType);
 
 	if(deviceType === "Keyboard") {
-		const eventData = {
-			key : keyName,
-			keyCode : 0,
-			"released": !state,
-		};
-		//device.log(`Key ${keyName} is state ${state}`);
-		keyboard.sendEvent(eventData, "Key Press");
+		processKeyboardMacros(bitIdx, state, keyName);
+
 	} else if(deviceType === "Mouse") {
-		if(state) {
-			switch(keyName) {
-			case "Dpi Stage Up":
-				DPIHandler.increment();
-				break;
-			case "Dpi Stage Down":
-				DPIHandler.decrement();
-				break;
-			case "Sniper":
-				DPIHandler.setSniperMode(true);
-				break;
-			default:
-				const eventData = {
-					"buttonCode": 0,
-					"released": !state,
-					"name":keyName
-				};
-				device.log(`bitIdx ${bitIdx} is state ${state}`);
-				//device.log(`Key ${keyName} is state ${state}`);
-				mouse.sendEvent(eventData, "Button Press");
-			}
-		} else {
-			if(keyName === "Sniper") { DPIHandler.setSniperMode(false); } else { const eventData = { "buttonCode": 0, "released": !state, "name":keyName }; mouse.sendEvent(eventData, "Button Press"); }
-		}
+		processMouseMacros(bitIdx, state, keyName);
 	}
 
+}
+
+function processMouseMacros(bitIdx, state, keyName) {
+	if(state) {
+		switch(keyName) {
+		case "Dpi Stage Up":
+			DPIHandler.increment();
+			break;
+		case "Dpi Stage Down":
+			DPIHandler.decrement();
+			break;
+		case "Sniper":
+			DPIHandler.setSniperMode(true);
+			break;
+		default:
+			const eventData = {
+				"buttonCode": 0,
+				"released": !state,
+				"name":keyName
+			};
+			device.log(`bitIdx ${bitIdx} is state ${state}`);
+			//device.log(`Key ${keyName} is state ${state}`);
+
+			if(keyName !== undefined) {
+				device.log(`Key ${keyName} is state ${state}`);
+				mouse.sendEvent(eventData, "Button Press");
+			}
+		}
+	} else {
+		if(keyName === "Sniper") { DPIHandler.setSniperMode(false); } else { const eventData = { "buttonCode": 0, "released": !state, "name":keyName }; mouse.sendEvent(eventData, "Button Press"); }
+	}
+}
+
+function processKeyboardMacros(bitIdx, state, keyName) {
+	const eventData = {
+		key : keyName,
+		keyCode : 0,
+		"released": !state,
+	};
+
+	if(keyName !== undefined) {
+		if(keyName === "Fn") {
+			FnEnabled = state;
+		}
+
+		if(FnEnabled) {
+			processFnKeys(eventData.key, state);
+		}
+
+		device.log(`Key ${keyName} is state ${state}`);
+		keyboard.sendEvent(eventData, "Key Press");
+	}
 }
 
 function configureMouseButtons(deviceID) { //TODO: Rewrite this properly once I get user confirmation of functionality.
@@ -519,6 +602,9 @@ function addAndRemoveDevicesFromDongleNotifications(bitmask) {
 
 	if(ConnectedChildren.length === 0) {
 		device.setImageFromUrl("https://assets.signalrgb.com/devices/default/usb-dongle.png");
+		device.removeProperty("settingControl");
+		device.removeProperty("PollRate");
+		DPIHandler.removeProperties();
 	}
 
 	for(const child of childrenToAdd) {
@@ -617,6 +703,24 @@ function PollDeviceState(deviceID = 0){
 	}
 
 	PollDeviceState.lastPollTime = Date.now();
+}
+
+function addPollingRates(deviceId, isMouse = false) {
+	let maxPollingRate = Corsair.FetchProperty(Corsair.properties.maxPollingRate, 0); //deviceId is omitted here because if we connect with a dongle, it will check the device's max rate instead of the dongle's.
+
+	if(maxPollingRate === -1){
+		maxPollingRate = Corsair.pollingRateNames["1000hz"];
+	}
+
+	const pollingRateValues = [];
+
+	for(let pollingRateValueCount = 1; pollingRateValueCount < maxPollingRate + 1; pollingRateValueCount++) {
+		pollingRateValues.push(Corsair.pollingRates[pollingRateValueCount]);
+	}
+
+
+	device.addProperty({ "property": "settingControl", "group": isMouse ? "mouse" : "", "label": "Enable Setting Control", "type": "boolean", "default": "false", "order": 1 });
+	device.addProperty({"property": "PollRate", "group": isMouse ? "mouse" : "", "label": "Polling Rate", "type": "combobox", "values": pollingRateValues, "default": "1000hz" });
 }
 
 function setPollRate(pollRate) {
@@ -856,18 +960,18 @@ class CorsairLibrary{
 			//55 : ".",
 			//56 : "/",
 			//57 : "Caps",
-			//58 : "F1",
-			//59 : "F2",
-			//60 : "F3",
-			//61 : "F4",
-			//62 : "F5",
-			//63 : "F6",
-			//64 : "F7",
-			//65 : "F8",
-			//66 : "F9",
-			//67 : "F10",
-			//68 : "F11",
-			//69 : "F12",
+			58 : "F1",
+			59 : "F2",
+			60 : "F3",
+			61 : "F4",
+			62 : "F5",
+			63 : "F6",
+			64 : "F7",
+			65 : "F8",
+			66 : "F9",
+			67 : "F10",
+			68 : "F11",
+			69 : "F12",
 			//70 : "Print Screen",
 			//71 : "Scroll Lock",
 			//72 : "Pause Break",
@@ -1276,7 +1380,7 @@ class CorsairLibrary{
 					"ISO #", "ISO <"
 				],
 				ledPositions: [
-					[1, 1],    [3, 1], [4, 1], [5, 1], [6, 1],     [7, 1], [8, 1], [9, 1], [10, 1],  [11, 1], [12, 1], [13, 1], [14, 1],  [15, 1], [16, 1], [17, 1],     //[18,1], [19,1],[20,1], [21,1],
+					[1, 1],    [3, 1], [4, 1], [5, 1], [6, 1],     [7, 1], [8, 1], [9, 1], [10, 1],   [12, 1], [13, 1], [14, 1], [15, 1],  [15, 1], [16, 1], [17, 1],     //[18,1], [19,1],[20,1], [21,1],
 					[1, 2], [2, 2], [3, 2], [4, 2], [5, 2], [6, 2], [7, 2], [8, 2], [9, 2], [10, 2], [11, 2], [12, 2], [13, 2], [14, 2],   [15, 2], [16, 2], [17, 2],   [18, 2], [19, 2], [20, 2], [21, 2],
 					[1, 3], [2, 3], [3, 3], [4, 3], [5, 3], [6, 3], [7, 3], [8, 3], [9, 3], [10, 3], [11, 3], [12, 3], [13, 3], [14, 3],   [15, 3], [16, 3], [17, 3],   [18, 3], [19, 3], [20, 3], [21, 3],
 					[1, 4], [2, 4], [3, 4], [4, 4], [5, 4], [6, 4], [7, 4], [8, 4], [9, 4], [10, 4], [11, 4], [12, 4],         [14, 4],                             [18, 4], [19, 4], [20, 4],
@@ -2083,6 +2187,8 @@ export class ModernCorsairProtocol{
 			3: "500hz",
 			4: "1000hz",
 			5: "2000hz",
+			6: "4000hz",
+			7: "8000hz"
 		});
 
 		this.pollingRateNames = Object.freeze({
@@ -2091,6 +2197,8 @@ export class ModernCorsairProtocol{
 			"500hz": 3,
 			"1000hz": 4,
 			"2000hz": 5,
+			"4000hz" : 6,
+			"8000hz" : 7
 		});
 
 		this.layouts = Object.freeze({
@@ -2849,16 +2957,8 @@ export class ModernCorsairProtocol{
 
 	/** @private */
 	StreamLighting(RGBData, deviceID = 0) {
-		device.write([0x00, deviceID | 0x08, this.command.streamEndpoint, 0x00].concat(RGBData), this.GetWriteLength());
+		device.write([0x00, deviceID, this.command.streamEndpoint, 0x00].concat(RGBData), this.GetWriteLength());
 		device.pause(1);
-
-		const returnPacket = device.read([0x00], this.GetReadLength());
-
-		const ErrorCode = this.CheckError(returnPacket, `StreamLighting`);
-
-		if(ErrorCode){
-			device.log(`StreamLighting Error`);
-		}
 	}
 
 	/**
@@ -3145,7 +3245,6 @@ export default class DpiController {
 		this.minDpi = 50;
 	}
 	addProperties() {
-		device.addProperty({ "property": "settingControl", "group": "mouse", "label": "Enable Setting Control", "type": "boolean", "default": "false", "order": 1 });
 		device.addProperty({ "property": "dpiStages", "group": "mouse", "label": "Number of DPI Stages", "step": "1", "type": "number", "min": "1", "max": this.maxSelectedableStage, "default": this.maxStageIdx, "order": 1, "live" : false });
 		device.addProperty({ "property": "dpiRollover", "group": "mouse", "label": "DPI Stage Rollover", "type": "boolean", "default": "false", "order": 1 });
 
@@ -3157,6 +3256,15 @@ export default class DpiController {
 		}
 
 		this.rebuildUserProperties();
+	}
+	removeProperties() {
+		device.removeProperty("dpiStages");
+		device.removeProperty("dpiRollover");
+		device.removeProperty(`dpi${this.sniperStageIdx}`);
+
+		for(let stages = 0; stages < this.maxStageIdx; stages++) {
+			device.removeProperty(`dpi${stages+1}`);
+		}
 	}
 	addSniperProperty() {
 		device.addProperty({ "property": `dpi${this.sniperStageIdx}`, "group": "mouse", "label": "Sniper Button DPI", "step": "50", "type": "number", "min": this.minDpi, "max": this.maxDpi, "default": "400", "order": 3, "live" : false });
