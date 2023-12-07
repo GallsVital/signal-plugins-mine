@@ -186,6 +186,7 @@ export class deviceLibrary {
 		this.PIDLibrary	=	{
 			0x193C: "ROG Falchion", // Wired
 			0x193E: "ROG Falchion",
+			0x1A64: "ROG Falchion",
 			0x1875: "ROG Strix Flare",
 			0x18AF: "ROG Strix Flare",
 			0x18CF: "ROG Strix Flare",
