@@ -311,6 +311,7 @@ class GigabyteVisionDeviceIds {
 
 		this.GTX1650_GAMING_OC              = 0x3FE4;
 		this.GTX1660_GAMING_OC_6GB          = 0x3FC7;
+		this.GTX1660_GAMING_OC_6GB_2		= 0x3FCF;
 		this.GTX1660TI_GAMING_OC_6GB        = 0x3FC5;
 		this.GTX1660S_GAMING_OC             = 0x4014;
 
@@ -430,6 +431,7 @@ class GigabyteVisionGPuList {
 			new GigabyteVisionIdentifier(Nvidia.GTX1080TI,      GigabyteVisionIds.GTX1080TI_XTREME_WATERFORCE_2, 0x47, "GIGABYTE 1080Ti Waterforce Xtreme Edition"),
 
 			new GigabyteVisionIdentifier(Nvidia.GTX1660,        GigabyteVisionIds.GTX1660_GAMING_OC_6GB,		0x47, "GIGABYTE 1660 Gaming OC 6gb"),
+			new GigabyteVisionIdentifier(Nvidia.GTX1660,        GigabyteVisionIds.GTX1660_GAMING_OC_6GB_2,		0x47, "GIGABYTE 1660 Gaming OC 6gb"),
 
 			new GigabyteVisionIdentifier(Nvidia.GTX1660S,       GigabyteVisionIds.GTX1660S_GAMING_OC,			0x47, "GIGABYTE 1660 Super Gaming OC"),
 
