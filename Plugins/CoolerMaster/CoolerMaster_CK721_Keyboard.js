@@ -1,6 +1,6 @@
 export function Name() { return "CoolerMaster CK721"; }
 export function VendorId() { return 0x2516; }
-export function ProductId() { return 0x016D; } // 0x01C3 Wireless
+export function ProductId() { return 0x016D; } // TODO: 0x01C3 Wireless
 export function Publisher() { return "WhirlwindFX"; }
 export function Documentation(){ return "troubleshooting/coolermaster"; }
 export function Size() { return [15, 5]; }
@@ -55,6 +55,10 @@ export function LedPositions() {
 export function Initialize() {
 	device.write([0x00, 0x80, 0x01, 0x01, 0x02, 0x02], 65); //Software mode
 	device.write([0x00, 0x01, 0x81, 0xC8, 0x00, 0x01, 0x00, 0x12], 65); //CPU Effect mode
+
+	// TODO: Wireless support
+	//device.write([0x00, 0x01, 0x81, 0x91, 0x01, 0x01, 0x00, 0x12], 33); //CPU Effect mode Wireless ?
+	//device.write([0x00, 0x01, 0x81, 0x87, 0x01, 0x0A], 33); // ??
 }
 
 export function Render() {
@@ -112,5 +116,5 @@ export function Validate(endpoint) {
 }
 
 export function ImageUrl(){
-	return "https://marketplace.signalrgb.com/devices/brands/coolermaster/keyboards/ck721.png";
+	return "https://assets.signalrgb.com/devices/brands/coolermaster/keyboards/ck721.png";
 }
