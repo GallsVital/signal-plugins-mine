@@ -64,6 +64,18 @@ export function LedPositions() {
 }
 
 export function Initialize() {
+	switch (device.productId()) {
+	case 0x0159:
+		device.setName("CoolerMaster SK620");
+		break;
+	case 0x0087:
+		device.setName("CoolerMaster SK621");
+		break;
+	default:
+		device.setName("CoolerMaster SK622");
+		break;
+	}
+
 	MagicStartupPacket();
 	device.write([0x00, 0x56, 0x81, 0x00, 0x00, 0x01, 0x00, 0x00, 0x00, 0x09, 0x00, 0x00, 0x00, 0xBB, 0xBB, 0xBB, 0xBB], 65);
 }
