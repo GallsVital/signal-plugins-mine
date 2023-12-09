@@ -1,6 +1,6 @@
-export function Name() { return "CoolerMaster SK622"; }
+export function Name() { return "CoolerMaster SK620"; }
 export function VendorId() { return 0x2516; }
-export function ProductId() { return [0x0149, 0x014b]; }
+export function ProductId() { return [0x0149, 0x014B, 0x0159]; }
 export function Publisher() { return "WhirlwindFX && saxXxekaf"; }
 export function Documentation(){ return "troubleshooting/coolermaster"; }
 export function Size() { return [17, 7]; }
