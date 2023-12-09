@@ -20,7 +20,6 @@ export function ControllableParameters(){
 	];
 }
 
-
 const vLedNames = [
 	"Led 1", "Led 2", "Led 3", "Led 4", "Led 5", "Led 6", "Led 7", "Led 8", "Led 9", "Led 10", "Led 11", "Led 12"
 ];
@@ -41,15 +40,15 @@ export function Initialize() {
 }
 
 export function Render() {
-	SendPacket();
+	sendColors();
 }
 
-
-export function Shutdown() {
-	SendPacket(true);
+export function Shutdown(SystemSuspending) {
+	const color = SystemSuspending ? "#000000" : shutdownColor;
+	sendColors(color);
 }
 
-function SendPacket(shutdown = false) {
+function sendColors(overrideColor) {
 	const packet = [];
 	packet[0] = 0x00;
 	packet[1] = 0x00;
@@ -72,8 +71,8 @@ function SendPacket(shutdown = false) {
 		const iPxY = vLedPositions[iIdx][1];
 		let col;
 
-		if(shutdown){
-			col = hexToRgb(shutdownColor);
+		if(overrideColor){
+			col = hexToRgb(overrideColor);
 		}else if (LightingMode === "Forced") {
 			col = hexToRgb(forcedColor);
 		}else{
@@ -113,7 +112,6 @@ function hexToRgb(hex) {
 
 export function Validate(endpoint) {
 	return (endpoint.interface === -1 || endpoint.interface === 0) && endpoint.usage === 0x0001 && endpoint.usage_page === 0x000C;
-
 }
 
 export function ImageUrl(){
