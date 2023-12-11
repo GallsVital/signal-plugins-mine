@@ -528,6 +528,7 @@ class Asus_Ampere_Lovelace_IDs {
 		this.RTX3090_TUF_GAMING                    = 0x87B5;
 		this.RTX3090_STRIX_GAMING                  = 0x87AF;
 		this.RTX3090_STRIX_GAMING_2				   = 0x87AD;
+		this.RTX3090_STRIX_GAMING_3				   = 0x87C5;
 		this.RTX3090_STRIX_GAMING_WHITE            = 0x87D9;
 		this.RTX3090_STRIX_GAMING_WHITE_V2         = 0x87DA;
 		this.RTX3090_STRIX_GAMING_EVA			   = 0x8886;
@@ -679,6 +680,7 @@ const Asus3000GPUIDs =
 	new AsusGPUIdentifier(Nvidia.RTX3090, AsusID.RTX3090_TUF_GAMING, "Asus TUF 3090 Gaming"),
 	new AsusGPUIdentifier(Nvidia.RTX3090, AsusID.RTX3090_STRIX_GAMING, "Asus ROG Strix 3090 O24G Gaming"),
 	new AsusGPUIdentifier(Nvidia.RTX3090, AsusID.RTX3090_STRIX_GAMING_2, "Asus ROG Strix 3090 O24G Gaming"),
+	new AsusGPUIdentifier(Nvidia.RTX3090, AsusID.RTX3090_STRIX_GAMING_3, "Asus ROG Strix 3090 O24G Gaming"),
 	new AsusGPUIdentifier(Nvidia.RTX3090, AsusID.RTX3090_STRIX_GAMING_WHITE, "Asus ROG Strix 3090 O24G Gaming White"),
 	new AsusGPUIdentifier(Nvidia.RTX3090, AsusID.RTX3090_STRIX_GAMING_WHITE_V2, "Asus ROG Strix 3090 O24G Gaming White V2"),
 	new AsusGPUIdentifier(Nvidia.RTX3090, AsusID.RTX3090_STRIX_GAMING_EVA, "Asus ROG Strix 3090 EVA Edition"),
