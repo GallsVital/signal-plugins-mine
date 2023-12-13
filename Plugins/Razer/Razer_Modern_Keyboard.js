@@ -156,7 +156,8 @@ function processKeyboardInputs(input, released = false) {
 		return;
 	}
 
-	const eventData = { key : Razer.getInputDict()[input], keyCode : 0, "released": released };
+	const eventData = { key : Razer.getInputDict()[input], keyCode : input, "released": released };
+	console.log(eventData);
 	device.log(`${Razer.getInputDict()[input]} Hit. Release Status: ${released}`);
 	keyboard.sendEvent(eventData, "Key Press");
 }
