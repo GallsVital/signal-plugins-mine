@@ -264,7 +264,6 @@ class NvidiaGPUDeviceIds {
 		this.RTX2080S        = 0x1E81;
 		this.RTX2080TI_TU102 = 0x1E04;
 		this.RTX2080TI       = 0x1E07;
-		this.RTX2080_SUPER   = 0x1E81;
 		this.RTX3050         = 0x2507;
 		this.RTX3060         = 0x2503;
 		this.RTX3060_LHR     = 0x2504;
@@ -457,6 +456,8 @@ class GigabyteVisionGPuList {
 			new GigabyteVisionIdentifier(Nvidia.RTX2070S,		GigabyteVisionIds.RTX2070S_GAMING_OC_WHITE,		0x47, "GIGABYTE 2070 Super Gaming OC"),
 
 			new GigabyteVisionIdentifier(Nvidia.RTX2080_A,      GigabyteVisionIds.RTX2080_WINDFORCE,			0x47, "GIGABYTE 2080 Windforce OC"),
+
+			new GigabyteVisionIdentifier(Nvidia.RTX2080S,       GigabyteVisionIds.RTX2080S_GAMING_OC,			0x47, "GIGABYTE 2080 Super Gaming OC"),
 
 			new GigabyteVisionIdentifier(Nvidia.RTX2080TI,      GigabyteVisionIds.RTX2080TI_GAMING_OC,			0x47, "GIGABYTE 2080TI Gaming OC"),
 
