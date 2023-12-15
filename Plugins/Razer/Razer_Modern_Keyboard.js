@@ -687,14 +687,14 @@ export class deviceLibrary {
 				size : [21, 6],
 				vKeys :
 				[
-					0,    0,    0, 0, 0, 0,   0, 0, 0, 0,     0, 0, 0, 0,		0, 0, 0,		0, 0, 0, 0,		0,
-					0,    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,				0, 0, 0,		0, 0, 0, 0,		0,
-					0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,					0, 0, 0,		0, 0, 0, 0,
-					0,    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,								0, 0, 0,		0,
-					0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,								0,			0, 0, 0, 0,
-					0, 0, 0,            0,     0, 0, 0, 0,						0, 0, 0,		0,	0,
-					0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+					0,    0,    0, 0, 0, 0, 0, 0, 0, 0,  0, 0, 0, 0,		0, 0, 0,		0, 0, 0, 0,		0,
+					0,    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,			0, 0, 0,		0, 0, 0, 0,		0,
+						  0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,			0, 0, 0,		0, 0, 0, 0,
+					0,    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,							0, 0, 0,		0,
+						  0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,					0,			0, 0, 0, 0,
+						  0, 0, 0,			0,			0, 0, 0, 0,			0, 0, 0,		0,	0,
 
+					0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
 					0, 0,
 					0, 0,
 					0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
@@ -703,12 +703,12 @@ export class deviceLibrary {
 				[
 					"LightBar Left 1", "Esc", "F1", "F2", "F3", "F4", "F5", "F6", "F7", "F8", "F9", "F10", "F11", "F12",			"Print Screen", "Scroll Lock", "Pause Break",   "Button 1", "Button 2", "Button 3", "Button 4", "LightBar Right 1",
 					"LightBar Left 2", "`", "1", "2", "3", "4", "5", "6", "7", "8", "9", "0", "-_", "=+", "Backspace",				"Insert", "Home", "Page Up",					"NumLock", "Num /", "Num *", "Num -",			"LightBar Right 2",
-					"Tab", "Q", "W", "E", "R", "T", "Y", "U", "I", "O", "P", "[", "]", "\\",										"Del", "End", "Page Down",						"Num 7", "Num 8", "Num 9", "Num +",
+									   "Tab", "Q", "W", "E", "R", "T", "Y", "U", "I", "O", "P", "[", "]", "\\",						"Del", "End", "Page Down",						"Num 7", "Num 8", "Num 9", "Num +",
 					"LightBar Left 3", "CapsLock", "A", "S", "D", "F", "G", "H", "J", "K", "L", ";", "'", "Enter",																	"Num 4", "Num 5", "Num 6",						"LightBar Right 3",
-					"Left Shift", "Z", "X", "C", "V", "B", "N", "M", ",", ".", "/", "Right Shift",										"Up Arrow",									"Num 1", "Num 2", "Num 3", "Num Enter",
-					"Left Ctrl", "Left Win", "Left Alt", "Space", "Right Alt", "Fn", "Menu", "Right Ctrl",							"Left Arrow", "Down Arrow", "Right Arrow",		"Num 0",		"Num .",
-					"LightBar Bottom 1", "LightBar Bottom 2", "LightBar Bottom 3", "LightBar Bottom 4", "LightBar Bottom 5", "LightBar Bottom 6", "LightBar Bottom 7", "LightBar Bottom 8", "LightBar Bottom 9", "LightBar Bottom 10", "LightBar Bottom 11", "LightBar Bottom 12", "LightBar Bottom 13", "LightBar Bottom 14", "LightBar Bottom 15",
+									   "Left Shift", "Z", "X", "C", "V", "B", "N", "M", ",", ".", "/", "Right Shift",					"Up Arrow",									"Num 1", "Num 2", "Num 3", "Num Enter",
+									   "Left Ctrl", "Left Win", "Left Alt", "Space", "Right Alt", "Fn", "Menu", "Right Ctrl",		"Left Arrow", "Down Arrow", "Right Arrow",		"Num 0",		"Num .",
 
+					"LightBar Bottom 1", "LightBar Bottom 2", "LightBar Bottom 3", "LightBar Bottom 4", "LightBar Bottom 5", "LightBar Bottom 6", "LightBar Bottom 7", "LightBar Bottom 8", "LightBar Bottom 9", "LightBar Bottom 10", "LightBar Bottom 11", "LightBar Bottom 12", "LightBar Bottom 13", "LightBar Bottom 14", "LightBar Bottom 15",
 					"Wrist Rest Bar Left 1", "Wrist Rest Bar Right 1",
 					"Wrist Rest Bar Left 2", "Wrist Rest Bar Right 2",
 					"Wrist Rest Bar Bottom 1", "Wrist Rest Bar Bottom 2", "Wrist Rest Bar Bottom 3", "Wrist Rest Bar Bottom 4", "Wrist Rest Bar Bottom 5", "Wrist Rest Bar Bottom 6", "Wrist Rest Bar Bottom 7", "Wrist Rest Bar Bottom 8", "Wrist Rest Bar Bottom 9", "Wrist Rest Bar Bottom 10", "Wrist Rest Bar Bottom 11", "Wrist Rest Bar Bottom 12", "Wrist Rest Bar Bottom 13", "Wrist Rest Bar Bottom 14", "Wrist Rest Bar Bottom 15",
