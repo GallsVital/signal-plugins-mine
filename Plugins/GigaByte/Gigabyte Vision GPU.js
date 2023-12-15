@@ -526,7 +526,7 @@ class GigabyteVisionGPuList {
 			new GigabyteVisionIdentifier(Nvidia.RTX3090,        GigabyteVisionIds.RTX3090_GAMING_OC_24GB,		0x62, "GIGABYTE 3090 Gaming OC 24G"), // Confirmed
 
 			new GigabyteVisionIdentifier(Nvidia.RTX4060TI,		GigabyteVisionIds.RTX4060TI_GAMING_OC,			0x71, "GIGABYTE 4060Ti Gaming OC"),
-			new GigabyteVisionIdentifier(Nvidia.RTX4060TI,		GigabyteVisionIds.RTX4060TI_AERO,				0x71, "GIGABYTE 4060Ti Aero OC"),
+			new GigabyteVisionIdentifier(Nvidia.RTX4060TI,		GigabyteVisionIds.RTX4060TI_AERO,				0x71, "GIGABYTE 4060Ti Aero"),
 
 			new GigabyteVisionIdentifier(Nvidia.RTX4060TI_OC,	GigabyteVisionIds.RTX4060TI_GAMING_OC_2,		0x71, "GIGABYTE 4060Ti Gaming OC"),
 			new GigabyteVisionIdentifier(Nvidia.RTX4060TI_OC,	GigabyteVisionIds.RTX4060TI_AERO_OC,			0x71, "GIGABYTE 4060Ti Aero OC"),
