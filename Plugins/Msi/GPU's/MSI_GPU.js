@@ -63,9 +63,6 @@ export function BrandGPUList(){ return new MSIGPUList().devices; }
 export function Initialize() {
 	SetGPUNameFromBusIds(new MSIGPUList().devices);
 
-	// We could do a product id check here, or a subdevice id check, but I'm not sure if that's necessary.
-	// This may need to change with 5000 series cards in the future too.
-	is40SeriesCard = device.name.startsWith("MSI 40");
 	console.log("Is 40 Series Card: " + is40SeriesCard);
 
 	CheckedWrite(0x2E, 0x00);
@@ -110,7 +107,12 @@ function CheckedWrite(register, byte){
 function SetGPUNameFromBusIds(GPUList) {
 	for(const GPU of GPUList) {
 		if(CheckForIdMatch(bus, GPU)) {
+
+			// We could do a product id check here, or a subdevice id check, but I'm not sure if that's necessary.
+			// This may need to change with 5000 series cards in the future too.
+			is40SeriesCard = GPU.Name.startsWith("MSI 40");
 			device.setName(GPU.Name);
+
 			break;
 		}
 	}
@@ -158,7 +160,7 @@ function sendColors(shutdown = false) {
 		PreviousColors[2] = color[2];
 	}
 
-	device.pause(30);
+	device.pause(60);
 }
 
 class MSIGPUController {
