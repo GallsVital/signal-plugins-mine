@@ -27,7 +27,7 @@ export function DeviceMessages() {
 }
 
 const vLedNames = [ "GPU" ];
-const vLedPositions = [ [3, 1] ];
+const vLedPositions = [ [0, 0] ];
 
 let startupRed;
 let startupBlue;
