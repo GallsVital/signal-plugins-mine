@@ -233,6 +233,10 @@ function initializeDevice(deviceConfig, deviceID = 0) {
 		Corsair.SetHWBrightness(1000, deviceID);
 	}
 
+	deviceConfig.isLightingController = Corsair.FetchLightingControllerSupport(deviceID);
+	device.log(`Device Uses Lighting Controller Scheme: ${deviceConfig.isLightingController}`);
+	device.log("Let There Be Light!");
+
 	deviceConfig.supportsBattery = Corsair.FetchBatterySupport(deviceID);
 	device.log(`Device Battery Support: ${deviceConfig.supportsBattery}`);
 
@@ -253,6 +257,7 @@ function initializeDevice(deviceConfig, deviceID = 0) {
 
 		if(devicePID === 0x1B9E) {
 			Corsair.WriteToEndpoint("Background", this.endpoints.Buttons, [0x01, 0x01, 0x01, 0x00, 0x00, 0x01, 0x01, 0x01], deviceID);
+			Corsair.OpenHandle("Lighting", Corsair.endpoints.Lighting, deviceID);
 		} else { configureMouseButtons(deviceID); }
 
 	} else if(deviceConfig.keymapType === "Keyboard") {
@@ -284,10 +289,10 @@ function initializeDevice(deviceConfig, deviceID = 0) {
 		addPollingRates(deviceID);
 	}
 
-	deviceConfig.isLightingController = Corsair.FetchLightingControllerSupport(deviceID);
-	device.log(`Device Uses Lighting Controller Scheme: ${deviceConfig.isLightingController}`);
-	device.log("Let There Be Light!");
-	device.log(Corsair.FetchProperty(0x96));
+	if([0x1bb6, 0x1B7D, 0x1BC5, 0x1B7C].includes(devicePID)) {
+		Corsair.OpenHandle("Lighting", Corsair.endpoints.LightingController, deviceID);
+		device.log("Bruteforcing Handle Open because K100/K70 Pro Mini");
+	}
 }
 /* eslint-enable complexity */
 
@@ -379,14 +384,30 @@ function ProcessInput(InputData){
 		macroInputArray.update(InputData.slice(3, 35));
 	}
 }
+//1, 2, 4, 8
+//02, 06, 14, 15
 
-function processFnKeys(key, isPressed) {
+function setWinLockToggles(keys, deviceId) {
+	Corsair.SetProperty(Corsair.properties.LockedShortcuts, 0x02, deviceId);
+}
+
+function setWinLock(enabled, deviceId) {
+	winLockEnabled = !winLockEnabled;
+	Corsair.SetProperty(Corsair.properties.WinLockState, enabled, deviceId);
+}
+
+let winLockEnabled = false;
+
+/* eslint-disable complexity */
+function processFnKeys(key, isPressed) { //This is going to snowball HARD. We have to be careful about how we try and maintain this. I may break it out into its own class, and add library entries for things like the winlock light, and different keymaps. This most likely is going to end up like Logitech does with a button map lib.
 	switch(key) {
 
-	case "F3" :
-		break;
+	case "F1" :
+		if(isPressed) {
+			setWinLock(winLockEnabled, macroSubdeviceID);
+			device.log(`Winlock set to ${winLockEnabled}`);
+		}
 
-	case "F4" :
 		break;
 
 	case "F5" :
@@ -423,10 +444,15 @@ function processFnKeys(key, isPressed) {
 		device.log("Skip Track");
 		keyboard.sendHid(0xB0, {released : !isPressed});
 		break;
+
+	case "Lock":
+		if(isPressed) {
+			setWinLock(winLockEnabled, macroSubdeviceID);
+			device.log(`Winlock set to ${winLockEnabled}`);
+		}
 	}
-
-
 }
+/* eslint-enable complexity */
 
 let FnEnabled = false;
 
@@ -442,13 +468,14 @@ function processMacroInputs(bitIdx, state) {
 	}
 	const keyName = CorsairLibrary.GetKeyMapping(bitIdx, deviceType);
 
-	if(deviceType === "Keyboard") {
-		processKeyboardMacros(bitIdx, state, keyName);
+	if(keyName !== undefined) {
+		if(deviceType === "Keyboard") {
+			processKeyboardMacros(bitIdx, state, keyName);
 
-	} else if(deviceType === "Mouse") {
-		processMouseMacros(bitIdx, state, keyName);
+		} else if(deviceType === "Mouse") {
+			processMouseMacros(bitIdx, state, keyName);
+		}
 	}
-
 }
 
 function processMouseMacros(bitIdx, state, keyName) {
@@ -472,10 +499,10 @@ function processMouseMacros(bitIdx, state, keyName) {
 			device.log(`bitIdx ${bitIdx} is state ${state}`);
 			//device.log(`Key ${keyName} is state ${state}`);
 
-			if(keyName !== undefined) {
-				device.log(`Key ${keyName} is state ${state}`);
-				mouse.sendEvent(eventData, "Button Press");
-			}
+
+			device.log(`Key ${keyName} is state ${state}`);
+			mouse.sendEvent(eventData, "Button Press");
+
 		}
 	} else {
 		if(keyName === "Sniper") { DPIHandler.setSniperMode(false); } else { const eventData = { "buttonCode": 0, "released": !state, "name":keyName }; mouse.sendEvent(eventData, "Button Press"); }
@@ -489,18 +516,18 @@ function processKeyboardMacros(bitIdx, state, keyName) {
 		"released": !state,
 	};
 
-	if(keyName !== undefined) {
-		if(keyName === "Fn") {
-			FnEnabled = state;
-		}
 
-		if(FnEnabled) {
-			processFnKeys(eventData.key, state);
-		}
-
-		device.log(`Key ${keyName} is state ${state}`);
-		keyboard.sendEvent(eventData, "Key Press");
+	if(keyName === "Fn") {
+		FnEnabled = state;
 	}
+
+	if(FnEnabled) {
+		processFnKeys(eventData.key, state);
+	}
+
+	device.log(`Key ${keyName} is state ${state}`);
+	keyboard.sendEvent(eventData, "Key Press");
+
 }
 
 function configureMouseButtons(deviceID) { //TODO: Rewrite this properly once I get user confirmation of functionality.
@@ -2551,6 +2578,10 @@ export class ModernCorsairProtocol{
 			device.log(`${caller_context} CorsairProtocol Error [${hasError}]: Property is not supported on this device!`);
 			break;
 
+		case 6: //Handle not open?
+			device.log(`${caller_context} CorsairProtocol Error [${hasError}]: Handle is not open!`);
+			break;
+
 		case 9: // Read only property
 			device.log(`${caller_context} CorsairProtocol Error [${hasError}]: Property is read only!`);
 			break;
@@ -2952,6 +2983,7 @@ export class ModernCorsairProtocol{
 
 		if(ErrorCode){
 			device.log(`WriteLighting Error`);
+			device.pause(50); //Same idea as above but less extreme.
 		}
 	}
 
