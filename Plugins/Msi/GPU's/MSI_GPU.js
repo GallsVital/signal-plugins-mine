@@ -1,9 +1,9 @@
-export function Name() { return "MSI Ampere GPU"; }
+export function Name() { return "MSI GPU"; }
 export function Publisher() { return "WhirlwindFX"; }
 export function Documentation(){ return "troubleshooting/MSI"; }
 export function Type() { return "SMBUS"; }
-export function Size() { return [5, 2]; }
-export function DefaultPosition(){return [192, 127];}
+export function Size() { return [1, 1]; }
+export function DefaultPosition(){return [0, 0];}
 export function DefaultScale(){return 2.5;}
 export function LedNames() { return vLedNames; }
 export function LedPositions() { return vLedPositions; }
@@ -27,20 +27,21 @@ export function DeviceMessages() {
 }
 
 const vLedNames = [ "GPU" ];
-const vLedPositions = [ [3, 1]];
+const vLedPositions = [ [0, 0] ];
 
 let startupRed;
 let startupBlue;
 let startupGreen;
 let startupBrightness;
 let startupMode;
+let is40SeriesCard = false;
 
 /** @param {FreeAddressBus} bus */
 export function Scan(bus) {
 	const FoundAddresses = [];
 
 	  // Skip any non AMD / INTEL Busses
-	if (!bus.IsNvidiaBus()) {
+	  if (!bus.IsNvidiaBus()) {
 		return [];
 	}
 
@@ -60,12 +61,22 @@ export function Scan(bus) {
 export function BrandGPUList(){ return new MSIGPUList().devices; }
 
 export function Initialize() {
-	//bus.WriteByte(0x2E, 0x00);
-	//bus.WriteByte(0x2D, 0x00); 40 Series flags
+	SetGPUNameFromBusIds(new MSIGPUList().devices);
+
+	// We could do a product id check here, or a subdevice id check, but I'm not sure if that's necessary.
+	// This may need to change with 5000 series cards in the future too.
+	is40SeriesCard = device.name.startsWith("MSI 40");
+	console.log("Is 40 Series Card: " + is40SeriesCard);
+
+	CheckedWrite(0x2E, 0x00);
+
+	if(is40SeriesCard){
+		CheckedWrite(0x2D, 0x00); //40 Series flags
+	}
+
 	MSIGPU.setDeviceMode(MSIGPU.modes.STATIC);
 	MSIGPU.setDeviceBrightness(0x64);
-	//MSIGPU.setDeviceEffectSpeed(0x00); Yay 40 series quirks
-	SetGPUNameFromBusIds(new MSIGPUList().devices);
+	MSIGPU.setDeviceEffectSpeed(0x00); //Yay 40 series quirks
 }
 
 export function Render() {
@@ -75,11 +86,22 @@ export function Render() {
 export function Shutdown() {
 }
 
-function CheckForIdMatch(bus, Gpu) {
-	return Gpu.Vendor === bus.Vendor() &&
-    Gpu.SubVendor === bus.SubVendor() &&
-    Gpu.Device === bus.Product() &&
-    Gpu.SubDevice === bus.SubDevice();
+
+function CheckedWrite(register, byte){
+	let attempts = 0;
+	const maxAttempts = 4;
+
+	while(attempts < maxAttempts){
+		if(bus.WriteByte(register, byte) === 0){
+			return true;
+		}
+
+		attempts++;
+	}
+
+	console.error(`Failed to write to register ${register} after ${maxAttempts} attempts.`);
+
+	return false;
 }
 
 function SetGPUNameFromBusIds(GPUList) {
@@ -91,6 +113,13 @@ function SetGPUNameFromBusIds(GPUList) {
 	}
 }
 
+function CheckForIdMatch(bus, Gpu) {
+	return Gpu.Vendor === bus.Vendor() &&
+    Gpu.SubVendor === bus.SubVendor() &&
+    Gpu.Device === bus.Product() &&
+    Gpu.SubDevice === bus.SubDevice();
+}
+
 function sendColors(shutdown = false) {
 	let color;
 
@@ -99,15 +128,20 @@ function sendColors(shutdown = false) {
 	} else if (LightingMode === "Forced") {
 		color = hexToRgb(forcedColor);
 	} else {
-		color = device.color( vLedPositions[0][0],  vLedPositions[0][1]);
+		color = device.color(vLedPositions[0][0],  vLedPositions[0][1]);
 	}
 
-	//MSIGPU.setDeviceMode(MSIGPU.modes.STATIC); //40 Series special.
+	if(is40SeriesCard){
+		MSIGPU.setDeviceMode(MSIGPU.modes.STATIC);
+	}
+
 	//We aren't using the start flag here. The 40 series card didn't need it, so let's just try without.
-	bus.WriteByte(MSIGPU.registers.R1, color[0]);
-	bus.WriteByte(MSIGPU.registers.G1, color[1]);
-	bus.WriteByte(MSIGPU.registers.B1, color[2]);
-	device.pause(120);
+	CheckedWrite(MSIGPU.registers.R1, color[0]);
+	device.pause(1);
+	CheckedWrite(MSIGPU.registers.G1, color[1]);
+	device.pause(1);
+	CheckedWrite(MSIGPU.registers.B1, color[2]);
+	device.pause(30);
 }
 
 class MSIGPUController {
@@ -187,19 +221,19 @@ class MSIGPUController {
 			device.log(this.getStartupValues[3]); //Recheck brightness
 		}
 
-		device.log("Startup Color Code" + startupRed << 8 + startupGreen << 8 + startupBlue << 8);
+		device.log("Startup Color Code" + (startupRed << 8) + (startupGreen << 8) + (startupBlue << 8));
 	}
 
 	setDeviceMode(mode) {
-		bus.WriteByte(this.registers.MODE, mode);
+		CheckedWrite(this.registers.MODE, mode);
 	}
 
 	setDeviceBrightness(brightness) {
-		bus.WriteByte(this.registers.BRIGHTNESS, brightness);
+		CheckedWrite(this.registers.BRIGHTNESS, brightness);
 	}
 
 	setDeviceEffectSpeed(speed) {
-		bus.WriteByte(this.registers.SPEED, speed);
+		CheckedWrite(this.registers.SPEED, speed);
 	}
 }
 
@@ -265,6 +299,12 @@ class NvidiaGPUDeviceIds {
 		this.RTX3080TI       = 0x2208;
 		this.RTX3090         = 0x2204;
 		this.RTX3090TI       = 0x2203;
+		this.RTX4060TI       = 0x2803;
+		this.RTX4060TI_OC	 = 0x2805;
+		this.RTX4070		 = 0x2786;
+		this.RTX4070TI		 = 0x2782;
+		this.RTX4080		 = 0x2704;
+		this.RTX4090		 = 0x2684;
 	}
 };
 
@@ -272,6 +312,7 @@ const Nvidia = new NvidiaGPUDeviceIds();
 
 class MSIGPUDeviceIDs {
 	constructor() {
+		// 1000 Series
 		this.MSI_GTX1060_3GB                         = 0x3285;
 		this.MSI_GTX1060_6GB                         = 0x3282;
 		//MSI_GTX1070TI_TITANIUM                          0xc300 //FAILED
@@ -282,6 +323,7 @@ class MSIGPUDeviceIDs {
 		this.MSI_GTX1080TI_GAMING_X                  = 0x3603;
 		this.MSI_GTX1080_DUKE                        = 0x3369;
 
+		// 1660 Series
 		this.MSI_GTX1660_GAMING_X_6G                 = 0x3790;
 		this.MSI_GTX1660TI_GAMING_X_6G               = 0x375A;
 		this.MSI_GTX1660TI_GAMING_X_6G_2             = 0x375C;
@@ -289,6 +331,7 @@ class MSIGPUDeviceIDs {
 		this.MSI_GTX1660_SUPER_GAMING_X_6G           = 0xC758;
 		this.MSI_GTX1660S_VENTUS_XS_OC               = 0xC75A;
 
+		// 2000 Series
 		this.MSI_RTX2060_GAMING_Z_6G                 = 0x3752;
 		this.MSI_RTX2060_GAMING_Z_6G_2               = 0x3754;
 		this.MSI_RTX2060_SUPER_GAMING_X              = 0xC752;
@@ -313,6 +356,7 @@ class MSIGPUDeviceIDs {
 		this.MSI_RTX2080TI_LIGHTNING_Z               = 0x3770;
 		this.MSI_RTX2080TI_DUKE_OC					 = 0x3710;
 
+		// 3000 Series
 		this.MSI_RTX3050_GAMING_X_8G				 = 0xC979;
 
 		this.MSI_RTX3060_GAMING_X_12G                = 0x3976;
@@ -341,6 +385,30 @@ class MSIGPUDeviceIDs {
 		this.MSI_RTX3090_SUPRIM_X                    = 0x3882;
 		this.MSI_RTX3090TI_SUPRIX_X                  = 0x5090;
 		this.MSI_RTX3090TI_GAMING_TRIO               = 0x5091;
+
+		// 4000 Series
+		this.RTX4060TI_GAMING_X_TRIO                 = 0x5152;
+
+		this.RTX4060TI_OC_GAMING_X_16G				 = 0x5172;
+
+		this.RTX4070_GAMING_X_TRIO 					 = 0x5136;
+		this.RTX4070_GAMING_X_SLIM 					 = 0x513F;
+
+		this.RTX4070TI_GAMING_X_TRIO				 = 0x5132;
+		this.RTX4070TI_SUPRIM_X						 = 0x5133;
+		this.RTX4070TI_GAMING_X_TRIO_W				 = 0x5139;
+
+		this.RTX4080_SUPRIM							 = 0x5110;
+		this.RTX4080_GAMING_X_TRIO					 = 0x5111;
+		this.RTX4080_GAMING_X_TRIO_W				 = 0x5115;
+		this.RTX4080_GAMING_X_SLIM_W				 = 0x511A;
+
+		this.RTX4090_SUPRRIM_X						 = 0x5102;
+		this.RTX4090_GAMING_TRIO			         = 0x5103;
+		this.RTX4090_SUPRIM_LIQUID_X                 = 0x5104;
+		this.RTX4090_SUPRIM_X_CLASSIC				 = 0x5105;
+		this.RTX4090_SUPRIM_X_CLASSIC_2				 = 0x5106;
+		this.RTX4090_GAMING_X_SLIM					 = 0x510B;
 	}
 }
 
@@ -432,6 +500,30 @@ class MSIGPUList {
         	new MSIGPUIdentifier(Nvidia.RTX3090, 			MSIGPUIDs.MSI_RTX3090_SUPRIM_X,						0x68, "MSI 3090 Suprim X"),
         	new MSIGPUIdentifier(Nvidia.RTX3090TI, 			MSIGPUIDs.MSI_RTX3090TI_SUPRIX_X,					0x68, "MSI 3090 TI Suprim X"), //Untested
         	new MSIGPUIdentifier(Nvidia.RTX3090TI, 			MSIGPUIDs.MSI_RTX3090TI_GAMING_TRIO,				0x68, "MSI 3090 TI Gaming Trio"), //Untested
+
+
+        	new MSIGPUIdentifier(Nvidia.RTX4060TI,		MSIGPUIDs.RTX4060TI_GAMING_X_TRIO,		0x68, "MSI 4060Ti GAMING X TRIO"),
+
+        	new MSIGPUIdentifier(Nvidia.RTX4060TI_OC,  MSIGPUIDs.RTX4060TI_OC_GAMING_X_16G,		0x68, "MSI 4060TI GAMING X 16G OC"),
+
+        	new MSIGPUIdentifier(Nvidia.RTX4070,		MSIGPUIDs.RTX4070_GAMING_X_TRIO,		0x68, "MSI 4070 GAMING X TRIO",),
+        	new MSIGPUIdentifier(Nvidia.RTX4070,		MSIGPUIDs.RTX4070_GAMING_X_SLIM,		0x68, "MSI 4070 GAMING X SLIM",),
+
+        	new MSIGPUIdentifier(Nvidia.RTX4070TI,		MSIGPUIDs.RTX4070TI_GAMING_X_TRIO,		0x68, "MSI 4070Ti GAMING X TRIO"),
+        	new MSIGPUIdentifier(Nvidia.RTX4070TI,		MSIGPUIDs.RTX4070TI_GAMING_X_TRIO_W,	0x68, "MSI 4070Ti GAMING X TRIO White"),
+        	new MSIGPUIdentifier(Nvidia.RTX4070TI,		MSIGPUIDs.RTX4070TI_SUPRIM_X,			0x68, "MSI 4070Ti SUPRIM X"),
+
+        	new MSIGPUIdentifier(Nvidia.RTX4080,		MSIGPUIDs.RTX4080_SUPRIM,				0x68, "MSI 4080 SUPRIM"),
+        	new MSIGPUIdentifier(Nvidia.RTX4080,		MSIGPUIDs.RTX4080_GAMING_X_TRIO,		0x68, "MSI 4080 GAMING X TRIO"),
+        	new MSIGPUIdentifier(Nvidia.RTX4080,		MSIGPUIDs.RTX4080_GAMING_X_TRIO_W,		0x68, "MSI 4080 GAMING X TRIO White"),
+        	new MSIGPUIdentifier(Nvidia.RTX4080,		MSIGPUIDs.RTX4080_GAMING_X_SLIM_W,		0x68, "MSI 4080 GAMING X SLIM White",),
+
+        	new MSIGPUIdentifier(Nvidia.RTX4090,		MSIGPUIDs.RTX4090_GAMING_TRIO,			0x68, "MSI 4090 GAMING TRIO"),
+        	new MSIGPUIdentifier(Nvidia.RTX4090,		MSIGPUIDs.RTX4090_SUPRIM_LIQUID_X,		0x68, "MSI 4090 SUPRIM LIQUID X"),
+        	new MSIGPUIdentifier(Nvidia.RTX4090,		MSIGPUIDs.RTX4090_SUPRRIM_X,			0x68, "MSI 4090 SUPRIM X"),
+        	new MSIGPUIdentifier(Nvidia.RTX4090,		MSIGPUIDs.RTX4090_SUPRIM_X_CLASSIC,		0x68, "MSI 4090 SUPRIM X Classic"),
+        	new MSIGPUIdentifier(Nvidia.RTX4090,		MSIGPUIDs.RTX4090_SUPRIM_X_CLASSIC_2,	0x68, "MSI 4090 SUPRIM X Classic"),
+        	new MSIGPUIdentifier(Nvidia.RTX4090,		MSIGPUIDs.RTX4090_GAMING_X_SLIM,		0x68, "MSI 4090 GAMING X SLIM")
         ];
 	}
 }
