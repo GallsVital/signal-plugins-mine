@@ -495,6 +495,24 @@ class GigabyteMasterProtocol {
 					}
 				}
 			},
+			0x40DF : // 4070TI GAMING 12G
+			{
+				Size: [5, 3],
+				modeZones : [0],
+				Zones:
+				{
+					0: {
+						Names :		[ "Fan 1", "Fan 2", "Fan 3" ],
+						Positions : [ [1, 2], [2, 2], [3, 2] ],
+						Mapping :	[ 0, 1, 2 ]
+					},
+					3: {
+						Names :		[ "Logo", "Placeholder 1", "Placeholder 2" ],
+						Positions : [ [3, 1], [0, 0], [1, 1] ],
+						Mapping :	[ 0 ]
+					}
+				}
+			},
 			0x40C9 : // 4070TI ELITE
 			{
 				Size: [15, 9],
@@ -785,6 +803,7 @@ class GigabyteMasterDeviceIds {
 		this.RTX4070_MASTER					 = 0x40E9;
 		this.RTX4070_GAMING_OC_12G			 = 0x40C6;
 
+		this.RTX4070TI_GAMING_12G			 = 0x40DF;
 		this.RTX4070TI_GAMING_OC_12G		 = 0x40C6; // Yes, same PID for different SKUs
 		this.RTX4070TI_ELITE				 = 0x40C9;
 
@@ -879,6 +898,7 @@ class GigabyteMasterGPuList {
 			new GigabyteMasterIdentifier(Nvidia.RTX4070, 		GigabyteMasterIds.RTX4070_GAMING_OC_12G,			0x71, "GIGABYTE 4070 Gaming OC"),
 			new GigabyteMasterIdentifier(Nvidia.RTX4070, 		GigabyteMasterIds.RTX4070_MASTER,					0x71, "GIGABYTE 4070 AORUS Master"),
 
+			new GigabyteMasterIdentifier(Nvidia.RTX4070TI, 		GigabyteMasterIds.RTX4070TI_GAMING_12G,				0x71, "GIGABYTE 4070TI Gaming"),
 			new GigabyteMasterIdentifier(Nvidia.RTX4070TI, 		GigabyteMasterIds.RTX4070TI_GAMING_OC_12G,			0x71, "GIGABYTE 4070TI Gaming OC"), // Yes, same PID for different SKUs
 			new GigabyteMasterIdentifier(Nvidia.RTX4070TI, 		GigabyteMasterIds.RTX4070TI_ELITE,					0x71, "GIGABYTE 4070TI Elite 12G"),
 
