@@ -21,7 +21,10 @@ export function ControllableParameters(){
 }
 export function DefaultComponentBrand() { return "Corsair";}
 export function Documentation(){ return "troubleshooting/corsair"; }
-
+// Use the CorsairLink mutex any time this device is rendering.
+// if we don't our reads may be ruined by other programs
+export function UsesCorsairMutex(){ return true;}
+export function SupportsFanControl(){ return true; }
 const ConnectedFans = [];
 const ConnectedProbes = [];
 const DeviceMaxLedLimit = 32;
