@@ -160,7 +160,7 @@ function sendColors(shutdown = false) {
 		PreviousColors[2] = color[2];
 	}
 
-	device.pause(60);
+	device.pause(120);
 }
 
 class MSIGPUController {
