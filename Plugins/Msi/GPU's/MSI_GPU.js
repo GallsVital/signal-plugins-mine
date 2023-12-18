@@ -123,6 +123,8 @@ function CheckForIdMatch(bus, Gpu) {
     Gpu.SubDevice === bus.SubDevice();
 }
 
+const PreviousColors = [0, 0, 0];
+
 function sendColors(shutdown = false) {
 	let color;
 
@@ -139,11 +141,23 @@ function sendColors(shutdown = false) {
 	}
 
 	//We aren't using the start flag here. The 40 series card didn't need it, so let's just try without.
-	CheckedWrite(MSIGPU.registers.R1, color[0]);
-	device.pause(1);
-	CheckedWrite(MSIGPU.registers.G1, color[1]);
-	device.pause(1);
-	CheckedWrite(MSIGPU.registers.B1, color[2]);
+	if(PreviousColors[0] !== color[0]) {
+		CheckedWrite(MSIGPU.registers.R1, color[0]);
+		PreviousColors[0] = color[0];
+		device.pause(1);
+	}
+
+	if(PreviousColors[1] !== color[1]) {
+		CheckedWrite(MSIGPU.registers.G1, color[1]);
+		PreviousColors[1] = color[1];
+		device.pause(1);
+	}
+
+	if(PreviousColors[2] !== color[2]) {
+		CheckedWrite(MSIGPU.registers.B1, color[2]);
+		PreviousColors[2] = color[2];
+	}
+
 	device.pause(30);
 }
 
@@ -437,9 +451,9 @@ class MSIGPUList {
         	new MSIGPUIdentifier(Nvidia.GTX1660S, 			MSIGPUIDs.MSI_GTX1660_SUPER_GAMING_X_6G,			0x68, "MSI 1660 Super Gaming X 6G"),
         	new MSIGPUIdentifier(Nvidia.GTX1660S, 			MSIGPUIDs.MSI_GTX1660S_VENTUS_XS_OC,				0x68, "MSI 1660 Super Ventos XS OC"),
 
-        	new MSIGPUIdentifier(Nvidia.RTX2060_TU104,		MSIGPUIDs. MSI_RTX2060_GAMING_Z_6G,					0x68, "MSI 2060 Gaming Z"),
-        	new MSIGPUIdentifier(Nvidia.RTX2060_TU106,		MSIGPUIDs. MSI_RTX2060_GAMING_Z_6G,					0x68, "MSI 2060 Gaming Z"),
-        	new MSIGPUIdentifier(Nvidia.RTX2060_TU106,		MSIGPUIDs. MSI_RTX2060_GAMING_Z_6G_2,				0x68, "MSI 2060 Gaming Z"),
+        	new MSIGPUIdentifier(Nvidia.RTX2060_TU104,		MSIGPUIDs.MSI_RTX2060_GAMING_Z_6G,					0x68, "MSI 2060 Gaming Z"),
+        	new MSIGPUIdentifier(Nvidia.RTX2060_TU106,		MSIGPUIDs.MSI_RTX2060_GAMING_Z_6G,					0x68, "MSI 2060 Gaming Z"),
+        	new MSIGPUIdentifier(Nvidia.RTX2060_TU106,		MSIGPUIDs.MSI_RTX2060_GAMING_Z_6G_2,				0x68, "MSI 2060 Gaming Z"),
         	new MSIGPUIdentifier(Nvidia.RTX2060S_OC,		MSIGPUIDs.MSI_RTX2060_SUPER_GAMING_X,				0x68, "MSI 2060 Super Gaming X"),
         	new MSIGPUIdentifier(Nvidia.RTX2060S_OC,		MSIGPUIDs.MSI_RTX2060_SUPER_GAMING,					0x68, "MSI 2060 Super Gaming"),
         	new MSIGPUIdentifier(Nvidia.RTX2060S_OC,		MSIGPUIDs.MSI_RTX2060_SUPER_ARMOR_OC,				0x68, "MSI 2060 Super Armor OC"),
@@ -482,7 +496,7 @@ class MSIGPUList {
         	new MSIGPUIdentifier(Nvidia.RTX3070, 			MSIGPUIDs.MSI_RTX3070_GAMING_Z_TRIO,				0x68, "MSI 3070 Gaming X Trio"),
         	new MSIGPUIdentifier(Nvidia.RTX3070_LHR,		MSIGPUIDs.MSI_RTX3070_GAMING_Z_TRIO,				0x68, "MSI 3070 Gaming Z Trio"),
         	new MSIGPUIdentifier(Nvidia.RTX3070, 			MSIGPUIDs.MSI_RTX3070_SUPRIM_X,						0x68, "MSI 3070 Suprim X"),
-        	new MSIGPUIdentifier(Nvidia.RTX3070_LHR,		MSIGPUIDs. MSI_RTX3070_SUPRIM_X,					0x68, "MSI 3070 Suprim X LHR"),
+        	new MSIGPUIdentifier(Nvidia.RTX3070_LHR,		MSIGPUIDs.MSI_RTX3070_SUPRIM_X,					0x68, "MSI 3070 Suprim X LHR"),
         	new MSIGPUIdentifier(Nvidia.RTX3070, 			MSIGPUIDs.MSI_RTX3070_SUPRIM,						0x68, "MSI 3070 Suprim"),
         	new MSIGPUIdentifier(Nvidia.RTX3070_LHR,		MSIGPUIDs.MSI_RTX3070_SUPRIM,						0x68, "MSI 3070 Suprim LHR"),
         	new MSIGPUIdentifier(Nvidia.RTX3070TI, 			MSIGPUIDs.MSI_RTX3070TI_GAMING_X_TRIO,				0x68, "MSI 3070Ti Gaming X Trio"),
