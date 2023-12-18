@@ -287,6 +287,7 @@ class ASUSLegacyGPUDeviceIds{
 		this.ROG_STRIX_GTX1080_O8G_GAMING              = 0x85F9;
 		this.ROG_STRIX_GTX1080TI_11G_GAMING            = 0x85F1;
 		this.ROG_STRIX_GTX1080TI_GAMING                = 0x85EA;
+		this.ROG_STRIX_GTX1080TI_GAMING_OC			   = 0x85EB;
 		this.ROG_STRIX_GTX1080TI_11G_GAMING_OC         = 0x85E4;
 		this.ROG_STRIX_GTX1660_SUPER_GAMING_OC		   = 0x8752;
 		this.ROG_STRIX_GTX1660_SUPER_GAMING_ADVANCED   = 0x8753;
@@ -372,7 +373,8 @@ class ASUSLegacyGPUList{
 			new ASUSLegacyDeviceIdentifier(Nvidia.GTX1080,         	ASUSLegacyGPUIds.GTX1080_STRIX_GAMING,              		0x29, "ASUS GTX 1080 Strix Gaming"),
 			new ASUSLegacyDeviceIdentifier(Nvidia.GTX1080,         	ASUSLegacyGPUIds.ROG_STRIX_GTX1080_A8G_GAMING,      		0x29, "ASUS ROG Strix GTX 1080 A8G Gaming"),
 			new ASUSLegacyDeviceIdentifier(Nvidia.GTX1080,         	ASUSLegacyGPUIds.ROG_STRIX_GTX1080_O8G_GAMING,      		0x29, "ASUS ROG Strix GTX 1080 OC 11 Gbps"),
-			new ASUSLegacyDeviceIdentifier(Nvidia.GTX1080TI,       	ASUSLegacyGPUIds.ROG_STRIX_GTX1080TI_GAMING,        		0x29, "ASUS ROG Strix GTX 1080Ti Gaming OC"),
+			new ASUSLegacyDeviceIdentifier(Nvidia.GTX1080TI,       	ASUSLegacyGPUIds.ROG_STRIX_GTX1080TI_GAMING,        		0x29, "ASUS ROG Strix GTX 1080Ti Gaming"),
+			new ASUSLegacyDeviceIdentifier(Nvidia.GTX1080TI,       	ASUSLegacyGPUIds.ROG_STRIX_GTX1080TI_GAMING_OC,        		0x29, "ASUS ROG Strix GTX 1080Ti Gaming OC"),
 			new ASUSLegacyDeviceIdentifier(Nvidia.GTX1080TI,       	ASUSLegacyGPUIds.ROG_STRIX_GTX1080TI_11G_GAMING,    		0x29, "ASUS ROG Strix GTX 1080Ti Gaming 11G"),
 			new ASUSLegacyDeviceIdentifier(Nvidia.GTX1080TI,		ASUSLegacyGPUIds.ROG_STRIX_GTX1080TI_11G_GAMING_OC,			0x29, "ASUS ROG Strix GTX 1080Ti Gaming OC 11G"),
 			new ASUSLegacyDeviceIdentifier(Nvidia.GTX1650S,        	ASUSLegacyGPUIds.ROG_STRIX_GTX1650_SUPER_OC,        		0x2A, "ASUS ROG Strix GTX 1650 Super OC"),
