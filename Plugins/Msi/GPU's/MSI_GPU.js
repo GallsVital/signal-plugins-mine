@@ -27,7 +27,7 @@ export function DeviceMessages() {
 }
 
 const vLedNames = [ "GPU" ];
-const vLedPositions = [ [0, 0] ];
+const vLedPositions = [ [3, 1] ];
 
 let startupRed;
 let startupBlue;
@@ -76,7 +76,10 @@ export function Initialize() {
 
 	MSIGPU.setDeviceMode(MSIGPU.modes.STATIC);
 	MSIGPU.setDeviceBrightness(0x64);
-	MSIGPU.setDeviceEffectSpeed(0x00); //Yay 40 series quirks
+
+	if(is40SeriesCard){
+		MSIGPU.setDeviceEffectSpeed(0x00); //Yay 40 series quirks
+	}
 }
 
 export function Render() {
