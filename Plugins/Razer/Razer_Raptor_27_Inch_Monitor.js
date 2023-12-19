@@ -3,7 +3,7 @@ export function VendorId() { return 0x1532; }
 export function ProductId() { return [0x0F12, 0x0F28]; }
 export function Publisher() { return "WhirlwindFX"; }
 export function Documentation(){ return "troubleshooting/razer"; }
-export function Size() { return [15, 10]; }
+export function Size() { return [15, 8]; }
 export function Type() { return "Hid"; }
 export function DefaultPosition(){return [50, 100];}
 export function DefaultScale(){return 8.0;}
@@ -21,14 +21,14 @@ export function ControllableParameters(){
 }
 
 const vLeds = [
-	0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11
+	0, 1, 2, 3, 4, 5, 8, 6, 9, 7, 10, 11
 ];
 
 const vLedNames = [
 	"Led 1", "Led 2", "Led 3", "Led 4", "Led 5", "Led 6", "Led 7", "Led 8", "Led 9", "Led 10", "Led 11", "Led 12"
 ];
 const vLedPositions = [
-	[0, 1], [0, 3], [0, 7], [0, 9], [4, 9], [6, 9], [8, 9], [10, 9], [14, 9], [14, 7], [14, 3], [14, 1]
+	[0, 1], [0, 4], [0, 7], [2, 7], [4, 7], [6, 7], [8, 7], [10, 7], [12, 7], [14, 7], [14, 4], [14, 1]
 ];
 
 export function LedNames() {
