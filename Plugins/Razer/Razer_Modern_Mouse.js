@@ -519,6 +519,7 @@ export class deviceLibrary {
 			"Basilisk V3" : "https://assets.signalrgb.com/devices/brands/razer/mice/basilisk-v3.png",
 			"Basilisk V3 Pro" : "https://assets.signalrgb.com/devices/brands/razer/mice/basilisk-v3-pro.png",
 			"Basilisk X Hyperspeed" : "https://assets.signalrgb.com/devices/brands/razer/mice/basilisk-x-hyperspeed.png",
+			"Cobra Pro" : "https://assets.signalrgb.com/devices/brands/razer/mice/basilisk-v3-pro.png",
 			"Deathadder Elite" : "https://assets.signalrgb.com/devices/brands/razer/mice/deathadder-elite.png",
 			"Deathadder V2" : "https://assets.signalrgb.com/devices/brands/razer/mice/deathadder-v2.png",
 			"Deathadder V2 Pro" : "https://assets.signalrgb.com/devices/brands/razer/mice/deathadder-v2-pro.png",
@@ -559,6 +560,8 @@ export class deviceLibrary {
 			0x00b9: "Basilisk X Hyperspeed", //technically V3, but we do not care.
 			//0x0271 : "Blackwidow V3 Mini",
 			//0x0258 : "Blackwidow V3 Mini",
+			0x00AF: "Cobra Pro", //Wired
+			0x00B0: "Cobra Pro", //Wireless
 			0x005C: "Deathadder Elite",
 			0x008C: "Deathadder Mini",
 			0x0084: "Deathadder V2",
@@ -661,6 +664,16 @@ export class deviceLibrary {
 				vLedPositions: [],
 				maxDPI: 16000,
 				hasSniperButton : true
+			},
+			"Cobra Pro":
+			{
+				size: [6, 7],
+				vLedNames: ["Logo", "Scrollwheel", "UnderLeft1", "UnderLeft2", "UnderLeft3", "UnderLeft4", "UnderLeft5", "UnderBottom", "UnderRight1", "UnderRight2", "UnderRight3", "UnderRight4", "UnderRight5"],
+				vLedPositions: [[3, 4], [3, 0], [0, 1], [0, 2], [0, 3], [0, 4], [1, 5], [3, 6], [4, 4], [5, 3], [5, 2], [5, 1], [5, 0]],
+				maxDPI: 30000,
+				hyperscrollWheel: true,
+				wireless: true,
+				hasSniperButton : false
 			},
 			"Deathadder Elite":
 			{
