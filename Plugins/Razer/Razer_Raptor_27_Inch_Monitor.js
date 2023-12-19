@@ -20,11 +20,15 @@ export function ControllableParameters(){
 	];
 }
 
+const vLeds = [
+	0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11
+];
+
 const vLedNames = [
 	"Led 1", "Led 2", "Led 3", "Led 4", "Led 5", "Led 6", "Led 7", "Led 8", "Led 9", "Led 10", "Led 11", "Led 12"
 ];
 const vLedPositions = [
-	[0, 1], [0, 3], [0, 7], [0, 9], [5, 9], [7, 9], [11, 9], [14, 9], [14, 7], [14, 5], [14, 3], [14, 1]
+	[0, 1], [0, 3], [0, 7], [0, 9], [4, 9], [6, 9], [8, 9], [10, 9], [14, 9], [14, 7], [14, 3], [14, 1]
 ];
 
 export function LedNames() {
@@ -49,40 +53,35 @@ export function Shutdown(SystemSuspending) {
 }
 
 function sendColors(overrideColor) {
-	const packet = [];
-	packet[0] = 0x00;
-	packet[1] = 0x00;
+	let packet = [];
+	const RGBData	= [];
+
 	packet[2] = 0x1F;
-	packet[3] = 0x00;
-	packet[4] = 0x00;
-	packet[5] = 0x00;
 	packet[6] = 0x29;
-	packet[7] = 0x0f;
+	packet[7] = 0x0F;
 	packet[8] = 0x03;
-	packet[9] = 0x00;
-	packet[10] = 0x00;
-	packet[11] = 0x00;
-	packet[12] = 0x00;
 	packet[13] = 0x0B;
 
 	for(let iIdx = 0; iIdx < vLedPositions.length; iIdx++){
 
 		const iPxX = vLedPositions[iIdx][0];
 		const iPxY = vLedPositions[iIdx][1];
-		let col;
+		let color;
 
 		if(overrideColor){
-			col = hexToRgb(overrideColor);
+			color = hexToRgb(overrideColor);
 		}else if (LightingMode === "Forced") {
-			col = hexToRgb(forcedColor);
+			color = hexToRgb(forcedColor);
 		}else{
-			col = device.color(iPxX, iPxY);
+			color = device.color(iPxX, iPxY);
 		}
-		const iLedIdx = (iIdx*3) + 14;
-		packet[iLedIdx] = col[0];
-		packet[iLedIdx+1] = col[1];
-		packet[iLedIdx+2] = col[2];
+
+		RGBData[(vLeds[iIdx]*3)] 	= color[0];
+		RGBData[(vLeds[iIdx]*3)+1]	= color[1];
+		RGBData[(vLeds[iIdx]*3)+2]	= color[2];
 	}
+
+	packet = packet.concat(RGBData);
 
 	packet[89] = CalculateCrc(packet);
 
