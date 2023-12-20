@@ -519,7 +519,7 @@ export class deviceLibrary {
 			"Basilisk V3" : "https://assets.signalrgb.com/devices/brands/razer/mice/basilisk-v3.png",
 			"Basilisk V3 Pro" : "https://assets.signalrgb.com/devices/brands/razer/mice/basilisk-v3-pro.png",
 			"Basilisk X Hyperspeed" : "https://assets.signalrgb.com/devices/brands/razer/mice/basilisk-x-hyperspeed.png",
-			"Cobra Pro" : "https://assets.signalrgb.com/devices/brands/razer/mice/basilisk-v3-pro.png",
+			"Cobra Pro" : "https://assets.signalrgb.com/devices/brands/razer/mice/cobra-pro.png",
 			"Deathadder Elite" : "https://assets.signalrgb.com/devices/brands/razer/mice/deathadder-elite.png",
 			"Deathadder V2" : "https://assets.signalrgb.com/devices/brands/razer/mice/deathadder-v2.png",
 			"Deathadder V2 Pro" : "https://assets.signalrgb.com/devices/brands/razer/mice/deathadder-v2-pro.png",
