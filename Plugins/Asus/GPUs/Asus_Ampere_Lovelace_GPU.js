@@ -546,14 +546,15 @@ class Asus_Ampere_Lovelace_IDs {
 		this.RTX4070_TUF_GAMING_OC				   = 0x88EC;
 		this.RTX4070_STRIX_GAMING				   = 0x88F4;
 		this.RTX4070_STRIX_GAMING_2				   = 0x88F3;
+
 		this.RTX4070TI_TUF_GAMING_OC			   = 0x88A3;
+		this.RTX4070TI_TUF_GAMING_OC_WH			   = 0x8935;
 		this.RTX4070TI_12GB_STRIX_GAMING_OC		   = 0X88A7;
 		this.RTX4070TI_12GB_STRIX_GAMING_OC_2      = 0x88DC;
 		this.RTX4070TI_12GB_STRIX_GAMING_OC_3	   = 0X88E5;
 		this.RTX4070TI_12GB_STRIX_GAMING_OC_4      = 0x88E4;
 		this.RTX4070TI_TUF_GAMING				   = 0x88A6;
 		this.RTX4070TI_TUF_GAMING_2                = 0x88DD;
-
 		this.RTX4070TI_TUF_GAMING_OC_2			   = 0x88A4;
 		this.RTX4070TI_12GB_TUF					   = 0x88dd;
 
@@ -705,6 +706,7 @@ const Asus3000GPUIDs =
 	new AsusGPUIdentifier(Nvidia.RTX4070TI, AsusID.RTX4070TI_12GB_STRIX_GAMING_OC_4, "Asus ROG Strix RTX 4070Ti 12GB Gaming OC"),
 	new AsusGPUIdentifier(Nvidia.RTX4070TI, AsusID.RTX4070TI_TUF_GAMING_OC, "Asus TUF RTX 4070Ti Gaming OC"),
 	new AsusGPUIdentifier(Nvidia.RTX4070TI, AsusID.RTX4070TI_TUF_GAMING_OC_2, "Asus TUF RTX 4070Ti Gaming OC"),
+	new AsusGPUIdentifier(Nvidia.RTX4070TI, AsusID.RTX4070TI_TUF_GAMING_OC_WH, "Asus 4070Ti TUF Gaming OC White"),
 	new AsusGPUIdentifier(Nvidia.RTX4070TI, AsusID.RTX4070TI_TUF_GAMING, "Asus TUF RTX 4070Ti 12GB Gaming"),
 	new AsusGPUIdentifier(Nvidia.RTX4070TI, AsusID.RTX4070TI_TUF_GAMING_2, "Asus TUF RTX 4070Ti 12GB Gaming"),
 	new AsusGPUIdentifier(Nvidia.RTX4080, AsusID.RTX4080_TUF_GAMING, "Asus TUF RTX 4080 Gaming"),
