@@ -125,7 +125,7 @@ function CheckForIdMatch(bus, Gpu) {
     Gpu.SubDevice === bus.SubDevice();
 }
 
-const PreviousColors = [0, 0, 0];
+//const PreviousColors = [0, 0, 0];
 
 function sendColors(shutdown = false) {
 	let color;
@@ -143,22 +143,20 @@ function sendColors(shutdown = false) {
 	}
 
 	//We aren't using the start flag here. The 40 series card didn't need it, so let's just try without.
-	if(PreviousColors[0] !== color[0]) {
-		CheckedWrite(MSIGPU.registers.R1, color[0]);
-		PreviousColors[0] = color[0];
-		device.pause(1);
-	}
+	//if(PreviousColors[0] !== color[0]) {
+	CheckedWrite(MSIGPU.registers.R1, color[0]);
+	//	PreviousColors[0] = color[0];
+	//}
 
-	if(PreviousColors[1] !== color[1]) {
-		CheckedWrite(MSIGPU.registers.G1, color[1]);
-		PreviousColors[1] = color[1];
-		device.pause(1);
-	}
+	//if(PreviousColors[1] !== color[1]) {
+	CheckedWrite(MSIGPU.registers.G1, color[1]);
+	//	PreviousColors[1] = color[1];
+	//}
 
-	if(PreviousColors[2] !== color[2]) {
-		CheckedWrite(MSIGPU.registers.B1, color[2]);
-		PreviousColors[2] = color[2];
-	}
+	//if(PreviousColors[2] !== color[2]) {
+	CheckedWrite(MSIGPU.registers.B1, color[2]);
+	//	PreviousColors[2] = color[2];
+	//}
 
 	device.pause(120);
 }
