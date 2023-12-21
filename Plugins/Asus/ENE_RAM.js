@@ -423,6 +423,7 @@ class ENERam{
 
 		for(let iIdx = 0; iIdx < 64; iIdx++) {
 			configTable[iIdx] = this.Interface.ReadRegister(this.commands.ConfigTable + iIdx);
+			device.pause(10);
 		}
 
 		return configTable;
@@ -566,7 +567,7 @@ class ENERam{
 
 		for(let offset = 0x00; offset < 5; offset++){
 			const val = this.Bus().ReadByte(address, 0x9B + offset);
-			bus.pause(30);
+			this.Bus().pause(30);
 
 			if(val !== 0x1b + offset){
 				this.Bus().log(`Check 3 Failed! Expected ${0x1b + offset}, Got ${val}`, {toFile:true});
