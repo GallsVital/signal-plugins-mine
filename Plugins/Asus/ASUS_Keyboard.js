@@ -200,6 +200,7 @@ export class deviceLibrary {
 			0x1951: "ROG Strix Scope RX",
 			0x1A05: "ROG Strix Scope RX", // Deluxe
 			0x19F6: "ROG Strix Scope NX", // Deluxe Wired
+			0x19F8: "ROG Strix Scope NX", // Deluxe Wireless
 			0x1AAE: "ROG Strix Scope II 96", // Wired
 			//0x1ACE: "ROG Strix Scope II 96 Wireless" // WIP
 		};
