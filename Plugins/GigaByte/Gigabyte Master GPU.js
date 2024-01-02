@@ -809,6 +809,7 @@ class GigabyteMasterDeviceIds {
 
 		this.RTX4080_GAMING_OC_16G	    	 = 0x40bc;
 		this.RTX4080_GAMING_OC_16G_2	     = 0x40bd;
+		this.RTX4080_GAMING_OC_16G_3         = 0x40D7;
 		this.RTX4080_XTREME_WATERFORCE		 = 0x40c8;
 
 		this.RTX4090_AORUS_MASTER 			 = 0x40C0;
@@ -904,6 +905,7 @@ class GigabyteMasterGPuList {
 
 			new GigabyteMasterIdentifier(Nvidia.RTX4080, 		GigabyteMasterIds.RTX4080_GAMING_OC_16G,			0x71, "GIGABYTE 4080 Gaming OC"),
 			new GigabyteMasterIdentifier(Nvidia.RTX4080, 		GigabyteMasterIds.RTX4080_GAMING_OC_16G_2,			0x71, "GIGABYTE 4080 Gaming OC"),
+			new GigabyteMasterIdentifier(Nvidia.RTX4080, 		GigabyteMasterIds.RTX4080_GAMING_OC_16G_3,			0x71, "GIGABYTE 4080 Gaming OC"),
 			new GigabyteMasterIdentifier(Nvidia.RTX4080, 		GigabyteMasterIds.RTX4080_XTREME_WATERFORCE,		0x64, "GIGABYTE 4080 XTREME Waterforce 16GB"), //This card is single zone. Older ones were multizone. We'll see if it plays ball or not with sending multiple zones.
 
 			new GigabyteMasterIdentifier(Nvidia.RTX4090,        GigabyteMasterIds.RTX4090_GAMING_OC_24GB,			0x71, "GIGABYTE 4090 Gaming OC"),
