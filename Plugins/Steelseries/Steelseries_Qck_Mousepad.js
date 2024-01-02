@@ -58,7 +58,7 @@ export function LedPositions() {
 }
 
 export function Initialize() {
-	device.setName(Name() + PIDLibrary[ProductId]);
+	device.setName(Name() + PIDLibrary[device.productId()]);
 	device.setImageFromUrl(updateImage());
 }
 
