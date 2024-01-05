@@ -405,7 +405,7 @@ class MSIGPUDeviceIDs {
 
 		// 4000 Series
 		this.RTX4060TI_GAMING_X_TRIO                 = 0x5152;
-
+		this.RTX4060TI_GAMING_X_SLIM_OC				 = 0x5170;
 		this.RTX4060TI_OC_GAMING_X_16G				 = 0x5172;
 
 		this.RTX4070_GAMING_X_TRIO 					 = 0x5136;
@@ -428,7 +428,6 @@ class MSIGPUDeviceIDs {
 		this.RTX4090_GAMING_X_SLIM					 = 0x510B;
 	}
 }
-
 
 class MSIGPUList {
 	constructor() {
@@ -522,6 +521,7 @@ class MSIGPUList {
         	new MSIGPUIdentifier(Nvidia.RTX4060TI,		MSIGPUIDs.RTX4060TI_GAMING_X_TRIO,		0x68, "MSI 4060Ti GAMING X TRIO"),
 
         	new MSIGPUIdentifier(Nvidia.RTX4060TI_OC,  MSIGPUIDs.RTX4060TI_OC_GAMING_X_16G,		0x68, "MSI 4060TI GAMING X 16G OC"),
+        	new MSIGPUIdentifier(Nvidia.RTX4060TI_OC,	MSIGPUIDs.RTX4060TI_GAMING_X_SLIM_OC,	0x68, "MSI 4060TI GAMING X SLIM OC"),
 
         	new MSIGPUIdentifier(Nvidia.RTX4070,		MSIGPUIDs.RTX4070_GAMING_X_TRIO,		0x68, "MSI 4070 GAMING X TRIO",),
         	new MSIGPUIdentifier(Nvidia.RTX4070,		MSIGPUIDs.RTX4070_GAMING_X_SLIM,		0x68, "MSI 4070 GAMING X SLIM",),
