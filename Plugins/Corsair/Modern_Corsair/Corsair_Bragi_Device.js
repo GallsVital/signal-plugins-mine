@@ -34,6 +34,8 @@ export function ControllableParameters(){
 }
 
 const devFlags = false;
+let handleError = false;
+
 
 export function SubdeviceController() { return devFlags; } //Fix DPI Logic. If you remove too many stages, it blows up.
 
@@ -2553,7 +2555,7 @@ export class ModernCorsairProtocol{
 	 * @param {string} Context - String representing the calling location.
 	 * @returns {number} An Error Code if the Data packet contained an error, otherwise 0.
 	 */
-	CheckError(Data, Context){
+	CheckError(Data, Context){ //TODO: Rewrite this to add proper handling and dealing with errors in the case of the endpoint not being open.
 		const hasError = Data[3] ?? 0;
 
 		if(!hasError){
@@ -2580,6 +2582,7 @@ export class ModernCorsairProtocol{
 
 		case 6: //Handle not open?
 			device.log(`${caller_context} CorsairProtocol Error [${hasError}]: Handle is not open!`);
+			handleError = true;
 			break;
 
 		case 9: // Read only property
@@ -2952,7 +2955,8 @@ export class ModernCorsairProtocol{
 
 		const isLightingEndpointOpen = this.IsHandleOpen("Lighting", deviceID);
 
-		if(!isLightingEndpointOpen){
+		if(!isLightingEndpointOpen || handleError){
+			handleError = false;
 			this.OpenHandle("Lighting", isLightingController ? this.endpoints.LightingController : this.endpoints.Lighting, deviceID);
 		}
 
