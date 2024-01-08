@@ -1299,6 +1299,18 @@ class MysticLight {
 				ForceZoneBased	  : false,
 				JARGB_V2		  : true,
 			},
+			0x7E09 : //B650M Project Zero
+			{
+				OnboardLEDs    : 0,
+				RGBHeaders     : 0,
+				ARGBHeaders    : 3,
+				JPipeLEDs	   : 0,
+				CorsairHeaders : 0,
+				//PERLED
+				PerLEDOnboardLEDs : 0,
+				ForceZoneBased	  : false,
+				JARGB_V2		  : true,
+			},
 			0x7E10 : //B650 Edge
 			{
 				OnboardLEDs    : 6,
