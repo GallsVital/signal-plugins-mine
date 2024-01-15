@@ -1,6 +1,6 @@
 export function Name() { return "SteelSeries Apex Pro TKL 2023 Wireless"; }
 export function VendorId() { return 0x1038; }
-export function ProductId() { return 0x1630; }
+export function ProductId() { return [0x1630, 0x1632]; }
 export function Publisher() { return "WhirlwindFX"; }
 export function Documentation(){ return "troubleshooting/steelseries"; }
 export function Size() { return [17, 6]; }
