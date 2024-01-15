@@ -37,6 +37,7 @@ const NZXTSmartDevice2ProductNames = {
 	0x2011: "NZXT RGB and Fan Controller",
 	0x2012: "NZXT RGB and Fan Controller",
 	0x2019: "NZXT RGB and Fan Controller",
+	0x2021: "NZXT RGB and Fan Controller",
 };
 
 //Channel Name, Led Limit
