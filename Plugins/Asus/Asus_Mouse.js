@@ -402,6 +402,7 @@ export class deviceLibrary {
 			0x1960: "ROG Keris",
 			0x195E: "ROG Keris",
 			0x1A59: "ROG Keris",
+			0x1A66: "ROG Keris", // Keris Aimpoint Wired
 			0x1846: "Pugio I",
 			0x1906: "Pugio II",
 			0x1908: "Pugio II Wireless",
