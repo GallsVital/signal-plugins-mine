@@ -477,6 +477,34 @@ class GigabyteMasterProtocol {
 					}
 				}
 			},
+			0x4100 : // 4070TI Gaming OC V2
+			{
+				Size: [15, 9],
+				modeZones : [2, 3, 5, 6],
+				Zones:
+				{
+					0: {
+						Names :		[ "Fan 1 LED 1", "Fan 1 LED 2", "Fan 1 LED 3", "Fan 1 LED 4", "Fan 1 LED 5", "Fan 1 LED 6", "Fan 1 LED 7", "Fan 1 LED 8",],
+					 	Positions : [ [0, 5], [1, 4], [2, 3], [3, 4], [4, 5], [3, 6], [2, 7], [1, 8], ],
+						Mapping :	[ 0, 1, 2, 3, 4, 5, 6, 7 ]
+					},
+					1: {
+						Names :		[ "Fan 2 LED 1", "Fan 2 LED 2", "Fan 2 LED 3", "Fan 2 LED 4", "Fan 2 LED 5", "Fan 2 LED 6", "Fan 2 LED 7", "Fan 2 LED 8",],
+						Positions : [ [5, 5], [6, 4], [7, 3], [8, 4], [9, 5], [8, 6], [7, 7], [6, 8], ],
+						Mapping :	[ 0, 1, 2, 3, 4, 5, 6, 7 ]
+					},
+					2: {
+						Names :		[ "Fan 3 LED 1", "Fan 3 LED 2", "Fan 3 LED 3", "Fan 3 LED 4", "Fan 3 LED 5", "Fan 3 LED 6", "Fan 3 LED 7", "Fan 3 LED 8",],
+						Positions : [ [10, 5], [11, 4], [12, 3], [13, 4], [14, 5], [13, 6], [12, 7], [11, 8], ],
+						Mapping :	[ 0, 1, 2, 3, 4, 5, 6, 7 ]
+					},
+					3: {
+						Names :		[ "Side Logo LED" ],
+						Positions : [ [11, 0] ],
+						Mapping :	[ 0 ]
+					}
+				}
+			},
 			0x40C6 : // 4070 GAMING OC 12G
 			{
 				Size: [5, 3],
@@ -803,6 +831,7 @@ class GigabyteMasterDeviceIds {
 		this.RTX4070_MASTER					 = 0x40E9;
 		this.RTX4070_GAMING_OC_12G			 = 0x40C6;
 
+		this.RTX4070TI_GAMING_OC_V2			 = 0x4100;
 		this.RTX4070TI_GAMING_12G			 = 0x40DF;
 		this.RTX4070TI_GAMING_OC_12G		 = 0x40C6; // Yes, same PID for different SKUs
 		this.RTX4070TI_ELITE				 = 0x40C9;
@@ -901,6 +930,7 @@ class GigabyteMasterGPuList {
 
 			new GigabyteMasterIdentifier(Nvidia.RTX4070TI, 		GigabyteMasterIds.RTX4070TI_GAMING_12G,				0x71, "GIGABYTE 4070TI Gaming"),
 			new GigabyteMasterIdentifier(Nvidia.RTX4070TI, 		GigabyteMasterIds.RTX4070TI_GAMING_OC_12G,			0x71, "GIGABYTE 4070TI Gaming OC"), // Yes, same PID for different SKUs
+			new GigabyteMasterIdentifier(Nvidia.RTX4070TI, 		GigabyteMasterIds.RTX4070TI_GAMING_OC_V2,			0x71, "GIGABYTE 4070TI Gaming OC V2"),
 			new GigabyteMasterIdentifier(Nvidia.RTX4070TI, 		GigabyteMasterIds.RTX4070TI_ELITE,					0x71, "GIGABYTE 4070TI Elite 12G"),
 
 			new GigabyteMasterIdentifier(Nvidia.RTX4080, 		GigabyteMasterIds.RTX4080_GAMING_OC_16G,			0x71, "GIGABYTE 4080 Gaming OC"),
