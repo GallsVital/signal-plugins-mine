@@ -126,7 +126,7 @@ class DominatorRamModel{
 /**
  * Protocol for Corsair Dominator Ram
  */
-export class CorsairDominatorProtocol{
+export class CorsairDominatorProtocol{ //read 2 from 0x24
 	constructor(){
 		/**
 		 * Contains Known Registers
@@ -140,6 +140,7 @@ export class CorsairDominatorProtocol{
 		 * Expected Vender Id for Corsair Dominator Protocol Ram
 		 */
 		this.VendorId = 0x1B;
+		this.VendorId2 = 0x1A; //Corsair does love being funky.
 		/**
 		 * Array of expected Model Ids for Corsair Dominator Protocol Ram
 		 */
@@ -163,6 +164,7 @@ export class CorsairDominatorProtocol{
 			"CMH" : new DominatorRamModel("Corsair Vengeance Pro SL", 10, "CMH"),
 			"CMN" : new DominatorRamModel("Corsair Vengeance RGB RT", 10, "CMN"),
 			"CMG" : new DominatorRamModel("Corsair Vengeance RGB RS", 6, "CMG"),
+			"CMP" : new DominatorRamModel("Corsair Dominator Titanium", 11, "CMP"),
 		};
 
 		this.ModelNames = [];
@@ -292,14 +294,14 @@ export class CorsairDominatorProtocol{
 		const vendorByte = bus.ReadByte(address, this.Registers.Vender);
 		bus.log(`Address ${address} has Vendor Byte ${vendorByte}`, {toFile: true});
 
-		if (vendorByte !== this.VendorId){
-			return false;
+		if (vendorByte === this.VendorId2 || vendorByte === this.VendorId2){
+			const modelByte = bus.ReadByte(address, this.Registers.Model);
+			bus.log(`Address ${address} has Model Byte ${modelByte}`, {toFile: true});
+
+			return this.ModelIds.includes(modelByte);
 		}
 
-		const modelByte = bus.ReadByte(address, this.Registers.Model);
-		bus.log(`Address ${address} has Model Byte ${modelByte}`, {toFile: true});
-
-		return this.ModelIds.includes(modelByte);
+		return false;
 	}
 }
 
