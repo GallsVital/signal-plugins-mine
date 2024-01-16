@@ -285,6 +285,7 @@ class CrucialBallistix{
 		for (let register = 0xA0; register < 0xB0; register++) {
 			const expectedValue = register - 0xA0;
 			const iRet = this.Bus().ReadByte(address, register);
+			this.Bus().pause(30);
 
 			if (iRet !== expectedValue) {
 				this.Bus().log(`Address: [${address}], Register: [${register}], Expected [${expectedValue}] but instead got [${iRet}]`);
@@ -308,6 +309,7 @@ class CrucialBallistix{
 
 		for (let iIdx = 0; iIdx < 21; iIdx++) {
 			const iRet = this.Interface.ReadRegister(address, 0x1025 + iIdx);
+			this.Bus().pause(30);
 
 			if(iRet > 0){
 				Characters.push(iRet);

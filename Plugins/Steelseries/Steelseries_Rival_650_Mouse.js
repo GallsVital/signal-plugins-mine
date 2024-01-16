@@ -26,7 +26,7 @@ export function ControllableParameters(){
 }
 export function DeviceMessages() {
 	return [
-		{property: "Limited Frame Rate", message:"Limited Frame Rate", tooltip: "This device's firmware is limited to a slower refresh rate then other devices. Adjusting RGB Packet Delay may help, but may also increase instability"},
+		{property: "Limited Frame Rate", message:"Limited Frame Rate", tooltip: "This device's firmware is limited to a slower refresh rate than other devices. Adjusting RGB Packet Delay may help, but may also increase instability"},
 	];
 }
 

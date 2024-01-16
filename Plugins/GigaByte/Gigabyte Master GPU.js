@@ -523,6 +523,24 @@ class GigabyteMasterProtocol {
 					}
 				}
 			},
+			0x40DF : // 4070TI GAMING 12G
+			{
+				Size: [5, 3],
+				modeZones : [0],
+				Zones:
+				{
+					0: {
+						Names :		[ "Fan 1", "Fan 2", "Fan 3" ],
+						Positions : [ [1, 2], [2, 2], [3, 2] ],
+						Mapping :	[ 0, 1, 2 ]
+					},
+					3: {
+						Names :		[ "Logo", "Placeholder 1", "Placeholder 2" ],
+						Positions : [ [3, 1], [0, 0], [1, 1] ],
+						Mapping :	[ 0 ]
+					}
+				}
+			},
 			0x40C9 : // 4070TI ELITE
 			{
 				Size: [15, 9],
@@ -800,6 +818,8 @@ class GigabyteMasterDeviceIds {
 
 		this.RTX3080_XTREME_WATERFORCE       = 0x4038;
 		this.RTX3080_XTREME_WATERFORCE_10G	 = 0x4037;
+		this.RTX3080_XTREME_WATERFORCE_12G	 = 0x40A4;
+		this.RTX3080_XTREME_WATERFORCE_12G_2 = 0x40A3;
 
 		this.RTX3080TI_XTREME_WATERFORCE_12G = 0x4082;
 
@@ -813,10 +833,13 @@ class GigabyteMasterDeviceIds {
 
 		this.RTX4070TI_GAMING_OC_12G		 = 0x40C6;
 		this.RTX4070TI_GAMING_OC_V2			 = 0x4100; // Yes, same PID for different SKUs
+		this.RTX4070TI_GAMING_12G			 = 0x40DF;
+		this.RTX4070TI_GAMING_OC_12G		 = 0x40C6; // Yes, same PID for different SKUs
 		this.RTX4070TI_ELITE				 = 0x40C9;
 
 		this.RTX4080_GAMING_OC_16G	    	 = 0x40bc;
 		this.RTX4080_GAMING_OC_16G_2	     = 0x40bd;
+		this.RTX4080_GAMING_OC_16G_3         = 0x40D7;
 		this.RTX4080_XTREME_WATERFORCE		 = 0x40c8;
 
 		this.RTX4090_AORUS_MASTER 			 = 0x40C0;
@@ -890,6 +913,9 @@ class GigabyteMasterGPuList {
 			new GigabyteMasterIdentifier(Nvidia.RTX3080,        GigabyteMasterIds.RTX3080_XTREME_WATERFORCE,   		0x64, "GIGABYTE 3080 AORUS XTREME Waterforce 10GB"),
 			new GigabyteMasterIdentifier(Nvidia.RTX3080,        GigabyteMasterIds.RTX3080_XTREME_WATERFORCE_10G,	0x65, "GIGABYTE 3080 AORUS XTREME Waterforce 10GB"),
 
+			new GigabyteMasterIdentifier(Nvidia.RTX3080_GA102,	GigabyteMasterIds.RTX3080_XTREME_WATERFORCE_12G,	0x65, "GIGABYTE 3080 AORUS XTREME Waterforce 12GB GA102"),
+			new GigabyteMasterIdentifier(Nvidia.RTX3080_GA102,	GigabyteMasterIds.RTX3080_XTREME_WATERFORCE_12G_2,	0x64, "GIGABYTE 3080 AORUS XTREME Waterforce 12GB GA102"),
+
 			new GigabyteMasterIdentifier(Nvidia.RTX3080_LHR,    GigabyteMasterIds.RTX3080_XTREME_WATERFORCE_10G,	0x65, "GIGABYTE 3080 AORUS XTREME Waterforce 10GB"),
 			new GigabyteMasterIdentifier(Nvidia.RTX3080_LHR,	GigabyteMasterIds.RTX3080_XTREME_WATERFORCE,		0x64, "GIGABYTE 3080 AORUS XTREME Waterforce 10GB LHR"),
 
@@ -903,12 +929,14 @@ class GigabyteMasterGPuList {
 			new GigabyteMasterIdentifier(Nvidia.RTX4070, 		GigabyteMasterIds.RTX4070_GAMING_OC_12G,			0x71, "GIGABYTE 4070 Gaming OC"),
 			new GigabyteMasterIdentifier(Nvidia.RTX4070, 		GigabyteMasterIds.RTX4070_MASTER,					0x71, "GIGABYTE 4070 AORUS Master"),
 
+			new GigabyteMasterIdentifier(Nvidia.RTX4070TI, 		GigabyteMasterIds.RTX4070TI_GAMING_12G,				0x71, "GIGABYTE 4070TI Gaming"),
 			new GigabyteMasterIdentifier(Nvidia.RTX4070TI, 		GigabyteMasterIds.RTX4070TI_GAMING_OC_12G,			0x71, "GIGABYTE 4070TI Gaming OC"), // Yes, same PID for different SKUs
 			new GigabyteMasterIdentifier(Nvidia.RTX4070TI, 		GigabyteMasterIds.RTX4070TI_GAMING_OC_V2,			0x71, "GIGABYTE 4070TI Gaming OC V2"),
 			new GigabyteMasterIdentifier(Nvidia.RTX4070TI, 		GigabyteMasterIds.RTX4070TI_ELITE,					0x71, "GIGABYTE 4070TI Elite 12G"),
 
 			new GigabyteMasterIdentifier(Nvidia.RTX4080, 		GigabyteMasterIds.RTX4080_GAMING_OC_16G,			0x71, "GIGABYTE 4080 Gaming OC"),
 			new GigabyteMasterIdentifier(Nvidia.RTX4080, 		GigabyteMasterIds.RTX4080_GAMING_OC_16G_2,			0x71, "GIGABYTE 4080 Gaming OC"),
+			new GigabyteMasterIdentifier(Nvidia.RTX4080, 		GigabyteMasterIds.RTX4080_GAMING_OC_16G_3,			0x71, "GIGABYTE 4080 Gaming OC"),
 			new GigabyteMasterIdentifier(Nvidia.RTX4080, 		GigabyteMasterIds.RTX4080_XTREME_WATERFORCE,		0x64, "GIGABYTE 4080 XTREME Waterforce 16GB"), //This card is single zone. Older ones were multizone. We'll see if it plays ball or not with sending multiple zones.
 
 			new GigabyteMasterIdentifier(Nvidia.RTX4090,        GigabyteMasterIds.RTX4090_GAMING_OC_24GB,			0x71, "GIGABYTE 4090 Gaming OC"),

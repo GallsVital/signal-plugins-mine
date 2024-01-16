@@ -93,7 +93,6 @@ export function Initialize() {
 
 	if(ENE.config.XTREEM === false) {
 		device.log(`Device is not XTREEM RAM.`);
-		device.pause(100);
 	}
 
 	ENE.setLEDArrays();
@@ -103,7 +102,6 @@ export function Initialize() {
 
 export function Render() {
 	UpdateColors();
-	device.pause(10);
 }
 
 export function Shutdown() {
@@ -162,6 +160,7 @@ class ENEInterfaceFree extends ENEInterface{
 		this.bus.WriteWord(address, 0x00, ((register << 8) & 0xFF00) | ((register >> 8) & 0x00FF));
 
 		let returnValue = (this.bus.ReadByte(address, 0x81) << 8) & 0xFF00;
+		this.bus.pause(30);
 		returnValue |= this.bus.ReadByte(address, 0x81) & 0xFF;
 
 		return returnValue;
@@ -174,6 +173,7 @@ class ENEInterfaceFree extends ENEInterface{
 
 		for(let bytesToRead = 0; bytesToRead < length; bytesToRead++) {
 			returnedBytes[bytesToRead] = this.bus.ReadByte(address, 0x81);
+			this.bus.pause(30);
 		}
 
 		return returnedBytes;
@@ -224,6 +224,7 @@ class ENEInterfaceFixed extends ENEInterface{
 		this.bus.WriteWord(0x00, ((register << 8) & 0xFF00) | ((register >> 8) & 0x00FF));
 
 		let returnValue = (this.bus.ReadByte(0x81) << 8) & 0xFF00;
+		this.bus.pause(30);
 		returnValue |= this.bus.ReadByte(0x81) & 0xFF;
 
 		return returnValue;
@@ -232,6 +233,7 @@ class ENEInterfaceFixed extends ENEInterface{
 	ReadBytes(length) {
 		for(let bytesToRead = 0; bytesToRead < length; bytesToRead++) {
 			this.bus.ReadByte(0x81);
+			this.bus.pause(30);
 		}
 	}
 
@@ -242,6 +244,7 @@ class ENEInterfaceFixed extends ENEInterface{
 
 		for(let bytesToRead = 0; bytesToRead < length; bytesToRead++) {
 			returnedBytes[bytesToRead] = this.bus.ReadByte(0x81);
+			this.bus.pause(30);
 		}
 
 		return returnedBytes;
@@ -420,6 +423,7 @@ class ENERam{
 
 		for(let iIdx = 0; iIdx < 64; iIdx++) {
 			configTable[iIdx] = this.Interface.ReadRegister(this.commands.ConfigTable + iIdx);
+			device.pause(10);
 		}
 
 		return configTable;
@@ -563,8 +567,9 @@ class ENERam{
 
 		for(let offset = 0x00; offset < 5; offset++){
 			const val = this.Bus().ReadByte(address, 0x9B + offset);
+			this.Bus().pause(30);
 
-			if(val != 0x1b + offset){
+			if(val !== 0x1b + offset){
 				this.Bus().log(`Check 3 Failed! Expected ${0x1b + offset}, Got ${val}`, {toFile:true});
 
 				return false;
@@ -573,7 +578,7 @@ class ENERam{
 
 		const iRet = this.Bus().ReadByte(address, 0xA0);
 
-		if(iRet != 0x20){
+		if(iRet !== 0x20){
 			this.Bus().log(`Check 4 Failed! Expected ${0x20}, Got ${iRet}`, {toFile:true});
 
 			return false;
@@ -598,15 +603,16 @@ class ENERam{
 
 		for(let offset = 0x00; offset < 5; offset++){
 			const val = bus.ReadByte(0x9B + offset);
+			bus.pause(30);
 
-			if(val != 0x1b + offset){
+			if(val !== 0x1b + offset){
 				return false;
 			}
 		}
 
 		const iRet = bus.ReadByte(0xA0);
 
-		if(iRet != 0x20){
+		if(iRet !== 0x20){
 			return false;
 		}
 
@@ -626,6 +632,7 @@ class ENERam{
 
 		for (let iIdx = 0; iIdx < 16; iIdx++) {
 			const iRet = this.Interface.ReadRegister(address, 0x1000 + iIdx);
+			this.Bus().pause(30);
 
 			if(iRet > 0) {
 				Characters.push(iRet);
@@ -659,6 +666,7 @@ class ENERam{
 
 		for (let iIdx = 0; iIdx < 21; iIdx++) {
 			const iRet = this.Interface.ReadRegister(address, this.commands.ManufacturerName + iIdx);
+			this.Bus().pause(30);
 
 			if(iRet > 0) {
 				Characters.push(iRet);

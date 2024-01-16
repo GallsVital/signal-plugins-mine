@@ -392,6 +392,7 @@ export class deviceLibrary {
 			0x197F: "Gladius III Wireless",
 			0x1A72: "Gladius III Aimpoint",
 			0x1A70: "Gladius III Aimpoint",
+			0x1B0C: "Gladius III Aimpoint", // Evangelion Edition
 			0x18E1: "Impact II",
 			0x19D2: "Impact II",
 			0x1956: "Impact II Electro Punk",
@@ -401,6 +402,7 @@ export class deviceLibrary {
 			0x1960: "ROG Keris",
 			0x195E: "ROG Keris",
 			0x1A59: "ROG Keris",
+			0x1A66: "ROG Keris", // Keris Aimpoint Wired
 			0x1846: "Pugio I",
 			0x1906: "Pugio II",
 			0x1908: "Pugio II Wireless",

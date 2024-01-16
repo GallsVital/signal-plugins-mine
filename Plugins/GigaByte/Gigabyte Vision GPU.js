@@ -100,7 +100,7 @@ function GigabyteVisionGpuCheck(bus, address, log = false){
 	const ValidReturnCodes = [0x10, 0x11, 0x12, 0x14];
 	// 0x62 (Gaming OC) cards use a 8 byte write length.
 	// GPU will softlock if this is wrong.
-	const WriteLength = [0x32, 0x62, 0x71].includes(address) ? 8 : 4;
+	const WriteLength = [0x32, 0x50, 0x62, 0x71].includes(address) ? 8 : 4;
 
 	let data;
 
@@ -264,7 +264,6 @@ class NvidiaGPUDeviceIds {
 		this.RTX2080S        = 0x1E81;
 		this.RTX2080TI_TU102 = 0x1E04;
 		this.RTX2080TI       = 0x1E07;
-		this.RTX2080_SUPER   = 0x1E81;
 		this.RTX3050         = 0x2507;
 		this.RTX3060         = 0x2503;
 		this.RTX3060_LHR     = 0x2504;
@@ -311,6 +310,7 @@ class GigabyteVisionDeviceIds {
 
 		this.GTX1650_GAMING_OC              = 0x3FE4;
 		this.GTX1660_GAMING_OC_6GB          = 0x3FC7;
+		this.GTX1660_GAMING_OC_6GB_2		= 0x3FCF;
 		this.GTX1660TI_GAMING_OC_6GB        = 0x3FC5;
 		this.GTX1660S_GAMING_OC             = 0x4014;
 
@@ -326,6 +326,7 @@ class GigabyteVisionDeviceIds {
 		this.RTX2070_GAMING_OC              = 0x37AD;
 		this.RTX2070_GAMING_OC_WHITE		= 0x37C6;
 		this.RTX2070_WINDFORCE              = 0x37C2;
+		this.RTX2070_XTREME_OC_8G			= 0x37B5;
 		this.RTX2070S_GAMING_OC             = 0x3FEB;
 		this.RTX2070S_GAMING_OC_3X          = 0x4008;
 		this.RTX2070S_GAMING_OC_3X_WHITE    = 0x400D;
@@ -371,6 +372,8 @@ class GigabyteVisionDeviceIds {
 
 		this.RTX4060TI_GAMING_OC            = 0x40F8;
 		this.RTX4060TI_GAMING_OC_2			= 0x4112;
+		this.RTX4060TI_AERO					= 0x40F9;
+		this.RTX4060TI_AERO_OC				= 0x4113;
 		this.RTX4070_AERO					= 0x40E6;
 		this.RTX4070_EAGLE_OC				= 0x40ED;
 		this.RTX4070_WINDFORCE_OC			= 0x40EE;
@@ -428,6 +431,7 @@ class GigabyteVisionGPuList {
 			new GigabyteVisionIdentifier(Nvidia.GTX1080TI,      GigabyteVisionIds.GTX1080TI_XTREME_WATERFORCE_2, 0x47, "GIGABYTE 1080Ti Waterforce Xtreme Edition"),
 
 			new GigabyteVisionIdentifier(Nvidia.GTX1660,        GigabyteVisionIds.GTX1660_GAMING_OC_6GB,		0x47, "GIGABYTE 1660 Gaming OC 6gb"),
+			new GigabyteVisionIdentifier(Nvidia.GTX1660,        GigabyteVisionIds.GTX1660_GAMING_OC_6GB_2,		0x47, "GIGABYTE 1660 Gaming OC 6gb"),
 
 			new GigabyteVisionIdentifier(Nvidia.GTX1660S,       GigabyteVisionIds.GTX1660S_GAMING_OC,			0x47, "GIGABYTE 1660 Super Gaming OC"),
 
@@ -443,6 +447,7 @@ class GigabyteVisionGPuList {
 
 			new GigabyteVisionIdentifier(Nvidia.RTX2070_OC,     GigabyteVisionIds.RTX2070_GAMING_OC,			0x47, "GIGABYTE 2070 Gaming OC"),
 			new GigabyteVisionIdentifier(Nvidia.RTX2070_OC,     GigabyteVisionIds.RTX2070_GAMING_OC_WHITE,		0x47, "GIGABYTE 2070 Gaming OC White"),
+			new GigabyteVisionIdentifier(Nvidia.RTX2070_OC,		GigabyteVisionIds.RTX2070_XTREME_OC_8G,			0x50, "GIGABYTE 2070 XTREME OC 8G"),
 
 			new GigabyteVisionIdentifier(Nvidia.RTX2070S,       GigabyteVisionIds.RTX2070S_GAMING_OC,			0x47, "GIGABYTE 2070 Super Gaming OC"),
 			new GigabyteVisionIdentifier(Nvidia.RTX2070S,       GigabyteVisionIds.RTX2070S_GAMING_OC_3X,		0x47, "GIGABYTE 2070 Super Gaming OC 3x"),
@@ -452,6 +457,8 @@ class GigabyteVisionGPuList {
 			new GigabyteVisionIdentifier(Nvidia.RTX2070S,		GigabyteVisionIds.RTX2070S_GAMING_OC_WHITE,		0x47, "GIGABYTE 2070 Super Gaming OC"),
 
 			new GigabyteVisionIdentifier(Nvidia.RTX2080_A,      GigabyteVisionIds.RTX2080_WINDFORCE,			0x47, "GIGABYTE 2080 Windforce OC"),
+
+			new GigabyteVisionIdentifier(Nvidia.RTX2080S,       GigabyteVisionIds.RTX2080S_GAMING_OC,			0x47, "GIGABYTE 2080 Super Gaming OC"),
 
 			new GigabyteVisionIdentifier(Nvidia.RTX2080TI,      GigabyteVisionIds.RTX2080TI_GAMING_OC,			0x47, "GIGABYTE 2080TI Gaming OC"),
 
@@ -520,8 +527,10 @@ class GigabyteVisionGPuList {
 			new GigabyteVisionIdentifier(Nvidia.RTX3090,        GigabyteVisionIds.RTX3090_GAMING_OC_24GB,		0x62, "GIGABYTE 3090 Gaming OC 24G"), // Confirmed
 
 			new GigabyteVisionIdentifier(Nvidia.RTX4060TI,		GigabyteVisionIds.RTX4060TI_GAMING_OC,			0x71, "GIGABYTE 4060Ti Gaming OC"),
+			new GigabyteVisionIdentifier(Nvidia.RTX4060TI,		GigabyteVisionIds.RTX4060TI_AERO,				0x71, "GIGABYTE 4060Ti Aero"),
 
 			new GigabyteVisionIdentifier(Nvidia.RTX4060TI_OC,	GigabyteVisionIds.RTX4060TI_GAMING_OC_2,		0x71, "GIGABYTE 4060Ti Gaming OC"),
+			new GigabyteVisionIdentifier(Nvidia.RTX4060TI_OC,	GigabyteVisionIds.RTX4060TI_AERO_OC,			0x71, "GIGABYTE 4060Ti Aero OC"),
 
 			new GigabyteVisionIdentifier(Nvidia.RTX4070,		GigabyteVisionIds.RTX4070_AERO,					0x71, "GIGABYTE 4070 Aero"),
 			new GigabyteVisionIdentifier(Nvidia.RTX4070,		GigabyteVisionIds.RTX4070_EAGLE_OC,				0x71, "GIGABYTE 4070 Eagle OC"),

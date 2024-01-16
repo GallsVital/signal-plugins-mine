@@ -62,21 +62,13 @@ export function Render() {
 }
 
 export function Shutdown(SystemSuspending) {
+	const color = SystemSuspending ? "#000000" : shutdownColor;
 
-	if(SystemSuspending){
-		if(highSpeedMode) {
-			sendSingleColor("#000000");
-		} else {
-			SendColors("#000000");
-		}
-	}else{
-		if(highSpeedMode) {
-			sendSingleColor(shutdownColor);
-		} else {
-			SendColors(shutdownColor);
-		}
+	if(highSpeedMode) {
+		sendSingleColor(color);
+	} else {
+		SendColors(color);
 	}
-
 }
 
 export function onhighSpeedModeChanged() {
@@ -126,39 +118,6 @@ function setLEDs() {
 	device.setControllableLeds(vLedNames, vLedPositions);
 }
 
-const AddressPairs = {
-	0x60: [0x50, 0x48],
-	0x61: [0x51, 0x49],
-	0x62: [0x52, 0x4A],
-	0x63: [0x53, 0x4B]
-};
-
-function CheckForHyperFuryRam(bus, addr){ ///MMM I love checking SPD Values for Voltage to detect a RAM Kit.
-	if(!AddressPairs.hasOwnProperty(addr)){
-		return false;
-	}
-	const SubAddresses = AddressPairs[addr];
-	const iReturn = bus.ReadByte(SubAddresses[0], 0x31); // Value changes every time
-	bus.log(`Address [${SubAddresses[0]}], Reg 31: ${iReturn}`, {toFile: true});
-
-	if(iReturn >= 0){
-		const iRet1 = bus.ReadByte(SubAddresses[1], 0x21);
-		bus.log(`Address [${SubAddresses[1]}], Reg 21: ${iRet1}`, {toFile: true});
-
-		const iRet2 = bus.ReadByte(SubAddresses[1], 0x25);
-		bus.log(`Address [${SubAddresses[1]}], Reg 25: ${iRet2}`, {toFile: true});
-
-		const iRet3 = bus.ReadByte(SubAddresses[1], 0x27);
-		bus.log(`Address [${SubAddresses[1]}], Reg 27: ${iRet3}`, {toFile: true});
-
-		const ExpectedValues = [120, 130, 180, 200, 220, 240];
-
-		return ExpectedValues.includes(iRet1) && ExpectedValues.includes(iRet2) && ExpectedValues.includes(iRet3);
-	}
-
-	return false;
-}
-
 const addressDict = {
 	0x60 : 0x50,
 	0x61 : 0x51,
@@ -166,7 +125,7 @@ const addressDict = {
 	0x63 : 0x53
 };
 
-function CheckForHyperFuryRamUsingWord(bus, addr) { //The Backend Function for this is busted af.
+function CheckForHyperFuryRam(bus, addr) {
 	if(!addressDict.hasOwnProperty(addr)){
 		return false;
 	}
@@ -176,32 +135,61 @@ function CheckForHyperFuryRamUsingWord(bus, addr) { //The Backend Function for t
 	const iRet1 = bus.ReadByte(SubAddress, 0x00);
 	bus.log(`Address [${SubAddress}], Reg 00: ${iRet1}`, {toFile: true});
 
+	if(iRet1 !== 81){
+		bus.log(`Address [${SubAddress}], Expected register 0 to be 81! Address Failed`, {toFile: true});
+
+		return false;
+	}
+
 	const iRet2 = bus.ReadByte(SubAddress, 0x80);
 	bus.log(`Address [${SubAddress}], Reg 80: ${iRet2}`, {toFile: true});
 
+	if(iRet1 <= 0){
+		bus.log(`Address [${SubAddress}], Expected register 80 to be > 0! Address Failed`, {toFile: true});
 
-	bus.WriteByte(addr, 0x08, 0x53);
-
-	const nameReturnBytes = [];
-
-	for(let bytesToRead = 0; bytesToRead < 4; bytesToRead++) {
-		const returnByte = BinaryUtils.WriteInt16LittleEndian(bus.ReadWord(addr, bytesToRead+1));
-		bus.log(`Return Byte ${bytesToRead} returned ${returnByte[1]}`, {toFile : true});
-		nameReturnBytes.push(returnByte[1]);
+		return false;
 	}
 
-	bus.log(`Fury Identifier Return: ${nameReturnBytes}`, {toFile : true});
+	let attempts = 0;
+	let deviceCheck = false;
+	bus.WriteByte(addr, 0x08, 0x53);
 
-	const deviceCheck = String.fromCharCode(...nameReturnBytes).includes("FURY");
+	while(attempts < 5) {
+		const nameReturnBytes = [];
 
-	bus.log(`Return Contains FURY String: ${deviceCheck}`, {toFile : true});
+		for(let bytesToRead = 0; bytesToRead < 4; bytesToRead++) {
+			bus.pause(30);
 
-	const modelByte = BinaryUtils.WriteInt16LittleEndian(bus.ReadWord(addr, 0x06))[1]; //byte 0 is 0x5A header.
-	bus.log(`Model Byte: ${modelByte}`, {toFile : true});
+			const returnByte = BinaryUtils.WriteInt16LittleEndian(bus.ReadWord(addr, bytesToRead+1));
+			//bus.log(`Return Byte ${bytesToRead} returned ${returnByte[1]}`, {toFile : true});
+			nameReturnBytes.push(returnByte[1]);
+		}
+
+		bus.log(`Fury Identifier Return: ${nameReturnBytes}`, {toFile : true});
+
+		const deviceName = String.fromCharCode(...nameReturnBytes);
+
+		bus.log(`Device Name: ${deviceName}`);
+
+		deviceCheck = deviceName.includes("FURY");
+		bus.pause(30);
+
+		const modelByte = BinaryUtils.WriteInt16LittleEndian(bus.ReadWord(addr, 0x06))[1]; //byte 0 is 0x5A header.
+		bus.log(`Model Byte: ${modelByte}`, {toFile : true});
+
+		//bus.log(`Return Contains FURY String: ${deviceCheck}`, {toFile : true});
+
+		if(deviceCheck){
+			bus.log(`Device hit on attempt number: ${attempts}`, {toFile : true});
+			break;
+		}
+
+		attempts++;
+	}
 
 	bus.WriteByte(addr, 0x08, 0x44);
 
-	return iRet1 === 81 && iRet2 > 0 && deviceCheck;
+	return deviceCheck;
 }
 
 function SetMode(){
@@ -272,6 +260,19 @@ function sendSingleColor(overrideColor) {
 
 }
 
+function CheckedWrite(register, byte){
+	let returnCode = bus.WriteByte(register, byte);
+	let attempts = 0;
+
+	if(returnCode != 0 && attempts < 5){
+		device.pause(5);
+		returnCode = bus.WriteByte(register, byte);
+		attempts += 1;
+	}
+
+	return returnCode === 0;
+}
+
 const OldRGBData = [];
 
 function WriteRGBData(RGBData, firstRun){
@@ -284,27 +285,18 @@ function WriteRGBData(RGBData, firstRun){
 	}
 
 	for(let i = 0; i < RGBData.length; i++){
-		if(RGBData[i] !== OldRGBData[i]){
-			let returnCode = bus.WriteByte(0x50 + i, RGBData[i]);
-
-			let retryCount = 4;
-
-			while(returnCode !== 0 && retryCount > 0){
-				retryCount -= 1;
-				device.pause(3);
-				returnCode = bus.WriteByte(0x50 + i, RGBData[i]);
-
-				if(returnCode === 0){
-					OldRGBData[i] = RGBData[i];
-				}
-			}
-
-			if(returnCode === 0){
-				OldRGBData[i] = RGBData[i];
-			}else{
-				device.log("Failed To Write Byte after within 5 attempts!");
-			}
+		if(RGBData[i] === OldRGBData[i]){
+			continue;
 		}
+
+		const success = CheckedWrite(0x50 + i, RGBData[i]);
+
+		if(success){
+			OldRGBData[i] = RGBData[i];
+		}else{
+			device.log("Failed To Write Byte within 5 attempts!");
+		}
+
 	}
 
 	bus.WriteByte(0x08, 0x44);
