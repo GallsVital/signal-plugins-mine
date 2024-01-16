@@ -125,8 +125,8 @@ const DeviceInfo = {
 
 
 export function Initialize() {
+	
 	SetMotherboardName();
-
 	FetchFirmwareVersion();
 
 	// Read and parse the device's config table
@@ -144,6 +144,7 @@ export function Initialize() {
 		Create12vHeaders();
 	}
 
+	device.write([0xec, 0x52, 0x53, 0x00, 0x01], 65); //Stop using gen 2 :bonk:
 	// Set Mainboard to direct Mode
 	SetChannelModeDirect(0);
 
