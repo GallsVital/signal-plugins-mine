@@ -294,7 +294,7 @@ export class CorsairDominatorProtocol{ //read 2 from 0x24
 		const vendorByte = bus.ReadByte(address, this.Registers.Vender);
 		bus.log(`Address ${address} has Vendor Byte ${vendorByte}`, {toFile: true});
 
-		if (vendorByte === this.VendorId2 || vendorByte === this.VendorId2){
+		if (vendorByte === this.VendorId || vendorByte === this.VendorId2){
 			const modelByte = bus.ReadByte(address, this.Registers.Model);
 			bus.log(`Address ${address} has Model Byte ${modelByte}`, {toFile: true});
 
