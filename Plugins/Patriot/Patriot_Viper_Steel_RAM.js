@@ -27,15 +27,13 @@ export function Scan(bus) {
 	// Skip any non AMD / Nuvoton Busses
 	if(!bus.IsSystemBus()){return[];}
 
-	const result = bus.WriteQuick(addr);
+	const masterControllerAddressExist = checkForMasterController(bus, addr);
 
-	if(result < 0) {
-		bus.log(`Failed Quick Write test on Address: 0x77`, {toFile: true});
-
+	if(!masterControllerAddressExist) {
 		return [];
 	}
 
-	bus.log("Master Controller Found on Address: " + addr);
+	bus.log("Possible Master Controller Found on Address: " + addr);
 
 	let validSticks = 0;
 	const addressList = [0x50, 0x51, 0x52, 0x53, 0x54, 0x55, 0x56, 0x57];
@@ -51,16 +49,18 @@ export function Scan(bus) {
 		bus.WriteByte(0x36, 0x00, 0xff);//Crate does this
 
 		if(bus.ReadByte(addy, 0x00) === 0x23) {
-			bus.log("Address: " + addy + "Returned 0x23", {toFile: true});
+			bus.log("Address: " + addy + " Returned 0x23", {toFile: true});
 
 			const registerstoReadFrom = [0x40, 0x41, 0x61, 0x62, 0x63, 0x64];
 			const registerResponses = [0xFF, 0xFF, 0x50, 0x44, 0x41, 0x31];
 			bus.WriteByte(0x37, 0x00, 0xFF);
+			bus.pause(30);
 
 			let validResponse = true;
 
-			for(let bytes = 0; bytes < registerResponses.length; bytes++) {
+			for(let bytes = 0; bytes < registerResponses.length; bytes++) { //Could add a retry loop in here.
 				const response = bus.ReadByte(addy, registerstoReadFrom[bytes]);
+				bus.pause(30);
 				bus.log(`Patriot Viper Steel returned: ${response} for register: ${registerstoReadFrom[bytes]}`, {toFile: true});
 
 				if(response !== registerResponses[bytes]) {
@@ -83,6 +83,29 @@ export function Scan(bus) {
 	return [];
 
 }
+
+function checkForMasterController(bus, addr) {
+	let attempts = 0;
+	const maxAttempts = 5;
+
+
+	while(attempts < maxAttempts){
+		const result = bus.WriteQuick(addr);
+
+		if(result !== -1) {
+
+			return true;
+		}
+
+		attempts++;
+		bus.pause(30);
+	}
+
+	bus.log(`Failed Quick Write test on Address: 0x77 after 5 attempts`, {toFile: true});
+
+	return false;
+}
+
 const vLedNames = [ "LED 1", "LED 2", "LED 3", "LED 4", "LED 5" ];
 const vLedPositions = [ [0, 0], [0, 1], [0, 2], [0, 3], [0, 4] ];
 
