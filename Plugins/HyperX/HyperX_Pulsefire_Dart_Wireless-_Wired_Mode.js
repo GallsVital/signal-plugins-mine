@@ -21,9 +21,6 @@ export function ControllableParameters(){
 		{"property":"dpi1", "group":"mouse", "label":"DPI", "step":"50", "type":"number", "min":"200", "max":"12400", "default":"800"},
 	];
 }
-export function ConflictingProcesses() {
-	return ["NGenuity2.exe"];
-}
 let savedDpi1;
 
 const vLedNames = [ "Logo", "Scroll" ];

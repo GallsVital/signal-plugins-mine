@@ -5,9 +5,6 @@ export function Publisher() { return "Darkest#3270 & HarD#9999"; }
 export function Size() { return [16, 7]; }
 export function DefaultPosition() { return [70, 135]; }
 export function DefaultScale() { return 20.0; }
-export function ConflictingProcesses() {
-	return ["NGenuity2.exe"];
-}
 /* global
 shutdownColor:readonly
 LightingMode:readonly
