@@ -5,9 +5,6 @@ export function Publisher() { return "Derek Huber"; }
 export function Size() { return [14, 5]; }
 export function DefaultPosition() {return [75, 70]; }
 export function DefaultScale() {return 8.0;}
-export function ConflictingProcesses() {
-	return ["NGenuity2.exe"];
-}
 /* global
 shutdownColor:readonly
 LightingMode:readonly

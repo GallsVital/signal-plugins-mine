@@ -6,9 +6,6 @@ export function Size() { return [17, 6]; }
 export function DefaultPosition(){return [10, 100];}
 const DESIRED_HEIGHT = 85;
 export function DefaultScale(){return Math.floor(DESIRED_HEIGHT/Size()[1]);}
-export function ConflictingProcesses() {
-	return ["NGenuity2.exe"];
-}
 /* global
 shutdownColor:readonly
 LightingMode:readonly
