@@ -831,8 +831,7 @@ class GigabyteMasterDeviceIds {
 		this.RTX4070_MASTER					 = 0x40E9;
 		this.RTX4070_GAMING_OC_12G			 = 0x40C6;
 
-		this.RTX4070TI_GAMING_OC_12G		 = 0x40C6;
-		this.RTX4070TI_GAMING_OC_V2			 = 0x4100; // Yes, same PID for different SKUs
+		this.RTX4070TI_GAMING_OC_V2			 = 0x4100;
 		this.RTX4070TI_GAMING_12G			 = 0x40DF;
 		this.RTX4070TI_GAMING_OC_12G		 = 0x40C6; // Yes, same PID for different SKUs
 		this.RTX4070TI_ELITE				 = 0x40C9;
