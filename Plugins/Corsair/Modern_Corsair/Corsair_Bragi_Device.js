@@ -34,7 +34,6 @@ export function ControllableParameters(){
 }
 
 const devFlags = false;
-let handleError = false;
 
 
 export function SubdeviceController() { return devFlags; } //Fix DPI Logic. If you remove too many stages, it blows up.
@@ -256,11 +255,7 @@ function initializeDevice(deviceConfig, deviceID = 0) {
 
 	if(deviceConfig.keymapType === "Mouse") {
 		device.addFeature("mouse");
-
-		if(devicePID === 0x1B9E) {
-			Corsair.WriteToEndpoint("Background", this.endpoints.Buttons, [0x01, 0x01, 0x01, 0x00, 0x00, 0x01, 0x01, 0x01], deviceID);
-			Corsair.OpenHandle("Lighting", Corsair.endpoints.Lighting, deviceID);
-		} else { configureMouseButtons(deviceID); }
+		configureMouseButtons(deviceID);
 
 	} else if(deviceConfig.keymapType === "Keyboard") {
 		//setMacroKeys(deviceID);
@@ -291,10 +286,7 @@ function initializeDevice(deviceConfig, deviceID = 0) {
 		addPollingRates(deviceID);
 	}
 
-	if([0x1bb6, 0x1B7D, 0x1BC5, 0x1B7C].includes(devicePID)) {
-		Corsair.OpenHandle("Lighting", Corsair.endpoints.LightingController, deviceID);
-		device.log("Bruteforcing Handle Open because K100/K70 Pro Mini");
-	}
+
 }
 /* eslint-enable complexity */
 
@@ -922,7 +914,7 @@ class CorsairLibrary{
 			//4: "Back",
 			5: "Dpi Stage Up",
 			6: "Dpi Stage Down", //Cycle DPI on Sabre Pro.
-			7: "Profile Switch",
+			7: "Profile Switch", //7 is sniper on the M65 Ultra.
 			//8: "Scroll Up",
 			//9: "Scroll Down",
 			//200: "Sniper" //This is a placeholder
@@ -1514,29 +1506,29 @@ class CorsairLibrary{
 					"LeftBar2", "Tab", "Q", "W", "E", "R", "T", "Y", "U", "I", "O", "P", "[", "]", "\\", "RightBar2",
 					"CapsLock", "A", "S", "D", "F", "G", "H", "J", "K", "L", ";", "'", "Enter",
 					"LeftBar3", "Left Shift", "Z", "X", "C", "V", "B", "N", "M", ",", ".", "/", "Right Shift", "RightBar3",
-					"LeftBar4", "Left Ctrl", "Left Win", "Left Alt", "Space Left", "Space", "Space Right", "Right Alt", "Fn", "Menu", "Right Ctrl", "RightBar4",
-					"BottomBar1", "BottomBar2", "BottomBar3", "BottomBar4", "BottomBar5", "BottomBar6", "BottomBar7", "BottomBar8", "BottomBar9", "BottomBar10", "BottomBar11",
+					"LeftBar4", " Left Ctrl", "Left Win", "Left Alt", "Space Left", "Space", "Space Right", "Right Alt", "Fn", "Menu", "Right Ctrl", "RightBar4",
+					"BottomBar1", "BottomBar2", "BottomBar3", "BottomBar4", "BottomBar5", "BottomBar6", "BottomBar7", "BottomBar8", "BottomBar9",
 					"ISO #", "ISO <"
 				],
 				ledPositions: [
-					[0, 1], [1, 1],         [3, 1], [4, 1],         [6, 1], [7, 1],         [9, 1],  [10, 1], [11, 1], [12, 1], [13, 1],
-					[0, 2], [1, 2], [2, 2], [3, 2], [4, 2], [5, 2], [6, 2], [7, 2], [8, 2], [9, 2],  [10, 2], [11, 2], [12, 2], [13, 2], [14, 2], [15, 2],
-					[0, 3], [1, 3], [2, 3], [3, 3], [4, 3], [5, 3], [6, 3], [7, 3], [8, 3], [9, 3],  [10, 3], [11, 3], [12, 3], [13, 3], [14, 3], [15, 3],
-					[0, 4], [1, 4], [2, 4], [3, 4], [4, 4], [5, 4], [6, 4], [7, 4], [8, 4], [9, 4],  [10, 4], [11, 4],          [13, 4],
-					[0, 5],         [2, 5], [3, 5], [4, 5], [5, 5], [6, 5], [7, 5], [8, 5], [9, 5],  [10, 5], [11, 5],          [13, 5], [14, 5], [15, 5],
-					[0, 6], [1, 6], [2, 6],         [4, 6],         [6, 6],         [8, 6],          [10, 6], [11, 6], [12, 6], [13, 6], [14, 6], [15, 6],
-					[0, 7], [1, 7],         [3, 7], [4, 7],         [6, 7], [7, 7],         [9, 7],  [10, 7], [11, 7], [12, 7], [13, 7],
+					[0, 1], [1, 1],         [3, 1], [6, 1],         [8, 1], [9, 1],         [9, 1],          [10, 1], [12, 1],          [14, 1], [15, 1],
+					[0, 2], [1, 2], [2, 2], [3, 2], [4, 2], [5, 2], [6, 2], [7, 2], [8, 2], [9, 2], [10, 2], [11, 2], [12, 2], [13, 2], [14, 2], [15, 2],
+					[0, 3], [1, 3], [2, 3], [3, 3], [4, 3], [5, 3], [6, 3], [7, 3], [8, 3], [9, 3], [10, 3], [11, 3], [12, 3], [13, 3], [14, 3], [15, 3],
+					[1, 4], [2, 4], [3, 4], [4, 4], [5, 4], [6, 4], [7, 4], [8, 4], [9, 4], [10, 4], [11, 4], [12, 4], [13, 4],
+					[0, 5],         [2, 5], [3, 5], [4, 5], [5, 5], [6, 5], [7, 5], [8, 5], [9, 5], [10, 5], [11, 5],          [13, 5], [14, 5], [15, 5],
+					[0, 6], [1, 6], [2, 6],         [4, 6],         [6, 6],         [8, 6],         [10, 6], [11, 6], [12, 6], [13, 6], [14, 6], [15, 6],
+					[0, 7], [1, 7],         [3, 7],         [6, 7],         [8, 7],         [9, 7],                   [12, 7],          [14, 7], [15, 7],
 					//ISO
 					[2, 5], [12, 4]
 				],
 				ledMap: [
-					123, 124, 125, 126, 127, 128, 129, 130, 131, 132, 133,
-					160, 41, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 45, 46, 42, 171,
-					43, 20, 26, 8, 21, 23, 28, 24, 12, 18, 19, 47, 48, 49,
-					161, 57, 4, 22, 7, 9, 10, 11, 13, 14, 15, 51, 52, 40, 172,
-					162, 106, 29, 27, 6, 25, 5, 17, 16, 54, 55, 56, 110, 173,
-					163, 105, 108, 107, 0, 44, 1, 111, 122, 101, 109, 174,
-					193, 194, 195, 196, 197, 198, 199, 200, 201, 202, 203,
+					58, 59,     60, 61,     62, 63,     64,     65, 66,     67, 68,
+					85, 41, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 45, 46, 42, 69,
+					84, 43, 20, 26, 8, 21, 23, 28, 24, 12, 18, 19, 47, 48, 49,  70,
+					57, 4, 22, 7, 9, 10, 11, 13, 14, 15, 51, 52, 40,
+					83, 106, 29, 27, 6, 25, 5, 17, 16, 54, 55, 56, 110, 		71,
+					82, 105, 108, 107, 0, 44, 1, 111, 122, 101, 109,			72,
+					81, 80,     79,     78,     77,         76,     75,     74, 73,
 					100, 50 //ISO
 				],
 				devFirmware: "0.0.0",
@@ -2501,7 +2493,9 @@ export class ModernCorsairProtocol{
 	 * @param {number} DPI Desired DPI value to be set.
 	 */
 	SetDPI(DPI, deviceID = 0){
-		const hasIndependentAxes = this.FetchProperty("DPI X", deviceID) !== -1;
+
+		const hasIndependentAxes = this.FetchProperty("DPI X", deviceID) !== -1; //TODO Should this be stored somewhere? It's an extra variable to add and is a single extra op. Though it does throw an error in console every time dpi is changed if it isn't independent axes.
+		//The only place to realistically shove that var is in Corsair Config. This can only be called by a single mouse, and only gets called if we have a mouse.
 
 		if(hasIndependentAxes) {
 			this.SetIndependentXYDPI(DPI, deviceID);
@@ -2510,7 +2504,10 @@ export class ModernCorsairProtocol{
 			this.SetLinkedXYDPI(DPI, deviceID);
 		}
 	}
-
+	/**
+	 * Helper Function to set the device DPI if it has the ability to take X and Y DPI args separately. This will set the X and Y DPI values to the provided value.
+	 * @param {number} DPI Desired DPI value to be set.
+	 */
 	SetIndependentXYDPI(DPI, deviceID) {
 		const CurrentDPI = this.FetchProperty("DPI X", deviceID);
 
@@ -2525,7 +2522,10 @@ export class ModernCorsairProtocol{
 		device.log(`DPI X is now [${this.FetchProperty(this.properties.dpiX, deviceID)}]`);
 		device.log(`DPI Y is now [${this.FetchProperty(this.properties.dpiX, deviceID)}]`);
 	}
-
+	/**
+	 * Helper Function to set the device DPI if it only takes a single DPI arg for X and Y axes. This will set the X and Y DPI values to the provided value.
+	 * @param {number} DPI Desired DPI value to be set.
+	 */
 	SetLinkedXYDPI(DPI, deviceID) {
 		const CurrentDPI = this.FetchProperty("DPI", deviceID);
 
@@ -2559,7 +2559,7 @@ export class ModernCorsairProtocol{
 		const hasError = Data[3] ?? 0;
 
 		if(!hasError){
-			return hasError;
+			return hasError; //Error 2 on setting the HWBrightness on the Dark Core Pro. The return packets for this device seem flipped around with HWBrightness. It sends an odd packet first, and then the expected one.
 		}
 
 		const caller_line = (new Error).stack.split("\n")[2];
@@ -2571,8 +2571,11 @@ export class ModernCorsairProtocol{
 		case 1: // Invalid Value
 			device.log(`${caller_context} CorsairProtocol Error [${hasError}]: Invalid Value Set!`);
 			break;
+		case 2: // K70 Pro Mini returned this when I gave it RGBData that is too long.
+			device.log(`${caller_context} CorsairProtocol Error [${hasError}]: Packet Exceeds length!`);
+			break;
 
-		case 3: // Endpoint Error
+		case 3: // Endpoint Error - Usually indicates an unsupported function
 			device.log(`${caller_context} CorsairProtocol Error [${hasError}]: Operation Failed!`);
 			break;
 
@@ -2582,7 +2585,6 @@ export class ModernCorsairProtocol{
 
 		case 6: //Handle not open?
 			device.log(`${caller_context} CorsairProtocol Error [${hasError}]: Handle is not open!`);
-			handleError = true;
 			break;
 
 		case 9: // Read only property
@@ -2827,7 +2829,7 @@ export class ModernCorsairProtocol{
 
 		const ErrorCode = this.CheckError(returnPacket, `CheckHandle`);
 
-		if(ErrorCode){
+		if(ErrorCode){ //TODO: Add the checker here as well to note if the handle is closed.
 			this.CloseHandle(Handle);
 			device.log(`Failed to check Handle [${this.GetNameOfHandle(Handle)}, ${HexFormatter.toHex2(Handle,)}]. Did you open it?`);
 
@@ -2955,16 +2957,18 @@ export class ModernCorsairProtocol{
 
 		const isLightingEndpointOpen = this.IsHandleOpen("Lighting", deviceID);
 
-		if(!isLightingEndpointOpen || handleError){
-			handleError = false;
+		if(!isLightingEndpointOpen){
 			this.OpenHandle("Lighting", isLightingController ? this.endpoints.LightingController : this.endpoints.Lighting, deviceID);
 		}
 
 		let TotalBytes = RGBData.length;
 		const InitialPacketSize = this.GetWriteLength() - InitialHeaderSize;
 
-		//device.log(`RGBData length: ${RGBData.length}`);
-		this.WriteLighting(RGBData.length, RGBData.splice(0, InitialPacketSize), deviceID);
+		const writeLightingError = this.WriteLighting(RGBData.length, RGBData.splice(0, InitialPacketSize), deviceID); //Changed this to try reopening the handle if any error is encountered as the checkError function doesn't return the error type.S
+
+		if(writeLightingError) {
+			this.OpenHandle("Lighting", isLightingController ? this.endpoints.LightingController : this.endpoints.Lighting, deviceID);
+		}
 
 		TotalBytes -= InitialPacketSize;
 
@@ -2976,9 +2980,11 @@ export class ModernCorsairProtocol{
 		}
 	}
 
-	/** @private */
-	WriteLighting(LedCount, RGBData, deviceID = 0){ //We don't follow proper safety for this technically. There's no error checking in the pursuit of higher framerates.
-		device.write([0x00, deviceID | 0x08, this.command.writeEndpoint, 0x00, ...BinaryUtils.WriteInt32LittleEndian(LedCount)].concat(RGBData), this.GetWriteLength());
+
+	WriteLighting(LedCount, RGBData, deviceID = 0){
+		const packet = [0x00, deviceID | 0x08, this.command.writeEndpoint, 0x00, ...BinaryUtils.WriteInt32LittleEndian(LedCount)].concat(RGBData);
+
+		device.write(packet, this.GetWriteLength());
 		device.pause(1);
 
 		const returnPacket = device.read([0x00], this.GetReadLength());
@@ -2988,7 +2994,11 @@ export class ModernCorsairProtocol{
 		if(ErrorCode){
 			device.log(`WriteLighting Error`);
 			device.pause(50); //Same idea as above but less extreme.
+
+			return true;
 		}
+
+		return false;
 	}
 
 	/** @private */
@@ -3043,12 +3053,7 @@ export class ModernCorsairProtocol{
 		}
 
 		device.log(`Hardware Level Brightness is ${HardwareBrightness/10}%`);
-
 		this.SetProperty(this.properties.brightness, Brightness, deviceID);
-
-		// Setting brightness appears to queue 2 packets to be read from the device
-		// instead of the expected one.
-		//TODO: investigate?
 		this.ReadProperty(this.properties.brightness, deviceID);
 
 		device.log(`Hardware Level Brightness is now ${this.FetchProperty(this.properties.brightness, deviceID)/10}%`);
