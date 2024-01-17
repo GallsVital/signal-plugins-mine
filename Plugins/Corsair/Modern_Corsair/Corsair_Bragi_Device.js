@@ -454,13 +454,16 @@ function processMacroInputs(bitIdx, state) {
 	device.set_endpoint(0x01, 0x01, 0xFF42);
 
 	let deviceType;
+	let buttonMapType;
 
 	if(macroSubdeviceID === 0) {
 		deviceType = wiredDevice?.keymapType;
+		buttonMapType = wiredDevice?.buttonMap;
 	} else {
 		deviceType = BragiDongle?.children.get(macroSubdeviceID).keymapType;
+		buttonMapType = BragiDongle?.children.get(macroSubdeviceID).buttonMap; //"fixed" the button map problem. It's not the cleanest solution but should get us where we need to go.
 	}
-	const keyName = CorsairLibrary.GetKeyMapping(bitIdx, deviceType);
+	const keyName = CorsairLibrary.GetKeyMapping(bitIdx, deviceType, buttonMapType);
 
 	if(keyName !== undefined) {
 		if(deviceType === "Keyboard") {
@@ -895,11 +898,11 @@ class CorsairLibrary{
 		return CorsairLibrary.GetDeviceByName(deviceName);
 	}
 
-	static GetKeyMapping(keyIdx, deviceType) {
+	static GetKeyMapping(keyIdx, deviceType, buttonMapType) {
 		if(deviceType === "Keyboard") {
 			return CorsairLibrary.KeyboardKeyMapping()[keyIdx];
 		} else if(deviceType === "Mouse") {
-			return CorsairLibrary.MouseKeyMapping()[keyIdx];
+			return CorsairLibrary.MouseKeyMapping()[buttonMapType][keyIdx];
 		}
 
 		device.log(`deviceType ${deviceType} is either undefined or not a keyboard/mouse.`);
@@ -907,17 +910,28 @@ class CorsairLibrary{
 
 	static MouseKeyMapping(){
 		return Object.freeze({
-			//0: "Left Click",
-			//1: "Right Click",
-			//2: "Middle Click",
-			//3: "Forward",
-			//4: "Back",
-			5: "Dpi Stage Up",
-			6: "Dpi Stage Down", //Cycle DPI on Sabre Pro.
-			7: "Profile Switch", //7 is sniper on the M65 Ultra.
-			//8: "Scroll Up",
-			//9: "Scroll Down",
-			//200: "Sniper" //This is a placeholder
+			"Default" : {
+				//0: "Left Click",
+				//1: "Right Click",
+				//2: "Middle Click",
+				//3: "Forward",
+				//4: "Back",
+				5: "Dpi Stage Up",
+				6: "Dpi Stage Down",
+				7: "Profile Switch",
+				//8: "Scroll Up",
+				//9: "Scroll Down",
+			},
+			"Sabre" : {
+				6: "Dpi Stage Up", //This is a cycle key.
+				7: "Profile Switch",
+			},
+			"M65 Ultra" : {
+
+				5: "Dpi Stage Up",
+				6: "Dpi Stage Down", //Cycle DPI on Sabre Pro.
+				7: "Sniper", //7 is sniper on the M65 Ultra.
+			}
 		});
 	}
 
@@ -1178,6 +1192,7 @@ class CorsairLibrary{
 				ledSpacing: 12,
 				keyCount: 8,
 				keymapType : "Mouse",
+				buttonMap : "Default",
 				maxDPI : 18000
 			},
 			"Dark Core Pro": {
@@ -1199,6 +1214,7 @@ class CorsairLibrary{
 				ledSpacing: 12,
 				keyCount: 8,
 				keymapType : "Mouse",
+				buttonMap : "Default",
 				maxDPI : 18000
 			},
 			"Darkstar": {
@@ -1223,6 +1239,7 @@ class CorsairLibrary{
 				ledSpacing: 13,
 				keyCount: 15,
 				keymapType : "Mouse",
+				buttonMap : "Default",
 				maxDPI : 26000
 			},
 			"Harpoon Wireless": {
@@ -1234,6 +1251,7 @@ class CorsairLibrary{
 				devFirmware: "5.6.126",
 				ledSpacing: 2,
 				keymapType : "Mouse",
+				buttonMap : "Default",
 				maxDPI : 12400
 			},
 			"Ironclaw Wireless": {
@@ -1245,6 +1263,7 @@ class CorsairLibrary{
 				devFirmware: "5.6.126",
 				ledSpacing: 6,
 				keymapType : "Mouse",
+				buttonMap : "Default",
 				maxDPI : 12400
 			},
 			"M55": {
@@ -1256,6 +1275,7 @@ class CorsairLibrary{
 				devFirmware: "4.7.23",
 				ledSpacing: 2,
 				keymapType : "Mouse",
+				buttonMap : "Sabre",
 				maxDPI : 12400,
 			},
 			"M65 Ultra": {
@@ -1264,9 +1284,10 @@ class CorsairLibrary{
 				ledNames: [ "Scroll wheel", "DPI button", "Logo" ],
 				ledPositions: [ [1, 1], [1, 2], [1, 3] ],
 				ledMap: [ 0, 1, 2 ],
-				devFirmware: "0.0.0",
+				devFirmware: "1.18.42",
 				ledSpacing: 3,
 				keymapType : "Mouse",
+				buttonMap : "M65 Ultra",
 				maxDPI : 26500,
 				hasSniperButton : true
 			},
@@ -1279,6 +1300,7 @@ class CorsairLibrary{
 				devFirmware: "5.6.126",
 				ledSpacing: 5,
 				keymapType : "Mouse",
+				buttonMap : "Sabre",
 				maxDPI : 12400
 			},
 			"Sabre RGB": {
@@ -1290,6 +1312,7 @@ class CorsairLibrary{
 				devFirmware: "5.6.126",
 				ledSpacing: 4,
 				keymapType : "Mouse",
+				buttonMap : "Sabre",
 				maxDPI : 12400
 			},
 			"Sabre RGB Pro Wireless": {
@@ -3256,6 +3279,7 @@ class CorsairBragiDevice{
 		this.subdeviceId = subdeviceID;
 		this.supportsBattery = false;
 		this.keymapType = device?.keymapType ?? "Unknown";
+		this.buttonMap = device?.buttonMap ?? "Unknown";
 		this.maxDPI = device?.maxDPI ?? "0";
 		this.hasSniperButton = device?.hasSniperButton ?? false;
 		this.batteryPercentage = -1;
