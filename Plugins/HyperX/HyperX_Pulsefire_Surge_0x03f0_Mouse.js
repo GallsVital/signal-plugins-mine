@@ -17,9 +17,6 @@ export function ControllableParameters(){
 		{"property":"forcedColor", "group":"lighting", "label":"Forced Color", "min":"0", "max":"360", "type":"color", "default":"#009bde"},
 	];
 }
-export function ConflictingProcesses() {
-	return ["NGenuity2.exe"];
-}
 
 const vLedNames =
 [

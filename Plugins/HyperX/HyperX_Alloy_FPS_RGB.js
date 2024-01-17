@@ -19,9 +19,6 @@ export function ControllableParameters(){
 
 	];
 }
-export function ConflictingProcesses() {
-	return ["NGenuity2.exe"];
-}
 
 const vLedNames =
 [

@@ -515,6 +515,8 @@ class GigabyteVisionGPuList {
 			new GigabyteVisionIdentifier(Nvidia.RTX3080_GA102,  GigabyteVisionIds.RTX3080_EAGLE_12GB_LHR,		0x63, "GIGABYTE 3080 Eagle OC 12g LHR"),
 
 			new GigabyteVisionIdentifier(Nvidia.RTX3080_LHR,    GigabyteVisionIds.RTX3080_GAMING_OC,			0x62, "GIGABYTE 3080 Gaming OC LHR"),
+			new GigabyteVisionIdentifier(Nvidia.RTX3080_LHR,    GigabyteVisionIds.RTX3080_GAMING_OC,			0x63, "GIGABYTE 3080 Vision OC LHR"),
+
 			new GigabyteVisionIdentifier(Nvidia.RTX3080_LHR,    GigabyteVisionIds.RTX3080_VISION_OC,			0x63, "GIGABYTE 3080 Vision OC LHR"),
 			new GigabyteVisionIdentifier(Nvidia.RTX3080_LHR,    GigabyteVisionIds.RTX3080_EAGLE_OC,				0x63, "GIGABYTE 3080 Eagle OC LHR"),
 
