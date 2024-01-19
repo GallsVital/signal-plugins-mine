@@ -880,13 +880,13 @@ class MysticLight {
 			},
 			0x7D41 : //B660 Tomahawk
 			{
-				OnboardLEDs    : 0,
+				OnboardLEDs    : 5,
 				RGBHeaders     : 2,
 				ARGBHeaders    : 2,
 				JPipeLEDs	   : 0,
 				CorsairHeaders : 0,
 				//PERLED
-				PerLEDOnboardLEDs : 0,
+				PerLEDOnboardLEDs : 5,
 				ForceZoneBased	  : false,
 				JARGB_V2		  : false
 			},
