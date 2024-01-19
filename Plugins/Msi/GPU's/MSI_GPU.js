@@ -319,7 +319,7 @@ class NvidiaGPUDeviceIds {
 		this.RTX4060TI       = 0x2803;
 		this.RTX4060TI_OC	 = 0x2805;
 		this.RTX4070		 = 0x2786;
-		this.RTX4070_OC     =  0x2783;
+		this.RTX4070S		 = 0x2783;
 		this.RTX4070TI		 = 0x2782;
 		this.RTX4080		 = 0x2704;
 		this.RTX4090		 = 0x2684;
@@ -525,7 +525,7 @@ class MSIGPUList {
 
         	new MSIGPUIdentifier(Nvidia.RTX4070,		MSIGPUIDs.RTX4070_GAMING_X_TRIO,		0x68, "MSI 4070 GAMING X TRIO"),
         	new MSIGPUIdentifier(Nvidia.RTX4070,		MSIGPUIDs.RTX4070_GAMING_X_SLIM,		0x68, "MSI 4070 GAMING X SLIM"),
-        	new MSIGPUIdentifier(Nvidia.RTX4070_OC,		MSIGPUIDs.RTX4070_GAMING_X_SLIM,		0x68, "MSI 4070 GAMING X SLIM OC"),
+        	new MSIGPUIdentifier(Nvidia.RTX4070S,		MSIGPUIDs.RTX4070_GAMING_X_SLIM,		0x68, "MSI 4070 Super GAMING X SLIM"),
 
         	new MSIGPUIdentifier(Nvidia.RTX4070TI,		MSIGPUIDs.RTX4070TI_GAMING_X_TRIO,		0x68, "MSI 4070Ti GAMING X TRIO"),
         	new MSIGPUIdentifier(Nvidia.RTX4070TI,		MSIGPUIDs.RTX4070TI_GAMING_X_TRIO_W,	0x68, "MSI 4070Ti GAMING X TRIO White"),
