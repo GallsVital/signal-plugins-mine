@@ -155,9 +155,9 @@ export function Shutdown() {
 	}
 }
 
-function setMacroKeys(deviceID = 0) {
-	//Corsair.OpenHandle(1, Corsair.endpoints.Buttons, deviceID);
-	const macroFill = new Array(135).fill(1);
+function setMacroKeys(deviceID = 0, keyCount = 0) {
+	const macroFill = new Array(keyCount).fill(1);
+	device.log(`Macrofill Key Count ${keyCount}`);
 
 	device.log("Doing things to keys");
 	Corsair.WriteToEndpoint(1, Corsair.endpoints.Buttons, macroFill, deviceID);
@@ -258,7 +258,7 @@ function initializeDevice(deviceConfig, deviceID = 0) {
 		configureMouseButtons(deviceID);
 
 	} else if(deviceConfig.keymapType === "Keyboard") {
-		//setMacroKeys(deviceID);
+		setMacroKeys(deviceID, deviceConfig.keyCount);
 		device.addFeature("keyboard");
 	}
 
@@ -465,6 +465,10 @@ function processMacroInputs(bitIdx, state) {
 	}
 	const keyName = CorsairLibrary.GetKeyMapping(bitIdx, deviceType, buttonMapType);
 
+	if(deviceType === "Keyboard") {
+		device.log(`Key Pressed: ${bitIdx}`);
+	}
+
 	if(keyName !== undefined) {
 		if(deviceType === "Keyboard") {
 			processKeyboardMacros(bitIdx, state, keyName);
@@ -494,8 +498,6 @@ function processMouseMacros(bitIdx, state, keyName) {
 				"name":keyName
 			};
 			device.log(`bitIdx ${bitIdx} is state ${state}`);
-			//device.log(`Key ${keyName} is state ${state}`);
-
 
 			device.log(`Key ${keyName} is state ${state}`);
 			mouse.sendEvent(eventData, "Button Press");
@@ -1102,6 +1104,7 @@ class CorsairLibrary{
 			0x1B66 : "Ironclaw Wireless",
 			0x1B70 : "M55",
 			0x1b9e : "M65 Ultra",
+			0x1BB8 : "Nightsabre",
 			0x1B89 : "K95 Plat XT",
 			0x1BAB : "K100 Air",
 			0x1BA4 : "K55 Pro",
@@ -1143,6 +1146,7 @@ class CorsairLibrary{
 			"Ironclaw Wireless" : "https://assets.signalrgb.com/devices/default/mice/mouse.png",
 			"M55" : "https://assets.signalrgb.com/devices/default/mice/mouse.png",
 			"M65 Ultra" : "https://assets.signalrgb.com/devices/default/mice/mouse.png",
+			"Nightsabre" : "https://assets.signalrgb.com/devices/default/mice/mouse.png",
 			"K55 Pro" : "https://assets.signalrgb.com/devices/default/keyboards/full-size-keyboard-render.png",
 			"K55 Pro XT" : "https://assets.signalrgb.com/devices/default/keyboards/full-size-keyboard-render.png",
 			"K57" : "https://assets.signalrgb.com/devices/default/keyboards/full-size-keyboard-render.png",
@@ -1290,6 +1294,29 @@ class CorsairLibrary{
 				buttonMap : "M65 Ultra",
 				maxDPI : 26500,
 				hasSniperButton : true
+			},
+			"Nightsabre": {
+				name: "Nightsabre Wireless",
+				size: [7, 7],
+				ledNames: [
+					"Front Left", "Front Right",
+					"Top Led 1", "Top Led 2", "Top Led 3", "Top Led 4", "Top Led 5", "Top Led 6",
+					"Logo",
+					"Bottom LED 1", "Bottom LED 2", "Bottom LED 3"
+				],
+				ledPositions: [
+					[1, 0], 		[5, 0],
+					[0, 2], [1, 2], [2, 2], [3, 2], [4, 2], [5, 2],
+					[3, 4],
+					[0, 1], [1, 1], [2, 1]
+				],
+				ledMap: [ 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11 ],
+				devFirmware: "0.0.0",
+				ledSpacing: 12,
+				keyCount: 8,
+				keymapType : "Mouse",
+				buttonMap : "Default",
+				maxDPI : 26000
 			},
 			"Sabre RGB Pro": {
 				name: "Sabre Pro",
@@ -1556,6 +1583,7 @@ class CorsairLibrary{
 				],
 				devFirmware: "0.0.0",
 				ledSpacing: 0,
+				keyCount: 0, //The reason this is set to 0 manually is that turning keys to 1 on this board breaks them. goofy board.
 				keymapType : "Keyboard"
 			},
 			"K70 Pro": {
@@ -1837,6 +1865,7 @@ class CorsairLibrary{
 				ledMap: [138, 139, 140, 141, 142, 143, 144, 145, 146, 147, 148, 149, 150, 151, 152, 153, 154, 155, 156, 157, 158, 159, 160, 189, 182, 183, 171, 161, 128, 188, 137, 184, 114, 190, 191, 192, 102, 172, 162, 187, 186, 185, 173, 163, 131, 41, 58, 59, 60, 61, 62, 63, 64, 65, 66, 67, 68, 69, 70, 71, 72, 123, 126, 124, 125, 174, 164, 132, 53, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 45, 46, 42, 73, 74, 75, 83, 84, 85, 86, 175, 165, 176, 166, 133, 43, 20, 26, 8, 21, 23, 28, 24, 12, 18, 19, 47, 48, 49, 76, 77, 78, 95, 96, 97, 87, 177, 167, 134, 57, 4, 22, 7, 9, 10, 11, 13, 14, 15, 51, 52, 40, 92, 93, 94, 178, 168, 135, 106, 29, 27, 6, 25, 5, 17, 16, 54, 55, 56, 110, 82, 89, 90, 91, 88, 179, 169, 136, 105, 108, 107, 44, 111, 122, 101, 109, 80, 81, 79, 98, 99, 180, 170, 181, 100, 50],
 				devFirmware: "0.0.0",
 				ledSpacing: 0,
+				keyCount: 130,
 				keymapType : "Keyboard"
 			},
 		});
@@ -3265,7 +3294,7 @@ class CorsairBragiDongle{
 	}
 }
 class CorsairBragiDevice{
-
+/* eslint-disable complexity */
 	constructor(device, subdeviceID = 0){
 
 		this.name = device?.name ?? "Unknown Device";
@@ -3278,6 +3307,7 @@ class CorsairBragiDevice{
 		this.lightingEndpoint = -1;
 		this.subdeviceId = subdeviceID;
 		this.supportsBattery = false;
+		this.keyCount = device?.keyCount ?? 0;
 		this.keymapType = device?.keymapType ?? "Unknown";
 		this.buttonMap = device?.buttonMap ?? "Unknown";
 		this.maxDPI = device?.maxDPI ?? "0";
