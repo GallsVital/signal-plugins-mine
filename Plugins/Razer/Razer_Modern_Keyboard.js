@@ -221,8 +221,8 @@ export class deviceLibrary {
 		{
 			0x0228 : "Blackwidow Elite",
 			//0x024E : "Blackwidow V3", // Quartz // TODO
+			0x0258 : "Blackwidow V3 Mini", // Wired
 			0x0271 : "Blackwidow V3 Mini",
-			0x0258 : "Blackwidow V3 Mini",
 			0x0287 : "Blackwidow V4",
 			0x0293 : "Blackwidow V4 X",
 			0x028D : "Blackwidow V4 Pro",
