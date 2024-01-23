@@ -220,7 +220,7 @@ export class deviceLibrary {
 		this.PIDLibrary =
 		{
 			0x0228 : "Blackwidow Elite",
-			0x024E : "Blackwidow V3", // Quartz
+			//0x024E : "Blackwidow V3", // Quartz // TODO
 			0x0271 : "Blackwidow V3 Mini",
 			0x0258 : "Blackwidow V3 Mini",
 			0x0287 : "Blackwidow V4",
@@ -230,12 +230,12 @@ export class deviceLibrary {
 			0x0257 : "Huntsman Mini",
 			0x005E : "Huntsman Mini",
 			0x026C : "Huntsman V2",
-			0x0266 : "Huntsman V2 Analog",
-			0x026B : "Huntsman V2 TKL",
+			//0x0266 : "Huntsman V2 Analog", // TODO
+			//0x026B : "Huntsman V2 TKL", // TODO
 			0x02A6 : "Huntsman V3 Pro",
 			0x02A7 : "Huntsman V3 Pro TKL",
-			0x025D : "Ornata V2",
-			//0x0000 : "Huntsman V3 Pro Mini",
+			//0x025D : "Ornata V2", // TODO
+			//0x0000 : "Huntsman V3 Pro Mini", // TODO
 		};
 
 		this.LEDLibrary = //I'm tired of not being able to copy paste between files.
