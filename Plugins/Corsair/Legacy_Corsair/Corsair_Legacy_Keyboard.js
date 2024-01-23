@@ -88,7 +88,7 @@ function macroInputHandler(bitIdx, isPressed) {
 }
 
 function setStrafeLighting() {
-	device.write([0x00, 0x07, 0x05, 0x08, 0x00, 0x00, 0x01], 65);//Strafe Specific Lighting! //pretty simple. Uses the Lighting Mode Control switch, then 0x08 is strafe specific, 0x00 always is a thing, then the 0x01 is an on argument.
+	device.write([0x00, 0x07, 0x05, 0x08, 0x00, 0x01], 65);//Strafe Specific Lighting! //pretty simple. Uses the Lighting Mode Control switch, then 0x08 is strafe specific, 0x00 always is a thing, then the 0x01 is an on argument.
 }
 
 function InitScanCodes() {
