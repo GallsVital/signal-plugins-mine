@@ -6,9 +6,6 @@ export function Size() { return [21, 6]; }
 export function DefaultPosition(){return [10, 100];}
 const DESIRED_HEIGHT = 85;
 export function DefaultScale(){return Math.floor(DESIRED_HEIGHT/Size()[1]);}
-export function ConflictingProcesses() {
-	return ["NGenuity2.exe"];
-}
 /* global
 shutdownColor:readonly
 LightingMode:readonly
@@ -142,5 +139,5 @@ export function Validate(endpoint) {
 }
 
 export function ImageUrl() {
-	return "https://marketplace.signalrgb.com/devices/brands/hyperx/keyboards/alloy-origins.png";
+	return "https://assets.signalrgb.com/devices/brands/hyperx/keyboards/alloy-origins.png";
 }

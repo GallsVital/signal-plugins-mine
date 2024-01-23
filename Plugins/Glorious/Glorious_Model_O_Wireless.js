@@ -209,5 +209,5 @@ function hexToRgb(hex) {
 }
 
 export function ImageUrl(){
-	return "https://marketplace.signalrgb.com/devices/brands/glorious/mice/model-o-wireless.png";
+	return "https://assets.signalrgb.com/devices/brands/glorious/mice/model-o-wireless.png";
 }

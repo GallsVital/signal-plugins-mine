@@ -5,9 +5,6 @@ export function Publisher() { return "WhirlwindFX"; }
 export function Size() { return [21, 7]; }
 export function DefaultPosition(){return [50, 100];}
 export function DefaultScale(){return 8.0;}
-export function ConflictingProcesses() {
-	return ["NGenuity2.exe"];
-}
 /* global
 shutdownColor:readonly
 LightingMode:readonly
@@ -157,5 +154,5 @@ export function Validate(endpoint) {
 }
 
 export function ImageUrl() {
-	return "https://marketplace.signalrgb.com/devices/brands/hyperx/keyboards/alloy-elite-2.png";
+	return "https://assets.signalrgb.com/devices/brands/hyperx/keyboards/alloy-elite-2.png";
 }

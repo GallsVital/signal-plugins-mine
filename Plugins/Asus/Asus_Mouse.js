@@ -392,6 +392,7 @@ export class deviceLibrary {
 			0x197F: "Gladius III Wireless",
 			0x1A72: "Gladius III Aimpoint",
 			0x1A70: "Gladius III Aimpoint",
+			0x1B0C: "Gladius III Aimpoint", // Evangelion Edition
 			0x18E1: "Impact II",
 			0x19D2: "Impact II",
 			0x1956: "Impact II Electro Punk",
@@ -401,8 +402,10 @@ export class deviceLibrary {
 			0x1960: "ROG Keris",
 			0x195E: "ROG Keris",
 			0x1A59: "ROG Keris",
+			0x1A66: "ROG Keris", // Keris Aimpoint Wired
 			0x1846: "Pugio I",
 			0x1906: "Pugio II",
+			0x1908: "Pugio II Wireless",
 			//0x181C: "Spatha", // Flash based according to captures
 			0x1979: "Spatha X Wireless",
 			0x1977: "Spatha X Wireless"
@@ -576,6 +579,17 @@ export class deviceLibrary {
 				Protocol: "Legacy",
 				DPISupport: true
 			},
+			"Pugio II Wireless":
+			{
+				size: [7, 8],
+				vLedNames: ["Logo", "Scroll Wheel", "Underglow"],
+				vLedPositions: [[3, 5], [3, 0], [3, 6]],
+				maxDPI: 16000,
+				//battery: true, // Not tested
+				Endpoint : { "interface": 0, "usage": 0x0001, "usage_page": 0xFF01, "collection": 0x0000 },
+				Protocol: "Legacy",
+				DPISupport: true
+			},
 			"Spatha":
 			{
 				size: [3, 3],
@@ -615,6 +629,7 @@ export class deviceLibrary {
 			"ROG Keris": 			"https://marketplace.signalrgb.com/devices/brands/asus/mice/keris-wireless.png",
 			"Pugio I": 				"https://marketplace.signalrgb.com/devices/brands/asus/mice/pugio-ii.png",
 			"Pugio II": 			"https://marketplace.signalrgb.com/devices/brands/asus/mice/pugio-ii.png",
+			"Pugio II Wireless":	"https://marketplace.signalrgb.com/devices/brands/asus/mice/pugio-ii.png",
 			"Spatha X Wireless": 	"https://marketplace.signalrgb.com/devices/brands/asus/mice/spatha-x.png"
 		};
 

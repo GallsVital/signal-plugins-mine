@@ -1,4 +1,4 @@
-export function Name() { return "Lian Li Uni Fan Controller SL Infinity V0.8"; }
+export function Name() { return "Lian Li Uni Fan Controller SL Infinity"; }
 export function VendorId() { return  0x0CF2; }
 export function ProductId() { return 0xA102;}//0xA100; }
 export function Publisher() { return "WhirlwindFX"; }
@@ -24,7 +24,7 @@ export function ControllableParameters() {
 }
 export function DeviceMessages() {
 	return [
-		{property: "Limited Frame Rate", message:"Limited Frame Rate", tooltip: "This device's firmware is limited to a slower refresh rate than other device's when using more then 2 channels"},
+		{property: "Limited Frame Rate", message:"Limited Frame Rate", tooltip: "This device's firmware is limited to a slower refresh rate than other device's when using more than 2 channels"},
 	];
 }
 
@@ -376,5 +376,5 @@ function sendControlPacket(index, data, length) {
 }
 
 export function ImageUrl() {
-	return "https://marketplace.signalrgb.com/devices/brands/lian-li/fan-controllers/uni-hub-controller.png";
+	return "https://assets.signalrgb.com/devices/brands/lian-li/fan-controllers/uni-hub-controller.png";
 }

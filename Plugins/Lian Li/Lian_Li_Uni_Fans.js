@@ -26,7 +26,7 @@ export function LedPositions() { return vLedPos; }
 
 export function DeviceMessages() {
 	return [
-		{property: "Limited Frame Rate", message:"Limited Frame Rate", tooltip: "This device's firmware is limited to a slower refresh rate than other device's when using more then 2 channels"},
+		{property: "Limited Frame Rate", message:"Limited Frame Rate", tooltip: "This device's firmware is limited to a slower refresh rate than other device's when using more than 2 channels"},
 	];
 }
 export function SubdeviceController(){ return true; }
@@ -381,5 +381,5 @@ function sendCommit(){
 
 
 export function ImageUrl() {
-	return "https://marketplace.signalrgb.com/devices/brands/lian-li/fan-controllers/uni-hub-controller.png";
+	return "https://assets.signalrgb.com/devices/brands/lian-li/fan-controllers/uni-hub-controller.png";
 }

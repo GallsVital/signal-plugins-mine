@@ -22,10 +22,6 @@ export function ControllableParameters(){
 	];
 }
 
-export function ConflictingProcesses() {
-	return ["NGenuity2.exe"];
-}
-
 const vLedNames = [ "Logo" ];
 
 const vLedPositions = [ [1, 1] ];
@@ -97,5 +93,5 @@ export function Validate(endpoint) {
 }
 
 export function ImageUrl() {
-	return "https://marketplace.signalrgb.com/devices/brands/hyperx/mice/pulsefire-core.png";
+	return "https://assets.signalrgb.com/devices/brands/hyperx/mice/pulsefire-core.png";
 }

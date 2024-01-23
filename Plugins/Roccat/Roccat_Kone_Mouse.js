@@ -210,5 +210,5 @@ export function Validate(endpoint) {
 
 
 export function ImageUrl(){
-	return "https://marketplace.signalrgb.com/devices/brands/roccat/mice/kone-standard.png";
+	return "https://assets.signalrgb.com/devices/brands/roccat/mice/kone-standard.png";
 }

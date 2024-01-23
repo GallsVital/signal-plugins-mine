@@ -55,10 +55,6 @@ export function Shutdown() {
 	LegacyCorsair.setSpecialFunctionControlMode(LegacyCorsair.modes.HardwareMode);
 }
 
-export function onlayoutChanged() {
-	InitScanCodes();
-}
-
 function readInputs() {
 	device.set_endpoint(0, 0x0002, 0xffc0); // Macro input endpoint
 
@@ -568,7 +564,7 @@ class LegacyCorsairProtocol {
 		this.keyboardLayoutDict = {
 			0x00 : "ANSI",
 			0x01 : "ISO",
-			0x02 : "ABNT"
+			0x02 : "ABNT2"
 		};
 
 		this.keyIdx = {
@@ -777,7 +773,7 @@ class LegacyCorsairProtocol {
 		let VendorID = "";
 		let ProductID = "";
 		let pollingRate = 0;
-		let layout = 0;
+		let layout = "";
 		let deviceType = "";
 
 
@@ -822,9 +818,10 @@ class LegacyCorsairProtocol {
 		}
 
 		if(returnPacket[20] !== undefined && returnPacket[20] >= 0) {
-			layout = this.keyboardLayoutDict[returnPacket[20]];
 
-			if(layout > 5 && deviceType === "Keyboard") {
+			layout = this.keyboardLayoutDict[returnPacket[20]] ?? "ANSI";
+
+			if(returnPacket[20] > 5 && deviceType === "Keyboard") {
 				device.log("Mouse misidentified as a keyboard.", {toFile: true});
 				deviceType = "Mouse"; //something something Dark Core identifies as a keyboard
 			}

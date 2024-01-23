@@ -610,7 +610,7 @@ export function Validate(endpoint) {
 }
 
 export function ImageUrl(){
-	return "https://marketplace.signalrgb.com/devices/brands/razer/cases/lian-li-o11-d.png";
+	return "https://assets.signalrgb.com/devices/brands/razer/cases/lian-li-o11-d.png";
 }
 
 function Image() { //TODO: YEET THIS.

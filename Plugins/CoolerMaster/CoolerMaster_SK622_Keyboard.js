@@ -1,6 +1,6 @@
-export function Name() { return "CoolerMaster SK622"; }
+export function Name() { return "CoolerMaster SK620"; }
 export function VendorId() { return 0x2516; }
-export function ProductId() { return [0x0149, 0x014b]; }
+export function ProductId() { return [0x0087, 0x0159, 0x0149, 0x014B]; }
 export function Publisher() { return "WhirlwindFX && saxXxekaf"; }
 export function Documentation(){ return "troubleshooting/coolermaster"; }
 export function Size() { return [17, 7]; }
@@ -64,6 +64,18 @@ export function LedPositions() {
 }
 
 export function Initialize() {
+	switch (device.productId()) {
+	case 0x0159:
+		device.setName("CoolerMaster SK620");
+		break;
+	case 0x0087:
+		device.setName("CoolerMaster SK621");
+		break;
+	default:
+		device.setName("CoolerMaster SK622");
+		break;
+	}
+
 	MagicStartupPacket();
 	device.write([0x00, 0x56, 0x81, 0x00, 0x00, 0x01, 0x00, 0x00, 0x00, 0x09, 0x00, 0x00, 0x00, 0xBB, 0xBB, 0xBB, 0xBB], 65);
 }
@@ -172,5 +184,5 @@ export function Validate(endpoint) {
 }
 
 export function ImageUrl(){
-	return "https://marketplace.signalrgb.com/devices/brands/coolermaster/keyboards/sk622.png";
+	return "https://assets.signalrgb.com/devices/brands/coolermaster/keyboards/sk622.png";
 }

@@ -5,9 +5,6 @@ export function Publisher() { return "WhirlwindFX"; }
 export function Size() { return [8, 8]; }
 export function DefaultPosition(){return [230, 100];}
 export function DefaultScale(){return 3.0;}
-export function ConflictingProcesses() {
-	return ["NGenuity2.exe"];
-}
 /* global
 shutdownColor:readonly
 LightingMode:readonly
@@ -143,5 +140,5 @@ export function Validate(endpoint) {
 }
 
 export function ImageUrl() {
-	return "https://marketplace.signalrgb.com/devices/brands/hyperx/mousepads/fury-ultra.png";
+	return "https://assets.signalrgb.com/devices/brands/hyperx/mousepads/fury-ultra.png";
 }

@@ -29,9 +29,6 @@ export function ControllableParameters(){
 		{"property":"dpi5", "group":"mouse", "label":"DPI", "step":"50", "type":"number", "min":"200", "max":"16000", "default":"3200"},
 	];
 }
-export function ConflictingProcesses() {
-	return ["NGenuity2.exe"];
-}
 
 const vLedNames = [ "Scroll" ];
 
@@ -225,5 +222,5 @@ export function Validate(endpoint) {
 }
 
 export function ImageUrl() {
-	return "https://marketplace.signalrgb.com/devices/brands/hyperx/mice/pulsefire-haste-wireless.png";
+	return "https://assets.signalrgb.com/devices/brands/hyperx/mice/pulsefire-haste-wireless.png";
 }

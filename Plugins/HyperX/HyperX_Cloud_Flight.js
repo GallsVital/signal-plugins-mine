@@ -6,9 +6,6 @@ export function Type() { return "HID"; }
 export function Size() { return [1, 1]; }
 export function DefaultPosition() { return [0, 0]; }
 export function DefaultScale() { return 1.0; }
-export function ConflictingProcesses() {
-	return ["NGenuity.exe", "NGenuity2.exe"];
-}
 export function LacksOnBoardLeds() { return true; }
 /* global
 batteryPollControl:readonly
@@ -221,5 +218,5 @@ function CheckMicrophoneStatus() {
 }
 
 export function ImageUrl() {
-	return "https://marketplace.signalrgb.com/devices/brands/hyperx/audio/cloud-flight.png";
+	return "https://assets.signalrgb.com/devices/brands/hyperx/audio/cloud-flight.png";
 }

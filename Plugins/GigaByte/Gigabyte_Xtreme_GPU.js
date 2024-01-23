@@ -298,5 +298,5 @@ class GigabyteXtremeGPUList {
 }
 
 export function ImageUrl() {
-	return "https://marketplace.signalrgb.com/devices/brands/gigabyte/gpus/gpu.png";
+	return "https://assets.signalrgb.com/devices/brands/gigabyte/gpus/gpu.png";
 }

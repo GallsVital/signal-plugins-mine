@@ -127,5 +127,5 @@ export function Validate(endpoint) {
 }
 
 export function ImageUrl(){
-	return "https://marketplace.signalrgb.com/devices/brands/evga/keyboards/z20.png";
+	return "https://assets.signalrgb.com/devices/brands/evga/keyboards/z20.png";
 }

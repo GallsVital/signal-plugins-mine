@@ -21,9 +21,6 @@ export function ControllableParameters(){
 		{"property":"dpi1", "group":"mouse", "label":"DPI", "step":"50", "type":"number", "min":"200", "max":"12400", "default":"800"},
 	];
 }
-export function ConflictingProcesses() {
-	return ["NGenuity2.exe"];
-}
 
 const vLedNames = [ "Scroll", "Logo" ];
 
@@ -104,5 +101,5 @@ export function Validate(endpoint) {
 }
 
 export function ImageUrl() {
-	return "https://marketplace.signalrgb.com/devices/brands/hyperx/mice/pulsefire-raid.png";
+	return "https://assets.signalrgb.com/devices/brands/hyperx/mice/pulsefire-raid.png";
 }

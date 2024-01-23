@@ -141,5 +141,5 @@ export function Validate(endpoint) {
 }
 
 export function ImageUrl() {
-	return "https://marketplace.signalrgb.com/devices/brands/mountain/keyboards/everest-60.png";
+	return "https://assets.signalrgb.com/devices/brands/mountain/keyboards/everest-60.png";
 }

@@ -212,5 +212,5 @@ export function Validate(endpoint) {
 }
 
 export function ImageUrl() {
-	return "https://marketplace.signalrgb.com/devices/brands/mountain/keyboards/everest-max.png";
+	return "https://assets.signalrgb.com/devices/brands/mountain/keyboards/everest-max.png";
 }

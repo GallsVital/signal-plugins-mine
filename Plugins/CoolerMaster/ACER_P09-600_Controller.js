@@ -39,7 +39,7 @@ export function Initialize() {
 		device.createSubdevice(`12v Fan ${ChannelID}`);
 		device.setSubdeviceName(`12v Fan ${ChannelID}`, `12v Fan ${ChannelID}`);
 		device.setSubdeviceSize(`12v Fan ${ChannelID}`, 3, 3);
-		device.setSubdeviceImage(`12v Fan ${ChannelID}`, "https://marketplace.signalrgb.com/devices/default/fans/fan.png");
+		device.setSubdeviceImage(`12v Fan ${ChannelID}`, "https://assets.signalrgb.com/devices/default/fans/fan.png");
 	}
 }
 
@@ -112,5 +112,5 @@ export function Validate(endpoint) {
 }
 
 export function ImageUrl(){
-	return "https://marketplace.signalrgb.com/devices/brands/acer/cases/predator-orion-9000.png";
+	return "https://assets.signalrgb.com/devices/brands/acer/cases/predator-orion-9000.png";
 }

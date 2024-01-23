@@ -8,13 +8,16 @@ export function DefaultPosition(){return [200, 125];}
 export function DefaultScale(){return 2.5;}
 export function LedNames() { return vLedNames; }
 export function LedPositions() { return vLedPositions; }
+export function ConflictingProcesses() { return ["LightingService.exe"]; }
 /* global
+shutdownMode:readonly
 shutdownColor:readonly
 LightingMode:readonly
 forcedColor:readonly
 */
 export function ControllableParameters() {
 	return [
+		{"property":"shutdownMode", "group":"lighting", "label":"Shutdown Mode", "type":"combobox", "values":["SignalRGB", "Hardware"], "default":"Hardware"},
 		{"property":"shutdownColor", "group":"lighting", "label":"Shutdown Color", "min":"0", "max":"360", "type":"color", "default":"#009bde"},
 		{"property":"LightingMode", "group":"lighting", "label":"Lighting Mode", "type":"combobox", "values":["Canvas", "Forced"], "default":"Canvas"},
 		{"property":"forcedColor", "group":"lighting", "label":"Forced Color", "min":"0", "max":"360", "type":"color", "default":"#009bde"},
@@ -74,9 +77,19 @@ export function Render() {
 	sendColors();
 }
 
-export function Shutdown() {
-	AsusGPU.setDirectMode(0x00);
-	AsusGPU.setMode(AsusGPU.modes.rainbow);
+export function Shutdown(SystemSuspending) {
+
+	if(SystemSuspending){
+		sendColors("#000000"); // Go Dark on System Sleep/Shutdown
+	}else{
+		if (shutdownMode === "SignalRGB") {
+			sendColors(shutdownColor);
+		} else {
+			AsusGPU.setDirectMode(0x00);
+			AsusGPU.setMode(AsusGPU.modes.rainbow);
+		}
+	}
+
 }
 
 function SetGPUNameFromBusIds() {
@@ -93,7 +106,7 @@ function SetGPUNameFromBusIds() {
 
 let refreshColors = false;
 
-function sendColors(shutdown = false) {
+function sendColors(overrideColor) {
 
 	const RGBData = [];
 
@@ -102,8 +115,8 @@ function sendColors(shutdown = false) {
 		const iPxY = vLedPositions[iIdx][1];
 		let color;
 
-		if(shutdown) {
-			color = hexToRgb(shutdownColor);
+		if(overrideColor) {
+			color = hexToRgb(overrideColor);
 		} else if (LightingMode === "Forced") {
 			color = hexToRgb(forcedColor);
 		} else {
@@ -424,6 +437,7 @@ class NvidiaGPUDeviceIds {
 		this.RTX3080TI       = 0x2208;
 		this.RTX3090         = 0x2204;
 		this.RTX3090TI       = 0x2203;
+		this.RTX4060		 = 0x2882;
 		this.RTX4060TI		 = 0x2803;
 		this.RTX4070		 = 0x2786;
 		this.RTX4070TI 		 = 0x2782;
@@ -482,7 +496,6 @@ class Asus_Ampere_Lovelace_IDs {
 		this.RTX3070TI_TUF_GAMING_2            = 0x8813;
 		this.RTX3070TI_TUF_GAMING_OC 		   = 0x88BC;
 
-
 		this.RTX3080_STRIX_GAMING_WHITE        = 0x87D1;
 		this.RGB3080_STRIX_GAMING_V2 		   = 0x882F;
 		this.RTX3080_STRIX_GAMING_WHITE_OC_LHR = 0x8830;
@@ -515,12 +528,16 @@ class Asus_Ampere_Lovelace_IDs {
 		this.RTX3090_TUF_GAMING                    = 0x87B5;
 		this.RTX3090_STRIX_GAMING                  = 0x87AF;
 		this.RTX3090_STRIX_GAMING_2				   = 0x87AD;
+		this.RTX3090_STRIX_GAMING_3				   = 0x87C5;
 		this.RTX3090_STRIX_GAMING_WHITE            = 0x87D9;
 		this.RTX3090_STRIX_GAMING_WHITE_V2         = 0x87DA;
 		this.RTX3090_STRIX_GAMING_EVA			   = 0x8886;
 
+		this.RTX3090TI_STRIX_LC_GAMING			   = 0x8871;
 		this.RTX3090TI_STRIX_LC_GAMING_OC          = 0x8870;
 		this.RTX3090TI_TUF_GAMING				   = 0x8874;
+
+		this.RTX4060_STRIX_GAMING                  = 0x8908;
 
 		this.RTX4060TI_TUF_GAMING_OC			   = 0x88F6;
 
@@ -530,13 +547,15 @@ class Asus_Ampere_Lovelace_IDs {
 		this.RTX4070_TUF_GAMING_OC				   = 0x88EC;
 		this.RTX4070_STRIX_GAMING				   = 0x88F4;
 		this.RTX4070_STRIX_GAMING_2				   = 0x88F3;
+
 		this.RTX4070TI_TUF_GAMING_OC			   = 0x88A3;
+		this.RTX4070TI_TUF_GAMING_OC_WH			   = 0x8935;
 		this.RTX4070TI_12GB_STRIX_GAMING_OC		   = 0X88A7;
 		this.RTX4070TI_12GB_STRIX_GAMING_OC_2      = 0x88DC;
 		this.RTX4070TI_12GB_STRIX_GAMING_OC_3	   = 0X88E5;
+		this.RTX4070TI_12GB_STRIX_GAMING_OC_4      = 0x88E4;
 		this.RTX4070TI_TUF_GAMING				   = 0x88A6;
 		this.RTX4070TI_TUF_GAMING_2                = 0x88DD;
-
 		this.RTX4070TI_TUF_GAMING_OC_2			   = 0x88A4;
 		this.RTX4070TI_12GB_TUF					   = 0x88dd;
 
@@ -560,12 +579,15 @@ class Asus_Ampere_Lovelace_IDs {
 		this.RTX4090_STRIX_GAMING_WHITE_OC		   = 0x88C3;
 		this.RTX4090_STRIX_GAMING_WHITE_OC_2       = 0x88F1;
 		this.RTX4090_STRIX_GAMING_WHITE			   = 0x88C4;
+		this.RTX4090_STRIX_GAMING_WHITE_2		   = 0x88F2;
 		this.RTX4090_STRIX_LC_OC				   = 0x88E8;
 		this.RTX4090_TUF_GAMING                    = 0x889A;
 		this.RTX4090_TUF_GAMING_2                  = 0x889B;
 		this.RTX4090_TUF_GAMING_3	               = 0x88E3;
 		this.RTX4090_TUF_GAMING_OC				   = 0x88E6;
 		this.RTX4090_TUF_GAMING_OC_2               = 0x88E2;
+		this.RTX4090_TUF_GAMING_OG                 = 0x88E7;
+		this.RTX4090_MATRIX						   = 0x8934;
 	}
 }
 
@@ -661,12 +683,16 @@ const Asus3000GPUIDs =
 	new AsusGPUIdentifier(Nvidia.RTX3090, AsusID.RTX3090_TUF_GAMING, "Asus TUF 3090 Gaming"),
 	new AsusGPUIdentifier(Nvidia.RTX3090, AsusID.RTX3090_STRIX_GAMING, "Asus ROG Strix 3090 O24G Gaming"),
 	new AsusGPUIdentifier(Nvidia.RTX3090, AsusID.RTX3090_STRIX_GAMING_2, "Asus ROG Strix 3090 O24G Gaming"),
+	new AsusGPUIdentifier(Nvidia.RTX3090, AsusID.RTX3090_STRIX_GAMING_3, "Asus ROG Strix 3090 O24G Gaming"),
 	new AsusGPUIdentifier(Nvidia.RTX3090, AsusID.RTX3090_STRIX_GAMING_WHITE, "Asus ROG Strix 3090 O24G Gaming White"),
 	new AsusGPUIdentifier(Nvidia.RTX3090, AsusID.RTX3090_STRIX_GAMING_WHITE_V2, "Asus ROG Strix 3090 O24G Gaming White V2"),
 	new AsusGPUIdentifier(Nvidia.RTX3090, AsusID.RTX3090_STRIX_GAMING_EVA, "Asus ROG Strix 3090 EVA Edition"),
 
+	new AsusGPUIdentifier(Nvidia.RTX3090TI, AsusID.RTX3090TI_STRIX_LC_GAMING, "Asus ROG Strix 3090TI LC"),
 	new AsusGPUIdentifier(Nvidia.RTX3090TI, AsusID.RTX3090TI_STRIX_LC_GAMING_OC, "Asus ROG Strix 3090TI LC OC"),
 	new AsusGPUIdentifier(Nvidia.RTX3090TI, AsusID.RTX3090TI_TUF_GAMING, "Asus TUF 3090TI Gaming"),
+
+	new AsusGPUIdentifier(Nvidia.RTX4060, AsusID.RTX4060_STRIX_GAMING, "Asus ROG Strix 4060 Gaming"),
 
 	new AsusGPUIdentifier(Nvidia.RTX4060TI, AsusID.RTX4060TI_TUF_GAMING_OC, "Asus 4060Ti TUF Gaming OC"),
 
@@ -680,8 +706,10 @@ const Asus3000GPUIDs =
 	new AsusGPUIdentifier(Nvidia.RTX4070TI, AsusID.RTX4070TI_12GB_STRIX_GAMING_OC, "Asus ROG Strix RTX 4070Ti 12GB Gaming OC"),
 	new AsusGPUIdentifier(Nvidia.RTX4070TI, AsusID.RTX4070TI_12GB_STRIX_GAMING_OC_2, "Asus ROG Strix RTX 4070Ti 12GB Gaming OC"),
 	new AsusGPUIdentifier(Nvidia.RTX4070TI, AsusID.RTX4070TI_12GB_STRIX_GAMING_OC_3, "Asus ROG Strix RTX 4070Ti 12GB Gaming OC"),
+	new AsusGPUIdentifier(Nvidia.RTX4070TI, AsusID.RTX4070TI_12GB_STRIX_GAMING_OC_4, "Asus ROG Strix RTX 4070Ti 12GB Gaming OC"),
 	new AsusGPUIdentifier(Nvidia.RTX4070TI, AsusID.RTX4070TI_TUF_GAMING_OC, "Asus TUF RTX 4070Ti Gaming OC"),
 	new AsusGPUIdentifier(Nvidia.RTX4070TI, AsusID.RTX4070TI_TUF_GAMING_OC_2, "Asus TUF RTX 4070Ti Gaming OC"),
+	new AsusGPUIdentifier(Nvidia.RTX4070TI, AsusID.RTX4070TI_TUF_GAMING_OC_WH, "Asus 4070Ti TUF Gaming OC White"),
 	new AsusGPUIdentifier(Nvidia.RTX4070TI, AsusID.RTX4070TI_TUF_GAMING, "Asus TUF RTX 4070Ti 12GB Gaming"),
 	new AsusGPUIdentifier(Nvidia.RTX4070TI, AsusID.RTX4070TI_TUF_GAMING_2, "Asus TUF RTX 4070Ti 12GB Gaming"),
 	new AsusGPUIdentifier(Nvidia.RTX4080, AsusID.RTX4080_TUF_GAMING, "Asus TUF RTX 4080 Gaming"),
@@ -702,6 +730,7 @@ const Asus3000GPUIDs =
 	new AsusGPUIdentifier(Nvidia.RTX4090, AsusID.RTX4090_STRIX_GAMING_OC_2, "Asus 4090 ROG Strix Gaming OC"),
 	new AsusGPUIdentifier(Nvidia.RTX4090, AsusID.RTX4090_STRIX_GAMING_OC_3, "Asus 4090 ROG Strix Gaming OC"),
 	new AsusGPUIdentifier(Nvidia.RTX4090, AsusID.RTX4090_STRIX_GAMING_WHITE, "Asus ROG Strix 4090 Gaming White"),
+	new AsusGPUIdentifier(Nvidia.RTX4090, AsusID.RTX4090_STRIX_GAMING_WHITE_2, "Asus 4090 Strix Gaming White"),
 	new AsusGPUIdentifier(Nvidia.RTX4090, AsusID.RTX4090_STRIX_GAMING_WHITE_OC, "Asus ROG Strix 4090 Gaming White OC"),
 	new AsusGPUIdentifier(Nvidia.RTX4090, AsusID.RTX4090_STRIX_GAMING_WHITE_OC_2, "Asus ROG Strix 4090 Gaming White OC"),
 	new AsusGPUIdentifier(Nvidia.RTX4090, AsusID.RTX4090_STRIX_LC_OC, "Asus 4090 ROG Strix LC OC Edition"),
@@ -710,6 +739,8 @@ const Asus3000GPUIDs =
 	new AsusGPUIdentifier(Nvidia.RTX4090, AsusID.RTX4090_TUF_GAMING_3, "Asus 4090 TUF Gaming"),
 	new AsusGPUIdentifier(Nvidia.RTX4090, AsusID.RTX4090_TUF_GAMING_OC, "Asus 4090 TUF Gaming OC"),
 	new AsusGPUIdentifier(Nvidia.RTX4090, AsusID.RTX4090_TUF_GAMING_OC_2, "Asus 4090 TUF Gaming OC"),
+	new AsusGPUIdentifier(Nvidia.RTX4090, AsusID.RTX4090_TUF_GAMING_OG, "Asus 4090 TUF Gaming OG"),
+	new AsusGPUIdentifier(Nvidia.RTX4090, AsusID.RTX4090_MATRIX, "Asus 4090 Matrix"),
 ];
 
 function hexToRgb(hex) {
@@ -723,5 +754,5 @@ function hexToRgb(hex) {
 }
 
 export function ImageUrl() {
-	return "https://marketplace.signalrgb.com/devices/default/gpu.png";
+	return "https://assets.signalrgb.com/devices/default/gpu.png";
 }

@@ -8,6 +8,7 @@ export function DefaultPosition(){return [150, 40];}
 export function DefaultScale(){return 12.0;}
 export function LedNames() { return vLedNames; }
 export function LedPositions() { return vLedPositions; }
+export function ConflictingProcesses() { return ["LightingService.exe", "LEDKeeper2.exe", "RGBFusion.exe", "ControlCenter.exe"]; }
 /* global
 shutdownColor:readonly
 LightingMode:readonly
@@ -284,6 +285,7 @@ class CrucialBallistix{
 		for (let register = 0xA0; register < 0xB0; register++) {
 			const expectedValue = register - 0xA0;
 			const iRet = this.Bus().ReadByte(address, register);
+			this.Bus().pause(30);
 
 			if (iRet !== expectedValue) {
 				this.Bus().log(`Address: [${address}], Register: [${register}], Expected [${expectedValue}] but instead got [${iRet}]`);
@@ -307,6 +309,7 @@ class CrucialBallistix{
 
 		for (let iIdx = 0; iIdx < 21; iIdx++) {
 			const iRet = this.Interface.ReadRegister(address, 0x1025 + iIdx);
+			this.Bus().pause(30);
 
 			if(iRet > 0){
 				Characters.push(iRet);
@@ -343,5 +346,5 @@ function hexToRgb(hex) {
 }
 
 export function ImageUrl(){
-	return "https://marketplace.signalrgb.com/devices/brands/crucial/ram/ballistix-rgb.png";
+	return "https://assets.signalrgb.com/devices/brands/crucial/ram/ballistix-rgb.png";
 }

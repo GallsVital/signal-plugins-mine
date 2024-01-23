@@ -5,9 +5,6 @@ export function Publisher() { return "WhirlwindFX"; }
 export function Size() { return [3, 3]; }
 export function DefaultPosition() {return [150, 75]; }
 export function DefaultScale(){return 8.0;}
-export function ConflictingProcesses() {
-	return ["NGenuity2.exe"];
-}
 /* global
 shutdownColor:readonly
 LightingMode:readonly
@@ -121,5 +118,5 @@ export function Validate(endpoint) {
 
 
 export function ImageUrl(){
-	return "https://marketplace.signalrgb.com/devices/brands/hyperx/audio/quad-cast-s.png";
+	return "https://assets.signalrgb.com/devices/brands/hyperx/audio/quad-cast-s.png";
 }

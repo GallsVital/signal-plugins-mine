@@ -17,9 +17,6 @@ export function ControllableParameters(){
 		{"property":"forcedColor", "group":"lighting", "label":"Forced Color", "min":"0", "max":"360", "type":"color", "default":"#009bde"},
 	];
 }
-export function ConflictingProcesses() {
-	return ["NGenuity2.exe"];
-}
 
 const vLedNames =
 [
@@ -131,5 +128,5 @@ export function Validate(endpoint) {
 }
 
 export function ImageUrl() {
-	return "https://marketplace.signalrgb.com/devices/brands/hyperx/mice/pulsefire-surge.png";
+	return "https://assets.signalrgb.com/devices/brands/hyperx/mice/pulsefire-surge.png";
 }

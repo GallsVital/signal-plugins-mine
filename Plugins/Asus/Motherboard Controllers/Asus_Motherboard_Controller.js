@@ -106,7 +106,6 @@ const ConfigurationOverrides = {
 	//"AULA3-AR32-0214":{MainboardCount: 2, ARGBChannelCount:3, RGBHeaderCount: 1}, // Asus TUF GAMING Z790-PLUS WIFI D4
 	"AULA3-AR32-0213":{MainboardCount: 2, ARGBChannelCount:3, RGBHeaderCount: 1},
 	"AULA3-AR32-0218":{MainboardCount: 5, ARGBChannelCount:3, RGBHeaderCount: 1}, //Z790 Apex
-	"AULA3-6K75-0219":{MainboardCount: 5, ARGBChannelCount:3, RGBHeaderCount: 1}, //Also Z790 Apex
 	"Asus ROG MAXIMUS Z690 EXTREME GLACIAL":{MainboardCount: 7, ARGBChannelCount:4, RGBHeaderCount: 1, polymoOverride : true}, //The naming for this is a bit backwards. It forces polymo off.
 	//"AULA3-6K75-0206":{MainboardCount: 7, ARGBChannelCount:3, RGBHeaderCount: 1},
 	//"AULA3-AR42-0207":{MainboardCount: 3, ARGBChannelCount:1, RGBHeaderCount: 2},
@@ -126,8 +125,8 @@ const DeviceInfo = {
 
 
 export function Initialize() {
+	
 	SetMotherboardName();
-
 	FetchFirmwareVersion();
 
 	// Read and parse the device's config table
@@ -145,6 +144,7 @@ export function Initialize() {
 		Create12vHeaders();
 	}
 
+	device.write([0xec, 0x52, 0x53, 0x00, 0x01], 65); //Stop using gen 2 :bonk:
 	// Set Mainboard to direct Mode
 	SetChannelModeDirect(0);
 
@@ -168,21 +168,20 @@ export function Initialize() {
 
 }
 
+export function Shutdown(SystemSuspending) {
 
-export function Shutdown() {
-	SendMainBoardLeds(true);
+	const color = SystemSuspending ? "#000000" : shutdownColor;
+
+	SendMainBoardLeds(color); // Go Dark on System Sleep/Shutdown
 
 	if(DeviceInfo.PolymoSupport) {
-		sendPolymoColors(true);
-
-		for(let channel = 0; channel < DeviceInfo.ARGBChannelCount; channel++){
-			SendARGBChannel(channel, true, true);
-		}
-	} else {
-		for(let channel = 0; channel < DeviceInfo.ARGBChannelCount; channel++){
-			SendARGBChannel(channel, false, true);
-		}
+		sendPolymoColors(color);
 	}
+
+	for(let channel = 0; channel < DeviceInfo.ARGBChannelCount; channel++){
+		SendARGBChannel(channel, Boolean(DeviceInfo.PolymoSupport), color);
+	}
+
 }
 
 export function Render() {
@@ -217,7 +216,7 @@ function CreatePolymoSubdevice() {
 	}
 }
 
-function sendPolymoColors(shutdown = false) {
+function sendPolymoColors(overrideColor) {
 	const RGBData = [];
 
 	for(let polymoLEDs = 0; polymoLEDs < polymoDevice.Positions.length; polymoLEDs++) {
@@ -225,8 +224,8 @@ function sendPolymoColors(shutdown = false) {
 		const iY = polymoDevice.Positions[polymoLEDs][1];
 		let color;
 
-		if(shutdown) {
-			color = hexToRgb(shutdownColor);
+		if(overrideColor) {
+			color = hexToRgb(overrideColor);
 		} else if (LightingMode == "Forced") {
 			color = hexToRgb(forcedColor);
 		} else {
@@ -288,12 +287,12 @@ function Create12vHeaders(){
 }
 
 
-function SendMainBoardLeds(shutdown = false) {
+function SendMainBoardLeds(overrideColor) {
 	//Fetch Mainboard RGB Info
-	let [RGBData, TotalLedCount] = FetchMainBoardColors(shutdown);
+	let [RGBData, TotalLedCount] = FetchMainBoardColors(overrideColor);
 
 	//Fetch 12v Header RGB Info
-	const [HeaderRGBData, HeaderLedCount] = Fetch12VHeaderColors(shutdown);
+	const [HeaderRGBData, HeaderLedCount] = Fetch12VHeaderColors(overrideColor);
 
 	// Append 12v Header Info, Both are sent together with 12v Headers always at the end of the Mainboard LEDS
 	RGBData.push(...HeaderRGBData);
@@ -304,7 +303,7 @@ function SendMainBoardLeds(shutdown = false) {
 }
 
 
-function FetchMainBoardColors(shutdown = false){
+function FetchMainBoardColors(overrideColor){
 	const RGBData = [];
 	let TotalLedCount = 0;
 
@@ -313,8 +312,8 @@ function FetchMainBoardColors(shutdown = false){
 		const iPxY = vLedPositions[iIdx][1];
 		let col;
 
-		if(shutdown){
-			col = hexToRgb(shutdownColor);
+		if(overrideColor){
+			col = hexToRgb(overrideColor);
 		}else if (LightingMode === "Forced") {
 			col = hexToRgb(forcedColor);
 		}else{
@@ -332,15 +331,15 @@ function FetchMainBoardColors(shutdown = false){
 }
 
 
-function Fetch12VHeaderColors(shutdown = false){
+function Fetch12VHeaderColors(overrideColor){
 	const RGBData = [];
 	let TotalLedCount = 0;
 
 	for(let iIdx = 0; iIdx < DeviceInfo.RGBHeaderCount; iIdx++) {
 		let col;
 
-		if(shutdown){
-			col = hexToRgb(shutdownColor);
+		if(overrideColor){
+			col = hexToRgb(overrideColor);
 		}else if (LightingMode === "Forced") {
 			col = hexToRgb(forcedColor);
 		}else{
@@ -356,7 +355,7 @@ function Fetch12VHeaderColors(shutdown = false){
 	return [RGBData, TotalLedCount];
 }
 
-function SendARGBChannel(ChannelIdx, polymo = false, shutdown = false) {
+function SendARGBChannel(ChannelIdx, polymo = false, overrideColor) {
 	//Fetch Colors
 	let ChannelLedCount = device.channel(ChannelArray[ChannelIdx][0]).LedCount();
 	const componentChannel = device.channel(ChannelArray[ChannelIdx][0]);
@@ -372,8 +371,8 @@ function SendARGBChannel(ChannelIdx, polymo = false, shutdown = false) {
 		const pulseColor = device.getChannelPulseColor(ChannelArray[ChannelIdx][0]);
 		RGBData = device.createColorArray(pulseColor, ChannelLedCount, "Inline", RGBconfig);
 
-	}else if(shutdown){
-		RGBData = device.createColorArray(shutdownColor, ChannelLedCount, "Inline", RGBconfig);
+	}else if(overrideColor){
+		RGBData = device.createColorArray(overrideColor, ChannelLedCount, "Inline", RGBconfig);
 	}else{
 		RGBData = device.channel(ChannelArray[ChannelIdx][0]).getColors("Inline", RGBconfig);
 	}
@@ -571,5 +570,5 @@ function ClearReadBuffer(timeout = 10){
 }
 
 export function ImageUrl() {
-	return "https://marketplace.signalrgb.com/devices/brands/asus/motherboards/motherboard.png";
+	return "https://assets.signalrgb.com/devices/brands/asus/motherboards/motherboard.png";
 }

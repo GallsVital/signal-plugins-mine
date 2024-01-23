@@ -50,7 +50,7 @@ const boards = {
 			[0, 4], [1, 4], [2, 4],                         [6, 4],                            [10, 4], [11, 4], [12, 4], [13, 4]
 		],
 		size: [14, 5],
-		image: "https://marketplace.signalrgb.com/devices/brands/fantech/keyboards/maxfit61-standard.png",
+		image: "https://assets.signalrgb.com/devices/brands/fantech/keyboards/maxfit61-standard.png",
 	},
 	"Husky HAILSTORM": {
 		name: "Husky HAILSTORM",
@@ -76,7 +76,7 @@ const boards = {
 			[0, 4], [1, 4], [2, 4],                         [6, 4],                [9, 4], [10, 4], [11, 4], [12, 4], [13, 4], [14, 4]
 		],
 		size: [15, 5],
-		image: "https://marketplace.signalrgb.com/devices/brands/husky/keyboards/hailstorm.png",
+		image: "https://assets.signalrgb.com/devices/brands/husky/keyboards/hailstorm.png",
 	},
 	"FL-ESPORTS MK870TKL":{
 		name: "FL-ESPORTS MK870TKL",
@@ -105,7 +105,7 @@ const boards = {
 			[0, 5], [1, 5], [2, 5],                         [6, 5],                            [10, 5], [11, 5], [12, 5], [13, 5],	[14, 5], [15, 5], [16, 5]
 		],
 		size: [17, 6],
-		image: "https://marketplace.signalrgb.com/devices/brands/fantech/keyboards/mk876-tkl.png",
+		image: "https://assets.signalrgb.com/devices/brands/fantech/keyboards/mk876-tkl.png",
 	},
 	"Motospeed K24":{
 		name: "Motospeed K24",
@@ -134,7 +134,7 @@ const boards = {
 			[0, 5],			[2, 5],
 		],
 		size: [4, 6],
-		image: "https://marketplace.signalrgb.com/devices/brands/motospeed/keyboards/k24.png",
+		image: "https://assets.signalrgb.com/devices/brands/motospeed/keyboards/k24.png",
 	}
 };
 
@@ -253,5 +253,5 @@ export function Validate(endpoint) {
 }
 
 export function ImageUrl(){
-	return "https://marketplace.signalrgb.com/devices/default/keyboards/full-size-keyboard-render.png";
+	return "https://assets.signalrgb.com/devices/default/keyboards/full-size-keyboard-render.png";
 }

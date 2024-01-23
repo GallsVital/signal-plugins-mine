@@ -31,10 +31,10 @@ const PIDLibrary = {
 
 export function updateImage(){
 	if(device.productId() === 0x150A || device.productId() === 0x150D){
-		return "https://marketplace.signalrgb.com/devices/default/mousepad.png";
+		return "https://assets.signalrgb.com/devices/default/mousepad.png";
 	}
 
-	return "https://marketplace.signalrgb.com/devices/default/mousepad-xl.png";
+	return "https://assets.signalrgb.com/devices/default/mousepad-xl.png";
 }
 
 const vLedNames = [
@@ -58,7 +58,7 @@ export function LedPositions() {
 }
 
 export function Initialize() {
-	device.setName(Name() + PIDLibrary[ProductId]);
+	device.setName(Name() + PIDLibrary[device.productId()]);
 	device.setImageFromUrl(updateImage());
 }
 
@@ -140,5 +140,5 @@ export function Validate(endpoint) {
 }
 
 export function ImageUrl() {
-	return "https://marketplace.signalrgb.com/devices/default/mousepad-xl.png";
+	return "https://assets.signalrgb.com/devices/default/mousepad-xl.png";
 }

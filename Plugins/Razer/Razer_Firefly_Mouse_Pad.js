@@ -201,5 +201,5 @@ export function Validate(endpoint) {
 }
 
 export function ImageUrl(){
-	return "https://marketplace.signalrgb.com/devices/brands/razer/mousepads/firefly-v1.png";
+	return "https://assets.signalrgb.com/devices/brands/razer/mousepads/firefly-v1.png";
 }

@@ -506,6 +506,17 @@ const ConfigurationOverrides = //Leave this here for now. Just in case
     	PCB         : 12,
     	ARGBHeader3 : 0
     },
+	"B650M Pro RS WiFi":
+    {
+    	RGBHeader1  : 1,
+    	RGBHeader2  : 0,
+    	ARGBHeader1 : 80,
+    	ARGBHeader2 : 80,
+    	PCH         : 0,
+    	IOShield    : 0,
+    	PCB         : 3,
+    	ARGBHeader3 : 80
+    },
 };
 
 const deviceZones =
@@ -522,7 +533,7 @@ const deviceZones =
 
 function LEDConfig() {
 	const zoneLEDCounts = ReadConfig(2);
-	device.log(zoneLEDCounts);
+	device.log(`Device LED Counts: ${zoneLEDCounts}`, {toFile : true});
 
 	device.write([0x00, 0x14, 0x00, 0x01], 65);
 
@@ -848,5 +859,5 @@ export function Validate(endpoint) {
 }
 
 export function ImageUrl() {
-	return "https://marketplace.signalrgb.com/devices/brands/asrock/motherboards/motherboard.png";
+	return "https://assets.signalrgb.com/devices/brands/asrock/motherboards/motherboard.png";
 }

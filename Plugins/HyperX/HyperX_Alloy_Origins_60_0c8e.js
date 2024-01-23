@@ -5,9 +5,6 @@ export function Publisher() { return "Derek Huber"; }
 export function Size() { return [14, 5]; }
 export function DefaultPosition() {return [75, 70]; }
 export function DefaultScale() {return 8.0;}
-export function ConflictingProcesses() {
-	return ["NGenuity2.exe"];
-}
 /* global
 shutdownColor:readonly
 LightingMode:readonly
@@ -134,5 +131,5 @@ export function Validate(endpoint) {
 }
 
 export function ImageUrl() {
-	return "https://marketplace.signalrgb.com/devices/brands/hyperx/keyboards/alloy-origins-60.png";
+	return "https://assets.signalrgb.com/devices/brands/hyperx/keyboards/alloy-origins-60.png";
 }

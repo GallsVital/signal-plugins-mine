@@ -176,7 +176,7 @@ const library = {
 			63, 64, 65, 66, 67, 68, 69, 70, 71, 72, 73, 74, 75, 78, 79,
 			84, 85, 86, 87, 88, 89, 90, 91, 92, 93, 94, 95, 98, 100,
 			105, 107, 108, 109, 110, 111, 112, 113, 114, 115, 116, 118, 120, 121,
-			126, 127, 128, 129, 132, 135, 136, 137, 0, 0, 140,
+			126, 127, 128, 129, 132, 135, 136, 137, 140, 141, 142,
 			178, 179, 180, 181, 182, 183,
 		],
 		vKeyNames :
@@ -226,5 +226,5 @@ export function Validate(endpoint) {
 }
 
 export function ImageUrl(){ //Use as placeholder.
-	return "https://marketplace.signalrgb.com/devices/brands/asus/misc/rog-strix-scar-2022-laptop.png";
+	return "https://assets.signalrgb.com/devices/brands/asus/misc/rog-strix-scar-2022-laptop.png";
 }

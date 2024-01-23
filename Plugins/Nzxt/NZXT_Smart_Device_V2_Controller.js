@@ -37,6 +37,7 @@ const NZXTSmartDevice2ProductNames = {
 	0x2011: "NZXT RGB and Fan Controller",
 	0x2012: "NZXT RGB and Fan Controller",
 	0x2019: "NZXT RGB and Fan Controller",
+	0x2021: "NZXT RGB and Fan Controller",
 };
 
 //Channel Name, Led Limit
@@ -303,5 +304,5 @@ class NZXTSmartDevice2{
 const SmartDevice2 = new NZXTSmartDevice2();
 
 export function ImageUrl(){
-	return "https://marketplace.signalrgb.com/devices/brands/nzxt/fan-controllers/rgb-fan-controller.png";
+	return "https://assets.signalrgb.com/devices/brands/nzxt/fan-controllers/rgb-fan-controller.png";
 }

@@ -84,14 +84,23 @@ export function Render() {
 	sendColors();
 }
 
-export function Shutdown() {
-	AsusMotherboard.setDirectMode(0x00);
+export function Shutdown(SystemSuspending) {
+	if(!AsusMotherboard.ValidDeviceID) {
+		return;
+	}
+
+	if(SystemSuspending){
+		sendColors("#000000"); // Go Dark on System Sleep/Shutdown
+	}else{
+		AsusMotherboard.setDirectMode(0x00);
+	}
+
 }
 
-function GetLedColor(ChannelName, Led, shutdown = false) {
+function GetLedColor(ChannelName, Led, overrideColor) {
 
-	if(shutdown) {
-		return  hexToRgb(shutdownColor);
+	if(overrideColor) {
+		return  hexToRgb(overrideColor);
 	}
 
 	if (LightingMode === "Forced") {
@@ -102,14 +111,14 @@ function GetLedColor(ChannelName, Led, shutdown = false) {
 
 }
 
-function sendColors(shutdown = false) {
+function sendColors(overrideColor) {
 	const RGBData = [];
 
 	for(const ChannelName in LedChannels) {
 
 		for(const AuraLed of LedChannels[ChannelName]) {
 
-			const color = GetLedColor(ChannelName, AuraLed, shutdown);
+			const color = GetLedColor(ChannelName, AuraLed, overrideColor);
 
 			RGBData[AuraLed.ConfigIndex * 3] = color[0];
 			RGBData[AuraLed.ConfigIndex * 3 + 1] = color[2];
@@ -509,5 +518,5 @@ function hexToRgb(hex) {
 }
 
 export function ImageUrl() {
-	return "https://marketplace.signalrgb.com/devices/brands/asus/motherboards/motherboard.png";
+	return "https://assets.signalrgb.com/devices/brands/asus/motherboards/motherboard.png";
 }

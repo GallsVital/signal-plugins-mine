@@ -212,5 +212,5 @@ export function Validate(endpoint) {
 }
 
 export function ImageUrl(){
-	return "https://marketplace.signalrgb.com/devices/brands/lg/ultragear-27gn950.png";
+	return "https://assets.signalrgb.com/devices/brands/lg/ultragear-27gn950.png";
 }

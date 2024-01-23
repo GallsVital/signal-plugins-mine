@@ -19,9 +19,6 @@ export function ControllableParameters(){
 
 	];
 }
-export function ConflictingProcesses() {
-	return ["NGenuity2.exe"];
-}
 
 const vLedNames =
 [
@@ -136,5 +133,5 @@ export function Validate(endpoint) {
 }
 
 export function ImageUrl() {
-	return "https://marketplace.signalrgb.com/devices/brands/hyperx/keyboards/alloy-fps-rgb.png";
+	return "https://assets.signalrgb.com/devices/brands/hyperx/keyboards/alloy-fps-rgb.png";
 }

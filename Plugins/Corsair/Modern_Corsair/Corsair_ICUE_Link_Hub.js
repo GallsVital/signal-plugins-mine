@@ -26,6 +26,8 @@ export function SupportsFanControl(){ return true; }
 // Use the CorsairLink mutex any time this device is rendering.
 // if we don't our reads may be ruined by other programs
 export function UsesCorsairMutex(){ return true; }
+// Removing this can brick your device. Proceed at your own risk.
+export function AllowConflictBypass(){ return false;}
 
 /** @type {CorsairBragiController | undefined} */
 let BragiController;
@@ -462,7 +464,7 @@ class CorsairLibrary{
 
 	static DeviceImageLibrary() {
 		return Object.freeze({
-			"K70 Pro Mini" : "https://marketplace.signalrgb.com/devices/default/keyboards/keyboard-60.png",
+			"K70 Pro Mini" : "https://assets.signalrgb.com/devices/default/keyboards/keyboard-60.png",
 		});
 	}
 
@@ -548,7 +550,7 @@ class CorsairLibrary{
 			"LCD Cooler" : {
 				name : "ICUE Link Cooler With LCD Cap",
 				ledPositions: [
-					[6, 0], [5, 1], [7, 1], [4, 2], [8, 2], [3, 3], [9, 3], [2, 4], [10, 4], [1, 5], [11, 5], [0, 6], 
+					[6, 0], [5, 1], [7, 1], [4, 2], [8, 2], [3, 3], [9, 3], [2, 4], [10, 4], [1, 5], [11, 5], [0, 6],
 					[12, 6], [1, 7], [11, 7], [2, 8], [10, 8], [4, 10], [8, 10], [3, 9], [9, 9], [5, 11], [7, 11], [6, 12]
 				],
 				ledMap: [
@@ -2216,5 +2218,5 @@ class StateSetFanSpeeds extends State{
 };
 
 export function ImageUrl() {
-	return "https://marketplace.signalrgb.com/devices/default/misc/usb-drive-render.png";
+	return "https://assets.signalrgb.com/devices/default/misc/usb-drive-render.png";
 }

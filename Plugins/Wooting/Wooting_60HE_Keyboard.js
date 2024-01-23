@@ -5,6 +5,7 @@ export function Publisher() { return "WhirlwindFX"; }
 export function Size() { return [17, 6]; }
 export function DefaultPosition() { return [75, 70]; }
 export function DefaultScale(){ return 4.0; }
+export function ConflictingProcesses() { return ["wootility-lekker.exe"]; }
 /* global
 shutdownColor:readonly
 LightingMode:readonly
@@ -19,7 +20,7 @@ export function ControllableParameters() {
 	];
 }
 
-const vKeys =
+const vKeysANSI =
 [
 	21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34,
 	42, 43, 44, 45, 46, 47, 48, 49, 50, 51, 52, 53, 54, 55,
@@ -28,7 +29,7 @@ const vKeys =
 	105, 106, 107, 109, 110, 111, 112, 113, 115, 116, 117, 118,
 ];
 
-const vLedNames =
+const vKeyNamesANSI =
 [
 	"Esc", "1", "2", "3", "4", "5", "6", "7", "8", "9", "0", "-_", "=+", "Backspace", //14
 	"Tab", "Q", "W", "E", "R", "T", "Y", "U", "I", "O", "P", "[", "]", "\\",      //14
@@ -37,7 +38,7 @@ const vLedNames =
 	"Left Ctrl", "Left Win", "Left Alt", "Space1", "Space2", "Space3", "Space4", "Space5", "Right Alt", "Menu", "Right Ctrl", "Fn", //12
 ];
 
-const vLedPositions =
+const vKeyPositionsANSI =
 [
 	[0, 0], [1, 0], [2, 0], [3, 0], [4, 0], [5, 0], [6, 0], [7, 0], [8, 0], [9, 0], [10, 0], [11, 0], [12, 0], [13, 0],          //14
 	[0, 1], [1, 1], [2, 1], [3, 1], [4, 1], [5, 1], [6, 1], [7, 1], [8, 1], [9, 1], [10, 1], [11, 1], [12, 1], [13, 1],          //14
@@ -46,17 +47,44 @@ const vLedPositions =
 	[0, 4], [1, 4], [2, 4],         [3, 4], [4, 4], [6, 4], [8, 4], [9, 4],         [10, 4], [11, 4], [12, 4], [13, 4],          //12
 ];
 
+const vKeysISO =
+[
+	21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34,
+	42, 43, 44, 45, 46, 47, 48, 49, 50, 51, 52, 53, 54, 55,
+	63, 64, 65, 66, 67, 68, 69, 70, 71, 72, 73, 74, 75, 76,
+	84, 85, 86, 87, 88, 89, 90, 91, 92, 93, 94, 95, 97,
+	105, 106, 107, 109, 110, 111, 112, 113, 115, 116, 117, 118,
+];
+
+const vKeyNamesISO =
+[
+	"Esc", "1", "2", "3", "4", "5", "6", "7", "8", "9", "0", "-_", "=+", "Backspace", //14
+	"Tab", "Q", "W", "E", "R", "T", "Y", "U", "I", "O", "P", "[", "]", "\\",      //14
+	"CapsLock", "A", "S", "D", "F", "G", "H", "J", "K", "L", ";", "'", "ISO_#", "Enter",      //13
+	"Left Shift", "ISO_>", "Z", "X", "C", "V", "B", "N", "M", ",", ".", "/", "Right Shift", //12
+	"Left Ctrl", "Left Win", "Left Alt", "Space1", "Space2", "Space3", "Space4", "Space5", "Right Alt", "Menu", "Right Ctrl", "Fn", //12
+];
+
+const vKeyPositionsISO =
+[
+	[0, 0], [1, 0], [2, 0], [3, 0], [4, 0], [5, 0], [6, 0], [7, 0], [8, 0], [9, 0], [10, 0], [11, 0], [12, 0], [13, 0],          //14
+	[0, 1], [1, 1], [2, 1], [3, 1], [4, 1], [5, 1], [6, 1], [7, 1], [8, 1], [9, 1], [10, 1], [11, 1], [12, 1], [13, 1],          //14
+	[0, 2], [1, 2], [2, 2], [3, 2], [4, 2], [5, 2], [6, 2], [7, 2], [8, 2], [9, 2], [10, 2], [11, 2], [12, 2], [13, 2],  	          //13
+	[0, 3], [1, 3], [2, 3], [3, 3], [4, 3], [5, 3], [6, 3], [7, 3], [8, 3], [9, 3], [10, 3], [11, 3], 		   [13, 3],          //12
+	[0, 4], [1, 4], [2, 4],         [3, 4], [4, 4], [6, 4], [8, 4], [9, 4],         [10, 4], [11, 4], [12, 4], [13, 4],          //12
+];
+
 export function LedNames() {
-	return vLedNames;
+	return Wooting.config.vKeyNames;
 }
 
 export function LedPositions() {
-	return vLedPositions;
+	return Wooting.config.vKeyPositions;
 }
 
 export function Initialize() {
 	Wooting.getKeyboardLayout();
-	Wooting.deviceProtocolType = "Modern";
+	Wooting.config.deviceProtocolType = "Modern";
 	Wooting.initLighting();
 }
 
@@ -77,11 +105,13 @@ export function Shutdown(SystemSuspending) {
 
 function sendColors(overrideColor) {
 	const RGBData = [];
+	const vKeys = Wooting.getvKeys();
+	const vKeyPositions = Wooting.getvKeyPositions();
 
 	for(let iIdx = 0; iIdx < vKeys.length; iIdx++) {
 		let col;
-		const iPxX = vLedPositions[iIdx][0];
-		const iPxY = vLedPositions[iIdx][1];
+		const iPxX = vKeyPositions[iIdx][0];
+		const iPxY = vKeyPositions[iIdx][1];
 
 		if(overrideColor) {
 			col = hexToRgb(overrideColor);
@@ -125,17 +155,27 @@ class wootingProtocol { //This protocol will be common across the range of wooti
 
 		this.config = {
 			deviceProtocolType : "Modern",
-			deviceLayout : "ANSI"
+			deviceLayout : "ANSI",
+			vKeys : vKeysANSI,
+			vKeyNames : vKeyNamesANSI,
+			vKeyPositions : vKeyPositionsANSI
 		};
 	}
 
+	getvKeys() { return this.config.vKeys; }
+	setvKeys(vKeys) { this.config.vKeys = vKeys; }
+
+	getvKeyNames() { return this.config.vKeyNames; }
+	setvKeyNames(vKeyNames) { this.config.vKeyNames = vKeyNames; }
+
+	getvKeyPositions() { return this.config.vKeyPositions; }
+	setvKeyPositions(vKeyPositions) { this.config.vKeyPositions = vKeyPositions; }
+
 	sendPacket(data) {
-		let packet = [0x00, 0xD0, 0xDA];
-		data  = data || [ 0x00, 0x00, 0x00 ]; //Data is in reverse order
-		packet = packet.concat(data);
+		const packet = [0x00, 0xD0, 0xDA].concat(data);//Data is in reverse order
 		device.send_report(packet, 8);
 
-		const returnPacket = device.read([0x00, 0xD0, 0xDA, data[0]], 64);
+		const returnPacket = device.read(packet, 64);
 
 		return returnPacket;
 	}
@@ -165,16 +205,24 @@ class wootingProtocol { //This protocol will be common across the range of wooti
 
 		let layout;
 
+		device.log(`Keeb layout packet return: ${returnPacket}`);
+
 		if(this.config.deviceProtocolType === "Modern") {
-			layout = returnPacket[10];
+			layout = returnPacket[11];
 		} else {
-			layout = returnPacket[9];
+			layout = returnPacket[1];
 		}
 
 		if(layout === 0) {
 			this.config.deviceLayout = "ANSI";
+			this.setvKeys(vKeysANSI);
+			this.setvKeyNames(vKeyNamesANSI);
+			this.setvKeyPositions(vKeyPositionsANSI);
 		} else if(layout === 1) {
 			this.config.deviceLayout = "ISO";
+			this.setvKeys(vKeysISO);
+			this.setvKeyNames(vKeyNamesISO);
+			this.setvKeyPositions(vKeyPositionsISO);
 		}
 
 		device.log(`Keyboard Layout is ${this.config.deviceLayout}.`);
@@ -212,5 +260,5 @@ export function Validate(endpoint) {
 }
 
 export function ImageUrl() {
-	return "https://marketplace.signalrgb.com/devices/default/keyboard-80.png";
+	return "https://assets.signalrgb.com/devices/default/keyboard-80.png";
 }

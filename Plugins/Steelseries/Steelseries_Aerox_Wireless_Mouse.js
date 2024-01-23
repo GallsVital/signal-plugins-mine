@@ -244,6 +244,8 @@ class AeroxMouse {
 			0x1854 : "Steelseries Aerox 5",
 			0x1860 : "Steelseries Aerox 5 Diablo IV Edition",
 			0x233a : "Steelseries Aerox 5 Diablo IV Edition",
+			0x185C : "Steelseries Aerox 5 Lightfall Edition",
+			0x185E : "Steelseries Aerox 5 Lightfall Edition",
 			0x1858 : "Steelseries Aerox 9",
 			0x185A : "Steelseries Aerox 9"
 		};
@@ -322,5 +324,5 @@ class AeroxMouse {
 const Aerox = new AeroxMouse();
 
 export function ImageUrl() {
-	return "https://marketplace.signalrgb.com/devices/default/mouse.png";
+	return "https://assets.signalrgb.com/devices/default/mouse.png";
 }

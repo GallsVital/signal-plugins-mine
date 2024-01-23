@@ -1,6 +1,6 @@
 export function Name() { return "Royal Kludge RK61"; }
 export function VendorId() { return 0x258a; }
-export function ProductId() { return [0x0055, 0x007a, 0x0060, 0x004a, 0x00ec, 0x00E1]; }
+export function ProductId() { return [0x0055, 0x007a, 0x0060, 0x004a, 0x00ec, 0x00E1, 0x00F8]; }
 export function Publisher() { return "WhirlwindFX"; }
 export function Size() { return [14, 6]; }
 export function DefaultPosition(){return [240, 120];}
@@ -128,5 +128,5 @@ export function Validate(endpoint) {
 }
 
 export function ImageUrl(){
-	return "https://marketplace.signalrgb.com/devices/brands/royal-kludge/keyboards/rk61-sinowealth.png";
+	return "https://assets.signalrgb.com/devices/brands/royal-kludge/keyboards/rk61-sinowealth.png";
 }

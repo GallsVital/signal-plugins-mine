@@ -357,9 +357,9 @@ export class deviceLibrary {
 		};
 
 		this.imageLibrary = {
-			"Leviathan V2":		"https://marketplace.signalrgb.com/devices/brands/razer/audio/leviathan-v2.png",
-			"Leviathan V2 X":	"https://marketplace.signalrgb.com/devices/brands/razer/audio/leviathan-v2-x.png",
-			"Leviathan V2 Pro":	"https://marketplace.signalrgb.com/devices/brands/razer/audio/leviathan-v2-pro.png",
+			"Leviathan V2":		"https://assets.signalrgb.com/devices/brands/razer/audio/leviathan-v2.png",
+			"Leviathan V2 X":	"https://assets.signalrgb.com/devices/brands/razer/audio/leviathan-v2-x.png",
+			"Leviathan V2 Pro":	"https://assets.signalrgb.com/devices/brands/razer/audio/leviathan-v2-pro.png",
 		};
 	}
 }
@@ -382,5 +382,5 @@ export function Validate(endpoint) {
 }
 
 export function ImageUrl() {
-	return "https://marketplace.signalrgb.com/devices/brands/razer/audio/leviathan-v2.png";
+	return "https://assets.signalrgb.com/devices/brands/razer/audio/leviathan-v2.png";
 }
