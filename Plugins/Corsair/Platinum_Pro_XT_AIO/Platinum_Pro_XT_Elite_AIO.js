@@ -62,17 +62,14 @@ export function Initialize() {
 }
 
 export function Render() {
-
-	if(!PlatCooler.getFansInitialized()) {
+	if (!PlatCooler.getFansInitialized()) {
 		burstFans();
 
 		return;
 	}
 
 	sendColor();
-	device.pause(6);
 	PollFans();
-
 }
 
 export function Shutdown() {
@@ -166,8 +163,7 @@ function CompareArrays(array1, array2) {
     array1.every(function(value, index) { return value === array2[index];});
 }
 
-function sendColor(shutdown = false){
-
+function sendColor(shutdown = false) {
 	let RGBdata = [];
 	let TotalLedCount = 0;
 	const vLedPositions = PlatCooler.getvLedPositions();
@@ -218,20 +214,17 @@ function sendColor(shutdown = false){
 	RGBdata = RGBdata.concat(ColorData);
 	TotalLedCount += ChannelLedCount;
 
-	if(!CompareArrays(lastLoopRGBData, RGBdata)) {
+	if (!CompareArrays(lastLoopRGBData, RGBdata)) {
 		lastLoopRGBData = RGBdata;
 
 		PlatCooler.SendColorPacket(0b100, RGBdata.slice(0, 60));
-		device.pause(5);
 
-		if(TotalLedCount > 20) {
+		if (TotalLedCount > 20) {
 			PlatCooler.SendColorPacket(0b101, RGBdata.slice(60, 120));
-			device.pause(5);
 		}
 
-		if(TotalLedCount > 40) {
+		if (TotalLedCount > 40) {
 			PlatCooler.SendColorPacket(0b110, RGBdata.slice(120, 180));
-			device.pause(5);
 		}
 	}
 }
@@ -248,6 +241,48 @@ function hexToRgb(hex) {
 
 export function Validate(endpoint) {
 	return endpoint.interface === -1 || endpoint.interface === 0;
+}
+
+class RollingAverageCalculator {
+	constructor(windowSize, defaultAverage) {
+		this._windowSize = windowSize;
+		this._sum = 0;
+		this._values = Array.from({ length: windowSize }, () => defaultAverage);
+
+		for (let i = 0; i < this._windowSize; i++) {
+			this._sum += defaultAverage;
+		}
+	}
+
+	update(newValue) {
+		if (this._values.length === this._windowSize) {
+			const removedValue = this._values.shift();
+			this._sum -= removedValue;
+		}
+
+		this._values.push(newValue);
+		this._sum += newValue;
+
+		return this._sum / this._values.length;
+	}
+}
+
+class DeviceMetrics {
+	constructor(defaultWriteDelayAverage) {
+		this._writeDelayRollingAverageCalculator = new RollingAverageCalculator(30, defaultWriteDelayAverage);
+		this._writeStart = 0;
+	}
+
+	writeStart() {
+		this._writeStart = new Date().getTime();
+	}
+
+	writeEnd() {
+		const now = new Date().getTime();
+		const result = now - this._writeStart;
+
+		return ( Math.floor(this._writeDelayRollingAverageCalculator.update(result)) + 1 );
+	}
 }
 
 class PlatinumProtocol {
@@ -454,6 +489,8 @@ class PlatinumProtocol {
 
 		this.crcTable = [ 0, 7, 14, 9, 28, 27, 18, 21, 56, 63, 54, 49, 36, 35, 42, 45, 112, 119, 126, 121, 108, 107, 98, 101, 72, 79, 70, 65, 84, 83, 90, 93, 224, 231, 238, 233, 252, 251, 242, 245, 216, 223, 214, 209, 196, 195, 202, 205, 144, 151, 158, 153, 140, 139, 130, 133, 168, 175, 166, 161, 180, 179, 186, 189, 199, 192, 201, 206, 219, 220, 213, 210, 255, 248, 241, 246, 227, 228, 237, 234, 183, 176, 185, 190, 171, 172, 165, 162, 143, 136, 129, 134, 147, 148, 157, 154, 39, 32, 41, 46, 59, 60, 53, 50, 31, 24, 17, 22, 3, 4, 13, 10, 87, 80, 89, 94, 75, 76, 69, 66, 111, 104, 97, 102, 115, 116, 125, 122, 137, 142, 135, 128, 149, 146, 155, 156, 177, 182, 191, 184, 173, 170, 163, 164, 249, 254, 247, 240, 229, 226, 235, 236, 193, 198, 207, 200, 221, 218, 211, 212, 105, 110, 103, 96, 117, 114, 123, 124, 81, 86, 95, 88, 77, 74, 67, 68, 25, 30, 23, 16, 5, 2, 11, 12, 33, 38, 47, 40, 61, 58, 51, 52, 78, 73, 64, 71, 82, 85, 92, 91, 118, 113, 120, 127, 106, 109, 100, 99, 62, 57, 48, 55, 34, 37, 44, 43, 6, 1, 8, 15, 26, 29, 20, 19, 174, 169, 160, 167, 178, 181, 188, 187, 150, 145, 152, 159, 138, 141, 132, 131, 222, 217, 208, 215, 194, 197, 204, 203, 230, 225, 232, 239, 250, 253, 244, 243 ];
 		//we love CRC's
+
+		this.deviceMetrics = new DeviceMetrics(60);
 	}
 
 	getNumberOfFans() { return this.config.numberOfFans; }
@@ -507,17 +544,39 @@ class PlatinumProtocol {
 		return this.config.seq;
 	}
 
+	// EvanMulawski
+	writeToDevice(packet) {
+		device.clearReadBuffer();
+		this.deviceMetrics.writeStart();
+
+		try {
+			device.write(packet, 65);
+
+			// not sure why the write is 1-2ms - should be about 12-15ms
+			const delay = this.deviceMetrics.writeEnd();
+			//device.log(`Write Delay: ${delay} ms`);
+			device.pause(Math.max(10, delay));
+		} catch (error) {
+			this.deviceMetrics.writeEnd();
+			throw error;
+		}
+	}
+
 	sendPacketWithResponse(packet, callingFunction) {
 		packet[64] = this.calculateCRC(packet, 2, 63);
-		device.write(packet, 65);
+		this.writeToDevice(packet);
 
-		const returnPacket = device.read(packet, 65);
+		// const returnPacket = device.read(packet, 65);
 
-		if(returnPacket[5] !== 0){
-			device.log(`Device Status: ${this.packetStatusCodes[returnPacket[5]]} from ${callingFunction}`);
-			device.clearReadBuffer();
-			device.pause(50);
-		}
+		// if (returnPacket[5] !== 0) {
+		//   device.log(
+		//     `Device Status: ${
+		//       this.packetStatusCodes[returnPacket[5]]
+		//     } from ${callingFunction}`
+		//   );
+		//   //device.clearReadBuffer();
+		//   //device.pause(50);
+		// }
 	}
 
 	findSequence() {
@@ -617,7 +676,6 @@ class PlatinumProtocol {
 	}
 
 	sendCoolingProfile(profileData){
-
 		const packet = [0x00, 0x3F, this.getPacketSequence(), 0x14, 0x00, 0xFF, 0x05, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00].concat(profileData);
 
 		this.sendPacketWithResponse(packet, "Cooling Profile Set");
