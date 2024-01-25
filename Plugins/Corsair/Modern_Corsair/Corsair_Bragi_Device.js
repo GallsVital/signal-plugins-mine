@@ -258,13 +258,14 @@ function initializeDevice(deviceConfig, deviceID = 0) {
 		configureMouseButtons(deviceID);
 
 	} else if(deviceConfig.keymapType === "Keyboard") {
-		setMacroKeys(deviceID, deviceConfig.keyCount);
+		if([0x1B7D, 0x1BC5, 0x1B7C].includes(devicePID)) { setMacroKeys(deviceID, deviceConfig.keyCount); }
+
 		device.addFeature("keyboard");
 	}
 
 	device.pause(5);
 
-	if(Corsair.FetchDPISupport(deviceID) && DPIHandler.minDpi === 50) { //safety check. We check if the DPIHandler prop was updated. If it hasn't been then there's only a single instance.
+	if(Corsair.FetchDPISupport(deviceID)) { //safety check. We check if the DPIHandler prop was updated. If it hasn't been then there's only a single instance.
 
 		addPollingRates(deviceID, true);
 
@@ -3360,6 +3361,8 @@ export default class DpiController {
 		for(let stages = 0; stages < this.maxStageIdx; stages++) {
 			device.removeProperty(`dpi${stages+1}`);
 		}
+
+		this.dpiMap.clear(); //TODO: Do this more properly
 	}
 	addSniperProperty() {
 		device.addProperty({ "property": `dpi${this.sniperStageIdx}`, "group": "mouse", "label": "Sniper Button DPI", "step": "50", "type": "number", "min": this.minDpi, "max": this.maxDpi, "default": "400", "order": 3, "live" : false });
