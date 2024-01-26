@@ -378,9 +378,9 @@ export class deviceLibrary {
 		};
 
 		this.imageLibrary = {
-			"Function": 		"https://marketplace.signalrgb.com/devices/brands/nzxt/keyboards/function.png",
-			"Function TKL": 	"https://marketplace.signalrgb.com/devices/brands/nzxt/keyboards/function-tkl.png",
-			"Function MiniTKL":	"https://marketplace.signalrgb.com/devices/brands/nzxt/keyboards/function-mini-tkl.png",
+			"Function": 		"https://assets.signalrgb.com/devices/brands/nzxt/keyboards/function.png",
+			"Function TKL": 	"https://assets.signalrgb.com/devices/brands/nzxt/keyboards/function-tkl.png",
+			"Function MiniTKL":	"https://assets.signalrgb.com/devices/brands/nzxt/keyboards/function-mini-tkl.png",
 		};
 	}
 }
@@ -408,5 +408,5 @@ export function Validate(endpoint) {
 }
 
 export function ImageUrl() {
-	return "https://marketplace.signalrgb.com/devices/default/keyboards/full-size-keyboard-render.png";
+	return "https://assets.signalrgb.com/devices/default/keyboards/full-size-keyboard-render.png";
 }
