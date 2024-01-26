@@ -939,6 +939,7 @@ class CorsairLibrary{
 				0x1B65 : "Harpoon Wireless",
 				0x1B4C : "Ironclaw Wireless",
 				0x1B66 : "Ironclaw Wireless",
+				0x1BDC : "Ironclaw Wireless",
 				0x1B70 : "M55",
 				0x1b9e : "M65 Ultra",
 				0x1B89 : "K95 Plat XT",
