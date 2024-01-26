@@ -299,6 +299,7 @@ class PlatinumProtocol {
 			0x0C2D : "H100/H115I",
 			0x0C2E : "H100/H115I",
 			0x0C35 : "H100/H115I",
+			0x0C40:  "H100/H115I",
 			0x0C2F : "H150I",
 			0x0C22 : "H150I",
 			0x0C37 : "H150I"
@@ -310,6 +311,7 @@ class PlatinumProtocol {
 			0x0C18 : "H100I Platinum",
 			0x0C19 : "H100I Platinum SE",
 			0x0C35 : "H100I Elite",
+			0x0C40 : "H100I Elite",
 			0x0C20 : "H100I Pro XT",
 			0x0C2D : "H100I Pro XT",
 			0x0C21 : "H115I Pro XT",
