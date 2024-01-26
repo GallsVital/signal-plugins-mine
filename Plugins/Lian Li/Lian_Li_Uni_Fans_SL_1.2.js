@@ -1,6 +1,6 @@
 export function Name() { return "Lian Li Uni Fan Controller SL 1.2"; }
 export function VendorId() { return  0x0CF2; }
-export function ProductId() { return 0xA100;}//0xA100; }
+export function ProductId() { return [0xA100, 0xA106];} // 0xA106 Redragon Spec
 export function Publisher() { return "WhirlwindFX"; }
 export function Size() { return [1, 1]; }
 export function Type(){return "rawusb";}
