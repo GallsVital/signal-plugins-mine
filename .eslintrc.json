@@ -1,164 +1,176 @@
 {
-    "parserOptions": {
-        "parser": "@typescript-eslint/parser",
-        "ecmaVersion": "latest",
-        "sourceType": "module",
-        "ecmaFeatures": {
-            "jsx": false
-        },
-        "extends": [
-            "eslint:recommended",
-            "plugin:@typescript-eslint/eslint-recommended",
-            "plugin:@typescript-eslint/recommended",
-            "plugin:jest/recommended",
-            "plugin:@typescript-eslint/recommended-requiring-type-checking",
-            "plugin:jsdoc/recommended"
-        ]
+  "parserOptions": {
+    "parser": "@typescript-eslint/parser",
+    "ecmaVersion": "latest",
+    "sourceType": "module",
+    "ecmaFeatures": {
+      "jsx": false
     },
-    "plugins": [
-        "@typescript-eslint",
-        "jest",
-        "jsdoc"
-        ],
-    "env": {
-        "jest/globals": true,
-        "node": true,
-        "es6": true
-    },
-    "globals": {
-        "module": "writable",
-        "device": "readonly", 
-        "bus": "readonly",
-        "battery": "readonly",
-        "mouse": "readonly",
-        "keyboard": "readonly",
-        "udp": "readonly",
-        "service": "readonly",
-        "dtls": "readonly",
-        "XMLHttpRequest": "readonly",
-        "base64": "readonly"
-    },
-    "rules": {
-        "semi":"warn",
-        "consistent-return": "warn",
-        "curly":"warn",
-        //"no-console": "error",
-        "no-var": "warn",
-        "no-useless-return":"warn",
-        "brace-style": ["warn","1tbs", { "allowSingleLine": true }],
-        "indent": ["warn","tab"],
-        "no-unused-vars":"warn",
-        "comma-spacing":["warn", {"after":true,"before":false}],
-        "no-trailing-spaces":"warn",
-        "max-len":["off",150],
-        "no-multiple-empty-lines": ["warn",{ "max": 2 }],
-        "no-undef":["error"],
-        "eqeqeq": "warn",
-        "no-cond-assign":"error",
-        //"no-use-before-define": ["error", {"functions": false}],
-        "block-scoped-var":"warn",
-        "no-else-return":"warn",
-        "no-eval":"error",
-        "no-dupe-keys": "error",
-        "prefer-const":"warn",
-        "yoda":["warn", "never", { "onlyEquality": true }],
-        "complexity": ["warn",{"max":12}],
-        "no-return-assign": "error",
-        "no-constant-binary-expression": "error",
-        "for-direction": "error",
-        "padding-line-between-statements": [
-            "warn",
-            { "blankLine": "never", "prev": ["for","if","while"], "next": "*" },
-
-            { "blankLine": "always", "prev": ["block-like","export"], "next": "*" },
-            { "blankLine": "always", "prev": ["let","var","const"], "next": "*" },
-            { "blankLine": "any", "prev": ["let","var","const"], "next": "expression" },
-
-            { "blankLine": "never", "prev": ["let","var","const"], "next": ["let","var","const"] },
-            { "blankLine": "any", "prev": "*", "next": ["let","var","const"] },
-            { "blankLine": "always", "prev": "expression", "next": ["let","var","const"] },
-
-            { "blankLine": "never", "prev": ["*","export","block-like"], "next": "export" },
-            { "blankLine": "any", "prev": "*", "next": "export" },
-            { "blankLine": "always", "prev": "expression", "next": ["block-like"] },
-            { "blankLine": "always", "prev": "*", "next": "return" }
-        ],
-        "no-restricted-syntax": [
-            "error",
-            {
-                "selector": "MemberExpression[object.name = 'device'][property.name='readTimeout']", 
-                "message": "device.readTimeout() is deprecated and should not be used. Instead use device.read()"
-            },            {
-                "selector": "MemberExpression[object.name = 'device'][property.name='repollName']", 
-                "message": "device.repollName() is deprecated and should not be used. Instead use device.setName()"
-            },
-            {
-                "selector": "MemberExpression[object.name = 'device'][property.name='repollLeds']", 
-                "message": "device.repollLeds() is deprecated and should not be used. Instead use device.setControllableLeds()"
-            },
-            {
-                "selector": "MemberExpression[object.name = 'device'][property.name='repollSize']", 
-                "message": "device.repollSize() is deprecated and should not be used. Instead use device.setSize()"
-            }
-            //,
-            // {
-            //     "selector": "MemberExpression[object.name = 'device'][property.name='log']", 
-            //     "message": "device.log() is deprecated and should not be used. Instead use console.log()"
-            // },
-            // {
-            //     "selector": "MemberExpression[object.name = 'bus'][property.name='log']", 
-            //     "message": "bus.log() is deprecated and should not be used. Instead use console.log()"
-            // },
-            // {
-            //     "selector": "CallExpression[callee.name='sendPacketString']", 
-            //     "message": "sendPacketString() is deprecated and should not be used. Instead initialize an array."
-            // }
-        ],
-        "no-restricted-exports": ["error", {
-            "restrictedNamedExports": ["SupportsSubdevices"]
-        }],
-        // // JSDoc 
-        // //"jsdoc/check-access": 1, // Recommended
-        "jsdoc/check-alignment": 1 // Recommended
-        // "jsdoc/check-param-names": 1, // Recommended
-        // "jsdoc/check-property-names": 1, // Recommended
-        // "jsdoc/check-tag-names": 1, // Recommended
-        // "jsdoc/check-types": 1, // Recommended
-        // "jsdoc/check-values": 1, // Recommended
-        // "jsdoc/empty-tags": 1, // Recommended
-        // "jsdoc/implements-on-classes": 1, // Recommended
-        // "jsdoc/multiline-blocks": 1, // Recommended
-        // "jsdoc/newline-after-description": 1, // Recommended
-        // "jsdoc/no-multi-asterisks": 1, // Recommended
-        // //"jsdoc/no-undefined-types": 1, // Recommended
-        // "jsdoc/require-jsdoc": ["error", {"exemptEmptyFunctions": true}], // Recommended
-        // "jsdoc/require-param": 1, // Recommended
-        // //"jsdoc/require-param-description": 1, // Recommended
-        // "jsdoc/require-param-name": 1, // Recommended
-        // "jsdoc/require-param-type": 2, // Recommended
-        // "jsdoc/require-property": 1, // Recommended
-        // //"jsdoc/require-property-description": 1, // Recommended
-        // "jsdoc/require-property-name": 1, // Recommended
-        // "jsdoc/require-property-type": 2, // Recommended
-        // //"jsdoc/require-returns": 1, // Recommended
-        // //"jsdoc/require-returns-check": 1, // Recommended
-        // //"jsdoc/require-returns-description": 1, // Recommended
-        // "jsdoc/require-returns-type": 1, // Recommended
-        // //"jsdoc/require-yields": 1, // Recommended
-        // //"jsdoc/require-yields-check": 1, // Recommended
-        // "jsdoc/tag-lines": 1, // Recommended
-        // "jsdoc/valid-types": 1 // Recommended
-    
-    },
-    "overrides": [
-        {
-          "files": [
-            "./**/*.test.js", 
-            "./Scripts/*"
-        ],
-          "rules": {
-            "no-console": "off"
-          }
-        }
+    "extends": [
+      "eslint:recommended",
+      "plugin:@typescript-eslint/eslint-recommended",
+      "plugin:@typescript-eslint/recommended",
+      "plugin:jest/recommended",
+      "plugin:@typescript-eslint/recommended-requiring-type-checking",
+      "plugin:jsdoc/recommended"
     ]
+  },
+  "plugins": ["@typescript-eslint", "jest", "jsdoc"],
+  "env": {
+    "jest/globals": true,
+    "node": true,
+    "es6": true
+  },
+  "globals": {
+    "module": "writable",
+    "device": "readonly",
+    "bus": "readonly",
+    "battery": "readonly",
+    "mouse": "readonly",
+    "keyboard": "readonly",
+    "udp": "readonly",
+    "service": "readonly",
+    "dtls": "readonly",
+    "XMLHttpRequest": "readonly",
+    "base64": "readonly"
+  },
+  "rules": {
+    "semi": "warn",
+    "consistent-return": "warn",
+    "curly": "warn",
+    //"no-console": "error",
+    "no-var": "warn",
+    "no-useless-return": "warn",
+    "brace-style": ["warn", "1tbs", { "allowSingleLine": true }],
+    "indent": ["warn", "tab"],
+    "no-unused-vars": "warn",
+    "comma-spacing": ["warn", { "after": true, "before": false }],
+    "no-trailing-spaces": "warn",
+    "max-len": ["warn", 140],
+    "no-multiple-empty-lines": ["warn", { "max": 2 }],
+    "no-undef": ["error"],
+    "eqeqeq": "warn",
+    "no-cond-assign": "error",
+    //"no-use-before-define": ["error", {"functions": false}],
+    "block-scoped-var": "warn",
+    "no-else-return": "warn",
+    "no-eval": "error",
+    "no-dupe-keys": "error",
+    "prefer-const": "warn",
+    "yoda": ["warn", "never", { "onlyEquality": true }],
+    "complexity": ["warn", { "max": 12 }],
+    "no-return-assign": "error",
+    "no-constant-binary-expression": "error",
+    "for-direction": "error",
+    "padding-line-between-statements": [
+      "warn",
+      { "blankLine": "never", "prev": ["for", "if", "while"], "next": "*" },
+
+      { "blankLine": "always", "prev": ["block-like", "export"], "next": "*" },
+      { "blankLine": "always", "prev": ["let", "var", "const"], "next": "*" },
+      {
+        "blankLine": "any",
+        "prev": ["let", "var", "const"],
+        "next": "expression"
+      },
+
+      {
+        "blankLine": "never",
+        "prev": ["let", "var", "const"],
+        "next": ["let", "var", "const"]
+      },
+      { "blankLine": "any", "prev": "*", "next": ["let", "var", "const"] },
+      {
+        "blankLine": "always",
+        "prev": "expression",
+        "next": ["let", "var", "const"]
+      },
+
+      {
+        "blankLine": "never",
+        "prev": ["*", "export", "block-like"],
+        "next": "export"
+      },
+      { "blankLine": "any", "prev": "*", "next": "export" },
+      { "blankLine": "always", "prev": "expression", "next": ["block-like"] },
+      { "blankLine": "always", "prev": "*", "next": "return" }
+    ],
+    "no-restricted-syntax": [
+      "error",
+      {
+        "selector": "MemberExpression[object.name = 'device'][property.name='readTimeout']",
+        "message": "device.readTimeout() is deprecated and should not be used. Instead use device.read()"
+      },
+      {
+        "selector": "MemberExpression[object.name = 'device'][property.name='repollName']",
+        "message": "device.repollName() is deprecated and should not be used. Instead use device.setName()"
+      },
+      {
+        "selector": "MemberExpression[object.name = 'device'][property.name='repollLeds']",
+        "message": "device.repollLeds() is deprecated and should not be used. Instead use device.setControllableLeds()"
+      },
+      {
+        "selector": "MemberExpression[object.name = 'device'][property.name='repollSize']",
+        "message": "device.repollSize() is deprecated and should not be used. Instead use device.setSize()"
+      }
+      //,
+      // {
+      //     "selector": "MemberExpression[object.name = 'device'][property.name='log']",
+      //     "message": "device.log() is deprecated and should not be used. Instead use console.log()"
+      // },
+      // {
+      //     "selector": "MemberExpression[object.name = 'bus'][property.name='log']",
+      //     "message": "bus.log() is deprecated and should not be used. Instead use console.log()"
+      // },
+      // {
+      //     "selector": "CallExpression[callee.name='sendPacketString']",
+      //     "message": "sendPacketString() is deprecated and should not be used. Instead initialize an array."
+      // }
+    ],
+    "no-restricted-exports": [
+      "error",
+      {
+        "restrictedNamedExports": ["SupportsSubdevices"]
+      }
+    ],
+    // // JSDoc
+    // //"jsdoc/check-access": 1, // Recommended
+    "jsdoc/check-alignment": 1 // Recommended
+    // "jsdoc/check-param-names": 1, // Recommended
+    // "jsdoc/check-property-names": 1, // Recommended
+    // "jsdoc/check-tag-names": 1, // Recommended
+    // "jsdoc/check-types": 1, // Recommended
+    // "jsdoc/check-values": 1, // Recommended
+    // "jsdoc/empty-tags": 1, // Recommended
+    // "jsdoc/implements-on-classes": 1, // Recommended
+    // "jsdoc/multiline-blocks": 1, // Recommended
+    // "jsdoc/newline-after-description": 1, // Recommended
+    // "jsdoc/no-multi-asterisks": 1, // Recommended
+    // //"jsdoc/no-undefined-types": 1, // Recommended
+    // "jsdoc/require-jsdoc": ["error", {"exemptEmptyFunctions": true}], // Recommended
+    // "jsdoc/require-param": 1, // Recommended
+    // //"jsdoc/require-param-description": 1, // Recommended
+    // "jsdoc/require-param-name": 1, // Recommended
+    // "jsdoc/require-param-type": 2, // Recommended
+    // "jsdoc/require-property": 1, // Recommended
+    // //"jsdoc/require-property-description": 1, // Recommended
+    // "jsdoc/require-property-name": 1, // Recommended
+    // "jsdoc/require-property-type": 2, // Recommended
+    // //"jsdoc/require-returns": 1, // Recommended
+    // //"jsdoc/require-returns-check": 1, // Recommended
+    // //"jsdoc/require-returns-description": 1, // Recommended
+    // "jsdoc/require-returns-type": 1, // Recommended
+    // //"jsdoc/require-yields": 1, // Recommended
+    // //"jsdoc/require-yields-check": 1, // Recommended
+    // "jsdoc/tag-lines": 1, // Recommended
+    // "jsdoc/valid-types": 1 // Recommended
+  },
+  "overrides": [
+    {
+      "files": ["./**/*.test.js", "./Scripts/*"],
+      "rules": {
+        "no-console": "off"
+      }
+    }
+  ]
 }
