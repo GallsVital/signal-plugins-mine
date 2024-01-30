@@ -1,13 +1,10 @@
-export function Name() { return "Razer Blackwidow V4 Pro"; }
+export function Name() { return "Razer Keyboard"; }
 export function VendorId() { return 0x1532; }
-export function ProductId() { return 0x028D; }
+export function ProductId() { return Object.keys(razerDeviceLibrary.PIDLibrary); }
 export function Publisher() { return "WhirlwindFX"; }
 export function Documentation(){ return "troubleshooting/razer"; }
-export function Size() { return [22, 10]; }
+export function Size() { return [1, 1]; }
 export function Type() { return "Hid"; }
-export function DefaultPosition(){return [10, 100];}
-const DESIRED_HEIGHT = 85;
-export function DefaultScale(){return Math.floor(DESIRED_HEIGHT/Size()[1]);}
 /* global
 shutdownColor:readonly
 LightingMode:readonly
@@ -61,19 +58,16 @@ export function Shutdown(SystemSuspending) {
 	}else{
 		grabLighting(shutdownColor);
 		Razer.setModernMatrixEffect([0x00, 0x00, 0x03]); //Hardware mode baby.
-		//Razer.setDeviceMode("Hardware Mode");
 	}
 }
 
-function deviceInitialization(wake = false) {
+function deviceInitialization() {
 	Razer.detectDeviceEndpoint();
 	device.set_endpoint(Razer.Config.deviceEndpoint[`interface`], Razer.Config.deviceEndpoint[`usage`], Razer.Config.deviceEndpoint[`usage_page`]);
-	//Razer.setDeviceMode("Software Mode");
 	Razer.getDeviceTransactionID();
 	Razer.detectSupportedFeatures();
 	Razer.setDeviceProperties();
 	Razer.setDeviceMacroProperties();
-	Razer.setNumberOfLEDs(Razer.getDeviceLEDPositions().length);
 	Razer.setSoftwareLightingMode(); //we'll need the wake handler at some point for keebs, but for now we don't do features because I could not be bothered.
 }
 
@@ -137,11 +131,7 @@ function detectInputs() {
 }
 
 function spawnMacroHelpers() {
-	if(Razer.getDeviceType() === "Keyboard") {
-		device.addFeature("keyboard");
-	} else {
-		device.addFeature("mouse");
-	}
+	device.addFeature("keyboard");
 }
 
 function processInputs(Added, Removed) {
@@ -149,21 +139,15 @@ function processInputs(Added, Removed) {
 	for (let values = 0; values < Added.length; values++) {
 		const input = Added.pop();
 
-		if(Razer.getDeviceType() === "Keyboard") {
-			processKeyboardInputs(input);
-		} else {
-			processMouseInputs(input);
-		}
+		processKeyboardInputs(input);
+
 	}
 
 	for (let values = 0; values < Removed.length; values++) {
 		const input = Removed.pop();
 
-		if(Razer.getDeviceType() === "Keyboard") {
-			processKeyboardInputs(input, true);
-		} else {
-			processMouseInputs(input, true);
-		}
+		processKeyboardInputs(input, true);
+
 	}
 }
 
@@ -172,54 +156,17 @@ function processKeyboardInputs(input, released = false) {
 		return;
 	}
 
-	const eventData = { key : Razer.getInputDict()[input], keyCode : 0, "released": released };
+	const eventData = { key : Razer.getInputDict()[input], keyCode : input, "released": released };
+	console.log(eventData);
 	device.log(`${Razer.getInputDict()[input]} Hit. Release Status: ${released}`);
 	keyboard.sendEvent(eventData, "Key Press");
-}
-
-function processMouseInputs(input, released = false) {
-	if(released) {
-		if(input === 0x51) {
-			device.log("DPI Clutch Released.");
-			DpiHandler.SetSniperMode(false);
-		} else {
-			const eventData = { "buttonCode": 0, "released": true, "name": Razer.getInputDict()[input] };
-			device.log(Razer.getInputDict()[input] + " released.");
-			mouse.sendEvent(eventData, "Button Press");
-		}
-
-		return;
-	}
-
-	switch (input) {
-	case 0x20:
-		device.log("DPI Up");
-		DpiHandler.increment();
-		break;
-	case 0x21:
-		device.log("DPI Down");
-		DpiHandler.decrement();
-		break;
-
-	case 0x51:
-		device.log("DPI Clutch Hit.");
-		DpiHandler.SetSniperMode(true);
-		break;
-	case 0x52:
-		device.log("DPI Cycle Hit.");
-		DpiHandler.increment();
-		break;
-	default:
-		const eventData = { "buttonCode": 0, "released": false, "name": Razer.getInputDict()[input] };
-		device.log(Razer.getInputDict()[input] + " hit.");
-		mouse.sendEvent(eventData, "Button Press");
-	}
 }
 
 function grabLighting(overrideColor) {
 	const RGBData = [];
 	const vLedPositions = Razer.getDeviceLEDPositions();
 	const vKeys = Razer.getDeviceLEDIndexes();
+	const LEDsPerPacket = Razer.getNumberOfLEDsPacket();
 
 	for(let iIdx = 0; iIdx < vKeys.length; iIdx++) {
 		let col;
@@ -238,14 +185,13 @@ function grabLighting(overrideColor) {
 		RGBData[iLedIdx+1]	= col[1];
 		RGBData[iLedIdx+2]	= col[2];
 	}
+	const packetsTotal = Math.ceil((RGBData.length / 3) / LEDsPerPacket);
 	let packetCount = 0;
 
 	do {
-		const ledsToSend = 23;
-
-		Razer.setKeyboardDeviceColor(ledsToSend, RGBData.splice(0, ledsToSend*3), packetCount);
+		Razer.setKeyboardDeviceColor(LEDsPerPacket, RGBData.splice(0, LEDsPerPacket*3), packetCount);
 		packetCount++;
-	}while(packetCount < 8);
+	}while(packetCount <= packetsTotal);
 }
 
 function hexToRgb(hex) {
@@ -261,275 +207,112 @@ function hexToRgb(hex) {
 export class deviceLibrary {
 	constructor() {
 
-		this.mouseInputDict = {
-			0x20 : "DPI Up",
-			0x21 : "DPI Down",
-			0x22 : "Right Back Button",
-			0x23 : "Right Forward Button",
-			0x50 : "Profile Button",
-			0x51 : "DPI Clutch",
-			0x52 : "DPI Cycle",
-			0x54 : "Scroll Accel Button"
-		};
-
 		this.keyboardInputDict = {
 			0x20 : "M1",
 			0x21 : "M2",
 			0x22 : "M3",
 			0x23 : "M4",
-			0x24 : "M5"
+			0x24 : "M5",
+			0x52 : "Mute",
+			0x55 : "Play/Pause",
 		};
 
 		this.PIDLibrary =
 		{
+			0x0228 : "Blackwidow Elite",
+			//0x024E : "Blackwidow V3", // Quartz // TODO
+			0x0258 : "Blackwidow V3 Mini", // Wired
 			0x0271 : "Blackwidow V3 Mini",
-			0x0258 : "Blackwidow V3 Mini",
+			0x0287 : "Blackwidow V4",
+			0x0293 : "Blackwidow V4 X",
 			0x028D : "Blackwidow V4 Pro",
+			0x02A5 : "Blackwidow V4 75%",
+			0x0257 : "Huntsman Mini",
+			0x005E : "Huntsman Mini",
+			0x026C : "Huntsman V2",
+			//0x0266 : "Huntsman V2 Analog", // TODO
+			//0x026B : "Huntsman V2 TKL", // TODO
+			0x02A6 : "Huntsman V3 Pro",
+			0x02A7 : "Huntsman V3 Pro TKL",
+			//0x025D : "Ornata V2", // TODO
+			//0x0000 : "Huntsman V3 Pro Mini", // TODO
 		};
 
 		this.LEDLibrary = //I'm tired of not being able to copy paste between files.
 		{
-			"Abyssus Essential":
+			"Blackwidow Elite" :
 			{
-				size: [10, 10],
-				vLedNames: ["ScrollWheel", "Logo", "SideBarLeft1"],
-				vLedPositions: [[5, 0], [7, 5], [0, 1]],
-				maxDPI: 12400
+				size : [21, 7],
+				vKeys :
+				[
+					1,		3,	4,	5,	6,	7,  8,	9,  10, 11, 12, 13, 14,		15, 16, 17,		18,	19,	20,	21,
+					23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36,		37, 38, 39, 	40, 41, 42, 43,
+					45, 46, 47, 48, 49, 50, 51, 52, 53, 54, 55, 56, 57, 58,		59, 60, 61, 	62, 63, 64, 65,
+					67, 68, 69, 70, 71, 72, 73, 74, 75, 76, 77, 78,     80,						84, 85, 86,
+					89, 91, 92, 93, 94, 95, 96, 97, 98, 99, 100,	   102,	 	    104,		106, 107, 108, 109,
+					111, 112, 113,           116,       120, 122, 123, 124,		125, 126, 127,	129,	130,
+					121,
+				],
+				vLedNames :
+				[
+					"Esc", "F1", "F2", "F3", "F4", "F5", "F6", "F7", "F8", "F9", "F10", "F11", "F12",		"Print Screen", "Scroll Lock", "Pause Break",	"MediaPreviousTrack", "MediaPlayPause", "MediaNextTrack", "AudioMute",
+					"`", "1",  "2", "3", "4", "5",  "6", "7", "8", "9", "0",  "-",   "+",  "Backspace",		"Insert",       "Home",        "Page Up",		"NumLock", "Num /", "Num *", "Num -",		//22
+					"Tab", "Q", "W", "E", "R", "T", "Y", "U", "I", "O", "P", "[", "]", "\\",				"Del",          "End",         "Page Down",		"Num 7", "Num 8", "Num 9", "Num +",		//22
+					"CapsLock", "A", "S", "D", "F", "G", "H", "J", "K", "L", ";", "'", "Enter",																"Num 4", "Num 5", "Num 6",				//17
+					"Left Shift", "Z", "X", "C", "V", "B", "N", "M", ",", ".", "/", "Right Shift",                   	   "Up Arrow",						"Num 1", "Num 2", "Num 3", "Num Enter",	//18
+					"Left Ctrl", "Left Win", "Left Alt", "Space", "Right Alt", "Fn", "Menu", "Right Ctrl",	"Left Arrow",  "Down Arrow", "Right Arrow",		"Num 0", "Num .",							//14
+					"RazerLogo",
+				],
+				vLedPositions :
+				[
+					[0, 0], 		[2, 0], [3, 0], [4, 0], [5, 0], [6, 0], [7, 0], [8, 0], [9, 0], [10, 0], [11, 0], [12, 0], [13, 0],		[14, 0], [15, 0], [16, 0],	[17, 0], [18, 0], [19, 0], [20, 0], //21
+					[0, 1], [1, 1], [2, 1], [3, 1], [4, 1], [5, 1], [6, 1], [7, 1], [8, 1], [9, 1], [10, 1], [11, 1], [12, 1], [13, 1],		[14, 1], [15, 1], [16, 1],	[17, 1], [18, 1], [19, 1], [20, 1],	//22
+					[0, 2], [1, 2], [2, 2], [3, 2], [4, 2], [5, 2], [6, 2], [7, 2], [8, 2], [9, 2], [10, 2], [11, 2], [12, 2], [13, 2],		[14, 2], [15, 2], [16, 2],	[17, 2], [18, 2], [19, 2], [20, 2],	//22
+					[0, 3], [1, 3], [2, 3], [3, 3], [4, 3], [5, 3], [6, 3], [7, 3], [8, 3], [9, 3], [10, 3], [11, 3], 		   [13, 3],									[17, 3], [18, 3], [19, 3],			//17
+					[0, 4], 		[2, 4], [3, 4], [4, 4], [5, 4], [6, 4], [7, 4], [8, 4], [9, 4], [10, 4], [11, 4],          [13, 4],				 [15, 4],			[17, 4], [18, 4], [19, 4], [20, 4],	//18
+					[0, 5], [1, 5], [2, 5],                 		[6, 5],                       	[10, 5], [11, 5], [12, 5], [13, 5],		[14, 5], [15, 5], [16, 5],	[17, 5],		  [19, 5],	//14
+					[11, 6],
+				],
+				endpoint : { "interface": 2, "usage": 0x0002, "usage_page": 0x0001 },
+				DeviceType : "Keyboard",
+				LEDsPerPacket : 22,
+				image: "https://assets.signalrgb.com/devices/brands/razer/keyboards/blackwidow-elite.png"
 			},
-			"Basilisk Essential":
+			"Blackwidow V3" :
 			{
-				size: [3, 3],
-				vLedNames: ["Logo"],
-				vLedPositions: [[1, 0]],
-				maxDPI: 6400
+				size : [25, 9],
+				vKeys :
+				[
+					2,   4,   5,   6,   7,   8,  9,   10,  11,  12,  13,  14,  15,       16,  17,  18, //21
+					25,  26,  27,  28,  29,  30,  31,  32,  33,  34,  35,  36,  37,  38,  39,  40,  41,   42,  43,  44,  45,	//22
+					48,  49,  50,  51,  52,  53,  54,  55,  56,  57,  58,  59,  60,  61,	62,  63,  64,   65,  66,  67,  68,	//22
+					71,  72,  73,  74,  75,  76,  77,  78,  79,  80,  81,  82,       84,					88,  89,  90,		//17
+					94,  96,  97,  98,  99,  100, 101, 102, 103, 104, 105, 107,     			 109,		111, 112, 113, 114,	//18
+					117, 118, 119,                123,                127, 128, 129, 130, 131, 132, 133,	135,	  136,		//14
+				],
+				vLedNames :
+				[
+					"Esc", "F1", "F2", "F3", "F4", "F5", "F6", "F7", "F8", "F9", "F10", "F11", "F12",		"Print Screen", "Scroll Lock", "Pause Break",					//21
+					"`", "1",  "2", "3", "4", "5",  "6", "7", "8", "9", "0",  "-",   "+",  "Backspace",		"Insert",       "Home",        "Page Up",		"NumLock", "Num /", "Num *", "Num -",		//22
+					"Tab", "Q", "W", "E", "R", "T", "Y", "U", "I", "O", "P", "[", "]", "\\",				"Del",          "End",         "Page Down",		"Num 7", "Num 8", "Num 9", "Num +",		//22
+					"CapsLock", "A", "S", "D", "F", "G", "H", "J", "K", "L", ";", "'", "Enter",																"Num 4", "Num 5", "Num 6",				//17
+					"Left Shift", "Z", "X", "C", "V", "B", "N", "M", ",", ".", "/", "Right Shift",                   	   "Up Arrow",						"Num 1", "Num 2", "Num 3", "Num Enter",	//18
+					"Left Ctrl", "Left Win", "Left Alt", "Space", "Right Alt", "Fn", "Menu", "Right Ctrl",	"Left Arrow",  "Down Arrow", "Right Arrow",		"Num 0", "Num .",							//14
+				],
+				vLedPositions :
+				[
+					[0, 0], 		[2, 0], [3, 0], [4, 0], [5, 0], [6, 0], [7, 0], [8, 0], [9, 0], [10, 0], [11, 0], [12, 0], [13, 0],   [14, 0], [15, 0],	[16, 0],	//21
+					[0, 1], [1, 1], [2, 1], [3, 1], [4, 1], [5, 1], [6, 1], [7, 1], [8, 1], [9, 1], [10, 1], [11, 1], [12, 1], [13, 1],   [14, 1], [15, 1], [16, 1],	[17, 1], [18, 1], [19, 1], [20, 1],	//22
+					[0, 2], [1, 2], [2, 2], [3, 2], [4, 2], [5, 2], [6, 2], [7, 2], [8, 2], [9, 2], [10, 2], [11, 2], [12, 2], [13, 2],   [14, 2], [15, 2], [16, 2],	[17, 2], [18, 2], [19, 2], [20, 2],	//22
+					[0, 3], [1, 3], [2, 3], [3, 3], [4, 3], [5, 3], [6, 3], [7, 3], [8, 3], [9, 3], [10, 3], [11, 3], 		   [13, 3],									[17, 3], [18, 3], [19, 3],			//17
+					[0, 4], 		[2, 4], [3, 4], [4, 4], [5, 4], [6, 4], [7, 4], [8, 4], [9, 4], [10, 4], [11, 4],          [13, 4],            [15, 4],				[17, 4], [18, 4], [19, 4], [20, 4],	//18
+					[0, 5], [1, 5], [2, 5],                 		[6, 5],                       	[10, 5], [11, 5], [12, 5], [13, 5],   [14, 5], [15, 5], [16, 5],	[17, 5],		  [19, 5],			//14
+				],
+				endpoint : { "interface": 3, "usage": 0x0001, "usage_page": 0x000C },
+				DeviceType : "Keyboard",
+				LEDsPerPacket : 22,
+				image: "https://assets.signalrgb.com/devices/brands/razer/keyboards/blackwidow-v3.png"
 			},
-			"Basilisk Ultimate":
-			{
-				size: [7, 13],
-				vLedNames: ["ScrollWheel", "Logo", "SideBar1", "SideBar2", "SideBar3", "SideBar4", "SideBar5", "SideBar6", "SideBar7", "SideBar8", "SideBar9", "SideBar10", "SideBar11"],
-				vLedPositions: [[3, 0], [3, 11], [0, 1], [0, 2], [0, 3], [0, 4], [0, 5], [0, 6], [0, 7], [0, 8], [0, 9], [0, 10], [0, 11]],
-				maxDPI: 20000,
-				wireless: true
-			},
-			"Basilisk":
-			{
-				size: [3, 3],
-				vLedNames: ["ScrollWheel", "Logo"],
-				vLedPositions: [[1, 0], [1, 2]],
-				maxDPI: 12400
-			},
-			"Basilisk V2":
-			{
-				size: [3, 3],
-				vLedNames: ["ScrollWheel", "Logo"],
-				vLedPositions: [[1, 0], [1, 2]],
-				maxDPI: 12400
-			},
-			"Basilisk V3":
-			{
-				size: [7, 8],
-				vLedNames: ["Logo", "Scrollwheel", "UnderLeft1", "UnderLeft2", "UnderLeft3", "UnderLeft4", "UnderLeft5", "UnderRight1", "UnderRight2", "UnderRight3", "UnderRight4"],
-				vLedPositions: [[3, 5], [3, 1], [1, 1], [0, 2], [0, 3], [0, 4], [2, 6], [4, 6], [5, 3], [6, 2], [6, 1]],
-				maxDPI: 26000,
-				hyperscrollWheel: true
-			},
-			"Basilisk V3 Pro":
-			{
-				size: [6, 7],
-				vLedNames: ["Logo", "Scrollwheel", "UnderLeft1", "UnderLeft2", "UnderLeft3", "UnderLeft4", "UnderLeft5", "UnderBottom", "UnderRight1", "UnderRight2", "UnderRight3", "UnderRight4", "UnderRight5"],
-				vLedPositions: [[3, 4], [3, 0], [0, 1], [0, 2], [0, 3], [0, 4], [1, 5], [3, 6], [4, 4], [5, 3], [5, 2], [5, 1], [5, 0]],
-				maxDPI: 30000,
-				hyperscrollWheel: true,
-				wireless: true
-			},
-			"Basilisk X Hyperspeed":
-			{
-				size: [0, 0],
-				vLedNames: [],
-				vLedPositions: [],
-				maxDPI: 16000
-			},
-			"Deathadder Elite":
-			{
-				size: [3, 3],
-				vLedNames: ["ScrollWheel", "Logo", "Side Panel"],
-				vLedPositions: [[1, 0], [1, 2], [0, 1]],
-				maxDPI: 12400
-			},
-			"Deathadder Mini":
-			{
-				size: [3, 3],
-				vLedNames: ["Logo"],
-				vLedPositions: [[1, 2]],
-				maxDPI: 12400
-			},
-			"Deathadder V2":
-			{
-				size: [3, 3],
-				vLedNames: ["ScrollWheel", "Logo"],
-				vLedPositions: [[1, 0], [1, 2]],
-				maxDPI: 20000
-			},
-			"Deathadder V2 Pro":
-			{
-				size: [3, 3],
-				vLedNames: ["ScrollWheel", "Logo", "Side Panel"],
-				vLedPositions: [[1, 0], [1, 2], [0, 1]],
-				maxDPI: 20000,
-				wireless: true
-			},
-			"Deathadder V3 Pro":
-			{
-				size: [0, 0],
-				vLedNames: [],
-				vLedPositions: [],
-				maxDPI: 30000,
-				wireless: true
-			},
-			"Hyperflux Pad":
-			{
-				/** @type {number[]} */
-				size: [5, 5],
-				vLedNames: ["Led 1", "Led 2", "Led 3", "Led 4", "Led 5", "Led 6", "Led 7", "Led 8", "Led 9", "Led 10", "Led 11", "Led 12"],
-				/** @type {LedPosition[]} */
-				vLedPositions: [[1, 0], [2, 0], [3, 0], [4, 1], [4, 2], [4, 3], [3, 4], [2, 4], [1, 4], [0, 3], [0, 2], [0, 1]],
-			},
-			"Lancehead":
-			{
-				size: [10, 10],
-				vLedNames: ["ScrollWheel", "Logo", "SideBarLeft1"],
-				vLedPositions: [[5, 0], [7, 5], [0, 1]],
-				maxDPI: 12400,
-				wireless: true
-			},
-			"Lancehead Tournament Edition":
-			{
-				size: [5, 9],
-				vLedNames: ["ScrollWheel", "Logo", "Left Side Bar 1", "Left Side Bar 2", "Left Side Bar 3", "Left Side Bar 4", "Left Side Bar 5", "Left Side Bar 6", "Left Side Bar 7", "Right Side Bar 1", "Right Side Bar 2", "Right Side Bar 3", "Right Side Bar 4", "Right Side Bar 5", "Right Side Bar 6", "Right Side Bar 7"],
-				vLedPositions: [[2, 0], [2, 8], [0, 0], [0, 1], [0, 2], [0, 3], [0, 4], [0, 5], [0, 6], [4, 0], [4, 1], [4, 2], [4, 3], [4, 4], [4, 5], [4, 6]],
-				maxDPI: 16000,
-			},
-			"Mamba Elite":
-			{
-				size: [10, 11],
-				vLedNames: ["ScrollWheel", "Logo", "SideBarLeft1", "SideBarLeft2", "SideBarLeft3", "SideBarLeft4", "SideBarLeft5", "SideBarLeft6", "SideBarLeft7", "SideBarLeft8", "SideBarLeft9", "SideBarRight1", "SideBarRight2", "SideBarRight3", "SideBarRight4", "SideBarRight5", "SideBarRight6", "SideBarRight7", "SideBarRight8", "SideBarRight9"],
-				vLedPositions: [[5, 0], [5, 8], [0, 1], [0, 2], [0, 3], [0, 4], [0, 5], [0, 7], [0, 8], [0, 9], [0, 10], [9, 1], [9, 2], [9, 3], [9, 4], [9, 5], [9, 7], [9, 8], [9, 9], [9, 10]],
-				maxDPI: 16000
-			},
-			"Mamba":
-			{
-				size: [3, 3],
-				vLedNames: ["ScrollWheel", "Logo"],
-				vLedPositions: [[1, 0], [1, 2]],
-				maxDPI: 16000,
-				wireless: true
-			},
-			"Mamba Hyperflux":
-			{
-				size: [3, 3],
-				vLedNames: ["ScrollWheel", "Logo"],
-				vLedPositions: [[1, 0], [1, 2]],
-				maxDPI: 16000,
-				hyperflux: true,
-				wireless: true
-			},
-			"Mamba Tournament Edition":
-			{
-				size: [5, 7],
-				vLedNames: ["Left Side Bar 1", "Left Side Bar 2", "Left Side Bar 3", "Left Side Bar 4", "Left Side Bar 5", "Left Side Bar 6", "Left Side Bar 7", "Right Side Bar 1", "Right Side Bar 2", "Right Side Bar 3", "Right Side Bar 4", "Right Side Bar 5", "Right Side Bar 6", "Right Side Bar 7", "Logo", "ScrollWheel"],
-				vLedPositions: [[0, 0], [0, 1], [0, 2], [0, 3], [0, 4], [0, 5], [0, 6], [4, 0], [4, 1], [4, 2], [4, 3], [4, 4], [4, 5], [4, 6], [2, 5], [2, 0]],
-				maxDPI: 16000
-			},
-			"Naga Chroma":
-			{
-				size: [3, 3],
-				vLedNames: ["ScrollWheel", "Logo", "Side Panel"],
-				vLedPositions: [[0, 0], [0, 2], [1, 1]],
-				maxDPI: 18000
-			},
-			"Naga Pro":
-			{
-				size: [3, 3],
-				vLedNames: ["ScrollWheel", "Logo", "Side Panel"],
-				vLedPositions: [[1, 0], [1, 2], [0, 1]],
-				maxDPI: 18000,
-				wireless: true
-			},
-			"Naga Pro V2":
-			{
-				size: [3, 3],
-				vLedNames: ["ScrollWheel", "Logo", "Side Panel"],
-				vLedPositions: [[1, 0], [1, 2], [0, 1]],
-				maxDPI: 30000,
-				wireless: true
-			},
-			"Naga Lefthand":
-			{
-				size: [3, 3],
-				vLedNames: ["ScrollWheel", "Logo", "Side Panel"],
-				vLedPositions: [[0, 0], [0, 2], [1, 1]],
-				maxDPI: 16000
-			},
-			"Naga Trinity":
-			{
-				size: [3, 3],
-				vLedNames: ["ScrollWheel", "Logo", "Side Panel"],
-				vLedPositions: [[0, 0], [0, 2], [1, 1]],
-				maxDPI: 12400
-			},
-			"Naga X":
-			{
-				size: [3, 3],
-				vLedNames: ["ScrollWheel", "Side Panel"],
-				vLedPositions: [[1, 0], [0, 1]],
-				maxDPI: 18000
-			},
-			"Orochi V2":
-			{
-				size: [0, 0],
-				vLedNames: [],
-				vLedPositions: [],
-				maxDPI: 18000
-			},
-			"Viper 8KHz":
-			{
-				size: [2, 2],
-				vLedNames: ["Mouse"],
-				vLedPositions: [[1, 1]],
-				maxDPI: 12400
-			},
-			"Viper":
-			{
-				size: [2, 2],
-				vLedNames: ["Mouse"],
-				vLedPositions: [[1, 1]],
-				maxDPI: 12400
-			},
-			"Viper V2 Pro":
-			{
-				size: [0, 0],
-				vLedNames: [],
-				vLedPositions: [],
-				maxDPI: 30000
-			},
-			"Viper Mini":
-			{
-				size: [2, 2],
-				vLedNames: ["Mouse"],
-				vLedPositions: [[1, 1]],
-				maxDPI: 12400
-			},
-			"Viper Ultimate":
-			{
-				size: [2, 2],
-				vLedNames: ["Mouse"],
-				vLedPositions: [[1, 1]],
-				maxDPI: 12400,
-				wireless: true
-			},
-
-			//Keebs
-
 			"Blackwidow V3 Mini" :
 			{
 				size : [15, 6],
@@ -567,9 +350,110 @@ export class deviceLibrary {
 				],
 				endpoint : { "interface": 3, "usage": 0x0001, "usage_page": 0x000C },
 				DeviceType : "Keyboard",
-				ledsToSend : 15
+				LEDsPerPacket : 15,
+				image: "https://assets.signalrgb.com/devices/brands/razer/keyboards/blackwidow-v3-mini.png"
 			},
+			"Blackwidow V4" :
+			{
+				size : [25, 9],
+				vKeys :
+				[
+					1,   2,   4,   5,   6,   7,   8,  9,   10,  11,  12,  13,  14,  15,       16,  17,  18,	19,  20,  21,  22,	//21
+					24,  25,  26,  27,  28,  29,  30,  31,  32,  33,  34,  35,  36,  37,  38,  39,  40,  41,   42,  43,  44,  45,	//22
+					47,  48,  49,  50,  51,  52,  53,  54,  55,  56,  57,  58,  59,  60,  61,	62,  63,  64,   65,  66,  67,  68,	//22
+					70,  71,  72,  73,  74,  75,  76,  77,  78,  79,  80,  81,  82,       84,					88,  89,  90,		//17
+					93,  94,  96,  97,  98,  99,  100, 101, 102, 103, 104, 105, 107,     			 109,		111, 112, 113, 114,	//18
+					116, 117, 118, 119,                123,                127, 128, 129, 130, 131, 132, 133,	135,	  136,		//14
 
+					138, 147, //2
+					139, 148, //2
+					140, 149, //2
+					141, 150, //2
+					142, 151, //2
+					143, 152, //2
+					144, 153, //2
+					145, 154, //2
+					146, 155, //2
+				],
+				vLedNames :
+				[
+					"M6", "Esc", "F1", "F2", "F3", "F4", "F5", "F6", "F7", "F8", "F9", "F10", "F11", "F12",   "Print Screen", "Scroll Lock", "Pause Break", "Rewind", "Pause", "Skip", "Mute",					//21
+					"M5", "`", "1",  "2", "3", "4", "5",  "6", "7", "8", "9", "0",  "-",   "+",  "Backspace",           "Insert",       "Home",        "Page Up",     "NumLock", "Num /", "Num *", "Num -",		//22
+					"M4", "Tab", "Q", "W", "E", "R", "T", "Y", "U", "I", "O", "P", "[", "]", "\\",                      "Del",          "End",         "Page Down",   "Num 7", "Num 8", "Num 9", "Num +",		//22
+					"M3", "CapsLock", "A", "S", "D", "F", "G", "H", "J", "K", "L", ";", "'", "Enter",                                                  		          "Num 4", "Num 5", "Num 6",				//17
+					"M2", "Left Shift", "Z", "X", "C", "V", "B", "N", "M", ",", ".", "/", "Right Shift",                   	   "Up Arrow",                            "Num 1", "Num 2", "Num 3", "Num Enter",	//18
+					"M1", "Left Ctrl", "Left Win", "Left Alt", "Space", "Right Alt", "Fn", "Menu", "Right Ctrl",      "Left Arrow",  "Down Arrow", "Right Arrow",     "Num 0", "Num .",							//14
+
+					"Underglow Left LED 1", "Underglow Right LED 1", //2
+					"Underglow Left LED 2", "Underglow Right LED 2", //2
+					"Underglow Left LED 3", "Underglow Right LED 3", //2
+					"Underglow Left LED 4", "Underglow Right LED 4", //2
+					"Underglow Left LED 5", "Underglow Right LED 5", //2
+					"Underglow Left LED 6", "Underglow Right LED 6", //2
+					"Underglow Left LED 7", "Underglow Right LED 7", //2
+					"Underglow Left LED 8", "Underglow Right LED 8", //2
+					"Underglow Left LED 9", "Underglow Right LED 9", //2
+				],
+				vLedPositions :
+				[
+					[1, 1], [2, 1],			[4, 1], [5, 1], [6, 1], [7, 1],			[9, 1], [10, 1], [11, 1], [12, 1], [13, 1], [14, 1], [15, 1], [16, 1], [17, 1], [18, 1], [19, 1], [20, 1], [21, 1], [22, 1], [23, 1],	//21
+					[1, 2], [2, 2], [3, 2], [4, 2], [5, 2], [6, 2], [7, 2], [8, 2], [9, 2], [10, 2], [11, 2], [12, 2], [13, 2], [14, 2], [15, 2], 		   [17, 2], [18, 2], [19, 2], [20, 2], [21, 2], [22, 2], [23, 2],	//22
+					[1, 3], [2, 3], [3, 3], [4, 3], [5, 3], [6, 3], [7, 3], [8, 3], [9, 3], [10, 3], [11, 3], [12, 3], [13, 3], [14, 3], [15, 3], 		   [17, 3], [18, 3], [19, 3], [20, 3], [21, 3], [22, 3], [23, 3],	//22
+					[1, 4], [2, 4], [3, 4], [4, 4], [5, 4], [6, 4], [7, 4], [8, 4], [9, 4], [10, 4], [11, 4], [12, 4], [13, 4], [14, 4],                           		              [20, 4], [21, 4], [22, 4],			//17
+					[1, 5], [2, 5], 		[4, 5], [5, 5], [6, 5], [7, 5], [8, 5], [9, 5], [10, 5], [11, 5], [12, 5], [13, 5], [14, 5],  		            		[18, 5],          [20, 5], [21, 5], [22, 5], [23, 5],	//18
+					[1, 6], [2, 6], [3, 6], [4, 6],                                 [9, 6],                            [13, 6], [14, 6], [15, 6], [16, 6], [17, 6], [18, 6], [19, 6], [20, 6], 			[22, 6],			//14
+
+					[0, 0], [24, 0], //2
+					[0, 1], [24, 1], //2
+					[0, 2], [24, 2], //2
+					[0, 3], [24, 3], //2
+					[0, 4], [24, 4], //2
+					[0, 5], [24, 5], //2
+					[0, 6], [24, 6], //2
+					[0, 7], [24, 7], //2
+					[0, 8], [24, 8], //2
+
+				],
+				endpoint : { "interface": 3, "usage": 0x0000, "usage_page": 0x0001 },
+				DeviceType : "Keyboard",
+				LEDsPerPacket : 23,
+				image: "https://assets.signalrgb.com/devices/brands/razer/keyboards/blackwidow-v4.png"
+			},
+			"Blackwidow V4 X" :
+			{
+				size : [23, 6],
+				vKeys :
+				[
+					0,   1,   3,   4,   5,   6,   7,  8,   9,  10,  11,  12,  13,  14,       15,  16,  17,
+					22,  23,  24,  25,  26,  27,  28,  29,  30,  31,  32,  33,  34,  35,  36,  37,  38,  39,   40,  41,  42,  43,
+					44,  45,  46,  47,  48,  49,  50,  51,  52,  53,  54,  55,  56,  57,  58,	59,  60,  61,   62,  63,  64, 65,
+					66,  67,  68,  69,  70,  71,  72,  73,  74,  75,  76,  77,  78,       80,					84,  85,  86,
+					88,  89,  	91,  92,  93,  94,  95, 96, 97, 98, 99, 100,     102,  		            104,	106, 107, 108, 109,
+					110, 111, 112, 113,                117,                121, 122, 123, 124, 125, 126, 127,	129,	  130,
+				],
+				vLedNames :
+				[
+					"M6", "Esc", "F1", "F2", "F3", "F4", "F5", "F6", "F7", "F8", "F9", "F10", "F11", "F12",   		"Print Screen", "Scroll Lock", "Pause Break",					//21
+					"M5", "`", "1",  "2", "3", "4", "5",  "6", "7", "8", "9", "0",  "-",   "+",  "Backspace",           "Insert",       "Home",        "Page Up",     "NumLock", "Num /", "Num *", "Num -",		//22
+					"M4", "Tab", "Q", "W", "E", "R", "T", "Y", "U", "I", "O", "P", "[", "]", "\\",                      "Del",          "End",         "Page Down",   "Num 7", "Num 8", "Num 9", "Num +",		//22
+					"M3", "CapsLock", "A", "S", "D", "F", "G", "H", "J", "K", "L", ";", "'", "Enter",                                                  		          "Num 4", "Num 5", "Num 6",				//17
+					"M2", "Left Shift", "Z", "X", "C", "V", "B", "N", "M", ",", ".", "/", "Right Shift",                   	   "Up Arrow",                            "Num 1", "Num 2", "Num 3", "Num Enter",	//18
+					"M1", "Left Ctrl", "Left Win", "Left Alt", "Space", "Right Alt", "Fn", "Menu", "Right Ctrl",      "Left Arrow",  "Down Arrow", "Right Arrow",     "Num 0", "Num .",							//14
+				],
+				vLedPositions :
+				[
+					[0, 0], [1, 0],			[3, 0], [4, 0], [5, 0], [6, 0],			[8, 0], [9, 0], [10, 0], [11, 0], [12, 0], [13, 0], [14, 0], [15, 0], 	[16, 0], [17, 0], [18, 0],	//21
+					[0, 1], [1, 1], [2, 1], [3, 1], [4, 1], [5, 1], [6, 1], [7, 1], [8, 1], [9, 1], [10, 1], [11, 1], [12, 1], [13, 1], [14, 1],			[16, 1], [17, 1], [18, 1],	[19, 1], [20, 1], [21, 1], [22, 1],	//22
+					[0, 2], [1, 2], [2, 2], [3, 2], [4, 2], [5, 2], [6, 2], [7, 2], [8, 2], [9, 2], [10, 2], [11, 2], [12, 2], [13, 2], [14, 2], 		   	[16, 2], [17, 2], [18, 2],	[19, 2], [20, 2], [21, 2], [22, 2],	//22
+					[0, 3], [1, 3], [2, 3], [3, 3], [4, 3], [5, 3], [6, 3], [7, 3], [8, 3], [9, 3], [10, 3], [11, 3], [12, 3], [13, 3],													[19, 3], [20, 3], [21, 3],			//17
+					[0, 4], [1, 4], 		[3, 4], [4, 4], [5, 4], [6, 4], [7, 4], [8, 4], [9, 4], [10, 4], [11, 4], [12, 4], [13, 4],  		            		 [17, 4],			[19, 4], [20, 4], [21, 4], [22, 4],	//18
+					[0, 5], [1, 5], [2, 5], [3, 5],                                 [8, 5],                           [12, 5], [13, 5], [14, 5], [15, 5], 	[16, 5], [17, 5], [18, 5],	[19, 5], 		  [21, 5],			//14
+				],
+				endpoint : { "interface": 2, "usage": 0x0002, "usage_page": 0x0001 },
+				DeviceType : "Keyboard",
+				LEDsPerPacket : 21,
+				image: "https://assets.signalrgb.com/devices/brands/razer/keyboards/blackwidow-v4-x.png"
+			},
 			"Blackwidow V4 Pro" :
 			{
 				size : [25, 13],
@@ -579,14 +463,14 @@ export class deviceLibrary {
 					139,  1,   2,   4,   5,   6,   7,   8,  9,   10,  11,  12,  13,  14,  15,       16,  17,  18,	19,  20,  21,  22,	    154,
 					140, 24,  25,  26,  27,  28,  29,  30,  31,  32,  33,  34,  35,  36,  37,  38,  39,  40,  41,   42,  43,  44,  45,      153,
 					141, 47,  48,  49,  50,  51,  52,  53,  54,  55,  56,  57,  58,  59,  60,  61,	62,  63,  64,   65,  66,  67,  68,      152,
-					142, 70,  71,  72,  73,  74,  75,  76,  77,  78,  79,  80,  81,  82,       84,					88,  89,  90, 		    151,
-					143, 93,  94,  96,  97,  98,  99,  100, 101, 102, 103, 104, 105, 107,     			 109,		111, 112, 113, 114,     150,
+					142, 70,  71,  72,  73,  74,  75,  76,  77,  78,  79,  80,  81,  82,  83,  84,					88,  89,  90, 		    151,
+					143, 93,  94,  95,  96,  97,  98,  99,  100, 101, 102, 103, 104, 105, 107,			 109,		111, 112, 113, 114,     150,
 					144, 116, 117, 118, 119,                123,                127, 128, 129, 130, 131, 132, 133,	135,	  136,			149,
-					145,																						  							148,
-					146,																					      							147,
-					161,																						  							180,
-					162,																													179,
-					163,																						  							178,
+					145, 148,
+					146, 147,
+					161, 180,
+					162, 179,
+					163, 178,
 					164, 165, 166, 167, 168, 169, 170, 171, 172, 173, 174, 175, 176, 177
 				],
 
@@ -596,14 +480,14 @@ export class deviceLibrary {
 					"Underglow Left LED 2", "Volume Wheel", "Esc", "F1", "F2", "F3", "F4", "F5", "F6", "F7", "F8", "F9", "F10", "F11", "F12",   "Print Screen", "Scroll Lock", "Pause Break", "Rewind", "Pause", "Skip", "Mute",       "Underglow Right LED 2", //23
 					"Underglow Left LED 3", "M5", "`", "1",  "2", "3", "4", "5",  "6", "7", "8", "9", "0",  "-",   "+",  "Backspace",           "Insert",       "Home",        "Page Up",     "NumLock", "Num /", "Num *", "Num -",	   "Underglow Right LED 3", //24
 					"Underglow Left LED 4", "M4", "Tab", "Q", "W", "E", "R", "T", "Y", "U", "I", "O", "P", "[", "]", "\\",                      "Del",          "End",         "Page Down",   "Num 7", "Num 8", "Num 9", "Num +",      "Underglow Right LED 4", //24
-					"Underglow Left LED 5", "M3", "CapsLock", "A", "S", "D", "F", "G", "H", "J", "K", "L", ";", "'", "Enter",                                                  		          "Num 4", "Num 5", "Num 6",               "Underglow Right LED 5", //19
-					"Underglow Left LED 6", "M2", "Left Shift", "Z", "X", "C", "V", "B", "N", "M", ",", ".", "/", "Right Shift",                   	   "Up Arrow",                            "Num 1", "Num 2", "Num 3", "Num Enter",  "Underglow Right LED 6", //20
+					"Underglow Left LED 5", "M3", "CapsLock", "A", "S", "D", "F", "G", "H", "J", "K", "L", ";", "'", "ISO_#", "Enter",														  "Num 4", "Num 5", "Num 6",               "Underglow Right LED 5", //19
+					"Underglow Left LED 6", "M2", "Left Shift", "ISO_<", "Z", "X", "C", "V", "B", "N", "M", ",", ".", "/", "Right Shift",					 "Up Arrow",					  "Num 1", "Num 2", "Num 3", "Num Enter",  "Underglow Right LED 6", //20
 					"Underglow Left LED 7", "M1", "Left Ctrl", "Left Win", "Left Alt", "Space", "Right Alt", "Fn", "Menu", "Right Ctrl",      "Left Arrow",  "Down Arrow", "Right Arrow",     "Num 0", "Num .",                        "Underglow Right LED 7", //16
-					"Underglow Left LED 8",                                                                                                                                                                                            "Underglow Right LED 8",
-					"Underglow Left LED 9",                                                                                                                                                                                            "Underglow Right LED 9",
-					"Underglow Left LED 10",                                                                                                                                                                                           "Underglow Right LED 10",
-					"Underglow Left LED 11",                                                                                                                                                                                           "Underglow Right LED 11",
-					"Underglow Left LED 12",                                                                                                                                                                                           "Underglow Right LED 12",
+					"Underglow Left LED 8", "Underglow Right LED 8",
+					"Underglow Left LED 9", "Underglow Right LED 9",
+					"Underglow Left LED 10", "Underglow Right LED 10",
+					"Underglow Left LED 11", "Underglow Right LED 11",
+					"Underglow Left LED 12", "Underglow Right LED 12",
 					"Underglow Left LED 13",  "Underglow Bottom 1", "Underglow Bottom 2", "Underglow Bottom 3", "Underglow Bottom 4", "Underglow Bottom 5", "Underglow Bottom 6", "Underglow Bottom 7", "Underglow Bottom 8", "Underglow Bottom 9", "Underglow Bottom 10", "Underglow Bottom 11", "Underglow Bottom 12", "Underglow Right LED 13",
 				],
 
@@ -613,22 +497,384 @@ export class deviceLibrary {
 					[0, 1], [1, 1], [2, 1],			[4, 1], [5, 1], [6, 1], [7, 1],			[9, 1], [10, 1], [11, 1], [12, 1], [13, 1], [14, 1], [15, 1], [16, 1], [17, 1], [18, 1], [19, 1], [20, 1], [21, 1], [22, 1], [23, 1], [24, 1], //23
 					[0, 2], [1, 2], [2, 2], [3, 2], [4, 2], [5, 2], [6, 2], [7, 2], [8, 2], [9, 2], [10, 2], [11, 2], [12, 2], [13, 2], [14, 2], [15, 2], 		   [17, 2], [18, 2], [19, 2], [20, 2], [21, 2], [22, 2], [23, 2], [24, 2], //24
 					[0, 3], [1, 3], [2, 3], [3, 3], [4, 3], [5, 3], [6, 3], [7, 3], [8, 3], [9, 3], [10, 3], [11, 3], [12, 3], [13, 3], [14, 3], [15, 3], 		   [17, 3], [18, 3], [19, 3], [20, 3], [21, 3], [22, 3], [23, 3], [24, 3], //24
-					[0, 4], [1, 4], [2, 4], [3, 4], [4, 4], [5, 4], [6, 4], [7, 4], [8, 4], [9, 4], [10, 4], [11, 4], [12, 4], [13, 4], [14, 4],                           		              [20, 4], [21, 4], [22, 4],		  [24, 4], //19
-					[0, 5], [1, 5], [2, 5], 		[4, 5], [5, 5], [6, 5], [7, 5], [8, 5], [9, 5], [10, 5], [11, 5], [12, 5], [13, 5], [14, 5],  		            		[18, 5],          [20, 5], [21, 5], [22, 5], [23, 5], [24, 5], //19
+					[0, 4], [1, 4], [2, 4], [3, 4], [4, 4], [5, 4], [6, 4], [7, 4], [8, 4], [9, 4], [10, 4], [11, 4], [12, 4], [13, 4], [14, 4], [15, 4],                  		              [20, 4], [21, 4], [22, 4],		  [24, 4], //19
+					[0, 5], [1, 5], [2, 5], [3, 5], [4, 5], [5, 5], [6, 5], [7, 5], [8, 5], [9, 5], [10, 5], [11, 5], [12, 5], [13, 5], [14, 5],  		            		[18, 5],          [20, 5], [21, 5], [22, 5], [23, 5], [24, 5], //19
 					[0, 6], [1, 6], [2, 6], [3, 6], [4, 6],                                 [9, 6],                            [13, 6], [14, 6], [15, 6], [16, 6], [17, 6], [18, 6], [19, 6], [20, 6], 			[22, 6],		  [24, 6],
-					[0, 7],																																																		  [24, 7],
-					[0, 8],																																																		  [24, 8],
-					[0, 9],																																																		  [24, 9],
-					[0, 10],																																																	  [24, 10],
-					[0, 11],																																																	  [24, 11],
-					[0, 12],     [1, 12],        [3, 12],       [5, 12],        [7, 12],       [9, 12],        [11, 12],        [13, 12],        [15, 12],		[17, 12], 	[19, 12], [21, 12], [23, 12],						  [24, 12]
+					[0, 7], [24, 7],
+					[0, 8], [24, 8],
+					[0, 9], [24, 9],
+					[0, 10], [24, 10],
+					[0, 11], [24, 11],
+					[0, 12], [1, 12], [3, 12], [5, 12], [7, 12], [9, 12], [11, 12], [13, 12], [15, 12], [17, 12], [19, 12], [21, 12], [23, 12], [24, 12]
 
 				],
 				endpoint : { "interface": 3, "usage": 0x0000, "usage_page": 0x0001 },
 				DeviceType : "Keyboard",
-				ledsToSend : 23
-			}
+				LEDsPerPacket : 23,
+				image: "https://assets.signalrgb.com/devices/brands/razer/keyboards/blackwidow-v4-pro.png"
+			},
+			"Blackwidow V4 75%" :
+			{
+				size : [17, 9],
+				vKeys :
+				[
+					0,  1,   2,   3,  4,   5,   6,   7,   8,   9,   10,    11,   12,   13,  14,	//15
+					18, 19,  20,  21,  22,  23,  24,  25,  26,  27,   28,   29,	  30,   32,  33,	//15
+					36, 37,  38,  39,  40,  41,  42,  43,  44,  45,   46,   47,   48,   49,  50,	//15
+					54, 55,  56,  57,  58,  59,  60,  61,  62,  63,   64,   65,         67,  68,	//14
+					72,      74,  75,  76,  77,  78,  79,  80,  81,   82,   83,   85,   86,  87,	//14
+					90, 91, 92,                  94,            97,   98,   100,   101,   102,  103,	//10
 
+					108, 117,	//2
+					109, 118,	//2
+					110, 119,	//2
+					111, 120,	//2
+					112, 121,	//2
+					113, 122,	//2
+					114, 123,	//2
+					115, 124,	//2
+					116, 125,	//2
+				],
+				vLedNames :
+				[
+					"Esc", "F1", "F2", "F3", "F4", "F5", "F6", "F7", "F8", "F9", "F10", "F11", "F12", "Play/Pause", "Mute",						//15
+					"`", "1",  "2", "3", "4", "5",  "6", "7", "8", "9", "0",  "-",   "+",  "Backspace", "Del",									//15
+					"Tab", "Q", "W", "E", "R", "T", "Y", "U", "I", "O", "P", "[", "]", "\\", "Page Up",											//15
+					"CapsLock", "A", "S", "D", "F", "G", "H", "J", "K", "L", ";", "'", "Enter", "Page Down",									//14
+					"Left Shift", "Z", "X", "C", "V", "B", "N", "M", ",", ".", "/", "Right Shift", "Up Arrow", "Insert",						//14
+					"Left Ctrl", "Left Win", "Left Alt", "Space", "Right Alt", "Fn",  "Right Ctrl", "Left Arrow",  "Down Arrow", "Right Arrow", //10
+
+					"Underglow Left LED 1", "Underglow Right LED 1", //2
+					"Underglow Left LED 2", "Underglow Right LED 2", //2
+					"Underglow Left LED 3", "Underglow Right LED 3", //2
+					"Underglow Left LED 4", "Underglow Right LED 4", //2
+					"Underglow Left LED 5", "Underglow Right LED 5", //2
+					"Underglow Left LED 6", "Underglow Right LED 6", //2
+					"Underglow Left LED 7", "Underglow Right LED 7", //2
+					"Underglow Left LED 8", "Underglow Right LED 8", //2
+					"Underglow Left LED 9", "Underglow Right LED 9", //2
+				],
+				vLedPositions :
+				[
+					[1, 1],	[2, 1], [3, 1], [4, 1], [5, 1],	[6, 1],	[7, 1], [8, 1], [9, 1], [10, 1], [11, 1], [12, 1], [13, 1], [14, 1], [15, 1],	//15
+					[1, 2], [2, 2], [3, 2], [4, 2], [5, 2], [6, 2], [7, 2], [8, 2], [9, 2], [10, 2], [11, 2], [12, 2], [13, 2], [14, 2], [15, 2],	//15
+					[1, 3], [2, 3], [3, 3], [4, 3], [5, 3], [6, 3], [7, 3], [8, 3], [9, 3], [10, 3], [11, 3], [12, 3], [13, 3], [14, 3], [15, 3],	//15
+					[1, 4], [2, 4], [3, 4], [4, 4], [5, 4], [6, 4], [7, 4], [8, 4], [9, 4], [10, 4], [11, 4], [12, 4], 			[14, 4], [15, 4],	//14
+					[1, 5],  		[3, 5],	[4, 5], [5, 5], [6, 5], [7, 5], [8, 5], [9, 5], [10, 5], [11, 5], [12, 5], [13, 5], [14, 5], [15, 5],	//14
+					[1, 6], [2, 6], [3, 6],					[6, 6],							[10, 6], [11, 6], [12, 6], [13, 6], [14, 6], [15, 6],	//10
+
+					[0, 0], [16, 0], //2
+					[0, 1], [16, 1], //2
+					[0, 2], [16, 2], //2
+					[0, 3], [16, 3], //2
+					[0, 4], [16, 4], //2
+					[0, 5], [16, 5], //2
+					[0, 6], [16, 6], //2
+					[0, 7], [16, 7], //2
+					[0, 8], [16, 8], //2
+
+				],
+				endpoint : { "interface": 3, "usage": 0x0000, "usage_page": 0x0001 },
+				DeviceType : "Keyboard",
+				LEDsPerPacket : 18,
+				image: "https://assets.signalrgb.com/devices/brands/razer/keyboards/blackwidow-v4-75.png"
+			},
+			"Huntsman Mini" :
+			{
+				size : [15, 5],
+				vKeys :
+				[
+					1,  2,  3,  4,  5,  6,  7,  8,  9,  10,  11, 12, 13,     14,
+					16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28,     29,
+					31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42,     44,
+					46,     48, 49, 50, 51, 52, 53, 54, 55, 56, 57,     59,
+					61, 62, 63,             67,                 71, 72, 73, 74,
+				],
+
+				vLedNames :
+				[
+					"Esc", "1", "2", "3", "4", "5", "6", "7", "8", "9", "0", "-_", "=+", "Backspace",
+					"Tab", "Q", "W", "E", "R", "T", "Y", "U", "I", "O", "P", "[", "]", "\\",
+					"CapsLock", "A", "S", "D", "F", "G", "H", "J", "K", "L", ";", "'", "Enter",
+					"Left Shift", "Z", "X", "C", "V", "B", "N", "M", ",", ".", "/", "Right Shift",
+					"Left Ctrl", "Left Win", "Left Alt", "Space", "Right Alt", "Fn", "Menu", "Right Ctrl",
+				],
+
+				vLedPositions :
+				[
+					[0, 0], [1, 0], [2, 0], [3, 0], [4, 0], [5, 0], [6, 0], [7, 0], [8, 0], [9, 0], [10, 0], [11, 0], [12, 0],			[14, 0],           //15
+					[0, 1], [1, 1], [2, 1], [3, 1], [4, 1], [5, 1], [6, 1], [7, 1], [8, 1], [9, 1], [10, 1], [11, 1], [12, 1],			[14, 1],           //15
+					[0, 2], [1, 2], [2, 2], [3, 2], [4, 2], [5, 2], [6, 2], [7, 2], [8, 2], [9, 2], [10, 2], [11, 2],		   [13, 2],            //14
+					[0, 3],			[2, 3], [3, 3], [4, 3], [5, 3], [6, 3], [7, 3], [8, 3], [9, 3], [10, 3], [11, 3],		   [13, 3],                    //14
+					[0, 4], [1, 4], [2, 4],							[6, 4],									 [11, 4], [12, 4], [13, 4], [14, 4],           //10
+				],
+				endpoint : { "interface": 2, "usage": 0x0002, "usage_page": 0x0001 },
+				DeviceType : "Keyboard",
+				LEDsPerPacket : 15,
+				image: "https://assets.signalrgb.com/devices/brands/razer/keyboards/huntsman-mini.png"
+			},
+			"Huntsman V2" :
+			{
+				size : [21, 6],
+				vKeys :
+				[
+					0,	2,	3,	4,	5,	6,  7,	8,  9, 10, 11, 12, 13,			14, 15, 16,	 	17, 18, 19, 20,
+					22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35,		36, 37, 38,		39, 40, 41, 42,
+					44, 45, 46, 47, 48, 49, 50, 51, 52, 53, 54, 55, 56, 57,		58, 59, 60,		61, 62, 63, 64,
+					66, 67, 68, 69, 70, 71, 72, 73, 74, 75, 76, 77,		79,						83, 84, 85,
+					88,		90, 91, 92, 93, 94, 95, 96, 97, 98, 99,	  	101,		103,		105, 106, 107, 108,
+					110, 111, 112,           116,		120, 121, 122,	123,	124, 125, 126,	128,	129,
+				],
+				vLedNames :
+				[
+					"Esc", "F1", "F2", "F3", "F4", "F5", "F6", "F7", "F8", "F9", "F10", "F11", "F12",		"Print Screen", "Scroll Lock", "Pause Break",	"MediaPreviousTrack", "MediaPlayPause", "MediaNextTrack", "AudioMute",
+					"`", "1",  "2", "3", "4", "5",  "6", "7", "8", "9", "0",  "-",   "+",  "Backspace",		"Insert",       "Home",        "Page Up",		"NumLock", "Num /", "Num *", "Num -",		//22
+					"Tab", "Q", "W", "E", "R", "T", "Y", "U", "I", "O", "P", "[", "]", "\\",				"Del",          "End",         "Page Down",		"Num 7", "Num 8", "Num 9", "Num +",		//22
+					"CapsLock", "A", "S", "D", "F", "G", "H", "J", "K", "L", ";", "'", "Enter",																"Num 4", "Num 5", "Num 6",				//17
+					"Left Shift", "Z", "X", "C", "V", "B", "N", "M", ",", ".", "/", "Right Shift",                   	   "Up Arrow",						"Num 1", "Num 2", "Num 3", "Num Enter",	//18
+					"Left Ctrl", "Left Win", "Left Alt", "Space", "Right Alt", "Fn", "Menu", "Right Ctrl",	"Left Arrow",  "Down Arrow", "Right Arrow",		"Num 0", "Num .",							//14
+				],
+				vLedPositions :
+				[
+					[0, 0], 		[2, 0], [3, 0], [4, 0], [5, 0], [6, 0], [7, 0], [8, 0], [9, 0], [10, 0], [11, 0], [12, 0], [13, 0],		[14, 0], [15, 0], [16, 0],	[17, 0], [18, 0], [19, 0], [20, 0], //21
+					[0, 1], [1, 1], [2, 1], [3, 1], [4, 1], [5, 1], [6, 1], [7, 1], [8, 1], [9, 1], [10, 1], [11, 1], [12, 1], [13, 1],		[14, 1], [15, 1], [16, 1],	[17, 1], [18, 1], [19, 1], [20, 1],	//22
+					[0, 2], [1, 2], [2, 2], [3, 2], [4, 2], [5, 2], [6, 2], [7, 2], [8, 2], [9, 2], [10, 2], [11, 2], [12, 2], [13, 2],		[14, 2], [15, 2], [16, 2],	[17, 2], [18, 2], [19, 2], [20, 2],	//22
+					[0, 3], [1, 3], [2, 3], [3, 3], [4, 3], [5, 3], [6, 3], [7, 3], [8, 3], [9, 3], [10, 3], [11, 3], 		   [13, 3],									[17, 3], [18, 3], [19, 3],			//17
+					[0, 4], 		[2, 4], [3, 4], [4, 4], [5, 4], [6, 4], [7, 4], [8, 4], [9, 4], [10, 4], [11, 4],          [13, 4],				 [15, 4],			[17, 4], [18, 4], [19, 4], [20, 4],	//18
+					[0, 5], [1, 5], [2, 5],                 		[6, 5],                       	[10, 5], [11, 5], [12, 5], [13, 5],		[14, 5], [15, 5], [16, 5],	[17, 5],		  [19, 5],	//14
+				],
+				endpoint : { "interface": 3, "usage": 0x0001, "usage_page": 0x000C },
+				DeviceType : "Keyboard",
+				LEDsPerPacket : 22,
+				image: "https://assets.signalrgb.com/devices/brands/razer/keyboards/huntsman-v2.png"
+			},
+			"Huntsman V2 TKL" :
+			{
+				size : [17, 6],
+				vKeys :
+				[
+					1,		3,	4,	5,	6,	7,  8,	9,  10, 11, 12, 13, 14,		15, 16, 17,
+					23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36,		37, 38, 39,
+					45, 46, 47, 48, 49, 50, 51, 52, 53, 54, 55, 56, 57, 58,		59, 60, 61,
+					67, 68, 69, 70, 71, 72, 73, 74, 75, 76, 77, 78,     80,
+					89, 91, 92, 93, 94, 95, 96, 97, 98, 99, 100,	   102,	 	    104,
+					111, 112, 113,           116,       120, 122, 123, 124,		125, 126, 127,
+				],
+				vLedNames :
+				[
+					"Esc", "F1", "F2", "F3", "F4", "F5", "F6", "F7", "F8", "F9", "F10", "F11", "F12",		"Print Screen", "Scroll Lock", "Pause Break",
+					"`", "1",  "2", "3", "4", "5",  "6", "7", "8", "9", "0",  "-",   "+",  "Backspace",		"Insert",       "Home",        "Page Up",
+					"Tab", "Q", "W", "E", "R", "T", "Y", "U", "I", "O", "P", "[", "]", "\\",				"Del",          "End",         "Page Down",
+					"CapsLock", "A", "S", "D", "F", "G", "H", "J", "K", "L", ";", "'", "Enter",
+					"Left Shift", "Z", "X", "C", "V", "B", "N", "M", ",", ".", "/", "Right Shift",                   	   "Up Arrow",
+					"Left Ctrl", "Left Win", "Left Alt", "Space", "Right Alt", "Fn", "Menu", "Right Ctrl",	"Left Arrow",  "Down Arrow", "Right Arrow",
+				],
+				vLedPositions :
+				[
+					[0, 0], 		[2, 0], [3, 0], [4, 0], [5, 0], [6, 0], [7, 0], [8, 0], [9, 0], [10, 0], [11, 0], [12, 0], [13, 0],		[14, 0], [15, 0], [16, 0],
+					[0, 1], [1, 1], [2, 1], [3, 1], [4, 1], [5, 1], [6, 1], [7, 1], [8, 1], [9, 1], [10, 1], [11, 1], [12, 1], [13, 1],		[14, 1], [15, 1], [16, 1],
+					[0, 2], [1, 2], [2, 2], [3, 2], [4, 2], [5, 2], [6, 2], [7, 2], [8, 2], [9, 2], [10, 2], [11, 2], [12, 2], [13, 2],		[14, 2], [15, 2], [16, 2],
+					[0, 3], [1, 3], [2, 3], [3, 3], [4, 3], [5, 3], [6, 3], [7, 3], [8, 3], [9, 3], [10, 3], [11, 3], 		   [13, 3],
+					[0, 4], 		[2, 4], [3, 4], [4, 4], [5, 4], [6, 4], [7, 4], [8, 4], [9, 4], [10, 4], [11, 4],          [13, 4],				 [15, 4],
+					[0, 5], [1, 5], [2, 5],                 		[6, 5],                       	[10, 5], [11, 5], [12, 5], [13, 5],		[14, 5], [15, 5], [16, 5],
+				],
+				endpoint : { "interface": 3, "usage": 0x0001, "usage_page": 0x000C },
+				DeviceType : "Keyboard",
+				LEDsPerPacket : 22,
+				image: "https://assets.signalrgb.com/devices/brands/razer/keyboards/huntsman-v2-tkl.png"
+			},
+			"Huntsman V2 Analog" :
+			{
+				size : [21, 6],
+				vKeys :
+				[
+					0,    0,    0, 0, 0, 0, 0, 0, 0, 0,  0, 0, 0, 0,		0, 0, 0,		0, 0, 0, 0,		0,
+					0,    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,			0, 0, 0,		0, 0, 0, 0,		0,
+						  0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,			0, 0, 0,		0, 0, 0, 0,
+					0,    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,							0, 0, 0,		0,
+						  0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,					0,			0, 0, 0, 0,
+						  0, 0, 0,			0,			0, 0, 0, 0,			0, 0, 0,		0,	0,
+
+					0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+					0, 0,
+					0, 0,
+					0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+				],
+				vLedNames :
+				[
+					"LightBar Left 1", "Esc", "F1", "F2", "F3", "F4", "F5", "F6", "F7", "F8", "F9", "F10", "F11", "F12",			"Print Screen", "Scroll Lock", "Pause Break",   "Button 1", "Button 2", "Button 3", "Button 4", "LightBar Right 1",
+					"LightBar Left 2", "`", "1", "2", "3", "4", "5", "6", "7", "8", "9", "0", "-_", "=+", "Backspace",				"Insert", "Home", "Page Up",					"NumLock", "Num /", "Num *", "Num -",			"LightBar Right 2",
+									   "Tab", "Q", "W", "E", "R", "T", "Y", "U", "I", "O", "P", "[", "]", "\\",						"Del", "End", "Page Down",						"Num 7", "Num 8", "Num 9", "Num +",
+					"LightBar Left 3", "CapsLock", "A", "S", "D", "F", "G", "H", "J", "K", "L", ";", "'", "Enter",																	"Num 4", "Num 5", "Num 6",						"LightBar Right 3",
+									   "Left Shift", "Z", "X", "C", "V", "B", "N", "M", ",", ".", "/", "Right Shift",					"Up Arrow",									"Num 1", "Num 2", "Num 3", "Num Enter",
+									   "Left Ctrl", "Left Win", "Left Alt", "Space", "Right Alt", "Fn", "Menu", "Right Ctrl",		"Left Arrow", "Down Arrow", "Right Arrow",		"Num 0",		"Num .",
+
+					"LightBar Bottom 1", "LightBar Bottom 2", "LightBar Bottom 3", "LightBar Bottom 4", "LightBar Bottom 5", "LightBar Bottom 6", "LightBar Bottom 7", "LightBar Bottom 8", "LightBar Bottom 9", "LightBar Bottom 10", "LightBar Bottom 11", "LightBar Bottom 12", "LightBar Bottom 13", "LightBar Bottom 14", "LightBar Bottom 15",
+					"Wrist Rest Bar Left 1", "Wrist Rest Bar Right 1",
+					"Wrist Rest Bar Left 2", "Wrist Rest Bar Right 2",
+					"Wrist Rest Bar Bottom 1", "Wrist Rest Bar Bottom 2", "Wrist Rest Bar Bottom 3", "Wrist Rest Bar Bottom 4", "Wrist Rest Bar Bottom 5", "Wrist Rest Bar Bottom 6", "Wrist Rest Bar Bottom 7", "Wrist Rest Bar Bottom 8", "Wrist Rest Bar Bottom 9", "Wrist Rest Bar Bottom 10", "Wrist Rest Bar Bottom 11", "Wrist Rest Bar Bottom 12", "Wrist Rest Bar Bottom 13", "Wrist Rest Bar Bottom 14", "Wrist Rest Bar Bottom 15",
+				],
+				vLedPositions :
+				[
+					[0, 0],  [1, 0], [2, 0], [3, 0], [4, 0], [5, 0], [6, 0], [7, 0], [8, 0], [9, 0], [10, 0], [11, 0], [12, 0], [13, 0],			[15, 0], [16, 0], [17, 0],   [18, 0], [19, 0], [20, 0], [21, 0], [22, 0],
+					[0, 1],  [1, 1], [2, 1], [3, 1], [4, 1], [5, 1], [6, 1], [7, 1], [8, 1], [9, 1], [10, 1], [11, 1], [12, 1], [13, 1], [14, 1],   [15, 1], [16, 1], [17, 1],   [18, 1], [19, 1], [20, 1], [21, 1], [22, 1],
+							 [1, 2], [2, 2], [3, 2], [4, 2], [5, 2], [6, 2], [7, 2], [8, 2], [9, 2], [10, 2], [11, 2], [12, 2], [13, 2], [14, 2],   [15, 2], [16, 2], [17, 2],   [18, 2], [19, 2], [20, 2], [21, 2],
+					[0, 3],  [1, 3], [2, 3], [3, 3], [4, 3], [5, 3], [6, 3], [7, 3], [8, 3], [9, 3], [10, 3], [11, 3], [12, 3],			 [14, 3],								 [18, 3], [19, 3], [20, 3],			 [22, 3],
+							 [1, 4], [2, 4], [3, 4], [4, 4], [5, 4], [6, 4], [7, 4], [8, 4], [9, 4], [10, 4], [11, 4],					 [14, 4],			 [16, 4],			 [18, 4], [19, 4], [20, 4], [21, 4],
+							 [1, 5], [2, 5], [3, 5],                      [7, 5],							  [11, 5], [12, 5], [13, 5], [14, 5],   [15, 5], [16, 5], [17, 5],   [18, 5],		   [20, 5],
+							 [1, 6], [2, 6], [3, 6], [4, 6],		 [6, 6], [7, 6], [8, 6], [9, 6], [10, 6], [11, 6],					 [14, 6], 	[15, 6], 					 [18, 6], [19, 6], [20, 6],
+
+					[0, 7],																																															 [22, 7],
+					[0, 8],																																															 [22, 8],
+							 [1, 8], [2, 8], [3, 8], [4, 8],		 [6, 8], [7, 8], [8, 8], [9, 8], [10, 8], [11, 8], [12, 8],			 [14, 8], [15, 8],						 [18, 8], [19, 8]
+				],
+				endpoint : { "interface": 3, "usage": 0x0001, "usage_page": 0x000C },
+				DeviceType : "Keyboard",
+				LEDsPerPacket : 23,
+				image: "https://assets.signalrgb.com/devices/brands/razer/keyboards/huntsman-v2%20-%20analog.png"
+			},
+			"Huntsman V3 Pro" :
+			{
+				size : [21, 6],
+				vKeys :
+				[
+					1,		3,	4,	5,	6,	7,  8,	9,  10, 11, 12, 13, 14,		15, 16, 17,			18,		130,
+					23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36,		37, 38, 39, 	40, 41, 42, 43,
+					45, 46, 47, 48, 49, 50, 51, 52, 53, 54, 55, 56, 57, 58,		59, 60, 61, 	62, 63, 64, 65,
+					67, 68, 69, 70, 71, 72, 73, 74, 75, 76, 77, 78,     80,						84, 85, 86,
+					89, 91, 92, 93, 94, 95, 96, 97, 98, 99, 100,	   102,	 	    104,		106, 107, 108, 109,
+					111, 112, 113,           117,       121, 122, 123, 124,		125, 126, 127,	128,	129,
+				],
+				vLedNames :
+				[
+					"Esc", "F1", "F2", "F3", "F4", "F5", "F6", "F7", "F8", "F9", "F10", "F11", "F12",		"Print Screen", "Scroll Lock", "Pause Break",			"MediaPlayPause",	"AudioMute",					//21
+					"`", "1",  "2", "3", "4", "5",  "6", "7", "8", "9", "0",  "-",   "+",  "Backspace",		"Insert",       "Home",        "Page Up",		"NumLock", "Num /", "Num *", "Num -",		//22
+					"Tab", "Q", "W", "E", "R", "T", "Y", "U", "I", "O", "P", "[", "]", "\\",				"Del",          "End",         "Page Down",		"Num 7", "Num 8", "Num 9", "Num +",		//22
+					"CapsLock", "A", "S", "D", "F", "G", "H", "J", "K", "L", ";", "'", "Enter",																"Num 4", "Num 5", "Num 6",				//17
+					"Left Shift", "Z", "X", "C", "V", "B", "N", "M", ",", ".", "/", "Right Shift",                   	   "Up Arrow",						"Num 1", "Num 2", "Num 3", "Num Enter",	//18
+					"Left Ctrl", "Left Win", "Left Alt", "Space", "Right Alt", "Fn", "Menu", "Right Ctrl",	"Left Arrow",  "Down Arrow", "Right Arrow",		"Num 0", "Num .",							//14
+				],
+				vLedPositions :
+				[
+					[0, 0], 		[2, 0], [3, 0], [4, 0], [5, 0], [6, 0], [7, 0], [8, 0], [9, 0], [10, 0], [11, 0], [12, 0], [13, 0],   [14, 0], [15, 0], [16, 0],			 [18, 0],		   [20, 0],	//21
+					[0, 1], [1, 1], [2, 1], [3, 1], [4, 1], [5, 1], [6, 1], [7, 1], [8, 1], [9, 1], [10, 1], [11, 1], [12, 1], [13, 1],   [14, 1], [15, 1], [16, 1],	[17, 1], [18, 1], [19, 1], [20, 1],	//22
+					[0, 2], [1, 2], [2, 2], [3, 2], [4, 2], [5, 2], [6, 2], [7, 2], [8, 2], [9, 2], [10, 2], [11, 2], [12, 2], [13, 2],   [14, 2], [15, 2], [16, 2],	[17, 2], [18, 2], [19, 2], [20, 2],	//22
+					[0, 3], [1, 3], [2, 3], [3, 3], [4, 3], [5, 3], [6, 3], [7, 3], [8, 3], [9, 3], [10, 3], [11, 3], 		   [13, 3],									[17, 3], [18, 3], [19, 3],			//17
+					[0, 4], 		[2, 4], [3, 4], [4, 4], [5, 4], [6, 4], [7, 4], [8, 4], [9, 4], [10, 4], [11, 4],          [13, 4],            [15, 4],				[17, 4], [18, 4], [19, 4], [20, 4],	//18
+					[0, 5], [1, 5], [2, 5],                 		[6, 5],                       	[10, 5], [11, 5], [12, 5], [13, 5],   [14, 5], [15, 5], [16, 5],	[17, 5],		  [19, 5],			//14
+				],
+				endpoint : { "interface": 3, "usage": 0x0001, "usage_page": 0x000C },
+				DeviceType : "Keyboard",
+				LEDsPerPacket : 22,
+				image: "https://assets.signalrgb.com/devices/brands/razer/keyboards/huntsman-v3-pro.png"
+			},
+			"Huntsman V3 Pro TKL" :
+			{
+				size : [17, 6],
+				vKeys :
+				[
+					1,   3,   4,   5,   6,   7,   8,   9,  10,  11,  12,  13,  14,       15,       18,
+					23,  24,  25,  26,  27,  28,  29,  30,  31,  32,  33,  34,  35,  36,  37,  38,  39,
+					45,  46,  47,  48,  49,  50,  51,  52,  53,  54,  55,  56,  57,  58,  59,  60,  61,
+					67,  68,  69,  70,  71,  72,  73,  74,  75,  76,  77,  78,       80,
+					89,  91,  92,  93,  94,  95,  96,  97,  98,  99,  100,  102,                104,
+					111, 112, 113,                117,                121, 122, 123, 124, 125, 126, 127,
+				],
+				vLedNames :
+				[
+					"Esc", "F1", "F2", "F3", "F4", "F5", "F6", "F7", "F8", "F9", "F10", "F11", "F12",         "Media buttons", "Volume Wheel", //15
+					"`", "1", "2", "3", "4", "5", "6", "7", "8", "9", "0", "-_", "=+", "Backspace",           "Insert", "Home", "Page Up",  //17
+					"Tab", "Q", "W", "E", "R", "T", "Y", "U", "I", "O", "P", "[", "]", "\\",                  "Del", "End", "Page Down", //17
+					"CapsLock", "A", "S", "D", "F", "G", "H", "J", "K", "L", ";", "'", "Enter", 										//13
+					"Left Shift", "Z", "X", "C", "V", "B", "N", "M", ",", ".", "/", "Right Shift",                          "Up Arrow", //13
+					"Left Ctrl", "Left Win", "Left Alt", "Space", "Right Alt", "Fn", "Menu", "Right Ctrl",    "Left Arrow", "Down Arrow", "Right Arrow", //11
+				],
+				vLedPositions :
+				[
+					[0, 0], 		[2, 0], [3, 0], [4, 0], [5, 0], [6, 0], [7, 0], [8, 0], [9, 0], [10, 0], [11, 0], [12, 0], [13, 0],   [14, 0], 			[16, 0], //15
+					[0, 1], [1, 1], [2, 1], [3, 1], [4, 1], [5, 1], [6, 1], [7, 1], [8, 1], [9, 1], [10, 1], [11, 1], [12, 1], [13, 1],   [14, 1], [15, 1], [16, 1], //17
+					[0, 2], [1, 2], [2, 2], [3, 2], [4, 2], [5, 2], [6, 2], [7, 2], [8, 2], [9, 2], [10, 2], [11, 2], [12, 2], [13, 2],   [14, 2], [15, 2], [16, 2], //17
+					[0, 3], [1, 3], [2, 3], [3, 3], [4, 3], [5, 3], [6, 3], [7, 3], [8, 3], [9, 3], [10, 3], [11, 3], 		   [13, 3],								 //13
+					[0, 4], 		[2, 4], [3, 4], [4, 4], [5, 4], [6, 4], [7, 4], [8, 4], [9, 4], [10, 4], [11, 4],          [13, 4],            [15, 4],			 //13
+					[0, 5], [1, 5], [2, 5],                 		[6, 5],                       	[10, 5], [11, 5], [12, 5], [13, 5],   [14, 5], [15, 5], [16, 5], //11
+				],
+				endpoint : { "interface": 3, "usage": 0x0001, "usage_page": 0x000C },
+				DeviceType : "Keyboard",
+				LEDsPerPacket : 22,
+				image: "https://assets.signalrgb.com/devices/brands/razer/keyboards/huntsman-v3-pro-tkl.png"
+			},
+			"Huntsman V3 Pro Mini" :
+			{
+				size : [14, 5],
+				vKeys :
+				[
+					0,  1,  2,  3,  4,  5,  6,  7,  8,  9,  10, 11, 12, 14,
+					16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29,
+					32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 45,
+					48,     50, 51, 52, 53, 54, 55, 56, 57, 58, 59, 61,
+					64, 65, 66,             70,         74, 75, 76,
+				],
+
+				vLedNames :
+				[
+					"Esc", "1", "2", "3", "4", "5", "6", "7", "8", "9", "0", "-_", "=+", "Backspace",
+					"Tab", "Q", "W", "E", "R", "T", "Y", "U", "I", "O", "P", "[", "]", "\\",
+					"CapsLock", "A", "S", "D", "F", "G", "H", "J", "K", "L", ";", "'", "Enter",
+					"Left Shift", "Z", "X", "C", "V", "B", "N", "M", ",", ".", "/", "Right Shift",
+					"Left Ctrl", "Left Win", "Left Alt", "Space", "Right Alt", "Fn", "Right Ctrl",
+				],
+
+				vLedPositions :
+				[
+					[0, 0], [1, 0], [2, 0], [3, 0], [4, 0], [5, 0], [6, 0], [7, 0], [8, 0], [9, 0], [10, 0], [11, 0], [12, 0], [13, 0],           //15
+					[0, 1], [1, 1], [2, 1], [3, 1], [4, 1], [5, 1], [6, 1], [7, 1], [8, 1], [9, 1], [10, 1], [11, 1], [12, 1], [13, 1],         //15
+					[0, 2], [1, 2], [2, 2], [3, 2], [4, 2], [5, 2], [6, 2], [7, 2], [8, 2], [9, 2], [10, 2], [11, 2], [12, 2],          //14
+					[0, 3], [1, 3], [2, 3], [3, 3], [4, 3], [5, 3], [6, 3], [7, 3], [8, 3], [9, 3], [10, 3], [11, 3],                 //14
+					[0, 4], [1, 4], [2, 4],                         [6, 4],                 [9, 4], [10, 4], [11, 4],         //10
+				],
+				endpoint : { "interface": 3, "usage": 0x0001, "usage_page": 0x000C },
+				DeviceType : "Keyboard",
+				LEDsPerPacket : 15,
+				image: "https://assets.signalrgb.com/devices/brands/razer/keyboards/huntsman-v3-pro-mini.png"
+			},
+			"Ornata V2" :
+			{
+				size : [21, 7],
+				vKeys :
+				[
+					1,		3,	4,	5,	6,	7,  8,	9,  10, 11, 12, 13, 14,		15, 16, 17,		18,	19,	20,	21,
+					23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36,		37, 38, 39, 	40, 41, 42, 43,
+					45, 46, 47, 48, 49, 50, 51, 52, 53, 54, 55, 56, 57, 58,		59, 60, 61, 	62, 63, 64, 65,
+					67, 68, 69, 70, 71, 72, 73, 74, 75, 76, 77, 78,     80,						84, 85, 86,
+					89, 91, 92, 93, 94, 95, 96, 97, 98, 99, 100,	   102,	 	    104,		106, 107, 108, 109,
+					111, 112, 113,           116,       120, 122, 123, 124,		125, 126, 127,	129,	130,
+					121,
+				],
+				vLedNames :
+				[
+					"Esc", "F1", "F2", "F3", "F4", "F5", "F6", "F7", "F8", "F9", "F10", "F11", "F12",		"Print Screen", "Scroll Lock", "Pause Break",	"MediaPreviousTrack", "MediaPlayPause", "MediaNextTrack", "AudioMute",
+					"`", "1",  "2", "3", "4", "5",  "6", "7", "8", "9", "0",  "-",   "+",  "Backspace",		"Insert",       "Home",        "Page Up",		"NumLock", "Num /", "Num *", "Num -",		//22
+					"Tab", "Q", "W", "E", "R", "T", "Y", "U", "I", "O", "P", "[", "]", "\\",				"Del",          "End",         "Page Down",		"Num 7", "Num 8", "Num 9", "Num +",		//22
+					"CapsLock", "A", "S", "D", "F", "G", "H", "J", "K", "L", ";", "'", "Enter",																"Num 4", "Num 5", "Num 6",				//17
+					"Left Shift", "Z", "X", "C", "V", "B", "N", "M", ",", ".", "/", "Right Shift",                   	   "Up Arrow",						"Num 1", "Num 2", "Num 3", "Num Enter",	//18
+					"Left Ctrl", "Left Win", "Left Alt", "Space", "Right Alt", "Fn", "Menu", "Right Ctrl",	"Left Arrow",  "Down Arrow", "Right Arrow",		"Num 0", "Num .",							//14
+					"RazerLogo",
+				],
+				vLedPositions :
+				[
+					[0, 0], 		[2, 0], [3, 0], [4, 0], [5, 0], [6, 0], [7, 0], [8, 0], [9, 0], [10, 0], [11, 0], [12, 0], [13, 0],		[14, 0], [15, 0], [16, 0],	[17, 0], [18, 0], [19, 0], [20, 0], //21
+					[0, 1], [1, 1], [2, 1], [3, 1], [4, 1], [5, 1], [6, 1], [7, 1], [8, 1], [9, 1], [10, 1], [11, 1], [12, 1], [13, 1],		[14, 1], [15, 1], [16, 1],	[17, 1], [18, 1], [19, 1], [20, 1],	//22
+					[0, 2], [1, 2], [2, 2], [3, 2], [4, 2], [5, 2], [6, 2], [7, 2], [8, 2], [9, 2], [10, 2], [11, 2], [12, 2], [13, 2],		[14, 2], [15, 2], [16, 2],	[17, 2], [18, 2], [19, 2], [20, 2],	//22
+					[0, 3], [1, 3], [2, 3], [3, 3], [4, 3], [5, 3], [6, 3], [7, 3], [8, 3], [9, 3], [10, 3], [11, 3], 		   [13, 3],									[17, 3], [18, 3], [19, 3],			//17
+					[0, 4], 		[2, 4], [3, 4], [4, 4], [5, 4], [6, 4], [7, 4], [8, 4], [9, 4], [10, 4], [11, 4],          [13, 4],				 [15, 4],			[17, 4], [18, 4], [19, 4], [20, 4],	//18
+					[0, 5], [1, 5], [2, 5],                 		[6, 5],                       	[10, 5], [11, 5], [12, 5], [13, 5],		[14, 5], [15, 5], [16, 5],	[17, 5],		  [19, 5],	//14
+					[11, 6],
+				],
+				endpoint : { "interface": 2, "usage": 0x0002, "usage_page": 0x0001 },
+				DeviceType : "Keyboard",
+				LEDsPerPacket : 22,
+				image: "https://assets.signalrgb.com/devices/brands/razer/keyboards/ornata-v2.png"
+			},
 		};
 	}
 }
@@ -699,8 +945,6 @@ export class RazerProtocol {
 			AdditionalDeviceFirmwareVersions: [],
 			/** @type {string[]} Stored Serials for Hyperspeed dongles. */
 			AdditionalDeviceSerialNumbers: [],
-			/** Variable to indicate how many LEDs a device has, used in the color send packet for mice. Does not apply for keyboards. */
-			NumberOfLEDs: -1,
 			/** Variable to indicate how many leds should be sent per packet. */
 			LEDsPerPacket: -1,
 			/** Variable to indicate what type of device is connected. */
@@ -721,6 +965,8 @@ export class RazerProtocol {
 			DeviceLEDPositions : [],
 			/** Variable that holds current device's LED vKeys. */
 			DeviceLedIndexes : [],
+			/** Variable that holds current device's layout. */
+			DeviceLayout : 0,
 			/** Variable that holds the current device's Product ID. */
 			DeviceProductId : 0x00,
 			/** Dict for button inputs to map them with names and things. */
@@ -783,9 +1029,16 @@ export class RazerProtocol {
 	getSupportsModernMatrix() { return this.Config.supportsModernMatrix; }
 	setSupportsModernMatrix(supportsModernMatrix) { this.Config.supportsModernMatrix = supportsModernMatrix; }
 
-	getNumberOfLEDs() { return this.Config.NumberOfLEDs; }
-	/** Function for setting the number of LEDs a device has on it.*/
-	setNumberOfLEDs(NumberOfLEDs) { this.Config.NumberOfLEDs = NumberOfLEDs; }
+	/** Function for setting the number of LEDs a device has to send on each packet */
+	getNumberOfLEDsPacket() { return this.Config.LEDsPerPacket; }
+	/** Function for setting device led per packet properties.*/
+	setNumberOfLEDsPacket(NumberOfLEDsPacket) { this.Config.LEDsPerPacket = NumberOfLEDsPacket; }
+
+	/** Function for getting the device image property */
+	getDeviceImage() { return this.Config.image; }
+	/** Function for setting the device image property */
+	setDeviceImage(image) { this.Config.image = image; }
+
 	/** Function for setting device led properties.*/
 	setDeviceProperties() {
 		const layout = razerDeviceLibrary.LEDLibrary[razerDeviceLibrary.PIDLibrary[device.productId()]];
@@ -794,11 +1047,14 @@ export class RazerProtocol {
 			device.log("Valid Library Config found.");
 			device.setName("Razer " + razerDeviceLibrary.PIDLibrary[device.productId()]);
 			device.setSize(layout.size);
+			device.setImageFromUrl(layout.image);
 
 			this.setDeviceLEDNames(layout.vLedNames);
 			this.setDeviceLEDPositions(layout.vLedPositions);
+			this.setNumberOfLEDsPacket(layout.LEDsPerPacket);
 			this.setDeviceProductId(device.productId()); //yay edge cases!
-
+			this.setDeviceImage(layout.image);
+			this.getDeviceLayout();
 
 			if(layout.vKeys) {
 				this.setDeviceLEDIndexes(layout.vKeys);
@@ -808,53 +1064,15 @@ export class RazerProtocol {
 				this.setDeviceType(layout.DeviceType);
 			}
 
-			if(layout.maxDPI) {
-				device.log(`Max DPI: ${layout.maxDPI}`);
-				RazerMouse.setMaxDPI(layout.maxDPI);
-			}
-
-			if(layout.hasSniperButton) {
-				device.log("Device has Sniper Button.");
-				RazerMouse.setHasSniperButton(layout.hasSniperButton);
-			}
-
-			if(layout.requiresApplyPacket) {
-				device.log("Device Requires Apply Packet");
-				this.setRequiresApplyPacket(layout.requiresApplyPacket);
-			}
-
 		} else {
 			device.log("No Valid Library Config found.");
 		}
 
 		device.setControllableLeds(this.getDeviceLEDNames(), this.getDeviceLEDPositions());
-		this.getDeviceLEDZones();
 
-		if (layout.hyperflux) { this.setHyperFluxProperties(); }
 	}
 	setDeviceMacroProperties() {
-		if (this.getDeviceType() === "Keyboard") {
-			this.setInputDict(razerDeviceLibrary.keyboardInputDict);
-		} else {
-			this.setInputDict(razerDeviceLibrary.mouseInputDict);
-		}
-	}
-	setHyperFluxProperties() {
-		device.log("Device has a Hyperflux Pad!");
-		this.setHyperFlux(true);
-
-		const hyperflux = razerDeviceLibrary.LEDLibrary["Hyperflux Pad"];
-
-		device.createSubdevice("Hyperflux");
-		// Parent Device + Sub device Name + Ports
-		device.setSubdeviceName("Hyperflux", `Hyperflux Mousepad`);
-		//device.setSubdeviceImage("Hyperflux", Razer_Mamba.image);
-
-		if (hyperflux.size[0] !== undefined && hyperflux.size[1] !== undefined) {
-			device.setSubdeviceSize("Hyperflux", hyperflux.size[0], hyperflux.size[1]);
-		}
-
-		device.setSubdeviceLeds("Hyperflux", hyperflux.vLedNames, hyperflux.vLedPositions);
+		this.setInputDict(razerDeviceLibrary.keyboardInputDict);
 	}
 	/* eslint-disable complexity */
 	/** Function for detection all of the features that a device supports.*/
@@ -1198,32 +1416,6 @@ export class RazerProtocol {
 
 		return -1;
 	}
-	/** Function to fetch all of a device's LED Zones.*/
-	getDeviceLEDZones() {
-		const activeZones = [];
-
-		for (let zones = 0; zones < 30; zones++) {
-			RazerMouse.setModernMouseLEDBrightness(100, 0, true);
-
-			const ledExists = RazerMouse.getModernMouseLEDBrightness(zones, true); //iirc main reason I use this is that it only applies to mice?
-
-
-			if (ledExists === 100) {
-				device.log(`LED Zone ${this.LEDIDs[zones]} Exists`, { toFile: true });
-				activeZones.push(zones);
-
-			}
-
-		}
-
-		if (activeZones.length > 0) {
-			device.log("Device uses Modern Protocol for Lighting.", { toFile: true });
-
-			return activeZones;
-		}
-
-		return -1; //Return -1 if we have no zones. I.E. device has no led zones 💀
-	}
 	/** Function to check if a device is in Hardware Mode or Software Mode. */
 	getDeviceMode(retryAttempts = 5) {
 		let errorCode = 0;
@@ -1253,6 +1445,39 @@ export class RazerProtocol {
 			device.log("Current Device Mode: " + this.DeviceModes[deviceMode]);
 
 			return deviceMode;
+		}
+
+		return -1;
+	}
+	getDeviceLayout(retryAttempts = 5){
+		let errorCode = 0;
+		let returnPacket = [];
+		let attempts = 0;
+
+		do {
+			 [returnPacket, errorCode] = this.ConfigPacketSend([0x02, 0x00, 0x86]);
+
+			 if(errorCode !== 2) {
+				device.pause(10);
+				attempts++;
+			 }
+		}
+
+		while(errorCode !== 2 && attempts < retryAttempts);
+
+		if (errorCode !== 2) {
+
+			device.log("Error fetching Device Layout. Error Code: " + this.DeviceResponses[errorCode], { toFile: true });
+
+			return -1;
+		}
+
+		if (returnPacket !== undefined) {
+			const layoutMode = returnPacket[0];
+			device.log("Current Layout: " + layoutMode);
+			this.Config.DeviceLayout = layoutMode;
+
+			return layoutMode;
 		}
 
 		return -1;
@@ -1476,9 +1701,13 @@ export class RazerProtocol {
 		if (ModernMatrix > -1) {
 			this.setSupportsModernMatrix(true);
 			this.setModernSoftwareLightingMode();
+			console.log("Modern matrix set!");
 		} else if (this.Config.MouseType === "Modern") {
 			this.setLegacyMatrixEffect(); ///MMM Edge cases are tasty.
+			console.log("Legacy matrix set!");
 		}
+
+		console.log("May there be light!");
 	}
 	/** Function to set a legacy device's effect. Why is the Mamba TE so special?*/
 	setLegacyMatrixEffect() {
@@ -1657,8 +1886,8 @@ export class RazerProtocol {
 		return -1;
 	}
 	/** Function to set a modern keyboard's led colors.*/
-	setKeyboardDeviceColor(NumberOfLEDs, RGBData, packetidx) {
-		this.StandardPacketSend([(NumberOfLEDs*3 + 5), 0x0F, 0x03, 0x00, 0x00, packetidx, 0x00, NumberOfLEDs].concat(RGBData));
+	setKeyboardDeviceColor(LEDsPerPacket, RGBData, packetidx) {
+		this.StandardPacketSend([(LEDsPerPacket * 3) + 5, 0x0F, 0x03, 0x00, 0x00, packetidx, 0x00, LEDsPerPacket - 1].concat(RGBData));
 	}
 }
 
@@ -2180,81 +2409,6 @@ class RazerMouseFunctions {
 
 		return 0;
 	}
-	/** Function to set Mouse Lighting.*/
-	setMouseLighting(RGBData, NumberOfLEDs = Razer.getNumberOfLEDs(), hyperflux = false) { //no returns on this or the led color sets. I do not care.
-		Razer.StandardPacketSend([(NumberOfLEDs * 3 + 5), 0x0F, 0x03, hyperflux ? 1 : 0, 0x00, 0x00, 0x00, NumberOfLEDs - 1].concat(RGBData));
-	}
-	/** Function to set a legacy mouse's led brightness. You cannot use zero for this one as it wants a specific zone. That being said we could scan for specific zones on a device.*/
-	getModernMouseLEDBrightness(led = 0, detection = false, retryAttempts = 5) {
-		let errorCode = 0;
-		let returnPacket = [];
-		let attempts = 0;
-
-		do {
-			 [returnPacket, errorCode] =  Razer.ConfigPacketSend([0x03, 0x0f, 0x84, 0x00, led]);
-
-			 if(errorCode !== 2) {
-				device.pause(10);
-				attempts++;
-			 }
-		}
-
-		while(errorCode !== 2 && attempts < retryAttempts);
-
-		if (errorCode !== 2) {
-
-			if(!detection) {
-				device.log("Error fetching Modern Mouse LED Brightness. Error Code: " + Razer.DeviceResponses[errorCode], { toFile: true });
-			}
-
-			if (errorCode === 1) {
-				return -2;
-			}
-
-			return -1;
-		}
-
-		if (returnPacket[10] !== undefined) {
-			const brightness = returnPacket[10] ?? 0;
-			device.log(`LED ${led} is set to ${brightness * 100 / 255}% brightness.`, { toFile: true });
-
-			return brightness * 100 / 255;
-		}
-
-		return -3;
-	}
-	/** Function to set a modern mouse's led brightness. If we use 0, it does all of the zones in the matrix.*/
-	setModernMouseLEDBrightness(brightness, led = 0, detection = false, retryAttempts = 5) {
-		let errorCode = 0;
-		let attempts = 0;
-
-		do {
-			 const returnValues = Razer.ConfigPacketSend([0x03, 0x0f, 0x04, 0x01, led, brightness * 255 / 100]);
-			 errorCode = returnValues[1];
-
-			 if(errorCode !== 2) {
-				device.pause(10);
-				attempts++;
-			 }
-		}
-
-		while(errorCode !== 2 && attempts < retryAttempts);
-
-		if (errorCode !== 2) {
-
-			if(!detection) {
-				device.log("Error setting Modern Mouse LED Brightness. Error Code: " + Razer.DeviceResponses[errorCode], { toFile: true });
-			}
-
-			if (errorCode === 1) {
-				return -2;
-			}
-
-			return -1;
-		}
-
-		return 0;
-	}
 }
 
 const RazerMouse = new RazerMouseFunctions();
@@ -2435,5 +2589,5 @@ export function Validate(endpoint) {
 }
 
 export function ImageUrl() {
-	return "https://assets.signalrgb.com/devices/brands/razer/keyboards/blackwidow-v4-pro.png";
+	return "https://assets.signalrgb.com/devices/default/keyboards/full-size-keyboard-render.png";
 }
