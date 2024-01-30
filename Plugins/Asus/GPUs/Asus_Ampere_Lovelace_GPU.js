@@ -560,7 +560,7 @@ class Asus_Ampere_Lovelace_IDs {
 		this.RTX4070TI_TUF_GAMING_OC_2			   = 0x88A4;
 		this.RTX4070TI_12GB_TUF					   = 0x88dd;
 
-		this.RTX4070TI_SUPER_16G                   = 0x896B;
+		this.RTX4070TI_SUPER_STRIX_16G			   = 0x896B;
 
 		this.RTX4080_STRIX_GAMING_3				   = 0x88A0;
 		this.RTX4080_TUF_GAMING					   = 0x88A1;
@@ -716,7 +716,7 @@ const Asus3000GPUIDs =
 	new AsusGPUIdentifier(Nvidia.RTX4070TI, AsusID.RTX4070TI_TUF_GAMING, "Asus TUF RTX 4070Ti 12GB Gaming"),
 	new AsusGPUIdentifier(Nvidia.RTX4070TI, AsusID.RTX4070TI_TUF_GAMING_2, "Asus TUF RTX 4070Ti 12GB Gaming"),
 
-	new AsusGPUIdentifier(Nvidia.RTX4070TI_S, AsusID.RTX4070TI_SUPER_16G, "ASUS ROG Strix 4070Ti Super 16GB"),
+	new AsusGPUIdentifier(Nvidia.RTX4070TI_S, AsusID.RTX4070TI_SUPER_STRIX_16G, "ASUS ROG Strix 4070Ti Super 16GB"),
 
 	new AsusGPUIdentifier(Nvidia.RTX4080, AsusID.RTX4080_TUF_GAMING, "Asus TUF RTX 4080 Gaming"),
 	new AsusGPUIdentifier(Nvidia.RTX4080, AsusID.RTX4080_TUF_GAMING_2, "Asus TUF RTX 4080 Gaming"),
