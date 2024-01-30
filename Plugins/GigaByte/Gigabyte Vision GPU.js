@@ -283,6 +283,7 @@ class NvidiaGPUDeviceIds {
 		this.RTX4060TI		 = 0x2803;
 		this.RTX4060TI_OC	 = 0x2805;
 		this.RTX4070		 = 0x2786;
+		this.RTX4070S        = 0x2783;
 		this.RTX4070TI 		 = 0x2782;
 		this.RTX4080		 = 0x2704;
 		this.RTX4090		 = 0x2684;
@@ -377,6 +378,7 @@ class GigabyteVisionDeviceIds {
 		this.RTX4070_AERO					= 0x40E6;
 		this.RTX4070_EAGLE_OC				= 0x40ED;
 		this.RTX4070_WINDFORCE_OC			= 0x40EE;
+		this.RTX4070S_AERO                  = 0x4139;
 		this.RTX4070TI_GAMING_OC            = 0x40c6;
 		this.RTX4070TI_EAGLE_12G			= 0x40D2;
 		this.RTX4070TI_EAGLE_OC_12G			= 0x40CA;
@@ -537,6 +539,9 @@ class GigabyteVisionGPuList {
 			new GigabyteVisionIdentifier(Nvidia.RTX4070,		GigabyteVisionIds.RTX4070_AERO,					0x71, "GIGABYTE 4070 Aero"),
 			new GigabyteVisionIdentifier(Nvidia.RTX4070,		GigabyteVisionIds.RTX4070_EAGLE_OC,				0x71, "GIGABYTE 4070 Eagle OC"),
 			new GigabyteVisionIdentifier(Nvidia.RTX4070, 		GigabyteVisionIds.RTX4070_WINDFORCE_OC,			0x71, "GIGABYTE 4070 Windforce OC"),
+
+			new GigabyteVisionIdentifier(Nvidia.RTX4070S,		GigabyteVisionIds.RTX4070S_AERO,				0x71, "GIGABYTE 4070 Super Aero"),
+
 
 			new GigabyteVisionIdentifier(Nvidia.RTX4070TI,		GigabyteVisionIds.RTX4070TI_EAGLE,				0x71, "GIGABYTE 4070Ti Eagle"),
 			new GigabyteVisionIdentifier(Nvidia.RTX4070TI,      GigabyteVisionIds.RTX4070TI_EAGLE_12G,			0x71, "GIGABYTE 4070TI Eagle"),
