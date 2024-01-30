@@ -45,10 +45,6 @@ export function LedPositions() {
 export function Initialize() {
 	SetMode();
 	setLEDs();
-
-	if(!highSpeedMode) {
-		SendColors(false, true);
-	}
 }
 
 export function Render() {
@@ -75,13 +71,14 @@ export function onhighSpeedModeChanged() {
 	setLEDs();
 
 	if(!highSpeedMode) {
-		SendColors(false, true);
+		SetMode();
 	}
 }
 
 export function Scan(bus) {
 
-	const PossibleAddresses = [0x60, 0x61, 0x62, 0x63];
+	const PossibleAddresses = [0x60, 0x61, 0x62, 0x63, 0x58, 0x59, 0x5a, 0x5b];
+
 	const FoundAddresses = [];
 
   	for (const addr of PossibleAddresses) {
@@ -91,11 +88,14 @@ export function Scan(bus) {
 	  }
 
 	  const validAddress = bus.WriteQuick(addr);
+	  bus.pause(30);
 
 	  // Skip any address that fails a quick write
 	  if (validAddress !== 0){
 		  continue;
 	  }
+
+	  bus.log(`Address ${addr} passed quick write test with result ${validAddress}`, {toFile : true});
 
 	  if(CheckForHyperFuryRam(bus, addr)){
 			bus.log("Kingston Hyper Fury Ram Found At Address: " + addr, {toFile: true});
@@ -118,50 +118,19 @@ function setLEDs() {
 	device.setControllableLeds(vLedNames, vLedPositions);
 }
 
-const addressDict = {
-	0x60 : 0x50,
-	0x61 : 0x51,
-	0x62 : 0x52,
-	0x63 : 0x53
-};
-
-function CheckForHyperFuryRam(bus, addr) {
-	if(!addressDict.hasOwnProperty(addr)){
-		return false;
-	}
-
-	const SubAddress = addressDict[addr];
-
-	const iRet1 = bus.ReadByte(SubAddress, 0x00);
-	bus.log(`Address [${SubAddress}], Reg 00: ${iRet1}`, {toFile: true});
-
-	if(iRet1 !== 81){
-		bus.log(`Address [${SubAddress}], Expected register 0 to be 81! Address Failed`, {toFile: true});
-
-		return false;
-	}
-
-	const iRet2 = bus.ReadByte(SubAddress, 0x80);
-	bus.log(`Address [${SubAddress}], Reg 80: ${iRet2}`, {toFile: true});
-
-	if(iRet1 <= 0){
-		bus.log(`Address [${SubAddress}], Expected register 80 to be > 0! Address Failed`, {toFile: true});
-
-		return false;
-	}
+function CheckForHyperFuryRam(bus, addr) { //Note: I removed the checks for spd info. These should not be necessary considering the fact that we check both if the stick returns 'FURY' AND if it is one of the Fury models.
 
 	let attempts = 0;
 	let deviceCheck = false;
 	bus.WriteByte(addr, 0x08, 0x53);
 
-	while(attempts < 5) {
+	while(attempts < 5) { //This should always hit on the first attempt, but conflicting apps can break stuff.
 		const nameReturnBytes = [];
 
 		for(let bytesToRead = 0; bytesToRead < 4; bytesToRead++) {
 			bus.pause(30);
 
 			const returnByte = BinaryUtils.WriteInt16LittleEndian(bus.ReadWord(addr, bytesToRead+1));
-			//bus.log(`Return Byte ${bytesToRead} returned ${returnByte[1]}`, {toFile : true});
 			nameReturnBytes.push(returnByte[1]);
 		}
 
@@ -174,10 +143,8 @@ function CheckForHyperFuryRam(bus, addr) {
 		deviceCheck = deviceName.includes("FURY");
 		bus.pause(30);
 
-		const modelByte = BinaryUtils.WriteInt16LittleEndian(bus.ReadWord(addr, 0x06))[1]; //byte 0 is 0x5A header.
+		const modelByte = [0x10, 0x11, 0x23].includes(BinaryUtils.WriteInt16LittleEndian(bus.ReadWord(addr, 0x06))[1]); //Beast, Renegade, DDR4
 		bus.log(`Model Byte: ${modelByte}`, {toFile : true});
-
-		//bus.log(`Return Contains FURY String: ${deviceCheck}`, {toFile : true});
 
 		if(deviceCheck){
 			bus.log(`Device hit on attempt number: ${attempts}`, {toFile : true});
@@ -193,18 +160,18 @@ function CheckForHyperFuryRam(bus, addr) {
 }
 
 function SetMode(){
-	bus.WriteByte(0x08, 0x53); //start Command
-	bus.WriteByte(0x0b, 0x00); //LED index
-	bus.WriteByte(0x09, 0x10); //Mode set to direct
+	CheckedWrite(0x08, 0x53); //start Command
+	CheckedWrite(0x0b, 0x00); //LED index
+	CheckedWrite(0x09, 0x10); //Mode set to direct
 
-	bus.WriteByte(0x0C, 0x01); //Effect Direction. Why does this even need set when we're in direct mode??!?!?!
-	bus.WriteByte(0x20, 0x50); //Brightness, why does this get set to 0x50/80?
+	CheckedWrite(0x0C, 0x01); //Effect Direction. Why does this even need set when we're in direct mode??!?!?!
+	CheckedWrite(0x20, 0x50); //Brightness, why does this get set to 0x50/80?
 
-	bus.WriteByte(0x08, 0x44); //End Command
+	CheckedWrite(0x08, 0x44); //End Command
 }
 
 
-function SendColors(overrideColor, firstRun = false){
+function SendColors(overrideColor){
 	const RGBData = [];
 
 	//Fetch Colors
@@ -222,7 +189,7 @@ function SendColors(overrideColor, firstRun = false){
 		RGBData.push(...Color);
  	}
 
-	WriteRGBData(RGBData, firstRun);
+	WriteRGBData(RGBData);
 }
 
 
@@ -275,14 +242,9 @@ function CheckedWrite(register, byte){
 
 const OldRGBData = [];
 
-function WriteRGBData(RGBData, firstRun){
+function WriteRGBData(RGBData){
 	bus.WriteByte(0x08, 0x53);
 	device.pause(3);
-
-	if(firstRun) {
-		bus.WriteByte(0x0b, 0x00);
-		bus.WriteByte(0x09, 0x10);
-	}
 
 	for(let i = 0; i < RGBData.length; i++){
 		if(RGBData[i] === OldRGBData[i]){
