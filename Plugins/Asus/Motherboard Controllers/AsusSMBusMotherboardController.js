@@ -32,7 +32,7 @@ export function Scan(bus) {
 	  // Skip any non AMD / Nuvoton Busses
 
 	for(const addr of addys) {
-		if(!bus.IsAMDBus() && !bus.IsNuvotonBus()){return;}
+		if(!bus.IsAMDBus() && !bus.IsNuvotonBus()){return [];}
 
 		const result = bus.WriteQuick(addr);
 
@@ -56,7 +56,7 @@ const vLedNames = [];
 const vLedPositions = [];
 
 /** @type {Object<String, AuraMotherboardLed>} */
-const LedChannels = {};
+let LedChannels = {};
 
 let configTable = [];
 let deviceLEDCount = 0;
@@ -73,7 +73,6 @@ export function Initialize() {
 	AsusMotherboard.getDeviceLEDs();
 	AsusMotherboard.createSubdevices();
 	AsusMotherboard.setDirectMode(0x01);
-	device.log(LedChannels);
 }
 
 export function Render() {
@@ -229,6 +228,7 @@ class AsusSMBus {
 
 		for (let iIdx = 0; iIdx < 16; iIdx++) {
 			const iRet = this.Interface.ReadRegister(address, this.registers.DeviceName + iIdx);
+			this.Bus().pause(30);
 
 			if(iRet > 0) {
 				Characters.push(iRet);
@@ -257,6 +257,7 @@ class AsusSMBus {
 
 		for (let iIdx = 0; iIdx < 21; iIdx++) {
 			const iRet = this.Interface.ReadRegister(address, this.registers.ManufactureName + iIdx);
+			this.Bus().pause(30);
 
 			if(iRet > 0) {
 				Characters.push(iRet);
@@ -357,8 +358,6 @@ class AsusAuraSMBusController {
         	0xA0 : "IOShield",
         	0xA2 : "M.2 Cover",
         	0xA3 : "M.2 Cover Zone 2"
-
-
         };
 	}
 
@@ -390,7 +389,7 @@ class AsusAuraSMBusController {
 				vChannelLEDPositions.push([i, 0 ]);
 			}
 
-			device.log(`Channel ${ChannelName} has ${LedChannels[ChannelName].length} leds`);
+			device.log(`Channel ${ChannelName} has ${LedChannels[ChannelName].length} LEDs.`);
 
 			device.createSubdevice(ChannelName);
 			device.setSubdeviceName(ChannelName, `${ParentDeviceName} - ${ChannelName}`);
@@ -403,6 +402,7 @@ class AsusAuraSMBusController {
 	getDeviceLEDs() {
 		const ProtocolVersionOffset = this.ledConfigs[deviceProtocolVersion];
 		let RGBHeaderCount = 0;
+		LedChannels = {}; //No more infinite led glitch.
 
 		for(let i = 0; i < deviceLEDCount; i++) {
 			// Get Zone name of the current LED in the config table
@@ -425,9 +425,8 @@ class AsusAuraSMBusController {
 			if(!LedChannels.hasOwnProperty(ChannelName)) {
 				LedChannels[ChannelName] = [];
 			}
-			const ChannelLength = LedChannels[ChannelName].length;
 
-			device.log(`Channel Length ${ChannelName}:${ChannelLength}`);
+			const ChannelLength = LedChannels[ChannelName].length;
 
 			LedChannels[ChannelName].push(new AuraMotherboardLed(i, ChannelLength, [ChannelLength, 0]));
 		}
@@ -439,8 +438,8 @@ class AsusAuraSMBusController {
 		configTable = this.getDeviceConfigTable();
 		deviceLEDCount = configTable[2];
 
-		for(let attempts = 0; attempts < 20; attempts++) {
-			if(deviceName in this.deviceNameDict && deviceLEDCount < 15) {
+		for(let attempts = 0; attempts < 5; attempts++) {
+			if(deviceName in this.deviceNameDict) {
 				device.log(`Init hit on attempt: ${attempts}.`);
 				break;
 			} else {
@@ -466,6 +465,7 @@ class AsusAuraSMBusController {
 
 		for(let iIdx = 0; iIdx < 16; iIdx++) {
 			const character = this.auraReadRegister(this.auraCommands.deviceName + iIdx);
+			device.pause(30);
 
 			if(character > 0) {
 				deviceName.push(character);
@@ -480,6 +480,7 @@ class AsusAuraSMBusController {
 
 		for(let iIdx = 0; iIdx < 64; iIdx++) {
 			configTable[iIdx] = this.auraReadRegister(this.auraCommands.configTable + iIdx);
+			device.pause(30);
 		}
 
 		device.log("Config Table", {toFile: true});
