@@ -45,10 +45,6 @@ export function LedPositions() {
 export function Initialize() {
 	SetMode();
 	setLEDs();
-
-	if(!highSpeedMode) {
-		SendColors(false, true);
-	}
 }
 
 export function Render() {
@@ -75,7 +71,7 @@ export function onhighSpeedModeChanged() {
 	setLEDs();
 
 	if(!highSpeedMode) {
-		SendColors(false, true);
+		SetMode();
 	}
 }
 
@@ -164,18 +160,18 @@ function CheckForHyperFuryRam(bus, addr) { //Note: I removed the checks for spd 
 }
 
 function SetMode(){
-	bus.WriteByte(0x08, 0x53); //start Command
-	bus.WriteByte(0x0b, 0x00); //LED index
-	bus.WriteByte(0x09, 0x10); //Mode set to direct
+	CheckedWrite(0x08, 0x53); //start Command
+	CheckedWrite(0x0b, 0x00); //LED index
+	CheckedWrite(0x09, 0x10); //Mode set to direct
 
-	bus.WriteByte(0x0C, 0x01); //Effect Direction. Why does this even need set when we're in direct mode??!?!?!
-	bus.WriteByte(0x20, 0x50); //Brightness, why does this get set to 0x50/80?
+	CheckedWrite(0x0C, 0x01); //Effect Direction. Why does this even need set when we're in direct mode??!?!?!
+	CheckedWrite(0x20, 0x50); //Brightness, why does this get set to 0x50/80?
 
-	bus.WriteByte(0x08, 0x44); //End Command
+	CheckedWrite(0x08, 0x44); //End Command
 }
 
 
-function SendColors(overrideColor, firstRun = false){
+function SendColors(overrideColor){
 	const RGBData = [];
 
 	//Fetch Colors
@@ -193,7 +189,7 @@ function SendColors(overrideColor, firstRun = false){
 		RGBData.push(...Color);
  	}
 
-	WriteRGBData(RGBData, firstRun);
+	WriteRGBData(RGBData);
 }
 
 
@@ -246,14 +242,9 @@ function CheckedWrite(register, byte){
 
 const OldRGBData = [];
 
-function WriteRGBData(RGBData, firstRun){
+function WriteRGBData(RGBData){
 	bus.WriteByte(0x08, 0x53);
 	device.pause(3);
-
-	if(firstRun) {
-		bus.WriteByte(0x0b, 0x00);
-		bus.WriteByte(0x09, 0x10);
-	}
 
 	for(let i = 0; i < RGBData.length; i++){
 		if(RGBData[i] === OldRGBData[i]){
