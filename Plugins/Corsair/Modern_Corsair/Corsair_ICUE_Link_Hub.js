@@ -152,6 +152,8 @@ function fetchTempSensors(firstRun = false) {
 			validSensorArray.push(tempSensorArray[sensors]);
 			validSensorPositions.push(sensors);
 
+			device.log(`Sensor found at Position ${sensors}!`);
+
 			if(firstRun) {
 				ConnectedProbes.push(sensors);
 			}
@@ -200,18 +202,16 @@ function fetchLinkDevices() {
 	device.log(`Child Device Packet ${childDevicePacket}`, {toFile : true});
 
 	for(let bytes = 8; bytes < childDevicePacket.length; bytes++) {
-		if(childDevicePacket[bytes] === 0x00 && childDevicePacket[bytes + 1] === 0x00 && childDevicePacket[bytes + 2] !== 0x00) {
-			if(childDevicePacket[bytes + 4] === 0x00 && childDevicePacket[bytes + 5] === 0x00) {
-				device.log(`Possible Child Device Found with Device Type ${childDevicePacket[bytes + 2]}`, {toFile : true});
+		if(childDevicePacket[bytes] === 0x00 && childDevicePacket[bytes + 1] === 0x00 && childDevicePacket[bytes + 2] !== 0x00 && childDevicePacket[bytes + 4] === 0x00 && childDevicePacket[bytes + 5] === 0x00) {
+			device.log(`Possible Child Device Found with Device Type ${childDevicePacket[bytes + 2]}`, {toFile : true});
 
-				const childDeviceID = childDevicePacket.slice(bytes, bytes + 34);
-				childDeviceArray.push({
-					deviceType : childDevicePacket[bytes + 2],
-					deviceID: childDeviceID,
-					coolerType: childDevicePacket[bytes + 3]
-				});
-				bytes = bytes + 33;
-			}
+			const childDeviceID = childDevicePacket.slice(bytes, bytes + 34);
+			childDeviceArray.push({
+				deviceType : childDevicePacket[bytes + 2],
+				deviceID: childDeviceID,
+				coolerType: childDevicePacket[bytes + 3]
+			});
+			bytes = bytes + 31; //Something something, I had to make this change because my LCD was breaking things.
 		}
 	}
 
@@ -256,30 +256,46 @@ function convertChildIdsToNames(childDeviceArray) {
 function addChildDevice(childDevice, uniqueId, deviceNumber) {
 	let deviceConfig;
 
-	if(childDevice.deviceType === 7) {//if it starts with 02 and ends with 6103 then it's a cooler.
-		device.log(`Child Cooler ID: ${childDevice.IDString}`, {toFile : true});
-
-		if(childDevice.IDString.includes("02") && childDevice.IDString.includes("03")) {
-			device.log(`Adding Child Cooler ${childDevice.IDString}`, {toFile : true});
-			deviceConfig = CorsairLibrary.GetDeviceByCorsairLinkCoolerId(childDevice.coolerType);
-		}
-	} else if(childDevice.deviceType === 6) {//4EOC6479CD6AD24319 is the only id I have thus far.
-		device.log(`Child LCD Cooler ID: ${childDevice.IDString}`, {toFile : true});
-
-		if(childDevice.IDString.includes("4EOC")) {
-			device.log(`Adding Child LCD Cooler ${childDevice.IDString}`, {toFile : true});
-			deviceConfig = CorsairLibrary.GetDeviceByCorsairLinkId("LCD");
-		}
-	} else if(childDevice.deviceType === 1) { //If it starts with 0100 and then has 2035 in it, presume QX fan.
+	switch (childDevice.deviceType) {
+	case 1:
 		if(childDevice.IDString.includes("0100") && childDevice.IDString.includes("2035")) {
 			device.log(`Adding Child QX Fan ${childDevice.IDString}`, {toFile : true});
 			deviceConfig = CorsairLibrary.GetDeviceByCorsairLinkId("01000EAA520353FF2A"); //I find it fitting to use my model as the master
 		}
+
+		break;
+
+	case 6:
+		if(childDevice.IDString.includes("4E0C")) {
+			device.log(`Adding Child LCD Cooler ${childDevice.IDString}`, {toFile : true});
+			deviceConfig = CorsairLibrary.GetDeviceByCorsairLinkId("LCD");
+		}
+
+		break;
+
+	case 7:
+		if(childDevice.IDString.includes("02") && childDevice.IDString.includes("03")) {
+			device.log(`Adding Child Cooler ${childDevice.IDString}`, {toFile : true});
+			deviceConfig = CorsairLibrary.GetDeviceByCorsairLinkCoolerId(childDevice.coolerType);
+		}
+
+		break;
+
+	default:
+		device.log(`Device is of a type we do not yet have mapped. Contact us to help get it supported :)`);
+		device.log(`Device ID: ${childDevice.IDString}`, {toFile : true});
+		device.log(`Unique ID: ${uniqueId}`, {toFile : true});
+		device.log(`Device Type: ${childDevice.deviceType}`, {toFile : true});
+		break;
 	}
 
+	const ProbeID = ConnectedProbes[ConnectedProbes.findIndex((x) => x === deviceNumber + 1)]; //Explanation of this ridiculous logic: I need to know if there's actually a probe with this deviceID. findIndex finds this and then gives me the index.
+	//After finding the index, I need to assing the value of that index to the Probe and RPM ID's
+	const RPMID = ConnectedFans[ConnectedFans.findIndex((x) => x === deviceNumber + 1)];
+
 	deviceConfig.childDeviceId = uniqueId;
-	deviceConfig.sensorId = ConnectedProbes[deviceNumber];
-	deviceConfig.rpmId = ConnectedFans[deviceNumber];
+	deviceConfig.sensorId = ProbeID;
+	deviceConfig.rpmId = RPMID;
 	deviceConfig.deviceType = childDevice.deviceType;
 
 	const connectedDevice = new CorsairBragiDevice(deviceConfig);
@@ -452,6 +468,7 @@ class CorsairLibrary{
 			"1" : "H115I Link", //This one is assumed btw. Considering mine was 0, and then we had 2 and 3.
 			"2" : "H150I Link",
 			"3" : "H170I Link",
+			"4" : "H100I Link", //why is this like this x2
 			"5" : "H150I Link" //mmmm, why is this like this
 		});
 	}
@@ -550,17 +567,18 @@ class CorsairLibrary{
 			"LCD Cooler" : {
 				name : "ICUE Link Cooler With LCD Cap",
 				ledPositions: [
-					[6, 0], [5, 1], [7, 1], [4, 2], [8, 2], [3, 3], [9, 3], [2, 4], [10, 4], [1, 5], [11, 5], [0, 6],
-					[12, 6], [1, 7], [11, 7], [2, 8], [10, 8], [4, 10], [8, 10], [3, 9], [9, 9], [5, 11], [7, 11], [6, 12]
+					[6, 16], [4, 15], [2, 14], [1, 12], [0, 10], [0, 8], [0, 6], [1, 4], [2, 2], [4, 1],
+					[6, 0], [8, 0], [10, 0], [12, 1], [14, 2], [15, 4], [16, 6], [16, 8], [16, 10], [15, 12], [14, 14],
+					[12, 15], [10, 16], [8, 16]
 				],
 				ledMap: [
-					6, 5, 7, 4, 8, 3, 9, 2, 10, 1, 11, 0, 12, 23, 13, 22, 14, 21, 15, 20, 16, 19, 17, 18
+					0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23
 				],
 				LedNames: [
 					"Led 1", "Led 2", "Led 3", "Led 4", "Led 5", "Led 6", "Led 7", "Led 8", "Led 9", "Led 10", "Led 11", "Led 12", "Led 13", "Led 14", "Led 15", "Led 16",
 					"Led 17", "Led 18", "Led 19", "Led 20", "Led 21", "Led 22", "Led 23", "Led 24"
 				],
-				size: [13, 13]
+				size: [17, 17]
 			}
 		});
 	}
@@ -1410,7 +1428,6 @@ export class ModernCorsairProtocol{
 		device.write(packet, this.GetWriteLength());
 
 		const returnPacket = device.read(packet, this.GetReadLength());
-		device.log(returnPacket);
 
 		const ErrorCode = this.CheckError(returnPacket, `SetProperty`);
 
@@ -1904,8 +1921,6 @@ export class ModernCorsairProtocol{
 
 	/** */
 	FetchTemperatures(deviceID = 0) {
-		//device.log(`CorsairProtocol: Reading Temp Data.`);
-
 		const data = this.ReadFromEndpoint("Background", this.endpoints.TemperatureData, deviceID);
 
 		if(data.length === 0){
@@ -1922,7 +1937,8 @@ export class ModernCorsairProtocol{
 
 		const ProbeTemps = [];
 		const ProbeCount = data[7] ?? 0;
-		//this.log(`Device Reported [${ProbeCount}] Temperature Probes`); //Link system reports 15. We iterate through them skipping any with a value of 0 as they don't exist?
+
+		this.log(`Device Reported [${ProbeCount}] Temperature Probes`); //Link system reports 15. We iterate through them skipping any with a value of 0 as they don't exist?
 
 		const TempValues = data.slice(8, 8 + 3 * ProbeCount);
 
