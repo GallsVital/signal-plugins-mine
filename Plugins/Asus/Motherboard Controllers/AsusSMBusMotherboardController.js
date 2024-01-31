@@ -64,8 +64,6 @@ let deviceName = "";
 let deviceProtocolVersion = "";
 let ParentDeviceName = "";
 
-device.addProperty({"property":"dpi51", "label":"DPI", "step":"50", "type":"number", "min":"200", "max":"18000", "default":"800"});
-
 export function SubdeviceController(){ return true; }
 
 export function Initialize() {
