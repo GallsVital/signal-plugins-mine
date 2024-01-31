@@ -64,6 +64,8 @@ let deviceName = "";
 let deviceProtocolVersion = "";
 let ParentDeviceName = "";
 
+device.addProperty({"property":"dpi51", "label":"DPI", "step":"50", "type":"number", "min":"200", "max":"18000", "default":"800"});
+
 export function SubdeviceController(){ return true; }
 
 export function Initialize() {
@@ -228,7 +230,7 @@ class AsusSMBus {
 
 		for (let iIdx = 0; iIdx < 16; iIdx++) {
 			const iRet = this.Interface.ReadRegister(address, this.registers.DeviceName + iIdx);
-			this.Bus().pause(30);
+			this.Bus().pause(3);
 
 			if(iRet > 0) {
 				Characters.push(iRet);
@@ -257,7 +259,7 @@ class AsusSMBus {
 
 		for (let iIdx = 0; iIdx < 21; iIdx++) {
 			const iRet = this.Interface.ReadRegister(address, this.registers.ManufactureName + iIdx);
-			this.Bus().pause(30);
+			this.Bus().pause(3);
 
 			if(iRet > 0) {
 				Characters.push(iRet);
@@ -465,7 +467,7 @@ class AsusAuraSMBusController {
 
 		for(let iIdx = 0; iIdx < 16; iIdx++) {
 			const character = this.auraReadRegister(this.auraCommands.deviceName + iIdx);
-			device.pause(30);
+			device.pause(3);
 
 			if(character > 0) {
 				deviceName.push(character);
@@ -480,7 +482,7 @@ class AsusAuraSMBusController {
 
 		for(let iIdx = 0; iIdx < 64; iIdx++) {
 			configTable[iIdx] = this.auraReadRegister(this.auraCommands.configTable + iIdx);
-			device.pause(30);
+			device.pause(3);
 		}
 
 		device.log("Config Table", {toFile: true});
